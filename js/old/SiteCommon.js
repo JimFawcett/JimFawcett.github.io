@@ -2,7 +2,7 @@
  * TopNav.js - Top level navigation code for website
  * ver 1.0
  * This javascript file is a single source of navigation code on all
- * top level pages in www.lcs.syr.edu/faculty/fawcett
+ * top level pages in www.lcs3.syr.edu/faculty/fawcett
  *
  * Jim Fawcett, Syracuse University, 07 Aug 2011
  *************************************************************************/
@@ -51,15 +51,15 @@ $(document).ready(function () {
         </li>\
         <li><a href='#'>Directories</a>\
           <ul class='active'>\
-            <li><a href='http://www.lcs.syr.edu/faculty/fawcett/handouts'>Handouts</a></li>\
-            <li><a href='http://www.lcs.syr.edu/faculty/fawcett/handouts/CoreTechnologies'>CoreTech</a></li>\
-            <li><a href='http://www.lcs.syr.edu/faculty/fawcett/handouts/CSE681'>CSE681-SMA</a></li>\
-            <li><a href='http://www.lcs.syr.edu/faculty/fawcett/handouts/CSE686'>CSE686-IP</a></li>\
-            <li><a href='http://www.lcs.syr.edu/faculty/fawcett/handouts/CSE687'>CSE687-OOD</a></li>\
-            <li><a href='http://www.lcs.syr.edu/faculty/fawcett/handouts/CSE775'>CSE775-DO</a></li>\
-            <li><a href='http://www.lcs.syr.edu/faculty/fawcett/handouts/CSE776'>CSE776-DP</a></li>\
-            <li><a href='http://www.lcs.syr.edu/faculty/fawcett/handouts/CSE784'>CSE784-SS</a></li>\
-            <li><a href='http://www.lcs.syr.edu/faculty/fawcett/handouts/SummerProjects'>Summer Proj</a></li>\
+            <li><a href='http://www.lcs3.syr.edu/faculty/fawcett/handouts'>Handouts</a></li>\
+            <li><a href='http://www.lcs3.syr.edu/faculty/fawcett/handouts/CoreTechnologies'>CoreTech</a></li>\
+            <li><a href='http://www.lcs3.syr.edu/faculty/fawcett/handouts/CSE681'>CSE681-SMA</a></li>\
+            <li><a href='http://www.lcs3.syr.edu/faculty/fawcett/handouts/CSE686'>CSE686-IP</a></li>\
+            <li><a href='http://www.lcs3.syr.edu/faculty/fawcett/handouts/CSE687'>CSE687-OOD</a></li>\
+            <li><a href='http://www.lcs3.syr.edu/faculty/fawcett/handouts/CSE775'>CSE775-DO</a></li>\
+            <li><a href='http://www.lcs3.syr.edu/faculty/fawcett/handouts/CSE776'>CSE776-DP</a></li>\
+            <li><a href='http://www.lcs3.syr.edu/faculty/fawcett/handouts/CSE784'>CSE784-SS</a></li>\
+            <li><a href='http://www.lcs3.syr.edu/faculty/fawcett/handouts/SummerProjects'>Summer Proj</a></li>\
             <li><a href='#'></a></li>\
           </ul>\
         </li>\
@@ -67,15 +67,19 @@ $(document).ready(function () {
         <li><a href='#'>Research</a>\
           <ul class='active'>\
             <li><a href='Research.htm'>Research</a>\
-            <li><a href='../Research/MuratsResearch/MuratsDefense/StructuralModelsForLargeSoftwareSystems.htm'>M.Gungor</a>\
+            <li><a href='ResearchStatement.htm'>Resrch Stmt</a>\
+            <li><a href='ResearchCode.htm'>Resrch Code</a>\
+            <li><a href='SWMatrixCrossPlatformDev.htm'>V.Appadurai</a>\
             <li><a href='SoftwareMatrix.htm'>R.Ghosh</a>\
+            <li><a href='VoiceActivatedRecording.htm'>J.Goddard</a>\
+            <li><a href='../Research/MuratsResearch/MuratsDefense/StructuralModelsForLargeSoftwareSystems.htm'>M.Gungor</a>\
+            <li><a href='../Research/kaya/MehmetKaya.htm'>M.Kaya</a>\
             <li><a href='AspectOrientedProgramming.htm'>R.Krishnan-Chittur</a>\
             <li><a href='SelfHealingSoftwareMatrix.htm'>A.Krishna</a>\
-            <li><a href='SWMatrixCrossPlatformDev.htm'>V.Appadurai</a>\
             <li><a href='SWMatrixModelDrivenDev.htm'>T.Patel</a>\
-            <li><a href='SoftwareRestructuring.htm'>S.Singh</a>\
             <li><a href='ComputingWithGPUs.htm'>P.Pratt-Szeliga</a>\
-            <li><a href='VoiceActivatedRecording.htm'>J.Goddard</a>\
+            <li><a href='SoftwareRestructuring.htm'>S.Singh</a>\
+            <li><a href='EnhancedDebuggingThruVirtualization.htm'>R.Wilson</a>\
           </ul>\
         </li>\
         <li><a href='#'>Us</a>\
@@ -84,6 +88,7 @@ $(document).ready(function () {
             <li><a href='studentPictures.htm'>Student Pics</a></li>\
             <li><a href='StudentCultures.htm'>Student Cult</a></li>\
             <li><a href='Graduates.htm'>Graduates</a></li>\
+            <li><a href='Interviews.htm'>Interviews</a></li>\
             <li><a href='#'></a></li>\
           </ul>\
         </li>\
@@ -105,6 +110,8 @@ $(document).ready(function () {
             <li><a href='#'></a></li>\
           </ul>\
         </li>\
+        <li><a href='Projects.htm'>Projects</a></li>\
+        <li><a href='Blog.htm'>Blog</a></li>\
       </ul>\
     </div>\
     <hr class='menuend' />"

@@ -16,58 +16,38 @@ function initializeMenu() {
   topMenu[0].innerHTML = "<div class='navbar'>\
     <a href='index.html' class='menuItem'>Home</a>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Repositories &#9662;</button>\
+      <button class='dropbutton'>Utilities &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='Repositories.html'>Repo Summaries</a>\
-        <a href='Utilities.html'>Utilities</a>\
-        <a href='Tools.html'>Tools</a>\
-        <a href='Components.html'>Components</a>\
-        <a href='Projects.html'>Projects</a>\
-        <a href='Demos.html'>Demos</a>\
+        <a href='cppUtilities.html'>CppUtilities</a>\
+        <a class='disable' href='Logger.html'>Logger</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Design Notes &#9662;</button>\
+      <button class='dropbutton'>Tools &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='../Documentation/Experiment.htm'>Repository Index</a>\
-        <a href='../Documentation/Experiment.htm'>Blog Index</a>\
-        <a href='../Documentation/Experiment.htm'>Design Notes</a>\
+        <a href='TextFinder.html'>TextFinder</a>\
+        <a href='Duplicates.html'>Duplicates</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Blogs &#9662;</button>\
+      <button class='dropbutton'>Components &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='../webpages/Blog.htm'>First&nbsp;Things</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
-        <a href='../webpages/BlogDesign.htm'>SW&nbsp;Design</a>\
-        <a href='../webpages/BlogPrinciples.htm'>Design&nbsp;Principles</a>\
-        <a href='../webpages/BlogOOD.htm'>OO&nbsp;Design</a>\
-        <a href='../webpages/BlogObjectModels.htm'>Object&nbsp;Models</a>\
-        <a href='../webpages/BlogGlobals.htm'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data&nbsp;&nbsp;</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Engineering&nbsp;SW&nbsp;---</div>\
-        <a href='../webpages/BlogOCD.htm'>Concept&nbsp;Document</a>\
-        <a href='../webpages/BlogTesting.htm'>SW&nbsp;Testing</a>\
-        <a href='../webpages/SummerReading.htm'>Summer&nbsp;Reading</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Software&nbsp;Sys&nbsp;------</div>\
-        <a href='../webpages/BlogStructure.htm'>SW&nbsp;Structure</a>\
-        <a href='../webpages/BlogMessagePassingComm.htm'>Msg-Passing&nbsp;Comm</a>\
-        <a href='../webpages/BlogActiveObjects.htm'>Active&nbsp;Objects</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Reusable&nbsp;Pkgs&nbsp;----</div>\
-        <a href='../webpages/BlogNoSql.htm'>noSQL&nbsp;Database</a>\
-        <a href='../webpages/BlogParser.htm'>Parsing</a>\
-        <a href='../webpages/BlogCodeAnalyzer.htm'>Code&nbsp;Analyzer</a>\
-        <a href='../webpages/BlogMTree.htm'>M-ary&nbsp;Trees</a>\
-        <a href='../webpages/BlogGraph.htm'>Directed&nbsp;Graphs</a>\
-        <a href='../webpages/BlogFileSystem.htm'>C++&nbsp;FileSystem</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
+        <a href='BlockingQueue.html'>BlockingQueue</a>\
+        <a href='FileManager.html'>File Manager</a>\
+        <a href='FileSystem.html'>File System</a>\
+        <a href='ThreadPool.html'>Thread Pool</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Resources &#9662;</button>\
+      <button class='dropbutton'>Projects &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='../webpages/Help/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
-        <a href='../Webpages/SummerReading.htm'>Reading</a>\
-        <a href='../Webpages/SummerProjects.htm'>Projects</a>\
+        <a href='MsgPassingComm.html'>MsgPassingComm</a>\
+      </div>\
+    </div>\
+    <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Demos &#9662;</button>\
+      <div class='dropdown-content'>\
+        <a href='IOStreams.html'>IO Streams</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
