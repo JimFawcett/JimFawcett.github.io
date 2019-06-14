@@ -18,7 +18,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Utilities &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='cppUtilities.html'>CppUtilities</a>\
+        <a href='CppUtilities.html'>CppUtilities</a>\
         <a class='disable' href='Logger.html'>Logger</a>\
       </div>\
     </div>\
