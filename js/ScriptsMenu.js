@@ -14,7 +14,7 @@ function initializeMenu() {
 
   var topMenu = document.getElementsByTagName("nav");
   topMenu[0].innerHTML = "<div class='navbar'>\
-    <a href='index.html' class='menuItem'>Home</a>\
+    <a href='Index.html' class='menuItem'>Home</a>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Repositories &#9662;</button>\
       <div class='dropdown-content'>\
