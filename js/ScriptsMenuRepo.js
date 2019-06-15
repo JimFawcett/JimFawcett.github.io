@@ -14,7 +14,7 @@ function initializeMenu() {
 
   var topMenu = document.getElementsByTagName("nav");
   topMenu[0].innerHTML = "<div class='navbar'>\
-    <a href='Index.html' class='menuItem'>Home</a>\
+    <a href='index.html' class='menuItem'>Home</a>\
     <a href='Repositories.html' class='menuItem'>Repositories</a>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Utilities &#9662;</button>\
@@ -58,7 +58,7 @@ function initializeMenu() {
         <a href='Help.html'>Help</a>\
         <a href='#' onclick='toggleNavKeys()'>Nav Keys</a>\
         <a href='SiteDesign.html'>Site Design</a>\
-        <a href='Index.html'>Site Home</a>\
+        <a href='index.html'>Site Home</a>\
         <a href='Repositories.html'>Repositories</a>\
         <a href='SiteMap.html'>Site Map</a>\
       </div>\
