@@ -28,6 +28,7 @@ function initializeMenu() {
       <div class='dropdown-content'>\
         <a href='TextFinder.html'>TextFinder</a>\
         <a href='Duplicates.html'>Duplicates</a>\
+        <a href='CodeAnalyzer.html'>Code Analyzer</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
