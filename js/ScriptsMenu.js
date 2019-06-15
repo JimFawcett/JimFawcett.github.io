@@ -77,7 +77,7 @@ function initializeMenu() {
       <div class='dropdown-content'>\
         <a href='About.html'>Jim Fawcett</a>\
         <a href='Help.html'>Help</a>\
-        <a href='#' onclick='toggleNavKeys()'>Nav Keys</a>\
+        <a href='#' onclick='toggleNavKeys()'>Toggle Nav Keys</a>\
         <a href='SiteDesign.html'>Site Design</a>\
         <a href='index.html'>Site Home</a>\
         <a href='Repositories.html'>Repositories</a>\
