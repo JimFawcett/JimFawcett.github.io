@@ -55,7 +55,7 @@ function initializeMenu() {
         <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Reusable&nbsp;Pkgs&nbsp;----</div>\
         <a href='BlogNoSql.html'>noSQL&nbsp;Database</a>\
         <a href='BlogParser.html'>Parsing</a>\
-        <a href='CodeAnalyzer.html'>Code&nbsp;Analyzer</a>\
+        <a href='BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a>\
         <a href='BlogMTree.html'>M-ary&nbsp;Trees</a>\
         <a href='BlogGraph.html'>Directed&nbsp;Graphs</a>\
         <a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a>\
