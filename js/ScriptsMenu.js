@@ -15,23 +15,19 @@ function initializeMenu() {
   var topMenu = document.getElementsByTagName("nav");
   topMenu[0].innerHTML = "<div class='navbar'>\
     <a href='index.html' class='menuItem'>Home</a>\
-    <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Repositories &#9662;</button>\
-      <div class='dropdown-content'>\
-        <a href='Repositories.html'>Repo Summaries</a>\
-        <a href='Utilities.html'>Utilities</a>\
-        <a href='Tools.html'>Tools</a>\
-        <a href='Components.html'>Components</a>\
-        <a href='Projects.html'>Projects</a>\
-        <a href='Demos.html'>Demos</a>\
-      </div>\
-    </div>\
+    <a href='Repositories.html' class='menuItem'>Repositories</a>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Design Notes &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='../Documentation/Experiment.htm'>Repository Index</a>\
-        <a href='../Documentation/Experiment.htm'>Blog Index</a>\
-        <a href='../Documentation/Experiment.htm'>Design Notes</a>\
+        <a href='DesignNote-CvsCpp.html'>C vs C++</a>\
+        <a href='DesignNote-GettingStartedWithCpp.html'>Getting Started with C++</a>\
+        <a href='DesignNote-Cpp11.html'>C++11</a>\
+        <a href='DesignNote-CppKnowledgeBase.html'>C++ Knowledge Base</a>\
+        <a href='DesignNote-CppClasses.html'>C++ Classes</a>\
+        <a href='DesignNote-CppClassRelationships.html'>C++ Class Relationships</a>\
+        <a href='DesignNote-CompoundObjects.html'>Compound Objects</a>\
+        <a href='BlogPrinciples.html'>Design Principles</a>\
+        <a href='BlogOOD.html'>Object Oriented Design</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\

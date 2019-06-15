@@ -1,0 +1,339 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Classes</title>
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <style>
+    pre {
+      font-family: Consolas;
+      font-size: medium;
+      font-weight: normal;
+      margin-top: 10px;
+      margin-bottom: 0px;
+    }
+  </style>
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+</head>
+<body onload="initializeMenu()" oncontextmenu="return false;">
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <a id="Next" href="ClassRelationships.htm">N</a>
+  <a id="Prev" href="CSE687designConcept0.htm">P</a>
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <header>
+    <hgroup id="pagetitle">
+      <h1 id="title">C++ Class Structure</h1>
+    </hgroup>
+  </header>
+
+  <!-- page content -->
+  <main id="main">
+    <h3 style="margin-top: 0px;">Synopsis:</h3>
+    <notes-block class="tight">
+      The C++ language was built, from the ground up, to support user defined <strong>value types</strong>.
+    </notes-block>
+
+    <div>
+      <p>
+        It does that with copy constructors and copy
+        assignment operators that allow the designer to implement deep copies.  That makes the state of the destination object have the
+        same value as the state of the source, but those states are independent.  If the source changes its state later, that does not
+        affect the state of the destination.
+      </p>
+      <h4>Code in Header File X.h</h4>
+      <pre>
+  class X {
+  public:
+    X();                        // default constructor
+    x(const std::string&amp; msg);  // another constructor
+    X(const X&amp; x);              // copy constructor
+    X&amp; operator=(const X&amp; x);   // copy assignment operator
+    ~X();                       // destructor
+    std::string getMessage();   // method
+  private:
+    std::string* pMsg;          // private data
+  };
+      </pre>
+      <h4>Code in Implementation File X.cpp</h4>
+      <pre>
+  X::X() : pMsg(new std::string()) {}
+  X::X(const std::string&amp; s) : pMsg(new std::string(s)) {}
+  X::X(const X&amp; x) : pMsg(new std::string(*x.pMsg)) {}
+  X&amp; X::operator=(const X&amp; x)
+  {
+    if(this != &x)
+    {
+      delete pMsg;
+      pMsg = new std::string(*x.pMsg);
+    }
+    return *this;
+  }
+  X::~X()
+  {
+    delete pMsg;
+  }
+  std::string getMessage()
+  {
+    return *pMsg;
+  }
+      </pre>
+      <p>
+        C++ provides destructors that are called when the thread of execution leaves the scope where the instance was declared.  This means
+        that developers have tight control over how and when an instance's resources are returned to the process, for use by other instances.
+        Users of C++ classes do not need to be aware of these resource allocations and deallocations.  They simply
+        use instances of the classes and the instances take care of all resource management.
+      </p>
+      <p>
+        The language also provides move construction and move assignment operations.  Move construction builds an instance, taking ownership
+        of another instance's state.  This transfer is very efficient, usually effected with a pointer swap.  Similarly, move assignment
+        discards the destination's state and it takes ownership of the source's state.
+      </p>
+      <p>
+        Move operations usually occur only when the source is a temporary object, but the compiler can be coerced to execute a move on
+        a non-temporary object by using the std::move(...) operation.  Note that you need to be careful with this, as the source no longer
+        owns it's former state and may be unable to continue.  Essentially, the use of the std::move(...) is a promise not to use the
+        source object any longer, or to reinitialize it in some effective way.
+      </p>
+      <h3>Construction-Destruction Guarantee:</h3>
+      <p>
+        Instances of C++ classes hold instances of their base classes and composed member data in their
+        <a href="../presentations/ClassesAndObjects.pdf">memory footprint</a>.  That means that a class's bases and composed members
+        are an integral part of the class, and are always constructed when a class instance is constructed, and destroyed when it is
+        destroyed.  C++ Guarantees that!  There is no way to prevent it.
+        <div style="height:0px;"></div>
+        For this reason, the language has to ensure that is always possible. It does so by providing compiler generated operations.
+      </p>
+      <h3>Compiler Generated Operations:</h3>
+      <p>
+        C++ Compilers will generate construction and destruction operations if not provided by the class.
+        <ul>
+          <li>
+            If no constructors are declared for the class, the compiler will generate a default constructor that does default construction
+            on each of its base classes<sup>1</sup>, if any, and member wise default construction on each member.
+          </li>
+          <li>
+            The compiler will always generate a copy constructor if not declared by the class. The compiler generated copy constructor
+            copies into the class instances of each base class of the source instance, and copies of each member of the source into its members.
+          </li>
+          <li>
+            If not declared by the class, the compiler will always generate a copy assignment operator which does member-wise assignment
+            from the source instance's base classes and member data.
+          </li>
+          <li>
+            If the class does not declare a destructor, the compiler will always generate a destructor that does member-wise destruction
+            of each of the class's base instances and members.
+          </li>
+        </ul>
+        <div class="notecallout">
+          For every class you define, you should decide whether to provide construction, assignment, and destruction operations, or
+          allow the compiler to generate them, or to disable those operations.
+        </div>
+        <ul>
+          <li>
+            For every class with bases and members all of which have correct copy, assignment, and destruction semantics, you
+            don't need to, and should not, provide those operations.  Primitive data and STL containers all have correct
+            semantics for those operations, and classes that have only primitive and STL container data, have correct semantics
+            for those operations.
+            <div style="height:15px;"></div>
+            For almost every other class, the compiler generated operations will not be correct, and you must either provide them
+            or disable them.  Classes that contain pointers are examples of where you need to do this.
+          </li>
+          <li>
+            You can disable operations by declaring the operation followed by =delete.  Here's an example:
+            <pre>
+  Y(const Y&amp; y) = delete;
+            </pre>
+          </li>
+        </ul>
+      </p>
+      <a name="ruleOfThree" />
+      <h3>The Rule of Threes:</h3>
+      <p>
+        To summarize, for the three operations of construction, assignment, and destruction, we have three choices:
+        <ul class="tightlist">
+          <li>
+            Allow the compiler to generate them - don't declare them - if all the classes bases and members have
+            correct construction, assignment, and destruction semantics.
+          </li>
+          <li>
+            Provide them by declaring and implementing each of the operations.
+          </li>
+          <li>
+            Disable them by declaring each of the operations using = delete at the end of the declaration.
+          </li>
+        </ul>
+      </p>
+      <div>
+        <h4>Example Code:</h4>
+        <div class="indent">
+          <a href="../Lectures/CodeSnap-ClassAnatomy.h.htm">Class Anatomy CodeSnap</a>,
+          <a href="../code/codesnaps/classanatomy">Code folder</a><br />
+          <a href="../Lectures/CodeSnap-CompoundObjects.h.htm">Compound Objects CodeSnap</a>
+          <a href="../code/CodeSnaps/CompoundObjects">Code folder</a>
+        </div>
+      </div>
+      <!--<p>
+              The Test class demonstrates these operations with both class declarations and method implementations, as shown below.
+            </p>
+            <div style="margin:20px 20px; padding-top:0px;">
+              <codewrapper>
+                <codecaption style="text-align:left; padding-left:45px;">
+                  Example Code Test.h
+                </codecaption>
+                <code>
+      #include &lt;string>
+
+      class Test
+      {
+      public:
+        Test();                           // void constructor, sometimes called default constructor
+        Test(const std::string& name);    // constructor for named instance
+        Test(const Test& t);              // copy constructor
+        Test(Test&& t);                   // move constructor
+        Test& operator=(const Test& t);   // copy assignment operator
+        Test& operator=(Test&& t);        // move assignment operator
+        virtual ~Test();                  // destructor
+        std::string& name();
+        void say();
+      private:
+        std::string name_;
+      };
+                </code>
+                <codecaption style="text-align:left; padding-left:45px;">
+                  Example Code Test.cpp
+                </codecaption>
+                <code>
+      #include "TestClass.h"
+      #include "..\Helpers\Helpers.h"
+      #include &lt;iostream>
+      #include &lt;string>
+      #include &lt;vector>
+      #include &lt;memory>
+
+      //----< default constructor >----------------------------------------------
+
+      Test::Test()
+      {
+        std::cout << "\n  void construction of \"Test\"";
+        name_ = "Test";
+      }
+      //----< promotion constructor >--------------------------------------------
+
+      Test::Test(const std::string& name)
+      {
+        name_ = name;
+        std::cout << "\n  named construction of \"" << name_ << "\"";
+      }
+      //----< reset instance name string >---------------------------------------
+
+      std::string rename(const std::string& prefix, const std::string& sourceName)
+      {
+        if (prefix != sourceName.substr(0, 4))
+          return prefix + " of " + sourceName;
+        else
+          return sourceName;
+      }
+      //----< copy constructor >-------------------------------------------------
+
+      Test::Test(const Test& t) : name_(t.name_)
+      {
+        std::cout << "\n  copy of \"" << name_ << "\"";
+        name_ = rename("copy", t.name_);
+      }
+      //----< move constructor >-------------------------------------------------
+
+      Test::Test(Test&& t) : name_(std::move(t.name_))
+      {
+        std::cout << "\n  move of \"" << name_ << "\"";
+        t.name_ = "been moved";   // copies chars, so inefficient, but shows how move works
+        name_ = rename("move", t.name_);
+      }
+      //----< copy assignment operator >-----------------------------------------
+
+      Test& Test::operator=(const Test& t)
+      {
+        std::cout << "\n  copy assignment of \"" << name_ << "\"";
+        if (this != &t)
+        {
+          name_ = rename("copy", std::move(t.name_));
+        }
+        return *this;
+      }
+      //----< move assignment operator >-----------------------------------------
+
+      Test& Test::operator=(Test&& t)
+      {
+        if (this != &t)
+        {
+          name_ = rename("move", std::move(t.name_));
+          t.name_ = "been moved";  // copys chars, so inefficient, but shows how move works
+          std::cout << "\n  move assignment of \"" << name_ << "\"";
+        }
+        return *this;
+      }
+      //----< destructor >-------------------------------------------------------
+
+      Test::~Test()
+      {
+        std::cout << "\n  destruction of \"" << name_ << "\"";
+      }
+      //----< name "property" >--------------------------------------------------
+
+      std::string& Test::name()
+      {
+        return name_;
+      }
+      //----< enunciator >-------------------------------------------------------
+
+      void Test::say()
+      {
+        std::cout << "\n  my name is \"" << name_ << "\"";
+      }
+                </code>
+              </codewrapper>
+            </div>
+            <div class="spacer"></div>
+            <p>
+              The <a href="../../CoreTechnologies/cpp/code/DemoClass">DemoClass</a> folder provides this code in a Visual Studio project so you can
+              try it out.
+            </p>
+            <div class="spacer"></div>
+            <p>
+              <h4>References:</h4>
+              <ul>
+                <li>
+                  <a href="http://en.cppreference.com/w/cpp/language">C++ language - cppreference.com</a>
+                </li>
+                <li>
+                  <a href="https://isocpp.org/wiki/faq/classes-and-objects">FAQ - Classes and Objects</a>
+                </li>
+              </ul>
+            </p>
+          </div>-->
+      <spacer-15></spacer-15>
+  </main>
+  <div>
+    <img class="strip-photo" src="pictures/Campusstrip.jpg" alt="CST strip" width="97%" />
+  </div>
+  <info-bar></info-bar>
+</body>
+</html>
