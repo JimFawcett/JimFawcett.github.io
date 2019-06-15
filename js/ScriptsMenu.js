@@ -59,6 +59,28 @@ function initializeMenu() {
         <a href='BlogMTree.html'>M-ary&nbsp;Trees</a>\
         <a href='BlogGraph.html'>Directed&nbsp;Graphs</a>\
         <a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a>\
+        <a href='../webpages/Blog.htm'>First&nbsp;Things</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
+        <a href='../webpages/BlogDesign.htm'>SW&nbsp;Design</a>\
+        <a href='../webpages/BlogPrinciples.htm'>Design&nbsp;Principles</a>\
+        <a href='../webpages/BlogOOD.htm'>OO&nbsp;Design</a>\
+        <a href='../webpages/BlogObjectModels.htm'>Object&nbsp;Models</a>\
+        <a href='../webpages/BlogGlobals.htm'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data&nbsp;&nbsp;</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Engineering&nbsp;SW&nbsp;---</div>\
+        <a href='../webpages/BlogOCD.htm'>Concept&nbsp;Document</a>\
+        <a href='../webpages/BlogTesting.htm'>SW&nbsp;Testing</a>\
+        <a href='../webpages/SummerReading.htm'>Summer&nbsp;Reading</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Software&nbsp;Sys&nbsp;------</div>\
+        <a href='../webpages/BlogStructure.htm'>SW&nbsp;Structure</a>\
+        <a href='../webpages/BlogMessagePassingComm.htm'>Msg-Passing&nbsp;Comm</a>\
+        <a href='../webpages/BlogActiveObjects.htm'>Active&nbsp;Objects</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Reusable&nbsp;Pkgs&nbsp;----</div>\
+        <a href='../webpages/BlogNoSql.htm'>noSQL&nbsp;Database</a>\
+        <a href='../webpages/BlogParser.htm'>Parsing</a>\
+        <a href='../webpages/BlogCodeAnalyzer.htm'>Code&nbsp;Analyzer</a>\
+        <a href='../webpages/BlogMTree.htm'>M-ary&nbsp;Trees</a>\
+        <a href='../webpages/BlogGraph.htm'>Directed&nbsp;Graphs</a>\
+        <a href='../webpages/BlogFileSystem.htm'>C++&nbsp;FileSystem</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
@@ -71,6 +93,9 @@ function initializeMenu() {
         <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
         <a href='SummerReading.html'>Reading</a>\
         <a href='SummerProjects.html'>Projects</a>\
+        <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
+        <a href='../Webpages/SummerReading.htm'>Reading</a>\
+        <a href='../Webpages/SummerProjects.htm'>Projects</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -252,6 +277,7 @@ function mouseAction(event) {
     }
     else {
       //toggleNavKeys();
+      toggleNavKeys();
     }
   }
 }
