@@ -1,0 +1,544 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - BlogNoSql.htm - NoSQL databases
+   - ver 1.1 - 04 September 2015
+   - Jim Fawcett, Syracuse University
+  -->
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <title>Blog NoSql</title>
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+</head>
+<body id="github" onload="initializeMenu()">
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <a id="Next" href="BlogParser.htm">N</a>
+  <a id="Prev" href="BlogActiveObjects.htm">P</a>
+
+  <header>
+    <hgroup id="pagetitle">
+      <h1 id="title">Code Artistry - No SQL Databases</h1>
+    </hgroup>
+  </header>
+
+  <!-- page content -->
+  <h2>Initial Thoughts:</h2>
+  <p>
+    There is currently a lot of technical interest in <a href="https://en.wikipedia.org/wiki/Big_data">&quot;Big&nbsp;Data&quot;</a>.
+    Extreme examples are: data collection and analyses from the <a href="https://en.wikipedia.org/wiki/Large_Hadron_Collider">Large Hadron Collider</a>,
+    the <a href="http://www.sdss.org/">Sloan Sky Survey</a>, analyses of Biological <a href="http://www.genome.jp/kegg/kegg1a.html">Genomes</a>,
+    collecting data for <a href="https://en.wikipedia.org/wiki/General_Circulation_Model">global climate models</a>, and
+    analyzing client interactions in <a href="https://en.wikipedia.org/wiki/Social_network_analysis">social networks</a>.
+  </p>
+  <p>
+    Conventional SQL databases may not be well suited for these kinds of applications. While they have worked very well for many
+    business applications and record keeping, they get overwhelmed by massive streams of data.
+    Developers are turning to <a href="https://en.wikipedia.org/wiki/NoSQL">&quot;noSQL&quot;&nbsp;databases</a>
+    like <a href="https://www.mongodb.org/">MongoDB</a>, <a href="http://couchdb.apache.org/">CouchDB</a>,
+    and <a href="http://redis.io/">Redis</a> to handle massive data collection and analyses.
+  </p>
+  <h3>SQL Data Model:</h3>
+  <p>
+    Traditional SQL databases provide a very well understood data management model that supports the <a href="https://en.wikipedia.org/wiki/ACID">ACID properties</a>,
+    e.g., each transaction is <strong>A</strong>tomic, leaves managed data in a <strong>C</strong>onsistent state, appears to operate in <strong>I</strong>solation from other
+    transactions that may operate concurrently, and at the end of the transaction the database state is <strong>D</strong>urable, e.g, is persisted to a permanent
+    store.
+  </p>
+  <p>
+    SQL data is normalized into tables with relationships.  This matches very well with data models where many records may be associated with the same data.
+    If we build a books database, for example, many books may be associated with the same publisher information.  We link the book information with a foreign key
+    relationship to publisher information in another table to avoid duplicating the same publisher data in every book record. Many to many relationships are
+    modeled by linking tables often containing two foreign keys.  For the books database a book may have several authors and an author may have published more
+    than one book.  So the link table holds records each of which capture the association of a book with an author. If a book has two authors there are two
+    records with that book key, one for each author.
+  </p>
+  <p>
+    Each SQL Table has a fixed schema that captures the type of the records in the table.  A record in the books table
+    might contain the book's name and date of publication.
+    SQL database designs emphasize data integrity and structuring models in a fixed normalized tabular form.
+    Queries into the database usually join data from
+    several tables to build a complete description of the results to be returned.
+  </p>
+  <h3>noSQL Data Models:</h3>
+  <p>
+    The data models used by noSQL databases are usually based on key/value pairs, document stores, or networks.  noSQL processing
+    favors modeling flexibility, the ability to easily scale out across multiple machines, and performance with very large datasets.
+    For that flexibility they give up real-time data consistency, accepting application enforced eventual consistency.  They give up
+    a formal query mechanism (hence the name).  And, they may give up Durability guarantees by only occasionally writing to persistant
+    storage in order to provide high throughput with large volumes of data.
+  </p>
+  <p>
+    The choice to use <a href="http://www.paperplanes.de/2010/7/5/relational_data_document_databases_schema_design.html">SQL or noSQL</a>
+    data management is driven by the nature of its uses. Below we discuss <a href="../CSE681/lectures/Project5-F2015.htm">Project #5</a>,
+    an application that builds a data management service for a large collaboration system composed of federated servers. That seems
+    ideally suited for noSQL data managment.
+  </p>
+  <h3>Goals of a noSQL Implementation:</h3>
+  <p>
+    The noSQL model has goals that often prove to be difficult to implement with SQL databases.  A noSQL database is designed to support one or more
+    of the following:
+    <ul>
+      <li>Very large collections of data</li>
+      <li>High throughput with data from streams</li>
+      <li>support tree or graph models for its data</li>
+      <li>support heterogenious collections of data</li>
+    </ul>
+    When repeated data isn't a concern, we may avoid the overhead associated with following query references through potentially
+    many tables and persisting every transaction to a durable store by using a network or key/value reference mechanism in
+    conjunction with mostly in-memory storage using only occasional writes to the file system.  However, when dealing with very large
+    data models these writes will likely be <a href="https://msdn.microsoft.com/en-us/library/azure/dn764982.aspx">sharded</a>
+    into many files for durable storage. Probably a few shards, the most recently used, will be held in memory.
+  </p>
+  <p>
+    A noSQL model may use a hashtable to store key/value pairs incurring essentially constant time lookup and retrieval of its data, e.g.,
+    time independent of the size of the data.  However, when the size of the managed data requires sharding, the
+    constant time lookup and retrievel may be compromised by processing necessary to locate shards that contain the data we
+    need to retrieve.  We need to think about things like managing multiple shards in memory using a Least Recently Used
+    mapping strategy, much like a virtual memory system.  We will likely think about using in-memory indexes to keep track of which
+    shards hold specific data items or categories of items.  For some applications it may be appropriate to shard data into time-related
+    batches, e.g., data collected in a day or a week.
+  </p>
+  <p>
+    With SQL data management all data is managed the same way.  The only flexibility is how we partition the data into tables and
+    possibly shard data across multiple machines.  Changing the schemas and sharding strategy can be quite difficult to implement.
+    Using noSQL databases we have a lot more flexibility in configuring data and it is easier to change schemas.
+  </p>
+  <p>
+    The good news is that configuring data, managing schemas, determining when and how to persist to durable storage, and maintaining
+    consistancy is, with noSQL, up to the application.  The bad news is that it is up to the application.
+  </p>
+  <h2>Implementing a noSQL Database:</h2>
+  <p>
+    In <a href="CSE681.htm">CSE681&nbsp;-&nbsp;Software&nbsp;Modeling&nbsp;&amp;&nbsp;Analysis</a>, Fall 2015, we are exploring the development of a noSQL
+    database in a series of five projects:
+    <ul>
+      <li>
+        <a href="../CSE681/lectures/Project1-F2015.htm">Project #1</a><br />
+        Develop the concept for a basic noSQL application.  We capture the concept with an &quot;Operational&nbsp;Concept&nbsp;Document&quot;&nbsp;(OCD).
+      </li>
+      <li>
+        <a href="../CSE681/lectures/Project2-F2015.htm">Project #2</a><br />
+        Implement most of the concept and perform thorough functional tests.
+      </li>
+      <li>
+        <a href="../CSE681/lectures/Project3-F2015.htm">Project #3</a><br />
+        Develop the concept for a remote noSQL application, based on Project #2, using
+        a message-passing communication service.
+      </li>
+      <li>
+        <a href="../CSE681/lectures/Project4-F2015.htm">Project #4</a><br />
+        Implement the remote noSQL database server and do performance testing.
+      </li>
+      <li>
+        <a href="../CSE681/lectures/Project5-F2015.htm">Project #5</a><br />
+        Create and document a data management service architecture using the ideas developed in the first four projects.
+        This service will provide the communication and state management infrastructure for a large Software Development
+        Collaboration System composed of a federation of cooperating servers and client controllers.
+      </li>
+    </ul>
+
+    Our goals are to understand why noSQL databases are interesting and useful, how they could be built, and
+    to think about the consequences of this approach.  The concepts, developed in Projects #1 and #3, are expressed
+    in Operational Concept Documents that focus on users and uses, top-level application structure, and critical issues.
+  </p>
+  <p>
+    Documenting critical issues helps us think critically about our ideas and planned implementation before committing
+    to code.  We may find that biasing our design in one direction or another may support the spinning off of new applications
+    and services from a solid base.  We might also find that there are significant impediments on the path we are embarking
+    and force a rethinking of the application and its goals.
+  </p>
+  <h3>Concept -> Uses:</h3>
+  <p>
+    In the projects for this course, we will be concerned with storing very large data sets, accepting data from streams quickly,
+    storing and accessing networks of data, and managing collections of heterogeneous data.
+  </p>
+  <p>
+    In the final project this Fall we will investigate the feasibility of building a data management service for a large collaboration
+    system.  That involves: managing a large repository's data, recording continuous integration and test activities,
+    managing notifications to a large collection of clients, and building and maintaining templates for test configurations,
+    collaboration sessions, work package descriptions, etc.
+  </p>
+  <p>
+    For the first project, however, uses focus on understanding requirements needed to implement a noSQL database, exploring alternative
+    structures, and demonstrating the implications of our design choices. The users are the developer, Teaching Assistants, and the Instructor.
+    Essentially each student developer is responsible for demonstrating that each of the requirements in the
+    <a href="Project2-F2015.htm">Project 2</a> statement have been met.
+  </p>
+  <p>
+    The design impact of this use is that the implementation must carefully demonstrate requirements in a step-by-step
+    fashion.  When a requirement asks for the ability to change some aspect of the database state it is the design's responsibility
+    to show the state before, display the nature of the change, and display the database state after the change.  This should be done
+    trying to make the display as economical as practical so limiting what an observer must understand to verify the action.
+  </p>
+  <h3>Concept -> Structure:</h3>
+  <p>
+    Perhaps the easiest way to begin creating a structure for an application we're developing is to think about the tasks it must
+    execute. The project statement for <a href="../cse681/lectures/Project2-F2015.htm">Project #2</a> requires the noSQL prototype to provide the
+    capability to:
+    <ul>
+      <li>Create items described by metadata and holding an instance of some generic type.</li>
+      <li>Create and Manage a Key/Value database with capability to store and delete Key/Value<sup><a href="#footnote">1</a></sup> pairs.</li>
+      <li>Edit Values</li>
+      <li>Persist database contents to an XML file<sup><a href="#footnote">2</a></sup>.</li>
+      <li>Augment database contents from an XML file with the same format as persisted, above.</li>
+      <li>Support a variety of queries, both simple and compound.</li>
+      <li>Support demonstration of all functional requirements through a series of discrete tests with display to the console.</li>
+    </ul>
+  </p>
+  <p>
+    Each database Value has structured meta-data and an instance of the generic Data type.  We will choose to create a C# class to represent
+    Values that might look something like this:
+  </p>
+  <p>
+    <pre>
+  public class Value&lt;Key,Data&gt;
+  {
+    // public methods providing
+    // access to private data
+    private string name;                           // Note: you may choose to capture
+    private DateTime timeStamp;                    // these Value states as properties
+    private string description;                    // rather than private data items.
+    private List&lt;Key&gt; children;
+    private Data payload;
+  }
+    </pre>
+    Here, the payload is what we really want to save in the database.  Metadata is just information about the payload
+    that helps us find what we want with a query.
+  </p>
+  <p>
+    We will also define a C# class that represents the database engine:
+    <pre>
+  public class noSQLdb&lt;Key,Value&gt;
+  {
+    // public methods providing database API
+    private Dictionary&lt;Key,Value&gt;                   // The <a href="https://msdn.microsoft.com/en-us/library/xfhwa508(v=vs.110).aspx">dictionary</a> should not be a public property.
+  }
+    </pre>
+  </p>
+  <p>
+    Each task in the list at the top of this section is a candidate to become a package. Some we may decide to merge later.
+    There may also be times to take an existing package and divide into smaller packages. Usually that happens when the
+    original was becoming too complicated to test easily.  Finally there may be a very few packages that we didn't have
+    the foresight to define in the concept, but discover a need for during implementation.
+  </p>
+  <div style="float:left; margin:20px 30px 20px 20px; border:1px solid gray; padding:5px; text-align:center; box-shadow:5px 5px 2px #888;">
+    <img src="pictures/PackageDiagramPr2F15.jpg" height="500" />
+  </div>
+  <div style="min-width:300px;">
+    <p>
+      We start with a TestExec package at the top that is responsible for the project's main use - demonstrating that requirements
+      have all been met.
+    <p>
+      TextExec creates instances of Key/Value pairs using a simple factory that may generate a unique key and
+      construct a Value with supplied parameters.
+    </p>
+    <p>
+      It uses those pairs to populate its noSQLdb instance through an API provided by
+      the DBEngine package.
+    </p>
+    <p>
+      The nature of query processing and sharding are the most interesting parts of this project and will be
+      left to students to work out in their individual ways.
+    </p>
+    <p>
+      The remaining parts are self-explanitory after reading the
+      <a href="../CSE681/lectures/Project2-F2015.htm">Project Statement</a>.
+    </p>
+    <p>
+      When an application is large or becomes complex we often provide a top-level package diagram, like this one,
+      and later provide more package diagrams for individual parts with significant internal structure.
+    </p>
+    <p>
+      We almost always provide activity diagrams to help OCD readers understand the intent of the concept.
+      The OCD for this project would greatly benefit from activity diagrams for handling queries and for
+      sharding.  These are left for students to provide.
+    </p>
+  </div>
+  <div style="clear:both;"></div>
+  <h3>Concept -> Critical Issues:</h3>
+  <p>
+    <ol>
+      <li>
+        <strong>Issue:</strong> - Demonstrating Requirements<br />
+        Students only get credit for requirements they clearly demonstrate.  No inputs other than a supplied
+        XML file to load the intial database are required<sup><a href="#footnote">3</a></sup>.  The only output required is a console display.<br />
+        <strong>Solution:</strong><br />
+        This requires careful orchestration of a series of tests invoked by the test executive and supported by processing
+        in the Display package.
+        <br />
+        <strong>Impact on Design:</strong><br />
+        It will be effective
+        to provide a method for each test that announces the Requirement number and displays db state before and after
+        each change.
+      </li>
+      <li>
+        <strong>Issue:</strong> - Designing Queries<br />
+        Statement and solution(s) are left to the students.
+      </li>
+      <li>
+        <strong>Issue:</strong> - Sharding<br />
+        Statement and solution(s) are left to the students.
+      </li>
+      <li>
+        <strong>More Issues:</strong> - Left to Students.
+      </li>
+    </ol>
+  </p>
+  <h3>Later Projects:</h3>
+  <p>
+    After completing Project #2 we work on a concept, in <a href="../CSE681/Lectures/Project3-F2015.htm">Project #3</a>, and implement, in
+    <a href="../CSE681/Lectures/Project4-F2015.htm">Project #4</a> remote access to the noSQL prototype via message-passing communication.
+  </p>
+  <p>
+    Finally we develop an architecture, in <a href="../CSE681/Lectures/Project5-F2015.htm">Project #5</a>, for a data management service
+    in a large Software Development Collaboration Environment using the NoSQL model we created in the earlier projects.
+  </p>
+  <p>
+    You will find that several noSQL databases are required for Project #5 and that the key types and value types will not all be the same.  I would
+    expect that sharding strategies may vary from database to database.  For that reason, it would be interesting to support
+    pluggable sharding strategies in our noSQL design.  You should probably address that as a critical issue in your OCD for
+    Project #1<sup><a href="#footnote">4</a></sup>.
+  </p>
+  <h2>Concept Revisited:</h2>
+  <p>
+    All the discussion that follows was added after students turned in their noSQL Operational Concept Documents.  This discussion is concerned
+    with things I wanted students to think about without being given too much guidance, but now want to clarify before they begin their designs for
+    the noSQL Database.  We will focus on meeting Requirements, Queries, Sharding, and say a couple of things about the ItemFactory.  To understand the details
+    discussed here you will find it helpful to look again at the <a href="../CSE681/Code/Project2HelpF15">Project #2 starter code</a> discussed
+    in class.
+  </p>
+  <h3>Top Level Activities:</h3>
+  In Project #5 our architectue describes data services for a federation of servers designed to support collaboration activities in a software development environment.
+  In Project #2, we're providing the noSQL database to support those services.
+
+  <div style="float:right; margin:20px 30px 20px 20px; border:1px solid grey; padding:15px; text-align:center; box-shadow:5px 5px 2px #888;">
+    <img src="pictures/RequirementsActivityDiagram.png" width="480" />
+    <div style="text-align:center; padding-top:10px;">Top Level Activity Diagram</div>
+  </div>
+  But for Project #2 all activities focus on demonstrating requirements.  To do this we:
+  <div>
+    <ul>
+      <li>
+        Demonstrate creation of each of the required parts, DBEngine&lt;Key, Value&gt;, DBElement&lt;Key, Data&gt;
+      </li>
+      <li>
+        Demonstrate adding, removing, and editing DBElements&lt;Key, Value&gt; while contained in the database.
+      </li>
+      <li>
+        Each time we make a required change in the database's state we are obligated to show the state before
+        the change, the changed DBElement, and the state of the database after the change.
+      </li>
+      <li>
+        Write the database contents to an XML file, clear the database contents, add a new element or two,
+        then read the XML and agument the existing database contents from the XML files contents.
+      </li>
+      <li>
+        Clear the database contents and load the database from and XML file describing your project's structure.
+      </li>
+    </ul>
+    In the help session on Friday Morning, 9/18/2015 we started the construction of a TestExec that implements
+    these activities.  You will find that code here: <a href="../CSE681/code/Project2HelpF15">Project2HelpF15</a>
+    in the Project2Starter folder.
+  </div>
+  <h3 style="clear:both;">Queries:</h3>
+  <p>
+    First, what is a query for this nonSQL database?  Let's define that in parts:
+    <ul>
+      <li>
+        A <strong>QueryPredicate</strong> is a function that accepts a db key and returns true or false depending upon the processing of the
+        predicate function.  For this noSQL db, the processing will look for specific conditions in the element bound to the supplied key,
+        e.g., name, description, time-date stamp, children, or payload.  We will use C# lambdas to implement QueryPredicates.  See
+        <a href="../Coretechnologies/CSharp/code/LambdaDemo">LambdaDemo</a> for code that is close to what we need here.
+      </li>
+      <li>
+        A <strong>simple query</strong> then, consists of applying the QueryPredicate to each of the keys in the database and collecting all of the
+        keys for which the predicate is true.  That's what DBFactory&lt;Key, Value&gt; does.
+      </li>
+      <li>
+        A compound query is a chain of queries, each query using the keyset returned by the previous query<sup><a href="#footnote">5</a></sup>.  We'll need some
+        way to manage those returned keysets - QueryEngine manages that process, using DBFactory&lt;Key, Value&gt;s to wrap return keysets.
+        At each step QueryEngine constructs a DBFactory&lt;Key, Value&gt; instance, applies its next QueryPredicate to that instance, to
+        get the next keyset.
+      </li>
+    </ul>
+  </p>
+  <div style="float:left; margin:20px 30px 20px 20px; border:1px solid grey; padding:15px; text-align:center; box-shadow:5px 5px 2px #888;">
+    <img src="pictures/noSQLquery.png" width="480" />
+    <div style="text-align:center; padding-top:10px;">Query Processing Class Diagram</div>
+  </div>
+  <p>
+    So, QueryEngine wraps each query return in an object that holds the resulting keyset and has the same reading interface (keys(), getValue(key, out val))
+    as the DBEngine but doesn't have any writing methods. That's DBFactory&lt;Key, Value&gt;.
+  </p>
+  <p>
+    Suppose that we define a C# interface, IQuery, that declares
+    those "reading" methods and have both DBFactory and DBEngine implement that interface.
+    Then to make a query the query engine applies a QueryPredicate to DBEngine&lt;Key, Value&gt;, creates a DBFactory&lt;Key, Value&gt;
+    passing to its constructor the ketset returned by the query.
+  </p>
+  <p>
+    If the query is compound this process is repeaded using the DBFactory
+    at each successive step.  Thus the keyset gets refined at each step of the compound query. Essentially the DBFactory is just a
+    container of keys that link back to the DBEngine through a reference held by the DBFactory.
+  </p>
+  <p>
+    With that setup we can define the simpleQuery method to use the IQuery interface so it can be applied at each step of the query, e.g.,
+    to either DBEngine&lt;Key, Value&gt; or to DBFactory&lt;Key, value&gt;.
+  </p>
+  <div style="float:left; margin:20px 30px 20px 20px; border:1px solid grey; padding:15px; text-align:center; box-shadow:5px 5px 2px #888;">
+    <img src="pictures/Project2-Activity.png" width="480" />
+    <div style="text-align:center; padding-top:10px;">Query Processing Activity Diagram</div>
+  </div>
+  <p>
+    QueryEngine is configured with a set of QueryPredicates. It uses the first on DBEngine&lt;Key, Value&gt; to get a DBFactory&ltKey, Value&gt;
+    typed as an IQuery&lt;Key, Value&gt; with the first keyset, and uses each
+    successive query on the returned DBFactory&lt;Key, Value&gt; to refine the keyset returned by the previous query.  You will find
+    the PredicateLambda project in <a href="../CoreTechnologies/CSharp/Code/LambdaDemo">LambdaDemo</a> to contain code that is close to
+    what you need for Project #2.
+  </p>
+  <p>
+    You can think of the QueryPredicates to be equivalent to stored procedures in a conventional database.
+  </p>
+  <h3>Sharding:</h3>
+  <p>
+    Sharding is the process of writing out part of the contents of the noSQL Database to files - we'll use XML processing to do that.
+    So how do we decide what part to write out for each shard? Here, the designer has to understand the data she's working with.
+  </p>
+  <p>
+    In <a href="../CSE681/Lectures/Project5-F2015.htm">Project #5</a> we're building a data management service for a federation of
+    servers that implement a Software Development Collaboration Facility. One of those servers is a Software Repository.  We'll use
+    a noSQL database to manage files in terms of their dependencies, e.g., which packages depend on which others. So each element
+    of the database represents a package.  The parent - child relationships supported by a noSQL database are just what we need to
+    represent dependencies between packages.  Here, we'll probably use the package name as the key
+    for each element of the database.
+  </p>
+  <p>
+    So, we'll shard that database by subsystem.  All the packages in one subsystem are described by one shard.  Note that we don't save
+    the packages in the database.  We just save their locations and dependencies.  The file system does a beautiful job of holding onto
+    the physical files.
+  </p>
+  <p>
+    Similarly, another server is a test harness.  It generates perhaps hundreds of test events per second, e.g., which test is executing,
+    did it pass or fail, ...  For this we'll probably shard based on time, e.g., all the messages that occurred today.
+  </p>
+  <h4>Sharding Critical Issues:</h4>
+  There are two obvious critical issues for sharding:
+  <ul>
+    <li>
+      How to select the contents of individual shards.  The only likely solution is to know your data (see the comments above).
+    </li>
+    <li>
+      How to efficiently query information distributed across shards as well as what's in memory. One solution for that is to use another
+      noSQL database to manage sharding.  If each element of that database represents a shard, then we can describe the shard
+      with the descriptor, and supply more details in the payload.  So a query into the shards uses the shard manager db to find
+      the appropriate, hopefully small number of, shards to load into memory and query.
+    </li>
+  </ul>
+  <h3>ItemFactory:</h3>
+  <p>
+    The starter code uses a DBElement&lt;Key, Data&gt; to ensure that all the code that uses the noSQL database have elements that
+    are structured in the same way.  ItemFactory is intended to support the creation of database elements where there are many very
+    similar instances to create.  Logging for the TestHarness in <a href="../CSE681/Lectures/Project5-F2015.htm">Project #5</a>
+    is an example.  There, the items will have identical, or nearly identical descriptors, have auto-generated names, and probably
+    have text payloads. The ItemFactory could use XML templates to configure items for these special situations so that client code
+    won't have to provide that functionality.  It should use DBElement&lt;Key, Data&gt; for all the heavy lifting.
+  </p>
+  <p>
+    The ItemEditor is responsible for supporting revisions to any part of a DBElement&lt;Key, Value&gt;, e.g., name, descriptor, time-date
+    stamp, child relationships, and payload. It too should use DBElement&lt;Key, Data&gt; to manage the all the element parts, and just
+    provide the functionality for change.  Most of this is quite straight-forward, but there is one interesting issue: how to support
+    editing the payload when we don't know anything about its structure.  For that we could make the ItemEditor class generic on the
+    payload Data type and ask the user to supply editing facilities for that.  How to do that is an interesting question to think about.
+  </p>
+  <hr />
+  <a name="footnote" />
+  <ol class="footnote">
+    <li>
+      The C# language has two kinds of types: value types and reference types.  Value types reside in static or stack memory, are
+      copyable, and when assigned are unique from the original source. Reference types reside in managed memory and are, in general,
+      not copyable nor assignable.  The program's code may copy or assign a reference to an instance on the managed heap, but
+      both target and source of the reference copy or assignment are the same heap-based instance.  Our use of the term Value
+      in this blog does not mean a C# value type.  It simply means the database data referenced by the key.  The kind of it's type may be
+      either a C# value or C# reference type.
+    </li>
+    <li>
+      Project #1 encourages students to think about issues like sharding.  We do not require students to implement sharding in
+      Project #2 but would be pleased to see and review any sharding processes they may attempt.
+    </li>
+    <li>
+      Please do not provide console menues.  A GUI could be effective for Project #2 but I would much rather have you spending
+      your time working on the functional requirements.
+    </li>
+    <li>
+      This is a test to see if you've read the entire blog carefully before submitting your first project.
+    </li>
+    <li>
+      The compound query discussed above is composed of a collection of clauses (conditions) joined with &quot;and&quot;s, e.g.,
+      ConditionA and ConditionB and ... must be true to satisfy the query.  Of course we may have queries joined by &quot;or&quot;s
+      or some mix.  For this project we will only require &quot;and&quot;ing clauses as that is the most common.
+    </li>
+  </ol>
+  <h3><a href="../CSE681/Lectures/Project2-F2015.htm">Project #2</a> Take-aways:</h3>
+  <div class="notecallout">
+    <p>
+      A few of the ideas discussed here are prototyped in:
+      <ul>
+        <li>
+          <a href="../CSE681/Code/Project2HelpF15">Project #2 starter code</a><br />
+          Provides starter code for DBEngine&lt;Key, Value&gt;, DBElement&lt;Key, Data&gt;, and associated display code.  After
+          the help session, Friday 9/18/2015, it also contains a TestExec that begins to demonstrate requirements.
+        </li>
+        <li>
+          <a href="../CoreTechnologies/CSharp/Code/LambdaDemo">LambdaDemo</a><br />
+          Contains three projects that dig into delegate-lambda relationships and of particular value
+          a project named PredicateLambda which provides starter code for the QueryEngine
+          and DBFactory&lt;Key, Value&gt;.
+        </li>
+      </ul>
+      Obviously there is still a lot of design and implementation left for you to enjoy before October 7th.
+    </p>
+    <p>
+      For those of you without a lot of software development experience, you should note that:
+      <ul>
+        <li>There is no requirement for sharding.  You just have to write the db contents to and from an XML file.</li>
+        <li>
+          There is no requirement for compound queries.  If you don't make compound queries then QueryEngine&lt;Key, Value&gt; just needs
+          one queryPredicate for a query and you don't need to build the DBFactory&lt;Key, Value&gt;, you just do its processing one time
+          in QueryEngine&lt;Key, Value&gt;.doQuery().
+        </li>
+        <li>
+          You won't penalized for ommitting features you discussed in the concept but were not required by the
+          Project #2 statement.
+        </li>
+        <li>
+          Your code must have a well-thought out structure and use well-formed packages, but it doesn't need to
+          look just like the concepts discussed here.
+        </li>
+      </ul>
+    </p>
+    <p>
+      <img class="photo" src="pictures/carnagieStrip.jpg" alt="Newhouse" width="98%" />
+    </p>
+    <info-bar></info-bar>
+</body>
+</html>

@@ -1,0 +1,563 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - BlogTesting.htm - Code Artist Thoughts
+   - ver 1.0 - 02 September 2016
+   - Jim Fawcett, Syracuse University
+  -->
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <title>Blog.SW Structure</title>
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+</head>
+<body id="github" onload="initializeMenu()">
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <a id="Next" href="BlogMessagePassingComm.htm">N</a>
+  <a id="Prev" href="../webpages/SummerReading.htm">P</a>
+
+  <header>
+    <hgroup id="pagetitle">
+      <h1 id="title">Code Artistry - Software Structure</h1>
+    </hgroup>
+  </header>
+
+  <!-- page content -->
+
+  <h3>Initial Thoughts:</h3>
+  There are many different aspects of <a href="BlogDesign.htm">Software Design</a>.  An important one is structure - what are the system parts,
+  what are their responsibilities, and how do the parts relate to each other.
+  <ol class="tight">
+    <li>
+      <h4>Software Parts Catalog:</h4>
+      <div style="padding:5px 0px;">
+        Here's a set of software parts, listed with increasing levels of abstraction:
+      </div>
+      <ul>
+        <li>
+          <div class="itemHeading">Functions and methods:</div>
+          <div class="itemContent">
+            Basic building blocks for all the other parts.
+          </div>
+        </li>
+        <li>
+          <div class="itemHeading">Classes, structs, and interfaces:</div>
+          <div class="itemContent">
+            A class encapsulates methods and data by controlling access, ensuring consistency of operation. Interfaces provide
+            contracts for service.  They allow the text of client code to bind to the inteface abstraction rather than a concrete
+            class.  That makes the code far less subject to breakage when the concrete classes have to change.
+          </div>
+        </li>
+        <li>
+          <div class="itemHeading">Packages:</div>
+          <div class="itemContent">
+            Packages are files each of which focuses on a single responsibility.  Each package has:
+            <ul class="tight">
+              <li>
+                prologue comments describing their operations, build process, and history of the package
+              </li>
+              <li>
+                declarations and definitions of classes, structs, and interfaces
+              </li>
+              <li>
+                test stub - a main and helper functions that provide construction testing for the package
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="itemHeading">Modules:</div>
+          <div class="itemContent">
+            Modules are collections of packages that are focused on a single responsibility, e.g., the <a href="BlogParser.htm">parser module</a>
+            has:
+            <ul class="tight">
+              <li>
+                Parser package with parser class and IRule and IAction interfaces
+              </li>
+              <li>
+                ActionsAndRules package with derived rules and actions and a Repository class
+              </li>
+              <li>
+                ScopeStack package
+              </li>
+              <li>
+                AbstrSynTree package
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="itemHeading">Programs:</div>
+          <div class="itemContent">
+            Programs are collections of modules.  The CodeAnalyzer program has modules for:
+            <ul class="tight">
+              <li>Scanning and tokenizing files into token sequences called SemiExpressions</li>
+              <li>parsing, using token sequences as inputs</li>
+              <li>building an Abstract Syntax Tree using ScopeStack and AbstrSynTree packages</li>
+              <li>managing program execution</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="itemHeading">Systems:</div>
+          <div class="itemContent">
+            Systems are collections of cooperating programs.  They often have structure determined by
+            their communication style, e.g.:
+            <ul class="tight">
+              <li>client/server</li>
+              <li>peer-to-peer</li>
+              <li>federation of servers and clients</li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+      <div style="height:10px;"></div>
+    </li>
+    <li>
+      <h3>Simple Programs:</h3>
+      <div style="float:right; padding:0px 0px 20px 20px; width:50%; margin-top:0px;">
+        <div class="photo" style="margin:0px;">
+          <img src="pictures/SimpleProgram.jpg" width="100%" />
+          <div>Simple Program Package Structure</div>
+        </div>
+      </div>
+      <div>
+        Simple programs often take the form show in the accompaning figure.  The Executive package doesn't do any computation or formatting, but
+        simply creates the program's top level components, and controls execution by passing them requests.
+        <br /><br />
+        Inputs might be a list of files to process, stored in a collection structure of some kind.  The Transform package requests the list, or
+        possibly the Input package sends them to the Transformer.  This communication implies that the Executive passed the caller a reference
+        to the callee.
+        <br /><br />
+        When transformation is complete the Display package requests the results, or some part of the results, and displays them to a user, based on
+        filtering information supplied by the Executive.
+        <br /><br />
+        A surprisingly large fraction of all programs have this structure, where the Input, Transform, and Display packages may depend on lower
+        level packages to accomplish their tasks.
+        <br /><br />
+        This figure shows the program's packages and how they communicate using function calls.
+      </div>
+      <div style="clear:both;"></div>
+    </li>
+    <li>
+      <h3>Data-Driven Programs:</h3>
+      <div style="float:right; padding:0px 0px 20px 20px; width:60%; margin-top:0px;">
+        <div class="photo" style="margin:0px;">
+          <img src="pictures/ClientServer.png" width="100%" />
+          <div>Traditional Client/Server Model</div>
+        </div>
+      </div>
+      The <strong>Client/Server model</strong> was one of the earliest software structures designed specifically to share data.
+      Under this model the server is reactive, only responding to client requests, but taking no action under its own initiative<sup>1</sup>.
+      Clients initiate transactions, using HTTP messages, waiting for reply messages from the server.
+      <br /><br />
+      <div style="float:right; padding:0px 0px 20px 20px; width:60%; margin-top:0px;">
+        <div class="photo" style="margin:0px;">
+          <img src="pictures/AspNetServer.jpg" width="100%" />
+          <div>Browser Client / Asp.Net Server</div>
+        </div>
+      </div>
+      We show, in the figure below, a modern incarnation of that structure.
+      The purpose of the server is to share content among many clients.  In this case the browser
+      and web server conspire to present a &quot;concurrent access&quot; model by having the server download content to the browser which then
+      may allow a user to spend significant time on its downloaded content while other browser clients are accessing the web server.
+      <br /><br />
+      Should a client's browser upload new content to the web server, all other clients may be able to see the new content immediately, providing
+      a very useful collaboration model.
+      <br /><br />
+      We see from the figure, that the server may be dynamically generating views of its content determined by the specific web application
+      and the client accesses and browser settings the client may have established.
+      <br /><br />
+      This figure presents a block diagram (not one of the UML diagrams) showing the principle processing activities for the exchange of web
+      application information, in the form of web pages, between web server and browser.
+      <br /><br />
+      A variation on the Client/Server model is the <strong>Model-View-Controller (MVC) structure</strong>, shown in the next figure.
+      <div style="float:right; padding:20px 0px 20px 20px; width:50%; margin-top:0px;" ">
+        <div class="photo" style="margin:0px;">
+          <img src="pictures/MVC.jpg" width="100%" />
+          <div>Model-View-Controller Structure</div>
+        </div>
+      </div>
+      The controller, on startup, sends a default view to the client.  Subsequent actions by the user on a view results in calls to the
+      controller which may access its data model to build a response.  That it sends back to the current view or a new view of some different
+      form.  In order to factor out view-handling details from the controller we often build a View Model which has objects that provide
+      simple interfaces for the control but may be managing views in complex ways.
+      <br /><br />
+      Similarly, we may factor out of the controller data management operations which we encapsulate in an Application Model.  This model
+      contains objects that manage processes and information inherent in the application, and take care of all data management operations
+      so that the controller doesn't have to deal with that.
+      <br /><br />
+      Note that the Views and Data may be local to a single running process, or may be distributed to serveral different remote hosts.
+      Views may be requested by a browser client through HTTP requests and returned via an HTTP response, or may simply be direct references
+      with a local process.  Similarly, the Data Model may be supported by a remote web service, like Google Maps, or again, may be a local
+      facility.
+      <div style="clear:both;"></div>
+    </li>
+    <li>
+      <h3>Analysis Driven Programs:</h3>
+      <div class="photo" style="float:right">
+        <div align="right" style="margin-right:40px; margin-top:0px;">
+          Figure 2 - Rule-Based Parser&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <input type="button" value="+" onclick="incrementSize(2);" />&nbsp;
+          <input type="button" value="-" onclick="decrementSize(2);" />
+        </div>
+        <img id="2" src="pictures/ParserStaticStructure.jpg" width="600" />
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;Parser Modules - Executive, Parser, Scanner, and Display</div>
+      </div>
+      <strong>Analyzers</strong> may nomonally take the form of a simple system.  For example, the code parser, shown in the next figure,
+      fits into that model.
+      <br /><br />
+      The Executive and Display are obvious.  The Scanner model replaces the Inputs package with the two packages:
+      Tokenizer, and SemiExp.  The Transformer morphs into packages for managing the parsing process and for defining
+      detailed rules and actions needed for code analysis.
+      <br /><br />
+      Often those packages are accompanied by additional packages like the ScopeStack and AbstrSynTree
+      packages.  The Abstract Syntax Tree (AST) holds results of parsing to be used later by the Executive and Display packages.  ScopeStack plays an
+      important role in building the AST.
+      <br /><br />
+      You can find here an example <a href="../Repository/Cpp/CodeAnalyzer">Code Analyzer</a> application, written in C++, that uses exactly this structure.
+      <br /><br />
+      <strong>Division of a program into packages</strong> is often a matter of binding together things that are related and separating those things that are not.
+      We do this to satisfy the <strong>Single Responsibility Princple (SRP)</strong> - make each package
+      focus on a single activity.  If you can't describe what a package does in a single short sentence, then it probably violates the SRP.
+      <br /><br />
+      However, there are other reasons for making program divisions.  Here's a list:
+      <br />
+      <ul>
+        <li>
+          <div class="itemHeading">Keep things together that are <strong>logically related</strong> (SRP)</div>
+        </li>
+        <li>
+          <div class="itemHeading">
+            Separate things that <strong>change at different rates</strong>.  The ActionsAndRules package changes with
+            every parsing application, but the Parser and
+            its interfaces, IRule and IAction, do not.  We separate ActionsAnRules
+            from the Parser package, to which it is intimately related, because it changes frequently and the rest of the Parser does not.
+          </div>
+        </li>
+        <li>
+          <div class="itemHeading">
+            Keep things that do a lot of <strong>communication</strong> back and forth together for performance reasons.  This is especially true where the processing
+            is distributed across a network or the internet.
+          </div>
+        </li>
+        <li>
+          <div class="itemHeading">
+            Partition to <strong>reuse</strong> or <strong>salvage</strong> existing software components.
+            Reuse is the incorporation of a component without making any changes.  Salvage is a weaker form of reuse where we need to change parts of the
+            component's code, but its design remains intact.
+            If we have existing FileManager, Tokenizer, ... packages, the program that uses those
+            parts must be structured to accomodate them and their processing needs and abilities.
+          </div>
+        </li>
+        <li>
+          <div class="itemHeading">
+            <strong>concurrent processing</strong>, either parallel or pipelined or both, usually has a major impact on the way
+            we need to lay out a system structure - see below.
+          </div>
+        </li>
+      </ul>
+      <div style="clear:both;"></div>
+    </li>
+    <li>
+      <h3>Concurrency Driven Programs:</h3>
+      <!--<div style="float:right; padding-left:10px; width:60%; margin-top:0px; padding-top:0px;">-->
+      <div style="float:right; padding:0px 0px 20px 20px; width:60%; margin-top:0px;">
+        <div class="photo" style="margin:0px;">
+          <img src="Pictures/ParallelTypeAnal.jpg" width="100%" />
+          <div>Parallel and Pipelined Concurrency for Type Analysis</div>
+        </div>
+      </div>
+      In the accompanying figure, we show <strong>analysis flow</strong> for a concurrent dependency analyzer that establishes dependency relationships
+      between two or more source code files.
+      <br /><br />
+      Processing occurs in two phases: the first analyzes all the types and global functions and data (for C++) found in the set of input
+      files, storing the type information in a type table that also holds namespace and source file information.
+      <br /><br />
+      The second pass consists
+      of tokenizing files and marking a dependency relation for them if any of their tokens are keys in the type table.
+      <div class="indent" style="padding:10px;">
+        File A depends on File B if it uses, in any way, the name of a type, global function, or global data, defined in B.
+      </div>
+      The first pass starts a File Search process running on its own thread. As files are discovered, their fully qualified names are
+      enqueued for type analysis.  Multiple type analysis threads are started from a thread
+      pool.  Each thread attempts to dequeue the name of a file to analyze.  If the queue is empty it simply blocks until a name becomes
+      available<sup>2</sup>.
+      <br /><br />
+      Once a thread has completed analysis of a file it has built a table of types found in the file, which it
+      deposits into a merge queue.
+      <br /><br />
+      A TypeTable merge thread dequeues partial type tables as they become available and merges them
+      into a table it is building that, at the end of its processing, contains the entire type information for all the files analyzed.
+      <br /><br />
+      When the merge process completes it publishes the type table and enqueues the file set for Dependency Analysis in the second phase.
+      <br /><br />
+      The second phase flow is very similar to the first, and so we will skip over those details.  The structure of this Analyzer is nominally
+      like the simple program, but it's Transform part blossoms into a number of packages that manage the parallel/pipelined concurrency used
+      in this program.  That middle part will have packages for: a thread-safe blocking queue, thread pool, parser for type analysis - the rules
+      are fairly simple, TypeTable package, and a Dependency package which records all of the dependency relationships found in the second pass.
+      <br /><br />
+      It's likely that the Simple System Display package will also blossom in this Analyzer program.  It has to show, perhaps with an indented list,
+      the dependency relationships.  Note that these relationships form a graph, not a tree, so it is harder to visualize the dependency structure
+      with text output.  Therefore we may be tempted to render the dependency graph visually, which presents all kinds of interesting graph routing
+      and exploration processing to be developed.
+      <br /><br />
+      You will find here a <a href="../Repository/Cpp/ParallelTextSearch-NewThreadPool">Parallel Text Search</a> application that works just like the first phase
+      of the Concurrent Type Analyzer, except that instead of type analysis the program searches files for multiple text strings.
+      <div style="clear:both"></div>
+    </li>
+    <li>
+      <h3>Event Driven Programs:</h3>
+      <div style="float:right; padding:20px 0px 20px 20px; width:60%; margin-top:0px;">
+        <div class="photo" style="margin:0px;">
+          <img src="Pictures/WindowsEventProcessing.jpg" width="100%" />
+          <div style="padding:10px;">
+            <strong>Handling Events based on Windows Messages</strong><br />
+          </div>
+        </div>
+      </div>
+      <strong>Windows Graphical User Applications</strong> have a special structure, sometimes referred to as a Single Threaded Apartment (STA), illustrated in the
+      diagram to the right.  Single Threaded Apartments are software components that create Windows which accept all inputs through a
+      thread-safe message queue.
+      Messages are dequeued by the the primary thread, e.g., the thread that created the window.  Usually many clients of the STA
+      may concurrently send or post messages to the queue.  However, the STA assumes that the only thread accessing the window functions and data
+      is the primary thread, responding to messages from the queue, and so no locking or other synchronization is performed.
+      <br /><br />
+      Graphical windows processing tends to be rather complex so the STA structure was created to avoid the additional complexity of dealing with concurrent
+      access to the window internals.
+      <br /><br />
+      Message arrive at the queue from device events through a &quot;raw input&quot; queue.  The screen management software has a window manager
+      with a stack of window references, one for each open window on the desktop.  It dequeues messages from devices and drops them down its window
+      stack.  The first window that can handle the message does so and stops message propagation to other windows.  This may happen for a mouse button
+      message, for example, when the mouse coordinates are within the Window's client area or chrome.
+      <br /><br />
+      Messages also arrive from code within the application, perhaps triggered by a control event - button click or scroll bar movement - or from other
+      programs or the Windows operating system.  All inputs from these agents occur as messages, never as direct access to a windows functions or data.
+      This message-passing process allows a window to react to incoming messages in a way that seems concurrent to a user.
+      <br /><br />
+      All of the Graphical User Interface frameworks like Qt, Gnome, WinForms, and Windows Presentation Foundation, are implemented with STAs, as is
+      browser processing for all of the major implementations - Internet Explorer, Google Chrome, FireFox, etc.  Also the Node.js message-dispatching
+      JavaScript framework uses an STA model.
+      <div style="clear:both;"></div>
+    </li>
+    <li>
+      <h3>Communication-Driven Systems:</h3>
+      <div style="float:right; padding:0px 0px 20px 20px; width:50%; margin-top:0px;">
+        <div class="photo" style="margin:0px;">
+          <img src="Pictures/PeerToPeer.jpg" width="100%" />
+          <div style="padding:10px;">
+            <strong>Peer-To-Peer Communication</strong><br />
+            Note that Communication Peers may not be functionally identical.
+          </div>
+        </div>
+      </div>
+      Distributed systems need some form of communication channel to communicate between remote machines.  This is done now, most frequently, with
+      TCP-based channels, often with an overlay of HTTP message handling.  The classic form of HTTP is used to implement Client/Server communication
+      where a client makes an HTTP request to a reactive server that forms an HTTP reply synchronously.
+      <br /><br />
+      In our courses we will favor message-passing systems using HTTP style messages, but expect to use one-way transmissions.  That is, a sender
+      forms a request or notification message and sends to a designated receiver over a connected socket channel, perhaps wrapped in middleware
+      infrastructure like Windows Communication Foundation (WCF).  If the request implies some form of response, the receiver forms the reply message,
+      perhaps after a significant amount of processing, then sends the reply to the reciever over a separate channel connection.
+      <br /><br />
+      This one-way communication over dedicated channels uses more system resources than a single bilateral channel, e.g., more sockets and more
+      threads.  However, it yields a very flexible style of communication where no one waits for a reply.  Each end of the communication is active.
+      That is, it can initiate messages as well as sink them.  We never have to worry about talk protocols of the request/response form.  We just
+      send messages when appropriate, and check our receive queues in a timely fashion, probably with a dedicated thread.
+      <br /><br />
+      The implications of this structure are that we can expect each peer to host both a sender and receiver.  Receivers listen for connection requests.
+      When one arrives the receiver uses a thread pool thread to handle the incoming message, mostly to frame messages arriving as bytes in the
+      receive socket, and depositing into a thread safe blocking queue, to await processing by the receiver's host.
+      <br /><br />
+      Senders dequeue their host's outgoing messages, then attempt to open a channel to the destination with a socket connection request.  When that succeeds
+      the sender thread pushes the dequeued message into the channel and goes back to get another message.  Note that this implies the send thread
+      will do message packet inspection to see where the message needs to go.  If it goes the same place as the previous message the send thread
+      just pushes it into the socket.  If the message has a new destination the send thread closes the previous connection and attempts to open
+      a new connection to the new destination.
+      <br /><br />
+      It is relatively simple to cache opened channels for a while to minimize the overhead of frequent opeing/closing cycles.  One easy way to do
+      that is to use a hash table that uses the destination url as its key and holds the connected socket as the corresponding value.  Now, when
+      the destination changes the send thread checks the hash table to see if there already exists a connection to the destination.  If so, it uses
+      the connection.  If not, it creates a new one and inserts into the hash table before sending the message.  This idea also allows us
+      to hold onto messages that could not be sent in a stalled-message queue, also made part of the hash table's value.  When a connection is
+      finally established we may push stalled messages before passing on new messages.
+      <br /><br />
+      Distributed systems also need careful division of processing to make information transfer as efficient as possible.  Note that
+      there is approximately an order of magnitude difference in the time taken to:
+      <div style="padding:10px">
+        <ul class="tight">
+          <li>call within a process (T)</li>
+          <li>call between processes on the same machine (10 T)</li>
+          <li>call into another machine on a local network (100 T)</li>
+          <li>Call to another machine across the internet (1000 T)</li>
+        </ul>
+      </div>
+      We try to make communication as local as possible.  Obviously distributed processing has to communicate to remote processes to do any
+      cooperation.  However, we try to do that with as few messages as possible and cache information and data so that doesn't need to be
+      sent repeatedly between the same endpoints.  For example, if we are sending files from a code Repository to a Test Harness, we will want
+      the Test Harness to keep a cache of files it has recently requested.  If it needs to perform testing on a particular module from the code
+      baseline, it should ask for a list of all of the dependencies of the root module, and then request just those files it needs but does not already
+      have to carry out its tests.
+      <div style="clear:both;"></div>
+    </li>
+    <li>
+      <h3>Web Services:</h3>
+      <div style="float:right; padding:0px 0px 20px 20px; width:50%; margin-top:0px;">
+        <div class="photo" style="margin:0px; padding:20px;">
+          <img src="Pictures/webservices.jpg" width="100%" />
+          <img src="Pictures/webservices-keywords.jpg" width="80%" style="float:right;" />
+          <div style="padding:10px; clear:both;">
+            <strong>Service Architecture</strong> - images from google: webservice images<br />
+          </div>
+        </div>
+      </div>
+      Programs can consume services provided externally, perhaps by <strong>Operating System Service</strong> running on the same machine or
+      a <strong>Web Service</strong> running on the same machine, another machine on the same network, or running on a web host somewhere in the
+      internet.
+      <br /><br />
+      Operating System Serices communicate with local programs through interprocess communication mechanisms based on pipes or TCP
+      messaging.
+      <br /><br />
+      Web Services have a lot of similarities with web applications that are consumed in browsers.  However, the client of a web service is usually
+      not a person using a browser<sup>3</sup> but rather a program that accesses data from the service host and that data is usually shared by
+      many other programs as well.
+      <br /><br />
+      Traditional Web services use TCP communication exclusively, usually wrapped in HTTP messages.  These messages contain Simple Object Access
+      Protocol XML messages carried in the HTTP message body.  These help the service support a variety of operations including creating
+      a Remote Procedure Call fiction.  That uses a proxy to translate method calls into the required HTTP messages, and a stub at the other end
+      to parse the messages and build stack frames to invoke remote objects managed by the service host.
+      <br /><br />
+      SOAP processing is expensive, so a newer service protocol, call REST for REpresentational State Transfer is often used today.
+      That big name identifies a simple
+      idea.  Use the standard HTTP messages: GET, POST, PUT, and DELETE to manage shared information on the service host.
+
+      <br /><br />
+      People claim that REST is
+      stateless, and the messaging is, in the sense that the response to messages does not depend on prior messages, e.g., REST services are not
+      state machines.  They do not support sessions or application state.  If the functionality of a service requires managing state
+      between messages, that state is sent to the client with every reply and the client has to send that back with any request that
+      needs it.
+      Most REST services do manage data state in the service host, e.g., state stored in a database or in files.
+      <br /><br />
+      Partitioning your program's functionality into local processing augmented by remote shared services means that development time
+      may decrease and program quality improve.  You may get access to processing and data that you would not otherwise have. However,
+      if one or more of the services your program uses is provided by a third party, the functionality of the program can be compromised
+      by failures that you cannot easily correct.
+      <br /><br />
+      For systems like the Federations, discussed below, many of the clients and federated servers may share common functionality for
+      collaboration, security, data management, and other similar operations.  Using web services to supply some of those operations
+      for all the servers in a Federation, where performance is not critical, could be a very effective design strategy.
+      <div style="clear:both"></div>
+    </li>
+    <li>
+      <h3>Program Federations:</h3>
+
+      <div class="photo" style="float:right">
+        <div align="right" style="margin-right:40px; margin-top:0px;">
+          Software Development Federation&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <input type="button" value="+" onclick="incrementSize(3);" />&nbsp;
+          <input type="button" value="-" onclick="decrementSize(3);" />
+        </div>
+        <img id="3" src="pictures/Federation-RTS.jpg" width="575" />
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;Repository - TestHarness - Collaboration Federation</div>
+      </div>
+
+      Many large systems take the form of Federations of Servers and Clients that cooperate to carry out a common set of tasks by specialized behaviors.
+      In the figure to the right we show a Software Development Collaboration system composed of:
+      <ul>
+        <li>
+          <div class="itemHeading">
+            A <strong>Collaboration Server</strong> that holds managment information and hosts collaboration tools.
+          </div>
+        </li>
+        <li>
+          <div class="itemHeading">
+            A <strong>Repository Server</strong> that manages the software baseline of a large project, supporting ownership policies, checkin and checkout, version
+            management, and dependency analysis (see the end of the previous item on Communication).
+          </div>
+        </li>
+        <li>
+          <div class="itemHeading">
+            A <a href="BlogTesting.htm"><strong>TestHarness Server</strong></a> that supports continuous integration of new code into an existing baseline by
+            running tests of new parts in the context of a large part of the current baseline.
+          </div>
+        </li>
+        <li>
+          <div class="itemHeading">
+            <strong>Clients</strong> that provide users views into, and support using, the various facilities provided by the Federation.
+          </div>
+        </li>
+      </ul>
+      The large-scale structure of the Federation is dominated by its communication network, probably based on Peer-To-Peer processing,
+      as discussed above.
+      <br /><br />
+      Each of the Client and Server programs may be structured using techniques described in the previous items.  The Collaboration Server,
+      for example, is largely Data-Driven, but also provides a set of collaboration services, probably exposed as web applications hosted in
+      client web browsers and web services that JavaScript libraries consume, also in client web browsers.
+
+      <div style="clear:both;"></div>
+    </li>
+    <li>
+      <h3>Summary:</h3>
+      Software structure is determined by:
+      <ul class="tight">
+        <li class="itemHeading">The packages, modules, and programs that are physical containers of code</li>
+        <li class="itemHeading">How data is managed and viewed</li>
+        <li class="itemHeading">How code is factored into flexible pieces that can be substituted into an enclosing structure - Rules and Actions in the Parser</li>
+        <li class="itemHeading">The way processing and data flows through a system - analysis products like filenames and typetables in the CodeAnalyzer</li>
+        <li class="itemHeading">How events are processed</li>
+        <li class="itemHeading">How remote parts are linked together through communication channels</li>
+        <li class="itemHeading">The use of auxiliary services</li>
+        <li class="itemHeading">The division of labor between major parts of a federation</li>
+      </ul>
+      <br />
+      You won't learn enough about these variations to do useful things simply by reading this blog entry.  However, it will give you some
+      common sense about how things are built and you can look at concrete implementation examples provided by the
+      <a href="../Repository/Cpp/CodeAnalyzer">Code Analyzer</a> and <a href="../Repository/Cpp/ParallelTextSearch-NewThreadPool">Parallel Text Search</a> application.
+      <br /><br />
+      You will get practice and lots of experience with some of these structures in the course projects in <a href="CSE681.htm">CSE681 - Software Modeling and Analysis</a>,
+      and <a href="CSE687.htm">CSE687 - Object Oriented Design</a>.
+    </li>
+  </ol>
+  <p></p>
+  <div style="height:30px;"></div>
+  <hr />
+  <!-- Footnotes -->
+  <ol>
+    <li>
+      Some modern web applications are becoming proactive, sending notifications and pushing data to clients.  Features in and accompanying HTML5 and JavaScript 6 provide
+      some support for proactive operations.  Websockets, WebWorkers, and Local Storage are examples.
+    </li>
+    <li>
+      We will discuss blocking queues when we cover threading later this semester.
+    </li>
+    <li>
+      Browsers can consume web services using JavaScript libraries.
+    </li>
+  </ol>
+
+  <p>
+    <img class="photo" src="pictures/campusStrip.jpg" alt="Newhouse" width="98%" />
+  </p>
+  <info-bar></info-bar>
+</body>
+</html>
