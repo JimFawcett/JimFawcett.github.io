@@ -88,7 +88,7 @@ function initializeMenu() {
     <button class='menuScroll' onclick='scrollMenuLeft()'>&lt;</button>\
     <button class='menuUnscroll' onclick='scrollMenuRight()'>&gt;</button>\
   </div >\
-  <div style='clear:all;'></div>"
+  <div style='clear:all;'></div>";
 
   // hide Next and Prev links if page has no next or previous pages
   // otherwise load href from page link
@@ -184,7 +184,7 @@ function scrollMenuRight() {
   var i;
   for (i = 0; i < items.length; ++i) {
     var cpprp = window.getComputedStyle(items[len - i - 1], null).getPropertyValue("display");
-    if (cpprp != "block") {
+    if (cpprp !== "block") {
       items[len-i-1].style.display = "block";
       break;
     }
