@@ -20,6 +20,7 @@ function initializeMenu() {
       <button class='dropbutton'>Utilities &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='CppUtilities.html'>CppUtilities</a>\
+        <a class='disable' href='FileUtilities.html'>FileUtilities</a>\
         <a class='disable' href='Logger.html'>Logger</a>\
       </div>\
     </div>\
@@ -27,30 +28,43 @@ function initializeMenu() {
       <button class='dropbutton'>Tools &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='TextFinder.html'>TextFinder</a>\
-        <a href='Duplicates.html'>Duplicates</a>\
-        <a href='CodeAnalyzer.html'>Code Analyzer</a>\
+        <a class='disable' href='Duplicates.html'>Duplicates</a>\
+        <a class='disable' href='DiffGUI.html'>DiffGUI</a>\
+        <a class='disable' href='CodeWebifier.html'>CodeWebifier</a>\
+        <a class='disable' href='FileDates.html'>FileDates</a>\
+        <a class='disable' href='FileSizes.html'>FileSizes</a>\
+        <a class='disable' href='PrettyPrint.html'>PrettyPrint</a>\
+        <a class='disable' href='CodeAnalyzer.html'>Code Analyzer</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Components &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='BlockingQueue.html'>BlockingQueue</a>\
-        <a href='FileManager.html'>File Manager</a>\
-        <a href='FileSystem.html'>File System</a>\
-        <a href='ThreadPool.html'>Thread Pool</a>\
+        <a href='CppBlockingQueue.html'>CppBlockingQueue</a>\
+        <a class='disable' href='FileManager.html'>File Manager</a>\
+        <a class='disable' href='ThreadPool.html'>Thread Pool</a>\
+      </div>\
+    </div>\
+    <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Libraries &#9662;</button>\
+      <div class='dropdown-content'>\
+        <a class='disable' href='FileSystemWindows.html'>FileSystem-Windows</a>\
+        <a class='disable' href='FileSystemLinux.html'>FileSystem-Linux</a>\
+        <a class='disable' href='SocketsWindows.html'>Sockets-Windows</a>\
+        <a class='disable' href='SocketsLinux.html'>Sockets-Linux</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Projects &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='MsgPassingComm.html'>MsgPassingComm</a>\
+        <a class='disable' href='MsgPassingComm.html'>MsgPassingComm</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Demos &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='STR.html'>STR</a>\
-        <a href='IOStreams.html'>IO Streams</a>\
+        <a class='disable' href='IOStreams.html'>IO Streams</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
