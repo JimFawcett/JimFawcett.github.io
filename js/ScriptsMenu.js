@@ -61,12 +61,14 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Resources &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='Cpp/Cpp.html'>C++</a>\
-        <a href='CSharp/CSharp.html'>C#</a>\
-        <a href='Java/Java.html'>Java</a>\
+        <a class='disable' href='#'>C++</a>\
+        <a href='DesignNote-GettingStartedWithCpp.html'>Getting Started with C++</a>\
+        <a href='DesignNote-CppClasses.html'>C++ Classes</a>\
+        <a class='disable' href='#'>C#</a>\
+        <a class='disable' href='#'>Java</a>\
         <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
-        <a href='SummerReading.html'>Reading</a>\
-        <a href='SummerProjects.html'>Projects</a>\
+        <a href='SummerReading.html'>Summer Reading</a>\
+        <a href='SummerProjects.html'>Summer Projects</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
