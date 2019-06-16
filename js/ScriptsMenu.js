@@ -67,9 +67,6 @@ function initializeMenu() {
         <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
         <a href='SummerReading.html'>Reading</a>\
         <a href='SummerProjects.html'>Projects</a>\
-        <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
-        <a href='../Webpages/SummerReading.htm'>Reading</a>\
-        <a href='../Webpages/SummerProjects.htm'>Projects</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
