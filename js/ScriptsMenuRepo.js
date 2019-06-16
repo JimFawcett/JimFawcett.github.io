@@ -75,7 +75,8 @@ function initializeMenu() {
         <a href='#' onclick='toggleNavKeys()'>Toggle Nav Keys</a>\
         <a href='SiteDesign.html'>Site Design</a>\
         <a href='index.html'>Site Home</a>\
-        <a href='Repositories.html'>Repositories</a>\
+        <a href='Repositories.html'>Repository index</a>\
+        <a href='https://github.com/JimFawcett'>Repositories</a>\
         <a href='SiteMap.html'>Site Map</a>\
       </div>\
     </div>\
