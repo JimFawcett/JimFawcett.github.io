@@ -48,10 +48,10 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Libraries &#9662;</button>\
       <div class='dropdown-content'>\
-        <a class='disable' href='FileSystemWindows.html'>FileSystem-Windows</a>\
-        <a class='disable' href='FileSystemLinux.html'>FileSystem-Linux</a>\
-        <a class='disable' href='SocketsWindows.html'>Sockets-Windows</a>\
-        <a class='disable' href='SocketsLinux.html'>Sockets-Linux</a>\
+        <a href='FileSystem.html'>FileSystem-Windows</a>\
+        <a class='disable' href='FileSystem.html'>FileSystem-Linux</a>\
+        <a class='disable' href='Sockets.html'>Sockets-Windows</a>\
+        <a class='disable' href='Sockets.html'>Sockets-Linux</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
