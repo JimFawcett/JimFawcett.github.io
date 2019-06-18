@@ -65,7 +65,7 @@ function initializeMenu() {
       <button class='dropbutton'>Demos &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='STR.html'>STR</a>\
-        <a class='disable' href='#'>STL-Containers</a>\
+        <a href='STL-Containers.html'>STL-Containers</a>\
         <a class='disable' href='IOStreams.html'>IO Streams</a>\
       </div>\
     </div>\
