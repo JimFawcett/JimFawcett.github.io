@@ -52,6 +52,7 @@ function initializeMenu() {
         <a class='disable' href='FileSystem.html'>FileSystem-Linux</a>\
         <a class='disable' href='Sockets.html'>Sockets-Windows</a>\
         <a class='disable' href='Sockets.html'>Sockets-Linux</a>\
+        <a href='XmlDocument.html'>XmlDocument</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
