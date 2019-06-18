@@ -1,0 +1,418 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Compound Objects</title>
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+</head>
+<body onload="initializeMenu()" oncontextmenu="return false;">
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <a id="Next" href="Inheritance.htm">N</a>
+  <a id="Prev" href="Classes.htm">P</a>
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <header>
+    <hgroup id="pagetitle">
+      <h1 id="title">Class Relationships</h1>
+    </hgroup>
+  </header>
+
+  <!-- page content -->
+  <main id="main">
+    <h3 style="margin-top: 0px;">Synopsis:</h3>
+    <div class="indent">
+      <p>
+        The C++ language was built from the ground up to support user defined value types.  It does that with copy constructors and copy
+        assignment operators that allow the designer to implement deep copies.  That makes the state of the destination object have the
+        same value as the state of the source, but those states are independent.  If the source changes its state later, that does not
+        affect the state of the destination.
+      </p>
+      <p>
+        C++ provides destructors that are called when the thread of execution leaves the scope where the instance was declared.  This means
+        the developers have tight control over how and when an instance's resources are returned to the process, for use by other instances.
+        More importantly, the users of C++ classes do not need to be aware of these resource allocations and deallocations.  They simply
+        use instances of the classes and the instances take care of all resource management.
+      </p>
+      <p>
+        The language also provides move construction and move assignment operations.  Move construction builds an instance, taking ownership
+        of another instance's state.  This transfer is very efficient, usually effected with a pointer swap.  Similarly, move assignment
+        discards the destination's state and it takes ownership of the source's state.
+      </p>
+      <p>
+        Move operations usually only occur when the source is a temporary object, but the compiler can be coerced to execute a move on
+        a non-temporary object by using the std::move(...) operation.  Note that you need to be careful with this, as the source no longer
+        owns it's former state and may be unable to continue.  Essentially, the use of the std::move(...) is a promise not to use the
+        source object any longer, or to reinitialize it in some effective way.
+      </p>
+    </div>
+    <div class="indent" style="margin-bottom:10px;">
+      There are four <a href="../Presentations/ClassRelationships.pdf">class relationships</a>,
+      <a href="Repository/Presentations/ClassRelationships.doc">doc</a>,
+      we use to construct Object Oriented Designs: Inheritance, Composition, Aggregation,
+      and Using.  Inheritance is an "is-a" relationship.  Composition is a strong ownership or "part-of" relationship.  Aggregation
+      is also a "part-of" relationship, but is weaker than composition because it does not guarantee that the aggregated part is
+      owned, only that it can be owned by the aggregator.  Finally, using is a dependency on an object that is not part of the user,
+      was not created by the user, and should not be destroyed by the user.
+    </div>
+    <h3>Compound Object Example:</h3>
+    <div class="indent" style="float:right; padding-left:0px; padding-bottom:10px;">
+      <div style="float:left; margin:10px; border:1px solid gray; padding:5px; text-align:center; box-shadow:5px 5px 2px #888;">
+        <img src="Pictures/ObjectRelationships.JPG" ; width="700" />
+        <div style="text-align:center">
+          Compound Object Classes
+        </div>
+      </div>
+    </div>
+    <div>
+      <h4 style="padding-bottom:0px; margin-bottom:0px;">Construction Behaviors:</h4>
+      <ol style="margin-top:5px;">
+        <li>An instance of C is always contained within the footprint of each instance of B.</li>
+        <li>Clients of B do not see C's public interface.  That is only accessible to B.</li>
+        <li>Similarly, an instance of B is always contained within each instance of D.</li>
+        <li>Since D derives from B via public inheritance, its public methods become public methods of D.</li>
+        <li>Note that this does not hold for constructors, destructor, or assignment operators.</li>
+        <li>
+          The C++ language guarantees that a constructor call is made for the creation of every object
+          even if the class designer did not provide constructors.  It does that by generating default and copy constructors
+          that do member-wise construction of the class's bases and data elements if the class definition does not explicitly
+          provide them.
+        </li>
+        <li>
+          Similarly, the language guarantees that a destructor call is made for every object as it leaves the scope
+          in which it was declared, even if the class designer did not provide a destructor.  In that case the compiler
+          generates a destructor that does member-wise destruction of each of the class's bases and member data.
+        </li>
+        <li>
+          Note:
+          <span class="itemcallout top">
+            This means that you must always decide whether to provide default and copy constructors and destructors for
+            every class you design.
+          </span>
+        </li>
+        <li>
+          <span>
+            If a class's bases and member data have correct copy, assignment, and destruction semantics, then you
+            don't need to, and should not, provide them.  That is always true if your class holds only primitive types
+            and containers from the Standard Template Library, or holds instances of classes for which that is true.
+          </span>
+        </li>
+        <li>
+          If your class holds pointers to data on the heap, then you must provide copy, assignment, and destruction
+          operations, or qualify those operations with delete.
+        </li>
+        <li>
+          If you class holds any types that do not support copying or assignment, like mutexes and critical sections,
+          then you must qualify copy, assignment, and destruction operations with delete.
+        </li>
+      </ol>
+    </div>
+    <div style="clear:both;">
+    </div>
+    <div id="spacer"></div>
+    <div>
+      <h4>Example Code:</h4>
+      <div class="indent">
+        <a href="CodeSnap-CompoundObjects.cpp.htm">Compound Objects CodeSnap</a>,
+        <a href="../../CoreTechnologies/Cpp/Code/CompoundObjects">Code folder</a><p />
+        <div class="itemcallout">
+          This code has classes C, B, D, and U, shown in the diagram above.  All of these classes,
+          in the demo code, have correct
+          copy,assignment, destruction, and move semantics.  So we normally would not provide
+          those operations, deferring to the compiler generated ones.
+          <div style="height:5px;"></div>
+          However, they are provided
+          here so that they can write to the console to indicate to you how and when they are called.
+        </div>
+      </div>
+    </div>
+    <!--<p>
+            The classes C, B, D, and U, in the code below, demonstrate these operations with both class declarations and method implementations.
+          </p>
+          <div style="margin:20px 20px; padding-top:0px;">
+            <codewrapper>
+              <codecaption style="text-align:left; padding-left:45px;">
+                Example CompObj.cpp - only cpp file for this demonstration
+              </codecaption>
+              <code>
+    ///////////////////////////////////////////////////////////////////////
+    // CompObj.cpp - Compound Object Operations                          //
+    //                                                                   //
+    // Jim Fawcett, CSE687 - Object Oriented Design, Midterm Spring 2016 //
+    ///////////////////////////////////////////////////////////////////////
+    /*
+    * The main objectives of this demonstrations are to:
+    * - illustrate the importance of constructor initialization sequences
+    * - expose all of the operations that compound objects are expected
+    *   to provide.
+    */
+    #include &lt;iostream&gt;
+    #include &lt;string&gt;
+    #include "../Utilities/Utilities.h"
+
+    void putMsg(const std::string& msg)
+    {
+    std::cout &lt;&lt; "\n  " &lt;&lt; msg.c_str();
+    }
+
+    struct Cosmetic {
+    ~Cosmetic() { std::cout &lt;&lt; "\n\n"; }
+    } GlobalCosm;
+
+    ///////////////////////////////////////////////////////////////////////
+    // C class - instances are composed by the base class B
+
+    class C
+    {
+    public:
+      C() { putMsg("C default construction"); }
+      C(const C& c) : name_(c.name_)  // note initialization
+      {
+        putMsg("C copy construction");
+      }
+      C& operator=(const C& c)
+      {
+        putMsg("C assignment");
+        if (this == &c)
+          return *this;
+        name_ = c.name_;
+        return *this;
+      }
+      C(C&& c) : name_(std::move(c.name_))
+      {
+        putMsg("C move construction");
+      }
+      C& operator=(C&& c)
+      {
+        putMsg("C move assignment");
+        if (this == &c)
+          return *this;
+        name_ = std::move(c.name_);
+        return *this;
+      }
+      ~C()
+      {
+        putMsg("C destruction");
+      }
+    private:
+      std::string name_;
+    };
+    ///////////////////////////////////////////////////////////////////////
+    // B class - serves as the base of inheritance for D
+    /*
+    *  B's constructors, as their first act, invoke a C constructor.  They
+    *  don't execute their bodies until C's construction completes.
+    */
+    class B
+    {
+    public:
+      B()
+      {
+        putMsg("B default construction");
+      }
+      B(const B& b) : c(b.c)
+      {
+        putMsg("B copy construction");
+      }
+      B& operator=(const B& b)
+      {
+        putMsg("B copy assignment");
+        if (this == &b)
+          return *this;
+        c = b.c;
+        return *this;
+      }
+      B(B&& b) : c(std::move(b.c))
+      {
+        putMsg("B move construction");
+      }
+      B& operator=(B&& b)
+      {
+        putMsg("B move assignment");
+        if (this == &b)
+          return *this;
+        c = std::move(b.c);
+        return *this;
+      }
+      virtual void g()
+      {
+        putMsg("Calling g()");
+      }
+      virtual ~B()
+      {
+        putMsg("B destruction");
+      }
+    private:
+      C c;
+    };
+    ///////////////////////////////////////////////////////////////////////
+    // U class - instances are used by D
+
+    class U
+    {
+    public:
+      U()
+      {
+        putMsg("U default construction");
+      }
+      U(const U& u)
+      {
+        putMsg("U copy construction");
+      }
+      U& operator=(const U& u)
+      {
+        putMsg("U assignment");
+        return *this;
+      }
+      U(U&& u)
+      {
+        putMsg("U move construction");
+      }
+      U& operator=(U&& u)
+      {
+        putMsg("U move assignment");
+        return *this;
+      }
+      ~U()
+      {
+        putMsg("U destruction");
+      }
+    };
+    ///////////////////////////////////////////////////////////////////////
+    // D class
+    // - D derives from B.
+    // - There are no virtual functions because our goal is to
+    //   illustrate operations that occur when a compound object
+    //   is created, assigned, and destroyed.
+    /*
+    *  D's constructors, as their first act, invoke a B constructor.  They
+    *  don't execute their bodies until B's construction completes.
+    */
+    class D : public B
+    {
+    public:
+      D()
+      {
+        putMsg("D default construction");
+      }
+      D(const D& d) : B(d)
+      {
+        putMsg("D copy construction");
+      }
+      D& operator=(const D& d)
+      {
+        putMsg("D assignment");
+        if (this == &d)
+          return *this;
+        B::operator=(d);
+        return *this;
+      }
+      D(D&& d) : B(std::move(d))
+      {
+        putMsg("D move construction");
+      }
+      D& operator=(D&& d)
+      {
+        putMsg("D move assignment");
+        if (this == &d)
+          return *this;
+        B::operator=(std::move(d));
+        return *this;
+      }
+      virtual void g()
+      {
+        putMsg("Calling D::g()");
+      }
+      void f(U& u)
+      {
+        putMsg("D using U");
+      }
+      ~D()
+      {
+        putMsg("D destruction");
+      }
+    };
+
+    ///////////////////////////////////////////////////////////////////////
+    // global function testFunction
+    // - Illustrates move construction from temporary objects.
+
+    D testFunction()
+    {
+      Utilities::title("Running testFunction");
+      D d;
+      return d;  // d will be moved, not copied
+    }
+
+    ///////////////////////////////////////////////////////////////////////
+    // Test stub
+    // - You should experiment with this and with the parts provided
+    //   for the classes.
+    // - What do you think will happen if you comment out the move
+    //   operations?
+
+    int main()
+    {
+      Utilities::title("Demonstrating Operation of Compound Object", '=');
+      U u;
+      D d;
+      d.f(u);
+      d = testFunction();
+
+      Utilities::title("starting copy construction");
+      D d2 = d;
+
+      Utilities::title("starting move construction");
+      D d3 = std::move(d);
+      // d is now invalid
+
+      Utilities::title("Demonstrating polymorphism");
+      B* ptr = new B();
+      ptr-&gt;g();
+      ptr = &d;
+      ptr-&gt;g();
+
+      Utilities::title("leaving main's scope");
+    }
+              </code>
+            </codewrapper>
+          </div>
+          <div class="spacer"></div>
+          <div style="float:left; margin:30px; border:1px solid gray; padding:5px; text-align:center; box-shadow:5px 5px 2px #888;">
+            <img src="../Presentations/CompoundObject.out.jpg" ; width="550" />
+            <div style="text-align:center">
+              Compound Object Demo Output
+            </div>
+          </div>
+          <p style="padding-left:50px;">
+            The <a href="../code/CompoundObjects">Compound Objects Code</a><br />
+            folder provides this code in a Visual Studio project so you can try it out.
+          </p>
+          <div class="spacer"></div>
+        </div>
+        <div id="spacer"></div>-->
+  </main>
+  <p>
+    <img class="photo" src="pictures/Campusstrip.jpg" alt="CST strip" width="97%" />
+  </p>
+  <info-bar></info-bar>
+</body>
+</html>
