@@ -1,0 +1,242 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Templates</title>
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+  <style>
+    code {
+      background-color: white;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+    }
+
+    codecaption {
+      border: 1px solid black;
+      margin: 0px;
+      padding: 5px 30px;
+      font-size: large;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body id="github" onload="initializeMenu()">
+  <body id="github" onload="initializeMenu()">
+
+    <navKeysContainer>
+      <navKey onclick="scrollPageTop()">T</navKey>
+      <navKey onclick="scrollPageBottom()">B</navKey>
+      <navKey onclick="helpWin()">H</navKey>
+      <navKey onclick="loadPrev()">P</navKey>
+      <navKey onclick="loadNext()">N</navKey>
+    </navKeysContainer>
+
+    <nav>
+      <div id="navbar"></div>
+    </nav>
+    <!--<a id="Next" href="BlogDesign.htm">N</a>
+  <a id="Prev" href="BlogFileSystem.htm">P</a>-->
+
+    <header>
+      <hgroup id="pagetitle">
+        <h1 id="title">Generic Programming with Templates</h1>
+        <!--<h2 id="subtitle" class="indent">JimFawcett</h2>-->
+      </hgroup>
+    </header>
+
+    <!-- page content -->
+    <main id="main">
+      <h3 style="margin-top: 0px;">Synopsis:</h3>
+      <div class="indent">
+        <p>
+          Templates support building parameterized types and functions that accept an unspecified type which gets resolved only when an application
+          instantiates the code with a concrete type.  Parameterized code will accept, without compilation error, arbitrary calls on instances of the
+          template type.  When an application instantiates the parameterized code with a concrete type compilation of the instantiated code succeeds
+          if the type supports specified operations, else it fails.
+        </p>
+        <p>
+          So there are two C++ template compilation phases:
+          <ol>
+            <li>
+              Compilation of the template library code does a syntax check to identify known errors.  No object code is generated since the type of the
+              template parameter is not specified.
+            </li>
+            <li>
+              Compilation of the instantiated application code generates an object file if instantiated syntax is correct, otherwise it fails.
+            </li>
+          </ol>
+          This lazy syntax checking is very useful.  C# and Java generics do eagar type checking so many operations that would succeed for
+          useful types are not allowed because the compiler can't ensure that they will succeed.
+        </p>
+        <p>
+          An implication of this lasy compilation is that all of the template definition code must go in a header file, because the application
+          that uses the template definition has to see all of it's code to compile successfully, and it gets that only by including a header file.
+        </p>
+        <h4>An Example:</h4>
+        <p>
+          The Convert&lt;T&gt; class converts any type to and from strings, provided they have appropriate insertion and extraction operators.
+          It works for all of the native numerical types without writing any additional code.
+        </p>
+        <div style="margin:20px 20px 40px 20px;">
+          <codewrapper style="margin-bottom:0px;">
+            <codecaption style="text-align:left; padding-left:45px;">
+              Template Example Code - TemplatesIntro.h
+            </codecaption>
+            <pre>
+    template&lt;typename T&gt;
+    class Convert
+    {
+    public:
+    virtual ~Convert<T>
+    () {}
+    static std::string toString(const T& t);
+    static T fromString(const std::string& str);
+    static std::string id(const T& t);
+    };
+    /*----< serialize t to a std::string >-----------------------------*/
+    /*
+    * Assumes that T defines an insertion operator.
+    */
+    template&lt;typename T&gt;
+    std::string Convert&lt;T&gt;::toString(const T& t)
+    {
+    std::ostringstream out;
+    out << *const_cast<T*>
+    (&t);
+    return out.str();
+    }
+    /*----< create an instance of T from a std::string >---------------*/
+    /*
+    * Assumes that T defines an extraction operator.
+    * To succeed str must be created from Convert<T>
+    ::toString(const T& t).
+    */
+    template&lt;typename T&gt;
+    T Convert&lt;T&gt;::fromString(const std::string& str)
+    {
+    std::istringstream in(str);
+    T value;
+    in >> value;    // istringstream extraction provides the conversion
+    return value;
+    }
+    /*----< create an id string from an instance of T using RTTI >----*/
+
+    template&lt;typename T&gt;
+    std::string Convert&lt;T&gt;::id(const T& t)
+    {
+    return typeid(t).name();
+    }
+            </pre>
+            <codecaption style="text-align:left; padding-left:45px;">
+              Template Example Code - TemplatesIntro.cpp
+            </codecaption>
+            <pre>
+    #include "TemplatesIntro.h"
+
+    int main()
+    {
+    Title("Demonstrating Templates");
+    putLine();
+
+    title("Demonstrating Conversion of numerical types");
+    std::cout << "\n  conversion of integer: " << Convert&lt;int&gt;::toString(42);
+    std::cout << "\n  conversion of double:  " << Convert&lt;double&gt;::toString(3.1415927);
+    putLine();
+    }
+            </pre>
+          </codewrapper>
+        </div>
+        <p>
+          User defined types have to provide insertion and extraction
+          operators.  You can find an example of that in the TemplateDemo sample code, below.
+          You will find the code for Convert&lt;T&gt; and a TemplatesIntro&lt;T&gt; class that show how Convert&lt;T&gt; is used.
+        </p>
+        <p>
+          All of the  input stream classes: istream, ifstream, and istringstream, provide extraction
+          operators and all of the output stream classes: ostream, ofstream, and ostringstream, provide insertion operators
+          that convert primitive types (integral types, floating types) to and from strings.
+        </p>
+        <p>
+          We are using the conversion provided
+          by the std::istringstream class extraction operator&gt;&gt; in Check&lt;T&gt;::fromString(const&nbsp;std::string&amp;&nbsp;str),
+          and by the std::ostringstream class insertion operator&lt;&lt; in Check&lt;T&gt;::toString(const&nbsp;T&amp;&nbsp;t).
+        </p>
+        <p>
+          You can do the same for your user-defined classes, simply by overloading those operators to save and retrieve the class's state.
+          For classes with complex state you may need to save to an XML string for insertion, and parse the string for extraction.  The
+          <a href="../../Repository/XmlDocument">XmlDocument package</a> will be helpful for that.
+        </p>
+        <div class="spacer"></div>
+        <h3>Template Stack Example</h3>
+        <div class="indent">
+          <a href="CodeSnap-Templates.h.htm">Templates CodeSnap</a>,
+          <a href="../code/codesnaps/templates">Code folder</a>
+        </div>
+        <p>
+          <h3>Templates Presentation</h3>
+          <ul>
+            <li>
+              <a href="../Presentations/Templates.pdf">Templates presentation</a>,
+              <a href="../Presentations/Templates.ppt">ppt</a>
+            </li>
+          </ul>
+        </p>
+        <p>
+          <h3>More Templates Code Examples:</h3>
+          <ul>
+            <li>
+              <a href="../../CoreTechnologies/cpp/code/TemplateDemo">TemplateDemo</a>
+            </li>
+            <li>
+              <a href="../../CoreTechnologies/cpp/Code/templates">Basic template examples</a>
+            </li>
+            <li>
+              <a href="../../CoreTechnologies/cpp/Code/STL-Containers">Parameterized STL-Containers</a>
+            </li>
+            <li>
+              <a href="../../CoreTechnologies/cpp/Code/TemplateTechniques">Template Techniques</a>
+            </li>
+            <li>
+              <a href="../code/Functors">Functor examples</a>
+            </li>
+            <li>
+              <a href="../../Repository/Utilities">Utilities</a>
+            </li>
+          </ul>
+        </p>
+        <p>
+          <h3>References:</h3>
+          <ul>
+            <li>
+              <a href="http://en.cppreference.com/w/cpp/language/templates">Templates - cppreference.com</a>
+            </li>
+            <li>
+              <a href="https://isocpp.org/wiki/faq/templates">FAQ - Templates</a>
+            </li>
+          </ul>
+        </p>
+      </div>
+      <div id="spacer"></div>
+    </main>
+    <p>
+      <img class="photo" src="pictures/Campusstrip.jpg" alt="CST strip" width="97%" />
+    </p>
+    <footer>
+      <hr />
+      <div style="position:absolute; left:35px;">Computer Engineering Course Notes</div>
+      Jim Fawcett &copy; copyright 2016
+    </footer>
+    <a name="bottom"></a>
+  </body>
+</html>
