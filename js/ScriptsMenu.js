@@ -19,6 +19,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Design Notes &#9662;</button>\
       <div class='dropdown-content'>\
+        <a href='DesignNotes.html'>Annotated Summary of Design Notes</a>\
         <a href='DesignNote-CvsCpp.html'>C vs C++</a>\
         <a href='DesignNote-GettingStartedWithCpp.html'>Getting Started with C++</a>\
         <a href='DesignNote-Cpp11.html'>C++11</a>\
@@ -26,6 +27,7 @@ function initializeMenu() {
         <a href='DesignNote-CppClasses.html'>C++ Classes</a>\
         <a href='DesignNote-CppClassRelationships.html'>C++ Class Relationships</a>\
         <a href='DesignNote-CompoundObjects.html'>Compound Objects</a>\
+        <a href='Templates.html'>Templates</a>\
         <a href='BlogPrinciples.html'>Design Principles</a>\
         <a href='BlogOOD.html'>Object Oriented Design</a>\
       </div>\
@@ -33,6 +35,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Blogs &#9662;</button>\
       <div class='dropdown-content'>\
+        <a href='Blogs.html'>Annotated&nbsp;Summary&nbsp;of&nbsp;Blogs&nbsp;&nbsp;</a>\
         <a href='Blog.html'>First&nbsp;Things</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
         <a href='BlogDesign.html'>SW&nbsp;Design</a>\
