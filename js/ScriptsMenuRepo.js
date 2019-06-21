@@ -70,6 +70,14 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Build &#9662;</button>\
+      <div class='dropdown-content'>\
+        <a class='disable' href='#'>BuildDemo</a>\
+        <a class='disable' href='#'>BuildStructure</a>\
+        <a class='disable' href='#'>BuildAddRepo</a>\
+      </div>\
+    </div>\
+    <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='About.html'>Jim Fawcett</a>\
