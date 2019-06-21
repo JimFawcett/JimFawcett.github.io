@@ -17,7 +17,7 @@ function initializeMenu() {
     <a href='index.html' class='menuItem'>Home</a>\
     <a href='Repositories.html' class='menuItem'>Repositories</a>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Design Notes &#9662;</button>\
+      <button class='dropbutton'>Notes &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='DesignNotes.html'>Annotated Summary of Design Notes</a>\
         <a href='DesignNote-CvsCpp.html'>C vs C++</a>\
