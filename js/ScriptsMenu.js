@@ -96,13 +96,14 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='About.html'>Jim Fawcett</a>\
+        <a href='JimFawcett.html'>Jim Fawcett</a>\
         <a href='Help.html'>Help</a>\
+        <a href='ToDo.html'>ToDo</a>\
         <a href='#' onclick='toggleNavKeys()'>Toggle Nav Keys</a>\
         <a href='SiteDesign.html'>Site Design</a>\
         <a href='index.html'>Site Home</a>\
-        <a href='Repositories.html'>Repository index</a>\
-        <a href='https://github.com/JimFawcett'>Repositories</a>\
+        <a href='Repositories.html'>Repositories&nbsp;web&nbsp;page</a>\
+        <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
       </div>\
     </div>\
