@@ -28,7 +28,6 @@ function initializeMenu() {
       <button class='dropbutton'>Tools &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='TextFinder.html'>TextFinder</a>\
-        <a href='CppUtilities.html'>CppUtilities</a>\
         <a href='FileUtilities.html'>FileUtilities</a>\
         <a href='Duplicates.html'>Duplicates</a>\
         <a href='FileDates.html'>FileDates</a>\
@@ -37,6 +36,7 @@ function initializeMenu() {
         <a href='Diff_WPF.html'>Diff_WPF</a>\
         <a href='CodeWebifier.html'>CodeWebifier</a>\
         <a href='PrettyPrint.html'>PrettyPrint</a>\
+        <a href='CodeAnalyzer.html'>CodeAnalyzer</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -65,7 +65,8 @@ function initializeMenu() {
       <button class='dropbutton'>Projects &#9662;</button>\
       <div class='dropdown-content'>\
         <a class='disable' href='MsgPassingComm.html'>MsgPassingComm</a>\
-        <a class='disable' href='CodeAnalyzer.html'>CodeAnalyzer</a>\
+        <a class='disable' href='CppCodeAnalyzer.html'>CodeAnalyzer</a>\
+        <a class='disable' href='CsDependencyAnalysis.html'>CsDependencyAnalysis</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
