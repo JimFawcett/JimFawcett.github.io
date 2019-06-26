@@ -96,7 +96,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Prog Lang &#9662;</button>\
       <div class='dropdown-content'>\
-        <a class='disable' href='#'>C++</a>\
+        <a href='LangCpp.html'>C++</a>\
         <a class='disable' href='#'>C#</a>\
         <a class='disable' href='#'>HTML</a>\
         <a class='disable' href='#'>CSS</a>\
