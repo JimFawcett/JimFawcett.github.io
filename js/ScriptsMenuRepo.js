@@ -65,7 +65,7 @@ function initializeMenu() {
       <button class='dropbutton'>Projects &#9662;</button>\
       <div class='dropdown-content'>\
         <a class='disable' href='MsgPassingComm.html'>MsgPassingComm</a>\
-        <a class='disable' href='CppCodeAnalyzer.html'>CodeAnalyzer</a>\
+        <a class='disable' href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a>\
         <a class='disable' href='CsDependencyAnalysis.html'>CsDependencyAnalysis</a>\
       </div>\
     </div>\
