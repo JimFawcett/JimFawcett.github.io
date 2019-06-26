@@ -94,6 +94,20 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Prog Lang &#9662;</button>\
+      <div class='dropdown-content'>\
+        <a class='disable' href='#'>C++</a>\
+        <a class='disable' href='#'>C#</a>\
+        <a class='disable' href='#'>HTML</a>\
+        <a class='disable' href='#'>CSS</a>\
+        <a class='disable' href='#'>JavaScript</a>\
+        <a class='disable' href='#'>Java</a>\
+        <a class='disable' href='#'>Rust</a>\
+        <a class='disable' href='#'>Go</a>\
+        <a class='disable' href='#'>Python</a>\
+      </div>\
+    </div>\
+    <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
@@ -102,7 +116,7 @@ function initializeMenu() {
         <a href='#' onclick='toggleNavKeys()'>Toggle Nav Keys</a>\
         <a href='SiteDesign.html'>Site Design</a>\
         <a href='index.html'>Site Home</a>\
-        <a href='Repositories.html'>Repositories&nbsp;web&nbsp;page</a>\
+        <a href='Repositories.html'>Repository&nbsp;webpage</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
       </div>\

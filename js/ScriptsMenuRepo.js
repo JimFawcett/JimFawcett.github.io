@@ -20,21 +20,23 @@ function initializeMenu() {
       <button class='dropbutton'>Utilities &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='CppUtilities.html'>CppUtilities</a>\
-        <a class='disable' href='FileUtilities.html'>FileUtilities</a>\
-        <a class='disable' href='Logger.html'>Logger</a>\
+        <a href='FileUtilities.html'>FileUtilities</a>\
+        <a href='Logger.html'>Logger</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Tools &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='TextFinder.html'>TextFinder</a>\
-        <a class='disable' href='Duplicates.html'>Duplicates</a>\
-        <a class='disable' href='DiffGUI.html'>DiffGUI</a>\
-        <a class='disable' href='CodeWebifier.html'>CodeWebifier</a>\
-        <a class='disable' href='FileDates.html'>FileDates</a>\
-        <a class='disable' href='FileSizes.html'>FileSizes</a>\
-        <a class='disable' href='PrettyPrint.html'>PrettyPrint</a>\
-        <a class='disable' href='CodeAnalyzer.html'>Code Analyzer</a>\
+        <a href='CppUtilities.html'>CppUtilities</a>\
+        <a href='FileUtilities.html'>FileUtilities</a>\
+        <a href='Duplicates.html'>Duplicates</a>\
+        <a href='FileDates.html'>FileDates</a>\
+        <a href='FileSizes.html'>FileSizes</a>\
+        <a href='FindFiles.html'>FindFiles</a>\
+        <a href='Diff_WPF.html'>Diff_WPF</a>\
+        <a href='CodeWebifier.html'>CodeWebifier</a>\
+        <a href='PrettyPrint.html'>PrettyPrint</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -42,7 +44,11 @@ function initializeMenu() {
       <div class='dropdown-content'>\
         <a href='CppBlockingQueue.html'>CppBlockingQueue</a>\
         <a class='disable' href='FileManager.html'>File Manager</a>\
-        <a class='disable' href='ThreadPool.html'>Thread Pool</a>\
+        <a class='disable' href='CppProperty.html'>CppProperty</a>\
+        <a class='disable' href='ThreadPool.html'>ThreadPool</a>\
+        <a class='disable' href='Process.html'>Process</a>\
+        <a class='disable' href='ReTryWrapper.html'>ReTryWrapper</a>\
+        <a class='disable' href='WebComponents.html'>WebComponents</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -50,7 +56,7 @@ function initializeMenu() {
       <div class='dropdown-content'>\
         <a href='FileSystem.html'>FileSystem-Windows</a>\
         <a class='disable' href='FileSystem.html'>FileSystem-Linux</a>\
-        <a class='disable' href='Sockets.html'>Sockets-Windows</a>\
+        <a href='Sockets.html'>Sockets-Windows</a>\
         <a class='disable' href='Sockets.html'>Sockets-Linux</a>\
         <a href='XmlDocument.html'>XmlDocument</a>\
       </div>\
@@ -59,22 +65,25 @@ function initializeMenu() {
       <button class='dropbutton'>Projects &#9662;</button>\
       <div class='dropdown-content'>\
         <a class='disable' href='MsgPassingComm.html'>MsgPassingComm</a>\
+        <a class='disable' href='CodeAnalyzer.html'>CodeAnalyzer</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Demos &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='STR.html'>STR</a>\
+        <a href='STR.html'>STR&nbsp;Value&nbsp;Type</a>\
         <a href='STL-Containers.html'>STL-Containers</a>\
-        <a class='disable' href='IOStreams.html'>IO Streams</a>\
+        <a href='IOStreams.html'>IO Streams</a>\
+        <a class='disable' href='CppThreads.html'>CppThreads</a>\
+        <a class='disable' href='ProcAndThreads.html'>Processes&nbsp;&amp;&nbsp;Threads</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Build &#9662;</button>\
       <div class='dropdown-content'>\
-        <a class='disable' href='#'>BuildDemo</a>\
-        <a class='disable' href='#'>BuildStructure</a>\
-        <a class='disable' href='#'>BuildAddRepo</a>\
+        <a class='disable' href='#'>Build Demo</a>\
+        <a class='disable' href='#'>Build Structure</a>\
+        <a class='disable' href='#'>Build from repo</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -86,7 +95,7 @@ function initializeMenu() {
         <a href='#' onclick='toggleNavKeys()'>Toggle Nav Keys</a>\
         <a href='SiteDesign.html'>Site Design</a>\
         <a href='index.html'>Site Home</a>\
-        <a href='Repositories.html'>Repositories&nbsp;web&nbsp;page</a>\
+        <a href='Repositories.html'>Repository&nbsp;webpage</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
       </div>\
