@@ -28,7 +28,6 @@ function initializeMenu() {
       <button class='dropbutton'>Tools &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='TextFinder.html'>TextFinder</a>\
-        <a href='FileUtilities.html'>FileUtilities</a>\
         <a href='Duplicates.html'>Duplicates</a>\
         <a href='FileDates.html'>FileDates</a>\
         <a href='FileSizes.html'>FileSizes</a>\
@@ -36,7 +35,6 @@ function initializeMenu() {
         <a href='Diff_WPF.html'>Diff_WPF</a>\
         <a href='CodeWebifier.html'>CodeWebifier</a>\
         <a href='PrettyPrint.html'>PrettyPrint</a>\
-        <a href='CodeAnalyzer.html'>CodeAnalyzer</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -47,7 +45,7 @@ function initializeMenu() {
         <a class='disable' href='CppProperty.html'>CppProperty</a>\
         <a class='disable' href='ThreadPool.html'>ThreadPool</a>\
         <a class='disable' href='Process.html'>Process</a>\
-        <a class='disable' href='ReTryWrapper.html'>ReTryWrapper</a>\
+        <a class='disable' href='RetryWrapper.html'>RetryWrapper</a>\
         <a class='disable' href='WebComponents.html'>WebComponents</a>\
       </div>\
     </div>\
@@ -74,9 +72,9 @@ function initializeMenu() {
       <div class='dropdown-content'>\
         <a href='STR.html'>STR&nbsp;Value&nbsp;Type</a>\
         <a href='STL-Containers.html'>STL-Containers</a>\
-        <a href='IOStreams.html'>IO Streams</a>\
+        <a href='IOStreams.html'>IOStreams</a>\
         <a class='disable' href='CppThreads.html'>CppThreads</a>\
-        <a class='disable' href='ProcAndThreads.html'>Processes&nbsp;&amp;&nbsp;Threads</a>\
+        <a class='disable' href='ProcAndThreads.html'>ProcsAndThreads</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -95,8 +93,9 @@ function initializeMenu() {
         <a href='ToDo.html'>ToDo</a>\
         <a href='#' onclick='toggleNavKeys()'>Toggle Nav Keys</a>\
         <a href='SiteDesign.html'>Site Design</a>\
-        <a href='index.html'>Site Home</a>\
-        <a href='Repositories.html'>Repository&nbsp;webpage</a>\
+        <a class='border' href='index.html'>L1 Site Home</a>\
+        <a class='border' href='Repositories.html'>L2 Repository&nbsp;webpage</a>\
+        <a class='border' href='LangCpp.html'>L2 C++&nbsp;webpage</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
       </div>\

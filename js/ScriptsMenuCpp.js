@@ -1,8 +1,8 @@
-/////////////////////////////////////////////////////////////////////
-// ScriptsMenu.js - Constructs dropdown menu for Top Level Pages   //
-//                                                                 //
-// Jim Fawcett, Website, 25 June 2018                              //
-/////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+// ScriptsMenuCpp.js - Constructs dropdown menu for Top Level Pages  //
+//                                                                   //
+// Jim Fawcett, Website, 25 June 2018                                //
+///////////////////////////////////////////////////////////////////////
 
 //----< called in body.onload to initial menus and footer >----------
 /*
@@ -65,37 +65,28 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Design Course &#9662;</button>\
+      <button class='dropbutton'>C++ Lang &#9662;</button>\
       <div class='dropdown-content'>\
-        <a class='disable' href='#'>Table of Contents</a>\
-        <a class='disable' href='#'>Concept&nbsp;and&nbsp;Tasks&nbsp;(TextFinder)</a>\
-        <a class='disable' href='#'>Classes (Sockets-Windows)</a>\
-        <a class='disable' href='#'>Inheritance (XmlDocument)</a>\
-        <a class='disable' href='#'>Templates (Properties)</a>\
-        <a class='disable' href='#'>Flexible Designs (DirExplorer)</a>\
-        <a class='disable' href='#'>Components (Parser)</a>\
-        <a class='disable' href='#'>Project Structures</a>\
-        <a class='disable' href='#'>Threads (ThreadPool)</a>\
-        <a class='disable' href='#'>Sockets&nbsp;(MsgPassingCommunication)</a>\
-        <a class='disable' href='#'>Build Process (TextFinder)</a>\
-        <a class='disable' href='#'>Testing&nbsp;(FileSystem-Windows)</a>\
-        <a class='disable' href='#'>Appendix:&nbsp;<u>U</u>niversal&nbsp;<u>M</u>odeling&nbsp;<u>L</u>anguage</a>\
-        <a class='disable' href='#'>Appendix:&nbsp;Implementation&nbsp;metrics</a>\
-        <a class='disable' href='#'>Appendix: Design Patterns</a>\
+        <a href='DesignNote-CvsCpp.html'>C vs C++</a>\
+        <a href='DesignNote-GettingStartedWithCpp.html'>Getting Started</a>\
+        <a href='Resources/CppModels.pdf'>C++ models - pdf</a>\
+        <a href='DesignNote-CppClasses.html'>classes</a>\
+        <a class='disable' href='DesignNote-ValueTypes.html'>Value Types</a>\
+        <a href='DesignNote-CppClassRelationships.html'>class relationships</a>\
+        <a href='DesignNote-Cpp11.html'>C++11</a>\
+        <a href='DesignNote-CompoundObjects.html'>Compound Objects</a>\
+        <a href='Templates.html'>Templates</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Prog Lang &#9662;</button>\
+      <button class='dropbutton'>C++ Demos &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='LangCpp.html'>C++</a>\
-        <a class='disable' href='#'>C#</a>\
-        <a class='disable' href='#'>HTML</a>\
-        <a class='disable' href='#'>CSS</a>\
-        <a class='disable' href='#'>JavaScript</a>\
-        <a class='disable' href='#'>Java</a>\
-        <a class='disable' href='#'>Rust</a>\
-        <a class='disable' href='#'>Go</a>\
-        <a class='disable' href='#'>Python</a>\
+        <a class='disable' href='BasicSyntax.html'>basic syntax demos</a>\
+        <a href='STR.html'>STR Value Type demo</a>\
+        <a href='STL-Containers.html'>STL-Containers</a>\
+        <a href='IOStreams.html'>std::iostream demos</a>\
+        <a href='CppThreads.html'>basic c++11 thread demos</a>\
+        <a href='ProcsAndThreads.html'>Process and Thread demos</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
