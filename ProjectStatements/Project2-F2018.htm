@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - Project2-S2019.htm - Project #1, Fall 2018
+   - ver 1.0 - 16 Aug 2017
+   - Jim Fawcett, Syracuse University
+  -->
+  <title>Project #2</title>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+</head>
+<body onload="initializeMenu()" oncontextmenu="return false;">
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <a id="Next" href="Project3-S2019.htm">N</a>
+  <a id="Prev" href="Project1-S2019.htm">P</a>
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <header>
+    <h2 id="title">Project #2 - Multi-User Test Harness Core</h2>
+    <div id="pagedate">
+      Version 1.1<br />
+      Due Date: Wednesday, October 10th, 2018
+    </div>
+    <a href="../code/Project2HelpS2019">Project #2 helper files</a>
+  </header>
+
+  <!-- Notes Content -->
+  <section>
+    <h3>Purpose:</h3>
+    One focus area for this course is understanding how to structure and implement big software systems.  By big we mean systems
+    that may consist of hundreds or even thousands of packages<sup>1</sup> and perhaps several million lines of code.
+    We won't be building anything quite that large, but our projects may be considerably bigger than anything you've worked
+    on before.
+    <spacer-15></spacer-15>
+    In order to successfully implement big systems we need to partition code into relatively small parts and thoroughly test
+    each of the parts before inserting them into the software baseline<sup>2</sup>.  As new parts are added to the baseline and
+    as we make changes to fix latent errors or performance problems we will re-run test sequences for those parts
+    and, perhaps, for the entire baseline.  Managing that process efficiently requires effective tools for code analysis
+    as well as testing.  How we do that code analysis is illustrated by the projects for this year.
+    <spacer-15></spacer-15>
+    The projects this Fall focus on building software testing tools.  We will emphasize C++ code
+    but want our tools to be easily extendable to other similar languages like C# and Java.
+    <spacer-15></spacer-15>
+    You will find it useful to look at the <a href="../../Webpages/BlogTesting.htm">SW Testing</a> blog for a brief introduction
+    to production testing.
+    <spacer-15></spacer-15>
+    <div class="left" style="padding:10px 20px;">
+      <img class="photo" src="ProjectStructureF18.jpg" width="600" />
+    </div>
+    In this second project we will build and test the core functionality for multi-user testing.  
+    <spacer-15></spacer-15>
+    Our final project will build a
+    TestHarness server that creates child processes for each test request it receives.  The test request causes execution of a
+    container of tests, like the one we built in Project #1, in its own process.
+    <spacer-15></spacer-15>
+    This project will build something close to the child process created
+    by the TestHarness server, e.g., the Remote TestHarness will spawn multiple processes that run our Project #2 code.
+    <spacer-15></spacer-15>
+    Project #3 will build a message-passing communication system, and use it to support interprocess communication between
+    the host of a process pool and each child process in the pool.  We will discuss a lot more about that when we get to
+    Project #3.
+    <spacer-15></spacer-15>
+    Project #4 will then uses those facilities and the code from this project to build a multi-user TestHarness.  Most of our
+    effort on that project will be devoted to building an effective graphical user interface.
+    <div class="clear"></div>
+    In this project, we will develop facilities for:
+    <ul>
+      <li>
+        <strong>Loading dynamic link test libraries:</strong>
+        <div class="indent">
+          Each test library is implemented as a dynamic link library.  The library
+          contains a test driver that implements an ITest interface, has references to the code to be tested, and also
+          to the single-user TestHarness we built in Project #1 and a Logger we build in this project.
+        </div>
+      </li>
+      <li>
+        <strong>Executing tests:</strong>
+        <div class="indent">
+          When the project Executive loads the test library, it executes the library's test sequence using a bool test() method
+          declared in the ITest interface.
+        </div>
+      </li>
+      <li>
+        <strong>Reporting results:</strong>
+        <div class="indent">
+          The test driver uses its reference to the logging facility and uses it to
+          present test results on the project console, including, but not limited to, the test status returned by test().
+        </div>
+      </li>
+    </ul>
+  </section>
+  <section>
+    <h3>Requirements:</h3>
+    Your TestHarness Core Solution:
+    <ol>
+      <li>
+        <strong>Shall</strong> use Visual Studio 2017 and its C++ Windows Console Projects, as provided in the ECS computer labs.
+      </li>
+      <li>
+        <strong>Shall</strong> use the standard streams libraries for all I/O and operators new and delete for memory management.
+      </li>
+      <li>
+        (<strong>3</strong>) <strong>Shall</strong> provide an Executive package that loads all the test libraries from a
+        specified directory, and executes the TestRequest from each library after loading.
+      </li>
+      <li>
+        (<strong>2</strong>) <strong>Shall</strong> also provide Loader, Executor, and Logger packages.
+      </li>
+      <li>
+        (<strong>3</strong>) The Loader package <strong>shall</strong> support finding and loading all the test libraries
+        at a path specified by the Executive.
+      </li>
+      <li>
+        (<strong>4</strong>) The Executor package <strong>shall</strong> support executing all the tests in each TestRequest<sup>3</sup>.
+      </li>
+      <li>
+        (<strong>3</strong>) The Logger package <strong>shall</strong> support sending messages constructed by each test driver
+        to standard C++ streams.  That could be the process console, a file, or a std::ostringstream.  It <strong>shall</strong>
+        support sending each message to multiple streams that have been registered with the logger.
+      </li>
+      <li>
+        (<strong>5</strong>) The TestHarness Core <strong>shall</strong> own the logger and provide a reference to the testdriver of a TestRequest, on demand.  Each requester
+        <strong>shall</strong> get its own instance of the logger.  The TestHarness <strong>shall</strong> be responsible for controlling the lifetime of each logger instance
+        it creates.
+      </li>
+      <li>
+        (<strong>5</strong>) <strong>Shall</strong> include an automated unit test suite that exercises all of the special cases that seem appropriate for these
+        packages<sup>4</sup>.
+      </li>
+    </ol>
+    <hr />
+    <ol style="font-size:small">
+      <li>
+        In C++, a package consists of two source code files, a header (*.h) and an implementation file (*.cpp) that contain:
+        <ul class="tight">
+          <li>prologue, providing a name, brief descriptive phrase, author information, and environment information</li>
+          <li>description of the package's responsiblities and required files</li>
+          <li>maintenance history</li>
+          <li>class declaration and definitions</li>
+          <li>a main function, guarded by #ifdef and #endif declarations, that implements construction tests for all the defined code</li>
+        </ul>
+      </li>
+      <li>
+        A software baseline is the set of all code considered to be part of the current system, excluding experimental code
+        that individual developers are working on.
+      </li>
+      <li>
+        A TestRequest is implemented with a single-user TestHarness, as implemented in Project #1.  Each test library contains
+        one TestRequest.
+      </li>
+      <li>
+        The unit test suite must demonstrate that your implementation meets all requirements for this project that you have implemented.
+        You will not receive credit for any functional requirements that you do not demonstrate in this test, even if you have
+        implemented them.
+      </li>
+    </ol>
+  </section>
+  <section>
+    <h3>What you need to know:</h3>
+    In order to successfully meet these requirements you will need to know:
+    <spacer-10></spacer-10>
+    <ol class="tight">
+      <li>Basics of the C++ language: <a href="https://en.cppreference.com/w/">C++ Reference</a></li>
+      <li>
+        How to implement a simple class hierarchy.  This will be covered briefly in lecture #3 and in more detail later.
+      </li>
+      <li>
+        The <a href="../../Repository/Cpp/STLContainers">standard Containers</a>.
+      </li>
+      <li>How to use Visual Studio.  We will discuss this in one of the Help Sessions.</li>
+    </ol>
+  </section>
+  <spacer-15></spacer-15>
+  <div>
+    <img class="strip-photo" src="../../webpages/pictures/FacultyCenterStrip.jpg" />
+  </div>
+  <info-bar></info-bar>
+</body>
+</html>

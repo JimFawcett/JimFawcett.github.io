@@ -1,0 +1,207 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - Project1-S2019.htm - Project #1, Fall 2018
+   - ver 1.0 - 16 Aug 2017
+   - Jim Fawcett, Syracuse University
+  -->
+  <title>Project #1</title>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+</head>
+<body onload="initializeMenu()" oncontextmenu="return false;">
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <a id="Next" href="Project2cse687-F2018.html">N</a>
+  <a id="Prev" href="Project4cse687-F2018.html">P</a>
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <header>
+    <h2 id="title">Project #1 - Single-User Test Harness</h2>
+    <div id="pagedate">
+      Version 1.4<br />
+      Due Date: Wednesday, September 19th, 2018
+    </div>
+    <a href="../code/Project1HelpS2019">Project #1 helper files</a>
+  </header>
+
+  <!-- Notes Content -->
+
+  <section>
+    <h3>Purpose:</h3>
+    <!--<p>
+    The acronym OCD stands for Operational Concept Document.  It's purpose is to make you think critically about the design
+    and implementation of a project before committing to code.  It also serves to publish your concept to the development team,
+    which for this course is you (and only you).  For this project we will be writing an Operational Concept Document for
+    the remaining projects, e.g., Projects #2, #3, and #4.
+  </p>-->
+    <spacer-15></spacer-15>
+    One focus area for this course is understanding how to structure and implement big software systems.  By big we mean systems
+    that may consist of hundreds or even thousands of packages<sup>1</sup> and perhaps several million lines of code.
+    We won't be building anything quite that large, but our projects may be considerably bigger than anything you've worked
+    on before.
+    <spacer-15></spacer-15>
+    In order to successfully implement big systems we need to partition code into relatively small parts and thoroughly test
+    each of the parts before inserting them into the software baseline<sup>2</sup>.  As new parts are added to the baseline and
+    as we make changes to fix latent errors or performance problems we will re-run test sequences for those parts
+    and, perhaps, for the entire baseline.  Managing that process efficiently requires effective tools for code analysis
+    as well as testing.  How we do that code analysis is illustrated by the SMA projects for this year.  In OOD, we will focus, this year,
+    on testing applications.
+    <spacer-15></spacer-15>
+    The projects this Fall build software testing tools in several phases.  We will emphasize C++ code
+    but want our tools to be easily extendable to other similar languages like C# and Java.
+    You will find it useful to look at the <a href="../../Webpages/BlogTesting.htm">SW Testing</a> blog for a brief introduction
+    to production testing.
+    <spacer-15></spacer-15>
+    <div class="left" style="padding:10px 20px;">
+      <img class="photo" src="Pictures/ProjectStructureF18.jpg" width="600" />
+    </div>
+    <spacer-15></spacer-15>
+    In this first project we will build and test a small framework for single-user testing that:
+    <spacer-10></spacer-10>
+    <ul class="tight">
+      <li>
+        <strong>Defines a set of tests to run sequentially:</strong>
+        <div class="indent">
+          Each test is the combination of a test driver, that implements an ITest interface, and the production code it tests.
+          We want to chain multiple tests to be executed in sequence.  We expect to save that sequence and add additional
+          tests later, as the development of the code continues.
+        </div>
+      </li>
+      <li>
+        <strong>Provides exception-safe test execution:</strong>
+        <div class="indent">
+          Each test is to be run inside a try-catch block, used to handle exceptions thrown by the test.  A thrown exception
+          does not stop testing of the sequence.  Instead, it results in a fail result for the test that threw the exception.
+          Also, we want to insert each test into a single try-catch block so we don't have to litter our test drivers with
+          a lot of exception handling.  We will discuss how to do that in class.
+        </div>
+      </li>
+      <li>
+        <strong>Supports logging test results:</strong>
+        <div class="indent">
+          The results of testing need to be reported to the person executing the tests.  We will do that with a Logger class
+          that supports concurrently writing results into one or more output streams, e.g., to the console and a file or database for storage.
+        </div>
+      </li>
+    </ul>
+    <spacer-15></spacer-15>
+    <div class="clear"></div>
+    Succeeding projects will build, progressively, on the work of the prior projects.
+  </section>
+  <section>
+    <h3>Requirements:</h3>
+    Your Single-User TestHarness Solution:
+    <ol>
+      <li>
+        <strong>Shall</strong> use Visual Studio 2017 and its C++ Windows Console Projects, as provided in the ECS computer labs.
+      </li>
+      <li>
+        <strong>Shall</strong> use the standard streams libraries for all I/O and operators new and delete for memory management.
+      </li>
+      <li>
+        (<strong>2</strong>) <strong>Shall</strong> provide an ITest interface that all tests must implement.
+      </li>
+      <li>
+        (<strong>4</strong>) <strong>Shall</strong> provide a container that provides references to a sequence of one
+        or more test instances.  
+      </li>
+      <li>
+        (<strong>2</strong>) <strong>Shall</strong> provide a function that extracts callable test objects from the container
+        and executes them within a single try-catch block.
+      </li>
+      <li>
+        (<strong>1</strong>) <strong>Shall</strong> provide a logging facility that logs test success or failure, and test identification
+        messages that provide information to the user during test execution.
+      </li>
+      <li>
+        (<strong>1</strong>)
+        The logger <strong>shall</strong> provide for writing a
+        test message on the console, and into a file for persistant storage, with a single write<sup>3</sup> statement.
+      </li>
+      <li>
+        (<strong>1</strong>) Each message <strong>shall</strong> provide information about the test, author, and time-date of execution.
+        This information should be as compact as practical while still providing useful information.
+      </li>
+      <li>
+        (<strong>4</strong>) <strong>Shall</strong> develop tests for each class in the <a href="../../Repository/cpp/Utilities/CodeUtilities">CodeUtilities</a> package,
+        and execute them in your Single-User TestHarness.
+      </li>
+      <li>
+        (<strong>4</strong>) <strong>Shall</strong> include an automated unit test suite that demonstrates that you meet all the functional
+        requirements above.  Note that this is just a set of tests that is used to test the TestHarness
+        packages.
+      </li>
+      <li>
+        (<strong>1</strong>) Each test <strong>shall</strong> provide comments in the test driver code that cite what each part of the test
+        does, and the expected results.
+      </li>
+    </ol>
+    <div class="indent">
+      Here is a link to the <a href="../projects/prgs687.pdf">grade sheet</a> used to guide evaluatation of your work.
+    </div>
+    <spacer-15></spacer-15>
+    <hr />
+    <ol style="font-size:small">
+      <li>
+        In C++, a package consists of two source code files, a header (.h) and an implementation (.cpp), that contain:
+        <ul class="tight">
+          <li>prologue, providing a name, brief descriptive phrase, author information, and environment information</li>
+          <li>description of the package's responsiblities and required files</li>
+          <li>maintenance history</li>
+          <li>class declarations</li>
+          <li>class method definitions</li>
+          <li>a main function that implements construction tests for all the defined code</li>
+        </ul>
+        The <a href="CodeSnap-BlockingQueue.h.htm">Blocking Queue CodeSnap</a> is a good example.
+      </li>
+      <li>
+        A software baseline is the set of all code considered to be part of the current system, excluding experimental code
+        that individual developers are working on.
+      </li>
+      <li>
+        You may name the writing method however you wish.  The intent is that there is some way of registering streams for output
+        so that a write goes to every registered stream.
+      </li>
+    </ol>
+  </section>
+  <section>
+    <h3>What you need to know:</h3>
+    In order to successfully meet these requirements you will need to know:
+    <spacer-10></spacer-10>
+    <ol class="tight">
+      <li>Basics of the C++ language: <a href="https://en.cppreference.com/w/">C++ Reference</a></li>
+      <li>
+        How to implement a simple class hierarchy.  This will be covered briefly in lecture #2 and in more detail later.
+      </li>
+      <li>
+        The <a href="https://github.com/JimFawcett/STL-Containers">standard Containers</a>.
+      </li>
+      <li>How to use Visual Studio.  We will discuss this in one of the Help Sessions.</li>
+    </ol>
+  </section>
+  <spacer-15></spacer-15>
+  <div>
+    <img class="strip-photo" src="Pictures/FacultyCenterStrip.jpg" width="98%" />
+  </div>
+  <info-bar></info-bar>
+</body>
+</html>

@@ -90,6 +90,26 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Design Course &#9662;</button>\
+      <div class='dropdown-content'>\
+        <a class='disable' href='#'>Table of Contents</a>\
+        <a class='disable' href='#'>Concept&nbsp;and&nbsp;Tasks&nbsp;(TextFinder)</a>\
+        <a class='disable' href='#'>Classes (Sockets-Windows)</a>\
+        <a class='disable' href='#'>Inheritance (XmlDocument)</a>\
+        <a class='disable' href='#'>Templates (Properties)</a>\
+        <a class='disable' href='#'>Flexible Designs (DirExplorer)</a>\
+        <a class='disable' href='#'>Components (Parser)</a>\
+        <a class='disable' href='#'>Project Structures</a>\
+        <a class='disable' href='#'>Threads (ThreadPool)</a>\
+        <a class='disable' href='#'>Sockets&nbsp;(MsgPassingCommunication)</a>\
+        <a class='disable' href='#'>Build Process (TextFinder)</a>\
+        <a class='disable' href='#'>Testing&nbsp;(FileSystem-Windows)</a>\
+        <a class='disable' href='#'>Appendix:&nbsp;<u>U</u>niversal&nbsp;<u>M</u>odeling&nbsp;<u>L</u>anguage</a>\
+        <a class='disable' href='#'>Appendix:&nbsp;Implementation&nbsp;metrics</a>\
+        <a class='disable' href='#'>Appendix: Design Patterns</a>\
+      </div>\
+    </div>\
+    <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\

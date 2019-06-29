@@ -1,0 +1,252 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - Project1-F2017.htm - Project #1, Fall 2017
+   - ver 1.0 - 16 Aug 2017
+   - Jim Fawcett, Syracuse University
+  -->
+  <title>Project #3</title>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+</head>
+<body onload="initializeMenu()" oncontextmenu="return false;">
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <a id="Next" href="Project4-S2019.htm">N</a>
+  <a id="Prev" href="Project2-S2019.htm">P</a>
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <header>
+    <h2 id="title">Project #3 - Process Pool with Interprocess Communication</h2>
+    <div id="pagedate">
+      Version 1.0<br />
+      Due Date: Wednesday, November 7th, 2018
+    </div>
+    <a href="../code/Project3HelpS2019">Project #3 helper files</a>
+  </header>
+
+  <!-- Notes Content -->
+  <section>
+    <h3>Purpose:</h3>
+    One focus area for this course is understanding how to structure and implement big software systems.  By big we mean systems
+    that may consist of hundreds or even thousands of packages<sup>1</sup> and perhaps several million lines of code.
+    We won't be building anything quite that large, but our projects may be considerably bigger than anything you've worked
+    on before.
+    <spacer-15></spacer-15>
+    In order to successfully implement big systems we need to partition code into relatively small parts and thoroughly test
+    each of the parts before inserting them into the software baseline<sup>2</sup>.  As new parts are added to the baseline and
+    as we make changes to fix latent errors or performance problems we will re-run test sequences for those parts
+    and, perhaps, for the entire baseline.  Managing that process efficiently requires effective tools for code analysis
+    as well as testing.  How we do that code analysis is illustrated by the projects for this year.
+    <spacer-15></spacer-15>
+    The projects this Fall focus on building software testing tools.  We will emphasize C++ code
+    but want our tools to be easily extendable to other similar languages like C# and Java.
+    <spacer-15></spacer-15>
+    For this third project, you will find it useful to look at:
+    <spacer-10></spacer-10>
+    <ul class="tight">
+      <li>
+        <a href="../../Webpages/BlogMessagePassingComm.htm">Message-Passing Communication</a><br />
+        Blog on asynchronous communication.
+      </li>
+      <li>
+        <a href="../../Repository/Cpp/CppCommWithFileXfer/CommunicationChannel.pdf">Comm diagrams</a><br />
+        Diagrams used in the second Sockets Lecture.
+      </li>
+      <li>
+        <a href="../../Repository/Cpp/CppCommWithFileXfer/ClassDiagram.pdf">Class diagram</a><br />
+        Class diagram for the Comm Channel.
+      </li>
+    </ul>
+    <spacer-10></spacer-10>
+    You will find a relatively complete implementation of the <a href="../../Repository/Cpp/CppCommWithFileXfer">Comm Channel</a> in the
+    <a href="../../Repository/Cpp">Cpp Repository</a>.  You will find other help in the
+    <a href="../code/Project3HelpF18">CSE687/code/Project3HelpF18</a> folder.
+    <spacer-15></spacer-15>
+    <div class="left" style="padding: 10px 20px;">
+      <img class="photo" src="ProcessPoolStructure.jpg" width="700" />
+    </div>
+    <spacer-15></spacer-15>
+    In this project we will build and test prototypes for a Process Pool and Message-Passing Communication channel, used for
+    sending messages between a client process, the TestHarness process, and each of the child processes spawned by the TestHarness.
+    <spacer-15></spacer-15>
+    All of the processes: Client, TestHarness, and Children, encorporate a communication package used for message and file transfers.
+    <spacer-15></spacer-15>
+    The Client process builds a test library<sup>3</sup> and sends that, along with a TestRequest message, to the TestHarness.
+    Eventually it will receive a reply from the TestHarness with a test log and status for that request.
+    <spacer-15></spacer-15>
+    The TestHarness contains a TestRequest queue and a Ready queue.  These are thread-safe blocking queues<sup>4</sup> used to
+    control its process pool children.  When the TestHarness starts up, it spawns a specified number of child tester processes<sup>5</sup>.
+    Each child sends a ready message to its TestHarness host, indicating that it is ready to receive a request for testing.
+    <spacer-15></spacer-15>
+    The main thread of the TestHarness blocks on the TestRequest queue, until its Comm component receives and posts a client's
+    TestRequest message.  It then attempts to dequeue a ready message, and if one is available, it sends the TestRequest to the
+    child that posted the ready status<sup>5</sup>.  Otherwise, it blocks until a child is ready.
+    <spacer-15></spacer-15>
+    The main thread for each Child Tester Process blocks on its Comm receive queue until a TestRequest message is posted.
+    It then loads the library, named in the TestRequest, and executes all the tests in its Single-User TestHarness, just
+    as you did in Project #1.  When its testing is complete, it sends its test log, in a message, to the original client posting the request.
+    This works, because each message sent over the Comm Channel contains both source and destination addresses.
+    <div class="clear"></div>
+    <spacer-15></spacer-15>
+    Implementing Project #3 entails:
+    <ul>
+      <li>
+        <strong>Defining messages:</strong>
+        <div class="indent">
+          Messages are used for communication between client and test server.  Each message contains: source and destingation
+          addresses, a specified request for processing or results of processing, and may contain other attributes you deem
+          important or useful for your design.
+          In this project, we will implement HTTP &quot;style&quot; messages.  Each message
+          consists of a header with a sequence of attributes expressed as a text line with name and value, and may include a block of
+          bytes in an optional message body.
+        </div>
+      </li>
+      <li>
+        <strong>Erecting a Communication Framework:</strong>
+        <div class="indent">
+          Erect a framework for passing addressible messages used for requests, replies, and notifications.  This should
+          be relatively straight-forward because you will find a nearly complete implementation of the <a href="../../Repository/Cpp/CppCommWithFileXfer">Comm Channel</a> in the
+          <a href="../../Repository/Cpp">Cpp Repository</a>.
+        </div>
+      </li>
+      <li>
+        <strong>Creating a Framework for Hosting a Process Pool:</strong>
+        <div class="indent">
+          The TestHarness host will need to incorporate the Comm Channel and carry out the following activities:
+          <ol class="tight">
+            <li>
+              Create a specified number of Child Processes which execute all the tests.  You will find a
+              <a href="../../Repository/Cpp/Process">Process Class</a> in the Repository/Cpp folder.  That
+              shows you how to create a Win32 Process.
+            </li>
+            <li>
+              Post client TestRequest messages to the TestRequest Queue and Child Ready messages to the Ready Queue
+              with a receive thread.
+            </li>
+            <li>
+              Dequeue, on its main thread, TestRequests and Ready messages from its internal queues.  It may block on either the
+              TestRequest queue or the Ready queue, but when it eventually returns, it has a TestRequest and
+              a child ready to process it.  Note that the only purpose of the Ready Queue is to block the TestHarness
+              main thread until a Child Process is ready.  Consequently, the Ready messages are used only to find the
+              address of the ready Child, and are then discarded.
+            </li>
+          </ol>
+        </div>
+      </li>
+      <li>
+        <strong>Demonstrating operation with concurrent clients:</strong>
+        <div class="indent">
+          Show that clients can send requests and receive replies to those requests concurrently with
+          messaging between other clients and the server.
+        </div>
+      </li>
+    </ul>
+  </section>
+  <section>
+    <h3>Requirements:</h3>
+    Your Communication Solution:
+    <ol>
+      <li>
+        <strong>Shall</strong> use Visual Studio 2017 and its C++ Windows Console Projects, as provided in the ECS computer labs.
+      </li>
+      <li>
+        <strong>Shall</strong> use the standard streams libraries for all I/O and operators new and delete for memory management.
+      </li>
+      <li>
+        (<strong>2</strong>) <strong>Shall</strong> provide a ProcessPool Framework that operates as described in the Purpose section, above.
+      </li>
+      <li>
+        (<strong>2</strong>) <strong>Shall</strong> provide a TestHarness and Tester Children that operate as described in the Purpose section, above.
+      </li>
+      <li>
+        (<strong>1</strong>) <strong>Shall</strong> provide logging, as implemented in Project #1, in each Tester Child.  The results of logging
+        are sent by the child to the Client that sent the TestRequest<sup>6</sup>.
+      </li>
+      <li>
+        (<strong>2</strong>) <strong>Shall</strong> provide a Client process that sends HTTP style TestRequest messages and receives and displays
+        test results in the form of HTTP style messages.  Note that your Client process does not need to build test libraries.  You will do that as described below.
+      </li>
+      <li>
+        (<strong>5</strong>) <strong>Shall</strong> include an automated unit test suite that exercises all of the special cases that seem appropriate for the
+        packages in this Project.  In order to support testing you <strong>shall</strong> prepare Single-User test sequences, as you did in Project #1,
+        and build them as libraries.  They will be executed in Child Tester processes, using the Single-User TestHarness you developed in Project #1.
+        Each of these test sequences are used to demonstrate that you meet all the functional requirements of Project #3.
+      </li>
+    </ol>
+    <hr />
+    <ol style="font-size:small">
+      <li>
+        In C#, a package is a single source code file that contains:
+        <ul class="tight">
+          <li>prologue, providing a name, brief descriptive phrase, author information, and environment information</li>
+          <li>description of the package's responsiblities and required files</li>
+          <li>maintenance history</li>
+          <li>class definitions</li>
+          <li>a main function that implements construction tests for all the defined code</li>
+        </ul>
+      </li>
+      <li>
+        A software baseline is the set of all code considered to be part of the current system, excluding experimental code
+        that individual developers are working on.
+      </li>
+      <li>
+        A test library is a Win32 dynamic link library that contains all of the tests you want to run, exposed through an
+        ITest interface.
+      </li>
+      <li>
+        The thread-safe blocking queues are those discussed during the Threading lectures.  You will find an implementation of the
+        <a href="../../Repository/Cpp/Cpp11-BlockingQueue">Blocking Queue</a> in the <a href="../../Repository/Cpp">Repository/Cpp</a> folder.
+      </li>
+      <li>
+        All messages contain both source and destination attributes, so the TestHarness knows to which child the TestRequest must go, e.g.,
+        the child that sent the dequeued ready message.
+      </li>
+      <li>
+        Each tester child is required to provide the entire test report at the end of its testing, before sending a ready message to
+        the TestHarness mother process.  You may also provide an option for streaming a sequence of logged report message to the
+        client, but non-streamed reports must be the default.
+      </li>
+    </ol>
+  </section>
+  <section>
+    <h3>What you need to know:</h3>
+    In order to successfully meet these requirements you will need to know:
+    <spacer-10></spacer-10>
+    <ol class="tight">
+      <li>Basics of the C++ language: <a href="https://en.cppreference.com/w/">C++ Reference</a></li>
+      <li>Basics of <a href="../../Repository/Cpp/Cpp11-Concurrency">C++11 threading</a>, as discussed in class</li>
+      <li>
+        How Win32 sockets work.  This will be covered in detail in several lectures.
+      </li>
+      <li>
+        The <a href="../../Repository/Cpp/STLContainers">standard Containers</a>.
+      </li>
+      <li>How to use Visual Studio.  We will discuss this in one of the Help Sessions.</li>
+    </ol>
+  </section>
+  <spacer-15></spacer-15>
+  <div>
+    <img class="strip-photo" src="../../webpages/pictures/FacultyCenterStrip.jpg" />
+  </div>
+  <info-bar></info-bar>
+</body>
+</html>

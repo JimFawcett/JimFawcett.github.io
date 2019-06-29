@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - Project1-S2015.htm - Project #1, Spring 2016
+   - ver 1.0 - 06 January 2016
+   - Jim Fawcett, Syracuse University
+  -->
+  <title>Project #1</title>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+  <style>
+    summary {
+      padding: 3px 0px 5px 0px;
+    }
+  </style>
+</head>
+<body id="github" onload="initializeMenu()">
+
+  <a id="Next" href="Project2CSE687-S2016.html">N</a>
+  <a id="Prev" href="Project4CSE687-S2016.html">P</a>
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <header>
+    <hgroup id="pagetitle">
+      <h1 id="title">Project #1 - Lexical Scanner</h1>
+    </hgroup>
+  </header>
+
+  <!--Site navigation menus are generated with Javascript, using a Fallback link to a Navigation page-->
+  <nav>
+    <div id="nav">
+      <hr />
+      <a href="TopNav.htm">Site Navigation with no Javascript</a>
+      <hr />
+      <br />
+    </div>
+  </nav>
+
+  <!-- Notes Content -->
+  <div class="content">
+    <section>
+      <h2>Purpose:</h2>
+      <p>
+        The first two projects this Spring focus on building software tools for code analysis.  We will emphasize C++ code
+        but want our tools to be easily extendable to other similar languages like C# and Java.
+      </p>
+      <p>
+        Code analysis consists of extracting lexical content from source code files, analyzing the code's syntax from its lexical
+        content, and building an Abstract Syntax Tree (AST) that holds the results of our analysis.  It is then fairly easy to build
+        several backends that can do further analyses on the AST to construct code metrics, search for particular constructs, or some other
+        interesting features of the code.
+      </p>
+      <p>
+        You will find it useful to look at the <a href="../../Webpages/BlogParser.htm">Parsing</a> blog for a brief introduction
+        to parsing and code analysis.
+      </p>
+      <p>
+        In this first project we will build and test a lexical scanner in C++ that consists of two packages:
+        <ul>
+          <li>
+            <strong>Tokenizer</strong>
+            <div class="indent">
+              extracts words, called tokens, from a stream of characters.  Token boundaries are white-space characters, transitions between alphanumeric
+              and punctuator characters, and comment and string boundaries.  Certain classes of punctuator characters belong to single character or
+              two character tokens so they require special rules for extraction.
+            </div>
+          </li>
+          <li>
+            <strong>SemiExpression</strong>
+            <div class="indent">
+              groups tokens into sets, each of which contain all the information needed to analyze some
+              grammatical construct without containing extra tokens that have to be saved for subsequent analyses.  SemiExpressions are
+              determined by special terminating characters: semicolon, open brace, closed brace, newline when preceeded on the same line with
+              &apos;#&apos;, and colon when preceded by one of the three tokens &quot;public&quot;, &quot;protected&quot;, or &quot;private&quot;.
+            </div>
+          </li>
+        </ul>
+      </p>
+    </section>
+    <section>
+      <h2>Requirements:</h2>
+      Your Scanner Solution:
+      <ol>
+        <li>
+          <strong>Shall</strong> use Visual Studio 2015 and its C++ Windows Console Projects, as provided in the ECS computer labs.
+        </li>
+        <li>
+          <strong>Shall</strong> use the C++ standard library's streams for all I/O and new and delete for all heap-based memory management<sup>1</sup>.
+        </li>
+        <li>
+          (<strong>2</strong>) <strong>Shall</strong> provide C++ packages for Tokenizing, collecting SemiExpressions, and a scanner interface, ITokCollection.
+        </li>
+        <li>
+          (<strong>4</strong>) <strong>Shall</strong> provide a Tokenizer package that declares and defines a Toker class that implements the
+          State Pattern<sup>2</sup> with an abstract ConsumeState class and derived classes for collecting the following token types:
+          <ul>
+            <li>alphanumeric tokens</li>
+            <li>punctuator tokens</li>
+            <li>
+              special one<sup>3</sup> and two<sup>4</sup> character tokens with defaults that may be changed by calling setSpecialSingleChars(string ssc)
+              and/or setSpecialCharPairs(string scp).
+            </li>
+            <li>
+              C style comments returned as a single token
+            </li>
+            <li>
+              C++ style comments returned as a single token
+            </li>
+            <li>
+              quoted strings<sup>5</sup>
+            </li>
+          </ul>
+        </li>
+        <li>
+          (<strong>1</strong>) The Toker class, contained in the Tokenizer package, <strong>shall</strong> produce one token for each call to a member
+          function getTok().
+        </li>
+        <li>
+          (<strong>4</strong>) <strong>Shall</strong> provide a SemiExpression package that contains a class SemiExp used to retrieve collections of tokens
+          by calling Toker::getTok() repeatedly until one of the SemiExpression termination conditions, below, is satisfied.
+        </li>
+        <li>
+          (<strong>5</strong>) <strong>Shall</strong> terminate a token collection after extracting any of the single character tokens: semicolon, open brace,
+          closed brace.  Also on extracting newline if a &quot;#&quot; is the first character on that line.  Also, the extraction of a single character token
+          consisting of &quot;:&quot; if immediately preceeded by one of the tokens: &quot;public&quot;, &quot;protected&quot;, or
+          &quot;private&quot;.
+        </li>
+        <li>
+          (<strong>2</strong>) <strong>Shall</strong> provide a facility providing rules to ignore certain termination characters under special circumstances.
+          You are required to provide a rule to ignore the (two) semicolons within parentheses in a for(;;) expression<sup>6</sup>.
+        </li>
+        <li>
+          (<strong>2</strong>) The SemiExp class <strong>Shall</strong> implement the interface ITokenCollection with a declared method get().
+        </li>
+        <li>
+          (<strong>5</strong>) <strong>Shall</strong> include an automated unit test suite that exercises all of the special cases that seem appropriate for these two
+          packages<sup>7</sup>.
+        </li>
+      </ol>
+      <div style="height:20px;"></div>
+      <hr />
+      <ol class="tight" style="font-size:small">
+        <li>
+          That means that you are not allowed to use any of the C language I/0, e.g., printf, scanf, etc, nor the C memory management, e.g.,
+          calloc, malloc, or free.
+        </li>
+        <li>
+          <a href="https://en.wikipedia.org/wiki/State_pattern">https://en.wikipedia.org/wiki/State_pattern</a>
+        </li>
+        <li>
+          Special one character tokens: &lt;, &gt;, [, ], (, ), {, }, :, =, +, -, *, \n
+        </li>
+        <li>
+          Special two character tokens: &lt;&lt;, &gt;&gt;, ::, ++, --, ==, +=, -=, *=, /=
+        </li>
+        <li>
+          &quot;abc&quot; becomes the token abc and the outer quotes are discarded.  &quot;\&quot;abc\&quot;&quot; becomes the token &quot;abc&quot; with the outer quotes discarded.
+        </li>
+        <li>This will be discussed in class.</li>
+        <li>This is in addition to the construction tests you include as part of every package you submit.</li>
+      </ol>
+    </section>
+    <section>
+      <h2>What you need to know:</h2>
+      In order to successfully meet these requirements you will need to know:
+      <ol class="tight">
+        <li>Basics of the C++ language: <a href="http://cppReference.com">http://CppReference.com</a></li>
+        <li>
+          How to implement a simple class hierarchy.  This will be covered briefly in lecture #3 and in more detail later.
+        </li>
+        <li>
+          The <a href="../../CoreTechnologies/Cpp/Code/STL-Containers">STL Containers</a>.
+        </li>
+        <li>How to use Visual Studio.  We will discuss this in one of the Help Sessions.</li>
+      </ol>
+    </section>
+  </div>
+  <img class="strip-photo" src="pictures/facultyCenterStrip.jpg" width="98%" />
+  <info-bar></info-bar>
+</body>
+</html>

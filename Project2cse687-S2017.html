@@ -1,0 +1,239 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - Project2-S2018.htm - Project #2, Spring 2017
+   - ver 1.0 - 28 December 2016
+   - Jim Fawcett, Syracuse University
+  -->
+  <title>Project #2</title>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+</head>
+<body onload="initializeMenu()" oncontextmenu="return false;">
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <a id="Next" href="Project3-S2017.htm">N</a>
+  <a id="Prev" href="Project1-S2017.htm">P</a>
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+  <div onmouseover="scrollMenuDown()">
+
+    <header>
+      <div id="pagetitle">
+        <h1 id="title">Project #2 - Type-based Dependency Analysis</h1>
+        <h3 id="subtitle">Spring 2017</h3>
+        <div id="pagedate">
+          Version 2.1,
+          Due Date: Tuesday March 7th
+        </div>
+        <div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Notes Content -->
+    <div class="content">
+      <section>
+        <h2>Purpose:</h2>
+        <p>
+          The second project this Spring focuses on building software tools for code analysis.  We emphasize C++ code
+          but want our tools to be easily extendable to other similar languages like C# and Java.
+        </p>
+        <p>
+          Code analysis consists of extracting lexical content from source code files, analyzing the code's syntax from its lexical
+          content, and building a Type Table (TT) or an Abstract Syntax Tree (AST) that hold the results of our analysis.  It is then fairly easy to build
+          several backends that can do further analyses on the data held in TT or AST to construct code metrics,
+          search for particular constructs, or some other interesting features of the code.
+        </p>
+        <p>
+          You will find it useful to look at the <a href="../../Webpages/BlogParser.htm">Parsing</a> blog for a brief introduction
+          to parsing and code analysis.
+        </p>
+        <p>
+          In this second project we will build and test a type-based dependency analyzer that uses the analysis machinery I developed
+          for the CodeAnalyzer that the TAs and I run on your projects.
+          You will add to the packages from the CodeAnalyzer, the new packages:
+          <ul>
+            <li>
+              <strong>TypeTable:</strong>
+              <div class="indent">
+                Provides a container class that stores type information needed for dependency analysis.
+              </div>
+            </li>
+            <li>
+              <strong>TypeAnalysis:</strong>
+              <div class="indent">
+                Finds all the types and global functions defined in each of a collection of C++ source files.
+                It does this by building rules to detect:
+                <ul>
+                  <li>
+                    type definitions - classes, structs, enums, typedefs, and aliases.
+                  </li>
+                  <li>
+                    global function definitions
+                  </li>
+                  <li>
+                    global data definitions
+                  </li>
+                </ul>
+                and capture their fully qualified names and the files where they are defined.  It uses the TypeTable
+                package to store that information.
+              </div>
+            </li>
+            <li>
+              <strong>DependencyAnalysis:</strong>
+              <div class="indent">
+                Finds, for each file in a specified file collection, all other files from the file collection on which they depend.
+                File A depends on file B, if and only if, it uses the name of any type or global function or global data defined in file B.
+                It might do that by calling a function or method of a type or by inheriting the type.  Note that this intentionally
+                does not record dependencies of a file on files outside the file set, e.g., language and platform libraries.
+              </div>
+            </li>
+            <li>
+              <strong>Strong Components:</strong>
+              <div class="indent">
+                A strong component is the largest set of files that are all mutually dependent.  That is, all the files which can be reached
+                from any other file in the set by following direct or transitive dependency links.  The term &quot;Strong Component&quot; comes
+                from the theory of directed graphs.  There are a number of algorithms for finding strong components in graphs.  My favorite is
+                the Tarjan Algorithm, nicely described here:
+                <a href="https://en.wikipedia.org/wiki/Tarjan's_strongly_connected_components_algorithm">Tarjan Algorithm description and pseudo code</a>.
+                You will need a graph class to implement this.  You will find one in the Repository:
+                <a href="../../Repository/CppGraph">C++ graph class</a>.
+              </div>
+            </li>
+            <li>
+              <strong>Display:</strong>
+              <div class="indent">
+                Uses information in the Analyzer's AST and TypeTable to build an effective display of the dependency relationships between
+                all files in the selected file set.
+              </div>
+            </li>
+            <li>
+              <strong>NoSqlDb:</strong>
+              <div class="indent">
+                Stores and retrieves dependency information in a NoSqlDb&lt;std::string&gt;, you developed in Project #1.  Here, child relationships
+                denote compile dependencies.
+              </div>
+            </li>
+            <li>
+              <strong>TestExecutive:</strong>
+              <div class="indent">
+                Provides code to demonstrate that you meet all requirements.
+              </div>
+            </li>
+          </ul>
+          You will probably not need to change any of the code analyzer, other than to remove a few of its parts.  You will analyze dependencies
+          based on types and global functions you find in the analyzer's Abstract Syntax Tree (AST), then checking to see which files, if any, contain
+          those tokens.
+        </p>
+      </section>
+      <section>
+        <h2>Requirements:</h2>
+        Your DependencyAnalyzer Solution:
+        <ol>
+          <li>
+            <strong>Shall</strong> use Visual Studio 2015 and its C++ Windows Console Projects, as provided in the ECS computer labs.
+          </li>
+          <li>
+            (<strong>1</strong>) <strong>Shall</strong> use the C++ standard library's streams for all I/O and new and delete for all heap-based memory management<sup>1</sup>.
+          </li>
+          <li>
+            (<strong>2</strong>) <strong>Shall</strong> provide C++ packages as described in the <strong>Purpose</strong> section.  You are free to
+            alter the names and division of responsibilities as you see fit.  However, you are expected to enforce the &quot;Single Responsiblity Principle&quot;<sup>2</sup>
+            as illustrated in the package structure described above.
+          </li>
+          <li>
+            (<strong>3</strong>) <strong>Shall</strong> provide a TypeAnalysis package that identifies all of the types defined in a specified file.
+            It is expected that you will build on the analysis machinery provide in the <a href="../../Repository/CodeAnalyzer">CodeAnalyzer</a>.
+          </li>
+          <li>
+            (<strong>5</strong>) <strong>Shall</strong> provide a DependencyAnalysis package that identifies all of the dependencies between files
+            in a specified file collection.
+          </li>
+          <li>
+            (<strong>4</strong>) <strong>Shall</strong> find strong components in the dependency graph defined by the relationships evaluated in
+            the previous requirement.
+          </li>
+          <li>
+            (<strong>2</strong>) <strong>Shall</strong> write the analysis results, in XML format, to a specified file.
+          </li>
+          <li>
+            (<strong>3</strong>) <strong>Shall</strong> process the command line, accepting:
+            <ul>
+              <li>
+                Path to the directory tree containing files to analyze.
+              </li>
+              <li>
+                List of file patterns to match for selection of files to analyze.
+              </li>
+              <li>
+                Specification of the XML results file, supplying a default if no specification is provided.
+              </li>
+            </ul>
+          </li>
+          <li>
+            (<strong>5</strong>) <strong>Shall</strong> include an automated unit test suite that demonstrates you meet all the requirements of this
+            project<sup>3</sup>.
+          </li>
+        </ol>
+      </section>
+      <section class="footnote">
+        <div style="height:20px;"></div>
+        <hr />
+        <ol style="font-size:small">
+          <li>
+            That means that you are not allowed to use any of the C language I/0, e.g., printf, scanf, etc, nor the C memory management, e.g.,
+            calloc, malloc, or free.
+          </li>
+          <li>
+            <a href="https://en.wikipedia.org/wiki/Single_responsibility_principle">https://en.wikipedia.org/wiki/Single_responsibility_principle</a>
+          </li>
+          <li>This is in addition to the construction tests you include as part of every package you submit.</li>
+        </ol>
+        <div style="height:20px;"></div>
+      </section>
+      <section class="know">
+        <h2>What you need to know:</h2>
+        In order to successfully meet these requirements you will need to know:
+        <ol>
+          <li>
+            Details of the C++ language: <a href="http://cppReference.com">http://CppReference.com</a>.
+          </li>
+          <li>
+            All those things you learned while developing code for Projects #1.
+          </li>
+          <li>
+            How the <a href="../../Repository/CodeAnalyzer">CodeAnalyzer</a> works.  The TAs and I will give you a lot
+            of help with this.<br />
+            Also, you should look at the blog: <a href="../../webpages/BlogParser.htm">Parser</a>.
+          </li>
+          <li>
+            A Strong Component Algorithm: <a href="https://en.wikipedia.org/wiki/Tarjan's_strongly_connected_components_algorithm">Tarjan Algorithm description and pseudo code</a>
+          </li>
+          <li>
+            The <a href="../../CoreTechnologies/Cpp/Code/STL-Containers">STL Containers</a>.
+          </li>
+        </ol>
+      </section>
+    </div>
+  <img class="strip-photo" src="pictures/facultyCenterStrip.jpg" />
+  <info-bar></info-bar>
+</body>
+</html>

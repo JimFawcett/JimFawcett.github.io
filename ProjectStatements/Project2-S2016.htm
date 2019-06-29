@@ -1,0 +1,310 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - Project2-S2015.htm - Project #2, Spring 2016
+   - ver 1.0 - 06 January 2016
+   - Jim Fawcett, Syracuse University
+  -->
+  <title>Project #2</title>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+  <script type="text/javascript" src="js/CSE687-LectNav.js"></script>
+  <script type="text/javascript" src="js/Fallback.js"></script>
+  <link rel="stylesheet" href="css/TopLevel.css?v=1.0" />
+  <link rel="stylesheet" href="css/LecturesSupplement.css?v=1.0" />
+  <link rel="stylesheet" href="css/Fallback.css?v=1.0" />
+  <style type="text/css">
+    .close {
+      margin-top: 0px;
+    }
+
+    .note {
+      background-color: yellow;
+      color: black;
+      margin-left: 0;
+      margin-right: 0;
+      padding: 2px;
+    }
+
+    .light {
+      background-color: #eee;
+      padding: 20px;
+      display: table-cell;
+    }
+
+    .wblock {
+      padding: 20px 30px 30px 30px;
+      border: 1px solid black;
+      -webkit-box-shadow: 6px 6px 18px rgba(0,0,0,.62);
+      -moz-box-shadow: 6px 6px 18px rgba(0,0,0,.62);
+      box-shadow: 6px 6px 18px rgba(0,0,0,.62);
+    }
+
+    .block {
+      padding: 20px 30px 30px 30px;
+      border: 1px solid black;
+      -webkit-box-shadow: 6px 6px 18px rgba(0,0,0,.62);
+      -moz-box-shadow: 6px 6px 18px rgba(0,0,0,.62);
+      box-shadow: 6px 6px 18px rgba(0,0,0,.62);
+      display: table-cell;
+    }
+
+    .vertspace {
+      padding: 20px 0px 20px 0px;
+    }
+
+    h3 {
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    div > ul > li {
+      margin: 0px 0px 5px -30px;
+      padding: 0;
+    }
+
+    ol > li {
+      margin-bottom: 20px;
+    }
+
+    .spacer {
+      height: 10px;
+    }
+
+    table {
+      border-collapse: collapse;
+      border: none;
+    }
+
+    tr, td {
+      border: none;
+      padding: 0px;
+    }
+
+    section {
+      border: none;
+      margin: 20px;
+    }
+
+    hr {
+      margin: 10px;
+      margin-top: -10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div id="prevlink">
+        <a href="javascript: history.go(-1)">Back</a>
+      </div>
+      <div id="nextlink">
+        <a href="javascript: history.go(-1)">Back</a>
+      </div>
+      <div id="topcenter">
+        Object Oriented Design - Spring 2016
+      </div>
+    </div>
+    <div id="pagetitle">
+      <h1 id="title">Project #2 - Code Parser with Abstract Syntax Tree (AST)</h1>
+      <div id="pagedate">
+        Version 1.3 (added clarifying footnote about functions and revised due date)<br/>
+        <script type="text/javascript">
+            document.write("Revised: " + document.lastModified)
+        </script><br />
+        Due Date: Thursday March 10th
+      </div>
+      <div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Site navigation menus are generated with Javascript, using a Fallback link to a Navigation page -->
+  <nav>
+    <div id="nav">
+      <hr />
+      <a href="TopNav.htm">Site Navigation with no Javascript</a>
+      <hr />
+      <br />
+    </div>
+  </nav>
+  <!-- Notes Content -->
+  <div class="content">
+    <section>
+      <h2>Purpose:</h2>
+      <p>
+        The first two projects this Spring focus on building software tools for code analysis.  We will emphasize C++ code
+        but want our tools to be easily extendable to other similar languages like C# and Java.
+      </p>
+      <p>
+        Code analysis consists of extracting lexical content from source code files, analyzing the code's syntax from its lexical
+        content, and building an Abstract Syntax Tree (AST) that holds the results of our analysis.  It is then fairly easy to build
+        several backends that can do further analyses on the AST to construct code metrics, search for particular constructs, or some other
+        interesting features of the code.
+      </p>
+      <p>
+        You will find it useful to look at the <a href="../../Webpages/BlogParser.htm">Parsing</a> blog for a brief introduction 
+        to parsing and code analysis.
+      </p>
+      <p>
+        In this second project we will build a Parser-based code analyzer in C++ that consists of at least these packages:
+        <ul>
+          <li>
+            <strong>Tokenizer - from Project #1:</strong>
+            <div class="indent">
+              extracts words, called tokens, from a stream of characters.  Token boundaries are white-space characters, transitions between alphanumeric
+              and punctuator characters, and comment and string boundaries.  Certain classes of punctuator characters belong to single character or
+              two character tokens so they require special rules for extraction.
+            </div>
+          </li>
+          <li>
+            <strong>SemiExpression - from Project #1:</strong>
+            <div class="indent">
+              groups tokens into sets, each of which contain all the information needed to analyze some
+              grammatical construct without containing extra tokens that have to be saved for subsequent analyses.  SemiExpressions are
+              determined by special terminating characters: semicolon, open brace, closed brace, newline when preceeded on the same line with
+              &apos;#&apos;, and colon when preceded by one of the three tokens &quot;public&quot;, &quot;protected&quot;, or &quot;private&quot;.
+            </div>
+          </li>
+          <li>
+            <strong>Parser:</strong>
+            <div class="indent">
+              Uses Rules to identify specific syntactical constructs and builds an Abstract Syntax Tree to hold that information during
+              analyses.  The Parser is a class that contains instances of Rule classes and passes token collections it acquires from ITokenCollection
+              to each rule in turn until there are no more token collections to process.  Rules are containers for Actions that are 
+              classes that contain methods doAction(const SemiExp& se) that use se to add new elements to the AST.
+            </div>
+          </li>
+          <li>
+            <strong>RulesAndActions:</strong>
+            <div class="indent">
+              A package that contains definitions of the Rules and Actions used by Parser.  This package will be modified for each
+              type of code analysis implemented by an application.
+            </div>
+          </li>
+          <li>
+            <strong>AbstractSyntaxTree:</strong>
+            <div class="indent">
+              A package that provides functionality for the actions to build an Abstract Syntax Tree.  This package provides an interface for
+              building and for extracting scope information from the tree.
+            </div>
+          </li>
+          <li>
+            <strong>Metric Analysis and Metric Executive:</strong>
+            <div class="indent">
+              Application specific packages that uses information stored in the AST to create a display of all the function and method sizes and complexities of each
+              source code package identified for analysis.
+            </div>
+          </li>
+          <li>
+            <strong>FileMgr:</strong>
+            <div class="indent">
+              A package that navigates through a directory tree rooted at some specified path and returns names of all the files and/or directories
+              matching a pattern.
+            </div>
+          </li>
+        </ul>
+      </p>
+      <p>
+        In this project we will develop and test a C++ Metric Analysis program:
+      </p>
+    </section>
+    <section>
+      <h2>Requirements:</h2>
+      Your Metric Analyzer:
+      <ol>
+        <li>
+          <strong>Shall</strong> use Visual Studio 2015 and its C++ Windows Console Projects, as provided in the ECS computer labs.
+        </li>
+        <li>
+          <strong>Shall</strong> use the C++ standard library's streams for all I/O and new and delete for all heap-based memory management<sup>1</sup>.
+        </li>
+        <li>
+          (<strong>2</strong>) <strong>Shall</strong> provide C++ packages for analyzing function size and complexity metrics for a set of specified
+          packages.  These packages will use the Tokenizer and SemiExpression packages you developed<sup>2</sup> in Project #1.
+        </li>
+        <li>
+          (<strong>3</strong>) <strong>Shall</strong> provide a Parser package with a Parser class that is a container for Rules and
+          that provides the interfaces IRule and IAction for rules contained in the Parser and actions contained in each rule.
+        </li>
+        <li>
+          (<strong>3</strong>) <strong>Shall</strong> provide an associated RulesAndActions package that has rules to detect:
+          <ul>
+            <li>global functions and static and non-static member function definitions<sup>3</sup>.</li>
+            <li>beginning and end of all C++ scopes.</li>
+          </ul>
+          and actions for each rule that support building the Abstract Syntax Tree (AST) that represents a single file's
+          scope structure and identifies the type and line number extend of each scope.
+        </li>
+        <li>
+          (<strong>4</strong>) <strong>Shall</strong> provide a facility for building an abstract syntax tree that provides an interface
+          for adding scope nodes to the tree and an methods to analyze the contents of the tree.
+        </li>
+        <li>
+          (<strong>3</strong>) <strong>Shall</strong> provide a FileMgr package that supports finding files and/or directories
+          in a directory tree rooted at a specified path.
+        </li>
+        <li>
+          (<strong>4</strong>) <strong>Shall</strong> provide a MetricsAnalysis package for evaluating and displaying the size and complexity
+          of all global functions, static member functions, and non-static member functions in each of a set of specified packages.
+        </li>
+        <li>
+          (<strong>3</strong>) <strong>Shall</strong> provide a MetricsExecutive package that enables collecting metrics for all the
+          packages with names that match a specified pattern in a directory tree rooted at a specified path.  Please define the path
+          and file patterns on the MetricsExecutive command line.
+        </li>
+        <li>
+          (<strong>3</strong>) <strong>Shall</strong> include an automated unit test suite that exercises all of the packages provided in
+          your submission and demonstrates that you met all requirements<sup>4</sup>.
+        </li>
+      </ol>
+      <div style="height:20px;"></div>
+      <hr />
+      <ol style="font-size:small">
+        <li>
+          That means that you are not allowed to use any of the C language I/0, e.g., printf, scanf, etc, nor the C memory management, e.g.,
+          calloc, malloc, or free.
+        </li>
+        <li>
+          You may use the instructor's solution for the scanner.  Students who use their own scanner code will receive a 5 point bonus.
+        </li>
+        <li>
+          You just have to detect ALL functions.  You don't have to keep track of which are global, which are static, and which are non-static.
+        </li>
+        <li>This is in addition to the construction tests you include as part of every package you submit.</li>
+      </ol>
+    </section>
+    <section>
+      <h2>What you need to know:</h2>
+      In order to successfully meet these requirements you will need to know:
+      <ol>
+        <li>Syntax and structure of programs written with the C++ language: <a href="http://cppReference.com">http://CppReference.com</a></li>
+        <li>
+          How to define and implement interfaces.  This will be covered in class.
+        </li>
+        <li>
+          The <a href="../../CoreTechnologies/Cpp/Code/STL-Containers">STL Containers</a>.
+        </li>
+      </ol>
+    </section>
+  </div>
+  <footer>
+    <hr />
+    <div id="topleft">
+      <a href="javascript: history.go(-1)">Back</a>
+    </div>
+    <div id="topright">
+      <a href="javascript: history.go(-1)">Back</a>
+    </div>
+    <img src="pictures/facultyCenterStrip.jpg" width="100%" />
+    <hr />
+    Jim Fawcett &copy; copyright 2015
+  </footer>
+</body>
+</html>

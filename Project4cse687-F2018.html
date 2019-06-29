@@ -1,0 +1,263 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - Project4-S2019.htm - Project #4, Fall 2018
+   - ver 1.0 - 16 Aug 2017
+   - Jim Fawcett, Syracuse University
+  -->
+  <title>Project #4</title>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+</head>
+<body onload="initializeMenu()" oncontextmenu="return false;">
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <a id="Next" href="Project1cse687-F2018.html">N</a>
+  <a id="Prev" href="Project3cse687-F2018.html">P</a>
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <header>
+    <h2 id="title">Project #4 - Remote TestHarness</h2>
+    <div id="pagedate">
+      Version 1.0<br />
+      Due Date: Wednesday, December 5th, 2018
+    </div>
+    <a href="../code/Project4HelpS2019">Project #4 helper files</a>
+  </header>
+
+  <!-- Notes Content -->
+  <section>
+    <h3>Purpose:</h3>
+    One focus area for this course is understanding how to structure and implement big software systems.  By big we mean systems
+    that may consist of hundreds or even thousands of packages<sup>1</sup> and perhaps several million lines of code.
+    We won't be building anything quite that large, but our projects may be considerably bigger than anything you've worked
+    on before.
+    <spacer-15></spacer-15>
+    In order to successfully implement big systems we need to partition code into relatively small parts and thoroughly test
+    each of the parts before inserting them into the software baseline<sup>2</sup>.  As new parts are added to the baseline and
+    as we make changes to fix latent errors or performance problems we will re-run test sequences for those parts
+    and, perhaps, for the entire baseline.  Managing that process efficiently requires effective tools for code analysis
+    as well as testing.  How we do that code analysis is illustrated by the projects for this year.
+    <spacer-15></spacer-15>
+    The projects this Fall focus on building software testing tools.  We will emphasize C++ code
+    but want our tools to be easily extendable to other similar languages like C# and Java.
+    <spacer-15></spacer-15>
+    You will find it useful to look at the <a href="../../Webpages/BlogTesting.htm">SW Testing</a> blog for a brief introduction
+    to production testing.
+    <div class="left" style="padding:10px 20px;">
+      <img class="photo" src="Pictures/client-channel-server.jpg" width="600" />
+    </div>
+    <spacer-15></spacer-15>
+    In this fourth project we will build and test the functionality for remote multi-user testing. Most of the functionality has
+    already been developed in the first three projects.  Here, we will focus on the Client Graphical User Interface (GUI).
+    <spacer-15></spacer-15>
+    Things now get interesting - in both senses of the word - because C++ and its standard libraries give us little help for
+    building graphical user interfaces.  Instead, we are going to reach out to the libraries supported by two other languages
+    for that help:
+    <spacer-10></spacer-10>
+    The .Net libraries provide a very well engineered facility for building these interfaces, e.g., Windows Presentation Foundation (WPF).
+    We will elect to use C# with that framework, as shown in the accompanying diagram.  C# and WPF will be discussed in class, and we will
+    show you a lot of example code.  To alay your concerns, many students in this class in previous semesters have used this approach
+    successfully.
+    <spacer-10></spacer-10>
+    We also need a &quot;converter shim&quot; to allow the C# code to communicate with our native Communication Channel code.
+    The shim is built using C++/CLI, a managed .Net language with the same object model as C#, but much of its syntax like C++.
+    You may use a Shim I built for last year's project, probably with no changes.  The only constraints for this implementation
+    is that we need to build the Shim, and native Channel code, as a dynamic link library, which the GUI loads at startup.
+    We will give you alot of help with that.
+    <spacer-10></spacer-10>
+    You will spend most of your time, in Project #4, working on the GUI to provide facilities for the user to select one or more TestRequests
+    to send, and to display the test results.  Display is the most interesting, because we want to allow the test driver to log information
+    that is relevant for a particular test, as well as show the status: pass or fail.  We will leave it up to you to design all of the GUI
+    controls and displays to support testing.
+    <spacer-10></spacer-10>
+    <div class="clear"></div>
+    As for the earlier projects, the TestHarness must support:
+    <spacer-10></spacer-10>
+    <ul class="tight">
+      <li>
+        <strong>Loading dynamic link test libraries:</strong>
+        <div class="indent">
+          This requires:
+          <ol class="tight">
+            <li>
+              clients send one or more test libraries to the TestHarness Server
+            </li>
+            <li>
+              clients pass test request messages to define which libraries are to be executed
+            </li>
+          </ol>
+        </div>
+      </li>
+      <li>
+        <strong>Executing tests:</strong>
+        <div class="indent">
+          This requires:
+          <ol class="tight">
+            <li>
+              TestHarness executes each test request in a separate process, provided by a process pool.
+            </li>
+            <li>
+              The process pool is hosted by the TestHarness, which manages child test processes using
+              message-passing communication.
+            </li>
+            <li>
+              When the test execution completes, the child test process sends, to the requesting client, a test report.
+            </li>
+          </ol>
+        </div>
+      </li>
+      <li>
+        <strong>Reporting results in a Graphical User Interface:</strong>
+        <div class="indent">
+          The client displays test information
+          based on the return message and formatting parameters set by user actions in the client GUI.
+        </div>
+      </li>
+    </ul>
+    <spacer-10></spacer-10>
+    The good news is that you have already implemented all of that.  Now, we are focusing on the Client.  It must support:
+    <spacer-15></spacer-15>
+    <ul class="tight">
+      <li>
+        <strong>Selecting Test Libraries to send:</strong>
+        <div class="indent">
+          The Client displays all the dynamic link libraries in a specified directory.  It allows the user to make
+          multiple selections, and passes that information to a sender package.
+        </div>
+      </li>
+      <li>
+        <strong>Sending the selected libraries to the TestHarness:</strong>
+        <div class="indent">
+          There are two ways to do that:
+          <ul class="tight">
+            <li>
+              The client uses Comm's sendfile mechanism to transparently send each message.  We will discuss, in class, how the
+              Comm framework does that during one of the Sockets lectures.
+            </li>
+            <li>
+              The sender reads each binary file and stores it in the body of a message, one message for each file, and
+              sends the message to the TestHarness.
+            </li>
+          </ul>
+          The TestHarness will need to use code dedicated to whichever of the two alternatives you choose.
+        </div>
+      </li>
+      <li>
+        <strong>Displaying the results of testing:</strong>
+        <div class="indent">
+          The user has to be able to tell which results belong to which requests.  With asynchronous message passing, it is
+          possible for the results to arrive out-of-order, because each test is likely to take a different amount of time to complete
+          and is executed concurrently with other testing.  You can handle this by giving each TestRequest a unique identifier, and
+          embed that identifier in the results message.
+          <spacer-15></spacer-15>
+          Each results message will have a status: pass or fail, and additional information that is likely to vary in contents and
+          quantity from test to test.  You should design a structure for reporting test results, and design the UI display to
+          accomodate that structure, perhaps as a list of textual information items.
+        </div>
+      </li>
+    </ul>
+    <spacer-10></spacer-10>
+    The TAs and I will give you some help during Help Sessions and Office Hours, but we won't layout the entire GUI design for you.
+  </section>
+  <section>
+    <h3>Requirements:</h3>
+    Your TestHarness Solution:
+    <ol>
+      <li>
+        <strong>Shall</strong> use Visual Studio 2017 and its C++ Windows Console Projects, as provided in the ECS computer labs.
+      </li>
+      <li>
+        <strong>Shall</strong> use Windows Presentation Foundation (WPF) for all user display.
+      </li>
+      <li>
+        (<strong>3</strong>) <strong>Shall</strong> assemble the working parts from Projects #1, #2, and #3 into a Client-Server configuration.
+        Unlike conventional Client-Server architectures, the Client need not wait for a reply for a TestRequest from the TestHarness before sending additional
+        TestRequests.
+      </li>
+      <li>
+        (<strong>3</strong>) <strong>Shall</strong> provide a Graphical User Interface (GUI) for the client that supports selecting test libraires
+        to send for testing, and supports displaying the test results.
+      </li>
+      <li>
+        (<strong>2</strong>) <strong>Shall</strong> provide message designs appropriate for this application.  All messages
+        are instances of the same Message class, but have a specified set of attributes and body contents suited for the intended task.
+      </li>
+      <li>
+        (<strong>2</strong>) <strong>Shall</strong> support sending TestRequest messages from Client to TestHarness Server.
+      </li>
+      <li>
+        (<strong>2</strong>) <strong>Shall</strong> support correctly executing each TestRequest, as a sequence of tests, with each TestRequest
+        running in its own Process Pool child process.
+      </li>
+      <li>
+        (<strong>2</strong>) <strong>Shall</strong> support sending test results, via results messages, from the child process executing the tests
+        to the Client that made the request.
+      </li>
+      <li>
+        (<strong>2</strong>) <strong>Shall</strong> demonstrate correct test operations for two or more concurrent clients.  You need to ensure that
+        testing takes enough time to ensure that more than one child process is running at the same time.
+      </li>
+      <li>
+        (<strong>4</strong>) <strong>Shall</strong> include an automated unit test suite that demonstrates your Clients and TestHarness satisfy all of
+        the functional requirements, above.
+      </li>
+    </ol>
+    <hr />
+    <ol style="font-size:small">
+      <li>
+        In C#, a package is a single source code file that contains:
+        <ul class="tight">
+          <li>prologue, providing a name, brief descriptive phrase, author information, and environment information</li>
+          <li>description of the package's responsiblities and required files</li>
+          <li>maintenance history</li>
+          <li>class definitions</li>
+          <li>a main function that implements construction tests for all the defined code</li>
+        </ul>
+      </li>
+      <li>
+        A software baseline is the set of all code considered to be part of the current system, excluding experimental code
+        that individual developers are working on.
+      </li>
+    </ol>
+  </section>
+  <section>
+    <h3>What you need to know:</h3>
+    In order to successfully meet these requirements you will need to know:
+    <spacer-10></spacer-10>
+    <ol class="tight">
+      <li>Basics of the C++ language: <a href="https://en.cppreference.com/w/">C++ Reference</a></li>
+      <li>
+        How to implement a simple class hierarchy.  This will be covered briefly in lecture #3 and in more detail later.
+      </li>
+      <li>
+        The <a href="../../Repository/Cpp/STLContainers">standard Containers</a>.
+      </li>
+      <li>How to use Visual Studio.  We will discuss this in one of the Help Sessions.</li>
+    </ol>
+  </section>
+  <spacer-15></spacer-15>
+  <div>
+    <img class="strip-photo" src="Pictures/FacultyCenterStrip.jpg" width="98%" />
+  </div>
+  <info-bar></info-bar>
+</body>
+</html>

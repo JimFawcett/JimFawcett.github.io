@@ -1,0 +1,226 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - Project3-S2015.htm - Project #3, Spring 2016
+   - ver 1.0 - 06 January 2016
+   - Jim Fawcett, Syracuse University
+  -->
+  <title>Project #3</title>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+  <style>
+    summary {
+      padding: 3px 0px 5px 0px;
+    }
+  </style>
+</head>
+<body id="github" onload="initializeMenu()">
+
+  <a id="Next" href="Project4CSE687-S2016.html">N</a>
+  <a id="Prev" href="Project2CSE687-S2016.html">P</a>
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <div id="pagetitle">
+    <h1 id="title">Project #3 - Parallel Dependency Analysis</h1>
+    <div id="pagedate">
+      Version 1.0,
+      <script type="text/javascript">
+        document.write("Revised: " + document.lastModified)
+      </script><br />
+      Due Date: Tuesday April 5th
+    </div>
+    <div>
+    </div>
+  </div>
+
+  <!-- Site navigation menus are generated with Javascript, using a Fallback link to a Navigation page -->
+  <nav>
+    <div id="nav">
+      <hr />
+      <a href="TopNav.htm">Site Navigation with no Javascript</a>
+      <hr />
+      <br />
+    </div>
+  </nav>
+  <!-- Notes Content -->
+  <div class="content">
+    <section>
+      <h2>Purpose:</h2>
+      <p>
+        The first two projects this Spring focused on building software tools for code analysis.  We emphasize C++ code
+        but want our tools to be easily extendable to other similar languages like C# and Java.
+      </p>
+      <p>
+        Code analysis consists of extracting lexical content from source code files, analyzing the code's syntax from its lexical
+        content, and building an Abstract Syntax Tree (AST) that holds the results of our analysis.  It is then fairly easy to build
+        several backends that can do further analyses on the AST to construct code metrics, search for particular constructs, or some other
+        interesting features of the code.
+      </p>
+      <p>
+        You will find it useful to look at the <a href="../../Webpages/BlogParser.htm">Parsing</a> blog for a brief introduction
+        to parsing and code analysis.
+      </p>
+      <p>
+        In this third project we will build and test a type-based dependency analyzer that uses the analysis machinery we developed
+        in the first two projects and exercises the new thread facilities provided in the C++11 standard, as implemented in Visual Studio
+        2015.  We will add, to the packages from Projects #1 and #2, the new packages:
+        <ul>
+          <li>
+            <strong>ThreadPool<sup>1</sup>:</strong>
+            <div class="indent">
+              Provides facilities to enqueue work items and execute them asynchronously.  Each work item will be a callable object<sup>2</sup>
+              that is supplied by application code.
+            </div>
+          </li>
+          <li>
+            <strong>Tasks:</strong>
+            <div class="indent">
+              Provides a Task class that executes a specified callable object on a ThreadPool thread, using services of the ThreadPool package.
+            </div>
+          </li>
+          <li>
+            <strong>TypeAnalysis:</strong>
+            <div class="indent">
+              Finds all the types defined in each of a collection of C++ source files.  It does this by building rules to detect type definitions:
+              classes, structs, enums, typedefs, and aliases, and capture their fully qualified names and files where they are defined.
+            </div>
+          </li>
+          <li>
+            <strong>DependencyAnalysis:</strong>
+            <div class="indent">
+              Finds, for each file in a specified file collection, all other files from the file collection on which they depend.
+              File A depends on file B, if and only if, it uses the name of any type or global function defined in file B.
+              It might do that by calling a function or method of a type or by inheriting the type.  Note that this intentionally
+              does not record dependencies of a file on files outside the file set, e.g., language and platform libraries.
+            </div>
+          </li>
+          <li>
+            <strong>ParallelDependencyAnalysis:</strong>
+            <div class="indent">
+              Evaluates the dependency graph for all the packages in a specified file collection.  For each file the analyses run
+              asynchronously, using the facilities of the Task class.  I expect you will find it easiest to implement this in two
+              passes over the file collection.  In the first pass we find, asynchronously, all the types defined in the collection
+              using services of the TypeAnalysis package.
+              In the second pass we find, asynchronously, all the dependencies between files using the DependencyAnalysis package.
+            </div>
+          </li>
+          <li>
+            <strong>ParallelDependencyExecutive<sup>3</sup>:</strong>
+            <div class="indent">
+              Collects all of the files matching one or more patterns in a directory tree rooted at a specified path.  On that
+              collection it conducts a dependency analysis using the services of the ParallelDependencyAnalysis package.  It then
+              then displays the results by listing each of the files and there dependencies on two adjacent lines (possibly wrapped).
+            </div>
+          </li>
+        </ul>
+      </p>
+    </section>
+    <section>
+      <h2>Requirements:</h2>
+      Your DependencyAnalyzer Solution:
+      <ol>
+        <li>
+          <strong>Shall</strong> use Visual Studio 2015 and its C++ Windows Console Projects, as provided in the ECS computer labs.
+        </li>
+        <li>
+          <strong>Shall</strong> use the C++ standard library's streams for all I/O and new and delete for all heap-based memory management<sup>4</sup>.
+        </li>
+        <li>
+          (<strong>2</strong>) <strong>Shall</strong> provide C++ packages as described in the <strong>Purpose</strong> section.  You are free to
+          alter the names and division of responsibilities as you see fit.  However, you are expected to enforce the &quot;Single Responsiblity Principle&quot;<sup>5</sup>
+          as illustrated in the package structure described above.
+        </li>
+        <li>
+          (<strong>3</strong>) <strong>Shall</strong> provide a ThreadPool package that declares and defines
+          a ThreadPool class that executes enqueued work items asynchronously<sup>6</sup>.
+        </li>
+        <li>
+          (<strong>2</strong>) <strong>Shall</strong> implement a Task package that declares and defines a Task class that
+          executes a callable object on a ThreadPool thread.
+        </li>
+        <li>
+          (<strong>4</strong>) <strong>Shall</strong> provide a TypeAnalysis package that identifies all of the types defined in a specified file.
+          It is expected that you will use the analysis machinery you developed in Projects #1 and #2.
+        </li>
+        <li>
+          (<strong>3</strong>) <strong>Shall</strong> Provide a DependencyAnalysis package that identifies all of the dependencies between files
+          in a specified file collection.
+        </li>
+        <li>
+          (<strong>3</strong>) <strong>Shall</strong> provide ParallelDependencyAnalysis package that finds compilation dependencies between
+          all of the files in a specified file collection using the asynchronous processing facilities provided by the Task package.
+        </li>
+        <li>
+          (<strong>3</strong>) <strong>Shall</strong> provide a ParallelDependencyExecutive that finds all the compilation dependencies
+          between files in a file collection.  Each of the files in the collection are found in a directory tree rooted at a specified path
+          and whose names match one or more specified patterns.
+        </li>
+        <li>
+          (<strong>5</strong>) <strong>Shall</strong> include an automated unit test suite that demonstrates you meet all the requirements of this
+          project<sup>7</sup>.
+        </li>
+      </ol>
+      <div style="height:20px;"></div>
+      <hr />
+      <ol class="tight" style="font-size:small">
+        <li>
+          We will discuss the design of the ThreadPool class.  You may, if you wish, elect to wrap the Windows ThreadPool
+          in the ThreadPool class rather than implement it yourself.
+        </li>
+        <li>
+          These work item callable objects are likely to be implemented with C++ lambdas bound to std::function objects.
+        </li>
+        <li>
+          I expect that you will need to use the FileMgr package from Project #2 and also develope a Display package.
+          You may discover the need for other low-level packages as well.
+        </li>
+        <li>
+          That means that you are not allowed to use any of the C language I/0, e.g., printf, scanf, etc, nor the C memory management, e.g.,
+          calloc, malloc, or free.
+        </li>
+        <li>
+          <a href="https://en.wikipedia.org/wiki/Single_responsibility_principle">https://en.wikipedia.org/wiki/Single_responsibility_principle</a>
+        </li>
+        <li>This will be discussed in class.</li>
+        <li>This is in addition to the construction tests you include as part of every package you submit.</li>
+      </ol>
+    </section>
+    <section>
+      <h2>What you need to know:</h2>
+      In order to successfully meet these requirements you will need to know:
+      <ol class="tight">
+        <li>
+          Details of the C++ language: <a href="http://cppReference.com">http://CppReference.com</a> including C++11 threading
+          and concurrency models.
+        </li>
+        <li>
+          All those things you learned while developing code for Projects #1 and #2.
+        </li>
+        <li>
+          The <a href="../../CoreTechnologies/Cpp/Code/STL-Containers">STL Containers</a>.
+        </li>
+      </ol>
+    </section>
+  </div>
+  <spacer-25></spacer-25>
+  <img class="strip-photo" src="pictures/facultyCenterStrip.jpg" width="98%" />
+  <info-bar></info-bar>
+</body>
+</html>
