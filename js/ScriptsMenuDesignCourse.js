@@ -15,74 +15,87 @@ function initializeMenu() {
   var topMenu = document.getElementsByTagName("nav");
   topMenu[0].innerHTML = "<div class='navbar'>\
     <a href='index.html' class='menuItem'>Home</a>\
-    <a href='Repositories.html' class='menuItem'>Repositories</a>\
+    <a href='Repositories.html' class='menuItem notice'>Repositories</a>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Utilities &#9662;</button>\
+      <button class='dropbutton'>Notes &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='CppUtilities.html'>CppUtilities</a>\
-        <a href='FileUtilities.html'>FileUtilities</a>\
-        <a href='Logger.html'>Logger</a>\
+        <a href='DesignProcess.html'>Design Process</a>\
+        <a href='ProjectsList.html'>Project suggestions</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Tools &#9662;</button>\
+      <button class='dropbutton'>Blogs &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='TextFinder.html'>TextFinder</a>\
-        <a href='Duplicates.html'>Duplicates</a>\
-        <a href='FileDates.html'>FileDates</a>\
-        <a href='FileSizes.html'>FileSizes</a>\
-        <a href='FindFiles.html'>FindFiles</a>\
-        <a href='Diff_WPF.html'>Diff_WPF</a>\
-        <a href='CodeWebifier.html'>CodeWebifier</a>\
-        <a href='PrettyPrint.html'>PrettyPrint</a>\
+        <a href='Blogs.html'>Annotated&nbsp;Summary&nbsp;of&nbsp;Blogs&nbsp;&nbsp;</a>\
+        <a href='Blog.html'>First&nbsp;Things</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
+        <a href='BlogDesign.html'>SW&nbsp;Design</a>\
+        <a href='BlogPrinciples.html'>Design&nbsp;Principles</a>\
+        <a href='BlogOOD.html'>OO&nbsp;Design</a>\
+        <a href='BlogObjectModels.html'>Object&nbsp;Models</a>\
+        <a href='BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data&nbsp;&nbsp;</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Engineering&nbsp;SW&nbsp;---</div>\
+        <a href='BlogOCD.html'>Concept&nbsp;Document</a>\
+        <a href='BlogTesting.html'>SW&nbsp;Testing</a>\
+        <a href='SummerReading.html'>Summer&nbsp;Reading</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Software&nbsp;Sys&nbsp;------</div>\
+        <a href='BlogStructure.html'>SW&nbsp;Structure</a>\
+        <a href='BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a>\
+        <a href='BlogActiveObjects.html'>Active&nbsp;Objects</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Reusable&nbsp;Pkgs&nbsp;----</div>\
+        <a href='BlogNoSql.html'>noSQL&nbsp;Database</a>\
+        <a href='BlogParser.html'>Parsing</a>\
+        <a href='BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a>\
+        <a href='BlogMTree.html'>M-ary&nbsp;Trees</a>\
+        <a href='BlogGraph.html'>Directed&nbsp;Graphs</a>\
+        <a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Components &#9662;</button>\
+      <button class='dropbutton'>Resources &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='CppBlockingQueue.html'>CppBlockingQueue</a>\
-        <a class='disable' href='FileManager.html'>File Manager</a>\
-        <a class='disable' href='CppProperty.html'>CppProperty</a>\
-        <a class='disable' href='ThreadPool.html'>ThreadPool</a>\
-        <a class='disable' href='Process.html'>Process</a>\
-        <a class='disable' href='RetryWrapper.html'>RetryWrapper</a>\
-        <a class='disable' href='WebComponents.html'>WebComponents</a>\
+        <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
+        <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
+        <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
+        <a href='https://github.com/joshnh/Git-Commands'>git commands</a>\
+        <a class='disable' href='UMLDiagrams.html'>UML Diagrams</a>\
+        <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
+        <a href='SummerReading.html'>Summer Reading</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Libraries &#9662;</button>\
+      <button class='dropbutton'>Prog Lang &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='FileSystem.html'>FileSystem-Windows</a>\
-        <a class='disable' href='FileSystem.html'>FileSystem-Linux</a>\
-        <a href='Sockets.html'>Sockets-Windows</a>\
-        <a class='disable' href='Sockets.html'>Sockets-Linux</a>\
-        <a href='XmlDocument.html'>XmlDocument</a>\
+        <a href='LangCpp.html'>C++</a>\
+        <a class='disable' href='#'>C#</a>\
+        <a class='disable' href='#'>HTML</a>\
+        <a class='disable' href='#'>CSS</a>\
+        <a class='disable' href='#'>JavaScript</a>\
+        <a class='disable' href='#'>Java</a>\
+        <a class='disable' href='#'>Rust</a>\
+        <a class='disable' href='#'>Go</a>\
+        <a class='disable' href='#'>Python</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Projects &#9662;</button>\
+      <button class='dropbutton'>Design Course &#9662;</button>\
       <div class='dropdown-content'>\
-        <a class='disable' href='MsgPassingComm.html'>MsgPassingComm</a>\
-        <a class='disable' href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a>\
-        <a class='disable' href='CsDependencyAnalysis.html'>CsDependencyAnalysis</a>\
-      </div>\
-    </div>\
-    <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Demos &#9662;</button>\
-      <div class='dropdown-content'>\
-        <a href='STR.html'>STR&nbsp;Value&nbsp;Type</a>\
-        <a href='STL-Containers.html'>STL-Containers</a>\
-        <a href='IOStreams.html'>IOStreams</a>\
-        <a class='disable' href='CppThreads.html'>CppThreads</a>\
-        <a class='disable' href='ProcAndThreads.html'>ProcsAndThreads</a>\
-      </div>\
-    </div>\
-    <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Build &#9662;</button>\
-      <div class='dropdown-content'>\
-        <a class='disable' href='#'>Build Demo</a>\
-        <a class='disable' href='#'>Build Structure</a>\
-        <a class='disable' href='#'>Build from repo</a>\
+        <a class='disable' href='#'>Table of Contents</a>\
+        <a class='disable' href='#'>Concept&nbsp;and&nbsp;Tasks&nbsp;(TextFinder)</a>\
+        <a class='disable' href='#'>Classes (Sockets-Windows)</a>\
+        <a class='disable' href='#'>Inheritance (XmlDocument)</a>\
+        <a class='disable' href='#'>Templates (Properties)</a>\
+        <a class='disable' href='#'>Flexible Designs (DirExplorer)</a>\
+        <a class='disable' href='#'>Components (Parser)</a>\
+        <a class='disable' href='#'>Project Structures</a>\
+        <a class='disable' href='#'>Threads (ThreadPool)</a>\
+        <a class='disable' href='#'>Sockets&nbsp;(MsgPassingCommunication)</a>\
+        <a class='disable' href='#'>Build Process (TextFinder)</a>\
+        <a class='disable' href='#'>Testing&nbsp;(FileSystem-Windows)</a>\
+        <a class='disable' href='#'>Appendix:&nbsp;<u>U</u>niversal&nbsp;<u>M</u>odeling&nbsp;<u>L</u>anguage</a>\
+        <a class='disable' href='#'>Appendix:&nbsp;Implementation&nbsp;metrics</a>\
+        <a class='disable' href='#'>Appendix: Design Patterns</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -267,6 +280,7 @@ function mouseAction(event) {
       window.open(event.target, "_newtab" + Math.floor(Math.random() * 999999));
     }
     else {
+      //toggleNavKeys();
       toggleNavKeys();
     }
   }
