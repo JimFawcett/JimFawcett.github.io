@@ -26,7 +26,6 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Blogs &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='Blogs.html'>Annotated&nbsp;Summary&nbsp;of&nbsp;Blogs&nbsp;&nbsp;</a>\
         <a href='Blog.html'>First&nbsp;Things</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
         <a href='BlogDesign.html'>SW&nbsp;Design</a>\
