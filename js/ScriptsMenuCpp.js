@@ -66,6 +66,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>C++ Lang &#9662;</button>\
       <div class='dropdown-content'>\
+        <a href='LangCpp.html'>C++</a>\
         <a href='DesignNote-CvsCpp.html'>C vs C++</a>\
         <a href='DesignNote-GettingStartedWithCpp.html'>Getting Started</a>\
         <a href='Resources/CppModels.pdf'>C++ models - pdf</a>\
@@ -97,7 +98,6 @@ function initializeMenu() {
         <a href='CodeSnap-Inheritance.h.html'>Inheritance</a>\
         <a href='CodeSnap-CompoundObjects.cpp.html'>CompoundObjects</a>\
         <a href='CodeSnap-Templates.h.html'>Templates</a>\
-        <a href='CodeSnap-FunctionObjects.h.html'>FunctionObjects</a>\
         <a href='CodeSnap-FunctionObjects.h.html'>FunctionObjects</a>\
         <a href='CodeSnap-Lambdas.cpp.html'>Lambdas</a>\
         <a href='CodeSnap-LambdaCapture.cpp.html'>LambdaCapture</a>\
