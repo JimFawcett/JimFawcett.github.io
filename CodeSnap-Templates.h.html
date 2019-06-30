@@ -1,0 +1,180 @@
+﻿<!----------------------------------------------------------------------------
+  CodeSnap-Templates.htm
+  Published 18 May 2017
+  Jim Fawcett, CSE687 : Object Oriented Design, Summer 2017
+
+  Note:
+  - Markup characters in the text part, enclosed in <pre>...</pre> have to be
+    replaced with escape sequences, e.g., < becomes &lt; and > becomes &gt;
+  - Be careful that you don't replace genuine markup characters with escape
+    sequences, e.g., everything outside of the <pre>...</pre> section.
+----------------------------------------------------------------------------->
+<html>
+<head>
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+  <style>
+    h3 {
+      font-weight: normal;
+    }
+  </style>
+</head>
+<body onload="initializeMenu()" oncontextmenu="return false;">
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <!--<a id="Next" href="Project2-S2019.htm">N</a>
+  <a id="Prev" href="Project4-S2019.htm">P</a>-->
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <h3>
+    <a href="CodeSnap-Templates.h.htm">Stack.h</a>,
+    <a href="CodeSnap-Templates.cpp.htm">Stack.cpp</a>,
+    <a href="CodeSnap-Templates.txt.htm">Stack.txt</a>,
+    <a href="../Code/CodeSnaps/Templates">Code folder</a>,
+    <a href="Templates.htm">Templates webpage</a>
+  </h3>
+  <div class="indent">
+    This code illustrates syntax used for template classes.
+  </div>
+  <hr />
+  <pre class="codeSnap">
+#ifndef STACK_H
+#define STACK_H
+///////////////////////////////////////////////////////////////////////
+// Stack.h - stack class derived from Effective C++, Scott Meyers    //
+//                                                                   //
+//   Note: inclusion model for templates requires all template       //
+//         implementations be placed in header file.                 //
+//                                                                   //
+// Jim Fawcett, CSE687 - Object Oriented Design, Spring 2004         //
+///////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////
+// template class 
+
+template&lt;class T&gt; class stack {
+private:
+  template &lt;class U&gt; friend class stack;
+
+  struct stacknode {
+    T data;
+    stacknode *next;
+    stacknode(const T& newdata, stacknode *nextnode)
+      : data(newdata), next(nextnode) { }
+  };
+  stacknode *top;
+public:
+  stack();
+  ~stack();
+  void push(const T& object);
+  T pop(void);
+  void flush();
+  int size() const;
+    
+  // member templates
+  template &lt;class U&gt; stack(const stack&lt;U&gt;&);
+  template &lt;class U&gt; stack&lt;T&gt;& operator=(const stack&lt;U&gt;&);
+};
+
+//----&lt; void constructor &gt;---------------------------------------------
+
+template&lt;class T&gt; stack&lt;T&gt;::stack() : top(0) { }
+
+//----&lt; destructor &gt;---------------------------------------------------
+
+template &lt;class T&gt; stack&lt;T&gt;::~stack(void) {
+  while (top) {
+    stacknode *next_to_die = top;
+    top = top-&gt;next;
+    delete next_to_die;
+  }
+}
+//----&lt; push data onto stack &gt;-----------------------------------------
+
+template&lt;class T&gt; void stack&lt;T&gt;::push(const T &object) {
+  top = new stacknode(object, top);
+}
+//----&lt; pop data from stack &gt;------------------------------------------
+
+template &lt;class T&gt; T stack&lt;T&gt;::pop(void) {
+  if (!top) {
+    throw std::out_of_range("\n  attempt to pop empty stack\n");
+  }
+  stacknode *save = top;
+  top = top-&gt;next;
+  T data = save-&gt;data;
+  delete save;
+  return data;
+}
+//----&lt; empty stack &gt;--------------------------------------------------
+
+template &lt;class T&gt; void stack&lt;T&gt;::flush()
+{
+  stacknode* node = top;
+  while(node)
+  {
+    stacknode *next_to_die = node;
+    node = node-&gt;next;
+    delete next_to_die;
+  }
+}
+//----&lt; return number of elements on stack &gt;---------------------------
+
+template &lt;class T&gt; int stack&lt;T&gt;::size() const
+{
+  stacknode* node = top;
+  int count = 0;
+  while(node)
+  {
+    count++;
+    node = node-&gt;next;
+  }
+  return count;
+}
+//----&lt; copy and promotion constructor, a member template &gt;------------
+
+template &lt;class T&gt; 
+template &lt;class U&gt; stack&lt;T&gt;::stack(const stack&lt;U&gt;& s) : top(0)
+{
+  stack&lt;U&gt;::stacknode* node = const_cast&lt;stack&lt;U&gt;::stacknode*&gt;(s.top);
+  while(node)
+  {
+    this-&gt;push(node-&gt;data);
+    node = node-&gt;next;
+  }
+}
+//----&lt; assignment from stack of possibly a compatible type &gt;----------
+
+template &lt;class T&gt; 
+template &lt;class U&gt; stack&lt;T&gt;& stack&lt;T&gt;::operator=(const stack&lt;U&gt;& s)
+{
+  if((void*)this == (void*)&s)
+    return *this;
+  flush();
+  stack&lt;U&gt;::stacknode* node2 = const_cast&lt;stack&lt;U&gt;::stacknode*&gt;(s.top);
+  while(node2)
+  {
+    this-&gt;push(static_cast&lt;T&gt;(node2-&gt;data));
+    node2 = node2-&gt;next;
+  }
+  return *this;
+}
+#endif
+</pre>
+  <!--<div class="photo">
+    <img src="pictures/CSTstrip.jpg" width="100%" />
+  </div>-->
+  <info-bar></info-bar>
+</body>
+</html>

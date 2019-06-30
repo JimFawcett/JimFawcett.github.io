@@ -1,0 +1,249 @@
+﻿<!----------------------------------------------------------------------------
+  CodeSnap-Lambda.cs.htm
+  Published 19 Mar 2017
+  Jim Fawcett, CSE687 : Object Oriented Design, Summer 2017
+
+  Note:
+  - Markup characters in the text part, enclosed in <pre>...</pre> have to be
+    replaced with escape sequences, e.g., < becomes &lt; and > becomes &gt;
+  - Be careful that you don't replace genuine markup characters with escape
+    sequences, e.g., everything outside of the <pre>...</pre> section.
+----------------------------------------------------------------------------->
+<html>
+<head>
+  <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+  <script type="text/javascript" src="js/CSE687-LectNav.js"></script>
+  <script type="text/javascript" src="js/Fallback.js"></script>
+  <link rel="stylesheet" href="css/TopLevelV2.css?v=1.0" />
+  <link rel="stylesheet" href="css/CourseSupplements.css?v=1.0" />
+  <link rel="stylesheet" href="css/Fallback.css?v=1.0" />
+  <script type="text/javascript" src="js/CustomMarkup.js"></script>
+  <link rel="stylesheet" href="css/CustomMarkup.css?v=1.0" />
+  <style>
+    body {
+      margin: 0px 20px 20px 20px;
+      color: black;
+      background-color: #eee;
+      font-family: Consolas;
+      font-weight: 600;
+      font-size: 110%;
+    }
+
+    .indent {
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+
+    h3 {
+      margin-bottom: 15px; margin-top: 15px;
+    }
+
+    h4 {
+      margin-bottom: 5px;
+      margin-top: 3px;
+    }
+
+    hr {
+      margin-top: 20px;
+    }
+  </style>
+  <style>
+    div.readings {
+      padding: 10px 20px 15px 20px;
+    }
+
+      div.readings > ul {
+        padding: 0px;
+        margin: 0px 20px;
+      }
+
+        div.readings > ul > li {
+          padding: 0px;
+          margin: 0px;
+        }
+
+          div.readings > ul > li > h4 {
+            padding: 0px;
+            margin: 0px;
+          }
+
+    pre { 
+      font-family:"courier new", courier, monospace;
+      font-size:large; 
+    }
+
+  </style>
+</head>
+<body>
+  <a name="top"></a>
+  <!-- site navigation menu built with Javascript -->
+  <nav>
+    <div id="nav">
+      <div id="remove">
+        <hr />
+        <a href="TopNav.htm">Site Navigation with no Javascript</a>
+        <hr />
+        <br />
+      </div>
+    </div>
+  </nav>
+  <div id="pagenav">
+    <ul>
+      <li><a href="#top">T</a></li>
+      <li><a id="N" href="#top">N</a></li>
+      <li><a id="P" href="#top" prev>P</a></li>
+      <li><a href="#bottom">B</a></li>
+    </ul>
+  </div>
+
+  <!--<h3>
+    <a href="CodeSnap-BasicHttpProgService.IService.cs.htm">IService.cs</a>,
+    <a href="CodeSnap-BasicHttpProgService.Service.cs.htm">Service.cs</a>,
+    <a href="CodeSnap-BasicHttpProgService.ProgClient.cs.htm">ProgClient.cs</a>,
+    <a href="CodeSnap-BasicHttpProgService.ProgHost.cs.htm">ProgHost.cs</a>
+  </h3>-->
+  <div style="font-size:large; font-weight:bold; margin:20px;">
+    Illustrates lambdas and the several ways they capture local state.
+  </div>
+  <hr />
+  <h3>Lambdas.cpp</h3>
+<pre>
+/////////////////////////////////////////////////////////////////////
+// Lambdas.cpp - demonstrate lambda capture                        //
+//                                                                 //
+// Jim Fawcett, CSE687 - Object Oriented Design, Spring 2015       //
+/////////////////////////////////////////////////////////////////////
+/*
+ * When compiled a lambda definition is translated into a functor
+ * with operator() defining the code of the lambda.  Any referenced 
+ * data from the local scope becomes member data of the functor and 
+ * gets passed around with the lambda.
+ *
+ * Lambdas are defined like this:
+ * 1. [=] (arguments) 
+ *    { code to execute may include names of local data as well as arguments };
+ *    The [=] means that local data, like i below, are captured by value.
+ * 2. [&] (arguments)
+ *    { code to execute may include names of local data as well as arguments };
+ *    The [&] means that local data is captured by reference so must be in
+ *    scope when the lambda executes.
+ * 3. [localVar1, &localVar2] (arguments)
+ *    { code to execute includes localVar1 by value and localVar2 by reference }
+ */
+#include &lt;functional&gt;
+#include &lt;iostream&gt;
+#include &lt;sstream&gt;
+
+//----&lt; create a lambda and bind to a std::function &gt;----------------
+/*
+ * Lambda copies captured values, e.g., [=]
+ */
+std::function&lt;std::string()&gt; CreateLambda1(int i)
+{
+  // this std function converts an integer to a string
+  std::function&lt;std::string()&gt; f = [=]()
+  {
+    std::ostringstream convert;
+    convert &lt;&lt; i;                      // lambda captures value of i
+    return convert.str();
+  };
+  return f;
+}
+//----&lt; create a lambda and bind to a std::function &gt;----------------
+/*
+ * Lambda copies captured values, e.g., []
+ */
+std::function&lt;std::string(int)&gt; CreateLambda2()
+{
+  // this std function converts an integer to a string
+  std::function&lt;std::string(int)&gt; f = [](int i)
+  {
+    std::ostringstream convert;
+    convert &lt;&lt; i;                      // lambda captures value of i
+    return convert.str();
+  };
+  return f;
+}
+//----&lt; create a lambda and bind to a std::function &gt;----------------
+/*
+ * Lambda captures a reference to i and the value of j, e.g., [&i, j]
+ */
+std::function&lt;std::string()&gt; CreateLambda3(int& i)
+{
+  // this std function converts integers to a string
+  int j = 40;
+  std::function&lt;std::string()&gt; f = [&i, j]()
+  {
+    std::ostringstream convert;
+    convert &lt;&lt; i + j;                      // lambda captures reference to
+    return convert.str();                  // external i - would be an error
+  };                                       // if i was passed by value to
+  return f;                                // CreateLambda3(int i)
+}
+//----&lt; create a lambda and bind to a std::function &gt;----------------
+/*
+ * Lambda captures a reference to i that will become invalid when
+ * returning from invocation and a copy of j which will be valid, 
+ * e.g., [&i, j]
+ */
+std::function&lt;std::string()&gt; CreateLambda4()
+{
+  // this std function converts integers to a string
+  int i = 2;
+  int j = 40;
+  std::function&lt;std::string()&gt; f = [&i, j]()
+  {
+    std::ostringstream convert;
+    convert &lt;&lt; i + j;           // error here - will return invalid reference
+    return convert.str();       // to temporary value of i along with valid
+  };                            // copy of j, e.g., [&i, j]
+  return f;
+}
+
+//----&lt; demonstration of lambda operation &gt;--------------------------
+
+int main()
+{
+  std::cout &lt;&lt; "\n  Demonstrating Lambda Capture";
+  std::cout &lt;&lt; "\n ==============================";
+
+  std::function&lt;std::string()&gt; f = CreateLambda1(42);
+  std::cout &lt;&lt; "\n  The meaning of life is \"" &lt;&lt; f() &lt;&lt; "\"";
+
+  std::function&lt;std::string(int)&gt; g = CreateLambda2();
+  std::cout &lt;&lt; "\n  The meaning of life is still \"" &lt;&lt; g(42) &lt;&lt; "\"";
+
+  int i = 2;
+  std::function&lt;std::string()&gt; h = CreateLambda3(i);
+  std::cout &lt;&lt; "\n  Again, the meaning of life is still \"" &lt;&lt; h() &lt;&lt; "\"";
+
+  std::function&lt;std::string()&gt; error = CreateLambda4();
+  std::cout &lt;&lt; "\n  the meaning of life is not \"" &lt;&lt; error() &lt;&lt; "\"";
+
+  std::cout &lt;&lt; "\n\n  So long, Douglas Adams, and thanks for all the fish!\n\n";
+}
+</pre>
+  <h3>Lambdas.txt</h3>
+<pre>
+  Demonstrating Lambda Capture
+ ==============================
+  The meaning of life is "42"
+  The meaning of life is still "42"
+  Again, the meaning of life is still "42"
+  the meaning of life is not "-858993420"
+  So long, Douglas Adams, and thanks for all the fish!
+
+Press any key to continue . . .
+
+</pre>
+  <!--<div class="photo">
+    <img src="pictures/CSTstrip.jpg" width="100%" />
+  </div>-->
+  <footer>
+    <hr />
+    <div style="position:absolute; left:35px;">CSE687 - Object Oriented Design Course Notes</div>
+    Jim Fawcett &copy; copyright 2017
+  </footer>
+  <a name="bottom"></a>
+</body>
+</html>

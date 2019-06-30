@@ -1,0 +1,315 @@
+﻿<!----------------------------------------------------------------------------
+  CodeSnap-ClassAnatomy.cs.htm
+  Published 19 Mar 2017
+  Jim Fawcett, CSE687 : Object Oriented Design, Summer 2017
+
+  Note:
+  - Markup characters in the text part, enclosed in <pre>...</pre> have to be
+    replaced with escape sequences, e.g., < becomes &lt; and > becomes &gt;
+  - Be careful that you don't replace genuine markup characters with escape
+    sequences, e.g., everything outside of the <pre>...</pre> section.
+----------------------------------------------------------------------------->
+  <html>
+  <head>
+    <script src="js/ScriptsTemplate.js"></script>
+    <script src="js/ScriptsKeyboard.js"></script>
+    <script src="js/ScriptsMenuCpp.js"></script>
+    <link rel="stylesheet" href="css/StylesTemplate.css" />
+    <link rel="stylesheet" href="css/StylesMenu.css" />
+    <style>
+      h3 {
+        font-weight: normal;
+      }
+    </style>
+  </head>
+  <body id="github" onload="initializeMenu()">
+    <nav>
+      <div id="navbar"></div>
+    </nav>
+    <a id="Next" href="CodeSnap-ClassAnatomy.txt.html">N</a>
+    <a id="Prev" href="CodeSnap-ClassAnatomy.h.html">P</a>
+
+    <navKeysContainer>
+      <navKey onclick="scrollPageTop()">T</navKey>
+      <navKey onclick="scrollPageBottom()">B</navKey>
+      <navKey onclick="helpWin()">H</navKey>
+      <navKey onclick="loadPrev()">P</navKey>
+      <navKey onclick="loadNext()">N</navKey>
+    </navKeysContainer>
+
+    <h3>
+      <a href="CodeSnap-ClassAnatomy.h.html">ClassAnatomy.h</a>,
+      <a href="CodeSnap-ClassAnatomy.cpp.html">ClassAnatomy.cpp</a>,
+      <a href="CodeSnap-ClassAnatomy.txt.html">ClassAnatomy.txt</a>,
+      <a class="disable" href="#">Code folder</a>,
+      <a href="DesignNote-CppClasses.html">Classes webpage</a>
+    </h3>
+    <div class="indent">
+      Illustrates all of the basic parts of a class, e.g., Constructors, operators, destructor, and member data.
+    </div>
+    <hr />
+    <h3>ClassAnatomy.cpp</h3>
+    <div class='code'>
+      <pre class="codesnap">
+/////////////////////////////////////////////////////////////////////////////
+// TestClass.cpp - Implemented to demonstrate class operations             //
+//                                                                         //
+// Application:  CSE687 - OOD demonstration, Fall 2018                     //
+// Platform:     Dell XPS 8920, Win 10 Pro, Visual Studio 2017             //
+// Author:       Jim Fawcett, Syracuse University, CST 4-187               //
+//               jfawcett@twcny.rr.com, http://ecs.syr.edu/faculty/fawcett //
+/////////////////////////////////////////////////////////////////////////////
+
+#include "TestClass.h"
+#include "..\Helpers\Helpers.h"
+#include &lt;iostream&gt;
+#include &lt;iomanip&gt;
+#include &lt;sstream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;memory&gt;
+
+// add this to stringUtiltities
+
+//----< remove a substring if it exists, returning by value >----------------
+
+std::string remove(std::string& src, const std::string& removed)
+{
+  std::string modified = src;
+  size_t pos = modified.find(removed);
+  if (pos &gt;= modified.size())
+    return modified;
+  std::string ret = modified.erase(pos, removed.size());
+  return ret;
+}
+//----< remove a substring if it exists, returning by reference >------------
+
+void inPlaceRemove(std::string& src, const std::string& removed)
+{
+  size_t pos = src.find(removed);
+  if (pos &gt;= src.size())
+    return;
+  src = src.erase(pos, removed.size());
+}
+//----< configure output lines into fixed size fields >----------------------
+
+void showLine(const std::string& msg, size_t line, const std::string& function)
+{
+  std::ostringstream lineStr, funcStr;
+  lineStr &lt;&lt; line;
+  funcStr &lt;&lt; function;
+  std::string fStr = funcStr.str();
+  inPlaceRemove(fStr, "__thiscall ");  // remove VSC++ compiler decorations
+  inPlaceRemove(fStr, "__cdecl ");     // as not relevant for this discussion
+  std::cout &lt;&lt; "\n  " &lt;&lt; std::setw(40) &lt;&lt; std::left &lt;&lt; msg.substr(0, 40);
+  std::cout &lt;&lt; std::setw(9) &lt;&lt; " at line " &lt;&lt; std::setw(5) &lt;&lt; std::right &lt;&lt; "#" + lineStr.str() + " ";
+  std::cout &lt;&lt; std::left &lt;&lt; fStr.substr(0, 60);
+}
+
+//----&lt; default constructor &gt;----------------------------------------------
+
+Test::Test()
+{
+  showLine("void construction of Test",__LINE__, __FUNCSIG__);
+  name_ = "unnamed";
+}
+//----&lt; promotion constructor &gt;--------------------------------------------
+
+Test::Test(const std::string& name) : name_(name)
+{
+  std::string msg = "named construction of " + name;
+  showLine(msg, __LINE__, __FUNCSIG__);
+}
+//----&lt; copy constructor &gt;-------------------------------------------------
+
+Test::Test(const Test& t) : name_(t.name_)
+{
+  std::string msg = "copy of " + name_;
+  showLine(msg, __LINE__, __FUNCSIG__);
+}
+//----&lt; move constructor &gt;-------------------------------------------------
+
+Test::Test(Test&& t) : name_(std::move(t.name_))
+{
+  std::string msg = "move of " + name_;
+  showLine(msg, __LINE__, __FUNCSIG__);
+}
+//----&lt; copy assignment operator &gt;-----------------------------------------
+
+Test& Test::operator=(const Test& t)
+{
+  if (this == &t)
+    return *this;
+  name_ = t.name_;
+  std::string msg = "copy assignment of " + name_;
+  showLine(msg, __LINE__, __FUNCSIG__);
+  return *this;
+}
+//----&lt; move assignment operator &gt;-----------------------------------------
+
+Test& Test::operator=(Test&& t)
+{
+  if (this == &t)
+    return *this;
+  name_ = std::move(t.name_);
+  std::string msg = "move assignment of " + name_;
+  showLine(msg, __LINE__, __FUNCSIG__);
+  return *this;
+}
+//----&lt; destructor &gt;-------------------------------------------------------
+
+Test::~Test()
+{
+  std::string msg = "destruction of " + name_;
+  showLine(msg, __LINE__, __FUNCSIG__);
+}
+//----&lt; name "property" &gt;--------------------------------------------------
+
+std::string& Test::name()
+{
+  return name_;
+}
+//----&lt; enunciator &gt;-------------------------------------------------------
+
+void Test::say()
+{
+  std::cout &lt;&lt; "\n  my name is " &lt;&lt; name_;
+}
+//----&lt; cosmetic object that emits line feeds on termination &gt;-------------
+
+struct lineFeeds
+{
+  ~lineFeeds()
+  {
+    std::cout &lt;&lt; "\n\n";
+  }
+} cosmetic;
+//----&lt; demonstration of move construction &gt;-------------------------------
+
+Test demoFunc()
+{
+  Test demo("function demo's temporary Test");
+  showLine(demo.name(), __LINE__, __FUNCSIG__);
+  return demo;
+}
+//----&lt; test stub &gt;--------------------------------------------------------
+
+#include &lt;stdexcept&gt;
+
+int main()
+{
+  using Helper = UtilityHelpers::Utilities;
+  Helper::title("Demonstrate Test Class");
+
+  showLine("-- promotion construction of Test Fred", __LINE__, __FUNCSIG__);
+  Test t("Fred");         // named construction
+
+  showLine("-- copy construction of Test Fred", __LINE__, __FUNCSIG__);
+  Test t1 = t;            // copy construction
+
+  showLine("-- call demoFunc()", __LINE__, __FUNCSIG__);
+  Test t2 = demoFunc();   // move construction
+
+  showLine("-- void construction of unnamed Test", __LINE__, __FUNCSIG__);
+  Test t3;
+
+  showLine("-- assignment of Test Fred", __LINE__, __FUNCSIG__);
+  t3 = t1;                // copy assignment
+
+  showLine("-- assignment of temporary test", __LINE__, __FUNCSIG__);
+  t3 = Test();            // move assignment from temporary
+
+  std::cout &lt;&lt; "\n";
+
+  t1.name() = "t1";
+  t2.name() = "t2";
+  t3.name() = "t3";
+
+  Helper::title("Creating initialized std::vector of Tests");
+
+  showLine("-- initialize vector with copies of t1 & t2, and move of t3", __LINE__, __FUNCSIG__);
+  std::vector&lt;Test&gt; vt{ t1, t2, std::move(t3) };
+
+  for (auto& e : vt)
+  {
+    e.say();
+  }
+  std::cout &lt;&lt; "\n";
+
+  Helper::title("Testing push_backs");
+
+  showLine("-- promotion construction of t4", __LINE__, __FUNCSIG__);
+  Test t4("t4");
+
+  showLine("-- promotion construction of t5", __LINE__, __FUNCSIG__);
+  Test t5("t5");
+
+  showLine("-- push_back of t4", __LINE__, __FUNCSIG__);
+  vt.push_back(t4);
+
+  showLine("-- push_back of std::move(t5)", __LINE__, __FUNCSIG__);
+  vt.push_back(std::move(t5));
+
+  for (auto& e : vt)
+  {
+    e.say();
+  }
+  std::cout &lt;&lt; "\n";
+
+  Helper::title("Creating vector of smart pointers");
+  /*
+   *  - unique_ptr&lt;T&gt; is a smart pointer to an instance t of type T
+   *  - it assumes it is the only reference to t and that t is stored on the native heap
+   *  - since it represents unique ownership, it cannot be copied or assigned, only moved
+   *  - when it goes out of scope, either through a normal exit from the scope where it was defined
+   *    or because an exception was thrown, it calls delete on its iternal pointer to t
+   */
+
+  showLine("-- attach unique_ptr sp1 to new Test t6", __LINE__, __FUNCSIG__);
+  std::unique_ptr&lt;Test&gt; sp1(new Test("t6"));
+
+  showLine("-- attach unique_ptr sp2 to new Test t7", __LINE__, __FUNCSIG__);
+  std::unique_ptr&lt;Test&gt; sp2(new Test("t7"));
+
+  showLine("-- create vector of these unique_ptrs", __LINE__, __FUNCSIG__);
+  std::vector&lt;std::unique_ptr&lt;Test&gt;&gt; vp;
+
+  showLine("-- push_back std::move(sp1)", __LINE__, __FUNCSIG__);
+  vp.push_back(std::move(sp1));
+
+  showLine("-- push_back std::move(sp2)", __LINE__, __FUNCSIG__);
+  vp.push_back(std::move(sp2));
+
+  ///////////////////////////////////////////////////////////////////////////
+  // The line below doesn't work.  Initializer_lists are constant so
+  // you can copy but can't move out of them.  Unique_ptr is moveable but
+  // not copyable so you have to use push_back
+  //
+  //  std::vector&lt;std::unique_ptr&lt;Test&gt;&gt; vp { std::move(sp1), std::move(sp2) };
+  ///////////////////////////////////////////////////////////////////////////
+
+  // Resetting sp2 does not reset the vector vp's unique_ptr.
+  // Instead, it is resetting the now invalid sp2 in main to a new valid Test instance, t8.
+
+  showLine("-- reset sp2 to new Test(t8)", __LINE__, __FUNCSIG__);
+  sp2.reset(new Test("t8"));  // re-initializes sp2 to point to t8, original object was moved into vector so nothing to delete
+
+  showLine("-- reset sp2 to new Test(t9)", __LINE__, __FUNCSIG__);
+  sp2.reset(new Test("t9"));  // re-initializes sp2 to point to t9 then deletes t8
+
+  for (auto& p : vp)
+  {
+    p-&gt;say();
+  }
+  std::cout &lt;&lt; "\n";
+
+  Helper::title("Done with testing");
+}
+</pre>
+    </div>
+    <!--<div class="photo">
+    <img src="pictures/CSTstrip.jpg" width="100%" />
+  </div>-->
+    <info-bar></info-bar>
+  </body>
+  </html>

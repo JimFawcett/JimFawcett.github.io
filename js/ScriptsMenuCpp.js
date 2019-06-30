@@ -89,6 +89,24 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Code Snaps &#9662;</button>\
+      <div class='dropdown-content'>\
+        <a href='CodeSnap-PointersAndReferences.cpp.html'>PointersAndReferences</a>\
+        <a href='CodeSnap-ClassAnatomy.h.html'>ClassAnatomy</a>\
+        <a href='CodeSnap-Strings.h.html'>Strings</a>\
+        <a href='CodeSnap-Inheritance.h.html'>Inheritance</a>\
+        <a href='CodeSnap-CompoundObjects.cpp.html'>CompoundObjects</a>\
+        <a href='CodeSnap-Templates.h.html'>Templates</a>\
+        <a href='CodeSnap-FunctionObjects.h.html'>FunctionObjects</a>\
+        <a href='CodeSnap-FunctionObjects.h.html'>FunctionObjects</a>\
+        <a href='CodeSnap-Lambdas.cpp.html'>Lambdas</a>\
+        <a href='CodeSnap-LambdaCapture.cpp.html'>LambdaCapture</a>\
+        <a href='CodeSnap-Converter.h.html'>Converter</a>\
+        <a href='CodeSnap-BlockingQueue.h.html'>BlockingQueue</a>\
+        <a href='CodeSnap-TestUtilities.h.html'>TestUtilities</a>\
+     </div>\
+    </div>\
+    <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\

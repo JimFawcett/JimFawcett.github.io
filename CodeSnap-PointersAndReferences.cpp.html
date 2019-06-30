@@ -1,0 +1,166 @@
+﻿<!----------------------------------------------------------------------------
+  CodeSnap-PointersAndReferences.cpp.htm
+  Published 19 Mar 2017
+  Jim Fawcett, CSE687 : Object Oriented Design, Summer 2017
+
+  Note:
+  - Markup characters in the text part, enclosed in <pre>...</pre> have to be
+    replaced with escape sequences, e.g., < becomes &lt; and > becomes &gt;
+  - Be careful that you don't replace genuine markup characters with escape
+    sequences, e.g., everything outside of the <pre>...</pre> section.
+----------------------------------------------------------------------------->
+  <html>
+  <head>
+    <script src="js/ScriptsTemplate.js"></script>
+    <script src="js/ScriptsKeyboard.js"></script>
+    <script src="js/ScriptsMenuCpp.js"></script>
+    <link rel="stylesheet" href="css/StylesTemplate.css" />
+    <link rel="stylesheet" href="css/StylesMenu.css" />
+    <style>
+      h3 {
+        font-weight: normal;
+      }
+    </style>
+  </head>
+  <body id="github" onload="initializeMenu()">
+    <nav>
+      <div id="navbar"></div>
+    </nav>
+    <a id="Next" href="CodeSnap-PointersAndReferences.txt.html">N</a>
+    <a id="Prev" href="CodeSnap-PointersAndReferences.txt.html">P</a>
+
+    <navKeysContainer>
+      <navKey onclick="scrollPageTop()">T</navKey>
+      <navKey onclick="scrollPageBottom()">B</navKey>
+      <navKey onclick="helpWin()">H</navKey>
+      <navKey onclick="loadPrev()">P</navKey>
+      <navKey onclick="loadNext()">N</navKey>
+    </navKeysContainer>
+
+    <h3>
+      <a href="CodeSnap-PointersAndReferences.cpp.html">PointersAndReferences.cpp</a>,
+      <a href="CodeSnap-PointersAndReferences.txt.html">PointersAndReferences.txt</a>,
+      <a class="disable" href="#">Code folder</a>
+    </h3>
+    <div class="indent">
+      This demo illustrates how pointers and references are used in C++ code.
+      We've demonstrated std::unique_ptr and std::shared_ptr as well as native
+      pointers.
+    </div>
+    <hr />
+    <h3>PointersAndReferences.cpp</h3>
+    <pre class="codeSnap">
+/////////////////////////////////////////////////////////////////
+// PointersAndReferences.cpp - demonstration                   //
+//                                                             //
+// Jim Fawcett, CSE687 - Object Oriented Design, Summer 2017   //
+/////////////////////////////////////////////////////////////////
+/*
+ * This package demonstrates access to variables defined in the
+ * static, stack, and native heap memory regions.
+ * - Variables declared as static reside in static memory and 
+ *   live for the duration of the program.
+ * - Non-static variables reside in the stack frame of their local
+ *   scope and are destroyed when the thread of execution leaves
+ *   that scope.
+ * - Variables created with new reside in the native heap and are
+ *   destroyed when delete is called on their addresses.
+ */
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+#include &lt;memory&gt;
+#include "../Utilities/Utilities.h"
+
+///////////////////////////////////////////////////////////
+// Demonstration class
+class Demo
+{
+public:
+  using Message = std::string;
+  Demo(const Message& msg) : msg_(msg) {}
+  ~Demo()
+  {
+    putLine("destroying " + this-&gt;message());
+  }
+  Message& message()
+  {
+    return msg_;
+  }
+  Message countedMessage()
+  {
+    static size_t count = 0;  // executed only once on initial call, 
+                              // creating initialized variable in static memory
+    ++count;
+    Message temp = "#" + Convert&lt;size_t&gt;::toString(count) + " " + msg_;
+    return temp;
+  }
+private:
+  Message msg_;
+};
+
+///////////////////////////////////////////////////////////
+// Demonstration
+
+Cosmetic cosmetic("note order of destruction");
+
+int main()
+{
+  putTitle("Demonstrating Pointers and References", '=');
+  putLine();
+
+  putTitle("declare instance of custom class Demo");
+  Demo demo("demo");         // created in main's stack frame
+  putLine(demo.countedMessage());
+  putLine();
+
+  putTitle("declare and use pointer to demo");
+  Demo* pDemo = &demo;       // pointer to instance in stack memory so don't delete
+  putLine(pDemo-&gt;countedMessage());
+  putLine();
+
+  putTitle("declare and use reference to demo");
+  Demo& rDemo = demo;
+  putLine(rDemo.countedMessage());
+  putLine();
+
+  putTitle("declare and use pointer to Demo instance on heap");
+  pDemo = new Demo("demo on heap");  // pointer to instance in heap, so delete
+  putLine(pDemo-&gt;countedMessage());
+  delete pDemo;
+  putLine();
+
+  putTitle("declare and use reference to Demo instance on heap");
+  Demo& rHeapDemo = *new Demo("demo on heap");  // reference to instance in heap, so delete
+  putLine(rHeapDemo.countedMessage());
+  delete &rHeapDemo;
+  putLine();
+
+  putTitle("you can declare and use reference to reference to a temporary");
+  Demo&& rrDemo = Demo("another Demo instance");  // in stack memory so don't delete
+  putLine(rrDemo.countedMessage());
+  putLine();
+
+  putTitle("declare a unique_ptr to refer to heap allocation with automatic destruction");
+  std::unique_ptr&lt;Demo&gt; uPtr(new Demo("referenced by std::unique_ptr"));  // don't call delete, uPtr will
+  putLine(uPtr-&gt;countedMessage());
+  putLine();
+
+  putTitle("declare a shared_ptr sharing a reference counted heap allocation");
+  std::shared_ptr&lt;Demo&gt; sPtr1(new Demo("demo referenced by std::shared_ptr sPtr1"));  // don't call delete
+  putLine(sPtr1-&gt;countedMessage());
+  putLine();
+
+  putTitle("declare a shared_ptr sharing a reference counted heap allocation");
+  std::shared_ptr&lt;Demo&gt; sPtr2(sPtr1);   // this is how you share an allocation
+  sPtr2-&gt;message() = "demo referenced by std::shared_ptr sPtr2";
+  putLine(sPtr2-&gt;countedMessage());
+  putLine();
+
+  putLine("---- end of main ----");
+}</pre>
+    <!--<div class="photo">
+    <img src="pictures/CSTstrip.jpg" width="100%" />
+  </div>-->
+    <info-bar></info-bar>
+  </body>
+  </html>

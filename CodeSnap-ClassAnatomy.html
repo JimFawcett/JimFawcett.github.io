@@ -1,0 +1,228 @@
+﻿<!----------------------------------------------------------------------------
+  CodeSnap-ClassAnatomy.cs.htm
+  Published 19 Mar 2017
+  Jim Fawcett, CSE687 : Object Oriented Design, Summer 2017
+
+  Note:
+  - Markup characters in the text part, enclosed in <pre>...</pre> have to be
+    replaced with escape sequences, e.g., < becomes &lt; and > becomes &gt;
+  - Be careful that you don't replace genuine markup characters with escape
+    sequences, e.g., everything outside of the <pre>...</pre> section.
+----------------------------------------------------------------------------->
+<html>
+<head>
+  <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+  <script type="text/javascript" src="js/CSE687-LectNav.js"></script>
+  <script type="text/javascript" src="js/Fallback.js"></script>
+  <link rel="stylesheet" href="css/TopLevelV2.css?v=1.0" />
+  <link rel="stylesheet" href="css/CourseSupplements.css?v=1.0" />
+  <link rel="stylesheet" href="css/Fallback.css?v=1.0" />
+  <script type="text/javascript" src="js/CustomMarkup.js"></script>
+  <link rel="stylesheet" href="css/CustomMarkup.css?v=1.0" />
+  <style>
+    body {
+      margin: 0px 20px 20px 20px;
+      color: black;
+      background-color: #eee;
+      font-family: Consolas;
+      font-weight: 600;
+      font-size: 110%;
+    }
+
+    .indent {
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+
+    h3 {
+      margin-bottom: 15px; margin-top: 15px;
+    }
+
+    h4 {
+      margin-bottom: 5px;
+      margin-top: 3px;
+    }
+
+    hr {
+      margin-top: 20px;
+    }
+  </style>
+  <style>
+    div.readings {
+      padding: 10px 20px 15px 20px;
+    }
+
+      div.readings > ul {
+        padding: 0px;
+        margin: 0px 20px;
+      }
+
+        div.readings > ul > li {
+          padding: 0px;
+          margin: 0px;
+        }
+
+          div.readings > ul > li > h4 {
+            padding: 0px;
+            margin: 0px;
+          }
+
+    pre { 
+      font-family:"courier new", courier, monospace;
+      font-size:large; 
+    }
+
+  </style>
+</head>
+<body>
+  <a name="top"></a>
+  <!-- site navigation menu built with Javascript -->
+  <nav>
+    <div id="nav">
+      <div id="remove">
+        <hr />
+        <a href="TopNav.htm">Site Navigation with no Javascript</a>
+        <hr />
+        <br />
+      </div>
+    </div>
+  </nav>
+  <div id="pagenav">
+    <ul>
+      <li><a href="#top">T</a></li>
+      <li><a id="N" href="#top">N</a></li>
+      <li><a id="P" href="#top" prev>P</a></li>
+      <li><a href="#bottom">B</a></li>
+    </ul>
+  </div>
+
+  <!--<h3>
+    <a href="CodeSnap-BasicHttpProgService.IService.cs.htm">IService.cs</a>,
+    <a href="CodeSnap-BasicHttpProgService.Service.cs.htm">Service.cs</a>,
+    <a href="CodeSnap-BasicHttpProgService.ProgClient.cs.htm">ProgClient.cs</a>,
+    <a href="CodeSnap-BasicHttpProgService.ProgHost.cs.htm">ProgHost.cs</a>
+  </h3>-->
+  <div style="font-size:large; font-weight:bold; margin:20px;">
+    Illustrates all of the basic parts of a class, e.g., Constructors, operators, destructor, and member data.
+  </div>
+  <hr />
+  <h3>Test.h</h3>
+<pre>
+#include &lt;string>
+
+class Test
+{
+public:
+  Test();                           // void constructor, sometimes called default constructor
+  Test(const std::string& name);    // constructor for named instance
+  Test(const Test& t);              // copy constructor
+  Test(Test&& t);                   // move constructor
+  Test& operator=(const Test& t);   // copy assignment operator
+  Test& operator=(Test&& t);        // move assignment operator
+  virtual ~Test();                  // destructor
+  std::string& name();
+  void say();
+private:
+  std::string name_;
+};
+</pre>
+  <h3>Test.cpp</h3>
+<pre>
+#include "TestClass.h"
+#include "..\Helpers\Helpers.h"
+#include &lt;iostream>
+#include &lt;string>
+#include &lt;vector>
+#include &lt;memory>
+
+//----< default constructor >----------------------------------------------
+
+Test::Test()
+{
+  std::cout << "\n  void construction of \"Test\"";
+  name_ = "Test";
+}
+//----< promotion constructor >--------------------------------------------
+
+Test::Test(const std::string& name)
+{
+  name_ = name;
+  std::cout << "\n  named construction of \"" << name_ << "\"";
+}
+//----< reset instance name string >---------------------------------------
+
+std::string rename(const std::string& prefix, const std::string& sourceName)
+{
+  if (prefix != sourceName.substr(0, 4))
+    return prefix + " of " + sourceName;
+  else
+    return sourceName;
+}
+//----< copy constructor >-------------------------------------------------
+
+Test::Test(const Test& t) : name_(t.name_) 
+{
+  std::cout << "\n  copy of \"" << name_ << "\"";
+  name_ = rename("copy", t.name_);
+}
+//----< move constructor >-------------------------------------------------
+
+Test::Test(Test&& t) : name_(std::move(t.name_))
+{
+  std::cout << "\n  move of \"" << name_ << "\"";
+  t.name_ = "been moved";   // copies chars, so inefficient, but shows how move works
+  name_ = rename("move", t.name_);
+}
+//----< copy assignment operator >-----------------------------------------
+
+Test& Test::operator=(const Test& t)
+{
+  std::cout << "\n  copy assignment of \"" << name_ << "\"";
+  if (this != &t)
+  {
+    name_ = rename("copy", std::move(t.name_));
+  }
+  return *this;
+}
+//----< move assignment operator >-----------------------------------------
+
+Test& Test::operator=(Test&& t)
+{
+  if (this != &t)
+  {
+    name_ = rename("move", std::move(t.name_));
+    t.name_ = "been moved";  // copys chars, so inefficient, but shows how move works
+    std::cout << "\n  move assignment of \"" << name_ << "\"";
+  }
+  return *this;
+}
+//----< destructor >-------------------------------------------------------
+
+Test::~Test()
+{
+  std::cout << "\n  destruction of \"" << name_ << "\"";
+}
+//----< name "property" >--------------------------------------------------
+
+std::string& Test::name()
+{
+  return name_;
+}
+//----< enunciator >-------------------------------------------------------
+
+void Test::say()
+{
+  std::cout << "\n  my name is \"" << name_ << "\"";
+}
+</pre>
+  <!--<div class="photo">
+    <img src="pictures/CSTstrip.jpg" width="100%" />
+  </div>-->
+  <footer>
+    <hr />
+    <div style="position:absolute; left:35px;">CSE687 - Object Oriented Design Course Notes</div>
+    Jim Fawcett &copy; copyright 2017
+  </footer>
+  <a name="bottom"></a>
+</body>
+</html>

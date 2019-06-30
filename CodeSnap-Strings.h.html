@@ -1,0 +1,211 @@
+﻿<!----------------------------------------------------------------------------
+  CodeSnap-Strings.cpp.htm
+  Published 19 Mar 2017
+  Jim Fawcett, CSE687 : Object Oriented Design, Summer 2017
+
+  Note:
+  - Markup characters in the text part, enclosed in <pre>...</pre> have to be
+    replaced with escape sequences, e.g., < becomes &lt; and > becomes &gt;
+  - Be careful that you don't replace genuine markup characters with escape
+    sequences, e.g., everything outside of the <pre>...</pre> section.
+----------------------------------------------------------------------------->
+  <html>
+  <head>
+    <script src="js/ScriptsTemplate.js"></script>
+    <script src="js/ScriptsKeyboard.js"></script>
+    <script src="js/ScriptsMenuCpp.js"></script>
+    <link rel="stylesheet" href="css/StylesTemplate.css" />
+    <link rel="stylesheet" href="css/StylesMenu.css" />
+    <style>
+      h3 {
+        font-weight: normal;
+      }
+    </style>
+  </head>
+  <body id="github" onload="initializeMenu()">
+    <nav>
+      <div id="navbar"></div>
+    </nav>
+    <a id="Next" href="CodeSnap-Strings.cpp.html">N</a>
+    <a id="Prev" href="CodeSnap-Strings.txt.html">P</a>
+
+    <navKeysContainer>
+      <navKey onclick="scrollPageTop()">T</navKey>
+      <navKey onclick="scrollPageBottom()">B</navKey>
+      <navKey onclick="helpWin()">H</navKey>
+      <navKey onclick="loadPrev()">P</navKey>
+      <navKey onclick="loadNext()">N</navKey>
+    </navKeysContainer>
+
+    <h3>
+      <a href="CodeSnap-Strings.h.html">Strings.h</a>,
+      <a href="CodeSnap-Strings.cpp.html">Strings.cpp</a>,
+      <a href="CodeSnap-Strings.txt.html">Strings.txt</a>,
+      <a class="disable" href="#">Code folder</a>
+    </h3>
+    <div class="indent">
+      This demo illustrates basic std::string operations by creating
+      several useful utility functions.
+    </div>
+    <hr />
+
+    <pre class="codeSnap">
+#ifndef STRINGUTILITIES_H
+#define STRINGUTILITIES_H
+///////////////////////////////////////////////////////////////////////
+// StringUtilities.h - small, generally useful, helper classes       //
+// ver 1.0                                                           //
+// Language:    C++, Visual Studio 2017                              //
+// Application: Most Projects, CSE687 - Object Oriented Design       //
+// Author:      Jim Fawcett, Syracuse University, CST 4-187          //
+//              jfawcett@twcny.rr.com                                //
+///////////////////////////////////////////////////////////////////////
+/*
+* Package Operations:
+* -------------------
+* This package provides functions:
+* - Title(text)           display title
+* - title(text)           display subtitle
+* - putline(n)            display n newlines
+* - trim(str)             remove leading and trailing whitespace
+* - split(str, 'delim')   break string into vector of strings separated by delim char
+* - showSplit(vector)     display splits
+*
+* Required Files:
+* ---------------
+*   StringUtilities.h
+*
+* Maintenance History:
+* --------------------
+* ver 1.0 : 12 Jan 2018
+* - first release
+* - refactored from earlier Utilities.h
+*
+* Notes:
+* ------
+* - Designed to provide all functionality in header file.
+* - Implementation file only needed for test and demo.
+*
+* Planned Additions and Changes:
+* ------------------------------
+* - none yet
+*/
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;iostream&gt;
+#include &lt;sstream&gt;
+#include &lt;functional&gt;
+#include &lt;locale&gt;
+
+namespace Utilities
+{
+  /////////////////////////////////////////////////////////////////////
+  // String Helper functions
+
+  //----&lt; display underlined title &gt;-----------------------------------
+
+  inline void Title(const std::string& text, std::ostream& out = std::cout, char underline = '=')
+  {
+    out &lt;&lt; "\n  " &lt;&lt; text;
+    out &lt;&lt; "\n " &lt;&lt; std::string(text.size() + 2, underline);
+  }
+  //----&lt; display underlined subtitle &gt;--------------------------------
+
+  inline void title(const std::string& text, std::ostream& out = std::cout, char underline = '-')
+  {
+    out &lt;&lt; "\n  " &lt;&lt; text;
+    out &lt;&lt; "\n " &lt;&lt; std::string(text.size() + 2, underline);
+  }
+  //----&lt; display j newlines &gt;-----------------------------------------
+
+  inline void putline(size_t j = 1, std::ostream& out = std::cout)
+  {
+    for (size_t i = 0; i &lt; j; ++i)
+      out &lt;&lt; "\n";
+  }
+  /*--- remove whitespace from front and back of string argument ---*/
+  /*
+  *  - does not remove newlines
+  */
+  template &lt;typename T&gt;
+  inline std::basic_string&lt;T&gt; trim(const std::basic_string&lt;T&gt;& toTrim)
+  {
+    if (toTrim.size() == 0)
+      return toTrim;
+    std::basic_string&lt;T&gt; temp;
+    std::locale loc;
+    typename std::basic_string&lt;T&gt;::const_iterator iter = toTrim.begin();
+    while (isspace(*iter, loc) && *iter != '\n')
+    {
+      if (++iter == toTrim.end())
+      {
+        break;
+      }
+    }
+    for (; iter != toTrim.end(); ++iter)
+    {
+      temp += *iter;
+    }
+    typename std::basic_string&lt;T&gt;::reverse_iterator riter;
+    size_t pos = temp.size();
+    for (riter = temp.rbegin(); riter != temp.rend(); ++riter)
+    {
+      --pos;
+      if (!isspace(*riter, loc) || *riter == '\n')
+      {
+        break;
+      }
+    }
+    if (0 &lt;= pos && pos &lt; temp.size())
+      temp.erase(++pos);
+    return temp;
+  }
+  /*--- split sentinel separated strings into a vector of trimmed strings ---*/
+
+  template &lt;typename T&gt;
+  inline std::vector&lt;std::basic_string&lt;T&gt;&gt; split(const std::basic_string&lt;T&gt;& toSplit, T splitOn = ',')
+  {
+    std::vector&lt;std::basic_string&lt;T&gt;&gt; splits;
+    std::basic_string&lt;T&gt; temp;
+    typename std::basic_string&lt;T&gt;::const_iterator iter;
+    for (iter = toSplit.begin(); iter != toSplit.end(); ++iter)
+    {
+      if (*iter != splitOn)
+      {
+        temp += *iter;
+      }
+      else
+      {
+        splits.push_back(trim(temp));
+        temp.clear();
+      }
+    }
+    if (temp.length() &gt; 0)
+      splits.push_back(trim(temp));
+    return splits;
+  }
+  /*--- show collection of string splits ------------------------------------*/
+
+  template &lt;typename T&gt;
+  inline void showSplits(const std::vector&lt;std::basic_string&lt;T&gt;&gt;& splits, std::ostream& out = std::cout)
+  {
+    out &lt;&lt; "\n";
+    for (auto item : splits)
+    {
+      if (item == "\n")
+        out &lt;&lt; "\n--" &lt;&lt; "newline";
+      else
+        out &lt;&lt; "\n--" &lt;&lt; item;
+    }
+    out &lt;&lt; "\n";
+  }
+}
+#endif
+
+</pre>
+    <!--<div class="photo">
+    <img src="pictures/CSTstrip.jpg" width="100%" />
+  </div>-->
+    <info-bar></info-bar>
+  </body>
+  </html>

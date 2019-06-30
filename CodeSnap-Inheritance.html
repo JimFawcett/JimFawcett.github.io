@@ -1,0 +1,335 @@
+﻿<!----------------------------------------------------------------------------
+  CodeSnap-Inheritance.htm
+  Published 18 May 2017
+  Jim Fawcett, CSE687 : Object Oriented Design, Summer 2017
+
+  Note:
+  - Markup characters in the text part, enclosed in <pre>...</pre> have to be
+    replaced with escape sequences, e.g., < becomes &lt; and > becomes &gt;
+  - Be careful that you don't replace genuine markup characters with escape
+    sequences, e.g., everything outside of the <pre>...</pre> section.
+----------------------------------------------------------------------------->
+<html>
+<head>
+  <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+  <script type="text/javascript" src="js/CSE687-LectNav.js"></script>
+  <script type="text/javascript" src="js/Fallback.js"></script>
+  <link rel="stylesheet" href="css/TopLevelV2.css?v=1.0" />
+  <link rel="stylesheet" href="css/CourseSupplements.css?v=1.0" />
+  <link rel="stylesheet" href="css/Fallback.css?v=1.0" />
+  <script type="text/javascript" src="js/CustomMarkup.js"></script>
+  <link rel="stylesheet" href="css/CustomMarkup.css?v=1.0" />
+  <style>
+    body {
+      margin: 0px 20px 20px 20px;
+      color: black;
+      background-color: #eee;
+      font-family: Consolas;
+      font-weight: 600;
+      font-size: 110%;
+    }
+
+    .indent {
+      margin-left: 20px;
+      margin-right: 20px;
+    }
+
+    h3 {
+      margin-bottom: 15px; margin-top: 15px;
+    }
+
+    h4 {
+      margin-bottom: 5px;
+      margin-top: 3px;
+    }
+
+    hr {
+      margin-top: 20px;
+    }
+  </style>
+  <style>
+    div.readings {
+      padding: 10px 20px 15px 20px;
+    }
+
+    div.readings > ul {
+      padding: 0px;
+      margin: 0px 20px;
+    }
+
+    div.readings > ul > li {
+      padding: 0px;
+      margin: 0px;
+    }
+
+    div.readings > ul > li > h4 {
+      padding: 0px;
+      margin: 0px;
+    }
+    pre { 
+      font-family:"courier new", courier, monospace;
+      font-size:large; 
+    }
+  </style>
+</head>
+<body>
+  <a name="top"></a>
+  <!-- site navigation menu built with Javascript -->
+  <nav>
+    <div id="nav">
+      <div id="remove">
+        <hr />
+        <a href="TopNav.htm">Site Navigation with no Javascript</a>
+        <hr />
+        <br />
+      </div>
+    </div>
+  </nav>
+  <div id="pagenav">
+    <ul>
+      <li><a href="#top">T</a></li>
+      <li><a id="N" href="#top">N</a></li>
+      <li><a id="P" href="#top" prev>P</a></li>
+      <li><a href="#bottom">B</a></li>
+    </ul>
+  </div>
+
+  <!--<h3>
+    <a href="CodeSnap-BasicHttpProgService.IService.cs.htm">IService.cs</a>,
+    <a href="CodeSnap-BasicHttpProgService.Service.cs.htm">Service.cs</a>,
+    <a href="CodeSnap-BasicHttpProgService.ProgClient.cs.htm">ProgClient.cs</a>,
+    <a href="CodeSnap-BasicHttpProgService.ProgHost.cs.htm">ProgHost.cs</a>
+  </h3>-->
+  <div style="font-size:large; font-weight:bold; margin:20px;">
+    This code illustrates how to build and use a polymorphic hierarchy of classes.
+  </div>
+  <hr />
+  <h3>Soldiers.h</h3>
+  <pre>
+#ifndef SOLDIERS_H
+#define SOLDIERS_H
+/////////////////////////////////////////////////////////////////////////////////
+// Soldiers.h - demonstrates inheritance                                       //  
+//                                                                             //
+// Jim Fawcett, Summer Short Course, Su2016                                    //
+/////////////////////////////////////////////////////////////////////////////////
+/*
+ * Illustrates flexability afforded by polymorphic substitution.  
+ * The global show function accepts a reference to any instance with 
+ * class derived from Soldier, e.g., Officer, Sergeant, or Private.  
+ * It then dynamically dispatches to the appropriate functions 
+ * Soldier::salute() and Soldier::equipment().
+*/
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;iostream&gt;
+#include "Utilities.h"
+
+class Gear
+{
+public:
+  using Name = std::string;
+  Gear(const Name& name);
+  ~Gear();
+  Name name();
+protected:
+  Name name_;
+};
+
+class Person
+{
+public:
+  using Name = std::string;
+  Person(const Name& name);
+  void eat();
+  void sleep();
+  Name name();
+  virtual ~Person();
+protected:
+  Name name_;
+};
+
+class Soldier : public Person
+{
+public:
+  using Equipment = std::vector&lt;Gear&gt;;
+  using Rank = std::string;
+  Soldier(const Name& name, const Rank& rank="private");
+  virtual void salute() = 0;
+  Rank rank() { return rank_; }
+  void add(const Gear& gear);
+  Equipment& equipment();
+private:
+  Equipment equip_;
+  Rank rank_;
+};
+
+class Officer : public Soldier
+{
+public:
+  Officer(const Name& name, const Rank& rank="Captain");
+  virtual void salute();
+};
+
+class Sergeant : public Soldier
+{
+public:
+  Sergeant(const Name& name);
+  virtual void salute();
+};
+
+class Private : public Soldier
+{
+public:
+  Private(const Name& name);
+  virtual void salute();
+};
+
+void show(Soldier& s);
+
+#endif
+</pre>
+  <h3>Soldiers.cpp</h3>
+<pre>
+/////////////////////////////////////////////////////////////////////////////////
+// Soldiers.cpp - demonstrates inheritance                                     //  
+//                                                                             //
+// Jim Fawcett, Summer Short Course, Su2016                                    //
+/////////////////////////////////////////////////////////////////////////////////
+/*
+*  Illustrates flexability afforded by polymorphic substitution.
+*  The global show function accepts a reference to any instance with
+*  class derived from Soldier, e.g., Officer, Sergeant, or Private.
+*  It then dynamically dispatches to the appropriate functions
+*  Soldier::salute() and Soldier::equipment().
+*/
+#include "Soldiers.h"
+
+Gear::Gear(const Name& name) : name_(name) {}
+Gear::~Gear() {}
+Gear::Name Gear::name() { return name_; }
+
+Person::Person(const Name& name) : name_(name) {}
+void Person::eat()
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; name() &lt;&lt; " eating";
+}
+void Person::sleep()
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; name() &lt;&lt; " sleeping";
+}
+Person::Name Person::name() { return name_; }
+Person::~Person() {}
+
+Soldier::Soldier(const Name& name, const Rank& rank) : Person(name), rank_(rank) {}
+void Soldier::add(const Gear& gear)
+{
+  equip_.push_back(gear);
+}
+Soldier::Equipment& Soldier::equipment()
+{
+  return equip_;
+}
+
+Officer::Officer(const Name& name, const Rank& rank) : Soldier(name, rank) {}
+void Officer::salute()
+{
+  std::cout &lt;&lt; "\n  casual salute";
+}
+
+Sergeant::Sergeant(const Name& name) : Soldier(name, "Sergeant") {}
+void Sergeant::salute()
+{
+  std::cout &lt;&lt; "\n  default salute";
+}
+
+Private::Private(const Name& name) : Soldier(name) {}
+void Private::salute()
+{
+  std::cout &lt;&lt; "\n  snappy salute";
+}
+
+//----&lt; global function accepts any Soldier object &gt;-------
+
+void show(Soldier& s)
+{
+  s.salute();
+  std::cout &lt;&lt; "\n  Sir, my name is " &lt;&lt; s.rank() &lt;&lt; " " &lt;&lt; s.name();
+  for (auto eq : s.equipment())
+    std::cout &lt;&lt; "\n    inspecting " &lt;&lt; eq.name();
+  if (s.equipment().size() == 0)
+    std::cout &lt;&lt; "\n    Sorry sir, I forgot my equipment";
+}
+
+int main()
+{
+  Officer off("Frank");
+  off.add(Gear("45 Caliber Pistol"));
+  Sergeant sgt("Sam");
+  sgt.add(Gear("m16 carbine"));
+  Private pvt1("George");
+  pvt1.add(Gear("m16 carbine"));
+  pvt1.add(Gear("40lb backpack"));
+  Private pvt2("Charlie");
+  pvt2.add(Gear("m16 carbine"));
+  pvt2.add(Gear("mortar"));
+  Private pvt3("Slacker");
+
+  Utilities::title("chow time");
+  off.eat();
+  sgt.eat();
+  pvt1.eat();
+  pvt2.eat();
+  pvt3.eat();
+  Utilities::putLine();
+  Utilities::title("inspection");
+  std::cout &lt;&lt; "\n  " &lt;&lt; off.rank() &lt;&lt; " " &lt;&lt; off.name() &lt;&lt; " inspecting his 1st squad";
+  show(sgt);
+  show(pvt1);
+  show(pvt2);
+  show(pvt3);
+  std::cout &lt;&lt; "\n\n";
+}
+</pre>
+  <h3>Soldiers.txt</h3>
+<pre>
+  chow time
+ -----------
+  Frank eating
+  Sam eating
+  George eating
+  Charlie eating
+  Slacker eating
+
+  inspection
+ ------------
+  Captain Frank inspecting his 1st squad
+  default salute
+  Sir, my name is Sergeant Sam
+    inspecting m16 carbine
+  snappy salute
+  Sir, my name is private George
+    inspecting m16 carbine
+    inspecting 40lb backpack
+  snappy salute
+  Sir, my name is private Charlie
+    inspecting m16 carbine
+    inspecting mortar
+  snappy salute
+  Sir, my name is private Slacker
+    Sorry sir, I forgot my equipment
+
+Press any key to continue . . .
+
+</pre>
+  <!--<div class="photo">
+    <img src="pictures/CSTstrip.jpg" width="100%" />
+  </div>-->
+  <footer>
+    <hr />
+    <div style="position:absolute; left:35px;">CSE687 - Object Oriented Design Course Notes</div>
+    Jim Fawcett &copy; copyright 2017
+  </footer>
+  <a name="bottom"></a>
+</body>
+</html>

@@ -1,0 +1,147 @@
+﻿<!----------------------------------------------------------------------------
+  CodeSnap-Lambda.cs.htm
+  Published 19 Mar 2017
+  Jim Fawcett, CSE687 : Object Oriented Design, Summer 2017
+
+  Note:
+  - Markup characters in the text part, enclosed in <pre>...</pre> have to be
+    replaced with escape sequences, e.g., < becomes &lt; and > becomes &gt;
+  - Be careful that you don't replace genuine markup characters with escape
+    sequences, e.g., everything outside of the <pre>...</pre> section.
+----------------------------------------------------------------------------->
+<html>
+<head>
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+  <style>
+    h3 {
+      font-weight: normal;
+    }
+  </style>
+</head>
+<body onload="initializeMenu()" oncontextmenu="return false;">
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <!--<a id="Next" href="Project2-S2019.htm">N</a>
+  <a id="Prev" href="Project4-S2019.htm">P</a>-->
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <h3>
+    <a href="CodeSnap-LambdaCapture.cpp.htm">Lambdas.cpp</a>,
+    <a href="CodeSnap-LambdaCapture.txt.htm">Lambdas.txt</a>,
+    <a href="../Code/CodeSnaps/LambdaCapture">Code folder</a>
+  </h3>
+  <div class="indent">
+    Illustrates lambdas and the several ways they capture local state.
+  </div>
+  <hr />
+<pre class="codeSnap">
+/////////////////////////////////////////////////////////////////////
+// Lambdas.cpp - demonstrate lambda capture                        //
+//                                                                 //
+// Jim Fawcett, CSE687 - Object Oriented Design, Spring 2015       //
+/////////////////////////////////////////////////////////////////////
+/*
+ * When compiled a lambda definition is translated into a functor
+ * with operator() defining the code of the lambda.  Any referenced 
+ * data from the local scope becomes member data of the functor and 
+ * gets passed around with the lambda.
+ *
+ * Lambdas are defined like this:
+ * 1. [=] (arguments) 
+ *    { code to execute may include names of local data as well as arguments };
+ *    The [=] means that local data, like i below, are captured by value.
+ * 2. [&] (arguments)
+ *    { code to execute may include names of local data as well as arguments };
+ *    The [&] means that local data is captured by reference so must be in
+ *    scope when the lambda executes.
+ * 3. [localVar1, &localVar2] (arguments)
+ *    { code to execute includes localVar1 by value and localVar2 by reference }
+ */
+#include &lt;functional&gt;
+#include &lt;iostream&gt;
+#include &lt;sstream&gt;
+
+//----&lt; create a lambda and bind to a std::function &gt;----------------
+/*
+ * Lambda copies captured values, e.g., [=]
+ */
+std::function&lt;std::string()&gt; CreateLambda1(int i)
+{
+  // this std function converts an integer to a string
+  std::function&lt;std::string()&gt; f = [=]()
+  {
+    std::ostringstream convert;
+    convert &lt;&lt; i;                      // lambda captures value of i
+    return convert.str();
+  };
+  return f;
+}
+//----&lt; create a lambda and bind to a std::function &gt;----------------
+/*
+ * Lambda copies captured values, e.g., []
+ */
+std::function&lt;std::string(int)&gt; CreateLambda2()
+{
+  // this std function converts an integer to a string
+  std::function&lt;std::string(int)&gt; f = [](int i)
+  {
+    std::ostringstream convert;
+    convert &lt;&lt; i;                      // lambda captures value of i
+    return convert.str();
+  };
+  return f;
+}
+//----&lt; create a lambda and bind to a std::function &gt;----------------
+/*
+ * Lambda captures a reference to i and the value of j, e.g., [&i, j]
+ */
+std::function&lt;std::string()&gt; CreateLambda3(int& i)
+{
+  // this std function converts integers to a string
+  int j = 40;
+  std::function&lt;std::string()&gt; f = [&i, j]()
+  {
+    std::ostringstream convert;
+    convert &lt;&lt; i + j;                      // lambda captures reference to
+    return convert.str();                  // external i - would be an error
+  };                                       // if i was passed by value to
+  return f;                                // CreateLambda3(int i)
+}
+//----&lt; create a lambda and bind to a std::function &gt;----------------
+/*
+ * Lambda captures a reference to i that will become invalid when
+ * returning from invocation and a copy of j which will be valid, 
+ * e.g., [&i, j]
+ */
+std::function&lt;std::string()&gt; CreateLambda4()
+{
+  // this std function converts integers to a string
+  int i = 2;
+  int j = 40;
+  std::function&lt;std::string()&gt; f = [&i, j]()
+  {
+    std::ostringstream convert;
+    convert &lt;&lt; i + j;           // error here - will return invalid reference
+    return convert.str();       // to temporary value of i along with valid
+  };                            // copy of j, e.g., [&i, j]
+  return f;
+}
+</pre>
+  <!--<div class="photo">
+    <img src="pictures/CSTstrip.jpg" width="100%" />
+  </div>-->
+  <info-bar></info-bar>
+</body>
+</html>
