@@ -41,10 +41,12 @@ function initializeMenu() {
       <button class='dropbutton'>Components &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='CppBlockingQueue.html'>CppBlockingQueue</a>\
-        <a class='disable' href='FileManager.html'>File Manager</a>\
+        <a href='FileManager.html'>File Manager</a>\
         <a class='disable' href='CppProperty.html'>CppProperty</a>\
         <a class='disable' href='ThreadPool.html'>ThreadPool</a>\
         <a class='disable' href='Process.html'>Process</a>\
+        <a href='CppConcurrentFileAccess.html'>CppConcurrentFileAccess</a>\
+        <a href='CppLexicalScanner.html'>CppLexicalScanner</a>\
         <a class='disable' href='RetryWrapper.html'>RetryWrapper</a>\
         <a class='disable' href='WebComponents.html'>WebComponents</a>\
       </div>\
@@ -57,14 +59,16 @@ function initializeMenu() {
         <a href='Sockets.html'>Sockets-Windows</a>\
         <a class='disable' href='Sockets.html'>Sockets-Linux</a>\
         <a href='XmlDocument.html'>XmlDocument</a>\
+        <a href='CppGraph.html'>CppGraph</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Projects &#9662;</button>\
       <div class='dropdown-content'>\
-        <a class='disable' href='MsgPassingComm.html'>MsgPassingComm</a>\
         <a class='disable' href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a>\
         <a class='disable' href='CsDependencyAnalysis.html'>CsDependencyAnalysis</a>\
+        <a class='disable' href='CppCommWithFileTransfer.html'>CppCommWithFileXfer</a>\
+        <a class='disable' href='CppHttpClientServer.html'>CppHttpClientServer</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
