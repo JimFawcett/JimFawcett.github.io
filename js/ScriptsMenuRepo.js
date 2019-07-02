@@ -42,13 +42,13 @@ function initializeMenu() {
       <div class='dropdown-content'>\
         <a href='CppBlockingQueue.html'>CppBlockingQueue</a>\
         <a href='FileManager.html'>File Manager</a>\
-        <a class='disable' href='CppProperty.html'>CppProperty</a>\
-        <a class='disable' href='ThreadPool.html'>ThreadPool</a>\
-        <a class='disable' href='Process.html'>Process</a>\
+        <a href='CppProperties.html'>CppProperties</a>\
+        <a href='ThreadPool.html'>ThreadPool</a>\
+        <a href='Process.html'>Process</a>\
         <a href='CppConcurrentFileAccess.html'>CppConcurrentFileAccess</a>\
         <a href='CppLexicalScanner.html'>CppLexicalScanner</a>\
-        <a class='disable' href='RetryWrapper.html'>RetryWrapper</a>\
-        <a class='disable' href='WebComponents.html'>WebComponents</a>\
+        <a href='RetryWrapper.html'>RetryWrapper</a>\
+        <a href='WebComponents.html'>WebComponents</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -65,10 +65,10 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Projects &#9662;</button>\
       <div class='dropdown-content'>\
-        <a class='disable' href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a>\
-        <a class='disable' href='CsDependencyAnalysis.html'>CsDependencyAnalysis</a>\
-        <a class='disable' href='CppCommWithFileTransfer.html'>CppCommWithFileXfer</a>\
-        <a class='disable' href='CppHttpClientServer.html'>CppHttpClientServer</a>\
+        <a href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a>\
+        <a href='CsDependencyAnalysis.html'>CsDependencyAnalysis</a>\
+        <a href='CppCommWithFileXfer.html'>CppCommWithFileXfer</a>\
+        <a href='CppHttpClientServer.html'>CppHttpClientServer</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -77,8 +77,8 @@ function initializeMenu() {
         <a href='STR.html'>STR&nbsp;Value&nbsp;Type</a>\
         <a href='STL-Containers.html'>STL-Containers</a>\
         <a href='IOStreams.html'>IOStreams</a>\
-        <a class='disable' href='CppThreads.html'>CppThreads</a>\
-        <a class='disable' href='ProcAndThreads.html'>ProcsAndThreads</a>\
+        <a href='CppThreads.html'>CppThreads</a>\
+        <a href='ProcAndThreads.html'>ProcsAndThreads</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
