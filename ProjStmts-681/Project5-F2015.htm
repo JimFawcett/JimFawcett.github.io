@@ -1,0 +1,433 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <!-- 
+     - Project5-F2014.htm - Project #5, Fall 2015
+     - ver 1.0 - 12 Aug 2015
+     - Jim Fawcett, Syracuse University
+    -->
+    <title>Project #5</title>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+    <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+    <meta name="Author" content="Jim Fawcett" />
+    <meta name="Author" content="James Fawcett" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="js/CSE681-LectNav.js"></script>
+    <script type="text/javascript" src="js/Fallback.js"></script>
+    <link rel="stylesheet" href="css/TopLevel.css?v=1.0" />
+    <link rel="stylesheet" href="css/CSE681-LectPage.css" />
+    <!--
+    <link rel="stylesheet" href="css/StudyGuideSupplement.css?v=1.0" />
+    -->
+    <link rel="stylesheet" href="css/Fallback.css?v=1.0" />
+    <style>
+      ol { margin-top:5px; margin-bottom:5px; }
+      ul > li { margin: 0px 50px 5px -15px; }
+      ol > li { margin:10px 50px 10px 0px; }
+      .em
+      {
+        font-weight: bold;
+      }
+      #title 
+      { 
+        text-align:left; 
+        margin-left:50px; 
+      }
+      #pagedate 
+      { 
+        text-align:left; 
+        margin-left:50px; margin-bottom:25px; 
+      }
+      section
+      {
+        border:0;
+        margin-left:50px;
+      }
+      table { width:100%; margin:10px 0px 10px 0px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div id="prevlink">
+          <a href="javascript: history.go(-1)">Back</a>
+        </div>
+        <div id="nextlink">
+          <a href="javascript: history.go(-1)">Back</a>
+        </div>
+        <div id="topcenter">
+          Software Modeling &amp; Analysis - Spring 2015
+        </div>
+      </div>
+      <div id="pagetitle" style="text-align:left; margin:0px 20px 0px 20px;">
+        <table width="100%" style="border-collapse:collapse; border-color:white; font-size:xx-large; font-weight:bold; text-align:left;">
+          <tr style="border-color:white;">
+            <th style="vertical-align:top; border-color:white;">Project&nbsp;#5&nbsp;-</th>
+            <th style="text-align:left; border-color:white;">Storage Management Subsystem for Software Collaboration Federation</th>
+          </tr>
+        </table>
+        <!--<h1 id="title">Project #5 - Event Manager for Software Collaboration Federation</h1>-->
+        <div id="pagedate" style="margin:0px 20px 0px 20px;">
+          Version 1.2, 
+          <script type="text/javascript">
+            document.write("Revised: " + document.lastModified)
+          </script><br />
+          Due Date: Wednesday December 9th
+        </div>
+        <div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Site navigation menus are generated with Javascript, using a Fallback link to a Navigation page -->
+    <!--<nav>
+      <div id="nav">
+        <hr />
+        <a href="TopNav.htm">Site Navigation with no Javascript</a>
+        <hr />
+        <br />
+      </div>
+    </nav>-->
+
+    <!-- Notes Content -->
+    <div class="content">
+      <section>
+        <h2>Purpose:</h2>
+        <p>
+          Software Collaboration Federation (SCF) is a collection of clients and servers and associated software designed
+          to support activities of a software development team, e.g.:
+          <ul>
+            <li>
+              Creating and publishing plans for development.  This includes writing concept documents, creating
+              and editing work packages, scheduling work packages, and allocating resources to work packages.
+            </li>
+            <li>Writing and publishing specification and design documents.</li>
+            <li>Preparing new source code packages</li>
+            <li>Acquiring existing source code packages for reuse</li>
+            <li>Building execution images and loadable libraries</li>
+            <li>
+              Executing tests: unit tests, integration tests, regression tests, performance tests,
+              stress tests, and acceptance tests.
+            </li>
+            <li>
+              Deploying software executables and documentation.
+            </li>
+            <li>
+              Reporting progress, key events, and failures.
+            </li>
+          </ul>
+          In the Fall 2012 semester we developed an architecture for a Virtual Display System (VDS).  The system in which it
+          is embedded is shown in Figure 1., below.  It is intended 
+          to support collaboration for large software development teams.  One of its primary features - the one we focused on - is a 
+          large display that serves as a visual interface into the design and implementation of complex software systems.  
+          To understand how VDS functions you should review the preliminary architectural document provided to the Fall 2012 class, 
+          <a href="../projects/Pr5F12.pdf">Preliminary Architecture for the Virtual Display System</a>.
+        </p>
+        <p>
+          In this project we will explore how to use the noSQL database we built in Projects #2 and #4 to manage recording
+          and reporting of important SCF data and events.  We will assume that SCF is intended to support development
+          teams comprised of several hundred developers divided into groups at different locations throughout the world.
+        </p>
+      </section>
+      <section>
+        <h2>Background:</h2>
+        <p>
+          The SCF is comprised of a federation of clients and servers<sup>1</sup>:
+          <ul>
+            <li>
+              Collaboration Server: supports project management, storing work package details and providing collaboration tools.
+            </li>
+            <li>
+              Repository Server: Stores source code and documents using a configuration control system and provides exploratory tools
+              based on metadata associated with each stored item.
+            </li>
+            <li>
+              Build Server<sup>2</sup>: builds and caches execution images and libraries as needed for test and deployment.
+            </li>
+            <li>
+              Test Server: loads and executes test images provided by the build server.  The test server also provides
+              deployment activities.
+            </li>
+            <li>
+              Virtual Display Server: provides a sophisticated interface for publishing management information and
+              collaboration activities that involve viewing source code, documents, diagrams, sketches, and webcams
+              to enhance personal and team interactions.  This is a prime vehicle for collaboration between remote teams.
+            </li>
+            <li>
+              Development Clients: provide user access to the many facilities of VDS including check-in and check-out of 
+              code and documents, creation and scheduling tests, and viewing results<sup>3</sup>.
+            </li>
+            <li>
+              Virtual Display Client: a specialized client that focuses on managing displays of documents, code, web cam views,
+              and various charts and tables that describe progress and interactions between development groups.
+            </li>
+          </ul>
+        </p>
+        <p>
+          <div>
+            <img src="VDS.png" width="100%" />
+            <div style="text-align:center; font-size:x-large; font-weight:bold">
+              Figure 1. Software Collaboration Federation (SCF)
+            </div>
+          </div>
+        </p>
+        <p>
+          The Storage Management Subsystem (SMS) provides a core SCF service<sup>4</sup> and is composed of Data and Event Managers
+          hosted on each of the clients and servers in the VDS Federation and a Data and Event Coordinator that supervises the
+          operation of all of the individual Data and Event Managers.
+        </p>
+      </section>
+      <section>
+        <h2>Storage Management Subsystem Architecture:</h2>
+        <p>
+          The Storage Management System provides a number of services including storing and managing:
+          <ul>
+            <li>Routing lists for communication of messages and notifications</li>
+            <li>Layout information for VDS: where are the windows, what content do they display</li>
+            <li>Metadata for source code and documents in the repository</li>
+            <li>Check-in/out status for code and documents in the repository</li>
+            <li>Test configurations and results</li>
+            <li>Lists of services and servers available to clients</li>
+            <li>Templates for displays and messages</li>
+          </ul>
+        </p>
+        <p>
+          In your Architecture Document you should summarize the SCF structure and behaviors, and then focus in detail on
+          the Storage Management Subsystem. For that you should:
+          <ul>
+            <li>
+              Define its structure and the internal interactions<sup>5</sup> between elements of the Storage Management Subsystem and
+              external interactions with other services and components of the Software Collaboration Federation.
+            </li>
+            <li>
+              Discuss behaviors that are common to all the Data Storage Managers.
+            </li>
+            <li>
+              Discuss behaviors that are unique to each of the Managers and how the implementation will merge the unique
+              and common operations.
+            </li>
+            <li>
+              Discuss behaviors of the Data Storage Coordinator, how it will be hosted, and its interactions with the
+              rest of the Subsystem as well as with the other parts of SCF.
+            </li>
+            <li>
+              Enumerate all of the data structures that SMS will have to handle, e.g., their structure, purpose,
+              performance issues, and any other constraints that occur to you.
+            </li>
+            <li>Discuss how storing and managing new data configurations can be added to an existing SMS.</li>
+            <li>
+              Define all of the events that will be handled by SMS:
+              <ul>
+                <li>Origin of the event.</li>
+                <li>
+                  Nature of the event, e.g., business as usual events - checkin, successful build completion, successful test
+                  and errors or anomolous behavior.
+                </li>
+                <li>Notifications that result and their destinations.</li>
+                <li>Event information that will be stored, that will be transmitted, and the lifetime of the information.</li>
+                <li>Priority of messages and mechanisms for expediting the transmission of high priority messages.</li>
+              </ul>
+            </li>
+            <li>
+              Discuss how new events can be added and managed in an existing SMS.
+            </li>
+            <li>
+              Discuss critical issues: complexity, security, performance, integration of SMS with the SCF communication service
+              and with its other parts if you think there should be interactions with parts other than the communication service.
+            </li>
+            <li>
+              How will SMS support giving users deep insight into the operations of SCF via: message content, message
+              configuration, orchestrating the time of delivery of messages, displaying stored data content, and showing
+              the data traffic and evolution of stored data?
+            </li>
+          </ul>
+        </p>
+      </section>
+      <section>
+        <h2>Prototypes:</h2>
+        <p>
+          In order to support the many decisions required to define the architecture of a large interesting software construct like SMS,
+          an architect will build a set of prototypes to understand how things should work, explore performance issues, and decide on specific
+          structures and patterns of communication.
+        </p>
+        <p>
+          A prototype should be:
+          <ul>
+            <li>As small as is possible while answering the questions that caused its construction.</li>
+            <li>Simple enough that developers can understand it and use it as the basis for a more complete solution.</li>
+            <li>Provide output information that contains convincing answers about the questions.</li>
+            <li>Documented as an integral part of the architectural document(s).</li>
+          </ul>
+        </p>
+        <p>
+          You will be required, below, to implement at least two prototypes for Project #5.
+        </p>    
+      </section>
+      <section>
+        <h2>Requirements:</h2>
+        Your Storage Management Subsystem (SMS) architectural document: 
+        <ol>
+          <li>
+            <strong>Shall</strong> be written using Microsoft Word or an equivalent office suite that can generate documents in word or PDF format.
+          </li>
+          <li>
+            <strong>Shall</strong> use diagrams created with Microsoft Visio or an equivalent tool that can generate diagrams embedded in
+            your document.  These diagrams should be delivered in Visio, PDF, or PNG formats.
+          </li>
+          <li>
+            Each diagram <strong>shall</strong> be accompanied by text that describes:
+            <ul>
+              <li>Why this diagram is here.</li>
+              <li>What the diagram tells us.</li>
+              <li>Conclusions we should draw from its presentation.</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Shall</strong>, at the beginning provide an Executive Summary that very briefly summarizes the 
+            main parts of your architecture, especially its users and uses, parts, and critical issues.  The summary
+            <strong>does not</strong> list the things you did to develop the document.
+          </li>
+          <li>
+            <strong>Shall</strong> briefly discuss the goals of the SCF and discuss in more detail the goals of the SMS.
+          </li>
+          <li>
+            <strong>Shall</strong> briefly discuss the uses and users of the SCF and discuss in more detail the uses and users of the SMS.
+            This discussion should consider the impact of uses on the design of SMS, explore uses beyond those specific to SCF<sup>5</sup>
+            and decide if any of them need to be addressed in the development of SMS, e.g.: provide for future extensions and additions.
+          </li>
+          <li>
+            <strong>Shall</strong> briefly discuss the structure of the Software Collaboration Federation and then discuss in detail
+            the structure of the Storage Management Subsystem, its data, and its events.
+          </li>
+          <li>
+            <strong>Shall</strong> discuss the responsibilities of each of the parts identified above and interactions between them.
+          </li>
+          <li>
+            <strong>Shall</strong> discuss issues that are critical for the development of SMS and propose means to address each
+            of the issues deemed to be important for SMS.
+          </li>
+          <li>
+            <strong>Shall</strong>, at an appropriate place in the document, discuss each of at least two prototypes you've developed.
+            You will develop the prototypes:
+            <ul>
+              <li>
+                <strong>Event Logger:</strong><br/>
+                The event logger records the type of event, the date-time of its occurance, and its origin.  The logger has its own
+                process and is accessed by code in other processes through the SCF communication service which you will represent
+                with a WCF service which is part of your prototype.  The purpose of this prototype is to estimate performance: throughput 
+                and latency of logging.  Note that a lot of this prototype will be taken directly from your implementation of Project #4.
+                You are required to use .Net Tasks as part of your implementation.
+                <p></p>
+                If you implement this prototype so that it can be conveniently used in process as well as between processes this will 
+                be counted as an additional prototype.  Note that that does not replace either of the two required prototypes described
+                here.
+              </li>
+              <li>
+                <strong>Critical Issue Prototype(s):</strong><br/>
+                This prototype is developed to help you answer questions and provide solutions to one or more of your critical issues.
+                What you do and how you do it will be left to you. You will find me reluctant to discuss this in any detail.
+              </li>
+            </ul>
+          </li>
+        </ol>
+        <p>
+          <hr />
+          <section class="footnote">
+            <ol class="footnote">
+              <li>
+                Clients and servers are usually identified by machine boundaries but that is not always the case.  We
+                may implement more than one server as virtual machines on a single physical machine.  Also, we may have
+                more than one physical machine that implements a server.  For example, toward the end of a large project
+                testing becomes a very intense large-scale activity and might be carried out on a Test Server Farm.
+              </li>
+              <li>
+                The Build Server will probably share the same machine as the Repository and so is not shown in Figure 1.
+              </li>
+              <li>
+                These clients are often processes that run on a developer's machine.  SCF clients are not expected to 
+                provide compilers and editors and other build tools.  Those already exist and would be a waste of resources
+                to re-implement.  So a developer's machine would have both the tools and the SCF client software.
+              </li>
+              <li>
+                One would expect a system like SCF to have several services around which its functionality is configured,
+                e.g., services for communication, security, storage, display, ...
+              </li>
+              <li>
+                The SMS will contain many parts that interconnect with SCF and that handle it's internal operations, e.g.,
+                data storage, query handling, persistance, message handling, and internal error handling.
+              </li>
+              <li>
+                If we don't look to future expansion of capabilities we may find that after a big expense and effort to
+                build the (sub)system we end up with an inflexible body of software with no growth potential. That's definately
+                <strong>not</strong> what an architect is paid to create.
+              </li>
+            </ol>
+          </section>
+        </p>
+      </section>
+      <section>
+        <h2>What you need to know:</h2>
+        In order to successfully meet these requirements you will need to:
+        <ol>
+          <li>
+            Understand the purpose of an architecture document, which is an elaboration of the Operational Concept Documents
+            you developed in Projects #1 and #3.
+          </li>
+          <li>
+            Understand the details of the design and implementation of Projects #2 and #4.
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h2>Things for which you lose points:</h2>
+        <p>
+          <ul>
+            <li>
+              Weak presentation of your discussions, e.g.: inadequate detail and inaccuracies in detail.
+            </li>
+            <li>
+              Formatting issues: your text and diagrams should convey their information in clear, simple fashion.
+              Formatting should be consistent.  If your diagrams and text are inconsistent in format, structure, and tone,
+              it becomes clear that you did a lot of cut and paste from the web and class documents rather than thinking
+              through issues and their presentation yourself.
+            </li>
+          </ul>
+        </p>
+      </section>
+      <section>
+        <h2>Things for which you gain points:</h2>
+        <p>
+          <ul>
+            <li>
+              I value highly your presentation of original ideas and discussion of original structures.
+            </li>
+            <li>
+              Your content should provide a broad treatment of a lot of the system parts and behaviors with
+              modest detail and much more detail for those parts you think are particularly interesting and/or important.
+              The broad treatment teaches your reader about the system and its context.  The detailed treatment
+              tells the reader about the important things you uncovered or developed.
+            </li>
+            <li>
+              Feel free to bend the preliminary architecture presented above in ways you think are useful and
+              intersting.
+            </li>
+          </ul>
+        </p>
+      </section>
+    </div>
+    <footer>
+      <hr />
+      <div id="topleft">
+        <a href="javascript: history.go(-1)">Back</a>
+      </div>
+      <div id="topright">
+        <a href="javascript: history.go(-1)">Back</a>
+      </div>
+      <img src="pictures/facultyCenterStrip.jpg" width="100%" />
+      <hr />
+      Jim Fawcett &copy; copyright 2015
+    </footer>
+  </body>
+</html>

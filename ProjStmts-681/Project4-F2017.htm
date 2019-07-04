@@ -1,0 +1,392 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - Project4-F2017.htm - Project #4, Fall 2017
+   - ver 1.0 - 16 Aug 2017
+   - Jim Fawcett, Syracuse University
+  -->
+  <title>Project #4</title>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+  <script type="text/javascript" src="js/Fallback.js"></script>
+  <script type="text/javascript" src="js/TopMenuV2.js"></script>
+  <link rel="stylesheet" href="css/TopLevelV2.css?v=1.0" />
+  <link rel="stylesheet" href="css/LecturesSupplement.css?v=1.0" />
+  <link rel="stylesheet" href="css/Fallback.css?v=1.0" />
+  <style>
+    /*ol {
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+
+    ul > li {
+      margin-left: -15px;
+      margin-right: 50px;
+    }
+
+    ol > li {
+      margin: 10px 50px 10px 0px;
+    }*/
+
+    .em {
+      font-weight: bold;
+    }
+
+    #title {
+      text-align: left;
+      margin: 20px 20px 20px 18px;
+      padding: 0px;
+    }
+
+    #pagedate {
+      text-align: left;
+      margin: 20px;
+    }
+
+    section {
+      border: 0;
+      margin: 20px;
+    }
+
+    .footnote {
+      font-size: small;
+      margin-left: 0px;
+    }
+
+    ul.tightlist {
+      margin-top: 5px;
+      margin-bottom: 10px;
+    }
+
+      ul.tightlist li {
+        margin-top: 0px;
+        margin-bottom: 0px;
+      }
+
+        ul.tightlist li h4 {
+          margin-top: 5px;
+          margin-bottom: 5px;
+        }
+  </style>
+  <script>
+    var zoomPred = true;
+    function doZoom(elem, type) {
+      if (type == "input") {
+        elem = document.getElementById("fed");
+      }
+      if (zoomPred) {
+        elem.style.width = "70%";
+        zoomPred = false;
+      }
+      else {
+        elem.style.width = "40%";
+        zoomPred = true;
+      }
+    }
+  </script>
+  <body>
+    <a name="top"></a>
+    <!-- site navigation menu built with Javascript -->
+    <nav>
+      <div id="nav">
+        <div id="remove">
+          <hr />
+          <a href="TopNav.htm">Site Navigation with no Javascript</a>
+          <hr />
+          <br />
+        </div>
+      </div>
+    </nav>
+    <div id="pagenav">
+      <ul>
+        <li><a href="#top">T</a></li>
+        <li><a href="Project1-F2017.htm#top">N</a></li>
+        <li><a href="Project3-F2017.htm#top" prev>P</a></li>
+        <li><a href="#bottom">B</a></li>
+      </ul>
+    </div>
+
+    <header>
+      <h2 id="title">Project #4 - Remote Build Server</h2>
+      <div id="pagedate">
+        Version 1.0,
+        <script type="text/javascript">
+          document.write("Revised: " + document.lastModified)
+        </script><br />
+        Due Date: Wednesday, December 6th
+      </div>
+      <div>
+      </div>
+      </div>
+    </header>
+
+    <!-- Notes Content -->
+    <div class="content">
+      <section>
+        <h3>Purpose:</h3>
+        <p>
+          One focus area for this course is understanding how to structure and implement big software systems.  By big we mean systems
+          that may consist of hundreds or even thousands of packages and perhaps several million lines of code.
+        </p>
+        <p>
+          In order to successfully implement big systems we need to partition code into relatively small parts and thoroughly test
+          each of the parts before inserting them into the software baseline.  As new parts are added to the baseline and
+          as we make changes to fix latent errors or performance problems we will re-run test sequences for those parts
+          and, perhaps, for the entire baseline.  Because there are so many packages the only way to make this intensive testing practical
+          is to automate the process.  How we do that is related to projects for this year.
+        </p>
+        <p>
+          The process, described above, supports continuous integration.  That is, when new code is created for a system, we build and test it
+          in the context of other code which it calls, and which call it.  As soon as all the tests pass, we check in the code and it becomes
+          part of the current baseline.  There are several services necessary to efficiently support continuous integration, as shown in the
+          Figure 1., below, a Federation of servers, each providing a dedicated service for continuous integration.
+          <div>
+            <input type="button" value="click to zoom" style="margin:15px;" onclick="doZoom(this, 'input');" />
+          </div>
+          <div id="fed" style="width:30%; padding-right:40px;" onclick="doZoom(this);">
+            <div class="photo" style="margin-top:0px; margin-bottom:10px; float:left;">
+              <img src="pictures/CollabSys.png" width="100%" />
+              <div class="center">Figure 1. Software Collaboration Federation</div>
+            </div>
+          </div>
+          <div style="float:left; width:58%; padding-left:20px; margin-bottom:20px;">
+            The Federation consists of:
+            <ul class="tightlist">
+              <li>
+                <h4>Repository:</h4>
+                Holds all code and documents for the current baseline, along with their dependency relationships.
+                It also holds test results and may cache build images.
+              </li>
+              <li>
+                <h4>Build Server:</h4>
+                Based on build requests and code sent from the Repository, the Build Server builds test libraries for submission to the Test Harness.
+              </li>
+              <li>
+                <h4>Test Harness:</h4>
+                Runs tests, concurrently for multiple users, based on test requests and libraries sent from the Build Server.  Clients
+                will checkin, to the Repository, code for testing, along with one or more test requests.  The repository sends code and requests to the
+                Build Server, where the code is built into libraries and the test requests and libraries are then sent to the Test Harness.
+                The Test Harness executes tests, logs results, and submits results to the Repository.  It also notifies the author of the tests
+                of the results.
+              </li>
+              <li>
+                <h4>Client:</h4>
+                The user's primary interface into the Federation, serves to submit code and test requests to the Repository.  Later, it will
+                be used view test results, stored in the repository.
+              </li>
+              <li>
+                <h4>Collaboration Server:</h4>
+                The Collab Server provides services for: remote meetings, shared digital whiteboard, shared calendars.
+                It also stores workplans, schedules, database of action items, etc.
+              </li>
+              <!--<li>
+        <h4>Load Balancer and Scaled out Test Harnesses:</h4>
+        These are not shown, in Figure 1., but may be needed for large projects.
+      </li>-->
+            </ul>
+          </div>
+        </p>
+        <h2 style="clear:both;">Build Server:</h2>
+        <p>
+        <p>
+          In the four projects for this course, we will be developing the concept for, and creating, one of these federated servers, the
+          Build Server - an automated tool that builds test libraries.
+          Each test execution, in the Test Harness, runs a library consisting of test driver and a small set of tested packages, recording pass status, and perhaps logging execution
+          details.  Test requests and code are submitted by the Repository to the Build Server.  The Build Server then builds libraries
+          needed for each test request, and submits the request and libraries to the Test Harness, where they are executed.
+        </p>
+        <p>
+          The four projects each have a specific role leading to the final Remote Build Server:
+          <ul>
+            <li>
+              For <a href="../lectures/Project1-F2017.htm">Project&nbsp;#1</a> you will create an Operational Concept Document (OCD) for a Remote Build Server,
+              and a small prototype demonstrating
+              <a href="https://stackoverflow.com/questions/6511380/how-do-i-build-a-solution-programmatically-in-c">programmable&nbsp;builds</a>.
+            </li>
+            <li>
+              <a href="../lectures/Project2-F2017.htm">Project&nbsp;#2</a> focuses on building the core Build Server Functionality, and thoroughly testing to
+              ensure that it functions as expected.
+            </li>
+            <li>
+              In <a href="../lectures/Project3-F2017.htm">Project&nbsp;#3</a>, you will build prototypes for Process Pools, Socket-based Message-passing Communication,
+              and for a Graphical User Interface (GUI), packages all needed for the last project.
+              These are relatively small &quot;proof-of-concept&quot; projects in which you experiment with
+              design and implementation strategies.
+            </li>
+            <li>
+              Finally, in <a href="../lectures/Project4-F2017.htm">Project&nbsp;#4</a> you will build a Remote Build Server, using parts you
+              developed in earlier projects. You will also add design details to your OCD, from <a href="Project1-F2017.htm">Project&nbsp;#1</a>,
+              to create an &quot;as-built&quot; design document.
+            </li>
+          </ul>
+        </p>
+        <p>
+          So, for this project #4, we will develop a Remote Build Server and document its design with a document based on the Project #1 OCD.
+          Your Build Server should:
+          <ul style="margin-left:15px;">
+            <li>
+              Provide a Build Server that uses Message-Passing Communication based on your <a href="Project2-F2017.htm">Comm prototype</a>.
+            </li>
+            <li>
+              Use mock Repository and Test Harness servers that are functioning processes, with message-passing communication.
+              However, they provide just enough functionality to demonstrate that your Remote Build Server functions as expected.
+            </li>
+            <li>
+              Provide a mock Client process, using WPF, based on your <a href="Project2-F2017.htm">GUI prototype</a>
+              that has just enough functionality to demonstrate that your Build Server
+              functions as expected.
+            </li>
+          </ul>
+          Your Build Server Design Document should:
+          <ul style="margin-left:15px;">
+            <li>
+              Build on the <a href="Project1-F2017.htm">Project #1</a> OCD, keeping its basic structure, 
+              but elaborating with design details.
+            </li>
+            <li>
+              Show activity diagrams, package diagrams, and class diagrams that illustrate the way you've implemented
+              your server and its environment.
+            </li>
+            <li>
+              Comments on possible inadequacies and errors of commission. 
+            </li>
+            <li>
+              Draws conclusions about what you like and don't like about your final implementation.
+            </li>
+          </ul>
+        </p>
+        Note that, in these projects, we will not be integrating our Build Server with a Federation's Repository and Test Harness Servers.  Instead, we will build mock Repository
+        and Test Harness servers that supply
+        just enough functionality to demonstrate operations of the Remote Build Server.  The Build Server will use a &quot;Federation ready&quot; communication channel
+        to communicate with the mock servers, and we will build a mock client that has just enough functionality to demonstrate Build Server working in this environment.
+        <div style="height:10px;"></div>
+        So the mock Repository and mock Test Harness are simple servers, running in their own processes, using our Message-Passing Communication, to send and receive
+        requests and replys.  However, the Mock operations are simple - not nearly as complex as full up Federated servers.
+        <div style="height:15px;"></div>
+        <div style="float:left; width:60%">
+          <img class="photo" src="pictures/Project4BlockStructure.png" style="width:98%;" />
+        </div>
+        <div style="clear:both;"></div>
+        We will discuss all of this at length in class and the help sessions.
+      </section>
+      <section>
+        <h3>Requirements:</h3>
+        Your Build Server
+        <ol>
+          <li>
+            <strong>Shall</strong> be prepared using C#, the .Net Frameowrk, and Visual Studio 2017.
+          </li>
+          <li>
+            <strong>Shall</strong> include a Message-Passing Communication Service built with WCF.  It is expected that you will
+            build on your <a href="Project3-F2107">Project #3 Comm Prototype</a>.
+          </li>
+          <li>
+            The Communication Service <strong>shall</strong> support retrieving build requests by Pool Processes from the mother
+            Builder process, sending and receiving build requests, and sending and receiving files.
+          </li>
+          <li>
+            <strong>Shall</strong> provide a Repository server that supports client browsing to find files to build,
+            builds an XML build request string and sends that and the cited files to the Build Server.
+          </li>
+          <li>
+            <strong>Shall</strong> provide a Process Pool component that creates a specified number of processes on command.
+          </li>
+          <li>
+            Pool Processes <strong>shall</strong> use message-passing communication to retrieve messages from the mother Builder process.
+          </li>
+          <li>
+            Each Pool Process <strong>shall</strong> attempt to build each library, cited in a retrieved build request, logging warnings and errors. 
+          </li>
+          <li>
+            If the build succeeds, <strong>shall</strong> send the build request and libraries to the Test Harness for execution,
+            and <strong>shall</strong> send the build log to the repository.
+          </li>
+          <li>
+            The Test Harness <strong>shall</strong> attempt to load each test library it receives and execute it.
+            It <strong>shall</strong> submit the results of testing to the Repository.
+          </li>
+          <li>
+            <strong>Shall</strong> include a Graphical User Interface, built using WPF.
+          </li>
+          <li>
+            The GUI client <strong>shall</strong> be a separate process, implemented with WPF and using message-passing communication.  
+            It <strong>shall</strong> provide mechanisms to get file lists from the Repository, and select files for packaging
+            into a test library<sup>1</sup>, adding to a test request structure.  It <strong>shall</strong> provide the capability 
+            of repeating that process to add other test libraries to the test request structure. 
+          </li>
+          <li>
+            The client <strong>shall</strong> send test request structures to the repository for storage and transmission to the Build Server.
+          </li>
+          <li>
+            The client <strong>shall</strong> be able to request the repository to send a test request in its storage to the Build Server
+            for build processing.
+          </li>
+        </ol>
+        Your As-Built Design Document<sup>2</sup>
+        <ol>
+          <li>
+            <strong>Shall</strong> build on your OCD from <a href="Project1-F2017">Project&nbsp;#1</a>. 
+          </li>
+          <li>
+            <strong>Shall</strong> used activity diagrams, package diagrams, and class diagrams to describe the essential parts of 
+            your design and implementation.
+          </li>
+          <li>
+            <strong>Shall</strong> comment on changes to the core concept as your design evolved, and on deficiencies you feel your
+            project incorporates<sup>3</sup>.
+          </li>
+        </ol>
+        <div style="height:20px;"></div>
+        <hr />
+        <ol class="footnote">
+          <li>
+            A test library consists of a test driver package and code packages to be tested.  The test driver package contains a class,
+            derived from a base Test class that defines an override-able bool test() function. The test driver is build by the author of
+            the tested code, and has the information necessary to make test calls into those packages.
+          </li>
+          <li>
+            You may use alternate office suites like <a href="http://wps.com/">WPS</a> or
+            <a href="https://www.libreoffice.org/">LibreOffice</a>, and diagrammers like
+            <a href="https://www.gliffy.com/">gliffy</a>, available as a chrome
+            <a href="https://chrome.google.com/webstore/detail/gliffy-diagrams/bhmicilclplefnflapjmnngmkkkkpfad">app</a>.
+            You may also find <a href="https://chrome.google.com/webstore/detail/workflowy/koegeopamaoljbmhnfjbclbocehhgmkm">WorkFlowy</a>
+            useful for organizing both documents, like an OCD, an also for thinking about code structure.
+          </li>
+          <li>
+            You won't loose points for this document by citing design and implementation deficiencies.  You only loose points
+            for not citing deficiencies I think are relatively obvious when grading your document.
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3>What you need to know:</h3>
+        In order to successfully meet these requirements you will need to know:
+        <ol>
+          <li>
+            A lot of details about your implementations of the preceding projects.
+          </li>
+          <li>
+            Definitions for Dynamic Link Libraries - see the class text, C# 6.0 in a Nutshell.
+          </li>
+          <li>How to organize and prepare a technical document. <a href="StudyGuideOCD.htm">Here's</a> some help.</li>
+        </ol>
+      </section>
+    </div>
+    <footer>
+      <hr />
+      <div class="photo">
+        <img src="../../webpages/pictures/FacultyCenterStrip.jpg" width="100%" />
+      </div>
+      <hr />
+      <div style="position:absolute; left:35px;">Software Modeling &amp; Analysis Course Notes</div>
+        Jim Fawcett &copy; copyright 2017
+      <a name="bottom"></a>
+    </footer>
+  </body>
+</html>

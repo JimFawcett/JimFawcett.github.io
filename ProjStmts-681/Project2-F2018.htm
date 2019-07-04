@@ -1,0 +1,226 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - Project2-F2018.htm - Project #1, Fall 2018
+   - ver 1.0 - 16 Aug 2017
+   - Jim Fawcett, Syracuse University
+  -->
+  <title>Project #2</title>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+</head>
+<body onload="initializeMenu()" oncontextmenu="return false;">
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <a id="Next" href="Project3-F2018.htm">N</a>
+  <a id="Prev" href="Project1-F2018.htm">P</a>
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <header>
+    <h2 id="title">Project #2 - Lexical Scanner</h2>
+    <h3 id="subtitle">Using State-Based Tokenizer</h3>
+    <div id="pagedate">
+      Version 1.2<br />
+      Due Date: Wednesday, October 3rd, 2018
+    </div>
+    <a href="../code/Project2HelpF2018">Project #2 helper files</a>
+  </header>
+
+  <!-- Notes Content -->
+
+  <section>
+    <h3>Purpose:</h3>
+    <!--<p>
+      The acronym OCD stands for Operational Concept Document.  It's purpose is to make you think critically about the design
+      and implementation of a project before committing to code.  It also serves to publish your concept to the development team,
+      which for this course is you (and only you).  For this project we will be writing an Operational Concept Document for
+      the remaining projects, e.g., Projects #2, #3, and #4.
+    </p>-->
+    <p>
+      One focus area for this course is understanding how to structure and implement big software systems.  By big we mean systems
+      that may consist of hundreds or even thousands of packages<sup>1</sup> and perhaps several million lines of code.
+      We won't be building anything quite that large, but our projects may be considerably bigger than anything you've worked
+      on before.
+    </p>
+    <p>
+      In order to successfully implement big systems we need to partition code into relatively small parts and thoroughly test
+      each of the parts before inserting them into the software baseline<sup>2</sup>.  As new parts are added to the baseline and
+      as we make changes to fix latent errors or performance problems we will re-run test sequences for those parts
+      and, perhaps, for the entire baseline.  Managing that process efficiently requires effective tools for code analysis
+      as well as testing.  How we do that code analysis is illustrated by the projects for this year.
+    </p>
+    <p>
+      The projects this Fall focus on building software tools for code analysis.  We will emphasize C# code
+      but want our tools to be easily extendable to other similar languages like C++ and Java.
+    </p>
+    <p>
+      Code analysis consists of extracting lexical content from source code files, analyzing the code's syntax from its lexical
+      content, and building an Abstract Syntax Tree (AST) that holds the results of our analysis.  It is then fairly easy to build
+      several backends that can do further analyses on the AST to construct code metrics, search for particular constructs, evaluate
+      package dependencies, or some other interesting features of the code.
+    </p>
+    <p>
+      You will find it useful to look at the <a href="../../Webpages/BlogParser.htm">Parsing</a> blog for a brief introduction
+      to parsing and code analysis.
+    </p>
+    <p>
+      In this second project we will build and test a lexical scanner in C# that consists of two packages:
+      <ul>
+        <li>
+          <strong>Tokenizer</strong>
+          <div class="indent">
+            extracts words, called tokens, from a stream of characters.  Token boundaries are white-space characters, transitions between alphanumeric
+            and punctuator characters, and comment and string boundaries.  Certain classes of punctuator characters belong to single character or
+            two character tokens so they require special rules for extraction.
+          </div>
+        </li>
+        <li>
+          <strong>SemiExpression</strong>
+          <div class="indent">
+            groups tokens into sets, each of which contain all the information needed to analyze some
+            grammatical construct without containing extra tokens that have to be saved for subsequent analyses.  SemiExpressions are
+            determined by special terminating characters: semicolon, open brace, closed brace, and newline when preceeded on the same line with
+            &apos;using&apos;.
+          </div>
+        </li>
+      </ul>
+    </p>
+  </section>
+  <section>
+    <h3>Requirements:</h3>
+    Your Scanner Solution:
+    <ol>
+      <li>
+        <strong>Shall</strong> use Visual Studio 2017 and its C# Windows Console Projects, as provided in the ECS computer labs.
+      </li>
+      <li>
+        <strong>Shall</strong> use the .Net System.IO and System.Text for all I/O.
+      </li>
+      <li>
+        (<strong>2</strong>) <strong>Shall</strong> provide C# packages for Tokenizing, collecting SemiExpressions, and a scanner interface, ITokCollection.
+      </li>
+      <li>
+        (<strong>4</strong>) <strong>Shall</strong> provide a Tokenizer package that declares and defines a Toker class that implements the
+        State Pattern<sup>3</sup> with an abstract ConsumeState<sup>4</sup> class and derived classes for collecting the following token types:
+        <spacer-10></spacer-10>
+        <ul class="tight">
+          <li>alphanumeric tokens</li>
+          <li>punctuator tokens</li>
+          <li>
+            special one<sup>5</sup> and two<sup>6</sup> character tokens with defaults that may be changed by calling setSpecialSingleChars(string ssc)
+            and/or setSpecialCharPairs(string scp)<sup>7</sup>.
+          </li>
+          <li>
+            Single-line comments returned as a single token, e.g., //
+          </li>
+          <li>
+            Multi-line comments returned as a single token, e.g., /* ... */
+          </li>
+          <li>
+            quoted strings<sup>8</sup>
+          </li>
+        </ul>
+      </li>
+      <li>
+        (<strong>1</strong>) The Toker class, contained in the Tokenizer package, <strong>shall</strong> produce one token for each call to a member
+        function getTok().
+      </li>
+      <li>
+        (<strong>4</strong>) <strong>Shall</strong> provide a SemiExpression package that contains a class SemiExp used to retrieve collections of tokens
+        by calling Toker::getTok() repeatedly until one of the SemiExpression termination conditions, below, is satisfied.
+      </li>
+      <li>
+        (<strong>5</strong>) <strong>Shall</strong> terminate a token collection after extracting any of the single character tokens: semicolon, open brace,
+        closed brace.  Also on extracting newline if a &apos;#&apos; is the first token on that line.
+      </li>
+      <li>
+        (<strong>2</strong>) <strong>Shall</strong> provide a facility providing rules to ignore certain termination characters under special circumstances.
+        You are required to provide a rule to ignore the (two) semicolons within parentheses in a for(;;) expression<sup>9</sup>.
+      </li>
+      <li>
+        (<strong>2</strong>) The SemiExp class <strong>Shall</strong> implement the interface ITokenCollection with a declared method get().
+      </li>
+      <li>
+        (<strong>5</strong>) <strong>Shall</strong> include an automated unit test suite that exercises all of the special cases that seem appropriate for these two
+        packages<sup>10</sup>.
+      </li>
+    </ol>
+    <hr />
+    <ol style="font-size:small">
+      <li>
+        In C#, a package is a single source code file that contains:
+        <ul class="tight">
+          <li>prologue, providing a name, brief descriptive phrase, author information, and environment information</li>
+          <li>description of the package's responsiblities and required files</li>
+          <li>maintenance history</li>
+          <li>class definitions</li>
+          <li>a main function that implements construction tests for all the defined code</li>
+        </ul>
+      </li>
+      <li>
+        A software baseline is the set of all code considered to be part of the current system, excluding experimental code
+        that individual developers are working on.
+      </li>
+      <li>
+        <a href="https://en.wikipedia.org/wiki/State_pattern">https://en.wikipedia.org/wiki/State_pattern</a>
+      </li>
+      <li>
+        You don't have to use the ConsumeState name.  In the demo code I used TokenState.
+      </li>
+      <li>
+        Special one character tokens: &lt;, &gt;, [, ], (, ), {, }, :, =, +, -, *
+      </li>
+      <li>
+        Special two character tokens: &lt;&lt;, &gt;&gt;, ::, ++, --, ==, +=, -=, *=, /=, &&, ||
+      </li>
+      <li>
+        You don't have to use these names, but if you use other names, the names should make it obvious
+        what the functions do.
+      </li>
+      <li>
+        The text &quot;abc&quot; becomes a 5 character token &quot;abc&quot;.
+      </li>
+      <li>This will be discussed in class.</li>
+      <li>This is in addition to the construction tests you include as part of every package you submit.</li>
+    </ol>
+  </section>
+  <section>
+    <h3>What you need to know:</h3>
+    In order to successfully meet these requirements you will need to know:
+    <spacer-10></spacer-10>
+    <ol class="tight">
+      <li>Basics of the C# language: <a href="https://www.programiz.com/csharp-programming/hello-world">C# tutorial - PROGRAMIZ</a></li>
+      <li>
+        How to implement a simple class hierarchy.  This will be covered briefly in lecture #3 and in more detail later.
+      </li>
+      <li>
+        The <a href="../../Repository/CSharp/NetContainers">.Net Containers</a>.
+      </li>
+      <li>How to use Visual Studio.  We will discuss this in one of the Help Sessions.</li>
+    </ol>
+  </section>
+  <spacer-15></spacer-15>
+  <div>
+    <img class="strip-photo" src="../../webpages/pictures/FacultyCenterStrip.jpg" />
+  </div>
+  <info-bar></info-bar>
+</body>
+</html>

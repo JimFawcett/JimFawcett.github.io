@@ -1,0 +1,258 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <!-- 
+     - Project4-F2014.htm - Project #4, Fall 2015
+     - ver 1.0 - 12 Aug 2015
+     - Jim Fawcett, Syracuse University
+    -->
+    <title>Project #4</title>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+    <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+    <meta name="Author" content="Jim Fawcett" />
+    <meta name="Author" content="James Fawcett" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="js/TopMenuV2.js"></script>
+    <script type="text/javascript" src="js/Fallback.js"></script>
+    <link rel="stylesheet" href="css/TopLevelV2.css?v=1.0" />
+    <link rel="stylesheet" href="css/LecturesSupplement.css?v=1.0" />
+    <link rel="stylesheet" href="css/Fallback.css?v=1.0" />
+    <style>
+      ol { margin-top:5px; margin-bottom:5px; }
+      ul > li { margin-left:-15px; margin-right:50px; }
+      ol > li { margin:10px 50px 10px 0px; }
+      .em
+      {
+        font-weight: bold;
+      }
+      #title 
+      { 
+        text-align:left; 
+        margin:20px 20px 20px 18px; padding:0px;
+      }
+      #pagedate 
+      { 
+        text-align:left; 
+        margin:20px;
+      }
+      section
+      {
+        border:0;
+        margin:20px;
+      }
+      .footnote
+      {
+        font-size:small; margin-left:0px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div id="prevlink">
+          <a href="javascript: history.go(-1)">Back</a>
+        </div>
+        <div id="nextlink">
+          <a href="javascript: history.go(-1)">Back</a>
+        </div>
+        <div id="topcenter">
+          Software Modeling &amp; Analysis - Fall 2016
+        </div>
+      </div>
+      <div id="pagetitle">
+        <h2 id="title">Project #4 - Remote Test Harness</h2>
+        <div id="pagedate">
+          Version 2.3, 
+          <script type="text/javascript">
+            document.write("Revised: " + document.lastModified)
+          </script><br />
+          Due Date: Wednesday, November 16th
+        </div>
+        <div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Notes Content -->
+    <div class="content">
+      <section>
+        <h3>Purpose:</h3>
+        <p>
+          In this project we will develop an implementation for accessing and using a remote Test Harness server
+          from multiple concurrent clients.  The Test Harness will retrieve test code from a Repository server<sup>1</sup>.
+          <ul>
+            <li>
+              One or more client(s) will concurrently supply the Test Harness with Test Requests.
+            </li>
+            <li>
+              The Test Harness will request test drivers and code to test, as cited in a Test Request, from the Repository.
+            </li>
+            <li>
+              One or more client(s) will concurrently extract Test Results and logs by enqueuing requests and displaying 
+              Test Harness and/or Repository replies<sup>2</sup> when they arrive.
+            </li>
+            <li>
+              The TestHarness, Repository, and Clients are all distinct projects that compile to separate executables.
+              All communication between these processes will be based on message-passing Windows Communication Foundation (WCF) channels.
+            </li>
+            <li>
+              Client activities will be defined by user actions in a Windows Presentation Foundation (WPF) user interface.
+              On startup, Client, Repository, and TestHarness instances will demonstrate that all functional
+              requirements are met with no input from the user.  For that you may use a separate TestExecutive project
+              if that seems appropriate.
+            </li>
+          </ul>  
+          An important part of this project is to assess the performance of the testing and communication as the number of concurrent
+          reader and writer clients increases.
+        </p>
+      </section>
+      <section>
+        <h3>Requirements:</h3>
+        Your Remote Remote Test Harness project:
+        <ol>
+          <li>
+            (1) <strong>Shall</strong> be implemented in C# using the facilities of the .Net Framework Class Library and Visual Studio 2015,
+            as provided in the ECS clusters.
+          </li>
+          <li>
+            (2) <strong>Shall</strong> implement a Test Harness Server that accepts one or more Test Requests, each in the form of an
+            a message with XML body that specifies the test developer's identity and the names of
+            a set of one or more test libraries to be tested.  Each test driver and the code it will be testing is implemented
+            as a dynamic link library (DLL) and sent by the client to the Repository server<sup>2</sup> before sending the Test Request
+            to the Test Harness.  
+            The Test Request XML body names one or more of these test DLLs to execute.
+          </li>
+          <li>
+            (1) If a Test Request specifies test DLLs not available from the Repository, the Test Harness server will send back an error message
+            to the client.
+          </li>
+          <li>
+            (2) The Test Harness <strong>shall</strong> enqueue Test Requests from multiple concurrent clients and execute them
+            by creating, for each Test Request, an AppDomain, running on its own thread.  Once a child AppDomain is constructed,
+            the Test Harness <strong>shall</strong> start the child processing the dequeued Test Request.  The result is that
+            Test Requests can be processed concurrently.
+          </li>
+          <li>
+            (1) Each test driver derives from an ITest interface that declares a method test() that takes no arguments and returns the test pass
+            status, e.g., a boolean true or false value.
+          </li>
+          <li>
+            (2) Test libraries and Test Requests are sent to the Repository and Test Harness server, respectively, and results sent back to a 
+            requesting client, using an asynchronous message-passing communication channel<sup>3</sup>.  The Test Harness receives test libraries
+            from the Repository using the same communication processing.  File transfer <strong>shall</strong> use streams or a chunking file
+            transfer that does not depend on enqueuing messages<sup>4</sup>.
+          </li>
+          <!--<li>
+            (3) Test execution <strong>shall</strong>, for each Test Request, run on a dedicated thread in an AppDomain that isolates 
+            test processing from Test Harness processing<sup>4</sup>.  You will need to ensure that an unhandled exception in test execution will not 
+            affect other Test Harness processing.
+          </li>-->
+          <li>
+            (2) At the end of test execution the Test Harness <strong>shall</strong> store the test results and logs in the Repository<sup>5</sup>
+            and send test results to the requesting client.  It then <strong>shall</strong> unload the child AppDomain responsible for that testing.
+          </li>
+          <li>
+            (1) The Test Harness <strong>shall</strong>, in cooperation with the Repository, store test results and logs for
+            all of the test executions using a key that combines the test developer identity and the current date-time.
+          </li>
+          <li>
+            (1) The Repository <strong>shall</strong> support client queries about Test Results from the Repository storage.
+          </li>
+          <li>
+            (2) All communication between Clients, the Test Harness, and the Repository, <strong>shall</strong> be implemented using
+            Windows Communication Foundation (WCF) channels, passing messages that contain requests, results, and notifications.
+          </li>
+          <li>
+            (2) Clients <strong>shall</strong> provide a Graphical User Interface constructed with Windows Presentation Foundation (WPF).
+            In order to demonstrate that you meet requirements you will probably need an interface for the Test Harness and for the
+            Repository.  These may be Console interfaces if you wish.
+          </li>
+          <li>
+            (1) <strong>Shall</strong> include means to time test executions and communication latency.
+          </li>
+          <li>
+            (1) <strong>Shall</strong> be accompanied by a test executive that clearly demonstrates you've met all the functional
+            requirements #2-#10, above.  If you do not demonstrate a requirement you will not get credit for it even if you have
+            it correctly implemented.
+          </li>
+          <li>
+            (1) <strong>Shall</strong> contain a brief text document that compares this implementation with the concept developed in
+            Project #3.  Does this project fully implement its concept? Was the original concept practical? Were there things you
+            learned during the implementation that made the origninal concept less relevant or incomplete?
+          </li>
+        </ol>
+        <a name="footnote" />
+        <p>
+          <hr />
+          <section class="footnote">
+            <ol class="footnote">
+              <li>
+                The Repository simply manages storage of code and logs.  It is not expected to contain dependency information, provide for check-in
+                and check-out, nor is it expected to provide version management, other than to use DateTime stamps and author name to
+                retrieve code and logs.  Note that a full implementation of a Repository would need to provide these functionalities.  Note also
+                that it would make a lot of sense for the Repository to store TestRequests as well, since they will be run again later when the
+                code that they depend on changes to fix latent errors, add new functionality, or fix performance problems.
+              </li>
+              <li>
+                The client can send the test code to the repository at any time prior to sending a Test Request, that cites that code,
+                to the Repository.
+              </li>
+              <li>
+                You will implement an asynchronous communication channel that supports Test Harness callbacks
+                when test results are ready, so the client will simply make a request and the server will communicate back
+                the result when it is ready, without the client blocking, awaiting the result.
+              </li>
+              <li>
+                This means that your communication service will provide message-passing for sending requests and results, and file
+                streaming or file chunking for sending binary files.
+              </li>
+              <li>
+                Note that the test harness calls test() and stores the test result and test log in the Repository.  It then
+                composes a response message with the test results and sends that to the requesting client.
+              </li>
+              <li>
+                You may, but are not required to, use an instance of <a href="https://www.mongodb.com/">MongoDB</a> to manage stored 
+                information in the Repository.
+              </li>
+            </ol>
+          </section>
+        </p>
+      </section>
+      <section>
+        <h3>What you need to know:</h3>
+        In order to successfully meet these requirements you will need to:
+        <ol>
+          <li>
+            Write C# code and use advanced facilities of the .Net Framework.
+          </li>
+          <li>
+            Understand .Net <a href="https://msdn.microsoft.com/en-us/library/system.threading.thread(v=vs.110).aspx">threading docs</a> and
+            <a href="https://ecs.syr.edu/faculty/fawcett/handouts/Webpages/Code.htm#CSharpThreadsAndSynchronization">Threading Examples</a>.
+          </li>
+          <li>
+            Use <a href="https://ecs.syr.edu/faculty/fawcett/handouts/Webpages/Code.htm#DotNetSocketsAndWCF">WCF example code</a> and
+            the <a href="https://msdn.microsoft.com/en-us/library/vstudio/ms735119(v=vs.90).aspx">WCF Docs</a>.
+          </li>
+          <li>
+            Use <a href="https://ecs.syr.edu/faculty/fawcett/handouts/Webpages/Code.htm#DotNetGUIs">WPF example code</a> and
+            the <a href="https://msdn.microsoft.com/en-us/library/ms754130(v=vs.110).aspx">WPF Docs</a>.
+          </li>
+        </ol>
+      </section>
+    </div>
+    <footer>
+      <hr />
+      <div id="topleft">
+        <a href="javascript: history.go(-1)">Back</a>
+      </div>
+      <div id="topright">
+        <a href="javascript: history.go(-1)">Back</a>
+      </div>
+      <img class="photo" src="pictures/facultyCenterStrip.jpg" width="100%" />
+      <hr />
+      Jim Fawcett &copy; copyright 2015
+    </footer>
+  </body>
+</html>

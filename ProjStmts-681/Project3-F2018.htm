@@ -1,0 +1,236 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - Project1-F2017.htm - Project #1, Fall 2017
+   - ver 1.0 - 16 Aug 2017
+   - Jim Fawcett, Syracuse University
+  -->
+  <title>Project #3</title>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+</head>
+<body onload="initializeMenu()" oncontextmenu="return false;">
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <a id="Next" href="Project4-F2018.htm">N</a>
+  <a id="Prev" href="Project2-F2018.htm">P</a>
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <header>
+    <h2 id="title">Project #3 - Type-Based Package Dependency Analysis</h2>
+    <div id="pagedate">
+      Version 1.5<br />
+      Due Date: Wednesday, October 31th, 2018
+    </div>
+    <a href="../code/Project3HelpF2018">Project #3 helper files</a>
+  </header>
+
+  <!-- Notes Content -->
+
+  <section>
+    <h3>Purpose:</h3>
+    <p>
+      One focus area for this course is understanding how to structure and implement big software systems.  By big we mean systems
+      that may consist of hundreds or even thousands of packages<sup>1</sup> and perhaps several million lines of code.
+      We won't be building anything quite that large, but our projects may be considerably bigger than anything you've worked
+      on before.
+    </p>
+    <p>
+      In order to successfully implement big systems we need to partition code into relatively small parts and thoroughly test
+      each of the parts before inserting them into the software baseline<sup>2</sup>.  As new parts are added to the baseline and
+      as we make changes to fix latent errors or performance problems we will re-run test sequences for those parts
+      and, perhaps, for the entire baseline.  Managing that process efficiently requires effective tools for code analysis
+      as well as testing.  How we do that code analysis is illustrated by the projects for this year.
+    </p>
+    <p>
+      The projects this Fall focus on building software tools for code analysis.  We will emphasize C# code
+      but want our tools to be easily extendable to other similar languages like C++ and Java.
+    </p>
+    <p>
+      Code analysis consists of extracting lexical content from source code files, analyzing the code's syntax from its lexical
+      content, and building a Type Table holding the dependency results.  Alternately you can provide an Abstract Syntax Tree (AST) that holds the results of our analysis.  It is then fairly easy to build
+      several backends that can do further analyses on the AST to construct code metrics, search for particular constructs, evaluate
+      package dependencies, or some other interesting features of the code.
+    </p>
+    <p>
+      You will find it useful to look at the <a href="../../Webpages/BlogParser.htm">Parsing</a> blog for a brief introduction
+      to parsing and code analysis.
+    </p>
+    <p>
+      In this third project we will build and test a package dependency analyzer in C# that consists of, at least, these packages:
+      <ul>
+        <li>
+          <strong>Tokenizer</strong>
+          <div class="indent">
+            extracts words, called tokens, from a stream of characters.  Token boundaries are white-space characters, transitions between alphanumeric
+            and punctuator characters, and comment and string boundaries.  Certain classes of punctuator characters belong to single character or
+            two character tokens so they require special rules for extraction.
+          </div>
+        </li>
+        <li>
+          <strong>SemiExpression</strong>
+          <div class="indent">
+            groups tokens into sets, each of which contain all the information needed to analyze some
+            grammatical construct without containing extra tokens that have to be saved for subsequent analyses.  SemiExpressions are
+            determined by special terminating characters: semicolon, open brace, closed brace, and newline when preceeded on the same line with
+            &apos;using&apos;.
+          </div>
+        </li>
+        <li>
+          <strong>TypeTable</strong>
+          <div class="indent">
+            Provides a container that stores type information needed for dependency analysis.
+          </div>
+        </li>
+        <li>
+          <strong>TypeAnalysis</strong>
+          <div class="indent">
+            Finds all the types defined in each of a collection of C# source files.  It does this by building rules to
+            detect type definitions - classes, structs, enums, and aliases.
+          </div>
+        </li>
+        <li>
+          <strong>DepAnalysis</strong>
+          <div class="indent">
+            Finds, for each file in a specified collection, all other files from the collection on which they depend.  File A
+            depends on file B, if and only if, it uses the name of any type defined in file B.  It might do that by calling a
+            method of a type or by inheriting the type.  Note that this intentionally does not record dpedndencies of a file on files
+            outsied the file set, e.g., language and platform libraries.
+          </div>
+        </li>
+        <li>
+          <strong>StrongComponent</strong>
+          <div class="indent">
+            A strong component is the largest set of files that are all mutually dependent.  That is, all the files whcih can
+            be reached from any other file in the set by following direct or transitive dependency links.  The term &apos;Strong Component&apos;
+            comes from the theory of directed graphs.  There are a number of algorithms for finding strong components in graphs.  
+            My favorite is the Tarjan Algorithm, nicely described here: 
+            <a href="https://en.wikipedia.org/wiki/Tarjan's_strongly_connected_components_algorithm">Tarjan Algorithm and pseudo code</a>.
+            You will n eed a graph class to implement this.  You will find one in the C# Repository: <a href="../../Repository/CSharp/CsGraph">C# graph class</a>.
+          </div>
+        </li>
+        <li>
+          <strong>Display</strong>
+          <div class="indent">
+            Uses information in the TypeTable to build an effective display of the dependency relationships between all files in the 
+            selected collection.  Note that you are not expected to provide a graphical display.  An indented text display will satisfy
+            these requirements.
+          </div>
+        </li>
+        <li>
+          <strong>Tester</strong>
+          <div class="indent">
+            Provides code to demonstrate you meet all requirements.
+          </div>
+        </li>
+      </ul>
+      Use of the <a href="../../Repository/CSharp/CsParser">C# Parser</a>, provided in the C# Repository is recommended.
+      <spacer-15></spacer-15>
+      You will find the <a href="../code/Project3HelpF2018/Project2-InstrSolF2018">Project2-InstrSolF2018</a> to be helpful.
+      That code integrates a complete solution of Project #2 with the C# Parser, and provides some of the rules you will need
+      for Project #3 (not all the Rules and Actions, of course).
+    </p>
+  </section>
+  <section>
+    <h3>Requirements:</h3>
+    Your Dependency Analysis Solution:
+    <ol>
+      <li>
+        <strong>Shall</strong> use Visual Studio 2017 and its C# Windows Console Projects, as provided in the ECS computer labs.
+      </li>
+      <li>
+        <strong>Shall</strong> use the .Net System.IO and System.Text for all I/O.
+      </li>
+      <li>
+        (<strong>2</strong>) <strong>Shall</strong> provide C# packages as described in the Purpose section.
+      </li>
+      <li>
+        (<strong>4</strong>) These packages <strong>shall</strong> evaluate all the dependencies between files in a
+        specified file set.  
+        Please support specifying the collection as all C# files in a sub-directory tree, 
+        rooted at a specified path.
+        You may elect to also provide an alternate means to specify the collection as a list of filenames, but you are not required to do so.
+      </li>
+      <li>
+        (<strong>3</strong>) Your dependency analysis <strong>shall</strong> be based on identification of all the user-defined types
+        in the specified set of files.  That means you will need to identify all of the Types defined within that code, e.g.,
+        interfaces, classes, structs, enums, and delegates.  You will also need to consider aliases, since an alias may refer to a type defined
+        in another file.
+        One last obligation - you need to account for namespaces<sup>3</sup>.
+      </li>
+      <li>
+        (<strong>3</strong>) <strong>Shall</strong> find all strong components, if any, in the file collection, based
+        on the dependency analysis, cited above.
+      </li>
+      <li>
+        (<strong>3</strong>) <strong>Shall</strong> display the results in a well formated area of the output.
+      </li>
+      <li>
+        (<strong>5</strong>) <strong>Shall</strong> include an automated unit test suite that demonstrates the requirements you've
+        implemented and exercises all of the special cases that seem appropriate for these two
+        packages<sup>4</sup>.
+      </li>
+    </ol>
+    <hr />
+    <ol style="font-size:small">
+      <li>
+        In C#, a package is a single source code file that contains:
+        <ul class="tight">
+          <li>prologue, providing a name, brief descriptive phrase, author information, and environment information</li>
+          <li>description of the package's responsiblities and required files</li>
+          <li>maintenance history</li>
+          <li>class definitions</li>
+          <li>a main function that implements construction tests for all the defined code</li>
+        </ul>
+      </li>
+      <li>
+        A software baseline is the set of all code considered to be part of the current system, excluding experimental code
+        that individual developers are working on.
+      </li>
+      <li>
+        A correct C# program may use two or more classes with the same names, provided that they reside in different namespaces.
+      </li>
+      <li>This is in addition to the construction tests you include as part of every package you submit.</li>
+    </ol>
+  </section>
+  <section>
+    <h3>What you need to know:</h3>
+    In order to successfully meet these requirements you will need to know:
+    <spacer-10></spacer-10>
+    <ol class="tight">
+      <li>Basics of the C# language: <a href="https://www.programiz.com/csharp-programming/hello-world">C# tutorial - PROGRAMIZ</a></li>
+      <li>
+        How to implement a simple class hierarchy.  This will be covered briefly in lecture #3 and in more detail later.
+      </li>
+      <li>
+        The <a href="../../Repository/CSharp/NetContainers">.Net Containers</a>.
+      </li>
+      <li>How to use Visual Studio.  We will discuss this in one of the Help Sessions.</li>
+      <li>How the parser, cited above, works.</li>
+    </ol>
+  </section>
+  <spacer-15></spacer-15>
+  <div>
+    <img class="strip-photo" src="../../webpages/pictures/FacultyCenterStrip.jpg" />
+  </div>
+  <info-bar></info-bar>
+</body>
+</html>

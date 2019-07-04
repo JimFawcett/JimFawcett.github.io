@@ -1,0 +1,199 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - Project4-F2018.htm - Project #4, Fall 2018
+   - ver 1.0 - 16 Aug 2017
+   - Jim Fawcett, Syracuse University
+  -->
+  <title>Project #4</title>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+</head>
+<body onload="initializeMenu()" oncontextmenu="return false;">
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <a id="Next" href="Project1-F2018.htm">N</a>
+  <a id="Prev" href="Project3-F2018.htm">P</a>
+
+  <navKeysContainer>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <header>
+    <h2 id="title">Project #4 - Remote Package Dependency Analysis</h2>
+    <div id="pagedate">
+      Version 1.1<br />
+      Due Date: Wednesday, December 5th, 2018
+    </div>
+    <a href="../code/Project4HelpF2018">Project #4 helper files</a>
+  </header>
+
+  <!-- Notes Content -->
+
+  <section>
+    <h3>Purpose:</h3>
+    <!--<p>
+      The acronym OCD stands for Operational Concept Document.  It's purpose is to make you think critically about the design
+      and implementation of a project before committing to code.  It also serves to publish your concept to the development team,
+      which for this course is you (and only you).  For this project we will be writing an Operational Concept Document for
+      the remaining projects, e.g., Projects #2, #3, and #4.
+    </p>-->
+    <p>
+      One focus area for this course is understanding how to structure and implement big software systems.  By big we mean systems
+      that may consist of hundreds or even thousands of packages<sup>1</sup> and perhaps several million lines of code.
+      We won't be building anything quite that large, but our projects may be considerably bigger than anything you've worked
+      on before.
+    </p>
+    <p>
+      In order to successfully implement big systems we need to partition code into relatively small parts and thoroughly test
+      each of the parts before inserting them into the software baseline<sup>2</sup>.  As new parts are added to the baseline and
+      as we make changes to fix latent errors or performance problems we will re-run test sequences for those parts
+      and, perhaps, for the entire baseline.  Managing that process efficiently requires effective tools for code analysis
+      as well as testing.  How we do that code analysis is illustrated by the projects for this year.
+    </p>
+    <p>
+      The projects this Fall focus on building software tools for code analysis.  We will emphasize C# code
+      but want our tools to be easily extendable to other similar languages like C++ and Java.
+    </p>
+    <p>
+      Code analysis consists of extracting lexical content from source code files, analyzing the code's syntax from its lexical
+      content, and building a Type Table holding the dependency results.  Alternately you can provide an Abstract Syntax Tree (AST) that holds the results of our analysis.  It is then fairly easy to build
+      several backends that can do further analyses on the AST to construct code metrics, search for particular constructs, evaluate
+      package dependencies, or some other interesting features of the code.
+    </p>
+    <p>
+      You will find it useful to look at the <a href="../../Webpages/BlogParser.htm">Parsing</a> blog for a brief introduction
+      to parsing and code analysis.
+    </p>
+    <p>
+      In this fourth project we will build and test a remote package dependency analyzer in C# that consists of, at least, these packages:
+      <ul class="tight">
+        <li>
+          <strong>Project #3 Packages</strong>
+          <div class="indent">
+            Most of the packages used for Project #3.
+          </div>
+        </li>
+        <li>
+          <strong>Comm</strong>
+          <div class="indent">
+            The Comm package implements asynchronous message passing communication using the Windows Communication Foundation Framework (WCF),
+            which provides a well-engineered set of communication functionalities wrapping sockets and windows IPC.  You will probably find that
+            this communication facility will need to be factored into several packages.  That is left up to you to design.
+          </div>
+        </li>
+        <li>
+          <strong>Server</strong>
+          <div class="indent">
+            A package residing on a remote<sup>3</sup> machine that exposes an HTTP endpoint for Comm Channel connections.
+            The <strong>Server</strong> implements all the functionalities developed in <a href="Project3-F2018.htm">Project #3</a>.
+          </div>
+        </li>
+        <li>
+          <strong>Client</strong>
+          <div class="indent">
+            A package, based on Windows Presentation Foundation (WPF), residing on the local machine.  This package provides
+            facilities for connecting a channel to the remote <strong>Server</strong>.  This package provides the capabilitiy
+            for sending requests messages for each of the functionalities of Project #3, and for receiving messages with the results,
+            and displaying the resulting information.
+          </div>
+        </li>
+      </ul>
+    </p>
+    <p>
+      A typical application of remote code analysis is for Code Repositories.  For that, Quality Assurance staff will run
+      analyses on code in a remote repository from clients on their desktops.  Also, developers will analyze code, written by
+      other developers, that they need for their own work.
+    </p>
+  </section>
+  <section>
+    <h3>Requirements:</h3>
+    Your Remote Dependency Analysis Solution:
+    <ol>
+      <li>
+        <strong>Shall</strong> use Visual Studio 2017 and its C# Windows Console Projects, as provided in the ECS computer labs.
+      </li>
+      <li>
+        <strong>Shall</strong> use the .Net System.IO and System.Text for all I/O.
+      </li>
+      <li>
+        (<strong>2</strong>) <strong>Shall</strong> provide C# packages as described in the Purpose section.
+      </li>
+      <li>
+        (<strong>4</strong>) The <strong>Server</strong> packages <strong>shall</strong> evaluate all the dependencies between files in a
+        specified file set, based on received request messages.  
+      </li>
+      <li>
+        (<strong>3</strong>) The <strong>Server</strong> packages <strong>shall</strong> find all strong components, if any, in the file collection, based
+        on the dependency analysis, cited above.
+      </li>
+      <li>
+        (<strong>4</strong>) The <strong>Client</strong> packages <strong>shall</strong> display requested results in a well formated GUI display.
+      </li>
+      <li>
+        (<strong>3</strong>) <strong>Shall</strong> include an automated unit test suite that demonstrates you meet all
+        of the functional requirements, stated above<sup>4</sup>.
+      </li>
+      <li>
+        (<strong>4</strong>) <strong>Shall</strong> update the OCD you developed in Project #1 to include all the things
+        you've added to Project #2 in Projects #3 and #4.
+      </li>
+    </ol>
+    <hr />
+    <ol style="font-size:small">
+      <li>
+        In C#, a package is a single source code file that contains:
+        <ul class="tight">
+          <li>prologue, providing a name, brief descriptive phrase, author information, and environment information</li>
+          <li>description of the package's responsiblities and required files</li>
+          <li>maintenance history</li>
+          <li>class definitions</li>
+          <li>a main function that implements construction tests for all the defined code</li>
+        </ul>
+      </li>
+      <li>
+        A software baseline is the set of all code considered to be part of the current system, excluding experimental code
+        that individual developers are working on.
+      </li>
+      <li>
+        You will be asked to demonstrate the operation of the Remote Dependency Analyzer, using two processes on
+        the same machine, e.g., your connection will be to &apos;localhost&apos;.  We do this to make the grading
+        process as painless as possible.
+      </li>
+      <li>This is in addition to the construction tests you include as part of every package you submit.</li>
+    </ol>
+  </section>
+  <section>
+    <h3>What you need to know:</h3>
+    In order to successfully meet these requirements you will need to know:
+    <spacer-10></spacer-10>
+    <ol class="tight">
+      <li>Basics of the WCF and WPF frameworks</li>
+      <li>Basics of the C# language: <a href="https://www.programiz.com/csharp-programming/hello-world">C# tutorial - PROGRAMIZ</a></li>
+      <li>
+        The <a href="../../Repository/CSharp/NetContainers">.Net Containers</a>.
+      </li>
+    </ol>
+  </section>
+  <spacer-15></spacer-15>
+  <div>
+    <img class="strip-photo" src="../../webpages/pictures/FacultyCenterStrip.jpg" />
+  </div>
+  <info-bar></info-bar>
+</body>
+</html>

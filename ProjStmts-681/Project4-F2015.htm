@@ -1,0 +1,250 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <!-- 
+     - Project4-F2014.htm - Project #4, Fall 2015
+     - ver 1.0 - 12 Aug 2015
+     - Jim Fawcett, Syracuse University
+    -->
+    <title>Project #4</title>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+    <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+    <meta name="Author" content="Jim Fawcett" />
+    <meta name="Author" content="James Fawcett" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="js/CSE681-LectNav.js"></script>
+    <script type="text/javascript" src="js/Fallback.js"></script>
+    <link rel="stylesheet" href="css/TopLevel.css?v=1.0" />
+    <link rel="stylesheet" href="css/CSE681-LectPage.css" />
+    <!--
+    <link rel="stylesheet" href="css/StudyGuideSupplement.css?v=1.0" />
+    -->
+    <link rel="stylesheet" href="css/Fallback.css?v=1.0" />
+    <style>
+      ol { margin-top:5px; margin-bottom:5px; }
+      ul > li { margin-left:-15px; margin-right:50px; }
+      ol > li { margin:10px 50px 10px 0px; }
+      .em
+      {
+        font-weight: bold;
+      }
+      #title 
+      { 
+        text-align:left; 
+        margin-left:50px; 
+      }
+      #pagedate 
+      { 
+        text-align:left; 
+        margin-left:50px; margin-bottom:25px; 
+      }
+      section
+      {
+        border:0;
+        margin-left:50px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div id="prevlink">
+          <a href="javascript: history.go(-1)">Back</a>
+        </div>
+        <div id="nextlink">
+          <a href="javascript: history.go(-1)">Back</a>
+        </div>
+        <div id="topcenter">
+          Software Modeling &amp; Analysis - Spring 2015
+        </div>
+      </div>
+      <div id="pagetitle">
+        <h1 id="title">Project #4 - Remote Key/Value Database</h1>
+        <div id="pagedate">
+          Version 1.6, 
+          <script type="text/javascript">
+            document.write("Revised: " + document.lastModified)
+          </script><br />
+          Due Date: Wednesday November 18th
+        </div>
+        <div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Site navigation menus are generated with Javascript, using a Fallback link to a Navigation page -->
+    <!--<nav>
+      <div id="nav">
+        <hr />
+        <a href="TopNav.htm">Site Navigation with no Javascript</a>
+        <hr />
+        <br />
+      </div>
+    </nav>-->
+
+    <!-- Notes Content -->
+    <div class="content">
+      <section>
+        <h2>Purpose:</h2>
+        <p>
+          In this project we will explore how to use the noSQL database we built in Project #2 from remote clients.
+          <ul>
+            <li>
+              One or more client(s) will concurrently supply the database with a stream of inputs through an input 
+              queue the database server provides.
+            </li>
+            <li>
+              One or more client(s) will concurrently extract data from the database by enqueuing requests and waiting for replies.
+            </li>
+          </ul>  
+          An important part of this project is to assess the performance of the database and communication as the number of concurrent
+          reader and writer clients increases.
+        </p>
+      </section>
+      <section>
+        <h2>Requirements:</h2>
+        Your Remote Key/Value Data Storage project:
+        <ol>
+          <li>
+            <strong>Shall</strong> be implemented in C# using the facilities of the .Net Framework Class Library and Visual Studio 2015,
+            as provided in the ECS clusters. All communication between processes and machines <strong>shall</strong> be implemented using
+            Windows Communication Foundation (WCF) and all client display <strong>shall</strong> be implemented with Windows Presentation 
+            Foundation (WPF).
+          </li>
+          <li>
+            (1) <strong>Shall</strong> use the noSQL database you implemented in Project #2<sup><a href="#footnote">1</a></sup>.
+          </li>
+          <li>
+            (3) <strong>Shall</strong> use WCF to communicate between clients and a server that exposes the noSQL database through messages that
+            are sent by clients and enqueued by the server.  Each message <strong>shall</strong> be processed by the server to interact with
+            the database and results are sent, as messages, back to queues provided by each client requestor. 
+          </li>
+          <li>
+            (3) <strong>Shall</strong> demonstrate that the required operations implemented in Project #2 can be executed remotely, e.g.:
+            <ul>
+              <li>add, delete, and edit key/value pairs</li>
+              <li>persist and restore the database from an XML file</li>
+              <li>support the same queries as required in Project #2</li>
+            </ul>
+            These operation requests <strong>shall</strong> be sent to the remote database in the form of messages, described
+            by a WCF Data Contract<sup><a href="#footnote">2</a></sup>.  
+            Replies <strong>shall</strong> be returned to the requestor in the form of WCF messages, using
+            a suitable Data Contract<sup><a href="#footnote">2</a></sup>.
+          </li>
+          <li>
+            (3) Write clients - those that send data to the remote database - <strong>shall</strong> use may use either a console interface 
+            or a WPF graphical user interface, and <strong>shall</strong> provide a stream of messages as described below.
+            The content of several different messages will be defined in an XML file, read at client startup.  The number of
+            messages sent of each type is defined by one or more elements of the XML file<sup><a href="#footnote">3</a></sup>.  
+            After reading the XML file the write client starts a high-resolution timer, sends the messages, stops the timer 
+            and writes the elapsed time to the console or GUI.
+          </li>
+          <li>
+            (1) Each write client <strong>shall</strong> accept an option switch on the command line that determines whether
+            messages are logged to the console or GUI as they are sent<sup><a href="#footnote">4</a></sup>.
+          </li>
+          <li>
+            (3) Read clients - those that send query requests to the remote database - <strong>shall</strong> provide a response queue
+            for incoming response messages and display results in either a console or WPF interface. 
+            The content of several different request messages 
+            will be defined in an XML file, read at client startup<sup><a href="#footnote">3</a></sup>.
+          </li>
+          <li>
+            (3) Read clients <strong>shall</strong> provide options to:
+            <ul>
+              <li>display some part of each response as it is processed (what to display is left up to you)</li>
+              <li>
+                set a specified number of requests to send, start a high-resolution timer when the first request is sent
+                and stop the timer when the last request is received.
+              </li>
+            </ul> 
+          </li>
+          <li>
+            (2) <strong>Shall</strong> be accompanied by a test executive<sup><a href="#footnote">5</a></sup> that clearly 
+            demonstrates you've met all the functional
+            requirements #2-#7, above.  If you do not demonstrate a requirement you will not get credit for it even if you have
+            it correctly implemented.
+          </li>
+          <li>
+            (1) The test executive <strong>shall</strong> accept from the command line the number of writers and readers to start<sup>6</sup>.
+          </li>
+        </ol>
+        <a name="footnote" />
+        <p>
+          <hr />
+          <section class="footnote">
+            <ol class="footnote">
+              <li>
+                You may use the instructor's solution if your Project #2 results are not fully functional.  However, you will
+                only get credit for your contributed value.  While it is certainly possible to get an excellent grade using
+                the instructor's solution, it is easier to do so if you can demonstrate that your Project #2 results are good
+                enough too use here.  Note that you may make any changes to your database implementation, or the instructor's,
+                you need to in order to implement this project.
+              </li>
+              <li>
+                You may use more than one Data Contract for request messages and for reply messages if you think that you need
+                to do that.
+              </li>
+              <li>
+                The intent here is that the XML file defines a sequence of elements, one for each message.  These are read
+                and a collection of prototype messages are created.  The client then loops over this set of messages sending
+                each one until the required number of messages has been sent.
+              </li>
+              <li>
+                I/O is slow, so we provide this option to disable for more accurate measurements of performance.
+              </li>
+              <li>
+                You may wish to provide three kinds of clients:
+                <ul>
+                  <li>Console or GUI client that demonstrates requirments are met.</li>
+                  <li>Read/Write client, used for performance testing.</li>
+                  <li>GUI read client, used to display performance testing results.</li>
+                </ul>
+                This is just a suggestion.  You are free to configure clients as you wish, provided that they are reasonably
+                easy to use.
+              </li>
+              <li>
+                This is fairly simple to accomplish using the System.Diagnostics.Process class from the .Net framework.
+              </li>
+            </ol>
+          </section>
+        </p>
+      </section>
+      <section>
+        <h2>What you need to know:</h2>
+        In order to successfully meet these requirements you will need to:
+        <ol>
+          <li>
+            Write C# code and use advanced facilities of the .Net Framework.
+          </li>
+          <li>
+            Understand .Net <a href="https://msdn.microsoft.com/en-us/library/system.threading.thread(v=vs.110).aspx">threading docs</a> and
+            <a href="https://ecs.syr.edu/faculty/fawcett/handouts/Webpages/Code.htm#CSharpThreadsAndSynchronization">Threading Examples</a>.
+          </li>
+          <li>
+            Use <a href="https://ecs.syr.edu/faculty/fawcett/handouts/Webpages/Code.htm#DotNetSocketsAndWCF">WCF example code</a> and
+            the <a href="https://msdn.microsoft.com/en-us/library/vstudio/ms735119(v=vs.90).aspx">WCF Docs</a>.
+          </li>
+          <li>
+            Use <a href="https://ecs.syr.edu/faculty/fawcett/handouts/Webpages/Code.htm#DotNetGUIs">WPF example code</a> and
+            the <a href="https://msdn.microsoft.com/en-us/library/ms754130(v=vs.110).aspx">WPF Docs</a>.
+          </li>
+        </ol>
+      </section>
+    </div>
+    <footer>
+      <hr />
+      <div id="topleft">
+        <a href="javascript: history.go(-1)">Back</a>
+      </div>
+      <div id="topright">
+        <a href="javascript: history.go(-1)">Back</a>
+      </div>
+      <img src="pictures/facultyCenterStrip.jpg" width="100%" />
+      <hr />
+      Jim Fawcett &copy; copyright 2015
+    </footer>
+  </body>
+</html>

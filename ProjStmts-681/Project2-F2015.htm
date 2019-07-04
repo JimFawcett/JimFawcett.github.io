@@ -1,0 +1,255 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <!-- 
+     - ProjectHelpers.htm - Note #0 - Getting Started
+     - ver 1.1 - 17 Aug 2011
+     - Jim Fawcett, Syracuse University
+    -->
+    <title>Project #2</title>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+    <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+    <meta name="Author" content="Jim Fawcett" />
+    <meta name="Author" content="James Fawcett" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="js/CSE681-LectNav.js"></script>
+    <script type="text/javascript" src="js/Fallback.js"></script>
+    <link rel="stylesheet" href="css/TopLevel.css?v=1.0" />
+    <link rel="stylesheet" href="css/CSE681-LectPage.css" />
+    <!--
+    <link rel="stylesheet" href="css/StudyGuideSupplement.css?v=1.0" />
+    -->
+    <link rel="stylesheet" href="css/Fallback.css?v=1.0" />
+    <style>
+      ol { margin-top:5px; margin-bottom:5px; }
+      ul > li { margin-left:-15px; margin-right:50px; }
+      ol > li { margin:10px 50px 10px 0px; }
+      .em
+      {
+        font-weight: bold;
+      }
+      #title 
+      { 
+        text-align:left; 
+        margin-left:50px; 
+      }
+      #pagedate 
+      { 
+        text-align:left; 
+        margin-left:50px; margin-bottom:25px; 
+      }
+      section
+      {
+        border:0;
+        margin-left:50px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div id="prevlink">
+          <a href="javascript: history.go(-1)">Back</a>
+        </div>
+        <div id="nextlink">
+          <a href="javascript: history.go(-1)">Back</a>
+        </div>
+        <div id="topcenter">
+          Software Modeling &amp; Analysis - Spring 2015
+        </div>
+      </div>
+      <div id="pagetitle">
+        <h1 id="title">Project #2 - Key/Value Database</h1>
+        <div id="pagedate">
+          Version 1.5, 
+          <script type="text/javascript">
+            document.write("Revised: " + document.lastModified)
+          </script><br />
+          Due Date: Wednesday October 7th
+        </div>
+        <div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Site navigation menus are generated with Javascript, using a Fallback link to a Navigation page -->
+    <!--<nav>
+      <div id="nav">
+        <hr />
+        <a href="TopNav.htm">Site Navigation with no Javascript</a>
+        <hr />
+        <br />
+      </div>
+    </nav>-->
+
+    <!-- Notes Content -->
+    <div class="content">
+      <section>
+        <h2>Purpose:</h2>
+        <p>
+          There is currently a lot of technical interest in <a href="https://en.wikipedia.org/wiki/Big_data">&quot;Big Data&quot;</a>.  Extreme examples are: data collection and analyses from the
+          Large Hadron Collider, the Sloan Sky Survey, analyses of Biological Genomes, measuring weather patterns, collecting data
+          for global climate models, and analyzing client interactions in social networks.
+        </p>
+        <p>
+          Conventional SQL databases are not well suited for these kinds of applications.  While they have worked very well for
+          many business applications and record keeping, they get overwhelmed by massive streams of data.  Developers are
+          turning to <a href="http://www.paperplanes.de/2010/7/5/relational_data_document_databases_schema_design.html">&quot;noSQL&quot;</a>
+          databases like MongoDB, couchDB, Redis, and Big Table to handle massive data collection and analyses.
+        </p>
+        <p>
+          In this project we will explore how a non SQL database can be constructed and used.
+        </p>
+      </section>
+      <section>
+        <h2>Requirements:</h2>
+        Your Key/Value Database project:
+        <ol>
+          <li>
+            (1) <strong>Shall</strong> be implemented in C# using the facilities of the .Net Framework Class Library and Visual Studio 2015,
+            as provided in the ECS clusters.
+          </li>
+          <li>
+            (3) <strong>Shall</strong> implement a generic key/value in-memory database where each value consists of:
+            <ul>
+              <li>
+                Metadata:
+                <ul>
+                  <li>A name string</li>
+                  <li>A text description of the item</li>
+                  <li>
+                    A time-date string recording the date and time the value was written to the database.
+                  </li>
+                  <li>
+                    a finite number (possibly zero) of child relationships with other values.  Each element of the child relationships collection
+                    is the key of another item in the database. Any item holding a key in this collection is the parent of the element accessed
+                    by the key.
+                  </li>
+                </ul>
+              </li>
+              <li>
+                An instance of the generic type<sup>1</sup>.  This might be a string, a container of a set of values of the same type, or some other collection
+                of data captured in some, perhaps custom, data structure.
+              </li>
+            </ul>
+          </li>
+          <li>
+            (2) <strong>Shall</strong> support addition and deletion of key/value pairs.
+          </li>
+          <li>
+            (2) <strong>Shall</strong> support editing of values including the addition and/or deletion of relationships,
+            editing text metadata, and replacing an existing value's instance with a new instance. Editing of keys is forbidden.
+          </li>
+          <li>
+            (2) <strong>Shall</strong>, on command, persist database contents to an XML file<sup>2,3</sup>.  It is intended
+            that this process be reversible, e.g., the database can be restored or augmented<sup>4</sup> from an existing XML file 
+            as well as write its contents out to an XML file.
+          </li>
+          <li>
+            (1) <strong>Shall</strong> accept a positive time interval or number of writes after which the database contents are
+            persisted.  This scheduled &quot;save&quot; process shall continue until cancelled.
+          </li>
+          <li>
+            (3) <strong>Shall</strong> support queries for:
+            <ul>
+              <li>The value of a specified key.</li>
+              <li>The children of a specified key.</li>
+              <li>The set of all keys matching a specified pattern which defaults to all keys.</li>
+              <li>All keys that contain a specified string in their metadata section.</li>
+              <li>
+                All keys that contain values written within a specified time-date interval.
+                If only one end of the interval is provided shall take the present as the other end of the interval.
+              </li>
+            </ul>
+          </li>
+          <li>
+            (1) <strong>Shall</strong> support the creation of a new immutable database constructed from the result of any query that
+            returns a collection of keys<sup>5</sup>.
+          </li>
+          <li>
+            (2) <strong>Shall</strong> be submitted with contents, in the form of an XML file, that describe your project's package structure and dependency relationships
+            that can be loaded when your project is graded.
+          </li>
+          <li>
+            (2) <strong>Shall</strong> be accompanied by a test executive that clearly demonstrates you've met all the functional
+            requirements #2-#9, above.  If you do not demonstrate a requirement you will not get credit for it even if you have
+            it correctly implemented.
+          </li>
+          <li>
+            (1) <strong>Shall</strong> contain a brief text document that compares this implementation with the concept developed in
+            Project #1.  Does this project fully implement its concept? Was the original concept practical? Were there things you 
+            learned during the implementation that made the origninal concept less relevant?
+          </li>
+          <li>
+            (5) <strong>Bonus (only counted if you have implemented all other requirements):</strong><br />
+            Implement categories by using a Dictionary&lt;key,value&gt; where each key is the name of a category
+            and each value is a list of keys for db items in that category<sup>6</sup>.  This implies that each
+            item's metadata should add a list for categories to which it belongs.  Note that the list might be
+            empty.
+          </li>
+        </ol>
+        <div class="paragSpacer"></div>
+        <p>
+          <hr />
+          <section class="footnote">
+            <ol class="footnote">
+              <li>
+                This instance of the generic type is the &quot;data&quot; that we store in the database. The metadata simply
+                provides information about this &quot;data&quot;.
+              </li>
+              <li>
+                XML is easy to parse with existing tools so it makes a good storage mechanism for data that will be examined by
+                other tools.  It is not very space-efficient so a &quot;production&quot; version of this database might
+                use some other more efficient, but more complex storage implementation.
+              </li>
+              <li>
+                For value instances that are not strings, you will need to override the generic type's ToString() method 
+                to persist the instance into an XML element.
+              </li>
+              <li>
+                By augmented we mean that the database already contains data and the contents of the XML file are read and
+                inserted into the database without destroying the original data.
+              </li>
+              <li>
+                The intent of this requirement is that the new database contains keys pointing to
+                the values stored in the original database.  This allows refining a query with a new query but doesn't allow the
+                new databases to modify the original database's values.
+              </li>
+              <li>
+                So, you can find all the db items in a given category by enumerating the category's list of keys. This facility
+                is very like conventional database indexes.
+              </li>
+            </ol>
+          </section>
+        </p>
+      </section>
+      <section>
+        <h2>What you need to know:</h2>
+        In order to successfully meet these requirements you will need to:
+        <ol>
+          <li>
+            Write C# code and use basic facilities of the .Net Framework.
+          </li>
+          <li>
+            Use the <a href="../../CoreTechnologies/CSharp/Code/NetContainers">.Net Containers</a>.
+          </li>
+          <li>Read and Write XML files.</li>
+        </ol>
+      </section>
+    </div>
+    <footer>
+      <hr />
+      <div id="topleft">
+        <a href="javascript: history.go(-1)">Back</a>
+      </div>
+      <div id="topright">
+        <a href="javascript: history.go(-1)">Back</a>
+      </div>
+      <img src="pictures/facultyCenterStrip.jpg" width="100%" />
+      <hr />
+      Jim Fawcett &copy; copyright 2015
+    </footer>
+  </body>
+</html>

@@ -66,6 +66,7 @@ function initializeMenu() {
       <button class='dropbutton'>Projects &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='SitePages.html'>SitePages</a>\
+        <a href='CppParser.html'>CppParser</a>\
         <a href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a>\
         <a href='CsDependencyAnalysis.html'>CsDependencyAnalysis</a>\
         <a href='CppCommWithFileXfer.html'>CppCommWithFileXfer</a>\
