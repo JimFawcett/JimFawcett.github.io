@@ -76,6 +76,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Demos &#9662;</button>\
       <div class='dropdown-content'>\
+        <a href='CppBasicDemos.html'>C++&nbsp;Basic&nbsp;Demos</a>\
         <a href='STR.html'>STR&nbsp;Value&nbsp;Type</a>\
         <a href='STL-Containers.html'>STL-Containers</a>\
         <a href='IOStreams.html'>IOStreams</a>\
