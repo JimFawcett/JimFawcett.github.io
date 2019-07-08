@@ -11,6 +11,7 @@ function toggleView(id, elem) {
   }
   if (image.style.display === "none") {
     image.style.display = "block";
+    elem.parentElement.style.right = "10px";
     elem.classList.add("darkElem");
     elem.classList.remove("lightElem");
     elem.childNodes[0].classList.add("darkElem");
@@ -18,6 +19,7 @@ function toggleView(id, elem) {
   }
   else {
     image.style.display = "none";
+    elem.parentElement.style.right = "35px";
     elem.classList.add("lightElem");
     elem.classList.remove("darkElem");
     elem.childNodes[0].classList.add("lightElem");
@@ -145,11 +147,10 @@ function createSizer(imageUrl, hiderText, hiderTop, size, placeholder) {
 
   // create hider text
   let hiderTextElem = document.createElement("hider-text");
-  let text = "<br />";
+  let text = "";
   for (i = 0; i < hiderText.length; ++i) {
     text += hiderText[i] + "<br />";
   }
-  text += "<br />";
   hiderTextElem.appendChild(document.createTextNode(hiderText));
   hiderTextElem.innerHTML = text;
   hiderContainer.appendChild(hiderTextElem);
