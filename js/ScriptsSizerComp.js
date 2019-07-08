@@ -120,13 +120,14 @@ var idCount = 0;
 /*---------------------------------------------------------
 *  Assemble image sizer and attach to placeholder
 *  - imageUrl:    relative path to image
+*  - caption:     append caption to image if not empty string 
 *  - hiderText:   caption for sizer on hider bar
 *  - hiderTop:    fixed vertical distance from window top
 *                 if zero sizer aligned with image top
 *  - size:        width of image container
 *  - placeholder: id of div that defines location of image in page
 */
-function createSizer(imageUrl, hiderText, hiderTop, size, placeholder) {
+function createSizer(imageUrl, caption, hiderText, hiderTop, size, placeholder) {
 
   let imageContainerId = "imageContainerId" + (++idCount).toString();
   let top = "top:" + hiderTop;
@@ -181,6 +182,12 @@ function createSizer(imageUrl, hiderText, hiderTop, size, placeholder) {
   image.setAttribute("src", imageUrl);
   image.setAttribute("width", "100%");
   imageContainer.appendChild(image);
+  if (caption !== "") {
+    let title = document.createElement("div");
+    title.appendChild(document.createTextNode(caption));
+    title.setAttribute("style", "text-align:center; white-space:nowrap; overflow:hidden; padding:5px 0px;");
+    imageContainer.appendChild(title);
+  }
   imageWrapper.appendChild(imageContainer);
   imageWrapper.appendChild(sizer);
 
