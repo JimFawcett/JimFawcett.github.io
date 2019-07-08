@@ -11,7 +11,7 @@ function toggleView(id, elem) {
   }
   if (image.style.display === "none") {
     image.style.display = "block";
-    elem.parentElement.style.right = "10px";
+    elem.parentElement.style.right = "26px";
     elem.classList.add("darkElem");
     elem.classList.remove("lightElem");
     elem.childNodes[0].classList.add("darkElem");
@@ -19,7 +19,7 @@ function toggleView(id, elem) {
   }
   else {
     image.style.display = "none";
-    elem.parentElement.style.right = "35px";
+    elem.parentElement.style.right = "1px";
     elem.classList.add("lightElem");
     elem.classList.remove("darkElem");
     elem.childNodes[0].classList.add("lightElem");
