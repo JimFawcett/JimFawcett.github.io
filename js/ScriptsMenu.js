@@ -79,12 +79,20 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Platforms &#9662;</button>\
+      <div class='dropdown-content'>\
+        <a class='disable' href='#'>Windows</a>\
+        <a class='disable' href='#'>Linux</a>\
+      </div >\
+    </div>\
+    <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
         <a href='Help.html'>Help</a>\
         <a href='ToDo.html'>ToDo</a>\
         <a href='#' onclick='toggleNavKeys()'>Toggle Nav Keys</a>\
+        <a href='#' onclick='toggleSizer()'>Toggle Image Sizers</a>\
         <a href='SiteDesign.html'>Site Design</a>\
         <a href='BookDesignCourse.html'>Design Course</a>\
         <a class='border' href='index.html'>L1 Site Home</a>\
