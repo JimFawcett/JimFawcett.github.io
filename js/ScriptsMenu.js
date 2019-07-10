@@ -92,7 +92,7 @@ function initializeMenu() {
         <a href='Help.html'>Help</a>\
         <a href='ToDo.html'>ToDo</a>\
         <a href='#' onclick='toggleNavKeys()'>Toggle Nav Keys</a>\
-        <a href='#' onclick='toggleSizer()'>Toggle Image Sizers</a>\
+        <a href='#' onclick='toggleImageSizer()'>Toggle Image Sizers</a>\
         <a href='SiteDesign.html'>Site Design</a>\
         <a href='BookDesignCourse.html'>Design Course</a>\
         <a class='border' href='index.html'>L1 Site Home</a>\
@@ -139,7 +139,7 @@ function initializeMenu() {
   // set display mode for navKeys from value in local storage
 
   setNavKeys();
-
+  setImageSizer();
   // listen for keyboard events:
   // - key actions are defined in ScriptsKeyboard.js
 
@@ -245,6 +245,42 @@ function setNavKeys() {
   if (navKeyState === null) {
     nkc[0].style.display = "inline";
     window.localStorage.setItem("navKeyState", "show");
+    return;
+  }
+  if (navKeyState === "show") {
+    nkc[0].style.display = "inline";
+  }
+  else {
+    nkc[0].style.display = "none";
+  }
+
+}
+//----< toggle image sizer display >-----------------------------------
+/*
+*  Image sizers appear to the right of some images
+*/
+function toggleImageSizer() {
+  var nkc = document.getElementsByTagName("sizer-Container");
+  var tog = window.getComputedStyle(nkc[0], null).getPropertyValue("display");
+  if (tog === "none") {
+    for (let i = 0; i < nkc.length; ++i)
+      nkc[i].style.display = "inline";
+    window.localStorage.setItem("imageSizerState", "show");  // persist change across pages
+  }
+  else {
+    for (let i = 0; i < nkc.length; ++i)
+      nkc[i].style.display = "none";
+    window.localStorage.setItem("imageSizerState", "hide");  // persist chage across pages
+  }
+}
+//----< set image sizer display >-----------------------------------------
+
+function setImageSizer() {
+  var nkc = document.getElementsByTagName("sizer-Container");
+  var navKeyState = window.localStorage.getItem("imageSizerState");
+  if (navKeyState === null) {
+    nkc[0].style.display = "inline";
+    window.localStorage.setItem("imageSizerState", "show");
     return;
   }
   if (navKeyState === "show") {
