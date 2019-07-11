@@ -81,8 +81,8 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Platforms &#9662;</button>\
       <div class='dropdown-content'>\
-        <a class='disable' href='#'>Windows</a>\
-        <a class='disable' href='#'>Linux</a>\
+        <a href='PlatformWindows.html'>Windows</a>\
+        <a href='PlatformLinux.html'>Linux</a>\
       </div >\
     </div>\
     <div class='dropdown menuItem'>\
