@@ -140,6 +140,7 @@ function initializeMenu() {
 
   setNavKeys();
   setImageSizer();
+
   // listen for keyboard events:
   // - key actions are defined in ScriptsKeyboard.js
 
@@ -262,15 +263,15 @@ function setNavKeys() {
 function toggleImageSizer() {
   var nkc = document.getElementsByTagName("sizer-Container");
   var tog = window.getComputedStyle(nkc[0], null).getPropertyValue("display");
-  if (tog === "none") {
-    for (let i = 0; i < nkc.length; ++i)
+  for (let i = 0; i < nkc.length; ++i) {
+    if (tog === "none") {
       nkc[i].style.display = "inline";
-    window.localStorage.setItem("imageSizerState", "show");  // persist change across pages
-  }
-  else {
-    for (let i = 0; i < nkc.length; ++i)
+      window.localStorage.setItem("imageSizerState", "show");  // persist change across pages
+    }
+    else {
       nkc[i].style.display = "none";
-    window.localStorage.setItem("imageSizerState", "hide");  // persist chage across pages
+      window.localStorage.setItem("imageSizerState", "hide");  // persist chage across pages
+    }
   }
 }
 //----< set image sizer display >-----------------------------------------
@@ -278,18 +279,20 @@ function toggleImageSizer() {
 function setImageSizer() {
   var nkc = document.getElementsByTagName("sizer-Container");
   var navKeyState = window.localStorage.getItem("imageSizerState");
-  if (navKeyState === null) {
-    nkc[0].style.display = "inline";
-    window.localStorage.setItem("imageSizerState", "show");
-    return;
-  }
-  if (navKeyState === "show") {
-    nkc[0].style.display = "inline";
-  }
-  else {
-    nkc[0].style.display = "none";
-  }
 
+  for (let i = 0; i < nkc.length; ++i) {
+    if (navKeyState === null) {
+      nkc[i].style.display = "inline";
+      window.localStorage.setItem("imageSizerState", "show");
+      return;
+    }
+    if (navKeyState === "show") {
+      nkc[i].style.display = "inline";
+    }
+    else {
+      nkc[i].style.display = "none";
+    }
+  }
 }
 //----< toggle nav keys display >------------------------------------
 /*
