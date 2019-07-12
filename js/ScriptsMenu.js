@@ -278,15 +278,15 @@ function toggleImageSizer() {
 
 function setImageSizer() {
   var nkc = document.getElementsByTagName("sizer-Container");
-  var navKeyState = window.localStorage.getItem("imageSizerState");
+  var imageSizerState = window.localStorage.getItem("imageSizerState");
 
   for (let i = 0; i < nkc.length; ++i) {
-    if (navKeyState === null) {
+    if (imageSizerState === null) {
       nkc[i].style.display = "inline";
       window.localStorage.setItem("imageSizerState", "show");
       return;
     }
-    if (navKeyState === "show") {
+    if (imageSizerState === "show") {
       nkc[i].style.display = "inline";
     }
     else {
