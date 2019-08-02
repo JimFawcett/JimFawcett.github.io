@@ -190,7 +190,7 @@ function createSizer(imageUrl, caption, hiderText, hiderTop, size, placeholder) 
     imageContainer.appendChild(title);
   }
   imageWrapper.appendChild(imageContainer);
-  imageWrapper.appendChild(sizer);
+  //imageWrapper.appendChild(sizer);
 
   loc.appendChild(imageWrapper);
 }
