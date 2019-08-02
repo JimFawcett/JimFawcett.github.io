@@ -111,6 +111,13 @@ function smaller(id) {
   // Debug test
   // sizerPositions();
 }
+function restore() {
+  alert("in restore");
+  let imageContainers = getElementsByTagName("image-container");
+  alert(imageContainers.length);
+  for (let i = 0; i < imageContainers.length; ++i)
+    imageContainers[i].style.width = imageContainers[i].style.width;
+}
 /*---------------------------------------------------------
 *  Global id suffix - needed because we may have more
 *                     than one sizer 
@@ -193,4 +200,8 @@ function createSizer(imageUrl, caption, hiderText, hiderTop, size, placeholder) 
   //imageWrapper.appendChild(sizer);
 
   loc.appendChild(imageWrapper);
+
+  let body = getElementById("github");
+  body.addEventListener("click", function () { restore(); });
+
 }
