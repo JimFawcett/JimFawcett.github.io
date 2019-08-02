@@ -282,7 +282,7 @@ function setImageSizer() {
 
   for (let i = 0; i < nkc.length; ++i) {
     if (imageSizerState === null) {
-      nkc[i].style.display = "inline";
+      nkc[i].style.display = "none";
       window.localStorage.setItem("imageSizerState", "show");
       return;
     }
