@@ -49,6 +49,7 @@ function initializeMenu() {
         <a href='CppLexicalScanner.html'>CppLexicalScanner</a>\
         <a href='RetryWrapper.html'>RetryWrapper</a>\
         <a href='WebComponents.html'>WebComponents</a>\
+        <a href='Tests.html'>Tests</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
