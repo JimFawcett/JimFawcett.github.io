@@ -61,50 +61,71 @@
 
   <hr class="spread" />
   <indent-block>
-    <div id="fig1"> </div><div id="fig2"> </div>
-    <spacer-10></spacer-10>
-    <!--<div id="fig1"></div>
-  <div id="fig2"></div>-->
-    <!--<div class="photo right">
-    <img class="border" src="Pictures/TextFinderPackageDiagram.JPG" width="500" />
-    <div style="text-align:center; width:500px;">
-      TextFinder Packages
-    </div>
-  </div>
-  <div class="photo right clear">
-    <img class="border" src="Pictures/TextFinderOutput.JPG" width="500" />
-    <div style="text-align:center; width:500px;">
-      TextFinder output
-    </div>
-  </div>-->
-    <h3>Responsibilities:</h3>
+    <div id="fig1"></div>
+    <div id="fig2"></div>
+    <div id="fig3"></div>
+    <!--<spacer-10></spacer-10>-->
+    <h3>Concept:</h3>
     <indent-block>
-      Textfinder searches files in a directory tree, that match one or more file patterns,
-      looking for text that matches a specified regular expression.
+      Textfinder accepts options from its command line and searches files in a directory tree, 
+      that match one or more file patterns, looking for text that matches a specified regular expression.
     </indent-block>
     <h3>Design:</h3>
     <indent-block>
-      It uses the facilities of the DirExplorerT, TextSearch, Application, FileSystem, and
-      Utilities packages.  TextFinder, the program executive, uses command line arguments
+      TextFinder uses facilities of DirExplorerT, TextSearch, Application, FileSystem, and
+      CppUtilities packages.  TextFinder, the program executive, uses command line arguments
       to configure its operation by
       configuring DirExplorerT with path, file pattern, and regular expression declarations.
       <spacer-15></spacer-15>
-      Eventually, TextFinder will serve as an example of the use of threads to build
-      software pipelines and parallel processing blocks.  The plan is to provide branches
-      for synchronous, pipeline, and parallel processing demos.
+      DirExplorerT&lt;Application&gt; is a reusable directory navigator that supports 
+      application specific processing of files and directories through its Application
+      template parameter.  
       <spacer-15></spacer-15>
-      It will be interesting to measure the performance of each of these to understand how
+      Application holds an ITextFinder interface pointer that allows
+      it to use searching facilities in TextFinder, e.g., method searchFile(filename),
+      which uses a regular expression data member of TextFinder.
+      <spacer-15></spacer-15>
+      Eventually, TextFinder will serve as an example of the use of threads to build
+      software pipelines and parallel processing blocks.  The plan is to provide solutions
+      for synchronous (this solution), pipeline, and parallel processing demos.
+      <spacer-15></spacer-15>
+      The structure used for this application makes it easy to set up a multi-threaded
+      pipeline: just put a blocking queue in TextFinder to receive filenames from
+      DirExplorerT&lt;Application&gt; and run each of them on a dedicated thread.
+      <spacer-15></spacer-15>
+      It will be interesting to measure the performance of each of these designs to understand how
       effective the use of concurrency will be for working sets of various sizes.
     </indent-block>
-    <spacer-15></spacer-15>
-    <h3>Resources:</h3>
+    <h3>Implementation:</h3>
     <indent-block>
-      <a href="https://github.com/JimFawcett/TextFinder">TextFinder repository</a>
+      Find C++ source code in 
+      <a href="https://github.com/JimFawcett/TextFinder">TextFinder repository</a>.
       <spacer-10></spacer-10>
       <div>
         TextFinder code was built with Visual Studio Community Edition - 2019 and tested on Windows 10.
+        It was compiled with the C++17 option set in Properties > C/C++ > language.
       </div>
+    </indent-block>
+    <h3>Operation:</h3>
+    <indent-block>
+      TextFinder processes its command line options using ProcessCmdLine then configures a few parameters
+      based on those options. It provides a reference to itself, typed as an ITextFinder interface, to
+      DirExplorerT&apos;s Application instance.
       <spacer-15></spacer-15>
+      That allows the instance to use TextFinder&apos;s searchFile(filename) method. This structure was used
+      to keep all of the searching operations in TextFinder, and all of the navigation operations in
+      DirExplorerT&lt;Application&gt; and Application.
+      <spacer-15></spacer-15>
+      The callback from Application to TextFinder was simple to implement and helps us apply the 
+      &quot;Single Responsibility Principle&quot;
+      <spacer-15></spacer-15>
+      When TextFinder starts it configures its parts; then it starts DirExplorerT&lt;Application&gt;
+      on a depth first walk through a specified directory tree, e.g., that path supplied on the command line.
+      DirExplorerT&lt;Application&gt; and Application collaborate to do all of the remaining processing.
+      <spacer-15></spacer-15>
+      TextFinder output, shown in the diagram, illustrates how useful TextFinder can be.  In the last part
+      of the output TextFinder was asked to locate any files that contain the text &quot;&lt;flex-break&gt;&quot;.
+      To do that it had to search more than 6000 directories, which it did in about two seconds.
     </indent-block>
     <h3>Status:</h3>
     <indent-block>
@@ -121,7 +142,8 @@
     <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
 
     <script>createSizer("Pictures/TextFinderPackageDiagram.JPG", "TextFinder Package Diagram", 340, "fig1")</script>
-    <script>createSizer("Pictures/TextFinderOutput.JPG", "TextFinder Output", 340, "fig2")</script>
+    <script>createSizer("Pictures/TextFinderClassDiagram.JPG", "TextFinder Class Diagram", 340, "fig2")</script>
+    <script>createSizer("Pictures/TextFinderOutput.JPG", "TextFinder Output", 340, "fig3")</script>
     <info-bar></info-bar>
 </body>
 </html>
