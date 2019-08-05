@@ -9,6 +9,9 @@ var HelpWin
 function keyAction(keyEvent) {
   keystate = 'down';
   var key = String.fromCharCode(keyEvent.which);
+  if (key === 'R') {
+    location.reload();
+  }
   if (key === 'L') {
     document.getElementById("Lect").click();
   }
