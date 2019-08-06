@@ -155,6 +155,7 @@ function initializeMenu() {
   var rvsd = document.getElementsByTagName("info-bar");
   var date = document.lastModified;
   rvsd[0].innerHTML = "copyright &copy; Jim Fawcett, 2019&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Page Revised: " + date;
+  rvsd[0].addEventListener('click', function () { location.reload(); });
 
   // set display mode for navKeys from value in local storage
 
