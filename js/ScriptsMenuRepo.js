@@ -17,7 +17,7 @@ function initializeMenu() {
     <a href='index.html' class='menuItem'>Home</a>\
     <a href='Repositories.html' class='menuItem'>Repositories</a>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Utilities &#9662;</button>\
+      <button class='dropbutton'>Utils &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='CppUtilities.html'>CppUtilities</a>\
         <a href='FileUtilities.html'>FileUtilities</a>\
@@ -38,7 +38,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Components &#9662;</button>\
+      <button class='dropbutton'>Cmpnts &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='CppBlockingQueue.html'>CppBlockingQueue</a>\
         <a href='FileManager.html'>File Manager</a>\
@@ -53,7 +53,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Libraries &#9662;</button>\
+      <button class='dropbutton'>Libs &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='FileSystem.html'>FileSystem-Windows</a>\
         <a class='disable' href='FileSystem.html'>FileSystem-Linux</a>\
@@ -64,7 +64,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Projects &#9662;</button>\
+      <button class='dropbutton'>Prjts &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='SitePages.html'>SitePages</a>\
         <a href='CppParser.html'>CppParser</a>\
