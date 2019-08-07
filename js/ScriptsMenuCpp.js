@@ -102,6 +102,7 @@ function initializeMenu() {
         <a href='CodeSnap-Lambdas.cpp.html'>Lambdas</a>\
         <a href='CodeSnap-LambdaCapture.cpp.html'>LambdaCapture</a>\
         <a href='CodeSnap-Converter.h.html'>Converter</a>\
+        <a class='disable' href='#'>Properties</a>\
         <a href='CodeSnap-BlockingQueue.h.html'>BlockingQueue</a>\
         <a href='CodeSnap-TestUtilities.h.html'>TestUtilities</a>\
      </div>\

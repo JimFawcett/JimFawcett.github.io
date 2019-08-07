@@ -15,10 +15,11 @@ function initializeMenu() {
   var topMenu = document.getElementsByTagName("nav");
   topMenu[0].innerHTML = "<div class='navbar'>\
     <a href='index.html' class='menuItem'>Home</a>\
-    <a href='Repositories.html' class='menuItem'>Repositories</a>\
+    <a href='Repositories.html' class='menuItem'>Repos</a>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Utils &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Utilities</div>\
         <a href='CppUtilities.html'>CppUtilities</a>\
         <a href='FileUtilities.html'>FileUtilities</a>\
         <a href='Logger.html'>Logger</a>\
@@ -27,6 +28,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Tools &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Tools</div>\
         <a href='TextFinder.html'>TextFinder</a>\
         <a href='Duplicates.html'>Duplicates</a>\
         <a href='FileDates.html'>FileDates</a>\
@@ -40,6 +42,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Cmpnts &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Components</div>\
         <a href='CppBlockingQueue.html'>CppBlockingQueue</a>\
         <a href='FileManager.html'>File Manager</a>\
         <a href='CppProperties.html'>CppProperties</a>\
@@ -55,6 +58,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Libs &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Libraries</div>\
         <a href='FileSystem.html'>FileSystem-Windows</a>\
         <a class='disable' href='FileSystem.html'>FileSystem-Linux</a>\
         <a href='Sockets.html'>Sockets-Windows</a>\
@@ -66,6 +70,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Prjts &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Projects</div>\
         <a href='SitePages.html'>SitePages</a>\
         <a href='CppParser.html'>CppParser</a>\
         <a href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a>\
@@ -77,9 +82,11 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Demos &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Demonstrations</div>\
         <a href='CppBasicDemos.html'>C++&nbsp;Basic&nbsp;Demos</a>\
         <a href='STR.html'>STR&nbsp;Value&nbsp;Type</a>\
         <a href='CompoundObjects.html'>CompoundObjects</a>\
+        <a href='ObjectFactories.html'>ObjectFactories</a>\
         <a href='STL-Containers.html'>STL-Containers</a>\
         <a href='IOStreams.html'>IOStreams</a>\
         <a href='CppThreads.html'>CppThreads</a>\
