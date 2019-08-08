@@ -68,7 +68,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Prjts &#9662;</button>\
+      <button class='dropbutton'>Projs &#9662;</button>\
       <div class='dropdown-content'>\
         <div class='darkTheme'>&nbsp;Projects</div>\
         <a href='SitePages.html'>SitePages</a>\
