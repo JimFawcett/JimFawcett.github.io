@@ -78,11 +78,11 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Design Course &#9662;</button>\
+      <button class='dropbutton'>Design Book &#9662;</button>\
       <div class='dropdown-content'>\
         <a class='disable' href='#'>Table of Contents</a>\
         <a class='disable' href='#'>Concept&nbsp;and&nbsp;Tasks&nbsp;(TextFinder)</a>\
-        <a class='disable' href='#'>Classes (Sockets-Windows)</a>\
+        <a class='disable' href='#'>Classes (CppUtilities)</a>\
         <a class='disable' href='#'>Inheritance (XmlDocument)</a>\
         <a class='disable' href='#'>Templates (Properties)</a>\
         <a class='disable' href='#'>Flexible Designs (DirExplorer)</a>\
