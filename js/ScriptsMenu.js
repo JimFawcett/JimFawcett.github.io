@@ -89,7 +89,7 @@ function initializeMenu() {
       <button class='dropbutton'>Stories &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='Stories.html'>What is a Story?</a>\
-        <a class='disable' href='#'>Starting C++</a>\
+        <a href='CppStory_SlideShow.html'>Starting C++</a>\
         <a class='disable' href='#'>Design Examples</a>\
         <a class='disable' href='#'>Building Complex Systems</a>\
       </div >\
