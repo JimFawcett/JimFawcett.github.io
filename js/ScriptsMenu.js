@@ -90,8 +90,11 @@ function initializeMenu() {
       <div class='dropdown-content'>\
         <a href='Stories.html'>What is a Story?</a>\
         <a href='CppStory_SlideShow.html'>Starting C++</a>\
+        <a class='disable' href='#'>Creating flexible code</a>\
         <a class='disable' href='#'>Design Examples</a>\
         <a class='disable' href='#'>Building Complex Systems</a>\
+        <a class='disable' href='#'>Site Story</a>\
+        <a class='disable' href='#'>Visual Studio Help</a>\
       </div >\
     </div>\
     <div class='dropdown menuItem'>\
