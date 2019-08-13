@@ -14,108 +14,103 @@ function initializeMenu() {
 
   var topMenu = document.getElementsByTagName("nav");
   topMenu[0].innerHTML = "<div class='navbar'>\
-    <a href='index.html' class='menuItem'>Home</a>\
-    <a href='Repositories.html' class='menuItem'>Repos</a>\
+    <a href='../../index.html' class='menuItem'>Home</a>\
+    <a href='../../Repositories.html' class='menuItem notice'>Repos</a>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Utils &#9662;</button>\
+      <button class='dropbutton'>Notes &#9662;</button>\
       <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Utilities</div>\
-        <a href='CppUtilities.html'>CppUtilities</a>\
-        <a href='FileUtilities.html'>FileUtilities</a>\
-        <a href='Logger.html'>Logger</a>\
+        <a href='../../DesignProcess.html'>Design Process</a>\
+        <a href='../../ProjectsList.html'>Project suggestions</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Tools &#9662;</button>\
+      <button class='dropbutton'>Blogs &#9662;</button>\
       <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Tools</div>\
-        <a href='TextFinder.html'>TextFinder</a>\
-        <a href='Duplicates.html'>Duplicates</a>\
-        <a href='FileDates.html'>FileDates</a>\
-        <a href='FileSizes.html'>FileSizes</a>\
-        <a href='FindFiles.html'>FindFiles</a>\
-        <a href='Diff_WPF.html'>Diff_WPF</a>\
-        <a href='CodeWebifier.html'>CodeWebifier</a>\
-        <a href='PrettyPrint.html'>PrettyPrint</a>\
+        <a href='../../Blog.html'>First&nbsp;Things</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
+        <a href='../../BlogDesign.html'>SW&nbsp;Design</a>\
+        <a href='../../BlogPrinciples.html'>Design&nbsp;Principles</a>\
+        <a href='../../BlogOOD.html'>OO&nbsp;Design</a>\
+        <a href='../../BlogObjectModels.html'>Object&nbsp;Models</a>\
+        <a href='../../BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data&nbsp;&nbsp;</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Engineering&nbsp;SW&nbsp;---</div>\
+        <a href='../../BlogOCD.html'>Concept&nbsp;Document</a>\
+        <a href='../../BlogTesting.html'>SW&nbsp;Testing</a>\
+        <a href='../../SummerReading.html'>Summer&nbsp;Reading</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Software&nbsp;Sys&nbsp;------</div>\
+        <a href='../../BlogStructure.html'>SW&nbsp;Structure</a>\
+        <a href='../../BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a>\
+        <a href='../../BlogActiveObjects.html'>Active&nbsp;Objects</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Reusable&nbsp;Pkgs&nbsp;----</div>\
+        <a href='../../BlogNoSql.html'>noSQL&nbsp;Database</a>\
+        <a href='../../BlogParser.html'>Parsing</a>\
+        <a href='../../BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a>\
+        <a href='../../BlogMTree.html'>M-ary&nbsp;Trees</a>\
+        <a href='../../BlogGraph.html'>Directed&nbsp;Graphs</a>\
+        <a href='../../BlogFileSystem.html'>C++&nbsp;FileSystem</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Cmpnts &#9662;</button>\
+      <button class='dropbutton'>Resources &#9662;</button>\
       <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Components</div>\
-        <a href='CppBlockingQueue.html'>CppBlockingQueue</a>\
-        <a href='FileManager.html'>File Manager</a>\
-        <a href='CppProperties.html'>CppProperties</a>\
-        <a href='ThreadPool.html'>ThreadPool</a>\
-        <a href='Process.html'>Process</a>\
-        <a href='CppConcurrentFileAccess.html'>CppConcurrentFileAccess</a>\
-        <a href='CppLexicalScanner.html'>CppLexicalScanner</a>\
-        <a href='RetryWrapper.html'>RetryWrapper</a>\
-        <a href='WebComponents.html'>WebComponents</a>\
-        <a href='Tests.html'>Tests</a>\
+        <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
+        <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
+        <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
+        <a href='https://github.com/joshnh/Git-Commands'>git commands</a>\
+        <a class='disable' href='../../UMLDiagrams.html'>UML Diagrams</a>\
+        <a href='../../Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
+        <a href='../../SummerReading.html'>Summer Reading</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Libs &#9662;</button>\
+      <button class='dropbutton'>Prog Lang &#9662;</button>\
       <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Libraries</div>\
-        <a href='FileSystem.html'>FileSystem-Windows</a>\
-        <a class='disable' href='FileSystem.html'>FileSystem-Linux</a>\
-        <a href='Sockets.html'>Sockets-Windows</a>\
-        <a class='disable' href='Sockets.html'>Sockets-Linux</a>\
-        <a href='XmlDocument.html'>XmlDocument</a>\
-        <a href='CppGraph.html'>CppGraph</a>\
+        <a href='../../LangCpp.html'>C++</a>\
+        <a href='../../LangCSharp.html'>C#</a>\
+        <a href='../../LangPowerShell'>PowerShell</a>\
+        <a class='disable' href='#'>HTML</a>\
+        <a class='disable' href='#'>CSS</a>\
+        <a class='disable' href='#'>JavaScript</a>\
+        <a class='disable' href='#'>Java</a>\
+        <a class='disable' href='#'>Rust</a>\
+        <a class='disable' href='#'>Go</a>\
+        <a class='disable' href='#'>Python</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Projs &#9662;</button>\
+      <button class='dropbutton'>Platforms &#9662;</button>\
       <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Projects</div>\
-        <a href='SitePages.html'>SitePages</a>\
-        <a href='CppParser.html'>CppParser</a>\
-        <a href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a>\
-        <a href='CsDependencyAnalysis.html'>CsDependencyAnalysis</a>\
-        <a href='CppCommWithFileXfer.html'>CppCommWithFileXfer</a>\
-        <a href='CppHttpClientServer.html'>CppHttpClientServer</a>\
-      </div>\
+        <a href='../../PlatformWindows.html'>Windows</a>\
+        <a href='../../PlatformLinux.html'>Linux</a>\
+      </div >\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Demos &#9662;</button>\
+      <button class='dropbutton'>Stories &#9662;</button>\
       <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Demonstrations</div>\
-        <a href='CppBasicDemos.html'>C++&nbsp;Basic&nbsp;Demos</a>\
-        <a href='STR.html'>STR&nbsp;Value&nbsp;Type</a>\
-        <a href='CompoundObjects.html'>CompoundObjects</a>\
-        <a href='ObjectFactories.html'>ObjectFactories</a>\
-        <a href='TemplateTechniques.html'>TemplateTechniques</a>\
-        <a href='STL-Containers.html'>STL-Containers</a>\
-        <a href='IOStreams.html'>IOStreams</a>\
-        <a href='CppThreads.html'>CppThreads</a>\
-        <a href='ProcAndThreads.html'>ProcsAndThreads</a>\
-      </div>\
-    </div>\
-    <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Build &#9662;</button>\
-      <div class='dropdown-content'>\
-        <a class='disable' href='#'>Build Demo</a>\
-        <a class='disable' href='#'>Build Structure</a>\
-        <a class='disable' href='#'>Build from repo</a>\
-      </div>\
+        <a href='../../Stories.html'>What is a Story?</a>\
+        <a href='../../CppStory_SlideShow.html'>Starting C++</a>\
+        <a class='disable' href='#'>Creating flexible code</a>\
+        <a class='disable' href='#'>Design Examples</a>\
+        <a class='disable' href='#'>Building Complex Systems</a>\
+        <a class='disable' href='#'>Site Story</a>\
+        <a class='disable' href='#'>Visual Studio Help</a>\
+      </div >\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='JimFawcett.html'>Jim Fawcett</a>\
-        <a href='Help.html'>Help</a>\
-        <a href='ToDo.html'>ToDo</a>\
+        <a href='../../JimFawcett.html'>Jim Fawcett</a>\
+        <a href='../../Help.html'>Help</a>\
+        <a href='../../ToDo.html'>ToDo</a>\
         <a href='#' onclick='toggleNavKeys()'>Toggle Nav Keys</a>\
-        <a href='SiteDesign.html'>Site Design</a>\
-        <a href='BookDesignCourse.html'>Design Course</a>\
-        <a class='border' href='index.html'>L1 Site Home</a>\
-        <a class='border' href='Repositories.html'>L2 Repository&nbsp;webpage</a>\
-        <a class='border' href='LangCpp.html'>L2 C++&nbsp;webpage</a>\
+        <a href='../../SiteDesign.html'>Site Design</a>\
+        <a href='../../BookDesignCourse.html'>Design Course</a>\
+        <a class='border' href='../../index.html'>L1 Site Home</a>\
+        <a class='border' href='../../Repositories.html'>L2 Repository&nbsp;webpage</a>\
+        <a class='border' href='../../LangCpp.html'>L2 C++&nbsp;webpage</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
-        <a href='SiteMap.html'>Site Map</a>\
+        <a href='../../SiteMap.html'>Site Map</a>\
       </div>\
     </div>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\
@@ -271,6 +266,7 @@ function setNavKeys() {
   else {
     nkc[0].style.display = "none";
   }
+
 }
 //----< toggle image sizer display >-----------------------------------
 /*
@@ -294,15 +290,18 @@ function toggleImageSizer() {
 
 function setImageSizer() {
   var nkc = document.getElementsByTagName("sizer-Container");
-  var navKeyState = window.localStorage.getItem("imageSizerState");
+  var imageSizerState = window.localStorage.getItem("imageSizerState");
 
   for (let i = 0; i < nkc.length; ++i) {
-    if (navKeyState === null) {
+    if (imageSizerState === null) {
       nkc[i].style.display = "inline";
       window.localStorage.setItem("imageSizerState", "show");
       return;
     }
-    if (navKeyState === "show") {
+    if (imageSizerState === "hide") {
+      nkc[i].style.display = "none";
+    }
+    if (imageSizerState === "show") {
       nkc[i].style.display = "inline";
     }
     else {
@@ -323,6 +322,7 @@ function mouseAction(event) {
       window.open(event.target, "_newtab" + Math.floor(Math.random() * 999999));
     }
     else {
+      //toggleNavKeys();
       toggleNavKeys();
     }
   }
