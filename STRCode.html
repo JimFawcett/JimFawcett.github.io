@@ -1,0 +1,309 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - CppModels.htm
+   - ver 1.0 - 10 June 2019
+   - Jim Fawcett, Syracuse University
+  -->
+  <title>STR Code</title>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Projects. Code Samples. Software Links" />
+  <meta name="keywords" content="Repository, Design, Code" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <script src="js/ScriptsSizerComp.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+  <link rel="stylesheet" href="css/StylesSizerComp.css" />
+  <style>
+    summary {
+      padding: 3px 0px 5px 0px;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 0.5fr;
+      grid-column-gap: 0em;
+      padding: 0px;
+    }
+
+    .item1 {
+      grid-column: 1;
+      padding: 0px;
+    }
+
+    .item2 {
+      grid-column: 2;
+      padding: 0px;
+    }
+
+    .border {
+      border: 1px solid black;
+      padding-bottom: 10px;
+    }
+  </style>
+</head>
+<body id="github" onload="initializeMenu()">
+
+  <navKeysContainer>
+    <navKey onclick="location.reload()">R</navKey>
+    <navKey onclick="scrollPageTop()">T</navKey>
+    <navKey onclick="scrollPageBottom()">B</navKey>
+    <navKey onclick="helpWin()">H</navKey>
+    <navKey onclick="loadPrev()">P</navKey>
+    <navKey onclick="loadNext()">N</navKey>
+  </navKeysContainer>
+
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <!--<a id="Next" href="CodeWebifier.html">N</a>
+  <a id="Prev" href="FindFiles.html">P</a>-->
+
+  <header>
+    <hgroup id="pagetitle">
+      <h1 id="title">STR Code Analysis</h1>
+    </hgroup>
+  </header>
+
+  <hr class="spread" />
+  <indent-block>
+    <div id="fig1"></div>
+    <h3>STR String Class</h3>
+    The STR class represents null terminated strings.  I wrote the code for this class before there was a
+    std::string class.  You should, of course, use the std::string class.  However, STR is a really nice
+    tool to illustrate how value types are created.
+    <spacer-15></spacer-15>
+    Value types are instances of classes that can be copied and assigned.  When a copy or assignment operation
+    completes, there are two unique instances of STR, each with the same state values.  But these states are
+    independent.  Should the destination of a copy or assignment change its state, that does not affect, in any
+    way the state of the source STR instance.
+    <spacer-15></spacer-15>
+    This is achieved by careful implementation of copy, move, and assignment operations. Each of the items,
+    below, shows how to implement every one of the STR class methods and a couple of global functions associated
+    with the class, e.g., STR insertion and extraction operators.
+    <spacer-15></spacer-15>
+    For each method in the STR class, declared in Figure 1, we show, in the following items, how to declare,
+    implement, and invoke the method.
+    <h3>STR Methods</h3>
+    <!--<details>
+    <summary>STR Class Diagram</summary>
+    <div id="fig1"></div>
+  </details>-->
+    <details>
+      <summary><span>STR Default Constructor</span></summary>
+      <div id="fig2"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      STR default constructor initializes an instance of STR with no arguments.  This might be used, for example,
+      to construct an array of STR instances.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>STR Copy Constructor</summary>
+      <div id="fig3"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      Copy constructors play an important role in developing value types, since copying is an essential feature
+      for them. Every time we pass a method or function argument by value, we make a copy of the instance on the
+      functions stack frame.  The same is true for return by value, and any code that explicitly invokes a copy.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>STR Move Constructor</summary>
+      <div id="fig4"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      Move constructors allow the compiler to avoid making copies when the source of the copy is a temporary
+      instance. A properly designed move constructor will take ownership of the temporary&apos;s state, possibly
+      invalidating the temporary object.  That is not a problem as long as a move is the last thing that happens
+      before the temporary goes out of scope.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>STR Promotion Constructor</summary>
+      <div id="fig5"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      Promotion constructors take a single argument of some other type, causing a conversion of the source type
+      to the destination type. Essentially the promotion constructor is just using information contained in the
+      source to build a new STR instance. For STR, we define a promotion from literal strings to STR instances.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>STR Destructor</summary>
+      <div id="fig6"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      Every class must have a destructor, either defined by the class, or implemented by the compiler.  For STR
+      instances, that just deallocates their character storage from the native heap.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>STR Copy Assignment Operator</summary>
+      <div id="fig7"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      Copy assignment changes the state of an existing instance to match the state of a source instance.
+      After copy assignment no changes have been made to the source.  The states of the two instances,
+      source and destination, have the same values but are stored independently.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>STR Move Assignment Operator</summary>
+      <div id="fig8"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      The idea of move assignment is very like move construction.  The only significant difference is that
+      with move construction we are building a new instance, while with move assignment we transfer ownership
+      of the source&apos;s state to the destination.  When compiling an assignment expression, the compiler
+      will use copy assignment if the source is a named object that will remain in scope.  If the source is
+      a temporary object, the compiler will use move assignment.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>STR Index Operator</summary>
+      <div id="fig9"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      An index operator is used to access one item of a collection, usually stored as a private member
+      of the class.  For non-const indexers, the index operator can be used to both read and write the item.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>STR Const Index Operator</summary>
+      <div id="fig10"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      A const index operator is used to access one item of a collection for reading, usually stored as a private member
+      of the class. This allows indexing a const instance of a class that provides this operator.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>STR Append a Character</summary>
+      <div id="fig11"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      The character append operation is a bit complicated, because the STR instance may, or may not, have unallocated
+      memory to store the character in its char array.  We have to check the space available and based on the result
+      either store in the original array, or create a larger temporary array, copy the original characters, append the
+      new one, deallocate the original array, and attach the new one to the instance.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>STR Append a String</summary>
+      <div id="fig12"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      This operation is very similar to the preceeding one, but now we check for space for the string.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>STR Addition Operator</summary>
+      <div id="fig13"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      Having implemented the Append operations, implementation of the Addion operator is almost trivial.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>STR Cast Operator</summary>
+      <div id="fig14"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      Casts create an instance of a new type based on information stored in the source type.
+      For STR instances that simply returns a const pointer to its internal character storage,
+      e.g., it returns a const literal string.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>STR Insertion Operator</summary>
+      <div id="fig15"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      Insertion operators have to be implemented as global functions.  For STR, the insertion simply
+      streams its characters to the output stream, specified in its calling parameters.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>STR Extraction Operator</summary>
+      <div id="fig16"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      Extraction could be complicated because we are streaming in from a source for which we have no
+      size information.  However, because we already implemented the character append operation, which
+      takes care of ensuring adequate storage, we simply append characters from the source stream.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>Coersions</summary>
+      <div id="fig17"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      Coercions happen when a compiler applies a promotion constructor or cast operator to
+      create an instance of a different type than the source of the coercion.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>Binary Operator Model</summary>
+      <div id="fig18"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      Binary operators can be defined either as class members or global functions.  This item
+      discusses the syntax for doing that.
+    </indent-block>
+    <spacer-15></spacer-15>
+    <details>
+      <summary>Expression Model</summary>
+      <div id="fig19"></div>
+    </details>
+    <indent-block style="margin-left:20px;">
+      When the compiler scans a C++ expression it looks for type mismatches.  If it finds any, it
+      will try to find a cast or promotion operation to resolve the mismatch.  If it finds one
+      non-ambiguous way to resolve the types, it applies that way, otherwise compilation fails.
+    </indent-block>
+    <spacer-15></spacer-15>
+    This design is fairly large and, in a few places, a bit complicated. However, the result is that
+    we can use instances of STR to represent strings, just as if they were of a type defined
+    by the C++ language.  We can copy them, assign them, index them, ..., without participating in
+    the instance&apos;s resource management.
+    <spacer-15></spacer-15>
+    The result is that the designer had to spend a lot of time getting all the details defined 
+    correctly, but users simply using the class without having any knowledge about its design
+    other than its class interface.
+    <spacer-15></spacer-15>
+
+  </indent-block>
+  <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
+
+  <script>createSizer("Pictures/STRClassDeclar.JPG", "Figure 1. STR Class Declaration", 340, "fig1")</script>
+  <script>createSizer("Pictures/STRDefaultCtor.JPG", "Figure 2. STR Default Ctor", 340, "fig2")</script>
+  <script>createSizer("Pictures/STRCopyCtor.JPG", "Figure 3. STR Copy Ctor", 340, "fig3")</script>
+  <script>createSizer("Pictures/STRMoveCtor.JPG", "Figure 4. STR Move Ctor", 340, "fig4")</script>
+  <script>createSizer("Pictures/STRPromoCtor.JPG", "Figure 5. STR Promo Ctor", 340, "fig5")</script>
+  <script>createSizer("Pictures/STRDtor.JPG", "Figure 6. STR Dtor", 340, "fig6")</script>
+  <script>createSizer("Pictures/STRCopyAssign.JPG", "Figure 7. STR Copy Assignment", 340, "fig7")</script>
+  <script>createSizer("Pictures/STRMoveAssign.JPG", "Figure 8. STR Move Assignment", 340, "fig8")</script>
+  <script>createSizer("Pictures/STRIndexOper.JPG", "Figure 9. STR Index Operator", 340, "fig9")</script>
+  <script>createSizer("Pictures/STRIndexOperConst.JPG", "Figure 10. STR Const Index Operator", 340, "fig10")</script>
+  <script>createSizer("Pictures/STRAppendChar.JPG", "Figure 11. STR Append Char", 340, "fig11")</script>
+  <script>createSizer("Pictures/STRAppendStr.JPG", "Figure 12. STR Append String", 340, "fig12")</script>
+  <script>createSizer("Pictures/STRAdd.JPG", "Figure 13. STR Add", 340, "fig13")</script>
+  <script>createSizer("Pictures/STRCast.JPG", "Figure 14. STR Cast Operator", 340, "fig14")</script>
+  <script>createSizer("Pictures/STRInsertionOper.JPG", "Figure 15. STR Insert Operator", 340, "fig15")</script>
+  <script>createSizer("Pictures/STRExtractOper.JPG", "Figure 16. STR Extract Operator", 340, "fig16")</script>
+  <script>createSizer("Pictures/STRBinaryOper.JPG", "Figure 17. Binary Operators", 340, "fig17")</script>
+  <script>createSizer("Pictures/STRCoercions.JPG", "Figure 18. Coercions", 340, "fig18")</script>
+  <script>createSizer("Pictures/STRExpressions.JPG", "Figure 19. Expressions Model", 340, "fig19")</script>
+  <script>createSizer("Pictures/STRCoercions.JPG", "Figure 20. Coercions Model", 340, "fig20")</script>
+  <spacer-25 class="clear"></spacer-25>
+  <spacer-25 class="clear"></spacer-25>
+  <spacer-25 class="clear"></spacer-25>
+  <info-bar></info-bar>
+</body>
+</html>
