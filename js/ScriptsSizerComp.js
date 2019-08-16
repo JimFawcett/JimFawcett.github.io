@@ -9,71 +9,51 @@ function bigger(id) {
   let width = pict.style.width;                         // "100px"
   let truncWidth = width.substr(0, width.length - 2);   // "100"
   let value = Number(truncWidth);                       // 100
-  value = 1.5 * value;                                  // 120
+  value = 1.2 * value;                                  // 120
   let newWidth = value.toString();                      // "120"
   newWidth = newWidth + "px";                           // "120px"
   pict.style.width = newWidth;
 }
 /*---------------------------------------------------------
-*  Make image smaller
-*/
-function smaller(id) {
-  let pict = document.getElementById(id);
-  let width = pict.style.width;
-  let truncWidth = width.substr(0, width.length - 2);
-  let value = Number(truncWidth);
-  value = value / 1.5;
-  let newWidth = value.toString();
-  newWidth = newWidth + "px";
-  pict.style.width = newWidth;
-}
-/*-- not yet functional --*/
-function refresh() {
-  location.reload();
-}
-/*---------------------------------------------------------
-*  Global id suffix - needed because we may have more
-*                     than one sizer 
+*  Create styled image in floated container
+*  - url is relative address of image
+*  - caption is image title text
+*  - placeholderId is id of div to be replaced with image
 */
 var idCount = 0;
 
-/*---------------------------------------------------------
-*  Assemble image sizer and attach to placeholder
-*  - imageUrl:    relative path to image
-*  - caption:     append caption to image if not empty string 
-*  - hiderText:   caption for sizer on hider bar
-*  - hiderTop:    fixed vertical distance from window top
-*                 if zero sizer aligned with image top
-*  - size:        width of image container
-*  - placeholder: id of div that defines location of image in page
-*/
-function createSizer(imageUrl, caption, size, placeholder) {
+function createSizer(url, caption, size, placeHolderId) {
 
-  let imageContainerId = "imageContainerId" + (++idCount).toString();
+  /* create image element */
+  let img = document.createElement("img");
+  let imgId = "imgId" + idCount.toString();
+  img.setAttribute("id", imgId);
+  img.setAttribute("src", url);
+  let imgStyle = "width: " + size.toString() + "px;";
+  img.setAttribute("style", imgStyle);
 
-  // add sizer to document
-  let loc = document.getElementById(placeholder);
+  /* create image frame div */
+  let imgFrame = document.createElement("div");
+  imgFrame.setAttribute("class", "imgFrame");
+  imgFrame.appendChild(img);
 
-  // create image wrapper
-  let imageWrapper = document.createElement("image-wrapper");
-  let imageWrapperId = "imageWrapperId" + idCount.toString();
-  imageWrapper.setAttribute("id", imageWrapperId);
-  let imageContainer = document.createElement("image-container");
-  imageContainer.setAttribute("id", imageContainerId);
-  let imgStyle = "width:" + size.toString() + "px;" + "padding:5px;" ;
-  imageContainer.setAttribute("style", imgStyle);
-  let image = document.createElement("img");
-  //image.addEventListener("click", function () { bigger(imageContainerId); });
-  image.setAttribute("src", imageUrl);
-  image.setAttribute("width", "100%");
-  imageContainer.appendChild(image);
-  imageContainer.addEventListener("click", function () { bigger(imageContainerId); });
+  /* create image container, padded to provide space between image and page content */
+  let imgContr = document.createElement("img-container");
+  let imgContrId = "imgContrId" + idCount.toString();
+  imgContr.setAttribute("id", imgContrId);
+  imgContr.setAttribute("class", "imgContr");
+  imgContr.appendChild(imgFrame);
+  imgContr.addEventListener("click", function () { bigger(imgId); });
+
+  /* add title text to image frame */
   if (caption !== "") {
     let title = document.createElement("div");
     title.appendChild(document.createTextNode(caption));
-    title.setAttribute("style", "text-align:center; white-space:nowrap; overflow:hidden; padding:5px 0px;");
-    imageContainer.appendChild(title);
+    title.setAttribute("class", "imgTitle");
+    imgFrame.appendChild(title);
   }
-  imageWrapper.appendChild(imageContainer);
-  loc.appendChild(imageWrapper);
+  /* add image container to page at placeholder */
+  let loc = document.getElementById(placeHolderId);
+  loc.appendChild(imgContr);
+  ++idCount;
 }
