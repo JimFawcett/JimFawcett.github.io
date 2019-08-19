@@ -93,7 +93,7 @@
     <h3>Design:</h3>
     <div id="fig1"></div>
     <indent-block>
-      This design of properties use an inheritance hierarchy, shown in Figure 1., to implement the various
+      This design of properties uses an inheritance hierarchy, shown in Figure 1., to implement the various
       design aspects needed for property behaviors, as described in the concept statement, above.
       <spacer-10></spacer-10>
       The first base class, PropContainer&lt;T&gt;, holds the encapsulated instance t &epsilon; T and provides
@@ -125,15 +125,15 @@
         </li>
       </ul>
       The first three of these methods call
-      <span class="code">PropContainer&lt;T&gt;::set(const T&amp; t)</span>
+      <span class="code">void PropContainer&lt;T&gt;::set(const T&amp; t)</span>
       and the last calls
-      <span class="code">PropContainer&lt;T&gt;::get()</span>.
+      <span class="code">T&amp; PropContainer&lt;T&gt;::get()</span>.
       Note that the <span class="code">set(const T&amp; t)</span> method copy assigns t to the
       encapsulated instance, e.g., makes a <strong>copy</strong> so users can&apos;t modify the
       inner instance through that reference.  Also note that the <span class="code">operator()()</span>
       method returns a copy of the inner instance, for the same reason.  For large types, those
       copies will have preformance implications, but are necessary to ensure application defined
-      constraints on operations are enforced and any changes, for thread-safe properties, happen 
+      constraints on operations are enforced and any changes, for thread-safe properties, happen
       only in a locked critical section.
       <spacer-10></spacer-10>
       Since Property&lt;T&gt; is not a T, it doesn&apos;t have T&apos;s methods.  If Property&lt;T&gt;
@@ -154,9 +154,9 @@
       template metaprogramming constructs provided by C++14 and C++17. The Property.h and CustomContTypeTraits.h
       files provide some notes about that.
       <spacer-10></spacer-10>
-      whenever it can, <code-span>PushAndPopProperty&lt;T&gt;</code-span> uses the protected 
+      Whenever it can, <code-span>PushAndPopProperty&lt;T&gt;</code-span> uses the protected
       <code-span>PropContainer&lt;T&gt;</code-span> reference-based methods for performance,
-      only using instance copy operations when it has to maintain thread-safety or application constraints. 
+      only using instance copy operations when it must to maintain thread-safety or application constraints.
       <spacer-10></spacer-10>
       For types not included in <span class="code">PropertyBase&lt;T&gt;</span>, e.g.,
       <span class="code">Widget</span>, applications can retreive
@@ -176,7 +176,7 @@
           <span class="code">Property&lt;T&gt;</span> imposes no constraints and does no locking.
         </li>
         <li>
-          <span class="code">TS_Property&lt;T&gt;</span> provides locking, by overriding public
+          <span class="code">TS_Property&lt;T&gt;</span> provides locking, by overriding empty public
           <span class="code">lock()</span> and <span class="code">unlock()</span> methods in the
           <span class="code">PropContainer&lt;T&gt; class</span>
         </li>
@@ -188,6 +188,35 @@
       </ul>
       The <span class="code">TS_Property&lt;T&gt;</span> class has been implemented and is part of this
       repository.  The other two are planned and should appear soon.
+      <spacer-15></spacer-15>
+      A final observation about this design: note how property operations are factored into
+      single-responsibility classes, e.g.:
+      <ul class="tight pad10">
+        <li>
+          <code-span>PropContainer</code-span> provides virtual functions to manage its encapsulated
+          instance t&epsilon;T, providing the flexibility needed by applications to enforce constraints
+          and thread safety.
+        </li>
+        <li>
+          <code-span>PropBase&lt;T&gt;</code-span> defines the primary user interface.
+        </li>
+        <li>
+          <code-span>PushAndPopProperty&lt;T&gt;</code-span> adds methods for widely used types.
+        </li>
+        <li>
+          The most derived classes
+          <code-span>Property&lt;T&gt;</code-span>,
+          <code-span>TS_Property&lt;T&gt;</code-span>, and
+          <code-span>Log_Property&lt;T&gt;</code-span> simply override
+          <code-span>PropContainer&lt;T&gt;</code-span> methods to suit the current application.
+        </li>
+      </ul>
+      <code-span>PropContainer&lt;T&gt;</code-span> sets up the flexibility infrastructure, and
+      <code-span>Property&lt;T&gt;</code-span>,
+      <code-span>TS_Property&lt;T&gt;</code-span>, and
+      <code-span>Log_Property&lt;T&gt;</code-span> use that for their application.
+      The Single-Responsibility Principle is the queen - most important - of all the design principles.
+
     </indent-block>
     <h3>Build:</h3>
     <indent-block>
