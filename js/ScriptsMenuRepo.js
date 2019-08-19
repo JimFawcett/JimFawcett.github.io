@@ -92,6 +92,7 @@ function initializeMenu() {
         <a href='IOStreams.html'>IOStreams</a>\
         <a href='CppThreads.html'>CppThreads</a>\
         <a href='ProcAndThreads.html'>ProcsAndThreads</a>\
+        <a href='Interop.html'>Interop</a>\
         <a class='lightItem' href='CppExamples.html'>More&nbsp;Examples</a>\
       </div>\
     </div>\
