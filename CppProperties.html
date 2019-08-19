@@ -15,12 +15,23 @@
   <title>CppProperties</title>
   <script src="js/ScriptsTemplate.js"></script>
   <script src="js/ScriptsKeyboard.js"></script>
-  <script src="js/ScriptsMenuRepo.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <script src="js/ScriptsSizerComp.js"></script>
   <link rel="stylesheet" href="css/StylesTemplate.css" />
   <link rel="stylesheet" href="css/StylesMenu.css" />
+  <link rel="stylesheet" href="css/StylesSizerComp.css" />
   <style>
     summary {
       padding: 3px 0px 5px 0px;
+    }
+    .code {
+      font-family: Consolas, sans-serif;
+      font-weight:bold;
+    }
+    code-span {
+      display:inline;
+      font-family: Consolas, sans-serif;
+      font-weight:bold;
     }
   </style>
 </head>
@@ -55,37 +66,146 @@
 
   <hr class="spread" />
   <indent-block>
-    <h3>Responsibilities:</h3>
+    <h3>Concept:</h3>
     <indent-block>
-      CppProperties provides class Property&lt;T,C&gt;. T is the type of an encapsulated variable, i.e.,
-      the value of the property, and C is the type of a constraint class that supports supplying
-      processing in getter and setter methods to constraint the values or operations allowed by
-      the class.  The Property class defines a default template type for C, so you can define
-      Property&lt;Widget&gt;, for example to use default constraints.
+      Properties are a programming language construct that provide encapsulated instances of the property type
+      with setter and getter methods to access that value. C++ does not provide properties, but this code shows
+      that can be done with templates and some specialization magic.
       <spacer-15></spacer-15>
-      The Property class derives publically from T, and so your code can call any of T&apos;s methods
-      on a Property&lt;T&gt;.  That is very useful, but means that we cannot directly define Properties
-      for the primitive types, e.g., int, double, ...
-      <spacer-10></spacer-10>
-      In order to do that, we have to wrap the primitive T type in a Box, e.g., 
-      Property&lt;Box&lt;int&gt;&gt;.
-      Box&lt;T&gt; is a thin wrapper class, also provided by CppProperties. It preserves the semantics of the
-      primitive type but allows a Boxed primitive to be inherited by the Property&lt;T, C&gt; class.
-      <spacer-10></spacer-10>
-      C&lt;T&gt; is a class that imposes constraints, if we need them, on the getter and setter methods of the
-      property.  Those constraints are placed in C::in(const T&amp; t) and C::out(). The default constraint
-      class simply stores and returns the t value without doing any checking or modification.
-      <spacer-15></spacer-15>
-      The code in Property.cpp demonstrates how to use Property and Box for several common cases.
+      There are some important reasons for using properties:
+      <ul class="tight pad10">
+        <li>
+          Provide thread-safe operations for the encapsulated instances.  Property access methods may take
+          and release locks as needed, so users of the class don&apos;t have to do that.
+        </li>
+        <li>
+          Provide logging of access to the encapsulated instances.  Again, access methods provide
+          whatever logging is needed.
+        </li>
+        <li>
+          Enforce application specific constraints on operations that may be executed on the
+          encapsulated instances, e.g., authorization, styling, security checks, ...
+        </li>
+      </ul>
+      If the Property class provides virtual functions for access, derived classes may simply provide whatever
+      their application needs.
     </indent-block>
-    <spacer-15></spacer-15>
+    <h3>Design:</h3>
+    <div id="fig1"></div>
+    <indent-block>
+      This design of properties use an inheritance hierarchy, shown in Figure 1., to implement the various
+      design aspects needed for property behaviors, as described in the concept statement, above.
+      <spacer-10></spacer-10>
+      The first base class, PropContainer&lt;T&gt;, holds the encapsulated instance t &epsilon; T and provides
+      protected virtual methods:
+      <ul class="tight pad10">
+        <li>
+          <span class="code">virtual void set(const T&amp; t)</span>
+        </li>
+        <li>
+          <span class="code">virtual T&amp; get()</span>
+        </li>
+      </ul>
+      The purpose of these methods is to manage access to the encapsulated type.  The PropertyBase&lt;T&gt;
+      class inherits those protected methods and uses them to implement the user interface methods:
+      <ul class="tight pad10">
+        <li>
+          <span class="code">
+            PropertyBase(const T& t)
+          </span>
+        </li>
+        <li>
+          <span class="code">PropertyBase<T>& operator=(const T& t)</span>
+        </li>
+        <li>
+          <span class="code">void operator()(const T& t)</span>
+        </li>
+        <li>
+          <span class="code">T operator()()</span>
+        </li>
+      </ul>
+      The first three of these methods call
+      <span class="code">PropContainer&lt;T&gt;::set(const T&amp; t)</span>
+      and the last calls
+      <span class="code">PropContainer&lt;T&gt;::get()</span>.
+      Note that the <span class="code">set(const T&amp; t)</span> method copy assigns t to the
+      encapsulated instance, e.g., makes a <strong>copy</strong> so users can&apos;t modify the
+      inner instance through that reference.  Also note that the <span class="code">operator()()</span>
+      method returns a copy of the inner instance, for the same reason.  For large types, those
+      copies will have preformance implications, but are necessary to ensure application defined
+      constraints on operations are enforced and any changes, for thread-safe properties, happen 
+      only in a locked critical section.
+      <spacer-10></spacer-10>
+      Since Property&lt;T&gt; is not a T, it doesn&apos;t have T&apos;s methods.  If Property&lt;T&gt;
+      derived from T, that would provide those methods, but then it would be very difficult
+      (maybe impossible) to enforce application constraints and provide consistent logging and
+      thread safety. So, I elected to take the design route described below.
+      <spacer-10></spacer-10>
+      <div id="fig2"></div>
+      The class PushAndPopProperty&lt;T&gt; provides methods for frequently occurring types:
+      <ul class="tight pad10">
+        <li>fundamental type operations</li>
+        <li>operations for STL sequential containers</li>
+        <li>operations for STL associative containers</li>
+      </ul>
+      Each of these types require different interfaces, so the PushAndPopProperty&lt;T&gt; class provides
+      specializations for each of these, based on custom type traits: is_fundamental,
+      is_stl_seq_container, and is_stl_assoc_container.  The selection of those specializations uses some
+      template metaprogramming constructs provided by C++14 and C++17. The Property.h and CustomContTypeTraits.h
+      files provide some notes about that.
+      <spacer-10></spacer-10>
+      whenever it can, <code-span>PushAndPopProperty&lt;T&gt;</code-span> uses the protected 
+      <code-span>PropContainer&lt;T&gt;</code-span> reference-based methods for performance,
+      only using instance copy operations when it has to maintain thread-safety or application constraints. 
+      <spacer-10></spacer-10>
+      For types not included in <span class="code">PropertyBase&lt;T&gt;</span>, e.g.,
+      <span class="code">Widget</span>, applications can retreive
+      a copy of the encapsulated type using <span class="code">T PropertyBase&lt;T&gt;::operator()()</span>,
+      use the copy&apos;s methods, and set the modified instance with
+      <span class="code">void PropertyBase&lt;T&gt;::operator()(const T&amp; t)</span> method.
+      That, obviously has performance and convenience issues, but would probably be worthwhile for
+      multi-threaded environments or applications needing specific logging operations.
+      <spacer-10></spacer-10>
+      For frequently used types, a developer may always add another <span class="code">PushAndPopProperty</span>
+      specialization.  That will probably be easier that for the STL containers, since the class interfaces
+      are likely to be smaller, simpler, and easier to implement.
+      <spacer-10></spacer-10>
+      Three potential classes derive from PushAndPopProperty&lt;T&gt;:
+      <ul class="tight pad10">
+        <li>
+          <span class="code">Property&lt;T&gt;</span> imposes no constraints and does no locking.
+        </li>
+        <li>
+          <span class="code">TS_Property&lt;T&gt;</span> provides locking, by overriding public
+          <span class="code">lock()</span> and <span class="code">unlock()</span> methods in the
+          <span class="code">PropContainer&lt;T&gt; class</span>
+        </li>
+        <li>
+          <span class="code">Log_Properties&lt;T&gt;</span> provides logging by overriding protected
+          methods <span class="code">void set(const T&amp; t)</span> and
+          <span class="code">T&amp; get()</span> methods in PropContainer&lt;T&gt;.
+        </li>
+      </ul>
+      The <span class="code">TS_Property&lt;T&gt;</span> class has been implemented and is part of this
+      repository.  The other two are planned and should appear soon.
+    </indent-block>
     <h3>Build:</h3>
     <indent-block>
       CppProperties was built with Visual Studio Community Edition - 2019 and tested on Windows 10.
       <spacer-25></spacer-25>
     </indent-block>
+    <h3>Status:</h3>
+    <indent-block>
+      All of the classes except <code-span>Property&lt;T&gt;</code-span> and 
+      <code-Span>Log-Property&lt;T&gt;</code-span> have been implemented.  The code has not been used
+      in any major application yet, so there may be some latent undetected errors.
+    </indent-block>
+    <spacer-15></spacer-15>
     <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
   </indent-block>
+  <spacer-25></spacer-25>
+  <script>createSizer("Pictures/PropertyClasses.jpg", "Figure 1. Property Classes", 500, "fig1")</script>
+  <script>createSizer("Pictures/PropertyOut.JPG", "Figure 2. Partial Property Output", 350, "fig2")</script>
   <info-bar></info-bar>
 </body>
 </html>
