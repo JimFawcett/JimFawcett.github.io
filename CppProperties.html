@@ -96,7 +96,7 @@
       This design of properties uses an inheritance hierarchy, shown in Figure 1., to implement the various
       design aspects needed for property behaviors, as described in the concept statement, above.
       <spacer-10></spacer-10>
-      The first base class, PropContainer&lt;T&gt;, holds the encapsulated instance t &epsilon; T and provides
+      The first base class, <code-span>PropContainer&lt;T&gt;</code-span>, holds the encapsulated instance t &epsilon; T and provides
       protected virtual methods:
       <ul class="tight pad10">
         <li>
@@ -106,7 +106,8 @@
           <span class="code">virtual T&amp; get()</span>
         </li>
       </ul>
-      The purpose of these methods is to manage access to the encapsulated type.  The PropertyBase&lt;T&gt;
+      The purpose of these methods is to manage access to the encapsulated type.  
+      The <code-span>PropertyBase&lt;T&gt;</code-span>
       class inherits those protected methods and uses them to implement the user interface methods:
       <ul class="tight pad10">
         <li>
@@ -136,25 +137,26 @@
       constraints on operations are enforced and any changes, for thread-safe properties, happen
       only in a locked critical section.
       <spacer-10></spacer-10>
-      Since Property&lt;T&gt; is not a T, it doesn&apos;t have T&apos;s methods.  If Property&lt;T&gt;
+      Since <code-span>Property&lt;T&gt;</code-span> is not a T, it doesn&apos;t have T&apos;s methods.  
+      If <code-span>Property&lt;T&gt;</code-span>
       derived from T, that would provide those methods, but then it would be very difficult
       (maybe impossible) to enforce application constraints and provide consistent logging and
       thread safety. So, I elected to take the design route described below.
       <spacer-10></spacer-10>
       <div id="fig2"></div>
-      The class PushAndPopProperty&lt;T&gt; provides methods for frequently occurring types:
+      The class <code-span>PropertyOps&lt;T&gt;</code-span> provides methods for frequently occurring types:
       <ul class="tight pad10">
         <li>fundamental type operations</li>
         <li>operations for STL sequential containers</li>
         <li>operations for STL associative containers</li>
       </ul>
-      Each of these types require different interfaces, so the PushAndPopProperty&lt;T&gt; class provides
-      specializations for each of these, based on custom type traits: is_fundamental,
-      is_stl_seq_container, and is_stl_assoc_container.  The selection of those specializations uses some
+      Each of these types require different interfaces, so the <code-span>PropertyOps&lt;T&gt;</code-span> class provides
+      specializations for each of these, based on custom type traits: <code-span>is_fundamental</code-span>,
+      <code-span>is_stl_seq_container</code-span>, and <code-span>is_stl_assoc_container</code-span>.  The selection of those specializations uses some
       template metaprogramming constructs provided by C++14 and C++17. The Property.h and CustomContTypeTraits.h
       files provide some notes about that.
       <spacer-10></spacer-10>
-      Whenever it can, <code-span>PushAndPopProperty&lt;T&gt;</code-span> uses the protected
+      Whenever it can, <code-span>PropertyOps&lt;T&gt;</code-span> uses the protected
       <code-span>PropContainer&lt;T&gt;</code-span> reference-based methods for performance,
       only using instance copy operations when it must to maintain thread-safety or application constraints.
       <spacer-10></spacer-10>
@@ -166,29 +168,31 @@
       That, obviously has performance and convenience issues, but would probably be worthwhile for
       multi-threaded environments or applications needing specific logging operations.
       <spacer-10></spacer-10>
-      For frequently used types, a developer may always add another <span class="code">PushAndPopProperty</span>
-      specialization.  That will probably be easier that for the STL containers, since the class interfaces
+      For frequently used types, a developer may always elect to add another <span class="code">PropertyOps</span>
+      specialization.  That will probably be easier than for STL containers, since those class interfaces
       are likely to be smaller, simpler, and easier to implement.
       <spacer-10></spacer-10>
       <div id="fig3"></div>
-      Three potential classes derive from PushAndPopProperty&lt;T&gt;:
+      Three classes derive from <code-span>PropertyOps&lt;T&gt;</code-span>:
       <ul class="tight pad10">
         <li>
           <span class="code">Property&lt;T&gt;</span> imposes no constraints and does no locking.
         </li>
         <li>
           <span class="code">TS_Property&lt;T&gt;</span> provides locking, by overriding empty public
-          <span class="code">lock()</span> and <span class="code">unlock()</span> methods in the
-          <span class="code">PropContainer&lt;T&gt; class</span>
+          <span class="code">lock()</span> and <span class="code">unlock()</span> methods,
+          inserting calls to methods <code-span>lock()</code-span> and <code-span>unlock()</code-span>
+          in the <span class="code">PropContainer&lt;T&gt;</span> class.
         </li>
         <li>
           <span class="code">Log_Properties&lt;T&gt;</span> provides logging by overriding protected
           methods <span class="code">void set(const T&amp; t)</span> and
-          <span class="code">T&amp; get()</span> methods in PropContainer&lt;T&gt;.
+          <span class="code">T&amp; get()</span> methods.
         </li>
       </ul>
-      The <span class="code">TS_Property&lt;T&gt;</span> class has been implemented and is part of this
-      repository.  The other two are planned and should appear soon.
+      The <code-span>Property&lt;T&gt;</code-span> and <span class="code">TS_Property&lt;T&gt;</span> classes 
+      have been implemented and are part of this repository.  <code-span>Log_Property&lt;T&gt;</code-span> 
+      is planned and should appear soon.
       <spacer-15></spacer-15>
       A final observation about this design: note how property operations are factored into
       single-responsibility classes, e.g.:
@@ -202,7 +206,7 @@
           <code-span>PropBase&lt;T&gt;</code-span> defines the primary user interface.
         </li>
         <li>
-          <code-span>PushAndPopProperty&lt;T&gt;</code-span> adds methods for widely used types.
+          <code-span>PropertyOps&lt;T&gt;</code-span> adds methods for widely used types.
         </li>
         <li>
           The most derived classes
