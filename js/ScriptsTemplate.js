@@ -41,3 +41,7 @@ function decrementSize(id) {
   e.style.width = size.toString() + "px";
 }
 
+function hidePageNote() {
+  let pgNote = document.getElementsByTagName("page-note")[0];
+  pgNote.style.display = "none";
+}

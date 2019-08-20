@@ -61,6 +61,7 @@ function initializeMenu() {
         <a class='disable' href='UMLDiagrams.html'>UML Diagrams</a>\
         <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
         <a href='SummerReading.html'>Summer Reading</a>\
+        <a href='CppExamples.html'>C++ Examples</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
