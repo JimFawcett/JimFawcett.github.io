@@ -19,6 +19,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Notes &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Developing&nbsp;Code&nbsp;</div>\
         <a href='DesignProcess.html'>Design Process</a>\
         <a href='ProjectsList.html'>Project suggestions</a>\
       </div>\
@@ -26,6 +27,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Blogs &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Opinions&nbsp;and&nbsp;Ideas&nbsp;</div>\
         <a href='Blog.html'>First&nbsp;Things</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
         <a href='BlogDesign.html'>SW&nbsp;Design</a>\
@@ -54,6 +56,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Resources &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Developer&nbsp;Resources&nbsp;</div>\
         <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
         <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
         <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
@@ -65,8 +68,12 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Prog Lang &#9662;</button>\
+      <button class='dropbutton'>P&L &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;OS&nbsp;Platforms</div>\
+        <a href='PlatformWindows.html'>Windows</a>\
+        <a href='PlatformLinux.html'>Linux</a>\
+        <div class='darkTheme'>&nbsp;Languages</div>\
         <a href='LangCpp.html'>C++</a>\
         <a href='LangCSharp.html'>C#</a>\
         <a href='LangPowerShell'>PowerShell</a>\
@@ -80,27 +87,33 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Platforms &#9662;</button>\
+      <button class='dropbutton'>Nbrhds &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='PlatformWindows.html'>Windows</a>\
-        <a href='PlatformLinux.html'>Linux</a>\
+        <div class='darkTheme'>&nbsp;Site&nbsp;Neighborhoods</div>\
+        <a href='https://JimFawcett.github.io'>JimFawcett-github</a>\
+        <a href='https://www.ecs.syr.edu/faculty/fawcett'>JimFawcett-SyracuseUniv</a>\
+        <a href='https://csiac.org'>CSIAC</a>\
       </div >\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Stories &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Ordered&nbsp;Content</div>\
         <a href='Stories.html'>What is a Story?</a>\
         <a href='CppStory_SlideShow.html'>Starting C++</a>\
-        <a class='disable' href='#'>Creating flexible code</a>\
+        <a class='disable' href='#'>Site Story</a>\
+        <a class='disable' href='#'>Repository&nbsp;Content</a>\
+        <a class='disable' href='#'>Using&nbsp;Visual&nbsp;Studio</a>\
+        <a class='disable' href='#'>Using&nbsp;VS&nbsp;Code</a>\
+        <a class='disable' href='#'>Building&nbsp;Repository&nbsp;Code&nbsp;</a>\
         <a class='disable' href='#'>Design Examples</a>\
         <a class='disable' href='#'>Building Complex Systems</a>\
-        <a class='disable' href='#'>Site Story</a>\
-        <a class='disable' href='#'>Visual Studio Help</a>\
       </div >\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;About&nbsp;this&nbsp;Site</div>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
         <a href='Help.html'>Help</a>\
         <a href='ToDo.html'>ToDo</a>\
