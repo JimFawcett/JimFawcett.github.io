@@ -56,7 +56,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Resources &#9662;</button>\
       <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Developer&nbsp;Resources&nbsp;</div>\
+        <div class='darkTheme'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
         <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
         <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
         <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
@@ -64,6 +64,7 @@ function initializeMenu() {
         <a class='disable' href='UMLDiagrams.html'>UML Diagrams</a>\
         <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
         <a href='SummerReading.html'>Summer Reading</a>\
+        <a href='WebNotes.html'>Web Notes</a>\
         <a href='CppExamples.html'>C++ Examples</a>\
       </div>\
     </div>\
@@ -125,6 +126,7 @@ function initializeMenu() {
         <a class='border' href='LangCpp.html'>L2 C++&nbsp;webpage</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
+        <a href='Menus.html'>Menus</a>\
       </div>\
     </div>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\

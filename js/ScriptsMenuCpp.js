@@ -67,11 +67,15 @@ function initializeMenu() {
       <button class='dropbutton'>C++ Lang &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='LangCpp.html'>C++</a>\
+        <a href='https://en.cppreference.com'>cppreference</a>\
+        <a href='https://isocpp.org/wiki/faq/classes-and-objects'>C++ FAQ</a>\
+        <a href='CppSynopsis.html'>C++ Synopsis</a>\
+        <a href='Resources/SurvivalGuide.pdf'>Survival&nbsp;Guide&nbsp;-&nbsppdf</a>\
         <a href='DesignNote-CvsCpp.html'>C vs C++</a>\
         <a href='DesignNote-GettingStartedWithCpp.html'>Getting Started</a>\
         <a href='Resources/CppModels.pdf'>C++ models - pdf</a>\
         <a href='DesignNote-CppClasses.html'>classes</a>\
-        <a class='disable' href='DesignNote-ValueTypes.html'>Value Types</a>\
+        <a href='STRCode.html'>Value Types</a>\
         <a href='DesignNote-CppClassRelationships.html'>class relationships</a>\
         <a href='DesignNote-Cpp11.html'>C++11</a>\
         <a href='DesignNote-CompoundObjects.html'>Compound Objects</a>\
@@ -121,6 +125,7 @@ function initializeMenu() {
         <a class='border' href='LangCpp.html'>L2 C++&nbsp;webpage</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
+        <a href='Menus.html'>Menus</a>\
       </div>\
     </div>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\

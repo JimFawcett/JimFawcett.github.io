@@ -111,6 +111,7 @@ function initializeMenu() {
         <a class='border' href='../../LangCpp.html'>L2 C++&nbsp;webpage</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='../../SiteMap.html'>Site Map</a>\
+        <a href='../../Menus.html'>Menus</a>\
       </div>\
     </div>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\

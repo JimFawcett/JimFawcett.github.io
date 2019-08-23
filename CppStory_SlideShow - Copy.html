@@ -1,0 +1,364 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - CppStory_SlideShow.html - sequencer for stories
+   - ver 1.0 - 10 August 2019
+   - Jim Fawcett, Syracuse University
+  -->
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Projects. Code Samples. Software Links" />
+  <meta name="keywords" content="Repository, Design, Code" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>C++ Story</title>
+  <script src="js/ScriptsStoryKeyboard.js"></script>
+  <link rel="stylesheet" href="css/StylesSimpleDropDownMenu.css" />
+  <style>
+    grid-container {
+      display: grid;
+      grid-gap: 0.2em;
+      grid-template-columns: 1fr 2em;
+      grid-template-rows: 2em 1fr;
+      grid-template-areas: "header header" "main right";
+      background-color: #cc0000;
+      /*border: 1em solid #cc0000;*/
+      position: absolute;
+      top: 0em;
+      bottom: 0em;
+      left: 0.1em;
+      right: 0.1em;
+    }
+
+    .header {
+      grid-area: header;
+      background-color: white;
+      text-align: left;
+      vertical-align: central;
+      line-height: 1.6em;
+      padding-left: 1em;
+      font-size: large;
+      font-weight: bold;
+    }
+
+    .firstButton {
+      font-size: large;
+      /*font-weight: bold;*/
+      width:1.75em;
+      height: 4em;
+      border:1px solid saddlebrown;
+    }
+
+    .left {
+      grid-area: left;
+      background-color: white;
+    }
+
+    .backwardButton {
+      font-size: larger;
+      font-weight: bold;
+      width:1.75em;
+      height: 4em;
+      border:1px solid saddlebrown;
+    }
+
+    .main {
+      grid-area: main;
+      background-color: white;
+    }
+
+    .right {
+      grid-area: right;
+      background-color: white;
+    }
+
+    .forwardButton {
+      font-size: larger;
+      font-weight: bold;
+      width:1.75em;
+      height: 4em;
+      border:1px solid saddlebrown;
+    }
+
+    .currentButton {
+      font-size: large;
+      /*font-weight: bold;*/
+      width:1.75em;
+      height: 4em;
+      border:1px solid saddlebrown;
+    }
+
+    .returnButton {
+      font-size: large;
+      /*font-weight: bold;*/
+      width:1.75em;
+      height: 4em;
+      border:1px solid saddlebrown;
+    }
+
+    .exitButton {
+      font-size: large;
+      /*font-weight: bold;*/
+      width:1.75em;
+      height: 4em;
+      border:1px solid saddlebrown;
+    }
+
+    .lastButton {
+      font-size: large;
+      /*font-weight: bold;*/
+      width:1.75em;
+      height: 4em;
+      border:1px solid saddlebrown;
+    }
+
+    .resp-container {
+      position: relative;
+      overflow: hidden;
+      z-index: 5;
+    }
+
+    .resp-iframe {
+      position: relative;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    /* 
+      tooltip styles are slightly modified versions of ones
+      presented in w3schools.com
+    */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      border-bottom: 1px dotted black;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 120px;
+      background-color: black;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px 5px;
+      position: absolute;
+      z-index: 10;
+      top:-10px;
+      right: 125%;
+  
+      /* Fade in tooltip - takes 1 second to go from 0% to 100% opac: */
+      opacity: 0;
+      transition: opacity 1s;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+      right:105%;;
+    }
+  </style>
+  <script>
+    var numPages = 32;
+    var storyPage = [
+      "stories/CppStory/CppStory_Cover.html",
+      "stories/CppStory/CppStory_Chapter1.html",
+      "CppSynopsis.html",
+      "DesignNote-CvsCpp.html",
+      "CppTypeSystem.html",
+      "CppBasicDemos.html",
+      "CppModels.html",
+      "stories/CppStory/CppStory_Exercises1.html",
+      "stories/CppStory/CppStory_Chapter2.html",
+      "DesignNote-CppClasses.html",
+      "STRCode.html",
+      "Duplicates.html",
+      "stories/CppStory/CppStory_Exercises2.html",
+      "stories/CppStory/CppStory_Chapter3.html",
+      "DesignNote-CppClassRelationships.html",
+      "Inheritance.html",
+      "DesignNote-CompoundObjects.html",
+      "TextFinder.html",
+      "stories/CppStory/CppStory_Exercises3.html",
+      "stories/CppStory/CppStory_Chapter4.html",
+      "Templates.html",
+      "TemplateTechniques.html",
+      "CppProperties.html",
+      "STL-Containers.html",
+      "stories/CppStory/CppStory_Exercises4.html",
+      "stories/CppStory/CppStory_Chapter5.html",
+      "Repositories.html",
+      "DesignNote-GettingStartedWithCpp.html",
+      "stories/CppStory/CppStory_Appendix.html",
+      "Resources/SurvivalGuide.pdf",
+      "CppExamples.html",
+      "CppReferences.html"
+    ]
+
+    var storyIndex = 0;
+
+    function showSlideAddr(n) {
+      let addrHolder = document.getElementById("slideAddress");
+      addrHolder.innerHTML = storyPage[n];
+    }
+    function showSlideNum(n) {
+      let numHolder = document.getElementById("slideNum");
+      numHolder.innerHTML = n.toString() + " of " + numPages.toString() + " pages";
+    }
+    function render(si) {
+      storyIndex = si;
+      showSlideAddr(si);
+      showSlideNum(si + 1);
+      let page = storyPage[si];
+      let slider = document.getElementById("slideShow");
+      slider.setAttribute("src", page);
+      document.getElementById("slideShow").src = document.getElementById("slideShow").src;
+    }
+    function first() {
+      render(0);
+    }
+    function last() {
+      render(numPages - 1);
+    }
+    function forward() {
+      var si = (++storyIndex) % numPages;
+      render(si);
+    }
+    function backward() {
+      var si = (--storyIndex) % numPages;
+      if (si === -1)
+        si = numPages - 1;
+      render(si);
+    }
+    function current() {
+      render(storyIndex);
+    }
+    function contentRefresh() {
+      document.getElementById("slideShow").src = document.getElementById("slideShow").src;
+      current();
+      //let ifrm = document.getElementById("slideShow");
+      //let isrc = ifrm.src;
+      //if (isrc !== "")
+      //  document.getElementById("slideShow").src = document.getElementById("slideShow").src;
+      //else
+      //  first();
+      // This fails due to cross-origin policy reported by FireFox debugger
+      //var ifrm = document.getElementById("slideShow");
+      //var temp = (ifrm.contentWindow || ifrm.contentDocument);
+      //var x = temp.location.h.href;
+      //x.refresh();
+
+      //if (temp.document)
+      //  temp = temp.document;
+      //temp.refresh();
+
+      //if (ifrm.contentWindow)
+      //  ifrm.contentWindow.refresh();
+      //else if (ifrm.contentDocument)
+      //  ifrm.contentDocument.refresh();
+
+      //document.getElementById("slideShow").document.contentRefresh();
+    }
+    function refresh() {
+      showSlideAddr(storyIndex);
+      showSlideNum(storyIndex + 1);
+      render(storyIndex);
+      document.addEventListener('keydown', (event) => { keyAction(event); }, false);
+    }
+    function exit() {
+      location.replace("../JimFawcett.github.io/index.html");
+    }
+  </script>
+</head>
+<body id="github" onload="initializeMenu()">
+
+  <grid-container>
+    <div class="header" onclick="current()">
+      C++ story: iframe slideshow - <span id="slideAddress"></span>
+      <div style="float:right; padding-right:25px;">Page <span id="slideNum">1</span></div>
+    </div>
+    <div class="main resp-container">
+      <iframe id="slideShow" class="resp-iframe" src=""></iframe>
+    </div>
+    <div class="right">
+      <div style="height:40px;"></div>
+      <div class="tooltip">
+        <div class="tooltiptext">move to next slide</div>
+        <button class="forwardButton" onclick="forward()">N</button>
+      </div>
+      <div class="tooltip">
+        <div class="tooltiptext">move to prev slide</div>
+        <button class="backwardButton" onclick="backward()">P</button>
+      </div>
+      <div class="tooltip">
+        <div class="tooltiptext">return to story content</div>
+        <button class="returnButton" onclick="current()">R</button>
+      </div>
+      <div class="tooltip">
+        <div class="tooltiptext">move to first slide</div>
+        <button class="firstButton" onclick="first()">F</button>
+      </div>
+      <div class="tooltip">
+        <div class="tooltiptext">move to last slide</div>
+        <button class="lastButton" onclick="last()">L</button>
+      </div>
+      <div class="tooltip">
+        <div class="tooltiptext">exit story</div>
+        <button class="exitButton" onclick="exit()">E</button>
+      </div>
+    </div>
+  </grid-container>
+
+  <div id="dropdownmenu" class="dropcontainer" style="position:absolute; top:0em; right:14.5em; z-index:10;">
+    <ul>
+      <li class="dropdown">
+        <a href="javascript:void(0)" class="dropbtn">TOC</a>
+        <div class="dropdown-content">
+          <a href="#" onclick="render(0)">Story Cover</a>
+          <a href="#" onclick="render(1)">Chap-1&nbsp;Introduction</a>
+          <a href="#" onclick="render(2)">&nbsp;&nbsp;C++&nbsp;Synopsis</a>
+          <a href="#" onclick="render(3)">&nbsp;&nbsp;C&nbsp;vs&nbsp;C++</a>
+          <a href="#" onclick="render(4)">&nbsp;&nbsp;C++&nbsp;Type&nbsp;System</a>
+          <a href="#" onclick="render(5)">&nbsp;&nbsp;C++&nbsp;Basic&nbsp;Demos</a>
+          <a href="#" onclick="render(6)">&nbsp;&nbsp;C++&nbsp;Models</a>
+          <a href="#" onclick="render(7)">&nbsp;&nbsp;Exercises-1</a>
+          <a href="#" onclick="render(8)">Chap-2&nbsp;Classes</a>
+          <a href="#" onclick="render(9)">&nbsp;&nbsp;Classes</a>
+          <a href="#" onclick="render(10)">&nbsp;&nbsp;Value&nbsp;Types</a>
+          <a href="#" onclick="render(11)">&nbsp;&nbsp;Duplicates</a>
+          <a href="#" onclick="render(12)">&nbsp;&nbsp;Exercises-2</a>
+          <a href="#" onclick="render(13)">Chap-3&nbsp;Relationships</a>
+          <a href="#" onclick="render(14)">&nbsp;&nbsp;Class&nbsp;Relationships</a>
+          <a href="#" onclick="render(15)">&nbsp;&nbsp;Class&nbsp;Inheritance</a>
+          <a href="#" onclick="render(16)">&nbsp;&nbsp;Compound&nbsp;Objects</a>
+          <a href="#" onclick="render(17)">&nbsp;&nbsp;TextFinder&nbsp;Example</a>
+          <a href="#" onclick="render(18)">&nbsp;&nbsp;Exercises-3</a>
+          <a href="#" onclick="render(19)">Chap-4&nbsp;Templates</a>
+          <a href="#" onclick="render(20)">&nbsp;&nbsp;Generic&nbsp;Programming</a>
+          <a href="#" onclick="render(21)">&nbsp;&nbsp;Template&nbsp;Techniques</a>
+          <a href="#" onclick="render(22)">&nbsp;&nbsp;C++&nbsp;Properites&nbsp;Example</a>
+          <a href="#" onclick="render(23)">&nbsp;&nbsp;STL&nbsp;Container&nbsp;Examples</a>
+          <a href="#" onclick="render(24)">&nbsp;&nbsp;Exercises-4</a>
+          <a href="#" onclick="render(25)">Chap-5&nbsp;Summary</a>
+          <a href="#" onclick="render(26)">&nbsp;&nbsp;Repository&nbsp;Summaries</a>
+          <a href="#" onclick="render(27)">&nbsp;&nbsp;Starting&nbsp;C++</a>
+          <a href="#" onclick="render(28)">Appendix</a>
+          <a href="#" onclick="render(29)">&nbsp;&nbsp;C++&nbsp;Survival&nbsp;Guide</a>
+          <a href="#" onclick="render(30)">&nbsp;&nbsp;C++&nbsp;Examples</a>
+          <a href="#" onclick="render(31)">&nbsp;&nbsp;C++&nbsp;References</a>
+          <a href="#">&nbsp;</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <spacer-25></spacer-25>
+
+  <script>
+    contentRefresh();
+  </script>
+  <info-bar></info-bar>
+</body>
+</html>
