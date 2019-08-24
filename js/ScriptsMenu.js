@@ -128,6 +128,7 @@ function initializeMenu() {
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
         <a href='Menus.html'>Menus</a>\
+        <a href='TestFileLoad.html'>TestFileLoad</a>\
       </div>\
     </div>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\
