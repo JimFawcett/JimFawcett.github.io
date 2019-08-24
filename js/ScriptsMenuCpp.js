@@ -131,8 +131,8 @@ function initializeMenu() {
         <a href='SiteDesign.html'>Site Design</a>\
         <a href='BookDesignCourse.html'>Design Course</a>\
         <a class='border' href='index.html'>L1 Site Home</a>\
-        <a class='border' href='Repositories.html'>L2 Repository&nbsp;webpage</a>\
-        <a class='border' href='LangCpp.html'>L2 C++&nbsp;webpage</a>\
+        <a class='border' href='Repositories.html'>L2&nbsp;Repository&nbsp;webpage</a>\
+        <a class='border' href='LangCpp.html'>L2&nbsp;C++&nbsp;webpage</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
         <a href='Menus.html'>Menus</a>\
