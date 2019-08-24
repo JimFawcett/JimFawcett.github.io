@@ -65,6 +65,7 @@ function initializeMenu() {
         <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
         <a href='SummerReading.html'>Summer Reading</a>\
         <a href='WebNotes.html'>Web Notes</a>\
+        <a href='CppReferences.html'>C++ References</a>\
         <a href='CppExamples.html'>C++ Examples</a>\
       </div>\
     </div>\
