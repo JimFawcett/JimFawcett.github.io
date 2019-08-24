@@ -19,6 +19,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Notes &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Developing&nbsp;Code</div>\
         <a href='DesignProcess.html'>Design Process</a>\
         <a href='ProjectsList.html'>Project suggestions</a>\
       </div>\
@@ -26,6 +27,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Blogs &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Opinions&nbsp;and&nbsp;Ideas</div>\
         <a href='Blog.html'>First&nbsp;Things</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
         <a href='BlogDesign.html'>SW&nbsp;Design</a>\
@@ -54,6 +56,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Resources &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Coding&nbsp;Resources</div>\
         <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
         <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
         <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
@@ -69,6 +72,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>C++ Lang &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;References&nbsp;for&nbsp;C++</div>\
         <a href='LangCpp.html'>C++</a>\
         <a href='https://en.cppreference.com'>cppreference</a>\
         <a href='https://isocpp.org/wiki/faq/classes-and-objects'>C++ FAQ</a>\
@@ -88,6 +92,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>C++ Demos &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Basic&nbsp;Code&nbsp;Demos</div>\
         <a class='disable' href='BasicSyntax.html'>basic syntax demos</a>\
         <a href='STR.html'>STR Value Type demo</a>\
         <a href='STL-Containers.html'>STL-Containers</a>\
@@ -99,6 +104,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Code Snaps &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Quick&nbsp;View&nbsp;Code</div>\
         <a href='CodeSnap-PointersAndReferences.cpp.html'>PointersAndReferences</a>\
         <a href='CodeSnap-ClassAnatomy.h.html'>ClassAnatomy</a>\
         <a href='CodeSnap-Strings.h.html'>Strings</a>\
@@ -117,6 +123,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;About&nbsp;this&nbsp;Site</div>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
         <a href='Help.html'>Help</a>\
         <a href='ToDo.html'>ToDo</a>\
