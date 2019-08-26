@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <title>Test File Load</title>
+  <style>
+    body {
+      margin: 5%;
+      font-family:Tahoma;
+    }
+    spacer-10 {
+      display: block;
+      height:10px;
+    }
+    spacer-15 {
+      display: block;
+      height:15px;
+    }
+    spacer-25 {
+      display: block;
+      height:25px;
+    }
+    descriptor-block {
+      display: block;
+      padding: 10px 25px;
+    }
+    #loadPlaceHolder {
+      padding-left: 25px;
+    }
+  </style>
+  <script>
+    function testForFileApi() {
+      if (window.File && window.FileReader && window.FileList)
+        alert('has FileApi');
+      else
+        alert('no FileApi');
+    }
+    /*
+     *  This function works, but requires user to select the
+     *  file to load. That is an artifact of the File API, 
+     *  implemented for security reasons.
+     */
+    function readFiles(event) {
+      let fileList = event.target.files;
+      for (var i = 0; i < fileList.length; ++i)
+        loadStory(fileList[i]);
+      event.preventDefault();
+    }
+
+    function loadStory(url) {
+      let reader = new FileReader();
+      reader.onload = function (loadedEvent) {
+        let place = document.getElementById("loadPlaceHolder");
+        place.innerHTML = loadedEvent.target.result;
+      }
+      reader.readAsText(url);
+    }
+    /*
+     * This function only works when the ajax call goes to a webserver
+     * that serves static pages.  For example, it works when this 
+     * TestFileLoad.html page resides in https://JimFawcett.github.io.
+     */
+    function readTextFile(file) {
+      var txt = "";
+      let place = document.getElementById("loadPlaceHolder");
+
+      var xmlhttp = new XMLHttpRequest();
+      xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.status == 200 && xmlhttp.readyState == 4) {
+          txt = xmlhttp.responseText;
+          let place = document.getElementById("loadPlaceHolder");
+          place.innerHTML = txt;
+          alert(txt);
+        }
+        else {
+          place.innerHTML = "ajax call failed"
+        }
+      }
+      xmlhttp.open("GET", file, true);
+      xmlhttp.send();
+    }
+  </script>
+</head>
+<body>
+  <h2>Test File Load</h2>
+  <descriptor-block>
+    Using JavaScript File API:
+    <spacer-10></spacer-10>
+    <button onclick="testForFileApi()">Test for JavaScript File Api</button>
+    <spacer-10></spacer-10>
+    <input type="file" onchange="readFiles(event)" />
+  </descriptor-block>
+  <descriptor-block>
+    Using ajax - only works if file is located in web server that serves static pages:
+    <spacer-10></spacer-10>
+    <button onclick="readTextFile('CppStory.html')">Read File</button>
+  </descriptor-block>
+  <spacer-10></spacer-10>
+  <div id="loadPlaceHolder"></div>
+</body>
+</html>
