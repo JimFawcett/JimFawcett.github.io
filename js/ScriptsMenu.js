@@ -61,7 +61,7 @@ function initializeMenu() {
         <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
         <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
         <a href='https://github.com/joshnh/Git-Commands'>git commands</a>\
-        <a class='disable' href='UMLDiagrams.html'>UML Diagrams</a>\
+        <a href='UML.html'>UML Diagrams</a>\
         <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
         <a href='SummerReading.html'>Summer Reading</a>\
         <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams</a>\
