@@ -19,6 +19,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Notes &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Developing&nbsp;Code</div>\
         <a href='DesignProcess.html'>Design Process</a>\
         <a href='ProjectsList.html'>Project suggestions</a>\
       </div>\
@@ -26,6 +27,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Blogs &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Opinions&nbsp;and&nbsp;Ideas</div>\
         <a href='Blog.html'>First&nbsp;Things</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
         <a href='BlogDesign.html'>SW&nbsp;Design</a>\
@@ -54,6 +56,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Resources &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Coding&nbsp;Resources</div>\
         <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
         <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
         <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
@@ -61,11 +64,17 @@ function initializeMenu() {
         <a class='disable' href='UMLDiagrams.html'>UML Diagrams</a>\
         <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
         <a href='SummerReading.html'>Summer Reading</a>\
+        <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams</a>\
+        <a href='WebNotes.html'>Web Notes</a>\
+        <a href='https://encycolorpedia.com/named'>Web Colors</a>\
+        <a href='CppReferences.html'>C++ References</a>\
+        <a href='CppExamples.html'>C++ Examples</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Prog Lang &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Programming&nbsp;Languages&nbsp;</div>\
         <a href='LangCpp.html'>C++</a>\
         <a class='disable' href='#'>C#</a>\
         <a class='disable' href='#'>HTML</a>\
@@ -80,6 +89,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Design Book &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Book&nbsp;Contents&nbsp;</div>\
         <a class='disable' href='#'>Table of Contents</a>\
         <a class='disable' href='#'>Concept&nbsp;and&nbsp;Tasks&nbsp;(TextFinder)</a>\
         <a class='disable' href='#'>Classes (CppUtilities)</a>\
@@ -100,6 +110,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;About&nbsp;this&nbsp;Site</div>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
         <a href='Help.html'>Help</a>\
         <a href='ToDo.html'>ToDo</a>\
