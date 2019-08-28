@@ -72,6 +72,7 @@ function initializeMenu() {
       <div class='dropdown-content'>\
         <div class='darkTheme'>&nbsp;Projects</div>\
         <a href='SitePages.html'>SitePages</a>\
+        <a href='StoriesRepo.html'>Stories</a>\
         <a href='CppParser.html'>CppParser</a>\
         <a href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a>\
         <a href='CsDependencyAnalysis.html'>CsDependencyAnalysis</a>\
