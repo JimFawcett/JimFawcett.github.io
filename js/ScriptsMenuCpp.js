@@ -80,6 +80,7 @@ function initializeMenu() {
         <a href='https://isocpp.org/wiki/faq/classes-and-objects'>C++ FAQ</a>\
         <a href='CppSynopsis.html'>C++ Synopsis</a>\
         <a href='Resources/SurvivalGuide.pdf'>Survival&nbsp;Guide&nbsp;-&nbsppdf</a>\
+        <a href='CppTypeSystem.html'>C++ Type System</a>\
         <a href='DesignNote-CvsCpp.html'>C vs C++</a>\
         <a href='DesignNote-GettingStartedWithCpp.html'>Getting Started</a>\
         <a href='Resources/CppModels.pdf'>C++ models - pdf</a>\
