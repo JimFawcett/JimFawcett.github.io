@@ -191,7 +191,7 @@
 
     var pages = [];
     var numItems = 0;
-    var current = 1;
+    var curr = 1;
     var src = null;
     var prevSrc = null;
 
@@ -205,6 +205,7 @@
      */
     function render(si) {
       curr = si;
+      console.log('entering render:\ncurr = ', curr);
       // get locations to show current page an number of pages
       let index = document.getElementById("pageIndex");
       index.innerHTML = si.toString();
@@ -236,17 +237,20 @@
 
         case 0:  // load story list
           clearLocalStorage();
+          clearPages();
           slider.setAttribute("src", "StoryList.html");
           disableButtons();
           enableButton('retrieveBtn');
-          current = 1;
+          curr = 1;
           if (isDefined(pageField))
             pageField.style.display = "none";
           break;
 
         default: // render story pages
-          if (si < -1 || numItems < si)
+          if (si < -1 || numItems < si) {
+            console.log('leaving render: bad si:\ncurr = ', curr);
             return;
+          }
           enableButton('clrStorage');  // button hidden, will probably remove
 
           // set iframe source to page indexed by si
@@ -271,6 +275,7 @@
       }
       // force iframe to change location
       document.getElementById("slideShow").src = document.getElementById("slideShow").src;
+      console.log('leaving render(curr):\ncurr = ', curr);
     }
     /* --------------------------------------------------------------
      *  Enable a single button
@@ -323,6 +328,7 @@
      *  Empty the placeholder contents
      */
     function clearDisplay(id) {
+      console.log('clearDisplay(id) calling render(-1):\ncurr = ', curr);
       render(-1);
       let place = document.getElementById(id);
       removeChildren(place);
@@ -332,9 +338,9 @@
      */
     function clearLocalStorage() {
       localStorage.clear();
-      pages = [];
-      numItems = 0;
-      render(-1);
+      //pages = [];
+      //numItems = 0;
+      //render(-1);
     }
     /* --------------------------------------------------------------
      *  Empty pages array
@@ -356,6 +362,7 @@
      *    what was processed.
      */
     function retrieve(id) {
+      console.log('entering retrieve(id):\ncurr = ', curr);
       clearPages();
       if ('numItems' in localStorage) {
         let numItemsStr = localStorage.getItem('numItems');
@@ -363,6 +370,7 @@
       }
       else {
         alert('please select story')
+        console.log('leaving retrieve(id) - no data in localStorage:\ncurr = ', curr);
         return;
       }
 
@@ -384,8 +392,10 @@
         pageField.style.display = "inline";
       }
       loadTOC();
+      console.log('retrieve(id) calling render(1):\ncurr = ', curr);
       render(1);
-      curr = 1;
+      //curr = 1;
+      console.log('leaving retrieve(id):\ncurr = ', curr);
     }
     /* ------------------------------------------------------------
      *  showPages(id)
@@ -418,6 +428,7 @@
      */
     function first() {
       curr = 1;
+      console.log('first() calling render(curr):\ncurr = ', curr);
       render(curr);
     }
     /* --------------------------------------------------------------
@@ -425,26 +436,29 @@
      */
     function last() {
       curr = numItems;
+      console.log('last() calling render(curr):\ncurr = ', curr);
       render(curr);
     }
     /* --------------------------------------------------------------
      *  Increment page count and render it
      */
     function next() {
-      if (typeof curr === 'undefined')
+      if (!isDefined(curr))
         curr = 1;
       else
         ++curr;
       if (curr > numItems)
         curr = 1;
+      console.log('next() calling render(curr):\ncurr = ', curr);
       render(curr);
     }
     /* --------------------------------------------------------------
      *  Return to story after navigating away in displayed page
      */
     function returnToCurr() {
-      if (typeof curr === 'undefined')
-        curr = 1;
+      console.log('returnToCurr() calling render(curr):\ncurr = ', curr);
+      //if (!isDefined(curr))
+      //  curr = 1;
       render(curr);
     }
     /* --------------------------------------------------------------
@@ -454,6 +468,7 @@
       --curr;
       if (curr < 1)
         curr = numItems;
+      console.log('prev() calling render(curr):\ncurr = ', curr);
       render(curr);
     }
     /* --------------------------------------------------------------
@@ -461,20 +476,20 @@
      * --------------------------------------------------------------
      *  Show or hid page note, collected from story TOC
      */
-    function toggleNote() {
-      let note = document.getElementById("pageNoteId");
-      let styleObj = activeStyle(note);
-      let vis = styleObj.getPropertyValue('visibility');
-      if (vis === 'hidden' || !isDefined(vis)) {
-        note.style.visibility = 'visible';
-        note.style.opacity = 1.0;
-        note.innerHTML = pages[curr - 1].note;
-      }
-      else {
-        note.style.visibility = 'hidden';
-        note.style.opacity = 0;
-      }
-    }
+    //function toggleNote() {
+    //  let note = document.getElementById("pageNoteId");
+    //  let styleObj = activeStyle(note);
+    //  let vis = styleObj.getPropertyValue('visibility');
+    //  if (vis === 'hidden' || !isDefined(vis)) {
+    //    note.style.visibility = 'visible';
+    //    note.style.opacity = 1.0;
+    //    note.innerHTML = pages[curr - 1].note;
+    //  }
+    //  else {
+    //    note.style.visibility = 'hidden';
+    //    note.style.opacity = 0;
+    //  }
+    //}
 
     function openNote() {
       let note = document.getElementById("pageNoteContainer");
@@ -496,7 +511,7 @@
         return;
       src = iframe.src;
       if (isDefined(prevSrc)) {
-        if (prevSrc === src) {
+        if (prevSrc === src && numItems === 0) {
           loadStory();
         }
       }
@@ -508,11 +523,13 @@
 
     function loadStoryList() {
       closeNote();
+      console.log('LoadStoryList() calling render(0):\ncurr = ', curr);
       render(0);
     }
 
     function loadStory() {
       closeNote();
+      console.log('loadStory calling retrieve("numItems"):\ncurr = ', curr);
       retrieve('numItems');
     }
 
@@ -580,6 +597,7 @@
     }
     function initialize() {
       addKeys();
+      console.log('initialize() calling render(0):\ncurr = ', curr);
       render(0);
     }
   </script>
