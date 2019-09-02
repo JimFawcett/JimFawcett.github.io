@@ -104,7 +104,7 @@ function initializeMenu() {
       <div class='dropdown-content'>\
         <div class='darkTheme'>&nbsp;Ordered&nbsp;Content</div>\
         <a href='Stories.html'>What is a Story?</a>\
-        <a href='CppStory_SlideShow.html'>Starting C++</a>\
+        <a href='StoryTeller.html'>Load Story List</a>\
         <a class='disable' href='#'>C++ Ecosystem</a>\
         <a class='disable' href='#'>Site Story</a>\
         <a class='disable' href='#'>Repository&nbsp;Content</a>\
