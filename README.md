@@ -8,5 +8,5 @@ get new tests and added functionality.  There will also be new code projects tha
 from Syracuse University, and there will be more focus on Linux code as well as Windows.
 
 <strong>Status:</strong>
-I've just started this website.  Many of the links do not work yet, and there are many pages to add.
+I've just started this website.  A few of the links do not work yet, and there are pages to add.
 Progress will be slow over the summer due to vacation plans, but by late August 2019 the pace will pick up.
