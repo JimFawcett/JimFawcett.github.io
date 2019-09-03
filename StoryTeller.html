@@ -1,6 +1,6 @@
 ﻿<!DOCTYPE html>
 <!--
-  StoryTeller.html - Prototype for displaying extensible stories
+  StoryTeller.html - Web app for displaying extensible stories
   Jim Fawcett, Aug 27, 2019
 -->
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -20,6 +20,8 @@
   <link rel="stylesheet" href="css/StylesMenu.css" />
   <link rel="stylesheet" href="css/StylesSimpleDropDownMenu.css" />
   <style>
+    /* these styles are very application specific so won't be move to CSS file */
+
     grid-container {
       display: grid;
       grid-gap: 0.2em;
@@ -61,17 +63,6 @@
       background-color: white;
     }
 
-    /*grid-container {
-      display: grid;
-      grid-gap: 0.1em;
-      grid-template-columns: 1fr;
-      grid-template-rows: 1fr;
-      background-color: #cc0000;
-      border: 0.25em solid #cc0000;
-      position: relative;
-      top: 0em;
-      height:600px;
-    }*/
     #slideShow {
       border: 2px solid saddlebrown;
       position: relative;
@@ -103,7 +94,6 @@
       right: 150px;
       min-width: 100px;
       max-width: 30%;
-      /*border: 2px solid #2e5694;*/
       border: 2px solid #2e5694;
       z-index: 100;
     }
@@ -161,9 +151,9 @@
       else
         return true;
     }
-
     /* --------------------------------------------------------------
-     *  activeStyle(elem)
+     *  activeStyle(elem) - returns the current style, not what
+     *                      was defined at load time.
      * --------------------------------------------------------------
      *  Returns a style object - interrogate with getPropertyValue()
      */
@@ -189,24 +179,26 @@
      *  e.g., the number of pages in the story.
      */
 
-    var pages = [];
-    var numItems = 0;
-    var curr = 1;
-    var src = null;
-    var prevSrc = null;
-
+    var pages = [];       // array to hold page objects
+    var numItems = 0;     // number of story pages
+    var curr = 1;         // current page index
+    var src = null;       // holds iframe src url
+    var prevSrc = null;   // used to detect no change in src on page load
+                          // needed to avoid user needing to explicitly load
+                          // story after selecting story link in story list
     /* --------------------------------------------------------------
      *  render(si) - si is story index
      * --------------------------------------------------------------
      *  Show story pages in iframe
      *  - si == -1 shows blank page
      *  - si ==  0 shows story list
-     *  - si >=  1 shows story page
+     *  - si >=  1 shows first story page
      */
     function render(si) {
       curr = si;
-      console.log('entering render:\ncurr = ', curr);
-      // get locations to show current page an number of pages
+      //console.log('entering render:\ncurr = ', curr);
+
+      // get locations to show current page and number of pages
       let index = document.getElementById("pageIndex");
       index.innerHTML = si.toString();
       let count = document.getElementById("numItems");
@@ -218,7 +210,6 @@
       // get story teller iframe
       let slider = document.getElementById("slideShow");
 
-      //console.log('pageField.tagname = ' + pageField.tagName);
       switch (si) {
         case -1:  // Refreshing story teller loads blank page
           slider.setAttribute("src", "blank.html")
@@ -226,6 +217,8 @@
           disableButton('retrieveBtn');
           disableButton('clrStorage');
 
+          // I left this here to show how to use activeStyle(..)
+          //-----------------------------------------------------
           //console.log('pageField.tagname = ' + pageField.tagName);
           //let styleObj = activeStyle(pageField);
           //let val = styleObj.getPropertyValue('display');
@@ -248,10 +241,10 @@
 
         default: // render story pages
           if (si < -1 || numItems < si) {
-            console.log('leaving render: bad si:\ncurr = ', curr);
+            //console.log('leaving render: bad si:\ncurr = ', curr);
             return;
           }
-          enableButton('clrStorage');  // button hidden, will probably remove
+          //enableButton('clrStorage');  // button hidden, will probably remove
 
           // set iframe source to page indexed by si
           slider.setAttribute("src", pages[si - 1].url);
@@ -275,7 +268,8 @@
       }
       // force iframe to change location
       document.getElementById("slideShow").src = document.getElementById("slideShow").src;
-      console.log('leaving render(curr):\ncurr = ', curr);
+
+      //console.log('leaving render(curr):\ncurr = ', curr);
     }
     /* --------------------------------------------------------------
      *  Enable a single button
@@ -328,7 +322,7 @@
      *  Empty the placeholder contents
      */
     function clearDisplay(id) {
-      console.log('clearDisplay(id) calling render(-1):\ncurr = ', curr);
+      //console.log('clearDisplay(id) calling render(-1):\ncurr = ', curr);
       render(-1);
       let place = document.getElementById(id);
       removeChildren(place);
@@ -338,9 +332,6 @@
      */
     function clearLocalStorage() {
       localStorage.clear();
-      //pages = [];
-      //numItems = 0;
-      //render(-1);
     }
     /* --------------------------------------------------------------
      *  Empty pages array
@@ -362,7 +353,8 @@
      *    what was processed.
      */
     function retrieve(id) {
-      console.log('entering retrieve(id):\ncurr = ', curr);
+      //console.log('entering retrieve(id):\ncurr = ', curr);
+
       clearPages();
       if ('numItems' in localStorage) {
         let numItemsStr = localStorage.getItem('numItems');
@@ -370,7 +362,8 @@
       }
       else {
         alert('please select story')
-        console.log('leaving retrieve(id) - no data in localStorage:\ncurr = ', curr);
+
+        //console.log('leaving retrieve(id) - no data in localStorage:\ncurr = ', curr);
         return;
       }
 
@@ -387,18 +380,21 @@
       // set number of pages in display field and show it
       let item = document.getElementById(id);
       item.innerHTML = numItems.toString();
+
       //console.log('pageField.tagname = ' + pageField.tagName);
       if (isDefined(pageField)) {
         pageField.style.display = "inline";
       }
+
       loadTOC();
-      console.log('retrieve(id) calling render(1):\ncurr = ', curr);
+      //console.log('retrieve(id) calling render(1):\ncurr = ', curr);
       render(1);
-      //curr = 1;
-      console.log('leaving retrieve(id):\ncurr = ', curr);
+
+      //console.log('leaving retrieve(id):\ncurr = ', curr);
     }
     /* ------------------------------------------------------------
-     *  showPages(id)
+     *  showPages(id) - this is no longer used, may add to an 
+     *                  admin dropdown
      * ------------------------------------------------------------
      *  - Step throught pages array and display their contents
      *    in placeholder
@@ -406,7 +402,7 @@
      *    uses this display
      */
     function showPages(id) {
-      if (!numItems)
+      if (!isDefined(numItems))
         return;
       place = document.getElementById(id);
       let underline = "---------------------------------";
@@ -428,7 +424,8 @@
      */
     function first() {
       curr = 1;
-      console.log('first() calling render(curr):\ncurr = ', curr);
+
+      //console.log('first() calling render(curr):\ncurr = ', curr);
       render(curr);
     }
     /* --------------------------------------------------------------
@@ -436,7 +433,8 @@
      */
     function last() {
       curr = numItems;
-      console.log('last() calling render(curr):\ncurr = ', curr);
+
+      //console.log('last() calling render(curr):\ncurr = ', curr);
       render(curr);
     }
     /* --------------------------------------------------------------
@@ -449,16 +447,16 @@
         ++curr;
       if (curr > numItems)
         curr = 1;
-      console.log('next() calling render(curr):\ncurr = ', curr);
+
+      //console.log('next() calling render(curr):\ncurr = ', curr);
       render(curr);
     }
     /* --------------------------------------------------------------
      *  Return to story after navigating away in displayed page
      */
     function returnToCurr() {
-      console.log('returnToCurr() calling render(curr):\ncurr = ', curr);
-      //if (!isDefined(curr))
-      //  curr = 1;
+
+      //console.log('returnToCurr() calling render(curr):\ncurr = ', curr);
       render(curr);
     }
     /* --------------------------------------------------------------
@@ -468,43 +466,33 @@
       --curr;
       if (curr < 1)
         curr = numItems;
-      console.log('prev() calling render(curr):\ncurr = ', curr);
+
+      //console.log('prev() calling render(curr):\ncurr = ', curr);
       render(curr);
     }
     /* --------------------------------------------------------------
-     *  toggleNote()
-     * --------------------------------------------------------------
-     *  Show or hid page note, collected from story TOC
+     *  Open page-note (specific to each page)
      */
-    //function toggleNote() {
-    //  let note = document.getElementById("pageNoteId");
-    //  let styleObj = activeStyle(note);
-    //  let vis = styleObj.getPropertyValue('visibility');
-    //  if (vis === 'hidden' || !isDefined(vis)) {
-    //    note.style.visibility = 'visible';
-    //    note.style.opacity = 1.0;
-    //    note.innerHTML = pages[curr - 1].note;
-    //  }
-    //  else {
-    //    note.style.visibility = 'hidden';
-    //    note.style.opacity = 0;
-    //  }
-    //}
-
     function openNote() {
       let note = document.getElementById("pageNoteContainer");
-      note.style.width = "500px";
+      note.style.width = "500px";  // this makes note visible
       note.style.padding = "10px 15px 20px 15px";
       note.style.border = "2px solid saddlebrown";
     }
-
+    /* --------------------------------------------------------------
+     *  Close page-note by setting width to 0px
+     */
     function closeNote() {
       let note = document.getElementById("pageNoteContainer");
       note.style.width = "0px";
       note.style.padding = "0px";
       note.style.border = "none";
     }
-
+    /* --------------------------------------------------------------
+     *  iframe onload event handler
+     *  Checks to see if loadStory should be called
+     *  so user doesn't have to do that.
+     */
     function srcChange() {
       let iframe = document.getElementById("slideShow");
       if (!isDefined(iframe))
@@ -516,42 +504,40 @@
         }
       }
       prevSrc = src;
-      //let srcField = document.getElementById("srcField");
-      //srcField.innerHTML = iframe.src;
-      //alert(iframe.src);
     }
-
+    /* --------------------------------------------------------------
+     *  Loads story list by calling render(0)
+     */
     function loadStoryList() {
       closeNote();
-      console.log('LoadStoryList() calling render(0):\ncurr = ', curr);
+      //console.log('LoadStoryList() calling render(0):\ncurr = ', curr);
       render(0);
     }
-
+    /* --------------------------------------------------------------
+     *  Loads story by calling retrieve to read story details
+     *  from localStorage
+     *  'numItems' is id of element that holds and displays page count
+     */
     function loadStory() {
       closeNote();
-      console.log('loadStory calling retrieve("numItems"):\ncurr = ', curr);
+      //console.log('loadStory calling retrieve("numItems"):\ncurr = ', curr);
       retrieve('numItems');
     }
-
-    function toc() {
-      let toc = document.getElementById("tocContainer");
-      toc.style.width = "300px";
-      toc.style.padding = "10px 15px";
-    }
-
-    function closeToc() {
-      let toc = document.getElementById("tocContainer");
-      toc.style.width = "0px";
-      toc.style.padding = "0px";
-    }
-
+    /* --------------------------------------------------------------
+     *  Loads Table of Contents by indexing through pages array
+     *  and using pages[i].url and pages[i].name to build table of links
+     */
     function loadTOC() {
       let itemList = document.getElementById('dropDownItems');
       removeChildren(itemList);
+
+      // place label at top of TOC
       let topItem = document.createElement('div');
       topItem.setAttribute('style', 'background-color:saddlebrown; color:white; padding-left:5px;');
       topItem.innerHTML = 'Story Pages';
       itemList.appendChild(topItem);
+
+      // create links and append to TOC
       for (i = 1; i <= numItems; ++i) {
         let item = document.createElement('a');
         item.setAttribute('href', '#');
@@ -559,12 +545,15 @@
         item.innerHTML = pages[i - 1].name;
         itemList.appendChild(item);
       }
+      // leave blank line at end of TOC
       let item = document.createElement('a');
       item.setAttribute('href', '#');
       item.innerHTML = '&nbsp;';
       itemList.appendChild(item);
     }
-
+    /* --------------------------------------------------------------
+     *  Define key actions when StoryTeller has focus
+     */
     function keyAction(keyEvent) {
       keystate = 'down';
       var key = String.fromCharCode(keyEvent.which);
@@ -589,15 +578,22 @@
       if (keyEvent.key === 'Escape')
         closeNote();
     }
+    /* --------------------------------------------------------------
+     *  Add event listener for key events
+     */
     function addKeys() {
 
       // listen for keyboard events:
       // - key actions are defined in ScriptsKeyboard.js
       document.addEventListener('keydown', (event) => { keyAction(event); }, false);
     }
+    /* --------------------------------------------------------------
+     *  Add key event listener and load the Story List
+     *  - called at end of document
+     */
     function initialize() {
       addKeys();
-      console.log('initialize() calling render(0):\ncurr = ', curr);
+      //console.log('initialize() calling render(0):\ncurr = ', curr);
       render(0);
     }
   </script>
@@ -609,19 +605,15 @@
       height: auto;
       top: 200px;
       right: 8.5em;
-      /*background-color: #001440;*/
       background-color: white;
       color: #3c1414;
-      /*color: saddlebrown;*/
       box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
       overflow-x: hidden;
       transition: 0.5s;
-      /*padding: 10px 15px;*/
       font-size: medium;
-      /*border:1px solid white;*/
     }
 
-    .openNotebtn {
+    #github .openNotebtn {
       font-size: 1.5em;
       cursor: pointer;
       background-color: #111;
@@ -630,41 +622,19 @@
       border: none;
     }
 
-    #github .tocContainer {
-      width: 0;
-      position: fixed;
-      z-index: 100;
-      height: auto;
-      top: 200px;
-      right: 8.5em;
-      background-color: #001440;
-      color: white;
-      overflow-x: hidden;
-      transition: 0.5s;
-      /*padding: 10px 15px;*/
-      font-size: medium;
-    }
-
-    #github div.tocContainer a {
-      color: white;
-    }
-
     #github #iframeSrc {
       background-color: white;
       border: none;
     }
-  </style>
-  <style>
+
     #github #loadBtn {
       width: 8em;
       height: 1.8em;
-      /*border:2px solid green;*/
     }
 
     #github #retrieveBtn {
       width: 8em;
       height: 1.8em;
-      /*border:2px solid green;*/
     }
 
     #github .title {
@@ -679,11 +649,12 @@
   </style>
 </head>
 <body id="github">
-
+ <!-- this nav element needs to stay to avoid a JavaScript error when initializing -->
   <nav>
     <div id="navbar"></div>
   </nav>
 
+  <!-- Defines StoryTeller page layout -->
   <grid-container>
     <div class="header">
       <span class="title">Story Teller</span>
@@ -699,12 +670,12 @@
         <span id="pageAddress"></span>
       </span>
     </div>
-    <!-- onload="somefunc" -->
+
+    <!-- All content is loaded here -->
     <iframe id="slideShow" class="main slideShow" src="" onload="srcChange()"></iframe>
-    <!--<iframe id="slideShow" class="main slideShow" src="" onload="srcChange()"></iframe>-->
-    <!-- load story TOC page -->
+
+    <!-- Define buttons and lables -->
     <div class="right">
-      <!--<button id="tocBtn" class="right" onclick="toc()">TOC</button>-->
       <button id="nextBtn" class="right" onclick="next()">Next</button>
       <button id="currBtn" class="right" onclick="returnToCurr()">Curr</button>
       <button id="prevBtn" class="right" onclick="prev()">Prev</button>
@@ -714,12 +685,16 @@
       <button id="toggleBtn" class="right" onclick="openNote()">?</button>
     </div>
 
-    <!-- Read page contents rendered by story TOC into localStorage -->
+    <!-- LoadStory button allows user to switch to a different story at any time -->
     <div class="footer">
       <button id="loadBtn" class="footer" onclick="loadStoryList()">Load Story List</button>
+
+      <!-- This button is no longer needed, but may be used later for admin actions -->
       <!--<button id="retrieveBtn" class="footer" onclick="loadStory()">Load Story</button>-->
     </div>
   </grid-container>
+
+  <!-- Define elements for page-notes: they slide out with page specific info -->
   <div id="pageNoteContainer" class="pageNotes" onclick="closeNote()">
     <div style="float:right">
       <button id="closeButton" onclick="closeNote()">X</button>
@@ -731,31 +706,20 @@
     <div id="pageNoteId">
       Page notes are shown here.
     </div>
-    <!--<div>&nbsp;</div>-->
   </div>
+
+  <!-- Table of Contents dropdown content goes here -->
   <div id="dropdownmenu" class="dropcontainer" style="position:absolute; top:0.47em; right:4.4em; z-index:200;">
     <ul>
       <li class="dropdown">
-        <!--<a href="javascript:void(0)" class="dropbtn">TOC</a>-->
         <div class="dropbtn">TOC</div>
         <div id="dropDownItems" class="dropdown-content">
           <a href="#" style="background-color:saddlebrown; color:white; padding-left:10px;">Story Pages</a>
         </div>
     </ul>
   </div>
-  <!--<div id="tocContainer" class="tocContainer">
-    <ul id="tocList" onmouseout="closeToc()">
-      <li style="padding:0px; margin:0px;">
-        <a href="#">dummy</a>
-      </li>
-    </ul>
-  </div>-->
-  <!--<div id="pageNoteId" class="pageNotes">
-    Page notes are shown here.
-  </div>-->
   <script>
     initialize();
-    //render(-1);  // show blank page in iframe
   </script>
 </body>
 </html>
