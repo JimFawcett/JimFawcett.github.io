@@ -358,7 +358,7 @@
      *    what was processed.
      */
     function retrieve(id) {
-      //console.log('entering retrieve(id):\ncurr = ', curr);
+      console.log('entering retrieve(id):\ncurr = ', curr);
 
       clearPages();
       if ('numItems' in localStorage) {
@@ -496,26 +496,63 @@
     function isLocalFile() {
       return window.location.protocol === "file:";
     }
+
+    function isChrome() {
+      return false;
+      var isChromium = window.chrome;
+      var winNav = window.navigator;
+      var vendorName = winNav.vendor;
+      var isOpera = typeof window.opr !== "undefined";
+      var isIEedge = winNav.userAgent.indexOf("Edge") > -1;
+      var isIOSChrome = winNav.userAgent.match("CriOS");
+
+      if (isIOSChrome) {
+         // is Google Chrome on IOS
+        return true;
+      } else if(
+        isChromium !== null &&
+        typeof isChromium !== "undefined" &&
+        vendorName === "Google Inc." &&
+        isOpera === false &&
+        isIEedge === false
+      ) {
+         // is Google Chrome
+        return true;
+      } else { 
+         // not Google Chrome 
+        return false;
+      }
+    }
     /* --------------------------------------------------------------
      *  iframe onload event handler
      *  Checks to see if loadStory should be called
      *  so user doesn't have to do that.
      */
     function srcChange() {
-
-      let storyName = document.getElementById("storyName");
-      if (!isDefined(storyName))
+      if (isChrome())
         return;
+      let storyName = document.getElementById("storyName");
+      if (!isDefined(storyName)) {
+        console.log('storyName not defined');
+        return;
+      }
       if (!isDefined(localStorage)) {
         console.log('local storage not defined');
+        return;
       }
       let name = localStorage.getItem('storySaved');
       if (isDefined(name)) {
         storyName.innerHTML = name + " : ";
       }
+      if (isChrome()) {
+        console.log('is chrome');
+        return;
+      }
       if (isLocalFile()) {
         console.log('isLocalFile');
         let signal = localStorage.getItem('storySaved');
+        console.log(signal);
+        console.log(localStorage.length);
         if (isDefined(signal)) {
           loadStory();
           localStorage.removeItem('storySaved');
@@ -531,15 +568,21 @@
       //prevSrc = src;
     }
     function storageChange(event) {
+      console.log(event.key);
       if (event.key !== 'storySaved')
         return;
       if (isLocalFile())
         return;
       console.log('storage event');
+      console.log('localStorage.length = ' + localStorage.length)
       let signal = localStorage.getItem('storySaved');
+      //loadStory();
       if (isDefined(signal)) {
         loadStory();
         //localStorage.removeItem('storySaved');
+      }
+      else {
+        console.log('signal undefined');
       }
     }
 
@@ -709,11 +752,10 @@
   </style>
 </head>
 <body id="github" onload="initialize()">
- <!-- this nav element needs to stay to avoid a JavaScript error when initializing -->
+  <!-- this nav element needs to stay to avoid a JavaScript error when initializing -->
   <nav>
     <div id="navbar"></div>
   </nav>
-
   <!-- Defines StoryTeller page layout -->
   <grid-container>
     <div class="header">
