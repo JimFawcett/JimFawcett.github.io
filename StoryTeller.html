@@ -151,10 +151,10 @@
      *  initialized
      */
     function isDefined(elem) {
-      if (typeof elem === 'undefined' || elem === null)
+      if (typeof elem === 'undefined' || elem === null) {
         return false;
-      else
-        return true;
+      }
+      return true;
     }
     /* --------------------------------------------------------------
      *  activeStyle(elem) - returns the current style, not what
@@ -394,7 +394,7 @@
       loadTOC();
       //console.log('retrieve(id) calling render(1):\ncurr = ', curr);
       render(1);
-
+      localStorage.clear();
       //console.log('leaving retrieve(id):\ncurr = ', curr);
     }
     /* ------------------------------------------------------------
@@ -499,16 +499,45 @@
      *  so user doesn't have to do that.
      */
     function srcChange() {
-      let iframe = document.getElementById("slideShow");
-      if (!isDefined(iframe))
+
+      let storyName = document.getElementById("storyName");
+      if (!isDefined(storyName))
         return;
-      src = iframe.src;
-      if (isDefined(prevSrc)) {
-        if (prevSrc === src && numItems === 0) {
-          loadStory();
-        }
+      if (!isDefined(localStorage)) {
+        alert('local storage not defined');
       }
-      prevSrc = src;
+      let name = localStorage.getItem('storySaved');
+      if (isDefined(name)) {
+        storyName.innerHTML = name + " : ";
+      }
+      //let signal = localStorage.getItem('storySaved');
+      //if (isDefined(signal)) {
+      //  loadStory();
+      //  localStorage.removeItem('storySaved');
+      //}
+       
+      //src = iframe.src;
+      //if (isDefined(prevSrc)) {
+      //  if (prevSrc === src && numItems === 0) {
+      //    loadStory();
+      //  }
+      //}
+      //prevSrc = src;
+    }
+    function storageChange(event) {
+      if (event.key !== 'storySaved')
+        return;
+      alert('storage event');
+      let signal = localStorage.getItem('storySaved');
+      if (isDefined(signal)) {
+        loadStory();
+        //localStorage.removeItem('storySaved');
+      }
+    }
+
+    function addStorageEvent() {
+      //alert('addStorageEvent called');
+      window.addEventListener("storage", storageChange);
     }
     /* --------------------------------------------------------------
      *  Loads story list by calling render(0)
@@ -598,6 +627,8 @@
      */
     function initialize() {
       addKeys();
+      addStorageEvent();
+      //localStorage.clear();
       //pageNoteScroll();
       //console.log('initialize() calling render(0):\ncurr = ', curr);
       render(0);
@@ -691,7 +722,7 @@
     </div>
 
     <!-- All content is loaded here -->
-    <iframe id="slideShow" class="main slideShow" src="" onload="srcChange()"></iframe>
+    <iframe id="slideShow" class="main slideShow" src="" onload="srcChange()" style="width:99.5%; height:99%;"></iframe>
 
     <!-- Define buttons and lables -->
     <div class="right">
@@ -707,7 +738,8 @@
     <!-- LoadStory button allows user to switch to a different story at any time -->
     <div class="footer">
       <button id="loadBtn" class="footer" onclick="loadStoryList()">Load Story List</button>
-      <span-3em></span-3em>
+      <span-2em></span-2em>
+      <button id="storyName" class="footer" style="background-color:white; border:none;"></button>
       <button id="pageAddress" class="footer" style="background-color:white; border:none;"></button>
 
       <!-- This button is no longer needed, but may be used later for admin actions -->
