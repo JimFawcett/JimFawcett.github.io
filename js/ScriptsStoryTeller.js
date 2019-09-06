@@ -19,7 +19,7 @@
  *  numItems is the number of links collected from the story TOC page,
  *  e.g., the number of pages in the story.
  */
-
+var storyName = "";   // name displayed in footer
 var pages = [];       // array to hold page objects
 var numItems = 0;     // number of story pages
 var curr = 1;         // current page index
@@ -312,11 +312,12 @@ function srcChange() {
     //console.log('local storage not defined');  
     return;
   }
-  let storyName = document.getElementById("storyNameId");
-  if (isDefined(storyName)) {
+  let storyNamePlace = document.getElementById("storyNameId");
+  if (isDefined(storyNamePlace)) {
     let name = localStorage.getItem('storySaved');
     if (isDefined(name)) {
-      storyName.innerHTML = name + " : ";
+      storyNamePlace.innerHTML = name + " : ";
+      storyName = name;
     }
   }
   if (isChrome()) {
@@ -346,7 +347,11 @@ function storageChange(event) {
   //console.log('storage event');
   //console.log('localStorage.length = ' + localStorage.length)
   let signal = localStorage.getItem('storySaved');
+  storyName = signal;
+  //alert(storyName);
   if (isDefined(signal)) {
+    let storyNamePlace = document.getElementById("storyNameId");
+    storyNamePlace.innerHTML = storyName;
     loadStory();
     localStorage.removeItem('storySaved');  // added 9/6/2019
   }
