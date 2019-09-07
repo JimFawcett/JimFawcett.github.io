@@ -180,11 +180,48 @@
         <details>
           <summary>Classes</summary>
           <indent-block class="pad10">
-            A class is a language construct that binds together member functions and data, providing access 
-            to users only to public member functions, not to its data. This encapsulation enables the class 
+            A class is a language construct that binds together member functions and data, providing access
+            to users only to public member functions, not to its data. This encapsulation enables the class
             to make strong guarantees about validity of its data.
             <spacer-10></spacer-10>
-            <a href="DesignNote-CppClasses.html">DesignNote-CppClasses.html</a> - class structure,
+            This class was designed to hold file information, including both file name and path.  The intent
+            is to hold any given file name only once, even if the file has copies in several directories, and
+            to hold each path name only once.  That is done using a unique arrangement of STL containers.
+            <div class='code'>
+<pre>
+class DataStore
+{
+public:
+  using Date = std::string;
+  using Path = std::string;
+  using Paths = std::set &lt; Path &gt; ;
+  using PathIter = Paths::iterator;
+  using ListOfIters = std::list &lt; PathIter &gt; ;
+  using Item = std::pair&lt;PathIter, Date&gt;;
+  using ListOfItems = std::list&lt;Item&gt;;
+  using File = std::string;
+  using Store = std::map &lt; File, ListOfItems &gt;;
+  using iterator = Store::iterator;
+  using PathCollection = std::vector &lt; Path &gt; ;
+
+  void save(const std::string& filespec);
+  void save(const std::string& filename, const std::string& path);
+  PathCollection getPaths(const File& file);
+  size_t numberOfFiles();
+  size_t numberOfPaths();
+  iterator begin() { return store.begin(); }
+  iterator end() { return store.end(); }
+private:
+  Store store;
+  Paths paths;
+};
+
+inline size_t DataStore::numberOfFiles() { return store.size(); }
+
+inline size_t DataStore::numberOfPaths() { return paths.size(); }
+
+</pre>
+            </div>                                                                                                                              <a href="DesignNote-CppClasses.html">DesignNote-CppClasses.html</a> - class structure,
           </indent-block>
         </details>
         <details>
@@ -318,15 +355,42 @@
         <details>
           <summary>Templates</summary>
           <indent-block class="pad10">
-            Templates are compile time constructs that allow us to avoid writing a lot of nearly identical 
-            code for classes that could sensibly use any of several concrete types, perhaps as arguments 
+            Templates are compile time constructs that allow us to avoid writing a lot of nearly identical
+            code for classes that could sensibly use any of several concrete types, perhaps as arguments
             to member functions or as instances of member data. Containers are a good example.
             <spacer-10></spacer-10>
-            Templates are also useful for building functions that accept callable objects, i.e., function 
-            pointers, functors, or lambdas. We use template functions to accept instances of any of these 
+            Here is an example from <a href="CppBlockingQueue.html">CppBlockingQueue</a> repository.
+            <div class='code'>
+              <pre>
+template &lt;typename T&gt;
+class BlockingQueue {
+public:
+  BlockingQueue() {}
+  BlockingQueue(BlockingQueue&lt;T&gt;&& bq);
+  BlockingQueue&lt;T&gt;& operator=(BlockingQueue&lt;T&gt;&& bq);
+  BlockingQueue(const BlockingQueue&lt;T&gt;&) = delete;
+  BlockingQueue&lt;T&gt;& operator=(const BlockingQueue&lt;T&gt;&) = delete;
+  T deQ();
+  void enQ(const T& t);
+  T& front();
+  void clear();
+  size_t size();
+private:
+  std::queue&lt;T&gt; q_;
+  std::mutex mtx_;
+  std::condition_variable cv_;
+};
+              </pre>
+            </div>
+            T is a type that isn&apos;t specified until an application using the queue is compiled, so
+            it will hold strings or messages or whatever the application needs without changing any of
+            the BlockingQueue code.
+            <spacer-10></spacer-10>
+            Templates are also useful for building functions that accept callable objects, i.e., function
+            pointers, functors, or lambdas. We use template functions to accept instances of any of these
             distinct types. Thread constructors are a good example.
             <spacer-10></spacer-10>
-            <a href="Templates.html">Templates.html</a>, 
+            <a href="Templates.html">Templates.html</a>,
             <a href="CodeSnap-Templates.h.html">CodeSnap-Templates.h.html</a>
             <spacer-10></spacer-10>
             Here are a few interesting examples of template use:
@@ -425,6 +489,7 @@
             <a href="https://en.cppreference.com/w/cpp/thread">Threads Library Reference</a>
           </indent-block>
         </details>
+        <a href="https://en.cppreference.com/w/cpp/header">Other C++ standard libraries</a>
       </indent-block>
     </details>
     <details>
@@ -526,8 +591,9 @@
         WPF GUI spawning a Windows program.
         <spacer-10></spacer-10>
         <strong>Background Information:</strong>
-        <ul>
-          <li>
+        <details>
+          <summary>WPF</summary>
+          <indent-block class="pad10">
             <a href="Resources/WindowsPresentationFoundation.pdf">Windows Presentation Foundation (WPF)</a><br />
             A Graphical User Interface (GUI) framework that:
             <ul class="tight">
@@ -547,8 +613,11 @@
                 Runs only on Windows, as a desktop application, and in the Mono environment on Linux.
               </li>
             </ul>
-          </li>
-          <li>
+          </indent-block>
+        </details>
+        <details>
+          <summary>C++\CLI</summary>
+          <indent-block class="pad10">
             <a href="Resources/MixedClasses.pdf">C++\CLI</a><br />
             A .Net managed language that runs in a Common Language Runtime (CLR) virtual machine and
             stores its instances in a managed heap, providing garbage collection, exception handling,
@@ -556,8 +625,8 @@
             <spacer-10></spacer-10>
             C++\CLI code interoperates directly with native C++ code. C++\CLI code and native C++ may be
             placed in the same file.
-          </li>
-        </ul>
+          </indent-block>
+        </details>
       </indent-block>
     </details>
   </indent-block>
