@@ -190,6 +190,7 @@ function initializeMenu() {
   for (var i = 0; i < elems.length; ++i) {
     elems[i].addEventListener("click", (event) => { toggleVisibility(event); }, false);
   }
+  addSwipeListeners();
 }
 
 //----< load page defined in current page's Prev link >--------------

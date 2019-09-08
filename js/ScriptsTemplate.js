@@ -45,3 +45,31 @@ function hidePageNote() {
   let pgNote = document.getElementsByTagName("page-note")[0];
   pgNote.style.display = "none";
 }
+
+let x0 = null;
+
+function lock(e) {
+  x0 = unify(e).clientX;
+}
+
+function move(e) {
+  let cont = document.getElementsByTagName('body')[0];
+  if (x0 || x0 === 0) {
+    let dx = unify(e).clientX - x0, s = Math.sign(dx);
+    if (dx > 50)
+      loadNext();
+    else if (dx < -50)
+      loadPrev();
+    x0 = null;
+  }
+}
+function unify(e) {
+  return e.changedTouches ? e.changedTouches[0] : e;
+}
+function addSwipeListeners() {
+  let cont = document.getElementsByTagName('body')[0];
+  cont.addEventListener('touchstart', lock, false);
+  cont.addEventListener('mousedown', lock, false);
+  cont.addEventListener('touchend', move, false);
+  cont.addEventListener('mouseup', move, false);
+}
