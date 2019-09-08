@@ -23,17 +23,16 @@
   <link rel="stylesheet" href="css/StylesSimpleDropDownMenu.css" />
   <link rel="stylesheet" href="css/StylesTemplate.css" />
   <link rel="stylesheet" href="css/StylesStoryTeller.css" />
-  <style>
-  </style>
   <script>
     let xst0 = null;
+    let cont = document.getElementsByTagName('grid-container')[0];
+    let tBtn = document.getElementById('toggleBtn');
 
-    function lock(e) {
+    function sTlock(e) {
       xst0 = unify(e).clientX;
     }
     let i = 0;
-    function move(e) {
-      let cont = document.getElementsByTagName('body')[0];
+    function sTmove(e) {
       if (xst0 || xst0 === 0) {
         let dx = unify(e).clientX - xst0, s = Math.sign(dx);
         if (dx > 50)
@@ -47,23 +46,28 @@
       return e.changedTouches ? e.changedTouches[0] : e
     }
     function addStSwipeListeners() {
-      localStorage.setItem('swipeEvents', 'true');
+      localStorage.setItem('StSwipeEvents', 'true');
+      let tBtn = document.getElementById('tBtn');
+      tBtn.innerHTML = 'Swp'
       let cont = document.getElementsByTagName('grid-container')[0];
-      cont.addEventListener('touchstart', lock, false);
-      cont.addEventListener('mousedown', lock, false);
-      cont.addEventListener('touchend', move, false);
-      cont.addEventListener('mouseup', move, false);
+      cont.addEventListener('touchstart', sTlock, false);
+      cont.addEventListener('mousedown', sTlock, false);
+      cont.addEventListener('touchend', sTmove, false);
+      cont.addEventListener('mouseup', sTmove, false);
     }
     function removeStSwipeListeners() {
-      localStorage.setItem('swipeEvents', 'false');
-      let cont = document.getElementsByTagName('body')[0];
-      cont.removeEventListener('touchstart', lock, false);
-      cont.removeEventListener('mousedown', lock, false);
-      cont.removeEventListener('touchend', move, false);
-      cont.removeEventListener('mouseup', move, false);
+      localStorage.setItem('StSwipeEvents', 'false');
+      let tBtn = document.getElementById('tBtn');
+      tBtn.innerHTML = '<del>Swp</del>'
+      let cont = document.getElementsByTagName('grid-container')[0];
+      cont.removeEventListener('touchstart', sTlock, false);
+      cont.removeEventListener('mousedown', sTlock, false);
+      cont.removeEventListener('touchend', sTmove, false);
+      cont.removeEventListener('mouseup', sTmove, false);
     }
     function toggleStSwipeEvents() {
-      if (getSwipeEvents() === 'true') {
+      let StSwipeState = getStSwipeEvents();
+      if (StSwipeState === 'true' || !isDefined(StSwipeState)) {
         removeStSwipeListeners();
       }
       else {
@@ -71,9 +75,20 @@
       }
     }
 
-    function getSwipeEvents() {
-      swipeEvents = localStorage.getItem('swipeEvents');
-      return swipeEvents;
+    function getStSwipeEvents() {
+      let StSwipeEvents = localStorage.getItem('StSwipeEvents');
+      return StSwipeEvents;
+    }
+
+    function StInitialize() {
+      let tBtn = document.getElementById('tBtn');
+      if (getStSwipeEvents() === 'true') {
+        addStSwipeListeners();
+        tBtn.innerHTML = 'Swp';
+      }
+      else {
+        tBtn.innerHTML = '<del>Swp</del>';
+      }
     }
   </script>
 </head>
@@ -112,7 +127,7 @@
       <button id="firstBtn" class="right navButton" onclick="first()">First</button>
       <button id="lastBtn" class="right navButton" onclick="last()">Last</button>
       <button id="exitBtn" class="right navButton" onclick="window.location = 'index.html'">Exit</button>
-      <button id="toggleBtn" class="right navButton" onclick="toggleStSwipeEvents()">Swp</button>
+      <button id="tBtn" class="right navButton" onclick="toggleStSwipeEvents()">Swp</button>
     </div>
 
     <!-- LoadStory button allows user to switch to a different story at any time -->
@@ -154,7 +169,9 @@
     </ul>
   </div>
   <script>
-    addSwipeListeners();
+    StInitialize();
+    //if (getStSwipeEvents() === 'true')
+    //  addStSwipeListeners();
   </script>
 </body>
 </html>

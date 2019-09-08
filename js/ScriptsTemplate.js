@@ -92,11 +92,14 @@ function removeSwipeListeners() {
 }
 
 function toggleSwipeEvents() {
+  let sKey = document.getElementById('sKey');
   if (getSwipeEvents() === 'true') {
     removeSwipeListeners();
+    sKey.innerHTML = '<del>S</del>';
   }
   else {
     addSwipeListeners();
+    sKey.innerHTML = 'S';
   }
 }
 

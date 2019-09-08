@@ -255,6 +255,8 @@ function openNote() {
  */
 function closeNote() {
   let note = document.getElementById("pageNoteContainer");
+  let tBtn = document.getElementById("toggleBtn");
+  tBtn.innerHTML = '?';
   note.style.width = "0px";
   note.style.padding = "0px";
   note.style.border = "none";
