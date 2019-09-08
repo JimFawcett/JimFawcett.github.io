@@ -46,7 +46,12 @@ function hidePageNote() {
   pgNote.style.display = "none";
 }
 
+/* ------------------------------------------------------------------
+ *  Swipe events for Next and Prev actions
+ */
+
 let x0 = null;
+let swipeEvents = false;
 
 function lock(e) {
   x0 = unify(e).clientX;
@@ -63,13 +68,39 @@ function move(e) {
     x0 = null;
   }
 }
+
 function unify(e) {
   return e.changedTouches ? e.changedTouches[0] : e;
 }
+
 function addSwipeListeners() {
+  localStorage.setItem('swipeEvents', 'true');
   let cont = document.getElementsByTagName('body')[0];
   cont.addEventListener('touchstart', lock, false);
   cont.addEventListener('mousedown', lock, false);
   cont.addEventListener('touchend', move, false);
   cont.addEventListener('mouseup', move, false);
+}
+
+function removeSwipeListeners() {
+  localStorage.setItem('swipeEvents', 'false');
+  let cont = document.getElementsByTagName('body')[0];
+  cont.removeEventListener('touchstart', lock, false);
+  cont.removeEventListener('mousedown', lock, false);
+  cont.removeEventListener('touchend', move, false);
+  cont.removeEventListener('mouseup', move, false);
+}
+
+function toggleSwipeEvents() {
+  if (getSwipeEvents() === 'true') {
+    removeSwipeListeners();
+  }
+  else {
+    addSwipeListeners();
+  }
+}
+
+function getSwipeEvents() {
+  swipeEvents = localStorage.getItem('swipeEvents');
+  return swipeEvents;
 }

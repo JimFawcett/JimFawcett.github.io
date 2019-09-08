@@ -131,6 +131,7 @@ function initializeMenu() {
         <a href='Help.html'>Help</a>\
         <a href='ToDo.html'>ToDo</a>\
         <a href='#' onclick='toggleNavKeys()'>Toggle Nav Keys</a>\
+        <a href='#' onclick='toggleSwipeEvents()'>Toggle Swipe Events</a>\
         <a href='SiteDesign.html'>Site Design</a>\
         <a href='BookDesignCourse.html'>Design Course</a>\
         <a class='border' href='index.html'>L1 Site Home</a>\
@@ -198,6 +199,9 @@ function initializeMenu() {
   for (var i = 0; i < elems.length; ++i) {
     elems[i].addEventListener("click", (event) => { toggleVisibility(event); }, false);
   }
+  let test = getSwipeEvents();
+  if (test === 'true')
+    addSwipeListeners();
 }
 
 //----< load page defined in current page's Prev link >--------------
