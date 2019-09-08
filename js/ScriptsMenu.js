@@ -191,9 +191,15 @@ function initializeMenu() {
   for (var i = 0; i < elems.length; ++i) {
     elems[i].addEventListener("click", (event) => { toggleVisibility(event); }, false);
   }
+  let sKey = document.getElementById('sKey');
   let test = getSwipeEvents();
-  if (test === 'true')
+  if (test === 'true') {
     addSwipeListeners();
+    sKey.innerHTML = 'S';
+  }
+  else {
+    skey.innerHTML = '<del>S</del>';
+  }
 }
 
 //----< load page defined in current page's Prev link >--------------

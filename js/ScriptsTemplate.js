@@ -62,9 +62,9 @@ function move(e) {
   if (x0 || x0 === 0) {
     let dx = unify(e).clientX - x0, s = Math.sign(dx);
     if (dx > 50)
-      loadNext();
-    else if (dx < -50)
       loadPrev();
+    else if (dx < -50)
+      loadNext();
     x0 = null;
   }
 }
