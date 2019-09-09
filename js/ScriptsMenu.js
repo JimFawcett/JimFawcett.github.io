@@ -68,6 +68,7 @@ function initializeMenu() {
         <a href='WebNotes.html'>Web Notes</a>\
         <a href='https://encycolorpedia.com/named'>Web Colors</a>\
         <a href='CppReferences.html'>C++ References</a>\
+        <a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a>\
         <a href='CppExamples.html'>C++ Examples</a>\
       </div>\
     </div>\
