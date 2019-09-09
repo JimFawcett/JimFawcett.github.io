@@ -41,3 +41,69 @@ function decrementSize(id) {
   e.style.width = size.toString() + "px";
 }
 
+function hidePageNote() {
+  let pgNote = document.getElementsByTagName("page-note")[0];
+  pgNote.style.display = "none";
+}
+
+/* ------------------------------------------------------------------
+ *  Swipe events for Next and Prev actions
+ */
+
+let x0 = null;
+let swipeEvents = false;
+
+function lock(e) {
+  x0 = unify(e).clientX;
+}
+
+function move(e) {
+  let cont = document.getElementsByTagName('body')[0];
+  if (x0 || x0 === 0) {
+    let dx = unify(e).clientX - x0, s = Math.sign(dx);
+    if (dx > 50)
+      loadPrev();
+    else if (dx < -50)
+      loadNext();
+    x0 = null;
+  }
+}
+
+function unify(e) {
+  return e.changedTouches ? e.changedTouches[0] : e;
+}
+
+function addSwipeListeners() {
+  localStorage.setItem('swipeEvents', 'true');
+  let cont = document.getElementsByTagName('body')[0];
+  cont.addEventListener('touchstart', lock, false);
+  cont.addEventListener('mousedown', lock, false);
+  cont.addEventListener('touchend', move, false);
+  cont.addEventListener('mouseup', move, false);
+}
+
+function removeSwipeListeners() {
+  localStorage.setItem('swipeEvents', 'false');
+  let cont = document.getElementsByTagName('body')[0];
+  cont.removeEventListener('touchstart', lock, false);
+  cont.removeEventListener('mousedown', lock, false);
+  cont.removeEventListener('touchend', move, false);
+  cont.removeEventListener('mouseup', move, false);
+}
+
+function toggleSwipeEvents() {
+  let sKey = document.getElementById('sKey');
+  if (getSwipeEvents() === 'true') {
+    removeSwipeListeners();
+    sKey.innerHTML = '<del>S</del>';
+  }
+  else {
+    addSwipeListeners();
+    sKey.innerHTML = 'S';
+  }
+}
+
+function getSwipeEvents() {
+  swipeEvents = localStorage.getItem('swipeEvents');
+  return swipeEvents;
+}

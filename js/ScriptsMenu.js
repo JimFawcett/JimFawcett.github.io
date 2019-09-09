@@ -122,7 +122,7 @@ function initializeMenu() {
         <a href='JimFawcett.html'>Jim Fawcett</a>\
         <a href='Help.html'>Help</a>\
         <a href='ToDo.html'>ToDo</a>\
-        <a href='#' onclick='toggleNavKeys()'>Toggle Nav Keys</a>\
+        <a href='#' onclick='togglenavKeys()'>Toggle Nav Keys</a>\
         <a href='#' onclick='toggleSwipeEvents()'>Toggle Swipe Events</a>\
         <a href='SiteDesign.html'>Site Design</a>\
         <a href='BookDesignCourse.html'>Design Course</a>\
@@ -172,7 +172,7 @@ function initializeMenu() {
 
   // set display mode for navKeys from value in local storage
 
-  setNavKeys();
+  setnavKeys();
   setImageSizer();
 
   // listen for keyboard events:
@@ -267,9 +267,9 @@ function scrollPageBottom() {
 }
 //----< toggle nav keys display >------------------------------------
 /*
-*  NavKeys are TBHNP keys at bottom right of each page
+*  navKeys are TBHNP keys at bottom right of each page
 */
-function toggleNavKeys() {
+function togglenavKeys() {
   var nkc = document.getElementsByTagName("navKeys-Container");
   var tog = window.getComputedStyle(nkc[0], null).getPropertyValue("display");
   if (tog === "none") {
@@ -281,9 +281,9 @@ function toggleNavKeys() {
     window.localStorage.setItem("navKeyState", "hide");  // persist chage across pages
   }
 }
-//----< setNavKeys display >-----------------------------------------
+//----< setnavKeys display >-----------------------------------------
 
-function setNavKeys() {
+function setnavKeys() {
   var nkc = document.getElementsByTagName("navKeys-Container");
   var navKeyState = window.localStorage.getItem("navKeyState");
   if (navKeyState === null) {
@@ -342,7 +342,7 @@ function setImageSizer() {
 }
 //----< toggle nav keys display >------------------------------------
 /*
-*   On right click, Toggle display of NavKeys TBHNP
+*   On right click, Toggle display of navKeys TBHNP
 *     unless target is anchor, then
 *   open link in new tab 
 */
@@ -353,8 +353,8 @@ function mouseAction(event) {
       window.open(event.target, "_newtab" + Math.floor(Math.random() * 999999));
     }
     else {
-      //toggleNavKeys();
-      toggleNavKeys();
+      //togglenavKeys();
+      togglenavKeys();
     }
   }
 }

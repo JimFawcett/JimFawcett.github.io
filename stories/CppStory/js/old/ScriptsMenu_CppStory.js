@@ -17,6 +17,41 @@ function initializeMenu() {
     <a href='../../index.html' class='menuItem'>Home</a>\
     <a href='../../Repositories.html' class='menuItem notice'>Repos</a>\
     <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Notes &#9662;</button>\
+      <div class='dropdown-content'>\
+        <a href='../../DesignProcess.html'>Design Process</a>\
+        <a href='../../ProjectsList.html'>Project suggestions</a>\
+      </div>\
+    </div>\
+    <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Blogs &#9662;</button>\
+      <div class='dropdown-content'>\
+        <a href='../../Blog.html'>First&nbsp;Things</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
+        <a href='../../BlogDesign.html'>SW&nbsp;Design</a>\
+        <a href='../../BlogPrinciples.html'>Design&nbsp;Principles</a>\
+        <a href='../../BlogOOD.html'>OO&nbsp;Design</a>\
+        <a href='../../BlogObjectModels.html'>Object&nbsp;Models</a>\
+        <a href='../../BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data&nbsp;&nbsp;</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Engineering&nbsp;SW&nbsp;---</div>\
+        <a href='../../BlogOCD.html'>Concept&nbsp;Document</a>\
+        <a href='../../BlogTesting.html'>SW&nbsp;Testing</a>\
+        <a href='../../SummerReading.html'>Summer&nbsp;Reading</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Software&nbsp;Sys&nbsp;------</div>\
+        <a href='../../BlogStructure.html'>SW&nbsp;Structure</a>\
+        <a href='../../BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a>\
+        <a href='../../BlogActiveObjects.html'>Active&nbsp;Objects</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Reusable&nbsp;Pkgs&nbsp;----</div>\
+        <a href='../../BlogNoSql.html'>noSQL&nbsp;Database</a>\
+        <a href='../../BlogParser.html'>Parsing</a>\
+        <a href='../../BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a>\
+        <a href='../../BlogMTree.html'>M-ary&nbsp;Trees</a>\
+        <a href='../../BlogGraph.html'>Directed&nbsp;Graphs</a>\
+        <a href='../../BlogFileSystem.html'>C++&nbsp;FileSystem</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
+      </div>\
+    </div>\
+    <div class='dropdown menuItem'>\
       <button class='dropbutton'>Resources &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
@@ -29,22 +64,26 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Code Snaps &#9662;</button>\
+      <button class='dropbutton'>Prog Lang &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='../../CodeSnap-PointersAndReferences.cpp.html'>PointersAndReferences</a>\
-        <a href='../../CodeSnap-ClassAnatomy.h.html'>ClassAnatomy</a>\
-        <a href='../../CodeSnap-Strings.h.html'>Strings</a>\
-        <a href='../../CodeSnap-Inheritance.h.html'>Inheritance</a>\
-        <a href='../../CodeSnap-CompoundObjects.cpp.html'>CompoundObjects</a>\
-        <a href='../../CodeSnap-Templates.h.html'>Templates</a>\
-        <a href='../../CodeSnap-FunctionObjects.h.html'>FunctionObjects</a>\
-        <a href='../../CodeSnap-Lambdas.cpp.html'>Lambdas</a>\
-        <a href='../../CodeSnap-LambdaCapture.cpp.html'>LambdaCapture</a>\
-        <a href='../../CodeSnap-Converter.h.html'>Converter</a>\
-        <a class='disable' href='#'>Properties</a>\
-        <a href='../../CodeSnap-BlockingQueue.h.html'>BlockingQueue</a>\
-        <a href='../../CodeSnap-TestUtilities.h.html'>TestUtilities</a>\
-     </div>\
+        <a href='../../LangCpp.html'>C++</a>\
+        <a href='../../LangCSharp.html'>C#</a>\
+        <a href='../../LangPowerShell'>PowerShell</a>\
+        <a class='disable' href='#'>HTML</a>\
+        <a class='disable' href='#'>CSS</a>\
+        <a class='disable' href='#'>JavaScript</a>\
+        <a class='disable' href='#'>Java</a>\
+        <a class='disable' href='#'>Rust</a>\
+        <a class='disable' href='#'>Go</a>\
+        <a class='disable' href='#'>Python</a>\
+      </div>\
+    </div>\
+    <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Platforms &#9662;</button>\
+      <div class='dropdown-content'>\
+        <a href='../../PlatformWindows.html'>Windows</a>\
+        <a href='../../PlatformLinux.html'>Linux</a>\
+      </div >\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Stories &#9662;</button>\
