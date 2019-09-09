@@ -270,7 +270,7 @@ function scrollPageBottom() {
 *  NavKeys are TBHNP keys at bottom right of each page
 */
 function toggleNavKeys() {
-  var nkc = document.getElementsByTagName("navKeysContainer");
+  var nkc = document.getElementsByTagName("navKeys-Container");
   var tog = window.getComputedStyle(nkc[0], null).getPropertyValue("display");
   if (tog === "none") {
     nkc[0].style.display = "inline";
@@ -284,7 +284,7 @@ function toggleNavKeys() {
 //----< setNavKeys display >-----------------------------------------
 
 function setNavKeys() {
-  var nkc = document.getElementsByTagName("navKeysContainer");
+  var nkc = document.getElementsByTagName("navKeys-Container");
   var navKeyState = window.localStorage.getItem("navKeyState");
   if (navKeyState === null) {
     nkc[0].style.display = "inline";
