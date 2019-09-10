@@ -220,12 +220,16 @@ function initializeMenu() {
 //----< load page defined in current page's Prev link >--------------
 
 function loadPrev() {
-  document.getElementById("Prev").click();
+  let prv = document.getElementById("Prev");
+  if (isDefined(prv))
+    prv.click();
 }
 //----< load page defined in current page's Next link >--------------
 
 function loadNext() {
-  document.getElementById("Next").click();
+  let nxt = document.getElementById("Next");
+  if (isDefined(nxt))
+    nxt.click();
 }
 //----< load page defined in current page's Lect link >--------------
 
