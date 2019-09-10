@@ -89,19 +89,34 @@ function initializeMenu() {
   // otherwise load href from page link
 
   var nxt = document.getElementById("Next");
+  var nKey = document.getElementById("nKey");
+  var swKey = document.getElementById("sKey");
   if (nxt === null) {
     document.getElementById("nextLink").style.display = "none";  // button top right menu
+    if (isDefined(nKey))
+      nKey.style.display = "none";
+    if (isDefined(swKey))
+      swKey.style.display = "none";
   }
   else {
     document.getElementById("nextLink").href = nxt.href;
+    if (isDefined(nKey))
+      nKey.style.display = "inline";
+    if (isDefined(swKey))
+      swKey.style.display = "inline";
   }
 
   var prv = document.getElementById("Prev");
+  var pKey = document.getElementById("pKey");
   if (prv === null) {
     document.getElementById("prevLink").style.display = "none";  // button top right menu
+    if (isDefined(pKey))
+      pKey.style.display = "none";
   }
   else {
     document.getElementById("prevLink").href = prv.href;
+    if (isDefined(pKey))
+      pKey.style.display = "inline";
   }
 
   // show footer with copyright notice and revision date
@@ -131,6 +146,15 @@ function initializeMenu() {
   var elems = document.getElementsByTagName("more-less");
   for (var i = 0; i < elems.length; ++i) {
     elems[i].addEventListener("click", (event) => { toggleVisibility(event); }, false);
+  }
+  let sKey = document.getElementById('sKey');
+  let test = getSwipeEvents();
+  if (test === 'true') {
+    addSwipeListeners();
+    sKey.innerHTML = 'S';
+  }
+  else {
+    sKey.innerHTML = '<del>S</del>';
   }
 }
 
@@ -182,7 +206,7 @@ function scrollMenuRight() {
   for (i = 0; i < items.length; ++i) {
     var cpprp = window.getComputedStyle(items[len - i - 1], null).getPropertyValue("display");
     if (cpprp !== "block") {
-      items[len-i-1].style.display = "block";
+      items[len - i - 1].style.display = "block";
       break;
     }
   }

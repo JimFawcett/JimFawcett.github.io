@@ -21,7 +21,7 @@ window.onerror = function (msg, url, linenumber) {
  *  initialized
  */
 function isDefined(elem) {
-  if (typeof elem === 'undefined' || elem === null) {
+  if (typeof elem === 'undefined' || elem === null || elem === 'undefined') {
     return false;
   }
   return true;

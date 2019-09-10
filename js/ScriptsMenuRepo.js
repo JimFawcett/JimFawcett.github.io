@@ -136,19 +136,34 @@ function initializeMenu() {
   // otherwise load href from page link
 
   var nxt = document.getElementById("Next");
+  var nKey = document.getElementById("nKey");
+  var swKey = document.getElementById("sKey");
   if (nxt === null) {
     document.getElementById("nextLink").style.display = "none";  // button top right menu
+    if (isDefined(nKey))
+      nKey.style.display = "none";
+    if (isDefined(swKey))
+      swKey.style.display = "none";
   }
   else {
     document.getElementById("nextLink").href = nxt.href;
+    if (isDefined(nKey))
+      nKey.style.display = "inline";
+    if (isDefined(swKey))
+      swKey.style.display = "inline";
   }
 
   var prv = document.getElementById("Prev");
+  var pKey = document.getElementById("pKey");
   if (prv === null) {
     document.getElementById("prevLink").style.display = "none";  // button top right menu
+    if (isDefined(pKey))
+      pKey.style.display = "none";
   }
   else {
     document.getElementById("prevLink").href = prv.href;
+    if (isDefined(pKey))
+      pKey.style.display = "inline";
   }
 
   // show footer with copyright notice and revision date
@@ -179,9 +194,15 @@ function initializeMenu() {
   for (var i = 0; i < elems.length; ++i) {
     elems[i].addEventListener("click", (event) => { toggleVisibility(event); }, false);
   }
+  let sKey = document.getElementById('sKey');
   let test = getSwipeEvents();
-  if (test === 'true')
+  if (test === 'true') {
     addSwipeListeners();
+    sKey.innerHTML = 'S';
+  }
+  else {
+    sKey.innerHTML = '<del>S</del>';
+  }
 }
 
 //----< load page defined in current page's Prev link >--------------
@@ -232,7 +253,7 @@ function scrollMenuRight() {
   for (i = 0; i < items.length; ++i) {
     var cpprp = window.getComputedStyle(items[len - i - 1], null).getPropertyValue("display");
     if (cpprp !== "block") {
-      items[len-i-1].style.display = "block";
+      items[len - i - 1].style.display = "block";
       break;
     }
   }
@@ -279,6 +300,7 @@ function setnavKeys() {
   else {
     nkc[0].style.display = "none";
   }
+
 }
 //----< toggle image sizer display >-----------------------------------
 /*
@@ -302,15 +324,18 @@ function toggleImageSizer() {
 
 function setImageSizer() {
   var nkc = document.getElementsByTagName("sizer-Container");
-  var navKeyState = window.localStorage.getItem("imageSizerState");
+  var imageSizerState = window.localStorage.getItem("imageSizerState");
 
   for (let i = 0; i < nkc.length; ++i) {
-    if (navKeyState === null) {
+    if (imageSizerState === null) {
       nkc[i].style.display = "inline";
       window.localStorage.setItem("imageSizerState", "show");
       return;
     }
-    if (navKeyState === "show") {
+    if (imageSizerState === "hide") {
+      nkc[i].style.display = "none";
+    }
+    if (imageSizerState === "show") {
       nkc[i].style.display = "inline";
     }
     else {
@@ -331,6 +356,7 @@ function mouseAction(event) {
       window.open(event.target, "_newtab" + Math.floor(Math.random() * 999999));
     }
     else {
+      //togglenavKeys();
       togglenavKeys();
     }
   }

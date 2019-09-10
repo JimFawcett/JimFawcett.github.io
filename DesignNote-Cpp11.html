@@ -12,7 +12,7 @@
   <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
   <meta name="Author" content="Jim Fawcett" />
   <meta name="Author" content="James Fawcett" />
-  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <script src="js/ScriptsUtilities.js"></script>
   <script src="js/ScriptsTemplate.js"></script>
   <script src="js/ScriptsKeyboard.js"></script>
   <script src="js/ScriptsMenuCpp.js"></script>
@@ -28,11 +28,12 @@
 
   <navKeys-Container>
     <nav-Key id="sKey" onclick="toggleSwipeEvents()">S</nav-Key>
-    <nav-Key onclick="scrollPageTop()">T</nav-Key>
-    <nav-Key onclick="scrollPageBottom()">B</nav-Key>
-    <nav-Key onclick="helpWin()">H</nav-Key>
-    <nav-Key onclick="loadPrev()">P</nav-Key>
-    <nav-Key onclick="loadNext()">N</nav-Key>
+    <nav-Key id="rKey" onclick="location.reload()">R</nav-Key>
+    <nav-Key id="tKey" onclick="scrollPageTop()">T</nav-Key>
+    <nav-Key id="bKey" onclick="scrollPageBottom()">B</nav-Key>
+    <nav-Key id="hKey" onclick="helpWin()">H</nav-Key>
+    <nav-Key id="pKey" onclick="loadPrev()">P</nav-Key>
+    <nav-Key id="nKey" onclick="loadNext()">N</nav-Key>
   </navKeys-Container>
 
   <header>
@@ -44,706 +45,706 @@
 
   <!-- page content -->
 
-    <strong>New and modified Language Features:</strong>
-    <p>
-      The C++ programming language has been standardized in 1998, 2003, and again in 2011, with a new standard revision approved in 2014 and a significant revision expected in 2017.
-      The Visual Studio 2013 C++ compiler implements most of the 2011 changes and a few of the 2014 changes.  The 2011 changes are discussed on this page.
-    </p>
+  <strong>New and modified Language Features:</strong>
+  <p>
+    The C++ programming language has been standardized in 1998, 2003, and again in 2011, with a new standard revision approved in 2014 and a significant revision expected in 2017.
+    The Visual Studio 2013 C++ compiler implements most of the 2011 changes and a few of the 2014 changes.  The 2011 changes are discussed on this page.
+  </p>
 
-    <ol>
-      <li class="tight">
-        <strong>compiler created functions:</strong><p></p>
-        Every class designer should consciously decide to implement these, or use the compiler generated versions, or prohibit them.  Generated members will be
-        correct only if every data member of the class has correct semantics for each one. Usually if we implement one then we do so for all.
-        <span class="note">Note:</span> if any constructor or destructor has an =default suffix then the compiler will generate that operation.  We won't
-        keep stating this for each of the functions below.
-        <spacer-15></spacer-15>
-        <ul class="tight">
-          <li>
-            <a href="http://en.cppreference.com/w/cpp/language/default_constructor">default constructor</a>
-            <div class="indent">
-              <strong>T()</strong><br />
-              Create an instance with default initialization (defined by the body of this function)
-              for creation of single instances and arrays of instances.
-              <p></p>
-              The compiler generates this only if no constructors are declared in your class and your code attempts an unparmaterized construction.
-              Its action is to call a default construction on each of the bases and data members of your class.
-            </div>
-          </li>
-          <li>
-            <a href="http://en.cppreference.com/w/cpp/language/copy_constructor">copy constructor</a>
-            <div class="indent">
-              <strong>T(const T&amp; t)</strong><br />
-              Create copy for pass and return by value. Creates instance and copies state from the source.
-              <p></p>
-              The compiler always generates this if not declared in your class, no move operations are declared, and your code attempts a copy, as in pass or return by value.
-              Its action is to call a copy construction on each of the bases and data members of your class.
-            </div>
-          </li>
-          <li>
-            <a href="http://en.cppreference.com/w/cpp/language/move_constructor">move constructor</a> <span class="note">(C++11)</span>
-            <div class="indent">
-              <strong>T(T&amp;&amp; t)</strong><br />
-              Create instance by moving contents of source, used for return by value and create from temporary.  Often this entails making
-              the target point to state created by the source instance, on the heap, and setting the souce pointer to nullptr.
-              <p></p>
-              The compiler will generate this if it's not declared and implied by code that uses the class and copy assignment, move assignment, and copy
-              construction are not
-              declared.  Its action is to do memberwise move construction on bases and data members that are movable and copy construction
-              on those that are not.
-            </div>
-          </li>
-          <li>
-            <a href="http://en.cppreference.com/w/cpp/language/as_operator">copy assignment operator</a>
-            <div class="indent">
-              <strong>T&amp; operator=(const T&amp; t)</strong><br />
-              Copy state of source into existing object.
-              <p></p>
-              The compiler will always generate this if it's not declared and implied by code that uses the class.  Its action is to do
-              memberwise assignment on all the bases and members of the class.
-            </div>
-          </li>
-          <li>
-            <a href="http://en.cppreference.com/w/cpp/language/move_operator">move assignment operator</a> <span class="note">(C++11)</span>
-            <div class="indent">
-              <strong>T&amp; operator=(T&amp;&amp; t)</strong><br />
-              Move state of source into existing object.  State handled in a fashion similar to move construction.
-              <p></p>
-              The compiler will generate this if it's not declared and no copy or move constructors, or copy assignment are declared.  Its action is to do memberwise
-              move assignment on all the bases and data members of the class.
-            </div>
-          </li>
-          <li>
-            <a href="http://en.cppreference.com/w/cpp/language/destructor">destructor</a>
-            <div class="indent">
-              <strong>[virtual] ~T()</strong><br />
-              Release all resources held by class instance, including memory. Qualify with virtual if class may be used as base for inheritance.
-              <p></p>
-              The compiler will generate this if no destructor is declared.  Its action is to do memberwise destruction on all bases and data members
-              of the class.
-            </div>
-          </li>
-        </ul>
-        <p class="indent">
-          <a href="../../CoreTechnologies/cpp/code/STLContainers/TestClass">Test class code example</a>, <a href="../code/str">Str class code example</a>
-        </p>
-        <spacer-15></spacer-15>
-      </li>
-      <li>
-        <strong>standard functions and lambda expressions:</strong>
-        <spacer-15></spacer-15>
-        <ul class="tight">
-          <li>
-            <strong><a href="http://en.cppreference.com/w/cpp/language/lambda">lambda expression</a>, i.e., [capture-list](params) opt[->Ret] { body }</strong> <span class="note">(C++11)</span><br />
-            <div class="indent">
-              Creates an anonymous closure, e.g., a lambda that can be bound to auto or to std::function.
-            </div>
-          </li>
-          <li>
-            <strong><a href="http://en.cppreference.com/w/cpp/utility/functional/function">std::function&lt;r(a)&gt;</a></strong> <span class="note">(C++11)</span><br />
-            <div class="indent">
-              where R is return type and A is one or more argument Types.<br />
-              Stores, copies, and invokes any callable target of the specified signature - functions, lambdas expressions, bind expressions,
-              function objects (functors), and pointers to member functions.
-            </div>
-          </li>
-          <li>
-            <strong>std::mem_fn</strong><br />
-            <div class="indent">
-              Creates a function object from a pointer to member
-            </div>
-          </li>
-          <li>
-            <strong>std::move</strong> <span class="note">(C++11)</span><br />
-            <div class="indent">
-              Casts its argument to an rvalue type, e.g., an un-named temporary
-            </div>
-          </li>
-          <li>
-            <strong>std::ref</strong> <span class="note">(C++11)</span><br />
-            <div class="indent">
-              Creates a reference_wrapper which is CopyConstructable and CopyAssignable
-            </div>
-          </li>
-          <li>
-            <strong>std::hash&lt;T&gt;</strong> <span class="note">(C++11)</span><br />
-            <div class="indent">
-              hash function with specializations for all the primative types, used by the standard unordered containers.
-            </div>
-          </li>
-          <li>
-            <strong>std::bind&lt;F&amp;&amp; f, Args&amp;&amp;... args&gt;</strong> <span class="note">(C++11)</span><br />
-            <div class="indent">
-              Wraps a callable object f and binds values to some of its arguments
-            </div>
-        </ul>
-        <p class="indent">
-          <a href="../../CoreTechnologies/Cpp/code/CallableObjects">CallableObjects code example</a>
-        </p>
-        <div class="pad"></div>
-      </li>
-      <li>
-        <strong>aliases:</strong><span class="note">(C++11)</span>
-        <div class="indent pad">
-          using AliasName = TypeName;<br />
-          Equivalent to typedef except that types can be templates.
-          <p>
-            <a href="../../CoreTechnologies/Cpp/code/Aliases">Aliases code example</a>
-          </p>
-        </div>
-        <div class="smallpad"></div>
-      </li>
-      <li>
-        <strong>uniform initialization:</strong><span class="note">(C++11)</span>
-        <div class="indent pad">
-          T var { item };<br />
-          std::Container cont { item1, item2, ... };
-          <p>
-            Here, std::Container could any STL container like std::vector&lt;int&gt; or std::list&lt;std::string&gt;.
-          </p>
-          <p>
-            <a href="../../CoreTechnologies/cpp/code/STLContainers">STL Containers code examples</a>
-          </p>
-        </div>
-        <div class="smallpad"></div>
-      </li>
-      <li>
-        <strong>auto</strong><span class="note">(C++11)</span>
-        <div class="indent pad">
-          auto is a type defined by the compiler, not the designer, using type inference.  It requires initialization and guarantees no temporaries are created.
-          The designer can override the compiler's inference as shown in the second and fourth lines below.  In this case there may be temporaries created.<p></p>
-          auto var { item };<br />
-          auto var = T{ item };<br />
-          auto cont { item1, item2, ... };<br />
-          auto cont = std::Container{ item1, item2, ... };</span>
-        </div>
-        <div class="pad"></div>
-      </li>
-      <li>
-        <strong>range-for:</strong><span class="note">(C++11)</span>
-        <div class="indent pad">
-          range-for works with any container type that provides iterators and begin() and end() functions.  This includes all the STL containers, std::array,
-          and std::string. In the first line c is a copy of the next container element.  In the second line c is a reference to the next container element and
-          so can be used to modify that element's value.<p></p>
-          for(auto c : cont) { body }<br />
-          for(auto& c : cont) { body }
-        </div>
-        <div class="pad"></div>
-      </li>
-      <li>
-        <strong>nullptr:</strong><span class="note">(C++11)</span>
-        <div class="indent pad">
-          nullptr is a replacement for 0 and NULL for initializing pointers.  It is used to indicate that a pointer does not reference initialized memory.
-          The language guarantees that deleting a nullptr does nothing.<p></p>
-          T* ptr = nullptr;<br />
-          unique_ptr&lt;T&gt; ptr(nullptr);
-        </div>
-        <div class="pad"></div>
-      </li>
-      <li>
-        <strong>constexpr:</strong><span class="note">(C++11) - not implemented in Visual Studio 2013</span>
-        <div class="indent pad">
-          A constexpr is an expression or function that can be evaluated at compile-time.<p></p>
-          constexp sum = 1 + 2 + 3;<br />
-          constexp int accum(int n) { return n &lt;= 1 ? 1 : accum(n-1); }
-        </div>
-        <div class="pad"></div>
-      </li>
-      <li>
-        <strong>decltype(T):</strong><span class="note">(C++11)</span>
-        <div class="indent pad">
-          If the argument is the unparenthesised name of an object or function or is a member access expression, e.g., object.member or pointer->member
-          then decltype specifies the declared type of T.<p></p>
-          If the argument is any other expression of type T then:
-          <ul class="tight">
-            <li>If the value category of T is xvalue then decltype specifies T&amp;&amp;</li>
-            <li>If the value category of T is lvalue then decltype specifies T&</li>
-            <li>Otherwise decltype specifies T</li>
-          </ul>
-          auto l = [](args) opt[->R] { body };<br />
-          decltype(l) l2 = l;
-        </div>
-        <div class="pad"></div>
-      </li>
-      <li>
-        <strong>static_assert:</strong><span class="note">(C++11)</span>
-        <div class="indent pad">
-          Performs compile-time assertion checking.<br />
-          <a href="http://en.cppreference.com/w/cpp/language/static_assert">static_assert(bool_constexpr, message)</a>
-        </div>
-        <div class="pad"></div>
-      </li>
-      <li>
-        <strong>override and final:</strong><span class="note">(C++11)</span>
-        <div class="indent pad">
-          <strong>override</strong> is an optional post-qualifier for virtual functions in a derived class.  It causes compiler checking to verify that the function has exactly
-          the same name and type sequence as a base class virtual function.  This avoids the compiler treating a function (with spelling errors) as an overload
-          instead of the override the designer intended.<p></p>
-          <strong>final</strong> is a post-qualifier that prohibits overriding qualified virtual member functions and using qualified classes as inherited bases.
-        </div>
-        <div class="pad"></div>
-      </li>
-      <li>
-        <strong>variadic templates:</strong><span class="note">(C++11)</span>
-        <div class="indent pad">
-          Variadic templates support writing functions that take an arbitrary number of arguments.
-          <p />
-          template &lt;typename C, typename T, typename... Args&gt; void inserter(C& c, T&& t, Args&&... args) { /* another body */ }<br />
-          template &lt;typename c, typename t&gt; void inserter(C& c, T&& t) { /* body */ }
-          <p></p>
-          The first template function accepts an arbitrary finite number of moveable items of type T and processes the first one and calls itself
-          recursively to handle the remainer.  The second function is a template specialization that stops the recursion.
-          <p></p>
-          The set of type parameters in a variadic template is referred to as a &quot;Parameter Pack&quot;
-          <p>
-            <a href="../../CoreTechnologies/Cpp/code/STLContainers/Inserter">Code Example</a>, <a href="http://en.cppreference.com/w/cpp/language/parameter_pack">Reference</a>
-          </p>
-        </div>
-        <div class="smallpad"></div>
-      </li>
-      <li>
-        <strong>noexcept:</strong> <span class="note">C++11</span>
-        <p></p>
-        noexcept is a specification that can be part of a function declarator.
-        <p>
+  <ol>
+    <li class="tight">
+      <strong>compiler created functions:</strong><p></p>
+      Every class designer should consciously decide to implement these, or use the compiler generated versions, or prohibit them.  Generated members will be
+      correct only if every data member of the class has correct semantics for each one. Usually if we implement one then we do so for all.
+      <span class="note">Note:</span> if any constructor or destructor has an =default suffix then the compiler will generate that operation.  We won't
+      keep stating this for each of the functions below.
+      <spacer-15></spacer-15>
+      <ul class="tight">
+        <li>
+          <a href="http://en.cppreference.com/w/cpp/language/default_constructor">default constructor</a>
           <div class="indent">
-            Void fun (int i) noexcept
+            <strong>T()</strong><br />
+            Create an instance with default initialization (defined by the body of this function)
+            for creation of single instances and arrays of instances.
+            <p></p>
+            The compiler generates this only if no constructors are declared in your class and your code attempts an unparmaterized construction.
+            Its action is to call a default construction on each of the bases and data members of your class.
           </div>
+        </li>
+        <li>
+          <a href="http://en.cppreference.com/w/cpp/language/copy_constructor">copy constructor</a>
+          <div class="indent">
+            <strong>T(const T&amp; t)</strong><br />
+            Create copy for pass and return by value. Creates instance and copies state from the source.
+            <p></p>
+            The compiler always generates this if not declared in your class, no move operations are declared, and your code attempts a copy, as in pass or return by value.
+            Its action is to call a copy construction on each of the bases and data members of your class.
+          </div>
+        </li>
+        <li>
+          <a href="http://en.cppreference.com/w/cpp/language/move_constructor">move constructor</a> <span class="note">(C++11)</span>
+          <div class="indent">
+            <strong>T(T&amp;&amp; t)</strong><br />
+            Create instance by moving contents of source, used for return by value and create from temporary.  Often this entails making
+            the target point to state created by the source instance, on the heap, and setting the souce pointer to nullptr.
+            <p></p>
+            The compiler will generate this if it's not declared and implied by code that uses the class and copy assignment, move assignment, and copy
+            construction are not
+            declared.  Its action is to do memberwise move construction on bases and data members that are movable and copy construction
+            on those that are not.
+          </div>
+        </li>
+        <li>
+          <a href="http://en.cppreference.com/w/cpp/language/as_operator">copy assignment operator</a>
+          <div class="indent">
+            <strong>T&amp; operator=(const T&amp; t)</strong><br />
+            Copy state of source into existing object.
+            <p></p>
+            The compiler will always generate this if it's not declared and implied by code that uses the class.  Its action is to do
+            memberwise assignment on all the bases and members of the class.
+          </div>
+        </li>
+        <li>
+          <a href="http://en.cppreference.com/w/cpp/language/move_operator">move assignment operator</a> <span class="note">(C++11)</span>
+          <div class="indent">
+            <strong>T&amp; operator=(T&amp;&amp; t)</strong><br />
+            Move state of source into existing object.  State handled in a fashion similar to move construction.
+            <p></p>
+            The compiler will generate this if it's not declared and no copy or move constructors, or copy assignment are declared.  Its action is to do memberwise
+            move assignment on all the bases and data members of the class.
+          </div>
+        </li>
+        <li>
+          <a href="http://en.cppreference.com/w/cpp/language/destructor">destructor</a>
+          <div class="indent">
+            <strong>[virtual] ~T()</strong><br />
+            Release all resources held by class instance, including memory. Qualify with virtual if class may be used as base for inheritance.
+            <p></p>
+            The compiler will generate this if no destructor is declared.  Its action is to do memberwise destruction on all bases and data members
+            of the class.
+          </div>
+        </li>
+      </ul>
+      <p class="indent">
+        <a href="../../CoreTechnologies/cpp/code/STLContainers/TestClass">Test class code example</a>, <a href="../code/str">Str class code example</a>
+      </p>
+      <spacer-15></spacer-15>
+    </li>
+    <li>
+      <strong>standard functions and lambda expressions:</strong>
+      <spacer-15></spacer-15>
+      <ul class="tight">
+        <li>
+          <strong><a href="http://en.cppreference.com/w/cpp/language/lambda">lambda expression</a>, i.e., [capture-list](params) opt[->Ret] { body }</strong> <span class="note">(C++11)</span><br />
+          <div class="indent">
+            Creates an anonymous closure, e.g., a lambda that can be bound to auto or to std::function.
+          </div>
+        </li>
+        <li>
+          <strong><a href="http://en.cppreference.com/w/cpp/utility/functional/function">std::function&lt;r(a)&gt;</a></strong> <span class="note">(C++11)</span><br />
+          <div class="indent">
+            where R is return type and A is one or more argument Types.<br />
+            Stores, copies, and invokes any callable target of the specified signature - functions, lambdas expressions, bind expressions,
+            function objects (functors), and pointers to member functions.
+          </div>
+        </li>
+        <li>
+          <strong>std::mem_fn</strong><br />
+          <div class="indent">
+            Creates a function object from a pointer to member
+          </div>
+        </li>
+        <li>
+          <strong>std::move</strong> <span class="note">(C++11)</span><br />
+          <div class="indent">
+            Casts its argument to an rvalue type, e.g., an un-named temporary
+          </div>
+        </li>
+        <li>
+          <strong>std::ref</strong> <span class="note">(C++11)</span><br />
+          <div class="indent">
+            Creates a reference_wrapper which is CopyConstructable and CopyAssignable
+          </div>
+        </li>
+        <li>
+          <strong>std::hash&lt;T&gt;</strong> <span class="note">(C++11)</span><br />
+          <div class="indent">
+            hash function with specializations for all the primative types, used by the standard unordered containers.
+          </div>
+        </li>
+        <li>
+          <strong>std::bind&lt;F&amp;&amp; f, Args&amp;&amp;... args&gt;</strong> <span class="note">(C++11)</span><br />
+          <div class="indent">
+            Wraps a callable object f and binds values to some of its arguments
+          </div>
+      </ul>
+      <p class="indent">
+        <a href="../../CoreTechnologies/Cpp/code/CallableObjects">CallableObjects code example</a>
+      </p>
+      <div class="pad"></div>
+    </li>
+    <li>
+      <strong>aliases:</strong><span class="note">(C++11)</span>
+      <div class="indent pad">
+        using AliasName = TypeName;<br />
+        Equivalent to typedef except that types can be templates.
+        <p>
+          <a href="../../CoreTechnologies/Cpp/code/Aliases">Aliases code example</a>
         </p>
-        If the body of the function throws an unhandled exception std::terminate()
-        is called by default.
+      </div>
+      <div class="smallpad"></div>
+    </li>
+    <li>
+      <strong>uniform initialization:</strong><span class="note">(C++11)</span>
+      <div class="indent pad">
+        T var { item };<br />
+        std::Container cont { item1, item2, ... };
+        <p>
+          Here, std::Container could any STL container like std::vector&lt;int&gt; or std::list&lt;std::string&gt;.
+        </p>
+        <p>
+          <a href="../../CoreTechnologies/cpp/code/STLContainers">STL Containers code examples</a>
+        </p>
+      </div>
+      <div class="smallpad"></div>
+    </li>
+    <li>
+      <strong>auto</strong><span class="note">(C++11)</span>
+      <div class="indent pad">
+        auto is a type defined by the compiler, not the designer, using type inference.  It requires initialization and guarantees no temporaries are created.
+        The designer can override the compiler's inference as shown in the second and fourth lines below.  In this case there may be temporaries created.<p></p>
+        auto var { item };<br />
+        auto var = T{ item };<br />
+        auto cont { item1, item2, ... };<br />
+        auto cont = std::Container{ item1, item2, ... };</span>
+      </div>
+      <div class="pad"></div>
+    </li>
+    <li>
+      <strong>range-for:</strong><span class="note">(C++11)</span>
+      <div class="indent pad">
+        range-for works with any container type that provides iterators and begin() and end() functions.  This includes all the STL containers, std::array,
+        and std::string. In the first line c is a copy of the next container element.  In the second line c is a reference to the next container element and
+        so can be used to modify that element's value.<p></p>
+        for(auto c : cont) { body }<br />
+        for(auto& c : cont) { body }
+      </div>
+      <div class="pad"></div>
+    </li>
+    <li>
+      <strong>nullptr:</strong><span class="note">(C++11)</span>
+      <div class="indent pad">
+        nullptr is a replacement for 0 and NULL for initializing pointers.  It is used to indicate that a pointer does not reference initialized memory.
+        The language guarantees that deleting a nullptr does nothing.<p></p>
+        T* ptr = nullptr;<br />
+        unique_ptr&lt;T&gt; ptr(nullptr);
+      </div>
+      <div class="pad"></div>
+    </li>
+    <li>
+      <strong>constexpr:</strong><span class="note">(C++11) - not implemented in Visual Studio 2013</span>
+      <div class="indent pad">
+        A constexpr is an expression or function that can be evaluated at compile-time.<p></p>
+        constexp sum = 1 + 2 + 3;<br />
+        constexp int accum(int n) { return n &lt;= 1 ? 1 : accum(n-1); }
+      </div>
+      <div class="pad"></div>
+    </li>
+    <li>
+      <strong>decltype(T):</strong><span class="note">(C++11)</span>
+      <div class="indent pad">
+        If the argument is the unparenthesised name of an object or function or is a member access expression, e.g., object.member or pointer->member
+        then decltype specifies the declared type of T.<p></p>
+        If the argument is any other expression of type T then:
+        <ul class="tight">
+          <li>If the value category of T is xvalue then decltype specifies T&amp;&amp;</li>
+          <li>If the value category of T is lvalue then decltype specifies T&</li>
+          <li>Otherwise decltype specifies T</li>
+        </ul>
+        auto l = [](args) opt[->R] { body };<br />
+        decltype(l) l2 = l;
+      </div>
+      <div class="pad"></div>
+    </li>
+    <li>
+      <strong>static_assert:</strong><span class="note">(C++11)</span>
+      <div class="indent pad">
+        Performs compile-time assertion checking.<br />
+        <a href="http://en.cppreference.com/w/cpp/language/static_assert">static_assert(bool_constexpr, message)</a>
+      </div>
+      <div class="pad"></div>
+    </li>
+    <li>
+      <strong>override and final:</strong><span class="note">(C++11)</span>
+      <div class="indent pad">
+        <strong>override</strong> is an optional post-qualifier for virtual functions in a derived class.  It causes compiler checking to verify that the function has exactly
+        the same name and type sequence as a base class virtual function.  This avoids the compiler treating a function (with spelling errors) as an overload
+        instead of the override the designer intended.<p></p>
+        <strong>final</strong> is a post-qualifier that prohibits overriding qualified virtual member functions and using qualified classes as inherited bases.
+      </div>
+      <div class="pad"></div>
+    </li>
+    <li>
+      <strong>variadic templates:</strong><span class="note">(C++11)</span>
+      <div class="indent pad">
+        Variadic templates support writing functions that take an arbitrary number of arguments.
+        <p />
+        template &lt;typename C, typename T, typename... Args&gt; void inserter(C& c, T&& t, Args&&... args) { /* another body */ }<br />
+        template &lt;typename c, typename t&gt; void inserter(C& c, T&& t) { /* body */ }
         <p></p>
-        <div class="pad"></div>
-      </li>
-      <li>
-        <strong>literals</strong>
-        <p>
-          Literals are compile-time constants.  The specifiers below allow us to be fairly specific about the literal type
-          to avoid needing silent conversions when there is a compatible type mismatch in code expressions.
-        </p>
-        <table>
-          <tr>
-            <th>type</th>
-            <th>value</th>
-            <th>interpretation</th>
-          </tr>
-          <tr>
-            <td>integer&nbsp;literal</td>
-            <td>10</td>
-            <td>integer</td>
-          </tr>
-          <tr>
-            <td> </td>
-            <td>10u</td>
-            <td>unsigned integer</td>
-          </tr>
-          <tr>
-            <td> </td>
-            <td>10l</td>
-            <td>long integer</td>
-          </tr>
-          <tr>
-            <td> </td>
-            <td>10ul</td>
-            <td>unsigned long integer</td>
-          </tr>
-          <tr>
-            <td>floating&nbsp;literal</td>
-            <td>10.0</td>
-            <td>double precision float</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>10.0f</td>
-            <td>single precision float</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>10.0l</td>
-            <td>long double</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>10.0e-2</td>
-            <td>0.1 using exponential notation</td>
-          </tr>
-          <tr>
-            <td>string&nbsp;literal</td>
-            <td>"a string"</td>
-            <td>const char[]</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>L"a string"</td>
-            <td>const wchar_t[]</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>u8"a string"</td>
-            <td>const char[] with utf-8 encoding</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>u"a string"</td>
-            <td>const char16_t[] with utf-16 encoding</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>U"a string"</td>
-            <td>const char32_t[] with utf-32 encoding</td>
-          </tr>
-          <tr>
-            <td></td>
-            <td>R"a string"</td>
-            <td>const char[] with raw encoding => everything is a char including \ and markup</td>
-          </tr>
-        </table>
-        <p>
-          <span class="note">C++14</span> will be introducing user defined literal suffixes, e.g. ns for nanosecond, kg for kilogram, etc.
-        </p>
-      </li>
-    </ol>
-    <strong>New Library Features:</strong>
-    <spacer-15></spacer-15>
-    <ol class="tight">
-      <li>
-        <strong>New Containers:</strong>
-        <p>
-          Here's a list of the most frequently used containers, annotated to show what was added in C++11.  All the containers
-          can be accessed with container specific iterators, e.g., vector&lt;double&gt;::iterator;
-        </p>
-        <table>
-          <tr>
-            <th>Container</th>
-            <th>Discussion</th>
-          </tr>
-          <tr>
-            <td>
-              std::vector&lt;T&gt;
-            </td>
-            <td>
-              An indexable collection of items of type T stored in continguous memory.<br />
-              Constant time insertion at back, O(N) if inserted at front.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              std::list&lt;T&gt;
-            </td>
-            <td>
-              A doubley linked list of items of type T.  Constant time to store in front or back,
-              but O(N) to insert in the middle.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              std::deque&lt;T&gt;
-            </td>
-            <td>
-              An indexable collection of items of type T.  Constant time to store in front or back,
-              but O(N) to insert in the middle.  This is a stringe beast composed of three blocks of
-              contiguous memory, at the front, at the back, and in the middle.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              std::queue&lt;T&gt;
-            </td>
-            <td>
-              A First In First Out (FIFO) collection of items of type T.  Items are Enqueued on the front and Dequeued from the back.  It
-              is a wrapper around a std::deque&lt;T&gt; so it is constant time to Enqueue and Dequeue.  I don't think you can access interior
-              elements with an iterator but I'll have to check that to be sure.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              std::stack&lt;T&gt;
-            </td>
-            <td>
-              A Last in First Out (LIFO) collection of items of type T.  Constant time to push and pop elements.
-              Same access comments as for the std::queue&lt;T&gt;
-            </td>
-          </tr>
-          <tr>
-            <td>
-              std::set&lt;Key&gt;
-            </td>
-            <td>
-              An ordered collecion of items of type T.  The std::set&lt;Key&gt; is based on a balanced binary (Red-Black) tree, so operations are logrithmic,
-              O(ln(N)) insertion, search, and retrieval.  Sets will not accept duplicate keys.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              std::multiset&lt;Key&gt;
-            </td>
-            <td>
-              An ordered collecion of items of type T.  The std::multiset&lt;Key&gt; is based on a balanced binary (Red-Black) tree, so operations are logrithmic,
-              O(ln(N)) insertion, search, and retrieval.  multisets will accept duplicate keys but that makes search and retrieval more complex as you may get back
-              a range of values for the duplicated key.
-            </td>
-          <tr>
-            <td>
-              std::map&lt;Key,&nbsp;Value&gt;
-            </td>
-            <td>
-              An colletion of key-value pairs of types Key and Value, respectively, ordered on the keys.  The std::map&lt;Key, Value&gt; is based on a balanced binary (Red-Black) tree, so operations are logrithmic,
-              O(ln(N)) insertion, search, and retrieval.  Maps will not accept duplicate keys.  If you iterate over the collection you will get a sequence of pairs with
-              iter->first returning the key and iter->second returning its associated value.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              std::multimap&lt;Key,&nbsp;Value&gt;
-            </td>
-            <td>
-              An colletion of key-value pairs of types Key and Value, respectively, ordered on the keys.  The std::map&lt;Key, Value&gt; is based on a balanced binary (Red-Black) tree, so operations are logrithmic,
-              O(ln(N)) insertion, search, and retrieval.  Multimaps will accept duplicate keys. The same comments we made about the std::map&lt;Key, value&gt; apply here. If you iterate over the collection you will get a sequence of pairs with
-              iter->first returning the key and iter->second returning its associated value.
-            </td>
-          <tr>
-            <td>
-              std::unordered_set&lt;Key&gt;<br /><span class="note">C++11</span>
-            </td>
-            <td>
-              An unordered colletion of items of Key type.  The std::unordered_set&lt;Key&gt; is based on a hash table, so operations are
-              are constant time for insertion, search, and retrieval.  Unordered_sets will not accept duplicate keys.  If you iterate over the collection you will items of type Key.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              std::unordered_multiset&lt;Key&gt;<br /><span class="note">C++11</span>
-            </td>
-            <td>
-              An unordered colletion of keys.  The std::unordered_multiset&lt;Key&gt; is based on a hash table, so operations are
-              are constant time for insertion, search, and retrieval.  Unordered_multisets will accept duplicate keys.  If you iterate over the collection you will get a sequence of keys.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              std::unordered_map&lt;Key,&nbsp;Value&gt;<br /><span class="note">C++11</span>
-            </td>
-            <td>
-              An unordered colletion of key-value pairs of types Key and Value, respectively.  The std::map&lt;Key, Value&gt; is based on a hash table, so operations are
-              are constant time for insertion, search, and retrieval.  Unordered_maps will not accept duplicate keys.  If you iterate over the collection you will get a sequence of pairs with
-              iter->first returning the key and iter->second returning its associated value.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              std::unordered_multimap&lt;Key,&nbsp;Value&gt;<br /><span class="note">C++11</span>
-            </td>
-            <td>
-              An unordered colletion of key-value pairs of types Key and Value, respectively.  The std::map&lt;Key, Value&gt; is based on a hash table, so operations are
-              are constant time for insertion, search, and retrieval.  Unordered_maps will accept duplicate keys.  If you iterate over the collection you will get a sequence of pairs with
-              iter->first returning the key and iter->second returning its associated value.
-            </td>
-          </tr>
-        </table>
-        <p>
-          <a href="../../CoreTechnologies/cpp/code/STLContainers">C++11 STL Container code examples</a>,
-          <a href="../../CoreTechnologies/cpp/code/STL-Containers">C++03 STL Container code examples</a>
-        </p>
-        <spacer-15></spacer-15>
-      </li>
-      <li>
-        <strong>Smart Pointers:</strong> <span class="note">C++11</span>
+        The first template function accepts an arbitrary finite number of moveable items of type T and processes the first one and calls itself
+        recursively to handle the remainer.  The second function is a template specialization that stops the recursion.
         <p></p>
-        Smart pointers are instances of classes that wrap native pointers, keep the pointer syntax, but add additional operations.
-        <p></p>
-        <table>
-          <tr>
-            <th>Declaration</th>
-            <th>Discussion</th>
-          </tr>
-          <tr>
-            <td style="width:16em;" class="top">
-              std::unique_ptr&lt;T&gt;&nbsp;uptr(new T);
-            </td>
-            <td>
-              std::unique_ptr is a smart pointer that represents sole ownership of a resource created on the heap.
-              Its action is to provide access to its owned object through standard pointer syntax and to delete the
-              object when it goes out of scope.
-              <p></p>
-              You must be careful not to initialize two or more std::unique_ptrs with the same raw pointer as that will
-              cause delete to be called more than once on the owned object with undefined behavior.
-            </td>
-          </tr>
-          <tr>
-            <td class="top">
-              std::shared_ptr&lt;T&gt;&nbsp;sptr1&#40;new&nbsp;T&#41;;<br />
-              std::shared_ptr&lt;T&gt;&nbsp;sptr2(sptr1);
-            </td>
-            <td>
-              std::shared_ptr is a smart reference counted pointer that represents shared ownership of a resource created on the heap.
-              When a shared pointer goes out of scope it decrements its reference count.  Only if the count goes to zero is the resource
-              deleted.
-              <p></p>
-              You must be careful not to create more than one std::shared_ptr from a raw pointer.  After the first is created you must
-              create the remainder from an already defined std::shared_ptr sharing the same resource.
-            </td>
-          </tr>
-          <tr>
-            <td class="top">
-              std::weak_ptr&lt;T&gt; wptr = sptr1;
-            </td>
-            <td>
-              std::weak_ptr allows you to refer to an object it doesn't own and may have been deleted.  You check by calling wptr.lock() or
-              wptr.expired().
-            </td>
-          </tr>
-        </table>
+        The set of type parameters in a variadic template is referred to as a &quot;Parameter Pack&quot;
         <p>
-          <a href="../../CoreTechnologies/cpp/code/STLContainers/TestClass">TestClass code example of std::unique_ptr</a>
+          <a href="../../CoreTechnologies/Cpp/code/STLContainers/Inserter">Code Example</a>, <a href="http://en.cppreference.com/w/cpp/language/parameter_pack">Reference</a>
         </p>
-        <div class="pad"></div>
-      </li>
-      <li>
-        <strong>type traits:</strong> <span class="note">C++11</span>
-        <p>
-          The type_traits library lets you make queries about a given type, like is it a pointer or is it a class.  <a href="http://en.cppreference.com/w/cpp/header/type_traits">here</a>'s
-          a complete list.
-        </p>
-        <div class="pad"></div>
-      </li>
-      <li>
-        <strong>chrono:</strong> <span class="note">C++11</span>
-        <p>
-          The chrono library has facilities for constructing clocks and measuring times.  You can get the system time with std::system_clock and
-          construct a high resolution timer from std::high_resolution_clock.  <a href="http://en.cppreference.com/w/cpp/header/chrono">here</a>'s a list
-          of all its facilities.
-        </p>
-        <a href="../../CoreTechnologies/cpp/code/ChronoTimer">Chrono Timer code example</a>
-        <spacer-15></spacer-15>
-      </li>
-      <li>
-        <strong>initializer-list:</strong> <span class="note">C++11</span>
-        <p>
-          std::initializer-list is a class that supports initializing declared primitives, structs, classes, and containers with the values they will hold
-          on startup. Here are two samples:
-        </p>
+      </div>
+      <div class="smallpad"></div>
+    </li>
+    <li>
+      <strong>noexcept:</strong> <span class="note">C++11</span>
+      <p></p>
+      noexcept is a specification that can be part of a function declarator.
+      <p>
         <div class="indent">
-          int x { -5 };<br />
-          std::vector&lt;int&gt; vint { 1, 2, 3, 4 };
+          Void fun (int i) noexcept
         </div>
-        <p>
-          You need to be careful when the type you are initializing has a constructor that takes a single parameter.  If your syntax uses braces instead of
-          parentheses, then the initializer list will be used rather than the constructor you intended.
-        </p>
-        <div class="pad"></div>
-      </li>
-      <li>
-        <strong>tuple:</strong> <span class="note">C++11</span>
-        <p>
-          std::tuple&lt;T<sub>1</sub>, T<sub>2</sub>, ...&gt; is a class that holds a fixed number of instances of arbitrary types.  It is a generalization of std::pair&lt;F, S&gt;.
-          the std::make_tuple(Args... args) is a variadic template function designed to make it easy to construct tuples.  The non-member function
-          std::get&lt;n&gt;(std::tuple) provides access to a tuple's nth member instance.
-          <table>
-            <tr>
-              <th>tuple syntax</th>
-              <th>Description</th>
-            </tr>
-            <tr>
-              <td>std::tuple&lt;T<sub>1</sub>, T<sub>2</sub>, ...&gt; t { t<sub>1</sub>, t<sub>2</sub>, ...}</td>
-              <td>
-                Declare an instance of a tuple that holds instances of T1, T2, ...
-              </td>
-            </tr>
-            <tr>
-              <td>
-                T<sub>n</sub> t<sub>n</sub> = get&lt;n&gt;(t);
-              </td>
-              <td>
-                Retrieve the value of the nth element of the tuple t.
-              </td>
-            </tr>
-            <tr>
-              <td>std::tuple&lt;T<sub>1</sub>, T<sub>2</sub>, ...&gt; t = std::make_tuple&lt;t<sub>1</sub>, t<sub>2</sub>, ...&gt;</td>
-              <td>
-                Alternate way to initialize a std::tuple.
-              </td>
-            </tr>
-          </table>
-        </p>
-        <div class="pad"></div>
-      </li>
-      <li>
-        <strong>regex:</strong> <span class="note">C++11</span>
-        <p>
-          Regular Expressions are strings with a particular syntax that makes it easy to specify exactly what a search should match.
-          There are special characters for the beginning and end of a search string, ways to specify that any of a set of characters
-          are acceptable at some place in the string and so forth.  The standard C++ library now has std::regex, a regular expression
-          processor that you may find useful.
-        <p></p>
-        <a href="http://regexone.com/">here</a>'s a tutorial.  You will also find a nice expositions in &quot;The C++ Programming Language&quot; starting on
-        page 1051 and in &quot;The C++ Standard Library&quot; starting on page 717.  These are our two required texts.
-        </p>
-        <div class="pad"></div>
-      </li>
-      <li>
-        <strong>concurrency:</strong> <span class="note">C++11</span>
-        <p>
-          C++ now supports threads and synchronization constructs to support multi-threaded programming.  Here are links to <a href="../../CoreTechnologies/cpp/code/Cpp11-Concurrency">C++11concurrency examples</a>
-          and a <a href="../../CoreTechnologies/cpp/code/Cpp11-BlockingQueue">blocking queue</a> implementation
-          that we will discuss later in the semester.  I recommend that you wait awhile before looking at these.  You will need to be quite comfortable with
-          C++11 to get much out of the examples.
-        </p>
-        <div class="pad"></div>
-      </li>
-      <li>
-        <strong>algorithms:</strong> <span class="note">C++11</span>
-        <p></p>
-        There have been a number of relatively useful algorithms in the standard library.  The table below lists a few of the ones I use occasionally.  I've also
-        included several that have been added with the new C++11 standard.
-        <p></p>
-        Note that all of the STL algorithms treat [start_iter, end_iter) as a closed open interval.  That is, start_iter points to the first element processed
-        and end_iter points to one <strong>past</strong> the last element processed.
-        <p></p>
+      </p>
+      If the body of the function throws an unhandled exception std::terminate()
+      is called by default.
+      <p></p>
+      <div class="pad"></div>
+    </li>
+    <li>
+      <strong>literals</strong>
+      <p>
+        Literals are compile-time constants.  The specifiers below allow us to be fairly specific about the literal type
+        to avoid needing silent conversions when there is a compatible type mismatch in code expressions.
+      </p>
+      <table>
+        <tr>
+          <th>type</th>
+          <th>value</th>
+          <th>interpretation</th>
+        </tr>
+        <tr>
+          <td>integer&nbsp;literal</td>
+          <td>10</td>
+          <td>integer</td>
+        </tr>
+        <tr>
+          <td> </td>
+          <td>10u</td>
+          <td>unsigned integer</td>
+        </tr>
+        <tr>
+          <td> </td>
+          <td>10l</td>
+          <td>long integer</td>
+        </tr>
+        <tr>
+          <td> </td>
+          <td>10ul</td>
+          <td>unsigned long integer</td>
+        </tr>
+        <tr>
+          <td>floating&nbsp;literal</td>
+          <td>10.0</td>
+          <td>double precision float</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>10.0f</td>
+          <td>single precision float</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>10.0l</td>
+          <td>long double</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>10.0e-2</td>
+          <td>0.1 using exponential notation</td>
+        </tr>
+        <tr>
+          <td>string&nbsp;literal</td>
+          <td>"a string"</td>
+          <td>const char[]</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>L"a string"</td>
+          <td>const wchar_t[]</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>u8"a string"</td>
+          <td>const char[] with utf-8 encoding</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>u"a string"</td>
+          <td>const char16_t[] with utf-16 encoding</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>U"a string"</td>
+          <td>const char32_t[] with utf-32 encoding</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>R"a string"</td>
+          <td>const char[] with raw encoding => everything is a char including \ and markup</td>
+        </tr>
+      </table>
+      <p>
+        <span class="note">C++14</span> will be introducing user defined literal suffixes, e.g. ns for nanosecond, kg for kilogram, etc.
+      </p>
+    </li>
+  </ol>
+  <strong>New Library Features:</strong>
+  <spacer-15></spacer-15>
+  <ol class="tight">
+    <li>
+      <strong>New Containers:</strong>
+      <p>
+        Here's a list of the most frequently used containers, annotated to show what was added in C++11.  All the containers
+        can be accessed with container specific iterators, e.g., vector&lt;double&gt;::iterator;
+      </p>
+      <table>
+        <tr>
+          <th>Container</th>
+          <th>Discussion</th>
+        </tr>
+        <tr>
+          <td>
+            std::vector&lt;T&gt;
+          </td>
+          <td>
+            An indexable collection of items of type T stored in continguous memory.<br />
+            Constant time insertion at back, O(N) if inserted at front.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            std::list&lt;T&gt;
+          </td>
+          <td>
+            A doubley linked list of items of type T.  Constant time to store in front or back,
+            but O(N) to insert in the middle.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            std::deque&lt;T&gt;
+          </td>
+          <td>
+            An indexable collection of items of type T.  Constant time to store in front or back,
+            but O(N) to insert in the middle.  This is a stringe beast composed of three blocks of
+            contiguous memory, at the front, at the back, and in the middle.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            std::queue&lt;T&gt;
+          </td>
+          <td>
+            A First In First Out (FIFO) collection of items of type T.  Items are Enqueued on the front and Dequeued from the back.  It
+            is a wrapper around a std::deque&lt;T&gt; so it is constant time to Enqueue and Dequeue.  I don't think you can access interior
+            elements with an iterator but I'll have to check that to be sure.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            std::stack&lt;T&gt;
+          </td>
+          <td>
+            A Last in First Out (LIFO) collection of items of type T.  Constant time to push and pop elements.
+            Same access comments as for the std::queue&lt;T&gt;
+          </td>
+        </tr>
+        <tr>
+          <td>
+            std::set&lt;Key&gt;
+          </td>
+          <td>
+            An ordered collecion of items of type T.  The std::set&lt;Key&gt; is based on a balanced binary (Red-Black) tree, so operations are logrithmic,
+            O(ln(N)) insertion, search, and retrieval.  Sets will not accept duplicate keys.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            std::multiset&lt;Key&gt;
+          </td>
+          <td>
+            An ordered collecion of items of type T.  The std::multiset&lt;Key&gt; is based on a balanced binary (Red-Black) tree, so operations are logrithmic,
+            O(ln(N)) insertion, search, and retrieval.  multisets will accept duplicate keys but that makes search and retrieval more complex as you may get back
+            a range of values for the duplicated key.
+          </td>
+        <tr>
+          <td>
+            std::map&lt;Key,&nbsp;Value&gt;
+          </td>
+          <td>
+            An colletion of key-value pairs of types Key and Value, respectively, ordered on the keys.  The std::map&lt;Key, Value&gt; is based on a balanced binary (Red-Black) tree, so operations are logrithmic,
+            O(ln(N)) insertion, search, and retrieval.  Maps will not accept duplicate keys.  If you iterate over the collection you will get a sequence of pairs with
+            iter->first returning the key and iter->second returning its associated value.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            std::multimap&lt;Key,&nbsp;Value&gt;
+          </td>
+          <td>
+            An colletion of key-value pairs of types Key and Value, respectively, ordered on the keys.  The std::map&lt;Key, Value&gt; is based on a balanced binary (Red-Black) tree, so operations are logrithmic,
+            O(ln(N)) insertion, search, and retrieval.  Multimaps will accept duplicate keys. The same comments we made about the std::map&lt;Key, value&gt; apply here. If you iterate over the collection you will get a sequence of pairs with
+            iter->first returning the key and iter->second returning its associated value.
+          </td>
+        <tr>
+          <td>
+            std::unordered_set&lt;Key&gt;<br /><span class="note">C++11</span>
+          </td>
+          <td>
+            An unordered colletion of items of Key type.  The std::unordered_set&lt;Key&gt; is based on a hash table, so operations are
+            are constant time for insertion, search, and retrieval.  Unordered_sets will not accept duplicate keys.  If you iterate over the collection you will items of type Key.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            std::unordered_multiset&lt;Key&gt;<br /><span class="note">C++11</span>
+          </td>
+          <td>
+            An unordered colletion of keys.  The std::unordered_multiset&lt;Key&gt; is based on a hash table, so operations are
+            are constant time for insertion, search, and retrieval.  Unordered_multisets will accept duplicate keys.  If you iterate over the collection you will get a sequence of keys.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            std::unordered_map&lt;Key,&nbsp;Value&gt;<br /><span class="note">C++11</span>
+          </td>
+          <td>
+            An unordered colletion of key-value pairs of types Key and Value, respectively.  The std::map&lt;Key, Value&gt; is based on a hash table, so operations are
+            are constant time for insertion, search, and retrieval.  Unordered_maps will not accept duplicate keys.  If you iterate over the collection you will get a sequence of pairs with
+            iter->first returning the key and iter->second returning its associated value.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            std::unordered_multimap&lt;Key,&nbsp;Value&gt;<br /><span class="note">C++11</span>
+          </td>
+          <td>
+            An unordered colletion of key-value pairs of types Key and Value, respectively.  The std::map&lt;Key, Value&gt; is based on a hash table, so operations are
+            are constant time for insertion, search, and retrieval.  Unordered_maps will accept duplicate keys.  If you iterate over the collection you will get a sequence of pairs with
+            iter->first returning the key and iter->second returning its associated value.
+          </td>
+        </tr>
+      </table>
+      <p>
+        <a href="../../CoreTechnologies/cpp/code/STLContainers">C++11 STL Container code examples</a>,
+        <a href="../../CoreTechnologies/cpp/code/STL-Containers">C++03 STL Container code examples</a>
+      </p>
+      <spacer-15></spacer-15>
+    </li>
+    <li>
+      <strong>Smart Pointers:</strong> <span class="note">C++11</span>
+      <p></p>
+      Smart pointers are instances of classes that wrap native pointers, keep the pointer syntax, but add additional operations.
+      <p></p>
+      <table>
+        <tr>
+          <th>Declaration</th>
+          <th>Discussion</th>
+        </tr>
+        <tr>
+          <td style="width:16em;" class="top">
+            std::unique_ptr&lt;T&gt;&nbsp;uptr(new T);
+          </td>
+          <td>
+            std::unique_ptr is a smart pointer that represents sole ownership of a resource created on the heap.
+            Its action is to provide access to its owned object through standard pointer syntax and to delete the
+            object when it goes out of scope.
+            <p></p>
+            You must be careful not to initialize two or more std::unique_ptrs with the same raw pointer as that will
+            cause delete to be called more than once on the owned object with undefined behavior.
+          </td>
+        </tr>
+        <tr>
+          <td class="top">
+            std::shared_ptr&lt;T&gt;&nbsp;sptr1&#40;new&nbsp;T&#41;;<br />
+            std::shared_ptr&lt;T&gt;&nbsp;sptr2(sptr1);
+          </td>
+          <td>
+            std::shared_ptr is a smart reference counted pointer that represents shared ownership of a resource created on the heap.
+            When a shared pointer goes out of scope it decrements its reference count.  Only if the count goes to zero is the resource
+            deleted.
+            <p></p>
+            You must be careful not to create more than one std::shared_ptr from a raw pointer.  After the first is created you must
+            create the remainder from an already defined std::shared_ptr sharing the same resource.
+          </td>
+        </tr>
+        <tr>
+          <td class="top">
+            std::weak_ptr&lt;T&gt; wptr = sptr1;
+          </td>
+          <td>
+            std::weak_ptr allows you to refer to an object it doesn't own and may have been deleted.  You check by calling wptr.lock() or
+            wptr.expired().
+          </td>
+        </tr>
+      </table>
+      <p>
+        <a href="../../CoreTechnologies/cpp/code/STLContainers/TestClass">TestClass code example of std::unique_ptr</a>
+      </p>
+      <div class="pad"></div>
+    </li>
+    <li>
+      <strong>type traits:</strong> <span class="note">C++11</span>
+      <p>
+        The type_traits library lets you make queries about a given type, like is it a pointer or is it a class.  <a href="http://en.cppreference.com/w/cpp/header/type_traits">here</a>'s
+        a complete list.
+      </p>
+      <div class="pad"></div>
+    </li>
+    <li>
+      <strong>chrono:</strong> <span class="note">C++11</span>
+      <p>
+        The chrono library has facilities for constructing clocks and measuring times.  You can get the system time with std::system_clock and
+        construct a high resolution timer from std::high_resolution_clock.  <a href="http://en.cppreference.com/w/cpp/header/chrono">here</a>'s a list
+        of all its facilities.
+      </p>
+      <a href="../../CoreTechnologies/cpp/code/ChronoTimer">Chrono Timer code example</a>
+      <spacer-15></spacer-15>
+    </li>
+    <li>
+      <strong>initializer-list:</strong> <span class="note">C++11</span>
+      <p>
+        std::initializer-list is a class that supports initializing declared primitives, structs, classes, and containers with the values they will hold
+        on startup. Here are two samples:
+      </p>
+      <div class="indent">
+        int x { -5 };<br />
+        std::vector&lt;int&gt; vint { 1, 2, 3, 4 };
+      </div>
+      <p>
+        You need to be careful when the type you are initializing has a constructor that takes a single parameter.  If your syntax uses braces instead of
+        parentheses, then the initializer list will be used rather than the constructor you intended.
+      </p>
+      <div class="pad"></div>
+    </li>
+    <li>
+      <strong>tuple:</strong> <span class="note">C++11</span>
+      <p>
+        std::tuple&lt;T<sub>1</sub>, T<sub>2</sub>, ...&gt; is a class that holds a fixed number of instances of arbitrary types.  It is a generalization of std::pair&lt;F, S&gt;.
+        the std::make_tuple(Args... args) is a variadic template function designed to make it easy to construct tuples.  The non-member function
+        std::get&lt;n&gt;(std::tuple) provides access to a tuple's nth member instance.
         <table>
           <tr>
-            <th>Algorithm</th>
-            <th>Discussion</th>
+            <th>tuple syntax</th>
+            <th>Description</th>
           </tr>
           <tr>
-            <td>bool std::all_of(start_iter, end_iter, PredicateFunctor());<br /><span class="note">C++11</span></td>
+            <td>std::tuple&lt;T<sub>1</sub>, T<sub>2</sub>, ...&gt; t { t<sub>1</sub>, t<sub>2</sub>, ...}</td>
             <td>
-              Checks if a predicate functor returns true on all of the elements of a container.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              bool std::any_of(start_iter, end_iter, PredicateFunctor());<br /><span class="note">C++11</span>
-            </td>
-            <td>
-              Checks if a predicate functor returns true on any of the elements of a container.
+              Declare an instance of a tuple that holds instances of T1, T2, ...
             </td>
           </tr>
           <tr>
             <td>
-              bool std::none_of(start_iter, end_iter, PredicateFunctor());<br /><span class="note">C++11</span>
+              T<sub>n</sub> t<sub>n</sub> = get&lt;n&gt;(t);
             </td>
             <td>
-              Checks if a predicate functor returns false on all of the elements of a container.
+              Retrieve the value of the nth element of the tuple t.
             </td>
           </tr>
           <tr>
-            <td style="width:30em;">UnaryFunction std::for_each(start_iter, end_iter, UnaryFunction&nbsp;f)</td>
-            <td>Functior processing is called on each element of the container.</td>
-          </tr>
-          <tr>
+            <td>std::tuple&lt;T<sub>1</sub>, T<sub>2</sub>, ...&gt; t = std::make_tuple&lt;t<sub>1</sub>, t<sub>2</sub>, ...&gt;</td>
             <td>
-              found_iter std::find(start_iter, end_iter, T&amp; t);
-            </td>
-            <td>
-              returns an iterator pointing to the found item or end_iter.
+              Alternate way to initialize a std::tuple.
             </td>
           </tr>
         </table>
-        <p>
-          <a href="../../CoreTechnologies/cpp/code/CallableObjects">Code example using for_each</a> near the end of the source code.
-        </p>
-      </li>
-    </ol>
+      </p>
+      <div class="pad"></div>
+    </li>
+    <li>
+      <strong>regex:</strong> <span class="note">C++11</span>
+      <p>
+        Regular Expressions are strings with a particular syntax that makes it easy to specify exactly what a search should match.
+        There are special characters for the beginning and end of a search string, ways to specify that any of a set of characters
+        are acceptable at some place in the string and so forth.  The standard C++ library now has std::regex, a regular expression
+        processor that you may find useful.
+      <p></p>
+      <a href="http://regexone.com/">here</a>'s a tutorial.  You will also find a nice expositions in &quot;The C++ Programming Language&quot; starting on
+      page 1051 and in &quot;The C++ Standard Library&quot; starting on page 717.  These are our two required texts.
+      </p>
+      <div class="pad"></div>
+    </li>
+    <li>
+      <strong>concurrency:</strong> <span class="note">C++11</span>
+      <p>
+        C++ now supports threads and synchronization constructs to support multi-threaded programming.  Here are links to <a href="../../CoreTechnologies/cpp/code/Cpp11-Concurrency">C++11concurrency examples</a>
+        and a <a href="../../CoreTechnologies/cpp/code/Cpp11-BlockingQueue">blocking queue</a> implementation
+        that we will discuss later in the semester.  I recommend that you wait awhile before looking at these.  You will need to be quite comfortable with
+        C++11 to get much out of the examples.
+      </p>
+      <div class="pad"></div>
+    </li>
+    <li>
+      <strong>algorithms:</strong> <span class="note">C++11</span>
+      <p></p>
+      There have been a number of relatively useful algorithms in the standard library.  The table below lists a few of the ones I use occasionally.  I've also
+      included several that have been added with the new C++11 standard.
+      <p></p>
+      Note that all of the STL algorithms treat [start_iter, end_iter) as a closed open interval.  That is, start_iter points to the first element processed
+      and end_iter points to one <strong>past</strong> the last element processed.
+      <p></p>
+      <table>
+        <tr>
+          <th>Algorithm</th>
+          <th>Discussion</th>
+        </tr>
+        <tr>
+          <td>bool std::all_of(start_iter, end_iter, PredicateFunctor());<br /><span class="note">C++11</span></td>
+          <td>
+            Checks if a predicate functor returns true on all of the elements of a container.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            bool std::any_of(start_iter, end_iter, PredicateFunctor());<br /><span class="note">C++11</span>
+          </td>
+          <td>
+            Checks if a predicate functor returns true on any of the elements of a container.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            bool std::none_of(start_iter, end_iter, PredicateFunctor());<br /><span class="note">C++11</span>
+          </td>
+          <td>
+            Checks if a predicate functor returns false on all of the elements of a container.
+          </td>
+        </tr>
+        <tr>
+          <td style="width:30em;">UnaryFunction std::for_each(start_iter, end_iter, UnaryFunction&nbsp;f)</td>
+          <td>Functior processing is called on each element of the container.</td>
+        </tr>
+        <tr>
+          <td>
+            found_iter std::find(start_iter, end_iter, T&amp; t);
+          </td>
+          <td>
+            returns an iterator pointing to the found item or end_iter.
+          </td>
+        </tr>
+      </table>
+      <p>
+        <a href="../../CoreTechnologies/cpp/code/CallableObjects">Code example using for_each</a> near the end of the source code.
+      </p>
+    </li>
+  </ol>
   <spacer-15></spacer-15>
   <div>
     <img class="strip-photo" src="Pictures/campusStrip.jpg" alt="CST strip" width="98%" />
