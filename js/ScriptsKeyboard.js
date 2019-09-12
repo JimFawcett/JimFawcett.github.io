@@ -23,10 +23,14 @@ function keyAction(keyEvent) {
   if (key === 'D')
     window.scrollBy(0, 200);
   if (key === 'N') {
-    document.getElementById("Next").click();
+    let nxt = document.getElementById("Next");
+    if (isDefined(nxt))
+      nxt.click();
   }
   if (key === 'P') {
-    document.getElementById('Prev').click();
+    let prv = document.getElementById('Prev');
+    if (isDefined(prv))
+      prv.click();
   }
   if (key === 'H') {
     HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
