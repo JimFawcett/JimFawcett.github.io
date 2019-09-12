@@ -12,12 +12,6 @@ function keyAction(keyEvent) {
   if (key === 'R') {
     location.reload();
   }
-  if (key === 'L') {
-    document.getElementById("Lect").click();
-  }
-  if (key === 'C') {
-    document.getElementById("Cour").click();
-  }
   if (key === 'S')
     toggleSwipeEvents();
   if (key === 'T')

@@ -261,6 +261,12 @@ function closeNote() {
   note.style.padding = "0px";
   note.style.border = "none";
 }
+/* --------------------------------------------------------------
+ *  Open help window
+ */
+function openHelp() {
+  window.open('StHelp.html', 'target=_blank', 'location=yes, width=1000, height=650, resizable');
+}
 /*
  *  Was this file loaded from file system instead of web server?
  */
@@ -456,11 +462,11 @@ function disableButtons() {
 function keyAction(keyEvent) {
   keystate = 'down';
   var key = String.fromCharCode(keyEvent.which);
-  if (key === 'R') {
-    location.reload();
-  }
+  //if (key === 'R') {
+  //  location.reload();
+  //}
   if (key === 'C') {
-    returnToCurrent();
+    returnToCurr();
   }
   if (key === 'N') {
     next();
@@ -472,10 +478,16 @@ function keyAction(keyEvent) {
     window.location = 'index.html';
   }
   if (key === 'H') {
+    openHelp();
+  }
+  if (key === 'O') {
     openNote();
   }
-  if (keyEvent.key === 'Escape')
-    closeNote();
+  if (key === 'S') {
+    toggleStSwipeEvents();
+  }
+  //if (keyEvent.key === 'Escape')
+  //  closeNote();
 }
 /* --------------------------------------------------------------
  *  Add event listener for key events
