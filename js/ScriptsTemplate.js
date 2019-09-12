@@ -95,7 +95,7 @@ function toggleSwipeEvents() {
   let sKey = document.getElementById('sKey');
   if (getSwipeEvents() === 'true') {
     removeSwipeListeners();
-    sKey.innerHTML = '<del>S</del>';
+    sKey.innerHTML = '<del>&nbsp;S&nbsp;</del>';
   }
   else {
     addSwipeListeners();
