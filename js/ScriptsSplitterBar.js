@@ -1,4 +1,10 @@
-// JavaScript source code
+/* ------------------------------------------------------------------
+ *  ScriptsSplitterBar.js 
+ *    - code for draggin splitter and resizing panes on either side
+ *  
+ *  Jim Fawcett, Emeritus Teaching Professor, Syracuse University
+ * ------------------------------------------------------------------
+ */
 
 function onLoadSplitter(figStr) {
   dragElement(document.getElementById(figStr + "-seperator"), "H", figStr);
@@ -9,10 +15,8 @@ function dragElement(element, direction, figStr) {
   // Two variables for tracking positions of the cursor
   const drag = { x: 0, y: 0 };
   const delta = { x: 0, y: 0 };
-  /* if present, the handler is where you move the DIV from
-     otherwise, move the DIV from anywhere inside the DIV */
-  //handler ? (handler.onmousedown = dragMouseDown) : (element.onmousedown = dragMouseDown);
-  element.onmousedown = dragMouseDown
+
+  element.onmousedown = dragMouseDown;
 
   // function that will be called whenever the down event of the mouse is raised
   function dragMouseDown(e) {
