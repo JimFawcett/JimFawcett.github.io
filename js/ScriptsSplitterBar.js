@@ -17,13 +17,16 @@ function dragElement(element, direction, figStr) {
   const delta = { x: 0, y: 0 };
 
   element.onmousedown = dragMouseDown;
+  element.ontouchstart = dragMouseDown;
 
   // function that will be called whenever the down event of the mouse is raised
   function dragMouseDown(e) {
     drag.x = e.clientX;
     drag.y = e.clientY;
     document.onmousemove = onMouseMove;
-    document.onmouseup = () => { document.onmousemove = document.onmouseup = null; }
+    document.ontouchmove = onMouseMove;
+    document.onmouseup = () => { document.onmousemove = document.onmouseup = null; };
+    document.ontouchend = () => { document.ontouchemove = document.ontouchend = null; };
   }
 
   // function that will be called whenever the up event of the mouse is raised
