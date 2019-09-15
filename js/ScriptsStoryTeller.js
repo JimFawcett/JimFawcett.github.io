@@ -117,6 +117,8 @@ function render(si) {
  *  Empty page information held in localStorage
  */
 function clearLocalStorage() {
+  if (!isDefined(localStorage))
+    return;
   localStorage.clear();
 }
 /* --------------------------------------------------------------

@@ -301,6 +301,8 @@ function togglenavKeys() {
 
 function setnavKeys() {
   var nkc = document.getElementsByTagName("navKeys-Container");
+  if (!isDefined(localStorage))
+    return;
   var navKeyState = window.localStorage.getItem("navKeyState");
   if (navKeyState === null) {
     nkc[0].style.display = "inline";
