@@ -244,11 +244,15 @@ function openNote() {
     note.style.padding = "10px 15px 20px 15px";
     note.style.border = "2px solid saddlebrown";
     tBtn.innerHTML = "<del>&nbsp;?&nbsp;</del>";
+    if(isEdge())
+      note.style.display = "block";
   }
   else {
     note.style.width = "0px";
     note.style.padding = "0px";
     note.style.border = "none";
+    if(isEdge())
+      note.style.display = "none";
     tBtn.innerHTML = "?";
   }
 }
@@ -262,6 +266,8 @@ function closeNote() {
   note.style.width = "0px";
   note.style.padding = "0px";
   note.style.border = "none";
+  if(isEdge())
+    note.style.display = "none";
 }
 /* --------------------------------------------------------------
  *  Open help window
@@ -306,6 +312,18 @@ function isChrome() {
     // not Google Chrome
     return false;
   }
+}
+
+function isEdge() {
+  var uA = window.navigator.userAgent,
+    isIE = /msie\s|trident\/|edge\//i.test(uA) && !!(document.uniqueID || document.documentMode || window.ActiveXObject || window.MSInputMethodContext),
+    checkVersion = (isIE && +(/(edge\/|rv:|msie\s)([\d.]+)/i.exec(uA)[2])) || NaN;
+  if (checkVersion)
+    return true;
+  return false;
+  //if (document.documentMode || /Edge/.test(navigator.userAgent))
+  //  return true;
+  //return false;
 }
 /* --------------------------------------------------------------
  *  iframe onload event handler
