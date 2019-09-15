@@ -417,6 +417,7 @@ function storageChange(event) {
     loadStory();
     console.log('---------- removing storySaved item -----------------');
     localStorage.removeItem('storySaved');  // added 9/6/2019
+    localStorage.clear();
   }
   else {
     console.log('signal undefined');
