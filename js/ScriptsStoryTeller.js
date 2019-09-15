@@ -339,10 +339,10 @@ function isEdge() {
  */
 function srcChange() {
   console.log('entered srcChange');
-  if (!isLocalFile()) {
-    console.log('local file - leaving srcChange');
-    return;
-  }
+  //if (!isLocalFile()) {
+  //  console.log('local file - leaving srcChange');
+  //  return;
+  //}
   //if (isChrome())
   //  return;
   if (!isDefined(localStorage)) {
