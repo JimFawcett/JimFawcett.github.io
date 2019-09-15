@@ -43,7 +43,7 @@ function getContent(storyName) {
     let key = "page-" + i.toString();
     save(key, url, name, note);
   }
-  console.log('setting storySaved:storyName');
+  console.log('-------------- setting storySaved:' + storyName + ' ---------------');
   localStorage.setItem('storySaved', storyName);
 }
 
@@ -60,5 +60,6 @@ function save(key, item1, item2, item3) {
 }
 
 function clearStorage() {
+  console.log('------------- clearing local storage ------------');
   localStorage.clear();
 }

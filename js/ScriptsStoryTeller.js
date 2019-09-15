@@ -338,9 +338,11 @@ function isEdge() {
  *    change events when using file: protocol.
  */
 function srcChange() {
-  if (!isLocalFile())
-    return;
   console.log('entered srcChange');
+  if (!isLocalFile()) {
+    console.log('local file - leaving srcChange');
+    return;
+  }
   //if (isChrome())
   //  return;
   if (!isDefined(localStorage)) {
@@ -369,6 +371,7 @@ function srcChange() {
     console.log(localStorage.length);
     if (isDefined(signal)) {
       loadStory();
+      console.log('---------- removing storySaved item -----------------');
       localStorage.removeItem('storySaved');  // prevent infinite recursion
     }
   }
@@ -383,8 +386,8 @@ function storageChange(event) {
   console.log('entered storageChange with event.key = ' + event.key);
   if (event.key !== 'storySaved')
     return;
-  //console.log('storage event');
-  //console.log('localStorage.length = ' + localStorage.length)
+  console.log('storage event');
+  console.log('localStorage.length = ' + localStorage.length)
   let signal = localStorage.getItem('storySaved');
   storyName = signal;
   console.log('storyName = ' + storyName);
@@ -393,10 +396,11 @@ function storageChange(event) {
     let storyNamePlace = document.getElementById("storyNameId");
     storyNamePlace.innerHTML = storyName;
     loadStory();
+    console.log('---------- removing storySaved item -----------------');
     localStorage.removeItem('storySaved');  // added 9/6/2019
   }
   else {
-    //console.log('signal undefined');
+    console.log('signal undefined');
   }
 }
 
