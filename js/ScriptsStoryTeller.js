@@ -361,10 +361,10 @@ function srcChange() {
     return;
   }
   if (isLocalFile()) {
-    //console.log('isLocalFile');
+    console.log('isLocalFile');
     let signal = localStorage.getItem('storySaved');
-    //console.log(signal);
-    //console.log(localStorage.length);
+    console.log(signal);
+    console.log(localStorage.length);
     if (isDefined(signal)) {
       loadStory();
       localStorage.removeItem('storySaved');  // prevent infinite recursion
@@ -400,7 +400,7 @@ function storageChange(event) {
 
 function addStorageEvent() {
   //alert('addStorageEvent called');
-  window.addEventListener("storage", storageChange, false);
+  window.addEventListener("storage", function (e) { storageChange(e); }, false);
 }
 /* --------------------------------------------------------------
  *  Loads story list by calling render(0)
@@ -534,6 +534,7 @@ function addKeys() {
  */
 function initialize() {
   addKeys();
+  console.log('adding storage event listener');
   addStorageEvent();
   //localStorage.clear();
   //console.log('initialize() calling render(0):\ncurr = ', curr);
