@@ -404,14 +404,14 @@ function storageChange(event) {
   console.log('storage event');
   console.log('localStorage.length = ' + localStorage.length);
   showStorage();
-  let signal = localStorage.getItem('storySaved');
-  storyName = signal;
-  console.log('storyName = ' + storyName);
   //alert(storyName);
   let numItemsStr = localStorage.getItem('numItems');
   numItems = parseInt(numItemsStr);
   if (numItems > 0) {
   //if (isDefined(signal)) {
+    let signal = localStorage.getItem('storySaved');
+    storyName = signal;
+    console.log('storyName = ' + storyName);
     let storyNamePlace = document.getElementById("storyNameId");
     storyNamePlace.innerHTML = storyName;
     loadStory();
