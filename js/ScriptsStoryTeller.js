@@ -340,6 +340,8 @@ function isEdge() {
  */
 function srcChange() {
   console.log('entered srcChange');
+  if (!isLocalFile())
+    return;
   if (isChrome()) {
     console.log('leaving srcChange - isChrome');
     return;
