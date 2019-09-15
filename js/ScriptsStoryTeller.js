@@ -338,11 +338,13 @@ function isEdge() {
  *    change events when using file: protocol.
  */
 function srcChange() {
+  console.log('entered srcChange');
   //if (isChrome())
   //  return;
   if (!isDefined(localStorage)) {
     // Edge doesn't define localStorage when protocal is file:
     //console.log('local storage not defined');  
+    console.log('leaving srcChange - no localStorage defined');
     return;
   }
   let storyNamePlace = document.getElementById("storyNameId");
@@ -355,6 +357,7 @@ function srcChange() {
   }
   if (isChrome()) {
     //console.log('is chrome');
+    console.log('leaving srcChange - isChrome');
     return;
   }
   if (isLocalFile()) {
@@ -367,6 +370,7 @@ function srcChange() {
       localStorage.removeItem('storySaved');  // prevent infinite recursion
     }
   }
+  console.log('leaving srcChange at end');
 }
 /* --------------------------------------------------------------
  *  localStorage changed event handler

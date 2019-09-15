@@ -31,6 +31,7 @@ function getContent(storyName) {
 
   // save number of pages in localStorage
   numItems = links.length;
+  console.log('numItems = ' + numItems);
   localStorage.setItem('numItems', numItems.toString());
 
   for (var i = 0; i < links.length; ++i) {
@@ -42,6 +43,7 @@ function getContent(storyName) {
     let key = "page-" + i.toString();
     save(key, url, name, note);
   }
+  console.log('setting storySaved:storyName');
   localStorage.setItem('storySaved', storyName);
 }
 
