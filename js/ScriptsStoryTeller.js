@@ -417,6 +417,7 @@ function loadStoryList() {
 function loadStory() {
   closeNote();
   //console.log('loadStory calling retrieve("numItems"):\ncurr = ', curr);
+  console.log('calling retrieve with numItems = ' + numItems);
   retrieve('numItems');
 }
 /* --------------------------------------------------------------
