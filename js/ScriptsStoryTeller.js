@@ -244,15 +244,15 @@ function openNote() {
     note.style.padding = "10px 15px 20px 15px";
     note.style.border = "2px solid saddlebrown";
     tBtn.innerHTML = "<del>&nbsp;?&nbsp;</del>";
-    if(isEdge())
-      note.style.display = "block";
+    //if(isEdge())
+    //  note.style.display = "block";
   }
   else {
     note.style.width = "0px";
     note.style.padding = "0px";
     note.style.border = "none";
-    if(isEdge())
-      note.style.display = "none";
+    //if(isEdge())
+    //  note.style.display = "none";
     tBtn.innerHTML = "?";
   }
 }
@@ -266,8 +266,8 @@ function closeNote() {
   note.style.width = "0px";
   note.style.padding = "0px";
   note.style.border = "none";
-  if(isEdge())
-    note.style.display = "none";
+  //if(isEdge())
+  //  note.style.display = "none";
 }
 /* --------------------------------------------------------------
  *  Open help window
