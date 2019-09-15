@@ -409,12 +409,12 @@ function storageChange(event) {
   numItems = parseInt(numItemsStr);
   if (numItems > 0) {
   //if (isDefined(signal)) {
+    loadStory();
     let signal = localStorage.getItem('storySaved');
     storyName = signal;
     console.log('storyName = ' + storyName);
     let storyNamePlace = document.getElementById("storyNameId");
     storyNamePlace.innerHTML = storyName;
-    loadStory();
     console.log('---------- removing storySaved item -----------------');
     localStorage.removeItem('storySaved');  // added 9/6/2019
     localStorage.clear();
