@@ -408,13 +408,21 @@ function storageChange(event) {
   let numItemsStr = localStorage.getItem('numItems');
   numItems = parseInt(numItemsStr);
   if (numItems > 0) {
+    var storyName;
   //if (isDefined(signal)) {
-    loadStory();
+    // wait for story to finish loading
+    //for (i = 0; i < 100; ++i) {
+    //  let signal = localStorage.getItem('storySaved');
+    //  storyName = signal;
+    //  if (isDefined(signal))
+    //    break;
+    //}
     let signal = localStorage.getItem('storySaved');
     storyName = signal;
     console.log('storyName = ' + storyName);
     let storyNamePlace = document.getElementById("storyNameId");
     storyNamePlace.innerHTML = storyName;
+    loadStory();
     console.log('---------- removing storySaved item -----------------');
     localStorage.removeItem('storySaved');  // added 9/6/2019
     localStorage.clear();
