@@ -340,8 +340,10 @@ function isEdge() {
  */
 function srcChange() {
   console.log('entered srcChange');
-  if (!isLocalFile())
+  if (!isLocalFile()) {
+    console.log('leaving srcChange - not local file');
     return;
+  }
   if (isChrome()) {
     console.log('leaving srcChange - isChrome');
     return;
@@ -406,7 +408,10 @@ function storageChange(event) {
   storyName = signal;
   console.log('storyName = ' + storyName);
   //alert(storyName);
-  if (isDefined(signal)) {
+  let numItemsStr = localStorage.getItem('numItems');
+  numItems = parseInt(numItemsStr);
+  if (numItems > 0) {
+  //if (isDefined(signal)) {
     let storyNamePlace = document.getElementById("storyNameId");
     storyNamePlace.innerHTML = storyName;
     loadStory();
