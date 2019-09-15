@@ -141,7 +141,7 @@ function clearPages() {
  *    what was processed.
  */
 function retrieve(id) {
-  //console.log('entering retrieve(id):\ncurr = ', curr);
+  console.log('entering retrieve(id):\ncurr = ', curr);
 
   clearPages();
   if ('numItems' in localStorage) {
@@ -151,13 +151,13 @@ function retrieve(id) {
   else {
     alert('please select story');
 
-    //console.log('leaving retrieve(id) - no data in localStorage:\ncurr = ', curr);
+    console.log('leaving retrieve(id) - no data in localStorage:\ncurr = ', curr);
     return;
   }
 
   enableButtons();
   disableButton('retrieveBtn');
-
+  console.log('loading ' + numItems + ' items into pages');
   // push page objects into pages array
   for (var i = 0; i < numItems; ++i) {
     let key = "page-" + i.toString();
@@ -378,13 +378,14 @@ function srcChange() {
  *    doesn't have to do that with a load button.
  */
 function storageChange(event) {
-  //console.log(event.key);
+  console.log('entered storageChange with event.key = ' + event.key);
   if (event.key !== 'storySaved')
     return;
   //console.log('storage event');
   //console.log('localStorage.length = ' + localStorage.length)
   let signal = localStorage.getItem('storySaved');
   storyName = signal;
+  console.log('storyName = ' + storyName);
   //alert(storyName);
   if (isDefined(signal)) {
     let storyNamePlace = document.getElementById("storyNameId");
@@ -416,8 +417,7 @@ function loadStoryList() {
  */
 function loadStory() {
   closeNote();
-  //console.log('loadStory calling retrieve("numItems"):\ncurr = ', curr);
-  console.log('calling retrieve with numItems = ' + numItems);
+  console.log('loadStory calling retrieve("numItems"):\ncurr = ', curr);
   retrieve('numItems');
 }
 /* --------------------------------------------------------------
