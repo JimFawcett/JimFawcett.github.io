@@ -338,6 +338,8 @@ function isEdge() {
  *    change events when using file: protocol.
  */
 function srcChange() {
+  if (!isLocalFile())
+    return;
   console.log('entered srcChange');
   //if (isChrome())
   //  return;
