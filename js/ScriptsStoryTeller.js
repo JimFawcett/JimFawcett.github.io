@@ -340,12 +340,23 @@ function isEdge() {
  */
 function srcChange() {
   console.log('entered srcChange');
+  if (isChrome()) {
+    console.log('leaving srcChange - isChrome');
+    return;
+  }
+  //if (!isDefined(localStorage)) {
+  //  // Edge doesn't define localStorage when protocal is file:
+  //  //console.log('local storage not defined');  
+  //  console.log('leaving srcChange - no localStorage defined');
+  //  return;
+  //}
   let signal = localStorage.getItem('storySaved');
   console.log('signal = ' + signal);
   console.log(localStorage.length);
-  //if (isDefined(signal)) {
-  //  return;
-  //}
+  if (!isDefined(signal)) {
+    console.log('story not saved - returning');
+    return;
+  }
 
   //if (storyLoaded)
   //  return;
@@ -355,12 +366,6 @@ function srcChange() {
   //}
   //if (isChrome())
   //  return;
-  if (!isDefined(localStorage)) {
-    // Edge doesn't define localStorage when protocal is file:
-    //console.log('local storage not defined');  
-    console.log('leaving srcChange - no localStorage defined');
-    return;
-  }
   let storyNamePlace = document.getElementById("storyNameId");
   if (isDefined(storyNamePlace)) {
     let name = localStorage.getItem('storySaved');
@@ -369,15 +374,10 @@ function srcChange() {
       storyName = name;
     }
   }
-  if (isChrome()) {
-    //console.log('is chrome');
-    console.log('leaving srcChange - isChrome');
-    return;
-  }
-  if (isLocalFile()) {
-    console.log('isLocalFile');
+  //if (isLocalFile()) {
+  //  console.log('isLocalFile');
     showStorage();
-    let signal = localStorage.getItem('storySaved');
+    signal = localStorage.getItem('storySaved');
     console.log('signal = ' + signal);
     console.log(localStorage.length);
     if (isDefined(signal)) {
@@ -385,7 +385,7 @@ function srcChange() {
       console.log('---------- removing storySaved item -----------------');
       localStorage.removeItem('storySaved');  // prevent infinite recursion
     }
-  }
+  //}
   console.log('leaving srcChange at end');
 }
 /* --------------------------------------------------------------
