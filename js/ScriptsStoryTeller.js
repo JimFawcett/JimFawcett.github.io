@@ -289,8 +289,8 @@ function isLocalFile() {
  *  test.
  */
 function isChrome() {
-  if (isEdge())
-    return false;
+  //if (isEdge())
+  //  return false;
   var isChromium = window.chrome;
   var winNav = window.navigator;
   var vendorName = winNav.vendor;
