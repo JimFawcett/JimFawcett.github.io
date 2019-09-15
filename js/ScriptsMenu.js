@@ -58,18 +58,18 @@ function initializeMenu() {
       <div class='dropdown-content'>\
         <div class='darkTheme'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
         <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
+        <a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a>\
         <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
         <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
         <a href='https://github.com/joshnh/Git-Commands'>git commands</a>\
-        <a href='UML.html'>UML Diagrams</a>\
         <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
         <a href='SummerReading.html'>Summer Reading</a>\
-        <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams</a>\
         <a href='WebNotes.html'>Web Notes</a>\
         <a href='https://encycolorpedia.com/named'>Web Colors</a>\
+        <a href='UML.html'>UML Diagrams</a>\
+        <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams</a>\
         <a href='CppReferences.html'>C++ References</a>\
-        <a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a>\
-        <a href='CppExamples.html'>C++ Examples</a>\
+        <a href='CppExamples.html'>C++ Example Code</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
