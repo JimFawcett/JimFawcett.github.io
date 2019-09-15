@@ -343,9 +343,9 @@ function srcChange() {
   let signal = localStorage.getItem('storySaved');
   console.log('signal = ' + signal);
   console.log(localStorage.length);
-  if (!isDefined(signal)) {
-    return;
-  }
+  //if (isDefined(signal)) {
+  //  return;
+  //}
 
   //if (storyLoaded)
   //  return;
@@ -449,6 +449,7 @@ function loadStory() {
   closeNote();
   console.log('loadStory calling retrieve("numItems"):\ncurr = ', curr);
   retrieve('numItems');
+  localStorage.removeItem('storySaved');
   storyLoaded = 'true';
 }
 /* --------------------------------------------------------------
