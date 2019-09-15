@@ -289,6 +289,8 @@ function isLocalFile() {
  *  test.
  */
 function isChrome() {
+  if (isEdge())
+    return false;
   var isChromium = window.chrome;
   var winNav = window.navigator;
   var vendorName = winNav.vendor;
@@ -315,12 +317,15 @@ function isChrome() {
 }
 
 function isEdge() {
-  var uA = window.navigator.userAgent,
-    isIE = /msie\s|trident\/|edge\//i.test(uA) && !!(document.uniqueID || document.documentMode || window.ActiveXObject || window.MSInputMethodContext),
-    checkVersion = (isIE && +(/(edge\/|rv:|msie\s)([\d.]+)/i.exec(uA)[2])) || NaN;
-  if (checkVersion)
+  if (/Edge/.test(navigator.userAgent))
     return true;
   return false;
+  //var uA = window.navigator.userAgent,
+  //  isIE = /msie\s|trident\/|edge\//i.test(uA) && !!(document.uniqueID || document.documentMode || window.ActiveXObject || window.MSInputMethodContext),
+  //  checkVersion = (isIE && +(/(edge\/|rv:|msie\s)([\d.]+)/i.exec(uA)[2])) || NaN;
+  //if (checkVersion)
+  //  return true;
+  //return false;
   //if (document.documentMode || /Edge/.test(navigator.userAgent))
   //  return true;
   //return false;
