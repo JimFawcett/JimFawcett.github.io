@@ -398,9 +398,12 @@ function srcChange() {
  *    doesn't have to do that with a load button.
  */
 function storageChange(event) {
+  var storyName;
   console.log('entered storageChange with event.key = ' + event.key);
   if (event.key !== 'storySaved')
     return;
+  else
+    storyName = localStorage.getItem('storySaved');
   console.log('storage event');
   console.log('localStorage.length = ' + localStorage.length);
   showStorage();
@@ -408,7 +411,7 @@ function storageChange(event) {
   let numItemsStr = localStorage.getItem('numItems');
   numItems = parseInt(numItemsStr);
   if (numItems > 0) {
-    var storyName;
+    //var storyName;
   //if (isDefined(signal)) {
     // wait for story to finish loading
     //for (i = 0; i < 100; ++i) {
@@ -417,8 +420,8 @@ function storageChange(event) {
     //  if (isDefined(signal))
     //    break;
     //}
-    let signal = localStorage.getItem('storySaved');
-    storyName = signal;
+    //let signal = localStorage.getItem('storySaved');
+    //storyName = signal;
     console.log('storyName = ' + storyName);
     let storyNamePlace = document.getElementById("storyNameId");
     storyNamePlace.innerHTML = storyName;
