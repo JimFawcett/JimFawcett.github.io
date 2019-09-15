@@ -433,6 +433,7 @@ function showStorage() {
  */
 function loadStoryList() {
   storyLoaded = 'false';
+  clearLocalStorage();
   closeNote();
   //console.log('LoadStoryList() calling render(0):\ncurr = ', curr);
   render(0);
