@@ -420,8 +420,8 @@ function storageChange(event) {
     //  if (isDefined(signal))
     //    break;
     //}
-    //let signal = localStorage.getItem('storySaved');
-    //storyName = signal;
+    let signal = localStorage.getItem('storySaved');
+    storyName = signal;
     console.log('storyName = ' + storyName);
     let storyNamePlace = document.getElementById("storyNameId");
     storyNamePlace.innerHTML = storyName;
