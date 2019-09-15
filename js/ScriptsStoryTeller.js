@@ -19,14 +19,15 @@
  *  numItems is the number of links collected from the story TOC page,
  *  e.g., the number of pages in the story.
  */
-var storyName = "";   // name displayed in footer
-var pages = [];       // array to hold page objects
-var numItems = 0;     // number of story pages
-var curr = 1;         // current page index
-var src = null;       // holds iframe src url
-var prevSrc = null;   // used to detect no change in src on page load
-                      // needed to avoid user needing to explicitly load
-                      // story after selecting story link in story list
+var storyName = "";        // name displayed in footer
+var storyLoaded = 'false'; // don't load more than once
+var pages = [];            // array to hold page objects
+var numItems = 0;          // number of story pages
+var curr = 1;              // current page index
+var src = null;            // holds iframe src url
+var prevSrc = null;        // used to detect no change in src on page load
+                           // needed to avoid user needing to explicitly load
+                           // story after selecting story link in story list
 
 /* --------------------------------------------------------------
  *  render(si) - si is story index
@@ -83,7 +84,7 @@ function render(si) {
 
     default: // render story pages
       if (si < -1 || numItems < si) {
-        //console.log('leaving render: bad si:\ncurr = ', curr);
+        console.log('leaving render: bad si:\ncurr = ', curr);
         return;
       }
       //enableButton('clrStorage');  // button hidden, will probably remove
@@ -339,6 +340,15 @@ function isEdge() {
  */
 function srcChange() {
   console.log('entered srcChange');
+  let signal = localStorage.getItem('storySaved');
+  console.log('signal = ' + signal);
+  console.log(localStorage.length);
+  if (!isDefined(signal)) {
+    return;
+  }
+
+  //if (storyLoaded)
+  //  return;
   //if (!isLocalFile()) {
   //  console.log('local file - leaving srcChange');
   //  return;
@@ -366,13 +376,14 @@ function srcChange() {
   }
   if (isLocalFile()) {
     console.log('isLocalFile');
+    showStorage();
     let signal = localStorage.getItem('storySaved');
-    console.log(signal);
+    console.log('signal = ' + signal);
     console.log(localStorage.length);
     if (isDefined(signal)) {
       loadStory();
       console.log('---------- removing storySaved item -----------------');
-      //localStorage.removeItem('storySaved');  // prevent infinite recursion
+      localStorage.removeItem('storySaved');  // prevent infinite recursion
     }
   }
   console.log('leaving srcChange at end');
@@ -387,7 +398,8 @@ function storageChange(event) {
   if (event.key !== 'storySaved')
     return;
   console.log('storage event');
-  console.log('localStorage.length = ' + localStorage.length)
+  console.log('localStorage.length = ' + localStorage.length);
+  showStorage();
   let signal = localStorage.getItem('storySaved');
   storyName = signal;
   console.log('storyName = ' + storyName);
@@ -397,7 +409,7 @@ function storageChange(event) {
     storyNamePlace.innerHTML = storyName;
     loadStory();
     console.log('---------- removing storySaved item -----------------');
-    //localStorage.removeItem('storySaved');  // added 9/6/2019
+    localStorage.removeItem('storySaved');  // added 9/6/2019
   }
   else {
     console.log('signal undefined');
@@ -408,10 +420,19 @@ function addStorageEvent() {
   //alert('addStorageEvent called');
   window.addEventListener("storage", function (e) { storageChange(e); }, false);
 }
+
+function showStorage() {
+  console.log('showStorage:');
+  console.log('------------');
+  Object.keys(localStorage).forEach(function (key) {
+    console.log(localStorage.getItem(key));
+  });
+}
 /* --------------------------------------------------------------
  *  Loads story list by calling render(0)
  */
 function loadStoryList() {
+  storyLoaded = 'false';
   closeNote();
   //console.log('LoadStoryList() calling render(0):\ncurr = ', curr);
   render(0);
@@ -422,9 +443,12 @@ function loadStoryList() {
  *  'numItems' is id of element that holds and displays page count
  */
 function loadStory() {
+  if (storyLoaded === 'true')
+    return;
   closeNote();
   console.log('loadStory calling retrieve("numItems"):\ncurr = ', curr);
   retrieve('numItems');
+  storyLoaded = 'true';
 }
 /* --------------------------------------------------------------
  *  Loads Table of Contents by indexing through pages array
