@@ -30,6 +30,9 @@ function getContent(storyName) {
   let notes = document.getElementsByClassName("pageNote");
 
   // save number of pages in localStorage
+  console.log('-------------- setting storySaved:' + storyName + ' ---------------');
+  localStorage.setItem('storySaved', storyName);
+
   numItems = links.length;
   console.log('numItems = ' + numItems);
   localStorage.setItem('numItems', numItems.toString());
@@ -43,8 +46,8 @@ function getContent(storyName) {
     let key = "page-" + i.toString();
     save(key, url, name, note);
   }
-  console.log('-------------- setting storySaved:' + storyName + ' ---------------');
-  localStorage.setItem('storySaved', storyName);
+  //console.log('-------------- setting storySaved:' + storyName + ' ---------------');
+  //localStorage.setItem('storySaved', storyName);
 }
 
 /* --------------------------------------------------------------
