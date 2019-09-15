@@ -372,7 +372,7 @@ function srcChange() {
     if (isDefined(signal)) {
       loadStory();
       console.log('---------- removing storySaved item -----------------');
-      localStorage.removeItem('storySaved');  // prevent infinite recursion
+      //localStorage.removeItem('storySaved');  // prevent infinite recursion
     }
   }
   console.log('leaving srcChange at end');
@@ -397,7 +397,7 @@ function storageChange(event) {
     storyNamePlace.innerHTML = storyName;
     loadStory();
     console.log('---------- removing storySaved item -----------------');
-    localStorage.removeItem('storySaved');  // added 9/6/2019
+    //localStorage.removeItem('storySaved');  // added 9/6/2019
   }
   else {
     console.log('signal undefined');
