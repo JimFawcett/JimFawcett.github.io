@@ -587,7 +587,7 @@ function initialize() {
   addKeys();
   console.log('adding storage event listener');
   addStorageEvent();
-  localStorage.clear();
+  //localStorage.clear();
   //console.log('initialize() calling render(0):\ncurr = ', curr);
   render(0);
 }
