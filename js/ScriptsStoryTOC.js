@@ -32,10 +32,11 @@ function getContent(storyName) {
   // save number of pages in localStorage
   //console.log('-------------- setting storySaved:' + storyName + ' ---------------');
   //localStorage.setItem('storySaved', storyName);
-
+  localStorage.removeItem('storySaved');
+  localStorage.setItem('numItems', '0');
   numItems = links.length;
-  console.log('numItems = ' + numItems);
-  localStorage.setItem('numItems', numItems.toString());
+  //console.log('numItems = ' + numItems);
+  //localStorage.setItem('numItems', numItems.toString());
 
   for (var i = 0; i < links.length; ++i) {
     let url = links[i].getAttribute("href");
@@ -46,6 +47,8 @@ function getContent(storyName) {
     let key = "page-" + i.toString();
     save(key, url, name, note);
   }
+  console.log('numItems = ' + numItems);
+  localStorage.setItem('numItems', numItems.toString());
   console.log('-------------- setting storySaved:' + storyName + ' ---------------');
   localStorage.setItem('storySaved', storyName);
 }
