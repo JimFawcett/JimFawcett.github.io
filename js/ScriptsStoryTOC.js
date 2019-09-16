@@ -32,8 +32,8 @@ function getContent(storyName) {
   // save number of pages in localStorage
   //console.log('-------------- setting storySaved:' + storyName + ' ---------------');
   //localStorage.setItem('storySaved', storyName);
-  localStorage.removeItem('storySaved');
-  localStorage.setItem('numItems', '0');
+  //localStorage.removeItem('storySaved');
+  //localStorage.setItem('numItems', '0');
   numItems = links.length;
   //console.log('numItems = ' + numItems);
   //localStorage.setItem('numItems', numItems.toString());
