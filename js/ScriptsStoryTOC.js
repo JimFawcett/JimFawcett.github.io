@@ -66,8 +66,8 @@ function save(key, item1, item2, item3) {
   localStorage.setItem(key, JSONstr);
 }
 
-function clearStorage() {
-  console.log('------------- clearing local storage ------------');
-  localStorage.clear();
-}
+//function clearStorage() {
+//  console.log('------------- clearing local storage ------------');
+//  localStorage.clear();
+//}
 
