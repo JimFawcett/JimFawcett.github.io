@@ -374,6 +374,8 @@ function srcChange() {
  *    doesn't have to do that with a load button.
  */
 function storageChange(event) {
+  if (event !== 'function')
+    return;
   var storyName;
   console.log('entered storageChange with event.key = ' + event.key);
   showStorage();

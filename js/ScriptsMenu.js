@@ -105,7 +105,8 @@ function initializeMenu() {
       <div class='dropdown-content'>\
         <div class='darkTheme'>&nbsp;Ordered&nbsp;Content</div>\
         <a href='Stories.html'>What is a Story?</a>\
-        <a href='StoryTeller.html'>Load Story List</a>\
+        <a href='StoryTeller.html'>Load Story List with ST</a>\
+        <a href='StoryTeller.html'>Load Story List with ST2</a>\
         <a class='disable' href='#'>C++ Ecosystem</a>\
         <a class='disable' href='#'>Site Story</a>\
         <a class='disable' href='#'>Repository&nbsp;Content</a>\
