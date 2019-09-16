@@ -404,7 +404,7 @@ function storageChange(event) {
   var storyName;
   console.log('entered storageChange with event.key = ' + event.key);
   if (event.key !== 'storySaved') {
-    return;
+    //return;
   }
   else {
     //storyName = localStorage.getItem('storySaved');
