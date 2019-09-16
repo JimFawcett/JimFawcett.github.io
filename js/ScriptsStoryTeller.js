@@ -72,7 +72,6 @@ function render(si) {
       break;
 
     case 0:  // load story list
-      //clearLocalStorage();
       clearPages();
       clearLocalStorage();
       slider.setAttribute("src", "StoryList.html");
@@ -95,8 +94,6 @@ function render(si) {
       // set note text for this page
       let noteElem = document.getElementById("pageNoteId");
       noteElem.innerHTML = pages[si - 1].note;
-
-      //console.log('pageField.tagname = ' + pageField.tagName);
 
       // show page index and number of pages
       if (isDefined(pageField)) {
@@ -161,6 +158,7 @@ function retrieve(id) {
   enableButtons();
   disableButton('retrieveBtn');
   console.log('loading ' + numItems + ' items into pages');
+
   // push page objects into pages array
   for (var i = 0; i < numItems; ++i) {
     let key = "page-" + i.toString();
@@ -350,12 +348,7 @@ function srcChange() {
     console.log('leaving srcChange - isChrome');
     return;
   }
-  //if (!isDefined(localStorage)) {
-  //  // Edge doesn't define localStorage when protocal is file:
-  //  //console.log('local storage not defined');  
-  //  console.log('leaving srcChange - no localStorage defined');
-  //  return;
-  //}
+
   let signal = localStorage.getItem('storySaved');
   console.log('signal = ' + signal);
   console.log(localStorage.length);
@@ -364,14 +357,6 @@ function srcChange() {
     return;
   }
 
-  //if (storyLoaded)
-  //  return;
-  //if (!isLocalFile()) {
-  //  console.log('local file - leaving srcChange');
-  //  return;
-  //}
-  //if (isChrome())
-  //  return;
   let storyNamePlace = document.getElementById("storyNameId");
   if (isDefined(storyNamePlace)) {
     let name = localStorage.getItem('storySaved');
@@ -380,19 +365,16 @@ function srcChange() {
       storyName = name;
     }
   }
-  //if (isLocalFile()) {
-  //  console.log('isLocalFile');
-    showStorage();
-    signal = localStorage.getItem('storySaved');
-    console.log('signal = ' + signal);
-    console.log(localStorage.length);
-    if (isDefined(signal)) {
-      loadStory();
-      console.log('---------- removing storySaved item -----------------');
-      localStorage.removeItem('storySaved');  // prevent infinite recursion
-      //localStorage.clear();
-    }
-  //}
+
+  showStorage();
+  signal = localStorage.getItem('storySaved');
+  console.log('signal = ' + signal);
+  console.log(localStorage.length);
+  if (isDefined(signal)) {
+    loadStory();
+    console.log('---------- removing storySaved item -----------------');
+    localStorage.removeItem('storySaved');  // prevent infinite recursion
+  }
   console.log('leaving srcChange at end');
 }
 /* --------------------------------------------------------------
@@ -404,46 +386,36 @@ function storageChange(event) {
   var storyName;
   console.log('entered storageChange with event.key = ' + event.key);
   showStorage();
-  if (event.key !== 'storySaved') {
-    return;
-  }
+
   //if (event.key !== 'numItems') {
   //  return;
   //}
+  if (event.key !== 'storySaved') {
+    return;
+  }
   else {
     storyName = localStorage.getItem('storySaved');
     //storyName = event.newValue;
     console.log('event.key = ' + event.key + ' : ' + 'event.newValue = ' + event.NewValue);
   }
 
-  //console.log('storage event');
   console.log('localStorage.length = ' + localStorage.length);
   showStorage();
-  //alert(storyName);
+
   let numItemsStr = localStorage.getItem('numItems');
   numItems = parseInt(numItemsStr);
   console.log('numItems = ' + numItems);
   if (numItems > 0) {
-    //var storyName;
-  //if (isDefined(signal)) {
-    // wait for story to finish loading
-    //for (i = 0; i < 100; ++i) {
-    //  let signal = localStorage.getItem('storySaved');
-    //  storyName = signal;
-    //  if (isDefined(signal))
-    //    break;
-    //}
     //-----------------------------------------------------
     // storyName is undefined unless these are uncommented
-    //let signal = localStorage.getItem('storySaved');
-    //storyName = signal;
+    let signal = localStorage.getItem('storySaved');
+    storyName = signal;
     console.log('storyName = ' + storyName);
     let storyNamePlace = document.getElementById("storyNameId");
     storyNamePlace.innerHTML = storyName;
     loadStory();
     console.log('---------- removing storySaved item -----------------');
     localStorage.removeItem('storySaved');  // added 9/6/2019
-    //localStorage.clear();
   }
   else {
     console.log('numItems === 0');
@@ -455,19 +427,11 @@ function addStorageEvent() {
   window.addEventListener("storage", function (e) { storageChange(e); }, false);
 }
 
-//function showStorage() {
-//  console.log('showStorage:');
-//  console.log('------------');
-//  Object.keys(localStorage).forEach(function (key) {
-//    console.log(localStorage.getItem(key));
-//  });
-//}
 /* --------------------------------------------------------------
  *  Loads story list by calling render(0)
  */
 function loadStoryList() {
   console.log('entering loadStoryList()');
-  //storyLoaded = 'false';
   clearLocalStorage();
   closeNote();
   //console.log('LoadStoryList() calling render(0):\ncurr = ', curr);
@@ -479,8 +443,6 @@ function loadStoryList() {
  *  'numItems' is id of element that holds and displays page count
  */
 function loadStory() {
-  //if (storyLoaded === 'true')
-  //  return;
   let storyKey = localStorage.getItem('storySaved');
   if (!isDefined(storyKey)) {
     console.log('story already loaded - leaving loadStory()');
@@ -490,7 +452,6 @@ function loadStory() {
   console.log('loadStory calling retrieve("numItems"):\ncurr = ', curr);
   retrieve('numItems');
   localStorage.removeItem('storySaved');
-  //storyLoaded = 'true';
 }
 /* --------------------------------------------------------------
  *  Loads Table of Contents by indexing through pages array
@@ -588,8 +549,6 @@ function keyAction(keyEvent) {
   if (key === 'S') {
     toggleStSwipeEvents();
   }
-  //if (keyEvent.key === 'Escape')
-  //  closeNote();
 }
 /* --------------------------------------------------------------
  *  Add event listener for key events

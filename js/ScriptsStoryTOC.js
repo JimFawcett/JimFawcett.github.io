@@ -29,11 +29,6 @@ function getContent(storyName) {
   // get a collection of all the page notes from divs below each link
   let notes = document.getElementsByClassName("pageNote");
 
-  // save number of pages in localStorage
-  //console.log('-------------- setting storySaved:' + storyName + ' ---------------');
-  //localStorage.setItem('storySaved', storyName);
-  //localStorage.removeItem('storySaved');
-  //localStorage.setItem('numItems', '0');
   numItems = links.length;
   //console.log('numItems = ' + numItems);
   //localStorage.setItem('numItems', numItems.toString());
