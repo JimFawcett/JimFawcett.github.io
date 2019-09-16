@@ -39,7 +39,7 @@ var prevSrc = null;        // used to detect no change in src on page load
  */
 function render(si) {
   curr = si;
-  //console.log('entering render:\ncurr = ', curr);
+  console.log('entering render:\ncurr = ', curr);
 
   // get locations to show current page and number of pages
   let index = document.getElementById("pageIndex");
@@ -407,15 +407,16 @@ function storageChange(event) {
   else {
     //storyName = localStorage.getItem('storySaved');
     storyName = event.newValue;
-    console.log('event.value = ' + event.value);
+    console.log('event.key = ' + event.key + ' : ' + 'event.newValue = ' + event.NewValue);
   }
 
-  console.log('storage event');
+  //console.log('storage event');
   console.log('localStorage.length = ' + localStorage.length);
   showStorage();
   //alert(storyName);
   let numItemsStr = localStorage.getItem('numItems');
   numItems = parseInt(numItemsStr);
+  console.log('numItems = ' + numItems);
   if (numItems > 0) {
     //var storyName;
   //if (isDefined(signal)) {
@@ -445,7 +446,7 @@ function storageChange(event) {
 
 function addStorageEvent() {
   //alert('addStorageEvent called');
-  window.addEventListener("storage", function (e) { storageChange(e); });
+  window.addEventListener("storage", function (e) { storageChange(e); }, false);
 }
 
 //function showStorage() {
