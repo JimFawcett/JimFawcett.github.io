@@ -55,7 +55,7 @@ function render(si) {
 
   switch (si) {
     case -1:  // Refreshing story teller loads blank page
-      slider.setAttribute("src", "blank.html")
+      slider.setAttribute("src", "blank.html");
       disableButtons();
       disableButton('retrieveBtn');
       disableButton('clrStorage');
@@ -77,7 +77,7 @@ function render(si) {
       slider.setAttribute("src", "StoryList.html");
       disableButtons();
       enableButton('retrieveBtn');
-      curr = 1;
+      //curr = 1;
       if (isDefined(pageField))
         pageField.style.display = "none";
       break;
@@ -110,9 +110,9 @@ function render(si) {
       addr.innerHTML = pages[si - 1].url;
   }
   // force iframe to change location
-  document.getElementById("slideShow").src = document.getElementById("slideShow").src;
+  //document.getElementById("slideShow").src = document.getElementById("slideShow").src;
 
-  //console.log('leaving render(curr):\ncurr = ', curr);
+  console.log('leaving render(curr):\ncurr = ', curr);
 }
 /* ------------------------------------------------------------
  *  Empty page information held in localStorage
