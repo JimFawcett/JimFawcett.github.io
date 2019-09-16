@@ -404,12 +404,15 @@ function storageChange(event) {
   var storyName;
   console.log('entered storageChange with event.key = ' + event.key);
   showStorage();
-  if (event.key !== 'storySaved') {
+  //if (event.key !== 'storySaved') {
+  //  return;
+  //}
+  if (event.key !== 'numItems') {
     return;
   }
   else {
-    //storyName = localStorage.getItem('storySaved');
-    storyName = event.newValue;
+    storyName = localStorage.getItem('storySaved');
+    //storyName = event.newValue;
     console.log('event.key = ' + event.key + ' : ' + 'event.newValue = ' + event.NewValue);
   }
 
