@@ -21,7 +21,9 @@ window.onerror = function (msg, url, linenumber) {
  *  initialized
  */
 function isDefined(elem) {
-  if (typeof elem === 'undefined' || elem === null || elem === 'undefined') {
+  //if (typeof elem === 'function')
+  //  return true;
+  if (typeof elem === 'undefined' || elem === null || elem === undefined) {
     return false;
   }
   return true;
@@ -45,3 +47,10 @@ function activeStyle(elem) {
   return window.getComputedStyle(elem);
 }
 
+function showStorage() {
+  console.log('showStorage:');
+  console.log('------------');
+  Object.keys(localStorage).forEach(function (key) {
+    console.log(key + ' : ' + localStorage.getItem(key));
+  });
+}

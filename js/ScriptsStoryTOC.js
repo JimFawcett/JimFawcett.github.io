@@ -51,6 +51,7 @@ function getContent(storyName) {
   localStorage.setItem('numItems', numItems.toString());
   console.log('-------------- setting storySaved:' + storyName + ' ---------------');
   localStorage.setItem('storySaved', storyName);
+  showStorage();
 }
 
 /* --------------------------------------------------------------
@@ -69,3 +70,4 @@ function clearStorage() {
   console.log('------------- clearing local storage ------------');
   localStorage.clear();
 }
+

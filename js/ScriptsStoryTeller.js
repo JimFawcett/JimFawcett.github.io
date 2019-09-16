@@ -440,13 +440,13 @@ function addStorageEvent() {
   window.addEventListener("storage", function (e) { storageChange(e); }, false);
 }
 
-function showStorage() {
-  console.log('showStorage:');
-  console.log('------------');
-  Object.keys(localStorage).forEach(function (key) {
-    console.log(localStorage.getItem(key));
-  });
-}
+//function showStorage() {
+//  console.log('showStorage:');
+//  console.log('------------');
+//  Object.keys(localStorage).forEach(function (key) {
+//    console.log(localStorage.getItem(key));
+//  });
+//}
 /* --------------------------------------------------------------
  *  Loads story list by calling render(0)
  */

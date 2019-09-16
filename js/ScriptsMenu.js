@@ -210,13 +210,18 @@ function initializeMenu() {
   let sKey = document.getElementById('sKey');
   if (!isDefined(sKey))
     return;
-  let test = getSwipeEvents();
-  if (test === 'true') {
-    addSwipeListeners();
-    sKey.innerHTML = 'S';
-  }
-  else {
-    sKey.innerHTML = '<del>S</del>';
+  //  if (typeof getSwipeEvents === 'function') {
+  //  if (isDefined(getSwipeEvents))
+  //  
+  if (typeof getSwipeEvents === 'function') {
+    let test = getSwipeEvents();
+    if (test === 'true') {
+      addSwipeListeners();
+      sKey.innerHTML = 'S';
+    }
+    else {
+      sKey.innerHTML = '<del>S</del>';
+    }
   }
 }
 
