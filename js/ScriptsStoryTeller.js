@@ -180,7 +180,7 @@ function retrieve(id) {
   loadTOC();
   //console.log('retrieve(id) calling render(1):\ncurr = ', curr);
   render(1);  // display first page
-  clearLocalStorage();
+  //clearLocalStorage();
   //console.log('leaving retrieve(id):\ncurr = ', curr);
 }
 /* --------------------------------------------------------------
