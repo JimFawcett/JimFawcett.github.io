@@ -403,8 +403,9 @@ function srcChange() {
 function storageChange(event) {
   var storyName;
   console.log('entered storageChange with event.key = ' + event.key);
+  showStorage();
   if (event.key !== 'storySaved') {
-    //return;
+    return;
   }
   else {
     //storyName = localStorage.getItem('storySaved');
@@ -442,7 +443,7 @@ function storageChange(event) {
     //localStorage.clear();
   }
   else {
-    console.log('signal undefined');
+    console.log('numItems === 0');
   }
 }
 
