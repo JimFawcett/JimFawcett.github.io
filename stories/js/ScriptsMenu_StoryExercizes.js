@@ -14,107 +14,66 @@ function initializeMenu() {
 
   var topMenu = document.getElementsByTagName("nav");
   topMenu[0].innerHTML = "<div class='navbar'>\
-    <a href='index.html' class='menuItem'>Home</a>\
-    <a href='Repositories.html' class='menuItem'>Repos</a>\
+    <a href='../../index.html' class='menuItem'>Home</a>\
+    <a href='../../Repositories.html' class='menuItem notice'>Repos</a>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Utils &#9662;</button>\
+      <button class='dropbutton'>Resources &#9662;</button>\
       <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Utilities</div>\
-        <a href='CppUtilities.html'>CppUtilities</a>\
-        <a href='FileUtilities.html'>FileUtilities</a>\
-        <a href='Logger.html'>Logger</a>\
+        <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
+        <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
+        <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
+        <a href='https://github.com/joshnh/Git-Commands'>git commands</a>\
+        <a class='disable' href='../../UMLDiagrams.html'>UML Diagrams</a>\
+        <a href='../../Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
+        <a href='../../SummerReading.html'>Summer Reading</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Tools &#9662;</button>\
+      <button class='dropbutton'>Code Snaps &#9662;</button>\
       <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Tools</div>\
-        <a href='TextFinder.html'>TextFinder</a>\
-        <a href='Duplicates.html'>Duplicates</a>\
-        <a href='FileDates.html'>FileDates</a>\
-        <a href='FileSizes.html'>FileSizes</a>\
-        <a href='FindFiles.html'>FindFiles</a>\
-        <a href='Diff_WPF.html'>Diff_WPF</a>\
-        <a href='CodeWebifier.html'>CodeWebifier</a>\
-        <a href='PrettyPrint.html'>PrettyPrint</a>\
-      </div>\
+        <a href='../../CodeSnap-PointersAndReferences.cpp.html'>PointersAndReferences</a>\
+        <a href='../../CodeSnap-ClassAnatomy.h.html'>ClassAnatomy</a>\
+        <a href='../../CodeSnap-Strings.h.html'>Strings</a>\
+        <a href='../../CodeSnap-Inheritance.h.html'>Inheritance</a>\
+        <a href='../../CodeSnap-CompoundObjects.cpp.html'>CompoundObjects</a>\
+        <a href='../../CodeSnap-Templates.h.html'>Templates</a>\
+        <a href='../../CodeSnap-FunctionObjects.h.html'>FunctionObjects</a>\
+        <a href='../../CodeSnap-Lambdas.cpp.html'>Lambdas</a>\
+        <a href='../../CodeSnap-LambdaCapture.cpp.html'>LambdaCapture</a>\
+        <a href='../../CodeSnap-Converter.h.html'>Converter</a>\
+        <a class='disable' href='#'>Properties</a>\
+        <a href='../../CodeSnap-BlockingQueue.h.html'>BlockingQueue</a>\
+        <a href='../../CodeSnap-TestUtilities.h.html'>TestUtilities</a>\
+     </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Cmpnts &#9662;</button>\
+      <button class='dropbutton'>Stories &#9662;</button>\
       <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Components</div>\
-        <a href='CppBlockingQueue.html'>CppBlockingQueue</a>\
-        <a href='FileManager.html'>File Manager</a>\
-        <a href='CppProperties.html'>CppProperties</a>\
-        <a href='ThreadPool.html'>ThreadPool</a>\
-        <a href='Process.html'>Process</a>\
-        <a href='CppConcurrentFileAccess.html'>CppConcurrentFileAccess</a>\
-        <a href='CppLexicalScanner.html'>CppLexicalScanner</a>\
-        <a href='RetryWrapper.html'>RetryWrapper</a>\
-        <a href='WebComponents.html'>WebComponents</a>\
-        <a href='Tests.html'>Tests</a>\
-      </div>\
-    </div>\
-    <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Libs &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Libraries</div>\
-        <a href='FileSystem.html'>FileSystem-Windows</a>\
-        <a class='disable' href='FileSystem.html'>FileSystem-Linux</a>\
-        <a href='Sockets.html'>Sockets-Windows</a>\
-        <a class='disable' href='Sockets.html'>Sockets-Linux</a>\
-        <a href='XmlDocument.html'>XmlDocument</a>\
-        <a href='CppGraph.html'>CppGraph</a>\
-      </div>\
-    </div>\
-    <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Projs &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Projects</div>\
-        <a href='SitePages.html'>SitePages</a>\
-        <a href='CppParser.html'>CppParser</a>\
-        <a href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a>\
-        <a href='CsDependencyAnalysis.html'>CsDependencyAnalysis</a>\
-        <a href='CppCommWithFileXfer.html'>CppCommWithFileXfer</a>\
-        <a href='CppHttpClientServer.html'>CppHttpClientServer</a>\
-      </div>\
-    </div>\
-    <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Demos &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Demonstrations</div>\
-        <a href='CppBasicDemos.html'>C++&nbsp;Basic&nbsp;Demos</a>\
-        <a href='STR.html'>STR&nbsp;Value&nbsp;Type</a>\
-        <a href='CompoundObjects.html'>CompoundObjects</a>\
-        <a href='ObjectFactories.html'>ObjectFactories</a>\
-        <a href='STL-Containers.html'>STL-Containers</a>\
-        <a href='IOStreams.html'>IOStreams</a>\
-        <a href='CppThreads.html'>CppThreads</a>\
-        <a href='ProcAndThreads.html'>ProcsAndThreads</a>\
-      </div>\
-    </div>\
-    <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Build &#9662;</button>\
-      <div class='dropdown-content'>\
-        <a class='disable' href='#'>Build Demo</a>\
-        <a class='disable' href='#'>Build Structure</a>\
-        <a class='disable' href='#'>Build from repo</a>\
-      </div>\
+        <a href='../../Stories.html'>What is a Story?</a>\
+        <a href='../../CppStory_SlideShow.html'>Starting C++</a>\
+        <a class='disable' href='#'>Creating flexible code</a>\
+        <a class='disable' href='#'>Design Examples</a>\
+        <a class='disable' href='#'>Building Complex Systems</a>\
+        <a class='disable' href='#'>Site Story</a>\
+        <a class='disable' href='#'>Visual Studio Help</a>\
+      </div >\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='JimFawcett.html'>Jim Fawcett</a>\
-        <a href='Help.html'>Help</a>\
-        <a href='ToDo.html'>ToDo</a>\
-        <a href='#' onclick='toggleNavKeys()'>Toggle Nav Keys</a>\
-        <a href='SiteDesign.html'>Site Design</a>\
-        <a href='BookDesignCourse.html'>Design Course</a>\
-        <a class='border' href='index.html'>L1 Site Home</a>\
-        <a class='border' href='Repositories.html'>L2 Repository&nbsp;webpage</a>\
-        <a class='border' href='LangCpp.html'>L2 C++&nbsp;webpage</a>\
+        <a href='../../JimFawcett.html'>Jim Fawcett</a>\
+        <a href='../../Help.html'>Help</a>\
+        <a href='../../ToDo.html'>ToDo</a>\
+        <a href='#' onclick='togglenavKeys()'>Toggle Nav Keys</a>\
+        <a href='#' onclick='toggleSwipeEvents()'>Toggle Swipe Events</a>\
+        <a href='../../SiteDesign.html'>Site Design</a>\
+        <a href='../../BookDesignCourse.html'>Design Course</a>\
+        <a class='border' href='../../index.html'>L1 Site Home</a>\
+        <a class='border' href='../../Repositories.html'>L2 Repository&nbsp;webpage</a>\
+        <a class='border' href='../../LangCpp.html'>L2 C++&nbsp;webpage</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
-        <a href='SiteMap.html'>Site Map</a>\
+        <a href='../../SiteMap.html'>Site Map</a>\
+        <a href='../../Menus.html'>Menus</a>\
       </div>\
     </div>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\
@@ -130,19 +89,34 @@ function initializeMenu() {
   // otherwise load href from page link
 
   var nxt = document.getElementById("Next");
+  var nKey = document.getElementById("nKey");
+  var swKey = document.getElementById("sKey");
   if (nxt === null) {
     document.getElementById("nextLink").style.display = "none";  // button top right menu
+    if (isDefined(nKey))
+      nKey.style.display = "none";
+    if (isDefined(swKey))
+      swKey.style.display = "none";
   }
   else {
     document.getElementById("nextLink").href = nxt.href;
+    if (isDefined(nKey))
+      nKey.style.display = "inline";
+    if (isDefined(swKey))
+      swKey.style.display = "inline";
   }
 
   var prv = document.getElementById("Prev");
+  var pKey = document.getElementById("pKey");
   if (prv === null) {
     document.getElementById("prevLink").style.display = "none";  // button top right menu
+    if (isDefined(pKey))
+      pKey.style.display = "none";
   }
   else {
     document.getElementById("prevLink").href = prv.href;
+    if (isDefined(pKey))
+      pKey.style.display = "inline";
   }
 
   // show footer with copyright notice and revision date
@@ -154,7 +128,7 @@ function initializeMenu() {
 
   // set display mode for navKeys from value in local storage
 
-  setNavKeys();
+  setnavKeys();
   setImageSizer();
 
   // listen for keyboard events:
@@ -172,6 +146,15 @@ function initializeMenu() {
   var elems = document.getElementsByTagName("more-less");
   for (var i = 0; i < elems.length; ++i) {
     elems[i].addEventListener("click", (event) => { toggleVisibility(event); }, false);
+  }
+  let sKey = document.getElementById('sKey');
+  let test = getSwipeEvents();
+  if (test === 'true') {
+    addSwipeListeners();
+    sKey.innerHTML = 'S';
+  }
+  else {
+    sKey.innerHTML = '<del>S</del>';
   }
 }
 
@@ -223,7 +206,7 @@ function scrollMenuRight() {
   for (i = 0; i < items.length; ++i) {
     var cpprp = window.getComputedStyle(items[len - i - 1], null).getPropertyValue("display");
     if (cpprp !== "block") {
-      items[len-i-1].style.display = "block";
+      items[len - i - 1].style.display = "block";
       break;
     }
   }
@@ -240,10 +223,10 @@ function scrollPageBottom() {
 }
 //----< toggle nav keys display >------------------------------------
 /*
-*  NavKeys are TBHNP keys at bottom right of each page
+*  navKeys are TBHNP keys at bottom right of each page
 */
-function toggleNavKeys() {
-  var nkc = document.getElementsByTagName("navKeysContainer");
+function togglenavKeys() {
+  var nkc = document.getElementsByTagName("navKeys-Container");
   var tog = window.getComputedStyle(nkc[0], null).getPropertyValue("display");
   if (tog === "none") {
     nkc[0].style.display = "inline";
@@ -254,10 +237,10 @@ function toggleNavKeys() {
     window.localStorage.setItem("navKeyState", "hide");  // persist chage across pages
   }
 }
-//----< setNavKeys display >-----------------------------------------
+//----< setnavKeys display >-----------------------------------------
 
-function setNavKeys() {
-  var nkc = document.getElementsByTagName("navKeysContainer");
+function setnavKeys() {
+  var nkc = document.getElementsByTagName("navKeys-Container");
   var navKeyState = window.localStorage.getItem("navKeyState");
   if (navKeyState === null) {
     nkc[0].style.display = "inline";
@@ -270,6 +253,7 @@ function setNavKeys() {
   else {
     nkc[0].style.display = "none";
   }
+
 }
 //----< toggle image sizer display >-----------------------------------
 /*
@@ -293,15 +277,18 @@ function toggleImageSizer() {
 
 function setImageSizer() {
   var nkc = document.getElementsByTagName("sizer-Container");
-  var navKeyState = window.localStorage.getItem("imageSizerState");
+  var imageSizerState = window.localStorage.getItem("imageSizerState");
 
   for (let i = 0; i < nkc.length; ++i) {
-    if (navKeyState === null) {
+    if (imageSizerState === null) {
       nkc[i].style.display = "inline";
       window.localStorage.setItem("imageSizerState", "show");
       return;
     }
-    if (navKeyState === "show") {
+    if (imageSizerState === "hide") {
+      nkc[i].style.display = "none";
+    }
+    if (imageSizerState === "show") {
       nkc[i].style.display = "inline";
     }
     else {
@@ -311,7 +298,7 @@ function setImageSizer() {
 }
 //----< toggle nav keys display >------------------------------------
 /*
-*   On right click, Toggle display of NavKeys TBHNP
+*   On right click, Toggle display of navKeys TBHNP
 *     unless target is anchor, then
 *   open link in new tab 
 */
@@ -322,7 +309,8 @@ function mouseAction(event) {
       window.open(event.target, "_newtab" + Math.floor(Math.random() * 999999));
     }
     else {
-      toggleNavKeys();
+      //togglenavKeys();
+      togglenavKeys();
     }
   }
 }

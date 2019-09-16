@@ -14,60 +14,73 @@ function initializeMenu() {
 
   var topMenu = document.getElementsByTagName("nav");
   topMenu[0].innerHTML = "<div class='navbar'>\
-    <a href='index.html' class='menuItem'>Home</a>\
-    <a href='Repositories.html' class='menuItem notice'>Repos</a>\
+    <a href='../../index.html' class='menuItem'>Home</a>\
+    <a href='../../Repositories.html' class='menuItem'>Repos</a>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Notes &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='DesignProcess.html'>Design Process</a>\
-        <a href='ProjectsList.html'>Project suggestions</a>\
+        <div class='darkTheme'>&nbsp;Developing&nbsp;Code&nbsp;</div>\
+        <a href='../../DesignProcess.html'>Design Process</a>\
+        <a href='../../ProjectsList.html'>Project suggestions</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Blogs &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='Blog.html'>First&nbsp;Things</a>\
+        <div class='darkTheme'>&nbsp;Opinions&nbsp;and&nbsp;Ideas&nbsp;</div>\
+        <a href='../../Blog.html'>First&nbsp;Things</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
-        <a href='BlogDesign.html'>SW&nbsp;Design</a>\
-        <a href='BlogPrinciples.html'>Design&nbsp;Principles</a>\
-        <a href='BlogOOD.html'>OO&nbsp;Design</a>\
-        <a href='BlogObjectModels.html'>Object&nbsp;Models</a>\
-        <a href='BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data&nbsp;&nbsp;</a>\
+        <a href='../../BlogDesign.html'>SW&nbsp;Design</a>\
+        <a href='../../BlogPrinciples.html'>Design&nbsp;Principles</a>\
+        <a href='../../BlogOOD.html'>OO&nbsp;Design</a>\
+        <a href='../../BlogObjectModels.html'>Object&nbsp;Models</a>\
+        <a href='../../BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data&nbsp;&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Engineering&nbsp;SW&nbsp;---</div>\
-        <a href='BlogOCD.html'>Concept&nbsp;Document</a>\
-        <a href='BlogTesting.html'>SW&nbsp;Testing</a>\
-        <a href='SummerReading.html'>Summer&nbsp;Reading</a>\
+        <a href='../../BlogOCD.html'>Concept&nbsp;Document</a>\
+        <a href='../../BlogTesting.html'>SW&nbsp;Testing</a>\
+        <a href='../../SummerReading.html'>Summer&nbsp;Reading</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Software&nbsp;Sys&nbsp;------</div>\
-        <a href='BlogStructure.html'>SW&nbsp;Structure</a>\
-        <a href='BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a>\
-        <a href='BlogActiveObjects.html'>Active&nbsp;Objects</a>\
+        <a href='../../BlogStructure.html'>SW&nbsp;Structure</a>\
+        <a href='../../BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a>\
+        <a href='../../BlogActiveObjects.html'>Active&nbsp;Objects</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Reusable&nbsp;Pkgs&nbsp;----</div>\
-        <a href='BlogNoSql.html'>noSQL&nbsp;Database</a>\
-        <a href='BlogParser.html'>Parsing</a>\
-        <a href='BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a>\
-        <a href='BlogMTree.html'>M-ary&nbsp;Trees</a>\
-        <a href='BlogGraph.html'>Directed&nbsp;Graphs</a>\
-        <a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a>\
+        <a href='../../BlogNoSql.html'>noSQL&nbsp;Database</a>\
+        <a href='../../BlogParser.html'>Parsing</a>\
+        <a href='../../BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a>\
+        <a href='../../BlogMTree.html'>M-ary&nbsp;Trees</a>\
+        <a href='../../BlogGraph.html'>Directed&nbsp;Graphs</a>\
+        <a href='../../BlogFileSystem.html'>C++&nbsp;FileSystem</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Resources &#9662;</button>\
       <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
         <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
         <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
         <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
         <a href='https://github.com/joshnh/Git-Commands'>git commands</a>\
-        <a class='disable' href='UMLDiagrams.html'>UML Diagrams</a>\
-        <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
-        <a href='SummerReading.html'>Summer Reading</a>\
+        <a href='../../UML.html'>UML Diagrams</a>\
+        <a href='../../Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
+        <a href='../../SummerReading.html'>Summer Reading</a>\
+        <a href='../../Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams</a>\
+        <a href='../../WebNotes.html'>Web Notes</a>\
+        <a href='https://encycolorpedia.com/named'>Web Colors</a>\
+        <a href='../../CppReferences.html'>C++ References</a>\
+        <a href='../../CppExamples.html'>C++ Examples</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Prog Lang &#9662;</button>\
+      <button class='dropbutton'>P&L &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='LangCpp.html'>C++</a>\
-        <a class='disable' href='#'>C#</a>\
+        <div class='darkTheme'>&nbsp;OS&nbsp;Platforms</div>\
+        <a href='../../PlatformWindows.html'>Windows</a>\
+        <a href='../../PlatformLinux.html'>Linux</a>\
+        <div class='darkTheme'>&nbsp;Languages</div>\
+        <a href='../../LangCpp.html'>C++</a>\
+        <a href='../../LangCSharp.html'>C#</a>\
+        <a href='../../LangPowerShell'>PowerShell</a>\
         <a class='disable' href='#'>HTML</a>\
         <a class='disable' href='#'>CSS</a>\
         <a class='disable' href='#'>JavaScript</a>\
@@ -78,39 +91,48 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Design Book &#9662;</button>\
+      <button class='dropbutton'>Nbrhds &#9662;</button>\
       <div class='dropdown-content'>\
-        <a class='disable' href='#'>Table of Contents</a>\
-        <a class='disable' href='#'>Concept&nbsp;and&nbsp;Tasks&nbsp;(TextFinder)</a>\
-        <a class='disable' href='#'>Classes (CppUtilities)</a>\
-        <a class='disable' href='#'>Inheritance (XmlDocument)</a>\
-        <a class='disable' href='#'>Templates (Properties)</a>\
-        <a class='disable' href='#'>Flexible Designs (DirExplorer)</a>\
-        <a class='disable' href='#'>Components (Parser)</a>\
-        <a class='disable' href='#'>Project Structures</a>\
-        <a class='disable' href='#'>Threads (ThreadPool)</a>\
-        <a class='disable' href='#'>Sockets&nbsp;(MsgPassingCommunication)</a>\
-        <a class='disable' href='#'>Build Process (TextFinder)</a>\
-        <a class='disable' href='#'>Testing&nbsp;(FileSystem-Windows)</a>\
-        <a class='disable' href='#'>Appendix:&nbsp;<u>U</u>niversal&nbsp;<u>M</u>odeling&nbsp;<u>L</u>anguage</a>\
-        <a class='disable' href='#'>Appendix:&nbsp;Implementation&nbsp;metrics</a>\
-        <a class='disable' href='#'>Appendix: Design Patterns</a>\
-      </div>\
+        <div class='darkTheme'>&nbsp;Site&nbsp;Neighborhoods</div>\
+        <a href='https://JimFawcett.github.io'>JimFawcett-github</a>\
+        <a href='https://www.ecs.syr.edu/faculty/fawcett'>JimFawcett-SyracuseUniv</a>\
+        <a href='https://csiac.org'>CSIAC</a>\
+      </div >\
+    </div>\
+    <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Stories &#9662;</button>\
+      <div class='dropdown-content'>\
+        <div class='darkTheme'>&nbsp;Ordered&nbsp;Content</div>\
+        <a href='../../Stories.html'>What is a Story?</a>\
+        <a href='../../StoryTeller.html'>Load Story List</a>\
+        <a class='disable' href='#'>C++ Ecosystem</a>\
+        <a class='disable' href='#'>Site Story</a>\
+        <a class='disable' href='#'>Repository&nbsp;Content</a>\
+        <a class='disable' href='#'>Using&nbsp;Visual&nbsp;Studio</a>\
+        <a class='disable' href='#'>Using&nbsp;VS&nbsp;Code</a>\
+        <a class='disable' href='#'>Building&nbsp;Repository&nbsp;Code&nbsp;</a>\
+        <a class='disable' href='#'>Design Examples</a>\
+        <a class='disable' href='#'>Building Complex Systems</a>\
+      </div >\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content'>\
-        <a href='JimFawcett.html'>Jim Fawcett</a>\
-        <a href='Help.html'>Help</a>\
-        <a href='ToDo.html'>ToDo</a>\
-        <a href='#' onclick='toggleNavKeys()'>Toggle Nav Keys</a>\
-        <a href='SiteDesign.html'>Site Design</a>\
-        <a href='BookDesignCourse.html'>Design Course</a>\
-        <a class='border' href='index.html'>L1 Site Home</a>\
-        <a class='border' href='Repositories.html'>L2 Repository&nbsp;webpage</a>\
-        <a class='border' href='LangCpp.html'>L2 C++&nbsp;webpage</a>\
+        <div class='darkTheme'>&nbsp;About&nbsp;this&nbsp;Site</div>\
+        <a href='../../JimFawcett.html'>Jim Fawcett</a>\
+        <a href='../../Help.html'>Help</a>\
+        <a href='../../ToDo.html'>ToDo</a>\
+        <a href='#' onclick='togglenavKeys()'>Toggle Nav Keys</a>\
+        <a href='#' onclick='toggleSwipeEvents()'>Toggle Swipe Events</a>\
+        <a href='../../SiteDesign.html'>Site Design</a>\
+        <a href='../../BookDesignCourse.html'>Design Course</a>\
+        <a class='border' href='../../index.html'>L1 Site Home</a>\
+        <a class='border' href='../../Repositories.html'>L2&nbsp;Repository&nbsp;webpage</a>\
+        <a class='border' href='../../LangCpp.html'>L2&nbsp;C++&nbsp;webpage</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
-        <a href='SiteMap.html'>Site Map</a>\
+        <a href='../../SiteMap.html'>Site Map</a>\
+        <a href='../../Menus.html'>Menus</a>\
+        <a href='../../TestFileLoad.html'>TestFileLoad</a>\
       </div>\
     </div>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\
@@ -126,19 +148,34 @@ function initializeMenu() {
   // otherwise load href from page link
 
   var nxt = document.getElementById("Next");
+  var nKey = document.getElementById("nKey");
+  var swKey = document.getElementById("sKey");
   if (nxt === null) {
     document.getElementById("nextLink").style.display = "none";  // button top right menu
+    if (isDefined(nKey))
+      nKey.style.display = "none";
+    if (isDefined(swKey))
+      swKey.style.display = "none";
   }
   else {
     document.getElementById("nextLink").href = nxt.href;
+    if (isDefined(nKey))
+      nKey.style.display = "inline";
+    if (isDefined(swKey))
+      swKey.style.display = "inline";
   }
 
   var prv = document.getElementById("Prev");
+  var pKey = document.getElementById("pKey");
   if (prv === null) {
     document.getElementById("prevLink").style.display = "none";  // button top right menu
+    if (isDefined(pKey))
+      pKey.style.display = "none";
   }
   else {
     document.getElementById("prevLink").href = prv.href;
+    if (isDefined(pKey))
+      pKey.style.display = "inline";
   }
 
   // show footer with copyright notice and revision date
@@ -150,7 +187,7 @@ function initializeMenu() {
 
   // set display mode for navKeys from value in local storage
 
-  setNavKeys();
+  setnavKeys();
   setImageSizer();
 
   // listen for keyboard events:
@@ -169,17 +206,32 @@ function initializeMenu() {
   for (var i = 0; i < elems.length; ++i) {
     elems[i].addEventListener("click", (event) => { toggleVisibility(event); }, false);
   }
+  let sKey = document.getElementById('sKey');
+  if (!isDefined(sKey))
+    return;
+  let test = getSwipeEvents();
+  if (test === 'true') {
+    addSwipeListeners();
+    sKey.innerHTML = 'S';
+  }
+  else {
+    sKey.innerHTML = '<del>S</del>';
+  }
 }
 
 //----< load page defined in current page's Prev link >--------------
 
 function loadPrev() {
-  document.getElementById("Prev").click();
+  let prv = document.getElementById("Prev");
+  if (isDefined(prv))
+    prv.click();
 }
 //----< load page defined in current page's Next link >--------------
 
 function loadNext() {
-  document.getElementById("Next").click();
+  let nxt = document.getElementById("Next");
+  if (isDefined(nxt))
+    nxt.click();
 }
 //----< load page defined in current page's Lect link >--------------
 
@@ -219,7 +271,7 @@ function scrollMenuRight() {
   for (i = 0; i < items.length; ++i) {
     var cpprp = window.getComputedStyle(items[len - i - 1], null).getPropertyValue("display");
     if (cpprp !== "block") {
-      items[len-i-1].style.display = "block";
+      items[len - i - 1].style.display = "block";
       break;
     }
   }
@@ -236,10 +288,10 @@ function scrollPageBottom() {
 }
 //----< toggle nav keys display >------------------------------------
 /*
-*  NavKeys are TBHNP keys at bottom right of each page
+*  navKeys are TBHNP keys at bottom right of each page
 */
-function toggleNavKeys() {
-  var nkc = document.getElementsByTagName("navKeysContainer");
+function togglenavKeys() {
+  var nkc = document.getElementsByTagName("navKeys-Container");
   var tog = window.getComputedStyle(nkc[0], null).getPropertyValue("display");
   if (tog === "none") {
     nkc[0].style.display = "inline";
@@ -250,10 +302,10 @@ function toggleNavKeys() {
     window.localStorage.setItem("navKeyState", "hide");  // persist chage across pages
   }
 }
-//----< setNavKeys display >-----------------------------------------
+//----< setnavKeys display >-----------------------------------------
 
-function setNavKeys() {
-  var nkc = document.getElementsByTagName("navKeysContainer");
+function setnavKeys() {
+  var nkc = document.getElementsByTagName("navKeys-Container");
   var navKeyState = window.localStorage.getItem("navKeyState");
   if (navKeyState === null) {
     nkc[0].style.display = "inline";
@@ -266,6 +318,7 @@ function setNavKeys() {
   else {
     nkc[0].style.display = "none";
   }
+
 }
 //----< toggle image sizer display >-----------------------------------
 /*
@@ -289,15 +342,18 @@ function toggleImageSizer() {
 
 function setImageSizer() {
   var nkc = document.getElementsByTagName("sizer-Container");
-  var navKeyState = window.localStorage.getItem("imageSizerState");
+  var imageSizerState = window.localStorage.getItem("imageSizerState");
 
   for (let i = 0; i < nkc.length; ++i) {
-    if (navKeyState === null) {
+    if (imageSizerState === null) {
       nkc[i].style.display = "inline";
       window.localStorage.setItem("imageSizerState", "show");
       return;
     }
-    if (navKeyState === "show") {
+    if (imageSizerState === "hide") {
+      nkc[i].style.display = "none";
+    }
+    if (imageSizerState === "show") {
       nkc[i].style.display = "inline";
     }
     else {
@@ -307,7 +363,7 @@ function setImageSizer() {
 }
 //----< toggle nav keys display >------------------------------------
 /*
-*   On right click, Toggle display of NavKeys TBHNP
+*   On right click, Toggle display of navKeys TBHNP
 *     unless target is anchor, then
 *   open link in new tab 
 */
@@ -318,8 +374,8 @@ function mouseAction(event) {
       window.open(event.target, "_newtab" + Math.floor(Math.random() * 999999));
     }
     else {
-      //toggleNavKeys();
-      toggleNavKeys();
+      //togglenavKeys();
+      togglenavKeys();
     }
   }
 }

@@ -20,7 +20,7 @@
  *  e.g., the number of pages in the story.
  */
 var storyName = "";        // name displayed in footer
-var storyLoaded = 'false'; // don't load more than once
+//var storyLoaded = 'false'; // don't load more than once
 var pages = [];            // array to hold page objects
 var numItems = 0;          // number of story pages
 var curr = 1;              // current page index
@@ -387,8 +387,8 @@ function srcChange() {
     if (isDefined(signal)) {
       loadStory();
       console.log('---------- removing storySaved item -----------------');
-      //localStorage.removeItem('storySaved');  // prevent infinite recursion
-      localStorage.clear();
+      localStorage.removeItem('storySaved');  // prevent infinite recursion
+      //localStorage.clear();
     }
   //}
   console.log('leaving srcChange at end');
@@ -435,8 +435,8 @@ function storageChange(event) {
     storyNamePlace.innerHTML = storyName;
     loadStory();
     console.log('---------- removing storySaved item -----------------');
-    //localStorage.removeItem('storySaved');  // added 9/6/2019
-    localStorage.clear();
+    localStorage.removeItem('storySaved');  // added 9/6/2019
+    //localStorage.clear();
   }
   else {
     console.log('signal undefined');
@@ -459,7 +459,8 @@ function addStorageEvent() {
  *  Loads story list by calling render(0)
  */
 function loadStoryList() {
-  storyLoaded = 'false';
+  console.log('entering loadStoryList()');
+  //storyLoaded = 'false';
   clearLocalStorage();
   closeNote();
   //console.log('LoadStoryList() calling render(0):\ncurr = ', curr);
@@ -471,13 +472,18 @@ function loadStoryList() {
  *  'numItems' is id of element that holds and displays page count
  */
 function loadStory() {
-  if (storyLoaded === 'true')
+  //if (storyLoaded === 'true')
+  //  return;
+  let storyKey = localStorage.getItem('storySaved');
+  if (!isDefined(storyKey)) {
+    console.log('story already loaded - leaving loadStory()');
     return;
+  }
   closeNote();
   console.log('loadStory calling retrieve("numItems"):\ncurr = ', curr);
   retrieve('numItems');
   localStorage.removeItem('storySaved');
-  storyLoaded = 'true';
+  //storyLoaded = 'true';
 }
 /* --------------------------------------------------------------
  *  Loads Table of Contents by indexing through pages array
