@@ -208,6 +208,8 @@ function initializeMenu() {
     elems[i].addEventListener("click", (event) => { toggleVisibility(event); }, false);
   }
   let sKey = document.getElementById('sKey');
+  if (!isDefined(sKey))
+    return;
   let test = getSwipeEvents();
   if (test === 'true') {
     addSwipeListeners();
