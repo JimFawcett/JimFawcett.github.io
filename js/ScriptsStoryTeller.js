@@ -72,8 +72,9 @@ function render(si) {
       break;
 
     case 0:  // load story list
-      clearLocalStorage();
+      //clearLocalStorage();
       clearPages();
+      clearLocalStorage();
       slider.setAttribute("src", "StoryList.html");
       disableButtons();
       enableButton('retrieveBtn');
