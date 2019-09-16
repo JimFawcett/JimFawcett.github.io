@@ -400,10 +400,14 @@ function srcChange() {
 function storageChange(event) {
   var storyName;
   console.log('entered storageChange with event.key = ' + event.key);
-  if (event.key !== 'storySaved')
+  if (event.key !== 'storySaved') {
     return;
-  else
-    storyName = localStorage.getItem('storySaved');
+  }
+  else {
+    //storyName = localStorage.getItem('storySaved');
+    storyName = event.value;
+  }
+
   console.log('storage event');
   console.log('localStorage.length = ' + localStorage.length);
   showStorage();
