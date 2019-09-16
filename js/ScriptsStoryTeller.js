@@ -387,7 +387,8 @@ function srcChange() {
     if (isDefined(signal)) {
       loadStory();
       console.log('---------- removing storySaved item -----------------');
-      localStorage.removeItem('storySaved');  // prevent infinite recursion
+      //localStorage.removeItem('storySaved');  // prevent infinite recursion
+      localStorage.clear();
     }
   //}
   console.log('leaving srcChange at end');
@@ -405,7 +406,8 @@ function storageChange(event) {
   }
   else {
     //storyName = localStorage.getItem('storySaved');
-    storyName = event.value;
+    storyName = event.newValue;
+    console.log('event.value = ' + event.value);
   }
 
   console.log('storage event');
@@ -424,15 +426,17 @@ function storageChange(event) {
     //  if (isDefined(signal))
     //    break;
     //}
-    let signal = localStorage.getItem('storySaved');
-    storyName = signal;
+    //-----------------------------------------------------
+    // storyName is undefined unless these are uncommented
+    //let signal = localStorage.getItem('storySaved');
+    //storyName = signal;
     console.log('storyName = ' + storyName);
     let storyNamePlace = document.getElementById("storyNameId");
     storyNamePlace.innerHTML = storyName;
     loadStory();
     console.log('---------- removing storySaved item -----------------');
     //localStorage.removeItem('storySaved');  // added 9/6/2019
-    //localStorage.clear();
+    localStorage.clear();
   }
   else {
     console.log('signal undefined');
@@ -441,7 +445,7 @@ function storageChange(event) {
 
 function addStorageEvent() {
   //alert('addStorageEvent called');
-  window.addEventListener("storage", function (e) { storageChange(e); }, false);
+  window.addEventListener("storage", function (e) { storageChange(e); });
 }
 
 //function showStorage() {
