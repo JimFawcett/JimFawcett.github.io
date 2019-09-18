@@ -11,7 +11,7 @@
   <meta name="keywords" content="Repository, Design, Code" />
   <meta name="Author" content="Jim Fawcett" />
   <meta name="Author" content="James Fawcett" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <title>Test Draggable Image</title>
   <script src="js/ScriptsUtilities.js"></script>
   <script src="js/ScriptsTemplate.js"></script>
@@ -22,102 +22,98 @@
   <link rel="stylesheet" href="css/StylesMenu.css" />
   <link rel="stylesheet" href="css/StylesSlideShow.css" />
   <script>
-    /* ------------------------------------------------------------------
-     *  Swipe events for Next and Prev actions
-     */
+    function doDrag(containerId, itemId) {
+      var dragItem = document.querySelector(itemId);
+      var container = document.querySelector(containerId);
 
-    //function draggables() {
+      var active = false;
+      var currentX;
+      var currentY;
+      var initialX;
+      var initialY;
+      var xOffset = 0;
+      var yOffset = 0;
 
-    const draggables = new Object;
-    draggables.x0 = null;
-    draggables.DragEvents = false;
-    draggables.id = null;
+      container.addEventListener("touchstart", dragStart, false);
+      container.addEventListener("touchend", dragEnd, false);
+      container.addEventListener("touchmove", drag, false);
 
-      //let x0 = null;
-      //let DragEvents = false;
-
-      function doAction(dx) {
-        console.log('dragging: ' + dx);
-      }
-
-      function doDrag(id, action) {
-        if (action === 'function')
-          doAction = action;
-        let elem = document.getElementById(id);
-        if (!isDefined(elem))
-          return;
-        addDragListeners(id);
-        draggables.id = id;
-      }
-
-      function lock(e) {
-        draggables.x0 = unify(e).clientX;
-      }
-
-      function move(e) {
-        if (draggables.x0 || draggables.x0 === 0) {
-          let dx = unify(e).clientX - draggables.x0, s = Math.sign(dx);
-          if (dx > 50)
-            doAction(dx);
-          else if (dx < -50)
-            doAction(dx);
-          draggables.x0 = null;
-        }
-      }
+      container.addEventListener("mousedown", dragStart, false);
+      container.addEventListener("mouseup", dragEnd, false);
+      container.addEventListener("mousemove", drag, false);
 
       function unify(e) {
         return e.changedTouches ? e.changedTouches[0] : e;
       }
 
-      function addDragListeners(id) {
-        alert('adding listeners');
-        let elem = document.getElementById(id);
-        if (!isDefined(elem))
-          return;
-        elem.addEventListener('touchstart', lock, false);
-        elem.addEventListener('mousedown', lock, false);
-        elem.addEventListener('touchend', move, false);
-        elem.addEventListener('mouseup', move, false);
+      function dragStart(e) {
+        initialX = unify(e).clientX - xOffset;
+        initialY = unify(e).clientY - yOffset;
+
+        if (e.target === dragItem) {
+          active = true;
+        }
       }
 
-      function removeDragListeners(id) {
-        let elem = document.getElementsByTagName(id);
-        if (!isDefined(elem))
-          return;
-        elem.removeEventListener('touchstart', lock, false);
-        elem.removeEventListener('mousedown', lock, false);
-        elem.removeEventListener('touchend', move, false);
-        elem.removeEventListener('mouseup', move, false);
-      }
-    //};
-    //function toggleSwipeEvents() {
-    //  let sKey = document.getElementById('sKey');
-    //  if (getSwipeEvents() === 'true') {
-    //    removeSwipeListeners();
-    //    sKey.innerHTML = '<del>&nbsp;S&nbsp;</del>';
-    //  }
-    //  else {
-    //    addSwipeListeners();
-    //    sKey.innerHTML = 'S';
-    //  }
-    //}
+      function dragEnd(e) {
+        initialX = currentX;
+        initialY = currentY;
 
-    //function getSwipeEvents() {
-    //  swipeEvents = localStorage.getItem('swipeEvents');
-    //  return swipeEvents;
-    //}
+        active = false;
+      }
+
+      function drag(e) {
+        if (active) {
+      
+          e.preventDefault();
+
+          currentX = unify(e).clientX - initialX;
+          currentY = unify(e).clientY - initialY;
+          xOffset = currentX;
+          yOffset = currentY;
+
+          setTranslate(currentX, currentY, dragItem);
+        }
+      }
+
+      function setTranslate(xPos, yPos, el) {
+        el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+      }
+    }
   </script>
   <style>
-    .draggable {
-      position:relative;
-      width:600px;
-      left:200px;
-      top:25px;
-      height:200px;
-      background-color:red;
+    #github #container {
+      /*width: 100%;*/
+      margin: 25px 15px;
+      height: 200px;
+      background-color: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 7px;
+      border:1px solid black;
+      touch-action: none;
     }
-    .draggable:hover {
-      cursor:grab;
+    #github #item {
+      width: 50px;
+      height: 50px;
+      background-color: black;
+      border: 2px solid rgba(136, 136, 136, .5);
+      border-radius: 20%;
+      touch-action: none;
+      user-select: none;
+    }
+    #github #item:active {
+      background-color: #ccc;
+    }
+    #github #item:hover {
+      cursor: grab;
+      border-width: 2px;
+    }
+    #github span-1em {
+      display:inline-block;
+      width:1.5em;
     }
   </style>
 </head>
@@ -141,16 +137,32 @@
   <header>
     <a class="repoLink" href="Tests.html">Tests.html</a>
     <hgroup id="pagetitle">
-      <h1 id="title">Test Draggable Image</h1>
+      <h1 id="title">Test Draggable Element</h1>
     </hgroup>
   </header>
 
   <spacer-10></spacer-10>
   <hr class="spread" />
-  <div id="dragTarget" class="draggable">&nbsp;</div>
+
+  <indent-block>
+    <h2>Draggable Element</h2>
+    <indent-block>
+      <strong>References:</strong><span-1em></span-1em>
+      <a href="https://www.kirupa.com/html5/drag.htm">www.kirupa.com</a>, 
+      <a href="https://css-tricks.com/simple-swipe-with-vanilla-javascript/">css-tricks.com</a>
+    </indent-block>
+    <div id="outerContainer">
+      <div id="container">
+        <div id="item">
+
+        </div>
+      </div>
+    </div>
+  </indent-block>
 
   <script>
-    doDrag('dragTarget');
+    /* change #container to #github to allow drag over entire page */
+    doDrag("#container", "#item");
   </script>
   <info-bar></info-bar>
 </body>
