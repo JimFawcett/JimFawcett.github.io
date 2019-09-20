@@ -21,16 +21,10 @@
       color: black;
       border: none;
       padding: 10px 20px;
-      font-size: large;
+      font-size: 1em;
       font-weight: bold;
-    }
-
-    codecaption {
-      border: 1px solid black;
-      margin: 0px;
-      padding: 5px 30px;
-      font-size: large;
-      font-weight: bold;
+      font-family:Consolas, monospace;
+      line-height:1.5em;
     }
   </style>
 </head>
@@ -63,153 +57,142 @@
   <main id="main">
     <h3 style="margin-top: 0px;">Synopsis:</h3>
     <div class="indent">
-      <p>
-        Templates support building parameterized types and functions that accept an unspecified type which gets resolved only when an application
-        instantiates the code with a concrete type.  Parameterized code will accept, without compilation error, arbitrary calls on instances of the
-        template type.  When an application instantiates the parameterized code with a concrete type compilation of the instantiated code succeeds
-        if the type supports specified operations, else it fails.
-      </p>
-      <p>
-        So there are two C++ template compilation phases:
-        <ol>
-          <li>
-            Compilation of the template library code does a syntax check to identify known errors.  No object code is generated since the type of the
-            template parameter is not specified.
-          </li>
-          <li>
-            Compilation of the instantiated application code generates an object file if instantiated syntax is correct, otherwise it fails.
-          </li>
-        </ol>
-        This lazy syntax checking is very useful.  C# and Java generics do eagar type checking so many operations that would succeed for
-        useful types are not allowed because the compiler can't ensure that they will succeed.
-      </p>
-      <p>
-        An implication of this lasy compilation is that all of the template definition code must go in a header file, because the application
-        that uses the template definition has to see all of it's code to compile successfully, and it gets that only by including a header file.
-      </p>
+      Templates support building parameterized types and functions that accept an unspecified type which gets resolved only when an application
+      instantiates the code with a concrete type.  Parameterized code will accept, without compilation error, arbitrary calls on instances of the
+      template type.  When an application instantiates the parameterized code with a concrete type compilation of the instantiated code succeeds
+      if the type supports specified operations, else it fails.
+      <spacer-15></spacer-15>
+      So there are two C++ template compilation phases:
+      <ol>
+        <li>
+          Compilation of the template library code does a syntax check to identify known errors.  No object code is generated since the type of the
+          template parameter is not specified.
+        </li>
+        <li>
+          Compilation of the instantiated application code generates an object file if instantiated syntax is correct, otherwise it fails.
+        </li>
+      </ol>
+      This lazy syntax checking is very useful.  C# and Java generics do eagar type checking so many operations that would succeed for
+      useful types are not allowed because the compiler can't ensure that they will succeed.
+      <spacer-15></spacer-15>
+      An implication of this lazy compilation is that all of the template definition code must go in a header file, because the application
+      that uses the template definition has to see all of it's code to compile successfully, and it gets that only by including a header file.
+      <spacer-15></spacer-15>
+
       <h4>An Example:</h4>
-      <p>
-        The Convert&lt;T&gt; class converts any type to and from strings, provided they have appropriate insertion and extraction operators.
+      <spacer-10></spacer-10>
+      <indent-block>
+        The stack&lt;T&gt; class provides a LIFO container for any type, provided it has appropriate copy and assignment operations.
         It works for all of the native numerical types without writing any additional code.
-      </p>
-      <div style="margin:20px 20px 0px 20px;">
-        <codewrapper class="code" style="margin-bottom:0px;">
-          <codecaption style="text-align:left; margin:15px 15px 15px -20px; padding: 5px 15px;">
-            Template Example Code - TemplatesIntro.h
-          </codecaption>
-          <pre>
-template&lt;typename T&gt;
-class Convert
-{
+        <spacer-10></spacer-10>
+        <pre class="code">
+
+#ifndef STACK_H
+#define STACK_H
+///////////////////////////////////////////////////////////////////////
+// Stack.h - stack class derived from Effective C++, Scott Meyers    //
+//   Note: inclusion model for templates requires all template       //
+//         implementations be placed in header file.                 //
+// Jim Fawcett, CSE687 - Object Oriented Design, Spring 2004         //
+///////////////////////////////////////////////////////////////////////
+
+template&lt;class T&gt; class stack {
+private:
+  template &lt;class U&gt; friend class stack;
+  struct stacknode {
+    T data;
+    stacknode *next;
+    stacknode(const T& newdata, stacknode *nextnode)
+      : data(newdata), next(nextnode) { }
+  };
+  stacknode *top;
 public:
-  virtual ~Convert<T>() {}
-  static std::string toString(const T& t);
-  static T fromString(const std::string& str);
-  static std::string id(const T& t);
+  stack();
+  ~stack();
+  void push(const T& object);
+  T pop(void);
+  void flush();
+  int size() const;
+  // member templates
+  template &lt;class U&gt; stack(const stack&lt;U&gt;&);
+  template &lt;class U&gt; stack&lt;T&gt;& operator=(const stack&lt;U&gt;&);
 };
-/*----< serialize t to a std::string >-----------------------------*/
-/*
-* Assumes that T defines an insertion operator.
-*/
-template&lt;typename T&gt;
-std::string Convert&lt;T&gt;::toString(const T& t)
-{
-  std::ostringstream out;
-  out << *const_cast<T*>(&t);
-  return out.str();
-}
-/*----< create an instance of T from a std::string >---------------*/
-/*
-* Assumes that T defines an extraction operator.
-* To succeed str must be created from Convert<T>::toString(const T& t).
-*/
-template&lt;typename T&gt;
-T Convert&lt;T&gt;::fromString(const std::string& str)
-{
-  std::istringstream in(str);
-  T value;
-  in >> value;    // istringstream extraction provides the conversion
-  return value;
-}
-/*----< create an id string from an instance of T using RTTI >----*/
 
-template&lt;typename T&gt;
-std::string Convert&lt;T&gt;::id(const T& t)
-{
-  return typeid(t).name();
+//----&lt; void constructor &gt;---------------------------------------------
+template&lt;class T&gt; stack&lt;T&gt;::stack() : top(0) { }
+
+//----&lt; destructor &gt;---------------------------------------------------
+template &lt;class T&gt; stack&lt;T&gt;::~stack(void) {
+  while (top) {
+    stacknode *next_to_die = top;
+    top = top-&gt;next;
+    delete next_to_die;
+  }
 }
+//----&lt; push data onto stack &gt;-----------------------------------------
+template&lt;class T&gt; void stack&lt;T&gt;::push(const T &object) {
+  top = new stacknode(object, top);
+}
+//----&lt; pop data from stack &gt;------------------------------------------
+template &lt;class T&gt; T stack&lt;T&gt;::pop(void) {
+  if (!top) {
+    throw std::out_of_range("\n  attempt to pop empty stack\n");
+  }
+  stacknode *save = top;
+  top = top-&gt;next;
+  T data = save-&gt;data;
+  delete save;
+  return data;
+}
+
+Remaining members elided.
             </pre>
-          <codecaption style="text-align:left; padding: 5px 15px;">
-            Template Example Code - TemplatesIntro.cpp
-          </codecaption>
-          <pre>
-#include "TemplatesIntro.h"
-
-int main()
-{
-  Title("Demonstrating Templates");
-  putLine();
-
-  title("Demonstrating Conversion of numerical types");
-  std::cout << "\n  conversion of integer: " << Convert&lt;int&gt;::toString(42);
-  std::cout << "\n  conversion of double:  " << Convert&lt;double&gt;::toString(3.1415927);
-  putLine();
-}
-            </pre>
-        </codewrapper>
-      </div>
-      <p>
-        User defined types have to provide insertion and extraction
-        operators.  You can find an example of that in the TemplateDemo sample code, below.
-        You will find the code for Convert&lt;T&gt; and a TemplatesIntro&lt;T&gt; class that show how Convert&lt;T&gt; is used.
-      </p>
-      <p>
-        All of the  input stream classes: istream, ifstream, and istringstream, provide extraction
-        operators and all of the output stream classes: ostream, ofstream, and ostringstream, provide insertion operators
-        that convert primitive types (integral types, floating types) to and from strings.
-      </p>
-      <p>
-        We are using the conversion provided
-        by the std::istringstream class extraction operator&gt;&gt; in Check&lt;T&gt;::fromString(const&nbsp;std::string&amp;&nbsp;str),
-        and by the std::ostringstream class insertion operator&lt;&lt; in Check&lt;T&gt;::toString(const&nbsp;T&amp;&nbsp;t).
-      </p>
-      <p>
-        You can do the same for your user-defined classes, simply by overloading those operators to save and retrieve the class's state.
-        For classes with complex state you may need to save to an XML string for insertion, and parse the string for extraction.  The
-        <a href="../../Repository/XmlDocument">XmlDocument package</a> will be helpful for that.
-      </p>
+      </indent-block>
+      <spacer-15></spacer-15>
+      User defined types have to provide copy constructors and copy assignment
+      operators.  You can find an example of that in the TemplateDemo sample code, below.
+      You will also find code for Convert&lt;T&gt; that converts T to and from a string representation.
+      There is also a TemplatesIntro&lt;T&gt; class that shows how Convert&lt;T&gt; is used.
+      <spacer-15></spacer-15>
+      We are using the conversion provided
+      by the std::istringstream class extraction operator&gt;&gt; in Check&lt;T&gt;::fromString(const&nbsp;std::string&amp;&nbsp;str),
+      and by the std::ostringstream class insertion operator&lt;&lt; in Check&lt;T&gt;::toString(const&nbsp;T&amp;&nbsp;t).
+      <spacer-15></spacer-15>
+      You can do the same for your user-defined classes, simply by overloading those operators to save and retrieve the class's state.
+      For classes with complex state you may need to save to an XML string for insertion, and parse the string for extraction.  The
+      <a href="../../Repository/XmlDocument">XmlDocument package</a> will be helpful for that.
+      <spacer-15></spacer-15>
       <div class="spacer"></div>
-      <h3>Template Stack Example</h3>
+      <h3>Complete Template Stack Example</h3>
       <div class="indent">
         <a href="CodeSnap-Templates.h.html">Templates CodeSnap</a>,
         <a href="CppBasicDemos.html">Code folder in Repository</a>
       </div>
-      <p>
-        <h3>Templates Presentation</h3>
-        <indent-block>
-          <a href="Resources/Templates.pdf">Templates presentation</a>
-          <div>
-            Covers most of the important parts of templates including specialization.
-            You want to look at this presentation carefully and concurrently look
-            at code in the repositories cited below.
-          </div>
-        </indent-block>
-      </p>
-      <p>
-        <h3>More Templates Code Examples:</h3>
-        <indent-block>
-          <a href="CppBasicDemos.html">CppBasicDemos</a>,
-          <a href="CppUtilities.html">CppUtilities</a>
-        </indent-block>
-        <h3>References:</h3>
-        <ul>
-          <li>
-            <a href="http://en.cppreference.com/w/cpp/language/templates">Templates - cppreference.com</a>
-          </li>
-          <li>
-            <a href="https://isocpp.org/wiki/faq/templates">FAQ - Templates</a>
-          </li>
-        </ul>
+      <spacer-15></spacer-15>
+      <h3>Templates Presentation</h3>
+      <indent-block>
+        <a href="Resources/Templates.pdf">Templates presentation</a>
+        <div>
+          Covers most of the important parts of templates including specialization.
+          You want to look at this presentation carefully and concurrently look
+          at code in the repositories cited below.
+        </div>
+      </indent-block>
+      <spacer-15></spacer-15>
+      <h3>More Templates Code Examples:</h3>
+      <indent-block>
+        <a href="CppBasicDemos.html">CppBasicDemos</a>,
+        <a href="CppUtilities.html">CppUtilities</a>
+      </indent-block>
+      <h3>References:</h3>
+      <ul>
+        <li>
+          <a href="http://en.cppreference.com/w/cpp/language/templates">Templates - cppreference.com</a>
+        </li>
+        <li>
+          <a href="https://isocpp.org/wiki/faq/templates">FAQ - Templates</a>
+        </li>
+      </ul>
     </div>
   </main>
   <spacer-25></spacer-25>
