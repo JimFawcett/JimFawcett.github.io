@@ -20,6 +20,7 @@
  *  e.g., the number of pages in the story.
  */
 var storyName = "";        // name displayed in footer
+//var storyLoaded = 'false'; // don't load more than once
 var pages = [];            // array to hold page objects
 var numItems = 0;          // number of story pages
 var curr = 1;              // current page index
@@ -73,7 +74,7 @@ function render(si) {
     case 0:  // load story list
       clearPages();
       clearLocalStorage();
-      slider.setAttribute("src", "StoryList.html");
+      slider.setAttribute("src", "StoryList3.html");
       disableButtons();
       enableButton('retrieveBtn');
       //curr = 1;
@@ -185,6 +186,7 @@ function retrieve(id) {
  */
 function first() {
   curr = 1;
+
   //console.log('first() calling render(curr):\ncurr = ', curr);
   render(curr);
 }
@@ -193,6 +195,7 @@ function first() {
  */
 function last() {
   curr = numItems;
+
   //console.log('last() calling render(curr):\ncurr = ', curr);
   render(curr);
 }
@@ -206,6 +209,7 @@ function next() {
     ++curr;
   if (curr > numItems)  // wrap-around
     curr = 1;
+
   //console.log('next() calling render(curr):\ncurr = ', curr);
   render(curr);
 }
@@ -213,6 +217,7 @@ function next() {
  *  Return to story after navigating away in displayed page
  */
 function returnToCurr() {
+
   //console.log('returnToCurr() calling render(curr):\ncurr = ', curr);
   render(curr);
 }
@@ -223,6 +228,7 @@ function prev() {
   --curr;
   if (curr < 1)       // wrap-around
     curr = numItems;
+
   //console.log('prev() calling render(curr):\ncurr = ', curr);
   render(curr);
 }
@@ -239,11 +245,15 @@ function openNote() {
     note.style.padding = "10px 15px 20px 15px";
     note.style.border = "2px solid saddlebrown";
     tBtn.innerHTML = "<del>&nbsp;?&nbsp;</del>";
+    //if(isEdge())
+    //  note.style.display = "block";
   }
   else {
     note.style.width = "0px";
     note.style.padding = "0px";
     note.style.border = "none";
+    //if(isEdge())
+    //  note.style.display = "none";
     tBtn.innerHTML = "?";
   }
 }
@@ -257,6 +267,8 @@ function closeNote() {
   note.style.width = "0px";
   note.style.padding = "0px";
   note.style.border = "none";
+  //if(isEdge())
+  //  note.style.display = "none";
 }
 /* --------------------------------------------------------------
  *  Open help window
@@ -278,6 +290,8 @@ function isLocalFile() {
  *  test.
  */
 function isChrome() {
+  //if (isEdge())
+  //  return false;
   var isChromium = window.chrome;
   var winNav = window.navigator;
   var vendorName = winNav.vendor;
@@ -317,14 +331,15 @@ function isEdge() {
  */
 function srcChange() {
   console.log('entered srcChange');
+  alert('entered srcChange');
 
   let signal = localStorage.getItem('storySaved');
   console.log('signal = ' + signal);
   console.log(localStorage.length);
-  if (!isDefined(signal)) {
-    console.log('story not saved - returning');
-    return;
-  }
+  //if (!isDefined(signal)) {
+  //  console.log('story not saved - returning');
+  //  return;
+  //}
 
   let storyNamePlace = document.getElementById("storyNameId");
   if (isDefined(storyNamePlace)) {
@@ -339,11 +354,12 @@ function srcChange() {
   signal = localStorage.getItem('storySaved');
   console.log('signal = ' + signal);
   console.log(localStorage.length);
-  if (isDefined(signal)) {
-    loadStory();
-    console.log('---------- removing storySaved item -----------------');
-    localStorage.removeItem('storySaved');  // prevent infinite recursion
-  }
+  loadStory();
+  //if (isDefined(signal)) {
+  //  loadStory();
+  //  console.log('---------- removing storySaved item -----------------');
+  //  localStorage.removeItem('storySaved');  // prevent infinite recursion
+  //}
   console.log('leaving srcChange at end');
 }
 /* --------------------------------------------------------------
@@ -351,46 +367,56 @@ function srcChange() {
  *  - Checks to see if loadStory should be called so user
  *    doesn't have to do that with a load button.
  */
-//function storageChange(event) {
-//  if (event !== 'function')
-//    return;
-//  var storyName;
-//  console.log('entered storageChange with event.key = ' + event.key);
-//  showStorage();
+function storageChange(event) {
+  //if (event !== 'function')
+  //  return;
+  var storyName;
+  console.log('entered storageChange with event.key = ' + event.key);
+  console.log('storageLength = ' + localStorage.length);
+  alert('sending getData message');
+  const ifrm = document.getElementById("slideShow");
+  ifrm.contentWindow.postMessage(
+    { action: 'getData', key: 'storySaved' }, "*"
+  );
 
-//  if (event.key !== 'storySaved') {
-//    return;
-//  }
-//  else {
-//    storyName = localStorage.getItem('storySaved');
-//    //storyName = event.newValue;
-//    console.log('event.key = ' + event.key);
-//    console.log('event.value = ' + event.value);
-//    console.log('event.newValue = ' + event.newValue);
-//  }
+  //showStorage();
 
-//  console.log('localStorage.length = ' + localStorage.length);
-//  showStorage();
+  //if (event.key !== 'numItems') {
+  //  return;
+  //}
+  //if (event.key !== 'storySaved') {
+  //  return;
+  //}
+  //else {
+  //  storyName = localStorage.getItem('storySaved');
+  //  //storyName = event.newValue;
+  //  console.log('event.key = ' + event.key);
+  //  console.log('event.value = ' + event.value);
+  //  console.log('event.newValue = ' + event.newValue);
+  //}
 
-//  let numItemsStr = localStorage.getItem('numItems');
-//  numItems = parseInt(numItemsStr);
-//  console.log('numItems = ' + numItems);
-//  if (numItems > 0) {
-//    //-----------------------------------------------------
-//    // storyName is undefined unless these are uncommented
-//    let signal = localStorage.getItem('storySaved');
-//    storyName = signal;
-//    console.log('storyName = ' + storyName);
-//    let storyNamePlace = document.getElementById("storyNameId");
-//    storyNamePlace.innerHTML = storyName;
-//    loadStory();
-//    console.log('---------- removing storySaved item -----------------');
-//    localStorage.removeItem('storySaved');  // added 9/6/2019
-//  }
-//  else {
-//    console.log('numItems === 0');
-//  }
-//}
+  //console.log('localStorage.length = ' + localStorage.length);
+  //showStorage();
+
+  //let numItemsStr = localStorage.getItem('numItems');
+  //numItems = parseInt(numItemsStr);
+  //console.log('numItems = ' + numItems);
+  //if (numItems > 0) {
+  //  //-----------------------------------------------------
+  //  // storyName is undefined unless these are uncommented
+  //  let signal = localStorage.getItem('storySaved');
+  //  storyName = signal;
+  //  console.log('storyName = ' + storyName);
+  //  let storyNamePlace = document.getElementById("storyNameId");
+  //  storyNamePlace.innerHTML = storyName;
+  //  loadStory();
+  //  console.log('---------- removing storySaved item -----------------');
+  //  localStorage.removeItem('storySaved');  // added 9/6/2019
+  //}
+  //else {
+  //  console.log('numItems === 0');
+  //}
+}
 
 function addStorageEvent() {
   //alert('addStorageEvent called');
@@ -413,15 +439,22 @@ function loadStoryList() {
  *  'numItems' is id of element that holds and displays page count
  */
 function loadStory() {
-  let storyKey = localStorage.getItem('storySaved');
-  if (!isDefined(storyKey)) {
-    console.log('story already loaded - leaving loadStory()');
-    return;
-  }
+  alert('entering loadStory()');
+  const ifrm = document.getElementById("slideShow");
+  ifrm.contentWindow.postMessage(
+    { action: 'getData', key: 'storySaved' }, "*"
+  );
+
+  //let storyKey = localStorage.getItem('storySaved');
+  //if (!isDefined(storyKey)) {
+  //  console.log('story already loaded - leaving loadStory()');
+  //  return;
+  //}
   closeNote();
-  console.log('loadStory calling retrieve("numItems"):\ncurr = ', curr);
+  console.log('loadStory calling retrieve("numItems"):\ncurr = ' + curr);
+  console.log('loadStory numItems = ' + numItems);
   retrieve('numItems');
-  localStorage.removeItem('storySaved');
+  //localStorage.removeItem('storySaved');
 }
 /* --------------------------------------------------------------
  *  Loads Table of Contents by indexing through pages array
