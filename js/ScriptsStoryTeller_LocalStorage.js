@@ -465,3 +465,78 @@ storyTeller.initialize = function () {
   storyTeller.render(0);
 };
 
+storyTellerSwipe = new Object;
+storyTellerSwipe.xst0 = null;
+//storyTellerSwipe.cont = document.getElementsByTagName('grid-container')[0];
+//storyTellerSwipe.tBtn = document.getElementById('toggleBtn');
+
+storyTellerSwipe.sTlock = function (e) {
+  storyTellerSwipe.xst0 = unify(e).clientX;
+};
+
+storyTellerSwipe.i = 0;
+
+storyTellerSwipe.sTmove = function (e) {
+  if (storyTellerSwipe.xst0 || storyTellerSwipe.xst0 === 0) {
+    let dx = storyTellerSwipe.unify(e).clientX - storyTellerSwipe.xst0, s = Math.sign(dx);
+    if (dx > 50)
+      storyTeller.prev();
+    else if (dx < -50)
+      storyTeller.next();
+    storyTellerSwipe.xst0 = null;
+  }
+};
+
+storyTellerSwipe.unify = function (e) {
+  return e.changedTouches ? e.changedTouches[0] : e;
+};
+
+storyTellerSwipe.addStSwipeListeners = function () {
+  localStorage.setItem('StSwipeEvents', 'true');
+  let tBtn = document.getElementById('tBtn');
+  tBtn.innerHTML = 'Swp'
+  let cont = document.getElementsByTagName('grid-container')[0];
+  cont.addEventListener('touchstart', storyTellerSwipe.sTlock, false);
+  cont.addEventListener('mousedown', storyTellerSwipe.sTlock, false);
+  cont.addEventListener('touchend', storyTellerSwipe.sTmove, false);
+  cont.addEventListener('mouseup', storyTellerSwipe.sTmove, false);
+};
+
+storyTellerSwipe.removeStSwipeListeners = function () {
+  localStorage.setItem('StSwipeEvents', 'false');
+  let tBtn = document.getElementById('tBtn');
+  tBtn.innerHTML = '<del>Swp</del>'
+  let cont = document.getElementsByTagName('grid-container')[0];
+  cont.removeEventListener('touchstart', storyTellerSwipe.sTlock, false);
+  cont.removeEventListener('mousedown', storyTellerSwipe.sTlock, false);
+  cont.removeEventListener('touchend', storyTellerSwipe.sTmove, false);
+  cont.removeEventListener('mouseup', storyTellerSwipe.sTmove, false);
+};
+
+storyTellerSwipe.toggleStSwipeEvents = function () {
+  let StSwipeState = storyTellerSwipe.getStSwipeEvents();
+  if (StSwipeState === 'true' || !isDefined(StSwipeState)) {
+    storyTellerSwipe.removeStSwipeListeners();
+  }
+  else {
+    storyTellerSwipe.addStSwipeListeners();
+  }
+};
+
+storyTellerSwipe.getStSwipeEvents = function () {
+  if (!isDefined(localStorage))
+    return false;
+  let StSwipeEvents = localStorage.getItem('StSwipeEvents');
+  return StSwipeEvents;
+};
+
+storyTellerSwipe.StInitialize = function () {
+  let tBtn = document.getElementById('tBtn');
+  if (storyTellerSwipe.getStSwipeEvents() === 'true') {
+    storyTellerSwipe.addStSwipeListeners();
+    tBtn.innerHTML = 'Swp';
+  }
+  else {
+    tBtn.innerHTML = '<del>Swp</del>';
+  }
+};
