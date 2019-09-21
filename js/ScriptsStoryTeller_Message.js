@@ -76,7 +76,7 @@ storyTeller.render = function (si) {
     case 0:  // load story list
       storyTeller.clearPages();
       storyTeller.clearLocalStorage();
-      slider.setAttribute("src", "StoryList.html");
+      slider.setAttribute("src", "StoryList_Message.html");
       storyTeller.disableButtons();
       storyTeller.enableButton('retrieveBtn');
       if (isDefined(pageField))
@@ -306,6 +306,12 @@ storyTeller.isEdge = function () {
  */
 storyTeller.srcChange = function () {
 
+  const msg = { action: 'queryAction', key: 'query', value: '2' };
+  let win = window.frames.stif;
+  win.postMessage(msg, '*');
+  if (isDefined(msg.key))
+    return;
+
   let signal = localStorage.getItem('storySaved');
   if (!isDefined(signal)) {
     return;
@@ -459,13 +465,25 @@ storyTeller.addKeys = function () {
   document.addEventListener('keydown', (event) => { storyTeller.keyAction(event); }, false);
 };
 /* --------------------------------------------------------------
+ *  Add event listener for messages
+ */
+storyTeller.addMessages = function () {
+  console.log('ScriptsStoryTeller_Message adding message event listener');
+  // listen for keyboard events:
+  // - key actions are defined in ScriptsKeyboard.js
+  window.addEventListener('message', (event) => { storyTeller.onMessage(event); }, false);
+};
+/* --------------------------------------------------------------
  *  Add key event listener and load the Story List
  *  - called by body.onLoad
  */
 storyTeller.initialize = function () {
   storyTeller.addKeys();
-  console.log('adding storage event listener');
+  storyTeller.addMessages();
   storyTeller.render(0);
+};
+storyTeller.onMessage = function (event) {
+  alert('storyTeller received message');
 };
 
 storyTellerSwipe = new Object;
