@@ -59,6 +59,7 @@ function initializeMenu() {
         <div class='darkTheme'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
         <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
         <a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a>\
+        <a href='CppSynopsis.html'>C++ Synopsis</a>\
         <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
         <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
         <a href='https://github.com/joshnh/Git-Commands'>git commands</a>\
