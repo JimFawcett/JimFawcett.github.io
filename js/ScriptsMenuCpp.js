@@ -68,6 +68,7 @@ function initializeMenu() {
         <a href='SummerReading.html'>Summer Reading</a>\
         <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams</a>\
         <a href='WebNotes.html'>Web Notes</a>\
+        <a href='Tests.html'>UI Widget Tests</a>\
         <a href='https://encycolorpedia.com/named'>Web Colors</a>\
         <a href='CppReferences.html'>C++ References</a>\
         <a href='CppExamples.html'>C++ Examples</a>\

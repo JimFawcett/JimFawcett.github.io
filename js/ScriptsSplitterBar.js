@@ -10,6 +10,10 @@ function onLoadSplitter(figStr) {
   dragElement(document.getElementById(figStr + "-seperator"), "H", figStr);
 }
 
+function unify(e) {
+  return e.changedTouches ? e.changedTouches[0] : e;
+}
+
 // function is used for dragging and moving
 function dragElement(element, direction, figStr) {
   // Two variables for tracking positions of the cursor
@@ -21,8 +25,8 @@ function dragElement(element, direction, figStr) {
 
   // function that will be called whenever the down event of the mouse is raised
   function dragMouseDown(e) {
-    drag.x = e.clientX;
-    drag.y = e.clientY;
+    drag.x = unify(e).clientX;
+    drag.y = unify(e).clientY;
     document.onmousemove = onMouseMove;
     document.ontouchmove = onMouseMove;
     document.onmouseup = () => { document.onmousemove = document.onmouseup = null; };
@@ -31,8 +35,8 @@ function dragElement(element, direction, figStr) {
 
   // function that will be called whenever the up event of the mouse is raised
   function onMouseMove(e) {
-    const currentX = e.clientX;
-    const currentY = e.clientY;
+    const currentX = unify(e).clientX;
+    const currentY = unify(e).clientY;
 
     delta.x = currentX - drag.x;
     delta.y = currentY - drag.y;

@@ -273,74 +273,93 @@ function scrollPageBottom() {
 *  navKeys are TBHNP keys at bottom right of each page
 */
 function togglenavKeys() {
-  var nkc = document.getElementsByTagName("navKeys-Container");
-  var tog = window.getComputedStyle(nkc[0], null).getPropertyValue("display");
-  if (tog === "none") {
-    nkc[0].style.display = "inline";
-    window.localStorage.setItem("navKeyState", "show");  // persist change across pages
+  try {
+    var nkc = document.getElementsByTagName("navKeys-Container");
+    var tog = window.getComputedStyle(nkc[0], null).getPropertyValue("display");
+    if (tog === "none") {
+      nkc[0].style.display = "inline";
+      window.localStorage.setItem("navKeyState", "show");  // persist change across pages
+    }
+    else {
+      nkc[0].style.display = "none";
+      window.localStorage.setItem("navKeyState", "hide");  // persist chage across pages
+    }
   }
-  else {
-    nkc[0].style.display = "none";
-    window.localStorage.setItem("navKeyState", "hide");  // persist chage across pages
+  catch (err) {
+    return;
   }
 }
 //----< setnavKeys display >-----------------------------------------
 
 function setnavKeys() {
-  var nkc = document.getElementsByTagName("navKeys-Container");
-  var navKeyState = window.localStorage.getItem("navKeyState");
-  if (navKeyState === null) {
-    nkc[0].style.display = "inline";
-    window.localStorage.setItem("navKeyState", "show");
+  try {
+    var nkc = document.getElementsByTagName("navKeys-Container");
+    var navKeyState = window.localStorage.getItem("navKeyState");
+    if (navKeyState === null) {
+      nkc[0].style.display = "inline";
+      window.localStorage.setItem("navKeyState", "show");
+      return;
+    }
+    if (navKeyState === "show") {
+      nkc[0].style.display = "inline";
+    }
+    else {
+      nkc[0].style.display = "none";
+    }
+  }
+  catch (err) {
     return;
   }
-  if (navKeyState === "show") {
-    nkc[0].style.display = "inline";
-  }
-  else {
-    nkc[0].style.display = "none";
-  }
-
 }
 //----< toggle image sizer display >-----------------------------------
 /*
 *  Image sizers appear to the right of some images
 */
 function toggleImageSizer() {
-  var nkc = document.getElementsByTagName("sizer-Container");
-  var tog = window.getComputedStyle(nkc[0], null).getPropertyValue("display");
-  for (let i = 0; i < nkc.length; ++i) {
-    if (tog === "none") {
-      nkc[i].style.display = "inline";
-      window.localStorage.setItem("imageSizerState", "show");  // persist change across pages
+  try {
+    var nkc = document.getElementsByTagName("sizer-Container");
+    var tog = window.getComputedStyle(nkc[0], null).getPropertyValue("display");
+    for (let i = 0; i < nkc.length; ++i) {
+      if (tog === "none") {
+        nkc[i].style.display = "inline";
+        window.localStorage.setItem("imageSizerState", "show");  // persist change across pages
+      }
+      else {
+        nkc[i].style.display = "none";
+        window.localStorage.setItem("imageSizerState", "hide");  // persist chage across pages
+      }
     }
-    else {
-      nkc[i].style.display = "none";
-      window.localStorage.setItem("imageSizerState", "hide");  // persist chage across pages
-    }
+  }
+  catch (err) {
+    return;
   }
 }
 //----< set image sizer display >-----------------------------------------
 
 function setImageSizer() {
-  var nkc = document.getElementsByTagName("sizer-Container");
-  var imageSizerState = window.localStorage.getItem("imageSizerState");
+  try {
+    var nkc = document.getElementsByTagName("sizer-Container");
+    var imageSizerState = window.localStorage.getItem("imageSizerState");
 
-  for (let i = 0; i < nkc.length; ++i) {
-    if (imageSizerState === null) {
-      nkc[i].style.display = "inline";
-      window.localStorage.setItem("imageSizerState", "show");
-      return;
+    for (let i = 0; i < nkc.length; ++i) {
+      if (imageSizerState === null) {
+        nkc[i].style.display = "inline";
+        window.localStorage.setItem("imageSizerState", "show");
+        return;
+      }
+      if (imageSizerState === "hide") {
+        nkc[i].style.display = "none";
+      }
+      if (imageSizerState === "show") {
+        nkc[i].style.display = "inline";
+      }
+      else {
+        nkc[i].style.display = "none";
+      }
     }
-    if (imageSizerState === "hide") {
-      nkc[i].style.display = "none";
-    }
-    if (imageSizerState === "show") {
-      nkc[i].style.display = "inline";
-    }
-    else {
-      nkc[i].style.display = "none";
-    }
+  }
+  catch (err) {
+    return;
   }
 }
 //----< toggle nav keys display >------------------------------------

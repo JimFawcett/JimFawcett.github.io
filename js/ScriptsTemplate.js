@@ -104,6 +104,11 @@ function toggleSwipeEvents() {
 }
 
 function getSwipeEvents() {
-  swipeEvents = localStorage.getItem('swipeEvents');
-  return swipeEvents;
+  try {
+    swipeEvents = localStorage.getItem('swipeEvents');
+    return swipeEvents;
+  }
+  catch (err) {
+    return false;
+  }
 }

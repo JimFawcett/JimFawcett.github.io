@@ -66,6 +66,7 @@ function initializeMenu() {
         <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
         <a href='SummerReading.html'>Summer Reading</a>\
         <a href='WebNotes.html'>Web Notes</a>\
+        <a href='Tests.html'>UI Widget Tests</a>\
         <a href='https://encycolorpedia.com/named'>Web Colors</a>\
         <a href='UML.html'>UML Diagrams</a>\
         <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams</a>\
