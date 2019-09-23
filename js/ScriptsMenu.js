@@ -310,22 +310,26 @@ function togglenavKeys() {
 //----< setnavKeys display >-----------------------------------------
 
 function setnavKeys() {
-  var nkc = document.getElementsByTagName("navKeys-Container");
-  if (!isDefined(localStorage))
+  try {
+    var nkc = document.getElementsByTagName("navKeys-Container");
+    if (!isDefined(localStorage))
+      return;
+    var navKeyState = window.localStorage.getItem("navKeyState");
+    if (navKeyState === null) {
+      nkc[0].style.display = "inline";
+      window.localStorage.setItem("navKeyState", "show");
+      return;
+    }
+    if (navKeyState === "show") {
+      nkc[0].style.display = "inline";
+    }
+    else {
+      nkc[0].style.display = "none";
+    }
+  }
+  catch (err) {
     return;
-  var navKeyState = window.localStorage.getItem("navKeyState");
-  if (navKeyState === null) {
-    nkc[0].style.display = "inline";
-    window.localStorage.setItem("navKeyState", "show");
-    return;
   }
-  if (navKeyState === "show") {
-    nkc[0].style.display = "inline";
-  }
-  else {
-    nkc[0].style.display = "none";
-  }
-
 }
 //----< toggle image sizer display >-----------------------------------
 /*
@@ -348,24 +352,29 @@ function toggleImageSizer() {
 //----< set image sizer display >-----------------------------------------
 
 function setImageSizer() {
-  var nkc = document.getElementsByTagName("sizer-Container");
-  var imageSizerState = window.localStorage.getItem("imageSizerState");
+  try {
+    var nkc = document.getElementsByTagName("sizer-Container");
+    var imageSizerState = window.localStorage.getItem("imageSizerState");
 
-  for (let i = 0; i < nkc.length; ++i) {
-    if (imageSizerState === null) {
-      nkc[i].style.display = "inline";
-      window.localStorage.setItem("imageSizerState", "show");
-      return;
+    for (let i = 0; i < nkc.length; ++i) {
+      if (imageSizerState === null) {
+        nkc[i].style.display = "inline";
+        window.localStorage.setItem("imageSizerState", "show");
+        return;
+      }
+      if (imageSizerState === "hide") {
+        nkc[i].style.display = "none";
+      }
+      if (imageSizerState === "show") {
+        nkc[i].style.display = "inline";
+      }
+      else {
+        nkc[i].style.display = "none";
+      }
     }
-    if (imageSizerState === "hide") {
-      nkc[i].style.display = "none";
-    }
-    if (imageSizerState === "show") {
-      nkc[i].style.display = "inline";
-    }
-    else {
-      nkc[i].style.display = "none";
-    }
+  }
+  catch (err) {
+    return;
   }
 }
 //----< toggle nav keys display >------------------------------------
