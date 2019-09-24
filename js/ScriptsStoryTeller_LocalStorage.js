@@ -461,7 +461,7 @@ storyTeller.addKeys = function () {
  */
 storyTeller.initialize = function () {
   storyTeller.addKeys();
-  console.log('adding storage event listener');
+  //console.log('adding storage event listener');
   storyTeller.render(0);
 };
 
