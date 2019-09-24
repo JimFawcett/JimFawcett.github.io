@@ -74,8 +74,9 @@ storyTeller.render = function (si) {
       break;
 
     case 0:  // load story list
-      storyTeller.clearPages();
-      storyTeller.clearLocalStorage();
+      //removed redundant calls - already called in retrieve
+      //storyTeller.clearPages();
+      //storyTeller.clearLocalStorage();
       slider.setAttribute("src", "StoryList.html");
       storyTeller.disableButtons();
       storyTeller.enableButton('retrieveBtn');

@@ -1,0 +1,167 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - StoryTellerDesign.html
+   - ver 1.0 - 10 June 2019
+   - Jim Fawcett, Emeritus Teaching Professor, Syracuse University
+  -->
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Projects. Code Samples. Software Links" />
+  <meta name="keywords" content="Repository, Design, Code" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <title>StoryTeller Design</title>
+  <script src="js/ScriptsUtilities.js"></script>
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <script src="js/ScriptsSizerComp.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+  <link rel="stylesheet" href="css/StylesSizerComp.css" />
+  <style>
+    summary {
+      padding: 3px 0px 5px 0px;
+    }
+  </style>
+</head>
+<body id="github" onload="initializeMenu()">
+
+  <navKeys-Container>
+    <nav-Key id="sKey" onclick="toggleSwipeEvents()">S</nav-Key>
+    <nav-Key id="rKey" onclick="location.reload()">R</nav-Key>
+    <nav-Key id="tKey" onclick="scrollPageTop()">T</nav-Key>
+    <nav-Key id="bKey" onclick="scrollPageBottom()">B</nav-Key>
+    <nav-Key id="hKey" onclick="helpWin()">H</nav-Key>
+    <nav-Key id="pKey" onclick="loadPrev()">P</nav-Key>
+    <nav-Key id="nKey" onclick="loadNext()">N</nav-Key>
+  </navKeys-Container>
+
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <!--<a id="Next" href="BlogDesign.htm">N</a>
+  <a id="Prev" href="BlogFileSystem.htm">P</a>-->
+
+  <header>
+    <hgroup id="pagetitle">
+      <h1 id="title">StoryTeller Design</h1>
+    </hgroup>
+  </header>
+
+  <!--<indent-block style="width:70%; display:block;">
+    <img class="strip-photo" src="Pictures/TextFinderCodeStrip.JPG" alt="Text Finder Code Strip" width="100%" />
+    <div align="center">TextFinder code fragment</div>
+  </indent-block>-->
+  <!--<div style="padding-left:25px;">
+    "Design is where science and art break even."
+    <br />
+    - Robin Mathew
+  </div>-->
+
+  <hr class="spread" />
+  <indent-block>
+    <h3>Concept:</h3>
+    <indent-block>
+      <div id="fig1"></div>
+      A story is an ordered collection of content from a website, relevant to a specific theme, e.g., C++.
+      Its purpose is to provide:
+      <ul class="tight pad10">
+        <li>
+          A starting point point for viewing the topic.
+        </li>
+        <li>
+          An ordered sequence of content on the topic, with each step in the sequence building on earlier steps.
+        </li>
+        <li>
+          A way of knowing when to stop.  The sequence presents every resource for the topic available on the site.
+        </li>
+      </ul>
+      StoryTeller is a mechanism for choosing one of several stories and manually stepping through its content.
+    </indent-block>
+    <h3>Design:</h3>
+    <indent-block>
+      We will discuss four views of the design: UI, activities, call graph, and a JavaScript code fragment.
+      <h4>StoryTeller User Interface (UI)</h4>
+      <indent-block>
+        The UI consists of a static web page with an embedded iframe.  The iframe, shown in the top left
+        quadrant of Fig 1., displays story content.  Buttons on the right are used for navigation through
+        the story timeline, and header and footer provide information that helps user navigation.
+      </indent-block>
+      <div id="fig2"></div>
+      <h4>StoryTeller Activities:</h4>
+      <indent-block>
+        When the StoryTeller loads the initialization process is triggered by the end of browser document
+        parsing.  That results in a list of available stories being loaded into the iframe.  We will see
+        how that is done in the next section.
+        <spacer-15></spacer-15>
+        Nothing happens until the user selects a story.  When its storyTOC loads, JavaScript analyzes its
+        own content and writes relevant information into local storage, e.g., the url, name, and page note text
+        for each link on the page - one link per story page.
+        <spacer-15></spacer-15>
+        When storyTOC loading completes, the information has been saved in localStorage and the iframe&apos;s
+        onLoad event fires, calling StoryTeller&apos;s srcChange() function.  StoryTeller reads story information
+        out of localStorage and builds an array of JavaScript page objects.  Each page object has attributes for
+        page url, used to load the page, page name, used to build a Table Of Contents (TOC), and page notes text,
+        used to supply additional information should the user click the [?] button.
+        <spacer-15></spacer-15>
+        When a user clicks next, prev, ... buttons the button listeners process the information, usually by calling
+        render to display a new page.  For example, next() adds 1 to curr, the page index, and calls render to
+        display the next page. That continues until the user clicks the [Exit] button.
+      </indent-block>
+      <div id="fig3"></div>
+      <h4>StoryTeller Call Graph:</h4>
+      <indent-block>
+        The call graph, shown in Fig 3., demonstrates how that works.  Processing starts with:
+        <ul class="tight pad10">
+          <li>
+            initialize() adds event listeners for key presses, then calls render(0), which loads
+            the StoryList.
+          </li>
+          <li>
+            When the user selects a story link, that changes the iframe document which loads a
+            storyTOC page.  Its JavaScript evaluates its own content with getContent() and save()s
+            it to localStorage.  When the storyTOC page loading is complete, that invokes the
+            srcChange() function when the iframe onLoad event is fired.
+          </li>
+          <li>
+            srcChange() calls retrieve to read story information from localStorage.
+          </li>
+          <li>
+            retrieve() reads localStorage, builds the pages array, and calls loadTOC() to build
+            the table of contents.  It then calls render(1) to show the first story page.
+          </li>
+          <li>
+            render(index), if index = 0, it is rendering the StoryList, so it clears pages array and
+            localStorage and loads the StoryList into the iframe.
+            If index > 0, retrieve has already been called, so it loads the page url into the iframe,
+            which displays pages[index-1].url.
+          </li>
+        </ul>
+      </indent-block>
+      <div id="fig4"></div>
+      <h4>JavaScript Code Fragment:</h4>
+      <indent-block>
+        Finally, a note about the structure of StoryTeller&apos;s JavaScript.  This github site has
+        been accumulating a lot of JavaScript libraries, so variable and function name collisions
+        started to happen.
+        <spacer-15></spacer-15>
+        To handle that, all of the more recent libraries define a JavaScript object for that specific library.
+        For StoryTeller, the object shown in Fig 4. was defined.  All of the data needed by many of the
+        functions and all of the functions are defined as properties of the storyTeller object.
+        <spacer-15></spacer-15>
+        Now, the code uses things like storyTeller.render(index).  For variables and functions that are
+        used many times in a single function, we can define an alias variable, e.g., let rend = storyTeller.render,
+        and then simply invoke rend(index);
+      </indent-block>
+    </indent-block>
+  </indent-block>
+  <spacer-15 class="clear"></spacer-15>
+  <info-bar></info-bar>
+  <script>createSizer("Pictures/StoryTellerPage.JPG", "Fig 1. - StoryTeller_LocalStorage UI", 500, "fig1")</script>
+  <script>createSizer("Pictures/StoryTellerActivities.JPG", "Fig 2. - StoryTeller_LocalStorage Activities", 500, "fig2")</script>
+  <script>createSizer("Pictures/StoryTellerCallGraph.JPG", "Fig 3. - StoryTeller_LocalStorage Call Graph", 500, "fig3")</script>
+  <script>createSizer("Pictures/StoryTellerJavaScriptFragment.JPG", "Fig 4. - JavaScript Fragment", 500, "fig4")</script>
+</body>
+</html>
