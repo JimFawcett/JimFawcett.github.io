@@ -308,6 +308,7 @@ function setnavKeys() {
     }
   }
   catch (err) {
+    console.log('exception: ' + err);
     return;
   }
 }
@@ -331,6 +332,7 @@ function toggleImageSizer() {
     }
   }
   catch (err) {
+    console.log('exception: ' + err);
     return;
   }
 }
@@ -359,6 +361,7 @@ function setImageSizer() {
     }
   }
   catch (err) {
+    console.log('exception: ' + err);
     return;
   }
 }

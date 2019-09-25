@@ -1,0 +1,194 @@
+﻿<!DOCTYPE html>
+<!--
+  StoryTeller.html - Web app for displaying extensible stories
+  Jim Fawcett, Aug 27, 2019
+-->
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Projects. Code Samples. Software Links" />
+  <meta name="keywords" content="Repository, Design, Code" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StoryTeller</title>
+  <script src="js/ScriptsUtilities.js"></script>
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <script src="js/ScriptsStoryTeller.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+  <link rel="stylesheet" href="css/StylesSimpleDropDownMenu.css" />
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesStoryTeller.css" />
+  <script>
+    let xst0 = null;
+    let cont = document.getElementsByTagName('grid-container')[0];
+    let tBtn = document.getElementById('toggleBtn');
+
+    function sTlock(e) {
+      xst0 = unify(e).clientX;
+    }
+    let i = 0;
+    function sTmove(e) {
+      if (xst0 || xst0 === 0) {
+        let dx = unify(e).clientX - xst0, s = Math.sign(dx);
+        if (dx > 50)
+          prev();
+        else if (dx < -50)
+          next();
+        xst0 = null;
+      }
+    }
+    function unify(e) {
+      return e.changedTouches ? e.changedTouches[0] : e
+    }
+    function addStSwipeListeners() {
+      localStorage.setItem('StSwipeEvents', 'true');
+      let tBtn = document.getElementById('tBtn');
+      tBtn.innerHTML = 'Swp'
+      let cont = document.getElementsByTagName('grid-container')[0];
+      cont.addEventListener('touchstart', sTlock, false);
+      cont.addEventListener('mousedown', sTlock, false);
+      cont.addEventListener('touchend', sTmove, false);
+      cont.addEventListener('mouseup', sTmove, false);
+    }
+    function removeStSwipeListeners() {
+      localStorage.setItem('StSwipeEvents', 'false');
+      let tBtn = document.getElementById('tBtn');
+      tBtn.innerHTML = '<del>Swp</del>'
+      let cont = document.getElementsByTagName('grid-container')[0];
+      cont.removeEventListener('touchstart', sTlock, false);
+      cont.removeEventListener('mousedown', sTlock, false);
+      cont.removeEventListener('touchend', sTmove, false);
+      cont.removeEventListener('mouseup', sTmove, false);
+    }
+    function toggleStSwipeEvents() {
+      let StSwipeState = getStSwipeEvents();
+      if (StSwipeState === 'true' || !isDefined(StSwipeState)) {
+        removeStSwipeListeners();
+      }
+      else {
+        addStSwipeListeners();
+      }
+    }
+
+    function getStSwipeEvents() {
+      if (!isDefined(localStorage))
+        return false;
+      let StSwipeEvents = localStorage.getItem('StSwipeEvents');
+      return StSwipeEvents;
+    }
+
+    function StInitialize() {
+      let tBtn = document.getElementById('tBtn');
+      if (getStSwipeEvents() === 'true') {
+        addStSwipeListeners();
+        tBtn.innerHTML = 'Swp';
+      }
+      else {
+        tBtn.innerHTML = '<del>Swp</del>';
+      }
+    }
+  </script>
+  <!--<style>
+    .showFocus:focus {
+      background-color:green;
+    }
+  </style>-->
+</head>
+<body id="github" onload="initialize()">
+  <!-- this nav element needs to stay to avoid a JavaScript error when initializing -->
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+
+  <navKeys-Container>
+    <nav-Key id="sKey" onclick="toggleSwipeEvents()">S</nav-Key>
+    <nav-Key id="rKey" onclick="location.reload()">R</nav-Key>
+    <nav-Key id="tKey" onclick="scrollPageTop()">T</nav-Key>
+    <nav-Key id="bKey" onclick="scrollPageBottom()">B</nav-Key>
+    <nav-Key id="hKey" onclick="helpWin()">H</nav-Key>
+    <nav-Key id="pKey" onclick="loadPrev()">P</nav-Key>
+    <nav-Key id="nKey" onclick="loadNext()">N</nav-Key>
+  </navKeys-Container>
+
+  <!-- Defines StoryTeller page layout -->
+  <grid-container>
+    <div class="header">
+      <span class="title">Story Teller</span>
+      <span id="pageField" class="pageField">
+        <span style="font-size:large;">
+          page&nbsp;
+          <span id="pageIndex"></span>&nbsp;
+          of&nbsp;
+          <span id="numItems"></span>
+          pages
+        </span>
+      </span>
+    </div>
+
+    <!-- All content is loaded here -->
+    <iframe id="slideShow" class="main slideShow" src="" onload="srcChange()" style="width:99.5%; height:99%;"></iframe>
+    <!--
+    <iframe id="slideShow" class="main slideShow" src="#" style="width:99.5%; height:99%;"></iframe>
+    -->
+    <!-- Define buttons and lables -->
+    <div class="right">
+      <button id="toggleBtn" class="right navButton" onclick="openNote()">?</button>
+      <button id="nextBtn" class="right navButton" onclick="next()">Next</button>
+      <button id="prevBtn" class="right navButton" onclick="prev()">Prev</button>
+      <button id="currBtn" class="right navButton" onclick="returnToCurr()">Curr</button>
+      <button id="firstBtn" class="right navButton" onclick="first()">First</button>
+      <button id="lastBtn" class="right navButton" onclick="last()">Last</button>
+      <button id="exitBtn" class="right navButton" onclick="window.location = 'index.html'">Exit</button>
+      <button id="tBtn" class="right navButton" onclick="toggleStSwipeEvents()">Swp</button>
+      <button id="hBtn" class="right navButton" onclick="openHelp()">Help</button>
+    </div>
+
+    <!-- LoadStory button allows user to switch to a different story at any time -->
+    <div class="footer">
+      <button id="loadBtn" class="footer" onclick="loadStoryList()">Load Story List</button>
+      <!-- This button is no longer needed, but may be used later for admin actions -->
+      <!--      <button id="retrieveBtn" class="footer" onclick="loadStory()">Load Story</button>-->
+      <span-2em></span-2em>
+      <button id="storyNameId" class="footer" style="background-color:white; border:none;"></button>
+      <button id="pageAddress" class="footer" style="background-color:white; border:none;"></button>
+
+    </div>
+  </grid-container>
+
+  <!-- Define elements for page-notes: they slide out with page specific info -->
+  <div id="pageNoteContainer" class="pageNotes" onclick="closeNote()">
+    <div style="float:right">
+      <!--
+      <button id="closeButton" onclick="closeNote()">X</button>
+      -->
+    </div>
+    <div>
+      Story Specific Page Notes<br />
+      --------------------------------
+    </div>
+    <div id="pageNoteId">
+      Page notes are shown here.
+    </div>
+  </div>
+
+  <!-- Table of Contents dropdown content goes here -->
+  <div id="dropdownmenu" class="dropcontainer" style="position:absolute; top:0.47em; right:4.4em; z-index:200;">
+    <ul>
+      <li class="dropdown">
+        <div class="dropbtn">TOC</div>
+        <div id="dropDownItems" class="dropdown-content">
+          <a href="#" style="background-color:saddlebrown; color:white; padding-left:10px;">Story Pages</a>
+        </div>
+    </ul>
+  </div>
+  <script>
+    StInitialize();
+      //if (getStSwipeEvents() === 'true')
+      //  addStSwipeListeners();
+  </script>
+</body>
+</html>

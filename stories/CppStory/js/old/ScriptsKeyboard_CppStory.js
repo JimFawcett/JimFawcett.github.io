@@ -18,8 +18,6 @@ function keyAction(keyEvent) {
   if (key === 'C') {
     document.getElementById("Cour").click();
   }
-  if (key === 'S')
-    toggleSwipeEvents();
   if (key === 'T')
     window.scrollTo(0, 0);
   if (key === 'B')

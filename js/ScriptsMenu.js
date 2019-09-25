@@ -63,13 +63,13 @@ function initializeMenu() {
         <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
         <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
         <a href='https://github.com/joshnh/Git-Commands'>git commands</a>\
-        <a href='Resources/VisualStudioHelpSlides.pdf'>Visual&nbsp;Studio&nbsp;Help&nbsp;Slides&nbsp;&nbsp;</a>\
+        <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
         <a href='SummerReading.html'>Summer Reading</a>\
         <a href='WebNotes.html'>Web Notes</a>\
         <a href='Tests.html'>UI Widget Tests</a>\
         <a href='https://encycolorpedia.com/named'>Web Colors</a>\
         <a href='UML.html'>UML Diagrams</a>\
-        <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a>\
+        <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams</a>\
         <a href='CppReferences.html'>C++ References</a>\
         <a href='CppExamples.html'>C++ Example Code</a>\
       </div>\
@@ -77,7 +77,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>P&L &#9662;</button>\
       <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;OS&nbsp;Platforms&nbsp;&nbsp;</div>\
+        <div class='darkTheme'>&nbsp;OS&nbsp;Platforms</div>\
         <a href='PlatformWindows.html'>Windows</a>\
         <a href='PlatformLinux.html'>Linux</a>\
         <div class='darkTheme'>&nbsp;Languages</div>\
@@ -109,7 +109,6 @@ function initializeMenu() {
         <a href='Stories.html'>What is a Story?</a>\
         <a href='StoryTeller_LocalStorage.html'>Load Story List - LS</a>\
         <a href='StoryTeller_V2.html'>Load Story List - V2</a>\
-        <a href='StoryTellerDesign.html'>StoryTeller Design</a>\
         <a class='disable' href='#'>C++ Ecosystem</a>\
         <a class='disable' href='#'>Site Story</a>\
         <a class='disable' href='#'>Repository&nbsp;Content</a>\
@@ -132,7 +131,7 @@ function initializeMenu() {
         <a href='SiteDesign.html'>Site Design</a>\
         <a href='BookDesignCourse.html'>Design Course</a>\
         <a class='border' href='index.html'>L1 Site Home</a>\
-        <a class='border' href='Repositories.html'>L2&nbsp;Repository&nbsp;webpage&nbsp;&nbsp;</a>\
+        <a class='border' href='Repositories.html'>L2&nbsp;Repository&nbsp;webpage</a>\
         <a class='border' href='LangCpp.html'>L2&nbsp;C++&nbsp;webpage</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
@@ -297,15 +296,21 @@ function scrollPageBottom() {
 *  navKeys are TBHNP keys at bottom right of each page
 */
 function togglenavKeys() {
-  var nkc = document.getElementsByTagName("navKeys-Container");
-  var tog = window.getComputedStyle(nkc[0], null).getPropertyValue("display");
-  if (tog === "none") {
-    nkc[0].style.display = "inline";
-    window.localStorage.setItem("navKeyState", "show");  // persist change across pages
+  try {
+    var nkc = document.getElementsByTagName("navKeys-Container");
+    var tog = window.getComputedStyle(nkc[0], null).getPropertyValue("display");
+    if (tog === "none") {
+      nkc[0].style.display = "inline";
+      window.localStorage.setItem("navKeyState", "show");  // persist change across pages
+    }
+    else {
+      nkc[0].style.display = "none";
+      window.localStorage.setItem("navKeyState", "hide");  // persist chage across pages
+    }
   }
-  else {
-    nkc[0].style.display = "none";
-    window.localStorage.setItem("navKeyState", "hide");  // persist chage across pages
+  catch (err) {
+    console.log('exception: ' + err);
+    return;
   }
 }
 //----< setnavKeys display >-----------------------------------------
@@ -329,6 +334,7 @@ function setnavKeys() {
     }
   }
   catch (err) {
+    console.log('exception: ' + err);
     return;
   }
 }
@@ -337,17 +343,23 @@ function setnavKeys() {
 *  Image sizers appear to the right of some images
 */
 function toggleImageSizer() {
-  var nkc = document.getElementsByTagName("sizer-Container");
-  var tog = window.getComputedStyle(nkc[0], null).getPropertyValue("display");
-  for (let i = 0; i < nkc.length; ++i) {
-    if (tog === "none") {
-      nkc[i].style.display = "inline";
-      window.localStorage.setItem("imageSizerState", "show");  // persist change across pages
+  try {
+    var nkc = document.getElementsByTagName("sizer-Container");
+    var tog = window.getComputedStyle(nkc[0], null).getPropertyValue("display");
+    for (let i = 0; i < nkc.length; ++i) {
+      if (tog === "none") {
+        nkc[i].style.display = "inline";
+        window.localStorage.setItem("imageSizerState", "show");  // persist change across pages
+      }
+      else {
+        nkc[i].style.display = "none";
+        window.localStorage.setItem("imageSizerState", "hide");  // persist chage across pages
+      }
     }
-    else {
-      nkc[i].style.display = "none";
-      window.localStorage.setItem("imageSizerState", "hide");  // persist chage across pages
-    }
+  }
+  catch (err) {
+    console.log('exception: ' + err);
+    return;
   }
 }
 //----< set image sizer display >-----------------------------------------
@@ -375,6 +387,7 @@ function setImageSizer() {
     }
   }
   catch (err) {
+    console.log('exception: ' + err);
     return;
   }
 }

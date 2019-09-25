@@ -25,6 +25,7 @@ function dragElement(element, direction, figStr) {
 
   // function that will be called whenever the down event of the mouse is raised
   function dragMouseDown(e) {
+    console.log('entered dragMouseDown');
     drag.x = unify(e).clientX;
     drag.y = unify(e).clientY;
     document.onmousemove = onMouseMove;
@@ -35,6 +36,7 @@ function dragElement(element, direction, figStr) {
 
   // function that will be called whenever the up event of the mouse is raised
   function onMouseMove(e) {
+    console.log('entered onMouseMove');
     const currentX = unify(e).clientX;
     const currentY = unify(e).clientY;
 
