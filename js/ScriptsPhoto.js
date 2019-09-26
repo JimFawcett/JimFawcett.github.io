@@ -5,6 +5,8 @@
   var photoWidget = new Object;
 photoWidget.create = function (id, url, caption, fontSize, size) {
   var placeholder = document.getElementById(id);
+  if (!isDefined(placeholder))
+    return;
   var cont = document.createElement("photo-container");
   var imgWrapper = document.createElement("photo-image");
   var img = document.createElement("img");

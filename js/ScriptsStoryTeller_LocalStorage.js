@@ -169,8 +169,8 @@ storyTeller.retrieve = function (id) {
   }
 
   storyTeller.loadTOC();
-  storyTeller.render(1);             // display first page
   storyTeller.clearLocalStorage();   // inserted 9/20/2019
+  storyTeller.render(1);             // display first page
 };
 /* --------------------------------------------------------------
  *  Render first page
