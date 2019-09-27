@@ -109,6 +109,7 @@ function initializeMenu() {
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content'>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
+        <a href='Friends.html'>Friends&nbsp;&amp&nbsp;Collaborators&nbsp;&nbsp;</a>\
         <a href='Help.html'>Help</a>\
         <a href='ToDo.html'>ToDo</a>\
         <a href='#' onclick='togglenavKeys()'>Toggle Nav Keys</a>\
