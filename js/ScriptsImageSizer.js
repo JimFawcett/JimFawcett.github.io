@@ -6,10 +6,13 @@
  * ------------------------------------------------------------------
  */
 
-function onLoadSplitter(figStr) {
-  const second = document.getElementById(figStr + "-second");
-  second.style.width = '300px';
-  dragElement(document.getElementById(figStr + "-seperator"), "H", figStr);
+function onLoadSizer(figStr, width) {
+  let second = null;
+  if (isDefined(width)) {
+    second = document.getElementById(figStr + "-second");
+    second.style.width = width;
+  }
+  dragElement(document.getElementById(figStr + "-seperator"), figStr);
 }
 
 function unify(e) {
@@ -17,19 +20,18 @@ function unify(e) {
 }
 
 // function is used for dragging and moving
-function dragElement(element, direction, figStr) {
+function dragElement(element, figStr) {
   // Two variables for tracking positions of the cursor
-  const drag = { x: 0, y: 0 };
-  const delta = { x: 0, y: 0 };
+  const drag = { x: 0 };
+  const delta = { x: 0 };
 
   element.onmousedown = dragMouseDown;
   element.ontouchstart = dragMouseDown;
 
   // function that will be called whenever the down event of the mouse is raised
   function dragMouseDown(e) {
-    console.log("entered dragMouseDown");
+    console.log('entered dragMouseDown');
     drag.x = unify(e).clientX;
-    drag.y = unify(e).clientY;
     document.onmousemove = onMouseMove;
     document.ontouchmove = onMouseMove;
     document.onmouseup = () => { document.onmousemove = document.onmouseup = null; };
@@ -38,29 +40,23 @@ function dragElement(element, direction, figStr) {
 
   // function that will be called whenever the up event of the mouse is raised
   function onMouseMove(e) {
-    console.log('entered onMouseMove');
     const currentX = unify(e).clientX;
-    const currentY = unify(e).clientY;
+    console.log('entered onMouseMove: currentX = ' + currentX);
 
     delta.x = currentX - drag.x;
-    delta.y = currentY - drag.y;
 
     const offsetLeft = element.offsetLeft;
-    const offsetTop = element.offsetTop;
-
 
     //const first = document.getElementById(figStr + "-first");
     const second = document.getElementById(figStr + "-second");
     //let firstWidth = first.offsetWidth;
     let secondWidth = second.offsetWidth;
-    if (direction === "H") // Horizontal
-    {
-      element.style.left = offsetLeft + delta.x + "px";
-      //firstWidth += delta.x;
-      secondWidth -= delta.x;
-    }
+
+    element.style.left = offsetLeft + delta.x + "px";
+    //firstWidth += delta.x;
+    secondWidth -= delta.x;
+
     drag.x = currentX;
-    drag.y = currentY;
     //first.style.width = firstWidth + "px";
     second.style.width = secondWidth + "px";
   }
