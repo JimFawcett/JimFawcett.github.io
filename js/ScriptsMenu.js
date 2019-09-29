@@ -69,9 +69,10 @@ function initializeMenu() {
         <a href='Tests.html'>UI Widget Tests</a>\
         <a href='https://encycolorpedia.com/named'>Web Colors</a>\
         <a href='UML.html'>UML Diagrams</a>\
-        <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams</a>\
+        <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a>\
         <a href='CppReferences.html'>C++ References</a>\
         <a href='CppExamples.html'>C++ Example Code</a>\
+        <div>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
