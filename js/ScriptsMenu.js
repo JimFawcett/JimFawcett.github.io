@@ -235,23 +235,33 @@ function initializeMenu() {
 //----< load page defined in current page's Prev link >--------------
 
 function loadPrev() {
-  document.getElementById("Prev").click();
+  try {
+    document.getElementById("Prev").click();
+  }
+  catch (err) {
+    console.log('exception: ' + err);
+  }
 }
 //----< load page defined in current page's Next link >--------------
 
 function loadNext() {
-  document.getElementById("Next").click();
+  try {
+    document.getElementById("Next").click();
+  }
+  catch (err) {
+    console.log('exception: ' + err);
+  }
 }
 //----< load page defined in current page's Lect link >--------------
 
-function loadLect() {
-  document.getElementById("Lect").click();  // Lect link is near top of first lect page
-}
-//----< load page defined in current page's Cour link >--------------
+//function loadLect() {
+//  document.getElementById("Lect").click();  // Lect link is near top of first lect page
+//}
+////----< load page defined in current page's Cour link >--------------
 
-function loadCour() {
-  document.getElementById("Cour").click();  // Cour link is near top of course page
-}
+//function loadCour() {
+//  document.getElementById("Cour").click();  // Cour link is near top of course page
+//}
 //----< hide, progressively, menu items on the left >----------------
 /*
 *  This let's user see menu items that overflow on the right
