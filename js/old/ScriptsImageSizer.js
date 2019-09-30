@@ -25,24 +25,17 @@ function dragElement(element, figStr) {
   const drag = { x: 0 };
   const delta = { x: 0 };
 
-  //element.onmousedown = dragMouseDown;
-  //element.ontouchstart = dragMouseDown;
-  element.addEventListener("mousedown", dragMouseDown, false);
-  element.addEventListener("touchstart", dragMouseDown, false);
+  element.onmousedown = dragMouseDown;
+  element.ontouchstart = dragMouseDown;
 
   // function that will be called whenever the down event of the mouse is raised
   function dragMouseDown(e) {
     console.log('entered dragMouseDown');
     drag.x = unify(e).clientX;
-    document.addEventListener("mousemove", onMouseMove, false);
-    document.addEventListener("touchmove", onMouseMove, false);
-    document.addEventListener("mouseup", () => { document.removeEventListener("mousemove", onMouseMove); });
-    document.addEventListener("touchend", () => { document.removeEventListener("touchmove", onMouseMove); });
-
-    //document.onmousemove = onMouseMove;
-    //document.ontouchmove = onMouseMove;
-    //document.onmouseup = () => { document.onmousemove = document.onmouseup = null; };
-    //document.ontouchend = () => { document.ontouchemove = document.ontouchend = null; };
+    document.onmousemove = onMouseMove;
+    document.ontouchmove = onMouseMove;
+    document.onmouseup = () => { document.onmousemove = document.onmouseup = null; };
+    document.ontouchend = () => { document.ontouchemove = document.ontouchend = null; };
   }
 
   // function that will be called whenever the up event of the mouse is raised
