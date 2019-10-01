@@ -73,6 +73,7 @@ function initializeMenu() {
         <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a>\
         <a href='CppReferences.html'>C++ References</a>\
         <a href='CppExamples.html'>C++ Example Code</a>\
+        <a href='Interviews.html'>Job Interviews</a>\
         <div>&nbsp;</div>\
       </div>\
     </div>\

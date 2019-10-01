@@ -73,6 +73,8 @@ function initializeMenu() {
         <a href='https://encycolorpedia.com/named'>Web Colors</a>\
         <a href='CppReferences.html'>C++ References</a>\
         <a href='CppExamples.html'>C++ Examples</a>\
+        <a href='Interviews.html'>Job Interviews</a>\
+        <div>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
