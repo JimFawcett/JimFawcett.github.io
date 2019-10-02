@@ -9,7 +9,7 @@ function bigger(id) {
   let width = pict.style.width;                         // "100px"
   let truncWidth = width.substr(0, width.length - 2);   // "100"
   let value = Number(truncWidth);                       // 100
-  value = 1.2 * value;                                  // 120
+  value = 1.35 * value;                                  // 120
   let newWidth = value.toString();                      // "120"
   newWidth = newWidth + "px";                           // "120px"
   pict.style.width = newWidth;
@@ -22,7 +22,7 @@ function smaller(id) {
   let width = pict.style.width;                         // "100px"
   let truncWidth = width.substr(0, width.length - 2);   // "100"
   let value = Number(truncWidth);                       // 100
-  value = value/1.2;                                    // 120
+  value = value/1.35;                                    // 120
   let newWidth = value.toString();                      // "120"
   newWidth = newWidth + "px";                           // "120px"
   pict.style.width = newWidth;
