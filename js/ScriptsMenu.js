@@ -103,6 +103,7 @@ function initializeMenu() {
         <a href='https://JimFawcett.github.io'>JimFawcett-github</a>\
         <a href='https://www.ecs.syr.edu/faculty/fawcett'>JimFawcett-SyracuseUniv</a>\
         <a href='https://csiac.org'>CSIAC</a>\
+        <a href='https://www.fluentcpp.com'>Fluent {C++}</a>\
       </div >\
     </div>\
     <div class='dropdown menuItem'>\
