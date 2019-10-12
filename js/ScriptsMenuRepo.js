@@ -18,8 +18,8 @@ function initializeMenu() {
     <a href='Repositories.html' class='menuItem'>Repos</a>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Utils &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Utilities</div>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Utilities</div>\
         <a href='CppUtilities.html'>CppUtilities</a>\
         <a href='FileUtilities.html'>FileUtilities</a>\
         <a href='Logger.html'>Logger</a>\
@@ -27,8 +27,8 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Tools &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Tools</div>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Tools</div>\
         <a href='TextFinder.html'>TextFinder</a>\
         <a href='Duplicates.html'>Duplicates</a>\
         <a href='FileDates.html'>FileDates</a>\
@@ -41,8 +41,8 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Cmpnts &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Components</div>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Components</div>\
         <a href='CppBlockingQueue.html'>CppBlockingQueue</a>\
         <a href='FileManager.html'>File Manager</a>\
         <a href='CppProperties.html'>CppProperties</a>\
@@ -57,8 +57,8 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Libs &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Libraries</div>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Libraries</div>\
         <a href='FileSystem.html'>FileSystem-Windows</a>\
         <a class='disable' href='FileSystem.html'>FileSystem-Linux</a>\
         <a href='Sockets.html'>Sockets-Windows</a>\
@@ -69,8 +69,8 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Projs &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Projects</div>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Projects</div>\
         <a href='SitePages.html'>SitePages</a>\
         <a href='StoryTellerRepo.html'>StoryTeller</a>\
         <a href='CppParser.html'>CppParser</a>\
@@ -82,8 +82,8 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Demos &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Demonstrations</div>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Demonstrations</div>\
         <a href='CppBasicDemos.html'>C++&nbsp;Basic&nbsp;Demos</a>\
         <a href='STR.html'>STR&nbsp;Value&nbsp;Type</a>\
         <a href='CompoundObjects.html'>CompoundObjects</a>\
@@ -99,7 +99,8 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Build &#9662;</button>\
-      <div class='dropdown-content'>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Builds</div>\
         <a class='disable' href='#'>Build Demo</a>\
         <a class='disable' href='#'>Build Structure</a>\
         <a class='disable' href='#'>Build from repo</a>\
@@ -107,7 +108,8 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
-      <div class='dropdown-content'>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;About</div>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
         <a href='Friends.html'>Friends&nbsp;&amp&nbsp;Collaborators&nbsp;&nbsp;</a>\
         <a href='Help.html'>Help</a>\
@@ -121,7 +123,6 @@ function initializeMenu() {
         <a class='border' href='LangCpp.html'>L2&nbsp;C++&nbsp;webpage</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
-        <a href='Menus.html'>Menus</a>\
       </div>\
     </div>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\

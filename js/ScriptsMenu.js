@@ -18,16 +18,16 @@ function initializeMenu() {
     <a href='Repositories.html' class='menuItem'>Repos</a>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Notes &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Developing&nbsp;Code&nbsp;</div>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Developing&nbsp;Code&nbsp;</div>\
         <a href='DesignProcess.html'>Design Process</a>\
         <a href='ProjectsList.html'>Project suggestions</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Blogs &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Opinions&nbsp;and&nbsp;Ideas&nbsp;</div>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Opinions&nbsp;and&nbsp;Ideas&nbsp;</div>\
         <a href='Blog.html'>First&nbsp;Things</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
         <a href='BlogDesign.html'>SW&nbsp;Design</a>\
@@ -55,8 +55,8 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Resources &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
         <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
         <a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a>\
         <a href='CppSynopsis.html'>C++ Synopsis</a>\
@@ -79,11 +79,11 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>P&L &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;OS&nbsp;Platforms</div>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;OS&nbsp;Platforms</div>\
         <a href='PlatformWindows.html'>Windows</a>\
         <a href='PlatformLinux.html'>Linux</a>\
-        <div class='darkTheme'>&nbsp;Languages</div>\
+        <div class='darkItem maxWidth'>&nbsp;Languages</div>\
         <a href='LangCpp.html'>C++</a>\
         <a href='LangCSharp.html'>C#</a>\
         <a href='LangPowerShell'>PowerShell</a>\
@@ -98,8 +98,8 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Nbrhds &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Site&nbsp;Neighborhoods</div>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Site&nbsp;Neighborhoods</div>\
         <a href='https://JimFawcett.github.io'>JimFawcett-github</a>\
         <a href='https://www.ecs.syr.edu/faculty/fawcett'>JimFawcett-SyracuseUniv</a>\
         <a href='https://csiac.org'>CSIAC</a>\
@@ -108,8 +108,8 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Stories &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Ordered&nbsp;Content</div>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Ordered&nbsp;Content</div>\
         <a href='Stories.html'>What is a Story?</a>\
         <a href='StoryTeller_LocalStorage.html'>Load Story List</a>\
         <a href='StoryTellerDesign.html'>StoryTeller Design</a>\
@@ -125,8 +125,8 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;About&nbsp;this&nbsp;Site</div>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;About&nbsp;this&nbsp;Site</div>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
         <a href='Friends.html'>Friends&nbsp;&amp&nbsp;Collaborators&nbsp;&nbsp;</a>\
         <a href='Help.html'>Help</a>\
