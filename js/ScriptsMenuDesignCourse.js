@@ -15,19 +15,19 @@ function initializeMenu() {
   var topMenu = document.getElementsByTagName("nav");
   topMenu[0].innerHTML = "<div class='navbar'>\
     <a href='index.html' class='menuItem'>Home</a>\
-    <a href='Repositories.html' class='menuItem darkItem' style='margin:0px;'>Repos</a>\
+    <a href='Repositories.html' class='menuItem' style='margin:0px;'>Repos</a>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Notes &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Developing&nbsp;Code</div>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Developing&nbsp;Code</div>\
         <a href='DesignProcess.html'>Design Process</a>\
         <a href='ProjectsList.html'>Project suggestions</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Blogs &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Opinions&nbsp;and&nbsp;Ideas</div>\
+      <div class='dropdown-content noScrollX''>\
+        <div class='darkItem maxWidth'>&nbsp;Opinions&nbsp;and&nbsp;Ideas</div>\
         <a href='Blog.html'>First&nbsp;Things</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
         <a href='BlogDesign.html'>SW&nbsp;Design</a>\
@@ -55,8 +55,8 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Resources &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Coding&nbsp;Resources</div>\
+      <div class='dropdown-content noScrollX''>\
+        <div class='darkItem maxWidth'>&nbsp;Coding&nbsp;Resources</div>\
         <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
         <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
         <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
@@ -73,8 +73,8 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Prog Lang &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Programming&nbsp;Languages&nbsp;</div>\
+      <div class='dropdown-content noScrollX''>\
+        <div class='darkItem maxWidth'>&nbsp;Programming&nbsp;Languages&nbsp;</div>\
         <a href='LangCpp.html'>C++</a>\
         <a class='disable' href='#'>C#</a>\
         <a class='disable' href='#'>HTML</a>\
@@ -88,8 +88,8 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Design Book &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Book&nbsp;Contents&nbsp;</div>\
+      <div class='dropdown-content noScrollX''>\
+        <div class='darkItem maxWidth'>&nbsp;Book&nbsp;Contents&nbsp;</div>\
         <a class='disable' href='#'>Table of Contents</a>\
         <a class='disable' href='#'>Concept&nbsp;and&nbsp;Tasks&nbsp;(TextFinder)</a>\
         <a class='disable' href='#'>Classes (CppUtilities)</a>\
@@ -105,12 +105,13 @@ function initializeMenu() {
         <a class='disable' href='#'>Appendix:&nbsp;<u>U</u>niversal&nbsp;<u>M</u>odeling&nbsp;<u>L</u>anguage</a>\
         <a class='disable' href='#'>Appendix:&nbsp;Implementation&nbsp;metrics</a>\
         <a class='disable' href='#'>Appendix: Design Patterns</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;About&nbsp;this&nbsp;Site</div>\
+      <div class='dropdown-content noScrollX''>\
+        <div class='darkItem maxWidth'>&nbsp;About&nbsp;this&nbsp;Site</div>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
         <a href='Help.html'>Help</a>\
         <a href='ToDo.html'>ToDo</a>\
@@ -124,6 +125,7 @@ function initializeMenu() {
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
         <a href='Menus.html'>Menus</a>\
+        <span>&nbsp;</a>\
       </div>\
     </div>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\
