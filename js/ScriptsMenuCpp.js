@@ -74,7 +74,7 @@ function initializeMenu() {
         <a href='CppReferences.html'>C++ References</a>\
         <a href='CppExamples.html'>C++ Examples</a>\
         <a href='Interviews.html'>Job Interviews</a>\
-        <div>&nbsp;</div>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -96,6 +96,7 @@ function initializeMenu() {
         <a href='DesignNote-Cpp11.html'>C++11</a>\
         <a href='DesignNote-CompoundObjects.html'>Compound Objects</a>\
         <a href='Templates.html'>Templates</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -108,6 +109,7 @@ function initializeMenu() {
         <a href='IOStreams.html'>std::iostream demos</a>\
         <a href='CppThreads.html'>basic c++11 thread demos</a>\
         <a href='ProcsAndThreads.html'>Process and Thread demos</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -127,6 +129,7 @@ function initializeMenu() {
         <a class='disable' href='#'>Properties</a>\
         <a href='CodeSnap-BlockingQueue.h.html'>BlockingQueue</a>\
         <a href='CodeSnap-TestUtilities.h.html'>TestUtilities</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
      </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -146,8 +149,7 @@ function initializeMenu() {
         <a class='border' href='LangCpp.html'>L2&nbsp;C++&nbsp;webpage</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
-        <a href='Menus.html'>Menus</a>\
-        <a href='TestFileLoad.html'>TestFileLoad</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\

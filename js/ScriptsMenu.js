@@ -22,6 +22,7 @@ function initializeMenu() {
         <div class='darkItem maxWidth'>&nbsp;Developing&nbsp;Code&nbsp;</div>\
         <a href='DesignProcess.html'>Design Process</a>\
         <a href='ProjectsList.html'>Project suggestions</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -74,7 +75,7 @@ function initializeMenu() {
         <a href='CppReferences.html'>C++ References</a>\
         <a href='CppExamples.html'>C++ Example Code</a>\
         <a href='Interviews.html'>Job Interviews</a>\
-        <div>&nbsp;</div>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -94,6 +95,7 @@ function initializeMenu() {
         <a class='disable' href='#'>Rust</a>\
         <a class='disable' href='#'>Go</a>\
         <a class='disable' href='#'>Python</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -104,6 +106,7 @@ function initializeMenu() {
         <a href='https://www.ecs.syr.edu/faculty/fawcett'>JimFawcett-SyracuseUniv</a>\
         <a href='https://csiac.org'>CSIAC</a>\
         <a href='https://www.fluentcpp.com'>Fluent {C++}</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div >\
     </div>\
     <div class='dropdown menuItem'>\
@@ -121,6 +124,7 @@ function initializeMenu() {
         <a class='disable' href='#'>Building&nbsp;Repository&nbsp;Code&nbsp;</a>\
         <a class='disable' href='#'>Design Examples</a>\
         <a class='disable' href='#'>Building Complex Systems</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div >\
     </div>\
     <div class='dropdown menuItem'>\
@@ -140,8 +144,7 @@ function initializeMenu() {
         <a class='border' href='LangCpp.html'>L2&nbsp;C++&nbsp;webpage</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
-        <a href='Menus.html'>Menus</a>\
-        <a href='TestFileLoad.html'>TestFileLoad</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\
