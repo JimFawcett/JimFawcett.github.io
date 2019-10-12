@@ -17,6 +17,8 @@
   <script src="js/ScriptsTemplate.js"></script>
   <script src="js/ScriptsKeyboard.js"></script>
   <script src="js/ScriptsMenu.js"></script>
+  <script src="js/ScriptsSizerComp.js"></script>
+  <link rel="stylesheet" href="css/StylesSizerComp.css" />
   <link rel="stylesheet" href="css/StylesTemplate.css" />
   <link rel="stylesheet" href="css/StylesMenu.css" />
   <link rel="stylesheet" href="css/StylesBrownTheme.css" />
@@ -77,16 +79,7 @@
   Another style is based on one-way asynchronous message channels between a sender on one peer and a receiver on another, as shown
   in the diagram below.  Each of these "peers" might be located on seperate machines or in seperate processes in the same
   machine.
-  <div style="float:right; padding:0px 0px 20px 20px; width:60%; margin-top:10px;">
-    <div class="photo" style="margin:0px;">
-      <img src="Pictures/AsyncMsgPassComm.jpg" width="99%" />
-      <div style="padding:10px;">
-        <strong>Figure 1. - Peer-To-Peer Communication</strong>
-        <spacer-10></spacer-10>
-        Note that message processing on Communication Peers may not be functionally identical.
-      </div>
-    </div>
-  </div>
+  <div id="fig1"></div>
   Each peer contains a sender and receiver package.  The sender communicates with one receiver at a time.  The receivers
   each handle concurrent senders by accepting messages in a receive queue.  Often those messages are processed sequentially
   by a single thread.  This means that the receiver and consequential processing do not have to be thread safe, as long as
@@ -111,17 +104,7 @@
   reply, then, since there will be multiple senders, the message needs a return address.  The message also needs to define
   the requested operation and provide any parameters needed to carry out the requested action.
   <p></p>
-  <div style="float:right; padding:0px 0px 20px 20px; width:60%; margin-top:10px;">
-    <div class="photo" style="margin:0px;">
-      <img src="Pictures/WCF-MsgPassing.PNG" width="100%" />
-      <div style="padding:10px;">
-        <strong>Figure 2. - WCF Message-Passing Communication</strong>
-        <spacer-10></spacer-10>
-        Receivers are wrappers around a WCF Service.<br />
-        Senders are wrappers around a proxy for the WCF Service.
-      </div>
-    </div>
-  </div>
+  <div id="fig2"></div>
   <h4>WCF Communication:</h4>
   If we use a communcation framework
   like Windows Communication Foundation (WCF), then each message will consist of a Simple Object Access Protocol (SOAP) wrapper
@@ -140,17 +123,7 @@
   a blank line.  If the message contains a content-length:483 attribute, that implies that the header is followed with a body
   containing 483 bytes of data, which need not be text.
   <p></p>
-  <div style="float:right; padding:0px 0px 20px 20px; width:60%; margin-top:10px;">
-    <div class="photo" style="margin:0px;">
-      <img src="Pictures/Socket-MsgPassing.PNG" width="100%" />
-      <div style="padding:10px;">
-        <strong>Figure 3. - Socket Message-Passing Communication</strong>
-        <spacer-10></spacer-10>
-        Receivers use Socket listeners that wait for connections.<br />
-        Senders use a connection socket.
-      </div>
-    </div>
-  </div>
+  <div id="fig3"></div>
   Receivers instantiate a socket listener, running on its own thread.  When a connection is established, the listener passes
   a work-item to a thread pool thread that contains the connected socket and a reference to the blocking queue.  When a thread
   pool thread is available, it begins framing messages by pulling bytes out of the socket, reading lines from the message header
@@ -174,20 +147,7 @@
   will simply write incoming blocks into a file, but not post them to the receive queue.  When transfer is complete it posts
   a message to the queue so the message processor knows a file has arrived.
   <p />
-  <div style="float:right; padding:0px 0px 20px 20px; width:70%; margin-top:10px;">
-    <div class="photo" style="margin:0px;">
-      <img src="Pictures/ChannelStructure.JPG" width="100%" />
-      <div style="padding:10px;">
-        <strong>Figure 4. - Socket-based Channel Structure</strong>
-        <spacer-10></spacer-10>
-        Each Sender connection is handled at the Receiver by a ClientHandler thread.  Each thread frames messages from
-        its client and enqueues them for server processing.
-        <spacer-10></spacer-10>
-        File transfer is handled with messages, using chunking.  Chunks are written to a Receiver's file, and, when done
-        a message is enqueued telling the server that a file arrived.
-      </div>
-    </div>
-  </div>
+  <div id="fig4"></div>
   <h4>Channel Structure</h4>
   We show, in Figure 4., details of the channel processing.  Each peer has a Comm component that contains both a Sender
   and a Receiver, so the Peers are depicted as mirror images in the diagram.
@@ -207,33 +167,8 @@
   This asynchronous message-passing communication is very fluid.  It establishes conversations, much like email exchanges,
   with its peers.  Of course, this flexibility is bought at the expense of sockets and threads at each end, but is very
   easy to set up and use.
-  <div style="float:right; padding:0px 0px 20px 20px; width:70%; margin-top:10px;">
-    <div class="photo" style="margin:0px;">
-      <img src="Pictures/MessageStructure.jpg" width="100%" />
-      <div style="padding:10px;">
-        <strong>Figure 5. - Message Structure</strong>
-        <spacer-10></spacer-10>
-        Messages consist of a header, composed of text lines, and an optional body, that may contain binary bytes.
-        This is the style originated by the HTTP protocol.
-        <spacer-10></spacer-10>
-        Our messages may not follow exactly the HTTP protocol,
-        but they are very similar.  Each header has a command and a set of attributes.  The end of the header is
-        signaled by a blank line.
-      </div>
-    </div>
-  </div>
-  <div style="float:right; padding:0px 0px 20px 20px; width:70%; margin-top:10px;">
-    <div class="photo" style="margin:0px;">
-      <img src="Pictures/MPC_ClassDiagram.jpg" width="100%" />
-      <div style="padding:10px;">
-        <strong>Figure 6. - Message-Passing Comm Class Diagram</strong>
-        <spacer-10></spacer-10>
-        Each Peer contains a Comm instance.  The Comm class composes a Sender and a Receiver instance, both of
-        which use a thread-safe blocking queue and a socket library with a base Socket class and derivedf
-        SocketListener and SocketConnecter classes.
-      </div>
-    </div>
-  </div>
+  <div id="fig5"></div>
+  <div id="fig6"></div>
   <h4>Message Structure</h4>
   Messages are similar to those used for HTTP communication.  We add &quot;to&quot; and &quot;from&quot; attributes
   and frequenly use custome attributes to provide information needed by the receiver.  Our messages start with a
@@ -308,5 +243,13 @@
   <spacer-25></spacer-25>
   <img class="photo" src="Pictures/facultyCenterStrip.jpg" width="100%" />
   <info-bar></info-bar>
+  <script>
+    createSizer("Pictures/AsyncMsgPassComm.jpg", "Fig 1. Peer-to-Peer Communication", 500, "fig1");
+    createSizer("Pictures/WCF-MsgPassing.PNG", "Fig 2. WCF Message-Passing Communication", 500, "fig2");
+    createSizer("Pictures/Socket-MsgPassing.PNG", "Fig 3. Socket Message-Passing Communication", 500, "fig3");
+    createSizer("Pictures/ChannelStructure.JPG", "Fig 4. Socket-based Channel Structure", 500, "fig4");
+    createSizer("Pictures/MessageStructure.jpg", "Fig 5. Message Structure", 500, "fig5");
+    createSizer("Pictures/MPC_ClassDiagram.jpg", "Fig 6. Message-passing Comm Class Diagram", 500, "fig6");
+  </script>
 </body>
 </html>
