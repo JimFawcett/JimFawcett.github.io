@@ -71,6 +71,7 @@ function initializeMenu() {
         <a href='Tests.html'>UI Widget Tests</a>\
         <a href='https://encycolorpedia.com/named'>Web Colors</a>\
         <a href='UML.html'>UML Diagrams</a>\
+        <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
         <a href='https://github.com/joshnh/Git-Commands'>git commands</a>\
         <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
         <a href='SummerReading.html'>Summer Reading</a>\
@@ -116,14 +117,7 @@ function initializeMenu() {
         <a href='Stories.html'>What is a Story?</a>\
         <a href='StoryTeller_LocalStorage.html'>Load Story List</a>\
         <a href='StoryTellerDesign.html'>StoryTeller Design</a>\
-        <a class='disable' href='#'>C++ Ecosystem</a>\
-        <a class='disable' href='#'>Site Story</a>\
-        <a class='disable' href='#'>Repository&nbsp;Content</a>\
-        <a class='disable' href='#'>Using&nbsp;Visual&nbsp;Studio</a>\
-        <a class='disable' href='#'>Using&nbsp;VS&nbsp;Code</a>\
-        <a class='disable' href='#'>Building&nbsp;Repository&nbsp;Code&nbsp;</a>\
-        <a class='disable' href='#'>Design Examples</a>\
-        <a class='disable' href='#'>Building Complex Systems</a>\
+        <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div >\
     </div>\
