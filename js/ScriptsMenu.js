@@ -82,7 +82,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>P&L &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;OS&nbsp;Platforms</div>\
+        <div class='darkItem maxWidth'>&nbsp;OS&nbsp;Platforms&nbsp;&nbsp;</div>\
         <a href='PlatformWindows.html'>Windows</a>\
         <a href='PlatformLinux.html'>Linux</a>\
         <div class='darkItem maxWidth'>&nbsp;Languages</div>\
