@@ -17,11 +17,10 @@ function initializeMenu() {
     <a href='index.html' class='menuItem'>Home</a>\
     <a href='Repositories.html' class='menuItem'>Repos</a>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Notes &#9662;</button>\
+      <button class='dropbutton'>Videos &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;Developing&nbsp;Code&nbsp;</div>\
-        <a href='DesignProcess.html'>Design Process</a>\
-        <a href='ProjectsList.html'>Project suggestions</a>\
+        <div class='darkItem maxWidth'>&nbsp;Site&nbsp;Videos&nbsp;</div>\
+        <a href='https://www.youtube.com/watch?v=hjtY2BlG5l0'>Publishing&nbsp;Code&nbsp;&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
@@ -58,9 +57,11 @@ function initializeMenu() {
       <button class='dropbutton'>Resources &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
+        <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a>\
+        <a href='DesignProcess.html'>Design Process</a>\
+        <a href='ProjectsList.html'>Project suggestions</a>\
         <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
         <a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a>\
-        <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a>\
         <a href='CppReferences.html'>C++ References</a>\
         <a href='CppExamples.html'>C++ Example Code</a>\
         <a href='CppSynopsis.html'>C++ Synopsis</a>\
