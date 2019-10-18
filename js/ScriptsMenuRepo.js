@@ -47,6 +47,7 @@ function initializeMenu() {
         <a href='FileManager.html'>File Manager</a>\
         <a href='CppProperties.html'>CppProperties</a>\
         <a href='ThreadPool.html'>ThreadPool</a>\
+        <a href='CppNoSqlDb.html'>CppNoSqlDb</a>\
         <a href='Process.html'>Process</a>\
         <a href='CppConcurrentFileAccess.html'>CppConcurrentFileAccess</a>\
         <a href='CppLexicalScanner.html'>CppLexicalScanner</a>\
