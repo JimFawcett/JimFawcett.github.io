@@ -21,6 +21,7 @@ function initializeMenu() {
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Site&nbsp;Videos&nbsp;</div>\
         <a href='https://www.youtube.com/watch?v=hjtY2BlG5l0'>Publishing&nbsp;Code&nbsp;&nbsp;</a>\
+        <a href='Resources/PublishingSourceCode.pdf'>Pub&nbsp;Code&nbsp;pdf&nbsp;&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
