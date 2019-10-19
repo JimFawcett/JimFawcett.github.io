@@ -110,8 +110,8 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;About</div>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
+        <a href='Interesting.html'>Things&nbsp;I&nbsp;find&nbsp;interesting&nbsp;&nbsp;</a>\
         <a href='Friends.html'>Friends&nbsp;&amp&nbsp;Collaborators&nbsp;&nbsp;</a>\
         <a href='Help.html'>Help</a>\
         <a href='ToDo.html'>ToDo</a>\
@@ -124,6 +124,7 @@ function initializeMenu() {
         <a class='border' href='LangCpp.html'>L2&nbsp;C++&nbsp;webpage</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\

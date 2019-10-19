@@ -128,6 +128,7 @@ function initializeMenu() {
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;About&nbsp;this&nbsp;Site</div>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
+        <a href='Interesting.html'>Things&nbsp;I&nbsp;find&nbsp;interesting&nbsp;&nbsp;</a>\
         <a href='Friends.html'>Friends&nbsp;&amp&nbsp;Collaborators&nbsp;&nbsp;</a>\
         <a href='Help.html'>Help</a>\
         <a href='ToDo.html'>ToDo</a>\
