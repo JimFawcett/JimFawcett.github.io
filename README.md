@@ -8,5 +8,5 @@ get new tests and added functionality.  There will also be new code projects tha
 from Syracuse University, and there will be more focus on Linux code as well as Windows.
 
 <strong>Status:</strong>
-I've just started this website.  A few of the links do not work yet, and there are pages to add.
-Progress will be slow over the summer due to vacation plans, but by late August 2019 the pace will pick up.
+The site now has more than 40 repositories of mostly C++ code, all with documentation.  I've just started adding videos about the 
+site content.  There are a lot of planned updates: https://JimFawcett.github.io/SitePlans.html.
