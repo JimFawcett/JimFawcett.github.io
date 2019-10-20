@@ -15,7 +15,15 @@ function initializeMenu() {
   var topMenu = document.getElementsByTagName("nav");
   topMenu[0].innerHTML = "<div class='navbar'>\
     <a href='index.html' class='menuItem'>Home</a>\
-    <a href='Repositories.html' class='menuItem'>Repos</a>\
+    <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Repos &#9662;</button>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Code&nbsp;Repositories&nbsp;&nbsp;</div>\
+        <a href='CppRepositories.html'>C++&nbsp;Repositories&nbsp;&nbsp;</a>\
+        <a href='CsRepositories.html'>C#&nbsp;Repositories&nbsp;&nbsp;</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
+      </div>\
+    </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Utils &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
