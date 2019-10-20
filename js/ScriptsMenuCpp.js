@@ -140,7 +140,7 @@ function initializeMenu() {
         <a href='Interesting.html'>Things&nbsp;I&nbsp;find&nbsp;interesting&nbsp;&nbsp;</a>\
         <a href='Friends.html'>Friends&nbsp;&amp&nbsp;Collaborators&nbsp;&nbsp;</a>\
         <a href='Help.html'>Help</a>\
-        <a href='ToDo.html'>ToDo</a>\
+        <a href='SitePlans.html'>Site Plans</a>\
         <a href='#' onclick='togglenavKeys()'>Toggle Nav Keys</a>\
         <a href='#' onclick='toggleSwipeEvents()'>Toggle Swipe Events</a>\
         <a href='SiteDesign.html'>Site Design</a>\

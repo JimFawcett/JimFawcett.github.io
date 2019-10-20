@@ -114,7 +114,7 @@ function initializeMenu() {
         <div class='darkItem maxWidth'>&nbsp;About&nbsp;this&nbsp;Site</div>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
         <a href='Help.html'>Help</a>\
-        <a href='ToDo.html'>ToDo</a>\
+        <a href='SitePlans.html'>Site Plans</a>\
         <a href='#' onclick='togglenavKeys()'>Toggle Nav Keys</a>\
         <a href='#' onclick='toggleSwipeEvents()'>Toggle Swipe Events</a>\
         <a href='SiteDesign.html'>Site Design</a>\

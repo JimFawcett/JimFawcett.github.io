@@ -109,6 +109,9 @@ function initializeMenu() {
         <a href='https://www.ecs.syr.edu/faculty/fawcett'>JimFawcett-SyracuseUniv</a>\
         <a href='https://csiac.org'>CSIAC</a>\
         <a href='https://www.fluentcpp.com'>Fluent {C++}</a>\
+        <a href='https://www.boost.org/'>Boost&nbsp;Library&nbsp;(C++)</a>\
+        <a href='https://www.pocoproject.org/'>poco&nbsp;Library&nbsp;(C++ networking)</a>\
+        <a href='https://openframeworks.cc/'>openFrameworks&nbsp;(C++ graphics)</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div >\
     </div>\
@@ -131,7 +134,7 @@ function initializeMenu() {
         <a href='Interesting.html'>Things&nbsp;I&nbsp;find&nbsp;interesting&nbsp;&nbsp;</a>\
         <a href='Friends.html'>Friends&nbsp;&amp&nbsp;Collaborators&nbsp;&nbsp;</a>\
         <a href='Help.html'>Help</a>\
-        <a href='ToDo.html'>ToDo</a>\
+        <a href='SitePlans.html'>Site Plans</a>\
         <a href='#' onclick='togglenavKeys()'>Toggle Nav Keys</a>\
         <a href='#' onclick='toggleSwipeEvents()'>Toggle Swipe Events</a>\
         <a href='SiteDesign.html'>Site Design</a>\
