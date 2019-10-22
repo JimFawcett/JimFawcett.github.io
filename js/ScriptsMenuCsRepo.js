@@ -40,12 +40,18 @@ function initializeMenu() {
       <button class='dropbutton'>Cmpnts &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Components</div>\
+        <a href='CsBlockingQueue.html'>CsBlockingQueue</a>\
+        <a href='CsNavigator.html'>CsNavigator</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Libs &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Libraries</div>\
+        <a href='CsConcurrentFileAccess.html'>CsConcurrentFileAccess</a>\
+        <a href='CsGraph.html'>CsGraph</a>\
+        <a href='CsParser.html'>CsParser</a>\
+        <a href='CsXDocument.html'>CsXDocument</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -53,12 +59,19 @@ function initializeMenu() {
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Projects</div>\
         <a href='CsDependencyAnalysis.html'>CsDependencyAnalysis</a>\
+        <a href='CsCommPrototype.html'>CsCommPrototype</a>\
+        <a href='CsRemotePluggableRepo.html'>CsRemotePluggableRepo</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Demos &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Demonstrations</div>\
+        <a href='CsBasicDemos.html'>CsBasicDemos</a>\
+        <a href='Cs_WCF_Demos.html'>WCF Demos</a>\
+        <a href='Cs_WPF_Demos.html'>WPF Demos</a>\
+        <a href='CsProcess.html'>CsProcess</a>\
+        <a href='CsPublisherSubscriber.html'>CsPublisherSubscriber</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\

@@ -2,7 +2,7 @@
 <html>
 <head>
   <!--
-   - CppThreads.html
+   - CsConcurrentFileAccess.html
    - ver 1.0 - 10 June 2019
    - Jim Fawcett, Emeritus Teaching Professor, Syracuse University
   -->
@@ -11,7 +11,7 @@
   <meta name="keywords" content="Repository, Design, Code" />
   <meta name="Author" content="Jim Fawcett" />
   <meta name="Author" content="James Fawcett" />
-  <title>CppThreads</title>
+  <title>CsConcurrentFileAccess</title>
   <script src="js/ScriptsUtilities.js"></script>
   <script src="js/ScriptsTemplate.js"></script>
   <script src="js/ScriptsKeyboard.js"></script>
@@ -43,44 +43,77 @@
   <a id="Prev" href="IOStreams.html">P</a>
 
   <header>
-    <a class="repoLink" href="https://github.com/JimFawcett/CppThreads">CppThreads code</a>
+    <a class="repoLink" href="https://github.com/JimFawcett/CsConcurrentFileAccess">CsConcurrentFileAccess code</a>
     <hgroup id="pagetitle">
-      <h1 id="title">CppThreads&nbsp;&nbsp;Repository</h1>
-      <h3 id="subtitle">Code illustrates a lot of the C++ thread library capabilities</h3>
+      <h1 id="title">CsConcurrentFileAccess&nbsp;&nbsp;Repository</h1>
+      <h3 id="subtitle">Supports multiple concurrent file readers and writers</h3>
     </hgroup>
   </header>
 
   <hr class="spread" />
   <indent-block>
-    <h3>Contents:</h3>
+    <h3>Concept:</h3>
     <indent-block>
-      This repository provides a collection of thread useage demos and examples of Tasks.
+      When a thread has opened a file for reading or writing, the .Net System.IO.File class will throw an exception
+      if another file attempts to open for either reading<sup>1</sup> or writing.  This small library
+      supports concurrent access by catching thrown exceptions, sleeping for a small interval and 
+      retrying the file open operation.  It will do that a finite number of times before declaring
+      failure<sup>2</sup>.
+    </indent-block>
+    <h3>Design:</h3>
+    <indent-block>
+      The library provides two classes:
       <ul>
         <li>
-          <strong>Cpp11-Concurrency</strong><br />
-          A set of about a dozen projects that illustrate basic thread operations.
+          FileReader with methods:
+          <ul class="tight">
+            <li>bool Open(string filename)</li>
+            <li>void Close()</li>
+            <li>
+              int ReadFile(string filename) - uses Open and Close
+            </li>
+            <li>
+              byte[] LastFileRead() - returns all bytes in filename
+            </li>
+          </ul>
+          and properties:
+          <ul class="tight">
+            <li>
+              int NumAttempts - number of attempts to Open
+            </li>
+            <li>
+              int NumFailures - number of failures to Open
+            </li>
+            <li>
+              int SleepMilliSecs - time to wait in milliseconds between attempts to Open
+            </li>
+          </ul>
         </li>
         <li>
-          <strong>Cpp11-ThreadTechniques</strong><br />
-          Techniques for interoperating with threads, including passing and returning values.
-        </li>
-        <li>
-          <strong>Cpp11-ThreadWithCallback</strong><br />
-          Example of triggering a callback when a thread completes.
-        </li>
-        <li>
-          <strong>Cpp11-Tasks</strong><br />
-          Tasks use a static threadpool for executing callable objects concurrently, e.g., pieces of work
-          needed for some analysis.
-        </li>
-        <li>
-          <strong>Cpp11-BlockingQueue</strong><br />
-          A thread-safe queue that blocks deQuer when empty.  It&apos;s implemented with a mutex and
-          condition variable.
-        </li>
-        <li>
-          <strong>LockPerformance</strong><br />
-          Compares performance of several locking constructs provided by Win32 and by C++ thread library.
+          FileWriter with methods:
+          <ul class="tight">
+            <li>
+              bool Open(string filename)
+            </li>
+            <li>
+              void Close()
+            </li>
+            <li>
+              int CopyFile(string readPath, string writePath)
+            </li>
+          </ul>
+          and properties:
+          <ul class="tight">
+            <li>
+              int NumAttempts - number of attempts to Open
+            </li>
+            <li>
+              int NumFailures - number of failures to Open
+            </li>
+            <li>
+              int SleepMilliSecs - time to wait in milliseconds between attempts to Open
+            </li>
+          </ul>
         </li>
       </ul>
     </indent-block>
@@ -88,6 +121,19 @@
     <indent-block>
       All code was built with Visual Studio, Community Edition - 2019, and tested on Windows 10.
     </indent-block>
+    <hr class="spread" />
+    <ol>
+      <li>
+        The System.IO.File class Open method supports FileShare.Read to allow multiple concurrent
+        readers access to a shared file.  That was used in this library to minimize
+        exception handling for read operations.
+      </li>
+      <li>
+        At this time, the library does not query the exception to see if continuing is feasible.
+        For example, if the error is file access denial, no amount of retrying will succeed. Eventually
+        the library will incorporate this query test.
+      </li>
+    </ol>
   </indent-block>
   <spacer-25></spacer-25>
   <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
