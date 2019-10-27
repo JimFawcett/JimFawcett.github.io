@@ -2,7 +2,7 @@
 <html>
 <head>
   <!--
-   - Test_Sizer.html - test image sizer
+   - Test_WebComponents.html - test image sizer
    - ver 1.0 - 03 August 2019
    - Jim Fawcett, Syracuse University
   -->
@@ -119,42 +119,88 @@
       background-color: #4c2f27; /* Acajou */
       color: #f2f0e6; /* Alabaster */
     }
+    .codeBlock {
+
+    }
+    #github .blue {
+      background-color:blue;
+    }
   </style>
   <script>
-    function createTemplate() {
+    function createCodeBlockTemplate() {
       let template = document.createElement('template');
       let outerBlk = document.createElement('div');
+      template.setAttribute('style', 'border:2px solid yellow');
+      outerBlk.setAttribute('id', 'outer');
       outerBlk.setAttribute(
         'style',
-        'background-color:#4c2f27; color:#f2f0e6; width:min-content; padding:0px;'
+        'width:min-content; padding:0px;' + ' border:4px solid green;'
       );
       let innerBlk = document.createElement('div');
+      innerBlk.setAttribute('id', 'inner');
       innerBlk.setAttribute(
         'style',
-        'white-space:pre; font-family:consolas, monospace;'
+        'white-space:pre; font-family:consolas, monospace; line-height:1.2;'
+        //+ 'background-color:#4c2f27; color:#f2f0e6;'
         + 'border: 1px solid red; padding: 0px 25px; '
-        + 'font-weight:bold;'
       );
       innerBlk.innerHTML = '<slot></slot>';
       outerBlk.appendChild(innerBlk);
       template.innerHTML = outerBlk.outerHTML;
       template.setAttribute('style', 'display:flex;');
+      alert(template.outerHTML);
       return template;
     }
 
     class CodeBlock extends HTMLElement {
       constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
+        this.sroot = this.attachShadow({ mode: 'open' });
       }
       connectedCallback() {
+        this.class = this.getAttribute('class');
+        //this.style.background = this.getAttribute('style.background');
+        //this.style.background = this.getAttribute('style.color');
         const { shadowRoot } = this;
-        let template = createTemplate();
+        let template = createCodeBlockTemplate();
         const node = document.importNode(template.content, true);
         shadowRoot.appendChild(node);
+        let inner = this.shadowRoot.querySelector('#inner');
+        alert('connectedCallback: ' + inner);
+        if (isDefined(inner)) {
+          alert('connectedCallback: ' + inner);
+          inner.setAttribute('class', this.class);
+          //inner.setAttribute('style', this.style);
+        }
+      }
+      static get observedAttributes() {
+        return ['class', 'style.background', 'style.color'];
+      }
+      attributeChangedCallback(attrName, oldValue, newValue) {
+        if (newValue !== oldValue) {
+          this[attrName] = this.hasAttribute(attrName);
+          const { shadowRoot } = this;
+          let inner = this.sroot.querySelector('#inner');
+          alert('attributedChangedCallback: ' + inner);
+          if (isDefined(inner))
+            inner.setAttribute(attrName, newValue);
+        }
+      }
+      set class(value) {
+        this.setAttribute('class', value);
+      }
+      get class() {
+        return this.getAttribute('class');
+      }
+      set style(value) {
+        this.setAttribute('style', value);
+      }
+      get style() {
+        return this.getAttribute('style');
       }
     }
-    window.customElements.define('coder-block', CodeBlock);
+    window.customElements.define('code-block', CodeBlock);
+
   </script>
 </head>
 <body id="github" onload="initializeMenu()">
@@ -186,92 +232,16 @@
 
   <indent-block>
     Some initial text.
-    <coder-block>
-this is a code block
-    </coder-block>
-    <coder-block>Fig 1 - a caption   </coder-block>
+    <code-block class="blue">
+class X {
+  X();
+  X(const X&amp; x);
+};
+
+<hr style="border-top:1px solid white;" />Fig 1. a caption
+    </code-block>
   </indent-block>
 
-  <code-container class="indent">
-    <code-block style="min-width:20%;">
-      <content-block class="codeDarkBrownTheme">
-class X {
-public:
-  X();
-  X(const X&amp;);
-  X&amp; operator=(const X&amp;)
-  ~X();
-}
-      </content-block>
-      <caption-block>
-        Fig 1. Dark Theme Code
-      </caption-block>
-    </code-block>
-
-    <code-block style="min-width:20%;">
-      <content-block class="codeLightBrownTheme">
-X x1, x2;
-x1 = x2;
-      </content-block>
-      <caption-block>
-        Fig 2. Light Theme Code
-      </caption-block>
-    </code-block>
-    <flex-break></flex-break>
-    <caption-block style="height:50px; align-content:center;">flex-break</caption-block>
-    <flex-break></flex-break>
-    <code-block style="min-width:20%;">
-      <content-block class="codeDarkBlueTheme">
-class X {
-public:
-  X();
-  X(const X&amp;);
-  X&amp; operator=(const X&amp;)
-  ~X();
-}
-      </content-block>
-      <caption-block>
-        Fig 1. Dark Theme Code
-      </caption-block>
-    </code-block>
-
-    <code-block style="min-width:20%;">
-      <content-block class="codeLightBlueTheme">
-X x1, x2;
-x1 = x2;
-      </content-block>
-      <caption-block>
-        Fig 2. Light Theme Code
-      </caption-block>
-    </code-block>
-    <flex-break></flex-break>
-    <caption-block style="height:50px; align-content:center;">flex-break</caption-block>
-    <flex-break></flex-break>
-    <code-block style="min-width:20%;">
-      <content-block class="codeDarkGrayTheme">
-class X {
-public:
-  X();
-  X(const X&amp;);
-  X&amp; operator=(const X&amp;)
-  ~X();
-}
-      </content-block>
-      <caption-block>
-        Fig 1. Dark Theme Code
-      </caption-block>
-    </code-block>
-
-    <code-block style="min-width:20%;">
-      <content-block class="codeLightGrayTheme">
-X x1, x2;
-x1 = x2;
-      </content-block>
-      <caption-block>
-        Fig 2. Light Theme Code
-      </caption-block>
-    </code-block>
-  </code-container>
   <info-bar></info-bar>
 </body>
 </html>
