@@ -13,7 +13,7 @@
   <meta name="Author" content="James Fawcett" />
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <title>Test PhotoSizerWebComp</title>
-
+  <!-- needed for Edge -->
   <script src="https://unpkg.com/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
   <script type="module" src="./superlative-input.js"></script>
 
@@ -55,6 +55,7 @@
     }
 
     #github photosizer-block {
+      /*display:none;*/
       --border: 1px solid black;
       --box-shadow: 3px 3px 5px #999;
       --wrapperPadding: 5px 10px 10px 10px;
@@ -76,8 +77,8 @@
     /* custom webcomponent - PhotoSizerBlock*/
 
     class PhotoSizerBlock extends HTMLElement {
-      constructor() {
-        super();
+      constructor(...args) {
+        const self = super(...args);
         const shadowRoot = this.attachShadow({ mode: 'open' });
         shadowRoot.innerHTML =
           `
@@ -123,9 +124,9 @@
             </div>`;
         this.bigger = this.bigger.bind(this);
         this.smaller = this.smaller.bind(this);
+        return self;
       }
       connectedCallback() {
-        //alert(this.shadowRoot.innerHTML);
         this.url = this.getAttribute('src');
         this.imgElem = this.shadowRoot.querySelector('img');
         this.imgElem.setAttribute('src', this.url);
@@ -136,9 +137,11 @@
         if (isDefined(this.height))
           this.imgElem.setAttribute(this.height);
         this.caption = this.shadowRoot.querySelector('#caption');
-        if (isDefined(this.caption))
-          this.caption.innerHTML = this.innerHTML;
-        this.innerHTML = "";
+        if (isDefined(this.caption)) {
+          this.captionText = this.innerHTML;
+          this.innerHTML = "";
+          this.caption.innerHTML = this.captionText;
+        }
         this.imgElem.addEventListener('click', this.bigger);
         this.caption.addEventListener('click', this.smaller);
       }
@@ -151,7 +154,19 @@
     }
     /* register with DOM - don't need to use script block to execute */
 
-    window.customElements.define('photosizer-block', PhotoSizerBlock);
+    /*--------------------------------------------------------------------------- 
+     * This listener is added because of a component lifecycle issue with chrome
+     * See first reference, below.
+     */
+    document.addEventListener('DOMContentLoaded', function () {
+      window.customElements.define('photosizer-block', PhotoSizerBlock);
+    }); 
+    /* 
+     * The listener, above, will be removed and replaced with this when chrome
+     * component lifecycle is fixed.
+     * 
+     * window.customElements.define('photosizer-block', PhotoSizerBlock); 
+     */
   </script>
 </head>
 <body id="github" onload="initializeMenu()">
@@ -169,8 +184,7 @@
   <nav>
     <div id="navbar"></div>
   </nav>
-  <!--<a id="Next" href="BlogDesign.htm">N</a>
-  <a id="Prev" href="BlogFileSystem.htm">P</a>-->
+
   <header>
     <a class="repoLink" href="Tests.html">Tests.html</a>
     <hgroup id="pagetitle">
@@ -179,7 +193,9 @@
     </hgroup>
   </header>
 
-  <spacer-10></spacer-10>
+  <indent-block>
+    Works with FireFox, Chrome, Safari.  Edge rendering has problem with innerHTML.
+  </indent-block>
   <hr class="spread" />
 
   <indent-block>
@@ -225,8 +241,8 @@
   /* custom webcomponent - PhotoSizerBlock*/
 
   class PhotoSizerBlock extends HTMLElement {
-    constructor() {
-      super();
+    constructor(...args) {
+      const self = super(...args);
       const shadowRoot = this.attachShadow({ mode: 'open' });
       shadowRoot.innerHTML =
         `
@@ -272,6 +288,7 @@
           &lt;/div&gt;`;
       this.bigger = this.bigger.bind(this);
       this.smaller = this.smaller.bind(this);
+      return self;
     }
     connectedCallback() {
       this.url = this.getAttribute('src');
@@ -284,10 +301,11 @@
       if (isDefined(this.height))
         this.imgElem.setAttribute(this.height);
       this.caption = this.shadowRoot.querySelector('#caption');
-      if (isDefined(this.caption))
-        this.caption.innerHTML = this.innerHTML;
-      this.innerHTML = "";
-
+      if (isDefined(this.caption)) {
+        this.captionText = this.innerHTML;
+        this.innerHTML = "";
+        this.caption.innerHTML = this.captionText;
+      }
       this.imgElem.addEventListener('click', this.bigger);
       this.caption.addEventListener('click', this.smaller);
     }
@@ -300,14 +318,28 @@
   }
   /* register with DOM - don't need to use script block to execute */
 
-  window.customElements.define('photosizer-block', PhotoSizerBlock);
-&lt;/script&gt;
-
+  /*---------------------------------------------------------------------------
+    * This listener is added because of a component lifecycle issue with chrome
+    * See first reference, below.
+    */
+  document.addEventListener('DOMContentLoaded', function () {
+    window.customElements.define('photosizer-block', PhotoSizerBlock);
+  });
+  /*
+  * The listener, above, will be removed and replaced with this when chrome
+  * component lifecycle is fixed.
+  *
+  * window.customElements.define('photosizer-block', PhotoSizerBlock);
+  */
+ &lt;/script&gt;
 </pre>
   </indent-block>
   <hr class="spread" />
   <h3>References:</h3>
   <ol class="tight">
+    <li>
+      <a href="https://stackoverflow.com/questions/48498581/textcontent-empty-in-connectedcallback-of-a-custom-htmlelement">Issue with Chrome loading innerHTML</a>
+    </li>
     <li>
       <a href="https://developers.google.com/web/fundamentals/web-components/customelements">customelements - google.com</a>
     </li>
