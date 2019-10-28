@@ -1,0 +1,344 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - Test_ImageSizerWebComponent.html
+   - ver 1.0 - 03 August 2019
+   - Jim Fawcett, Syracuse University
+  -->
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Projects. Code Samples. Software Links" />
+  <meta name="keywords" content="Repository, Design, Code" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Test PhotoSizerWebComp</title>
+  <script src="js/ScriptsUtilities.js"></script>
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenuCppRepo.js"></script>
+  <script src="js/ScriptsPhoto.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+  <link rel="stylesheet" href="css/StylesPhoto.css" />
+  <style>
+    #github #pagetitle {
+      background-color:#004225;   /* British racing green */
+      color: #fefefa;             /* Baby powder */
+    }
+
+    #github #title {
+      background-color:#004225;   /* British racing green */
+      color: #fefefa;             /* baby powder */
+    }
+
+    #github #subtitle {
+      background-color:#004225;   /* British racing green */
+      color: #fefefa;             /* baby powder */
+    }
+
+    #github .repoLink {
+      background-color:#004225;   /* British racing green */
+      color: #fefefa;             /* baby powder */
+    }
+    .srcCode {
+      display:block;
+      font-family: Consolas, monospace;
+      font-size: 0.95em;
+      padding-top:10px;
+      padding-bottom:10px;
+    }
+    #github photosizer-block {
+      --border:1px solid black;
+      --box-shadow: 3px 3px 5px #999;
+      --wrapperPadding: 5px 10px 10px 10px;
+      --margin: 20px;
+      --captionPadding: 0px 0px 5px 0px;
+    }
+    /* uncomment .photoBlock to use this class */
+    /*#github .photoSizerBlock {
+      --background-color: #efe;
+      --font-family:Comic Sans MS;
+      --font-weight: Bold;
+      --border: 3px solid darkgreen;
+      --captionPadding: 0px 0px 5px 0px;
+      --wrapperPadding: 5px;
+      --margin: 30px;
+    }*/
+  </style>
+  <script>
+    /* custom webcomponent - PhotoSizerBlock*/
+
+    class PhotoSizerBlock extends HTMLElement {
+      constructor() {
+        super();
+        const shadowRoot = this.attachShadow({mode: 'open'});
+        shadowRoot.innerHTML =
+          `
+          <style>
+            #cont {
+              display:flex;
+              padding: var(--padding);
+            }
+            #wrapper { 
+              width:min-content; 
+              padding: var(--wrapperPadding); //10px; 
+              margin: var(--margin);  //20px;
+              background-color: var(--background-color);
+              color: var(--color);
+              box-shadow: var(--box-shadow);
+              font-family: var(--font-family);
+              font-size: var(--font-size);
+              font-weight: var(--font-weight);
+              border: var(--border);
+            }
+            #caption {
+              user-select:none;
+              -webkit-user-select:none;
+              -moz-user-select:none;
+              -ms-user-select:none;
+              text-align:center;
+              padding-bottom:10px;
+              padding: var(--captionPadding); //0px 0px 10px 0px;
+            }
+            img {
+              user-select:none;
+              -webkit-user-select:none;
+              -moz-user-select:none;
+              -ms-user-select:none;
+            }
+          </style>
+          <div id="cont">
+            <slot></slot>
+            <div id="wrapper">
+              <div id="caption"></div>
+              <img />
+            </div>
+          </div>`;
+        this.bigger = this.bigger.bind(this);
+        this.smaller = this.smaller.bind(this);
+      }
+      connectedCallback() {
+        //alert(this.shadowRoot.innerHTML);
+        this.url = this.getAttribute('src');
+        this.imgElem = this.shadowRoot.querySelector('img');
+        this.imgElem.setAttribute('src', this.url);
+        this.width = this.getAttribute('width');
+        if (isDefined(this.width))
+          this.imgElem.setAttribute('width', this.width);
+        this.height = this.getAttribute('height');
+        if (isDefined(this.height))
+          this.imgElem.setAttribute(this.height);
+        this.caption = this.shadowRoot.querySelector('#caption');
+        if (isDefined(this.caption))
+          this.caption.innerHTML = this.innerHTML;
+        this.innerHTML = "";
+        this.imgElem.addEventListener('click', this.bigger);
+        this.caption.addEventListener('click', this.smaller);
+      }
+      bigger() {
+        this.imgElem.width = Number(this.imgElem.width) * 1.25;
+      }
+      smaller() {
+        this.imgElem.width = Number(this.imgElem.width) / 1.25;
+      }
+    }
+    /* register with DOM - don't need to use script block to execute */
+
+    window.customElements.define('photosizer-block', PhotoSizerBlock);
+  </script>
+</head>
+<body id="github" onload="initializeMenu()">
+
+  <navKeys-Container>
+    <nav-Key id="sKey" onclick="toggleSwipeEvents()">S</nav-Key>
+    <nav-Key id="rKey" onclick="location.reload()">R</nav-Key>
+    <nav-Key id="tKey" onclick="scrollPageTop()">T</nav-Key>
+    <nav-Key id="bKey" onclick="scrollPageBottom()">B</nav-Key>
+    <nav-Key id="hKey" onclick="helpWin()">H</nav-Key>
+    <nav-Key id="pKey" onclick="loadPrev()">P</nav-Key>
+    <nav-Key id="nKey" onclick="loadNext()">N</nav-Key>
+  </navKeys-Container>
+
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <!--<a id="Next" href="BlogDesign.htm">N</a>
+  <a id="Prev" href="BlogFileSystem.htm">P</a>-->
+  <header>
+    <a class="repoLink" href="Tests.html">Tests.html</a>
+    <hgroup id="pagetitle">
+      <h1 id="title">Test PhotoSizer Element</h1>
+      <h3 id="subtitle">Implements W3C/Google webcomponent</h3>
+    </hgroup>
+  </header>
+
+  <spacer-10></spacer-10>
+  <hr class="spread" />
+
+  <indent-block>
+    <photosizer-block src="Pictures/JimFawcett2.JPG" width="200" class="photoSizerBlock left">
+      Figure 1. a caption
+    </photosizer-block>
+    <div style="padding-right:25px;">
+      This is how this page uses the PhotoSizer Element:
+      <pre style="font-family: Consolas, monospace; font-size:1.0em;">
+    &lt;photosizer-block src="Pictures/JimFawcett2.JPG" width="200" class="photoSizerBlock"&gt;
+      Figure 1. a caption
+    &lt;/photosizer-block&gt;
+</pre>
+      And this is how this pages styles the PhotoSizer Element:
+      <pre style="display:flex; font-family: Consolas, monospace; font-size:1.0em;">
+    #github photosizer-block {
+      --border:1px solid black;
+      --box-shadow: 3px 3px 5px #999;
+      --wrapperPadding: 5px 10px 10px 10px;
+      --margin: 20px;
+      --captionPadding: 0px 0px 5px 0px;
+    }
+    /* uncomment .photoBlock to use this class */
+    /*#github .photoSizerBlock {
+      --background-color: #efe;
+      --font-family:Comic Sans MS;
+      --font-weight: Bold;
+      --border: 3px solid darkgreen;
+      --captionPadding: 0px 0px 5px 0px;
+      --wrapperPadding: 5px;
+      --margin: 30px;
+    }*/
+</pre>
+      View page source for all the details.
+    </div>
+  </indent-block>
+  <spacer-10 class="clear"></spacer-10>
+  <hr class="spread" />
+  <indent-block>
+    Here&apos;s the component code:
+    <pre style="font-size:1.0em; font-family:Consolas, monospace;">
+&lt;script&gt;
+  /* custom webcomponent - PhotoSizerBlock*/
+
+  class PhotoSizerBlock extends HTMLElement {
+    constructor() {
+      super();
+      const shadowRoot = this.attachShadow({ mode: 'open' });
+      shadowRoot.innerHTML =
+        `
+          &lt;style&gt;
+            #cont {
+              display:flex;
+              padding: var(--padding);
+            }
+            #wrapper {
+              width:min-content;
+              padding: var(--wrapperPadding); //10px;
+              margin: var(--margin);  //20px;
+              background-color: var(--background-color);
+              color: var(--color);
+              box-shadow: var(--box-shadow);
+              font-family: var(--font-family);
+              font-size: var(--font-size);
+              font-weight: var(--font-weight);
+              border: var(--border);
+            }
+            #caption {
+              user-select:none;
+              -webkit-user-select:none;
+              -moz-user-select:none;
+              -ms-user-select:none;
+              text-align:center;
+              padding-bottom:10px;
+              padding: var(--captionPadding); //0px 0px 10px 0px;
+            }
+            img {
+              user-select:none;
+              -webkit-user-select:none;
+              -moz-user-select:none;
+              -ms-user-select:none;
+            }
+          &lt;/style&gt;
+          &lt;div id="cont"&gt;
+            &lt;slot&gt;&lt;/slot&gt;
+            &lt;div id="wrapper"&gt;
+              &lt;div id="caption"&gt;&lt;/div&gt;
+              &lt;img /&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;`;
+      this.bigger = this.bigger.bind(this);
+      this.smaller = this.smaller.bind(this);
+    }
+    connectedCallback() {
+      this.url = this.getAttribute('src');
+      this.imgElem = this.shadowRoot.querySelector('img');
+      this.imgElem.setAttribute('src', this.url);
+      this.width = this.getAttribute('width');
+      if (isDefined(this.width))
+        this.imgElem.setAttribute('width', this.width);
+      this.height = this.getAttribute('height');
+      if (isDefined(this.height))
+        this.imgElem.setAttribute(this.height);
+      this.caption = this.shadowRoot.querySelector('#caption');
+      if (isDefined(this.caption))
+        this.caption.innerHTML = this.innerHTML;
+      this.innerHTML = "";
+
+      this.imgElem.addEventListener('click', this.bigger);
+      this.caption.addEventListener('click', this.smaller);
+    }
+    bigger() {
+      this.imgElem.width = Number(this.imgElem.width) * 1.25;
+    }
+    smaller() {
+      this.imgElem.width = Number(this.imgElem.width) / 1.25;
+    }
+  }
+  /* register with DOM - don't need to use script block to execute */
+
+  window.customElements.define('photosizer-block', PhotoSizerBlock);
+&lt;/script&gt;
+
+</pre>
+  </indent-block>
+  <hr class="spread" />
+  <h3>References:</h3>
+  <ol class="tight">
+    <li>
+      <a href="https://developers.google.com/web/fundamentals/web-components/customelements">customelements - google.com</a>
+    </li>
+    <li>
+      <a href="https://developers.google.com/web/fundamentals/web-components/shadowdom">shadowdom - google.com</a>
+    </li>
+    <li>
+      <a href="https://www.html5rocks.com/en/tutorials/webcomponents/">webcomponents - htm5rocks.com</a>
+    </li>
+    <li>
+      <a href="https://alligator.io/web-components/attributes-properties/">attributes&nbsp;&amp;&nbsp;properties - alligator.io</a>
+    </li>
+    <li>
+      <a href="https://css-tricks.com/styling-a-web-component/">styling webcomponent - css-tricks.com</a>
+    </li>
+    <li>
+      <a href="https://css-tricks.com/encapsulating-style-and-structure-with-shadow-dom/">encapsulating style and structure - css-tricks.com</a>
+    </li>
+    <li>
+      <a href="https://css-tricks.com/creating-a-custom-element-from-scratch/">creating custom component from scratch - css-tricks.com</a>
+    </li>
+    <li>
+      <a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements">Using custom elements - mozilla.org</a>
+    </li>
+    <li>
+      <a href="https://www.webcomponents.org/introduction#custom-elements">introduction to webcomponents - webcomponents.org</a>
+    </li>
+    <li>
+      <a href="https://dev.to/bennypowers/lets-build-web-components-part-3-vanilla-components-4on3">build web components - dev.to</a>
+    </li>
+    <li>
+      <a href="https://www.robinwieruch.de/web-components-tutorial/">tutorial - robinwieruch.de</a>
+    </li>
+    <li>
+      <a href="https://www.grapecity.com/blogs/web-components-introduction-creating-custom-html-elements-2018">introduction - grapecity.com</a>
+    </li>
+  </ol>
+  <info-bar></info-bar>
+</body>
+</html>

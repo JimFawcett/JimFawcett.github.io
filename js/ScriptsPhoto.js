@@ -2,7 +2,8 @@
  *  ScriptsPhoto.js
  */
 
-  var photoWidget = new Object;
+var photoWidget = new Object;
+
 photoWidget.create = function (id, url, caption, fontSize, size) {
   var placeholder = document.getElementById(id);
   if (!isDefined(placeholder))
