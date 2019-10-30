@@ -21,6 +21,7 @@ function initializeMenu() {
         <div class='darkItem maxWidth'>&nbsp;Code&nbsp;Repositories&nbsp;&nbsp;</div>\
         <a href='CppRepositories.html'>C++&nbsp;Repositories&nbsp;&nbsp;</a>\
         <a href='CsRepositories.html'>C#&nbsp;Repositories&nbsp;&nbsp;</a>\
+        <a href='JsRepositories.html'>JS&nbsp;Repositories&nbsp;&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////
-// ScriptsMenu.js - Constructs dropdown menu for Top Level Pages   //
+// ScriptsMenuJsReop.js - Constructs dropdown menu for Repo        //
 //                                                                 //
 // Jim Fawcett, Website, 25 June 2018                              //
 /////////////////////////////////////////////////////////////////////
@@ -36,55 +36,28 @@ function initializeMenu() {
       <button class='dropbutton'>Tools &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Tools</div>\
-        <a href='Diff_WPF.html'>Diff_WPF</a>\
-        <a href='CodeWebifier.html'>CodeWebifier</a>\
+        <div class='maxWidth'>&nbsp;None yet&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Cmpnts &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Components</div>\
-        <a href='CsBlockingQueue.html'>CsBlockingQueue</a>\
-        <a href='CsNavigator.html'>CsNavigator</a>\
+        <a href='Tests.html'>Tests.html</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Libs &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Libraries</div>\
-        <a href='CsConcurrentFileAccess.html'>CsConcurrentFileAccess</a>\
-        <a href='CsGraph.html'>CsGraph</a>\
-        <a href='CsParser.html'>CsParser</a>\
-        <a href='CsXDocument.html'>CsXDocument</a>\
-      </div>\
-    </div>\
-    <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Projs &#9662;</button>\
-      <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;Projects</div>\
-        <a href='CsDependencyAnalysis.html'>CsDependencyAnalysis</a>\
-        <a href='CsCommPrototype.html'>CsCommPrototype</a>\
-        <a href='CsRemotePluggableRepo.html'>CsRemotePluggableRepo</a>\
+        <a href='WebComponents.html'>WebComponents</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Demos &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Demonstrations</div>\
-        <a href='CsBasicDemos.html'>CsBasicDemos</a>\
-        <a href='Cs_WCF_Demos.html'>WCF Demos</a>\
-        <a href='Cs_WPF_Demos.html'>WPF Demos</a>\
-        <a href='CsProcess.html'>CsProcess</a>\
-        <a href='CsPublisherSubscriber.html'>CsPublisherSubscriber</a>\
-      </div>\
-    </div>\
-    <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Build &#9662;</button>\
-      <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;Builds</div>\
-        <a class='disable' href='#'>Build Demo</a>\
-        <a class='disable' href='#'>Build Structure</a>\
-        <a class='disable' href='#'>Build from repo</a>\
+        <a href='Tests.html'>Tests.html</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\

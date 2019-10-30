@@ -21,18 +21,11 @@ function initializeMenu() {
         <div class='darkItem maxWidth'>&nbsp;Code&nbsp;Repositories&nbsp;&nbsp;</div>\
         <a href='CppRepositories.html'>C++&nbsp;Repositories&nbsp;&nbsp;</a>\
         <a href='CsRepositories.html'>C#&nbsp;Repositories&nbsp;&nbsp;</a>\
+        <a href='JsRepositories.html'>JS&nbsp;Repositories&nbsp;&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
-    <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Videos &#9662;</button>\
-      <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;Site&nbsp;Videos&nbsp;</div>\
-        <a href='https://www.youtube.com/watch?v=hjtY2BlG5l0'>Publishing&nbsp;Code&nbsp;&nbsp;</a>\
-        <a href='Resources/PublishingSourceCode.pdf'>Pub&nbsp;Code&nbsp;pdf&nbsp;&nbsp;</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
-      </div>\
-    </div>\
+    <a href='Videos.html' class='menuItem'>Videos</a>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Blogs &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
@@ -76,6 +69,7 @@ function initializeMenu() {
         <a href='CppSynopsis.html'>C++ Synopsis</a>\
         <a href='DesignNote-Cpp11.html'>C++11 Survey</a>\
         <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
+        <a href='https://dev.to/chrisachard/intro-to-regex-for-web-developers-2fj4'>RegExp&nbsp;for&nbsp;JavaScript</a>\
         <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
         <a href='WebNotes.html'>Web Notes</a>\
         <a href='Tests.html'>UI Widget Tests</a>\
