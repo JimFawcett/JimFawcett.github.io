@@ -120,6 +120,7 @@ function initializeMenu() {
       <div class='dropdown-content'>\
         <div class='darkTheme'>&nbsp;About&nbsp;this&nbsp;Site</div>\
         <a href='../../JimFawcett.html'>Jim Fawcett</a>\
+        <a href='../../Interesting.html'>Interesting&nbsp;things&nbsp;&nbsp;</a>\
         <a href='../../Help.html'>Help</a>\
         <a href='../../ToDo.html'>ToDo</a>\
         <a href='#' onclick='togglenavKeys()'>Toggle Nav Keys</a>\

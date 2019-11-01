@@ -90,7 +90,7 @@ function initializeMenu() {
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
-        <a href='Interesting.html'>Things&nbsp;I&nbsp;find&nbsp;interesting&nbsp;&nbsp;</a>\
+        <a href='Interesting.html'>Interesting&nbsp;things&nbsp;&nbsp;</a>\
         <a href='Friends.html'>Friends&nbsp;&amp&nbsp;Collaborators&nbsp;&nbsp;</a>\
         <a href='Help.html'>Help</a>\
         <a href='SitePlans.html'>Site Plans</a>\
