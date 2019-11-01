@@ -43,21 +43,29 @@ function initializeMenu() {
       <button class='dropbutton'>Cmpnts &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Components</div>\
-        <a href='Tests.html'>Tests.html</a>\
+        <a href='WebComponents.html'>WebComponents</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Libs &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Libraries</div>\
-        <a href='WebComponents.html'>WebComponents</a>\
+        <a href='WebLibraries.html'>WebLibraries</a>\
+      </div>\
+    </div>\
+    <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Projs &#9662;</button>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Projects</div>\
+        <a href='SitePages.html'>SitePages</a>\
+        <a href='StoryTellerRepo.html'>StoryTeller</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Demos &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Demonstrations</div>\
-        <a href='Tests.html'>Tests.html</a>\
+        <a href='Tests.html'>Tests</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\

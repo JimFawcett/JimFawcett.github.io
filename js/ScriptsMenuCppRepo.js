@@ -61,8 +61,6 @@ function initializeMenu() {
         <a href='CppConcurrentFileAccess.html'>CppConcurrentFileAccess</a>\
         <a href='CppLexicalScanner.html'>CppLexicalScanner</a>\
         <a href='RetryWrapper.html'>RetryWrapper</a>\
-        <a href='WebComponents.html'>WebComponents</a>\
-        <a href='Tests.html'>Tests</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -81,8 +79,6 @@ function initializeMenu() {
       <button class='dropbutton'>Projs &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Projects</div>\
-        <a href='SitePages.html'>SitePages</a>\
-        <a href='StoryTellerRepo.html'>StoryTeller</a>\
         <a href='CppParser.html'>CppParser</a>\
         <a href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a>\
         <a href='CsDependencyAnalysis.html'>CsDependencyAnalysis</a>\
