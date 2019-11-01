@@ -81,7 +81,6 @@ function initializeMenu() {
         <div class='darkItem maxWidth'>&nbsp;Projects</div>\
         <a href='CppParser.html'>CppParser</a>\
         <a href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a>\
-        <a href='CsDependencyAnalysis.html'>CsDependencyAnalysis</a>\
         <a href='CppCommWithFileXfer.html'>CppCommWithFileXfer</a>\
         <a href='CppHttpClientServer.html'>CppHttpClientServer</a>\
       </div>\
