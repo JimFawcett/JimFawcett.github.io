@@ -55,24 +55,28 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Resources &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Coding&nbsp;Resources</div>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
+        <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a>\
+        <a href='DesignProcess.html'>Design Process</a>\
+        <a href='ProjectsList.html'>Project suggestions</a>\
         <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
         <a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a>\
+        <a href='CppReferences.html'>C++ References</a>\
+        <a href='CppExamples.html'>C++ Example Code</a>\
         <a href='CppSynopsis.html'>C++ Synopsis</a>\
         <a href='DesignNote-Cpp11.html'>C++11 Survey</a>\
         <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
+        <a href='https://dev.to/chrisachard/intro-to-regex-for-web-developers-2fj4'>RegExp&nbsp;for&nbsp;JavaScript</a>\
         <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
-        <a href='https://github.com/joshnh/Git-Commands'>git commands</a>\
-        <a href='UML.html'>UML Diagrams</a>\
-        <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
-        <a href='SummerReading.html'>Summer Reading</a>\
-        <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams</a>\
         <a href='WebNotes.html'>Web Notes</a>\
         <a href='Tests.html'>UI Widget Tests</a>\
         <a href='https://encycolorpedia.com/named'>Web Colors</a>\
-        <a href='CppReferences.html'>C++ References</a>\
-        <a href='CppExamples.html'>C++ Examples</a>\
+        <a href='UML.html'>UML Diagrams</a>\
+        <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
+        <a href='https://github.com/joshnh/Git-Commands'>git commands</a>\
+        <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
+        <a href='SummerReading.html'>Summer Reading</a>\
         <a href='Interviews.html'>Job Interviews</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
