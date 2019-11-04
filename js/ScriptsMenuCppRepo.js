@@ -43,7 +43,6 @@ function initializeMenu() {
         <a href='FileDates.html'>FileDates</a>\
         <a href='FileSizes.html'>FileSizes</a>\
         <a href='FindFiles.html'>FindFiles</a>\
-        <a href='Diff_WPF.html'>Diff_WPF</a>\
         <a href='CodeWebifier.html'>CodeWebifier</a>\
         <a href='PrettyPrint.html'>PrettyPrint</a>\
       </div>\

@@ -36,7 +36,7 @@ function initializeMenu() {
       <button class='dropbutton'>Tools &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Tools</div>\
-        <a href='javascript:'>None yet</a>\
+        <a href='Diff_WPF.html'>Diff_WPF</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
