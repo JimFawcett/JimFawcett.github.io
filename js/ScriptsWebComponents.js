@@ -6,9 +6,9 @@
  * ------------------------------------------------------------------
  */
 
-/* custom webcomponent - PhotoSizerBlock*/
+/* custom webcomponent - HideablePhotoSizerBlock*/
 
-class PhotoSizerBlock extends HTMLElement {
+class HideablePhotoSizerBlock extends HTMLElement {
   constructor(...args) {
     const self = super(...args);
     const shadowRoot = this.attachShadow({ mode: 'open' });
@@ -17,10 +17,7 @@ class PhotoSizerBlock extends HTMLElement {
               <style>
                 #cont {
                   display:flex;
-                  position:relative;
                   padding: var(--padding);
-                  background-color:white;
-                  //border:1px solid green;
                 }
                 #wrapper {
                   width:min-content;
@@ -40,13 +37,9 @@ class PhotoSizerBlock extends HTMLElement {
                   -ms-user-select:none;
                 }
                 #closer {
-                  position:absolute;
-                  top:20px; left:9px;
-                  border:1px solid #333;
+                  text-align:center;
+                  font-family:'Comic Sans MS', Sans-serif; 
                   background-color:#ddd;
-                  color:white;
-                  cursor:pointer;
-                  width:0.5em; height:1em;
                 }
                 #caption {
                   text-align:center;
@@ -54,7 +47,7 @@ class PhotoSizerBlock extends HTMLElement {
                   padding: var(--captionPadding); //0px 0px 10px 0px;
                   background-color:white;
                 }
-                #github img {
+                img {
                   user-select:none;
                   -webkit-user-select:none;
                   -moz-user-select:none;
@@ -63,10 +56,10 @@ class PhotoSizerBlock extends HTMLElement {
               </style>
               <div id="cont">
                 <slot></slot>
-                <div id="closer"></div>
                 <div id="wrapper">
                   <div id="caption"></div>
                   <img />
+                  <div id="closer">click to close</div>
                 </div>
               </div>`;
     this.bigger = this.bigger.bind(this);
@@ -106,15 +99,108 @@ class PhotoSizerBlock extends HTMLElement {
     if (isDefined(wrpr)) {
       if (wrpr.style.display === "none") {
         wrpr.style.display = "block";
-        this.closer.style.right = "undefined";
-        this.closer.style.left = "9px";
+        this.closer.style.right = "8px";
       }
       else {
         wrpr.style.display = "none";
-        this.closer.style.right = "200px";
-        this.closer.style.left = "undefined";
+        this.closer.style.right = "7px";
       }
     }
+  }
+}
+/* register with DOM - don't need to use script block to execute */
+
+/*---------------------------------------------------------------------------
+ * This listener is added because of a component lifecycle issue with chrome
+ * See first reference, below.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+  window.customElements.define('hidephotosizer-block', HideablePhotoSizerBlock);
+});
+    /*
+ * The listener, above, will be removed and replaced with this when chrome
+ * component lifecycle is fixed.
+ *
+ * window.customElements.define('photosizer-block', PhotoSizerBlock);
+ */
+/* custom webcomponent - PhotoSizerBlock*/
+
+class PhotoSizerBlock extends HTMLElement {
+  constructor(...args) {
+    const self = super(...args);
+    const shadowRoot = this.attachShadow({ mode: 'open' });
+    shadowRoot.innerHTML =
+      `
+              <style>
+                #cont {
+                  display:flex;
+                  padding: var(--padding);
+                }
+                #wrapper {
+                  width:min-content;
+                  padding: var(--wrapperPadding); //10px;
+                  margin: var(--margin);  //20px;
+                  background-color: var(--background-color);
+                  color: var(--color);
+                  box-shadow: var(--box-shadow);
+                  font-family: var(--font-family);
+                  font-size: var(--font-size);
+                  font-weight: var(--font-weight);
+                  border: var(--border);
+                  cursor: pointer;
+                  user-select:none;
+                  -webkit-user-select:none;
+                  -moz-user-select:none;
+                  -ms-user-select:none;
+                }
+                #caption {
+                  text-align:center;
+                  padding-bottom:10px;
+                  padding: var(--captionPadding); //0px 0px 10px 0px;
+                  background-color:white;
+                }
+                img {
+                  user-select:none;
+                  -webkit-user-select:none;
+                  -moz-user-select:none;
+                  -ms-user-select:none;
+                }
+              </style>
+              <div id="cont">
+                <slot></slot>
+                <div id="wrapper">
+                  <div id="caption"></div>
+                  <img />
+                </div>
+              </div>`;
+    this.bigger = this.bigger.bind(this);
+    this.smaller = this.smaller.bind(this);
+    return self;
+  }
+  connectedCallback() {
+    this.url = this.getAttribute('src');
+    this.imgElem = this.shadowRoot.querySelector('img');
+    this.imgElem.setAttribute('src', this.url);
+    this.width = this.getAttribute('width');
+    if (isDefined(this.width))
+      this.imgElem.setAttribute('width', this.width);
+    this.height = this.getAttribute('height');
+    if (isDefined(this.height))
+      this.imgElem.setAttribute(this.height);
+    this.caption = this.shadowRoot.querySelector('#caption');
+    if (isDefined(this.caption)) {
+      this.captionText = this.innerHTML;
+      this.innerHTML = "";
+      this.caption.innerHTML = this.captionText;
+    }
+    this.imgElem.addEventListener('click', this.bigger);
+    this.caption.addEventListener('click', this.smaller);
+  }
+  bigger() {
+    this.imgElem.width = Number(this.imgElem.width) * 1.25;
+  }
+  smaller() {
+    this.imgElem.width = Number(this.imgElem.width) / 1.25;
   }
 }
 /* register with DOM - don't need to use script block to execute */
@@ -132,6 +218,8 @@ document.addEventListener('DOMContentLoaded', function () {
  *
  * window.customElements.define('photosizer-block', PhotoSizerBlock);
  */
+/* register with DOM - don't need to use script block to execute */
+
 ///*---------------------------------------------------------------------------
 ///* custom webcomponent - PhotoSizerBlock*/
 

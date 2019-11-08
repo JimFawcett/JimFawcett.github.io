@@ -55,7 +55,7 @@
       padding-bottom: 10px;
     }
 
-    #github photosizer-block {
+    #github hidephotosizer-block {
       /*display:none;*/
       --border: 1px solid black;
       --box-shadow: 3px 3px 5px #999;
@@ -75,9 +75,9 @@
     }*/
   </style>
   <script>
-    /* custom webcomponent - PhotoSizerBlock*/
+    /* custom webcomponent - HideablePhotoSizerBlock*/
 
-    class PhotoSizerBlock extends HTMLElement {
+    class HideablePhotoSizerBlock extends HTMLElement {
       constructor(...args) {
         const self = super(...args);
         const shadowRoot = this.attachShadow({ mode: 'open' });
@@ -105,6 +105,10 @@
                   -moz-user-select:none;
                   -ms-user-select:none;
                 }
+                #closer {
+                  text-align:center;
+                  font-family:'Comic Sans MS', Sans-serif; 
+                }
                 #caption {
                   text-align:center;
                   padding-bottom:10px;
@@ -123,10 +127,12 @@
                 <div id="wrapper">
                   <div id="caption"></div>
                   <img />
+                  <div id="closer">click to close</div>
                 </div>
               </div>`;
         this.bigger = this.bigger.bind(this);
         this.smaller = this.smaller.bind(this);
+        this.toggle = this.toggle.bind(this);
         return self;
       }
       connectedCallback() {
@@ -147,12 +153,27 @@
         }
         this.imgElem.addEventListener('click', this.bigger);
         this.caption.addEventListener('click', this.smaller);
+        this.closer = this.shadowRoot.querySelector('#closer');
+        this.closer.addEventListener('click', this.toggle);
       }
       bigger() {
         this.imgElem.width = Number(this.imgElem.width) * 1.25;
       }
       smaller() {
         this.imgElem.width = Number(this.imgElem.width) / 1.25;
+      }
+      toggle() {
+        let wrpr = this.shadowRoot.getElementById("wrapper");
+        if (isDefined(wrpr)) {
+          if (wrpr.style.display === "none") {
+            wrpr.style.display = "block";
+            this.closer.style.right = "8px";
+          }
+          else {
+            wrpr.style.display = "none";
+            this.closer.style.right = "7px";
+          }
+        }
       }
     }
     /* register with DOM - don't need to use script block to execute */
@@ -162,7 +183,7 @@
      * See first reference, below.
      */
     document.addEventListener('DOMContentLoaded', function () {
-      window.customElements.define('photosizer-block', PhotoSizerBlock);
+      window.customElements.define('hidephotosizer-block', HideablePhotoSizerBlock);
     });
     /*
      * The listener, above, will be removed and replaced with this when chrome
@@ -191,7 +212,7 @@
   <header>
     <a class="repoLink" href="Tests.html">Tests.html</a>
     <hgroup id="pagetitle">
-      <h1 id="title">Test PhotoSizer Element</h1>
+      <h1 id="title">Test Hideable PhotoSizer Element - ver 2</h1>
       <h3 id="subtitle">Implements W3C/Google webcomponent</h3>
     </hgroup>
   </header>
@@ -202,19 +223,19 @@
   <hr class="spread" />
 
   <indent-block>
-    <photosizer-block src="Pictures/ThreadPool.JPG" width="200" class="photoSizerBlock left">
+    <hidephotosizer-block src="Pictures/ThreadPool.JPG" width="200" class="photoSizerBlock left">
       <span style="font-family:'Comic Sans MS';">Figure 1. ThreadPool</span>
-    </photosizer-block>
+    </hidephotosizer-block>
     <div style="padding-right:25px;">
-      This is how this page uses the PhotoSizer Element:
+      This is how this page uses the Hideable PhotoSizer Element:
       <pre style="font-family: Consolas, monospace; font-size:1.0em;">
-  &lt;photosizer-block src="Pictures/ThreadPool.JPG" width="200" class="photoSizerBlock left"&gt;
+  &lt;hidephotosizer-block src="Pictures/ThreadPool.JPG" width="200" class="photoSizerBlock left"&gt;
     &lt;span style="font-family:'Comic Sans MS';"&gt;Figure 1. ThreadPool&lt;/span&gt;
   &lt;/photosizer-block&gt;
 </pre>
       And this is how this pages styles the PhotoSizer Element:
       <pre style="display:flex; font-family: Consolas, monospace; font-size:1.0em;">
-    #github photosizer-block {
+    #github hidephotosizer-block {
       --border:1px solid black;
       --box-shadow: 3px 3px 5px #999;
       --wrapperPadding: 5px 10px 10px 10px;
@@ -252,7 +273,6 @@
           &lt;style&gt;
             #cont {
               display:flex;
-              position:relative;
               padding: var(--padding);
             }
             #wrapper {
@@ -273,19 +293,14 @@
               -ms-user-select:none;
             }
             #closer {
-              position:absolute;
-              top:20px; right:8px;
-              border:2px solid red;
-              background-color:black;
-              color:white;
-              cursor:pointer;
-              width:0.5em; height:1em;
+              text-align:center;
+              font-family:'Comic Sans MS', Sans-serif; 
             }
             #caption {
               text-align:center;
               padding-bottom:10px;
-              background-color:white;
               padding: var(--captionPadding); //0px 0px 10px 0px;
+              background-color:white;
             }
             img {
               user-select:none;
@@ -296,10 +311,10 @@
           &lt;/style&gt;
           &lt;div id="cont"&gt;
             &lt;slot&gt;&lt;/slot&gt;
-            &lt;div id="closer"&gt;&lt;/div&gt;
             &lt;div id="wrapper"&gt;
               &lt;div id="caption"&gt;&lt;/div&gt;
               &lt;img /&gt;
+              &lt;div id="closer"&gt;click to close&lt;/div&gt;
             &lt;/div&gt;
           &lt;/div&gt
         `;
