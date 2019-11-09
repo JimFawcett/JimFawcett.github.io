@@ -39,6 +39,7 @@ class HideablePhotoSizerBlock extends HTMLElement {
                 #closer {
                   text-align:center;
                   font-family:'Comic Sans MS', Sans-serif; 
+                  font-size:0.9em;
                   background-color:#ddd;
                 }
                 #caption {
