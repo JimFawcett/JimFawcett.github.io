@@ -109,6 +109,13 @@
         border:none;
         color:darkred;
       }
+      background-block {
+        display:block;
+        background-color:#ddd;
+        max-width:90%;
+        width:max-content;
+        padding:10px 15px;
+      }
   </style>
 </head>
 <body id="github" onload="initializeMenu()">
@@ -152,7 +159,7 @@
       <h4>Data Types:</h4>
       <indent-blocks>
         The C++ programming language provides fundamental types, built into the language,
-        additional types provided by the C++ standard libraries, and user-defined types that
+        additional types provided by the C++ standard libraries, and supports user-defined types that
         can be designed to provide the same behaviors as fundamental types.
         <spacer-15></spacer-15>
         Fundamental types:
@@ -240,7 +247,7 @@
               <spacer-10></spacer-10>
               <c-s>++pX</c-s> increments address stored in pX by <c-s>sizeof(X)</c-s>
               <spacer-10></spacer-10>
-              Retrieve the value referenced by pX using the dereference operator: 
+              Retrieve the value referenced by pX using the dereference operator:
               <c-s>*pX</c-s> returns the value referenced by <c-s>pX</c-s>
             </indent-block>
             <div class="clear"></div>
@@ -259,9 +266,9 @@
               is always defined in the reference declaration and cannot be changed.
               The value of <c-s>xr</c-s> is always the value of <c-s>x</c-s>, which can be changed.
               <spacer-10></spacer-10>
-              It is useful to think of a reference as another name for the referenced instance.  
+              It is useful to think of a reference as another name for the referenced instance.
               <spacer-10></spacer-10>
-              References are most often used to pass arguments to a function by reference.  
+              References are most often used to pass arguments to a function by reference.
               <spacer-10></spacer-10>
               Passing an argument to a function by value, <c-s>f(T t)</c-s>, copies the argument&apos;s value to the function&apos;s
               stack frame.
@@ -523,15 +530,180 @@
           </details>
           <spacer-15></spacer-15>
         </indent-block>
-        We will cover many of these in Chapter 2 - Data.
+        Definitions and declarations:
+        <indent-block class="pad10">
+          <details>
+            <summary><span class="labelStyle lightItem">type declaration</span></summary>
+            <indent-block class="pad10">
+              A type declaration defines a name associated with a specified type, e.g., a set
+              of operations supported for the named entity, but defines no storage.  That must
+              be done later, but before the entity is used.
+              <spacer-10></spacer-10>
+              <c-s>extern int x;</c-s>
+              <indent-block class="pad10">
+                The entity x supports all of the operations for ints, but no storage is defined
+                by this statement.
+              </indent-block>
+              <c-s>void f(int i);</c-s>
+              <indent-block class="pad10">
+                Declares f to be a function, to be defined later, accepting a single integer
+                argument and returning nothing.
+              </indent-block>
+              <c-s>class X;</c-s>
+              <indent-block class="pad10">
+                Declares X to be a class to be defined later. X is said to be an incomplete type and
+                the statement is a forward declaration of X.
+              </indent-block>
+              <c-s>class Y { /* operations elided */ };</c-s>
+              <indent-block class="pad10">
+                We often say that class Y is defined by the statement above, but technically it is a
+                declaration, because this statement defines the size required for instances of Y
+                but no storage is allocated.
+              </indent-block>
+            </indent-block>
+          </details>
+          <spacer-15></spacer-15>
+          <details>
+            <summary><span class="labelStyle lightItem">type definition</span></summary>
+            <indent-block class="pad10" style="width:100%;">
+              A type definition allocates storage for a declared entity of a specified type.
+              The designer can specify the location of that storage, e.g., in static, stack, or
+              heap memory.
+              <spacer-10></spacer-10>
+              <c-s>int x; int y{ 2 };</c-s>
+              <indent-block class="pad10">
+                The variable <c-s>x</c-s> is declared and storage is allocated
+                in the local stack frame, and filled with a default value;
+                <spacer-10></spacer-10>
+                The variable <c-s>y</c-s> is declared and storage is allocated in the local stack
+                frame and initialized with the value <c-s>2</c-s>.
+                <spacer-10></spacer-10>
+                <background-block>
+                  Life-time of this storage extends from the point of declaration until the thread
+                  of execution leaves the current scope.
+                </background-block>
+              </indent-block>
+              <c-s>void f(int i) { std::cout << "\n  " << argument has value << i; }</c-s>
+              <indent-block class="pad10">
+                The code within the <c-s>{</c-s> and <c-s>}</c-s> scope delimiters is compiled and allocated
+                to static memory adjacent to other code from the surrounding program.
+                <spacer-10></spacer-10>
+                <background-block>
+                  Life-time of this allocation is the life time of the program after the program&apos;s
+                  process has been created until the process begins termination.
+                </background-block>
+              </indent-block>
+              <c-s>X x; Y y(...);</c-s>
+              <indent-block class="pad10">
+                Reserves storage for <c-s>x &epsilon; X</c-s> in the stackframe for its local scope
+                and initializes that storage with a default value.
+                <spacer-10></spacer-10>
+                Reserves storage in the local stackframe for <c-s>y &epsilon; Y</c-s> and
+                initializes the storage using a Y constructor function that accepts the type(s)
+                specified by the ... elipsis, above.
+                <spacer-10></spacer-10>
+                <background-block>
+                  Life-time of this storage extends from the point of declaration until the thread
+                  of execution leaves the current scope.
+                </background-block>
+              </indent-block>
+              <c-s>static T t;</c-s> where <c-s>T</c-s> is some fundamental or user-defined type
+              <indent-block class="pad10">
+                Allocates storage for variable <c-s>t</c-s> in static memory, adjacent to other code for
+                the program.
+                <spacer-10></spacer-10>
+                <background-block>
+                  Life-time of the memory
+                  reservation for <c-s>t</c-s> extends from first use to the end of program
+                  execution.
+                </background-block>
+              </indent-block>
+              <c-s>X* pX = new X;</c-s>
+              <indent-block class="pad10">
+                Allocates storage for the pointer <c-s>pX</c-s> in the local stack frame, and
+                allocates storage in the native heap for an un-named instance of X.  The storage
+                for <c-s>pX</c-s> is initialized with the heap address of the X instance, and
+                the storage of the instance of X is initialized by X&apos;s default constructor.
+                <spacer-10></spacer-10>
+                <background-block>
+                  Life-time for this storage extends from the time the new operator is invoked
+                  until <c-s>delete</c-s> operator is called on <c-s>pX</c-s>.
+                </background-block>
+              </indent-block>
+            </indent-block>
+          </details>
+        </indent-block>
+        We will provide examples of, and cover many details about, C++ data types in Chapter 2 - Data.
         <spacer-15></spacer-15>
       </indent-blocks>
       <hr class="spread" />
       <h4>Operations:</h4>
       <indent-blocks>
-        C++ provides unary and binary operations for the fundamental types.  It also provides
-        operator functions that may be overloaded for user defined types.
-        Some of the most used <a href="https://en.cppreference.com/w/cpp/language/operator_precedence">operators</a>
+        C++ programs consist of an ordered sequence of
+        <a href="https://en.cppreference.com/w/cpp/language/statements">statments</a> where a statement is
+        an <a href="https://en.cppreference.com/w/cpp/language/expressions">expression</a> followed
+        by a semicolon &quot;<c-s>;</c-s>&quot;.
+        Statements may be declarative, expression, iterative, selection, and try-block, and may be
+        combinations of these. Declarative statements are compile-time artifacts, disappearing after
+        compilation.  All the others generate code that executes at run-time.
+        <indent-block class="pad10">
+          <details>
+            <summary>
+              <span class="labelStyle lightItem">program scopes</span>
+            </summary>
+            <indent-block class="pad10">
+              C++ programs are partitioned by scopes, e.g., sequences of statements enclosed within braces
+              <span style="white-space:nowrap;">&quot;<c-s>{</c-s> &quot; and &quot;<c-s>}</c-s>&quot;.</span>
+              <spacer-10></spacer-10>
+              There are several types of scopes:
+              <ul class="tight pad10">
+                <li>
+                  <c-s>namespace N { ... }</c-s>
+                </li>
+                <li>
+                  <c-s>class X { ... };</c-s>
+                </li>
+                <li>
+                  <c-s>enum class E { ... }</c-s>
+                </li>
+                <li>
+                  <c-s>void f(int i) { ... }</c-s>
+                </li>
+                <li>
+                  <c-s>try { ... } catch(execption&amp; ex) { ... }</c-s>
+                </li>
+                <li>
+                  <c-s>for(start; end; increment) { ... }</c-s>
+                </li>
+                <li>
+                  <c-s>for(T t : container) { ... }</c-s>
+                </li>
+                <li>
+                  <c-s>while(predicate) { ... }</c-s>
+                </li>
+                <li>
+                  <c-s>do { ... } while(predicate)</c-s>
+                </li>
+                <li>
+                  <c-s>if(predicate) { ... } else { ... }</c-s>
+                </li>
+              </ul>
+              The first three are compile-time artifacts that define names, allowed operations,
+              and accessibility.  They disappear after compilation.
+              <spacer-10></spacer-10>
+              The rest are compile-time and run-time constructs that affect execution and 
+              execution flow. Any entity declared within these scopes has a life-time that
+              starts at the point of declaration and ends when the thread of execution leaves the scope.
+              <spacer-10></spacer-10>
+              We will discuss all of these run-time operations in this section, below. 
+            </indent-block>
+          </details>
+        </indent-block>
+        C++ provides unary and binary <a href="https://en.cppreference.com/w/cpp/language/expressions">operations</a>
+        for the fundamental types.  It also provides operator functions that may be overloaded for
+        user-defined types.
+        Some of the most used operations and
+        <a href="https://en.cppreference.com/w/cpp/language/operator_precedence">operators</a>
         are illustrated here for both fundamental and user-defined types:
         <indent-block class="pad10">
           <details>
@@ -731,7 +903,7 @@
           <details>
             <summary>
               <span class="labelStyle lightItem">
-                selection:&nbsp;&nbsp;if-else, switch
+                selection:&nbsp;&nbsp;if-else, ternary operator, switch
               </span>
             </summary>
             <indent-block class="pad10 codeStyle">
@@ -748,6 +920,16 @@
                 This else clause is optional.
               </comment-block>
               }
+              <hr class="spread">
+              <div class="normal">
+                The ternary operator:
+                <indent-block class="pad10">
+                  <c-s>predicate ? e1 : e2</c-s>
+                </indent-block>
+                returns the value of expression <c-s>e1</c-s> if <c-s>predicate</c-s>
+                evaluates to <c-s>true</c-s>, otherwise it returns the value of expression
+                <c-s>e2</c-s>.
+              </div>
               <hr class="spread">
               <div class="normal">
                 The switch operation enables execution of code specific to some specified case.
@@ -823,8 +1005,10 @@
             </indent-block>
           </details>
         </indent-block>
-        Users can define invocable functions and methods (functions bound to a specific class), as illustrated
-        above.
+        Users can define invocable functions at namespace scope, including the global namespace,
+        but cannot define functions in function scope, e.g., no inner functions.
+        Users define methods (functions bound to a specific class) in class scope.
+        <spacer-15></spacer-15>
         <a href="https://en.cppreference.com/w/cpp/language/lambda">Lambdas</a> are locally defined
         callable objects that are useful for starting threads and using STL algorithms.
         <indent-block class="pad10">
@@ -851,6 +1035,8 @@
             </indent-block>
           </details>
         </indent-block>
+        Lambdas maybe defined in namespace, function, and method scopes, and so, can serve the role
+        of inner functions.  They are useful for much more, as we will see in Chapter 2.
       </indent-blocks>
       <hr class="spread" />
       <h4>Classes and class relationships:</h4>
@@ -1015,37 +1201,212 @@ private:
       </indent-blocks>
       <hr class="spread" />
       <h4>Templates and specialization</h4>
+      C++ templates provide a way of defining library functions and classes that depend
+      on some unspecified type or types.  STL containers like <c-s>std::vector&lt;T&gt;</c-s>
+      are examples.  
+      <spacer-15></spacer-15>
+      Template functions and types need to be instantiated by using applications
+      with specific type(s) before they can be used, e.g., <c-s>std::vector&lt;std::string&gt;</c-s>.
       <indent-blocks>
         <indent-block class="pad10">
           <details>
             <summary class="labelStyle lightItem">template functions</summary>
-            <div class="pad10-15 codeStyle" style="max-width:95%;">
-
-            </div>
+            <indent-block class="pad10" style="max-width:95%;">
+              <c-s>
+                template &lt;typename T&gt;<br />
+                T max(const T&amp; t1, const T&amp; t2) {<br />
+                &nbsp;&nbsp;return t1 &gt; t2 ? t1; t2;<br />
+                }
+              </c-s>
+              <spacer-10></spacer-10>
+              The template function <c-s>max&lt;T, T&gt;</c-s> accepts two arguments of the same
+              type and returns an instance of that type with the value of the larger of the
+              arguments.
+              <spacer-10></spacer-10>
+              This function, when instantiated with a specific type, will compile successfully
+              provided that T has defined <c-s>operator&gt;(T&amp; t)</c-s>. Otherwise, compilation
+              fails.
+              <spacer-10></spacer-10>
+              There is another subtle problem with <c-s>max&lt;T, T&gt;</c-s>.  It works correctly
+              for fundamental types and instances of classes like <c-s>std::string</c-s>.
+              However, if we make the following invocation:
+              <spacer-10></spacer-10>
+              <indent-block class="pad10">
+                <c-s>const char* pStr = max&lt;&quot;aardvark&quot;, &quot;zebra&quot;&gt;;</c-s>
+              </indent-block>
+              <spacer-10></spacer-10>
+              the function compiles, but we may not get a result we expect.  
+              <c-s>max&lt;T, T&gt;</c-s> returns the larger of
+              its two arguments, which, in this case are pointers, so we will get a pointer to whichever
+              string is stored in the higher memory location, having nothing to do with lexicographic
+              ordering of its arguments.
+              <spacer-10></spacer-10>
+              We see how to fix it by overloading <c-s>max&lt;T, T&gt;</c-s> for
+              that specific case, below.
+            </indent-block>
           </details>
-        </indent-block>
-        <indent-block class="pad10">
+          <spacer-15></spacer-15>
           <details>
             <summary class="labelStyle lightItem">overloading template functions</summary>
-            <div class="pad10-15 codeStyle" style="max-width:95%;">
-
-            </div>
+            <indent-block class="pad10" style="max-width:95%;">
+              <c-s>
+                template &lt;typename T&gt;<br />
+                T max(const T&amp; t1, const T&amp; t2) {<br />
+                &nbsp;&nbsp;return t1 &gt; t2 ? t1; t2;<br />
+                }
+                <spacer-10></spacer-10>
+                template &lt;&gt;<br />
+                using pStr = const char*;
+                pStr max(pStr s1, pStr s2) {<br />
+                &nbsp;&nbsp;return ((strcmp(s1,s2)>0) ? S1 : s2);<br />
+                }
+              </c-s>
+              <spacer-10></spacer-10>
+              The C++ language guarantees that the most specific function overload will be
+              applied to compile a function.  In this case, <c-s>pStr</c-s> is more specific
+              than the template type <c-s>T</c-s>, so the second version will be compiled
+              an the result will return the string with largest lexicographic order because
+              that is what the C function <c-s>strcmp</c-s> returns.
+              <spacer-10></spacer-10>
+              This overloading guarantee is very important.  It means that we can define a
+              generic template for a class and then supply specific overloads for any types
+              that are problematic.
+              <spacer-10></spacer-10>
+              This isn&apos;t a perfect solution, because there may be an open-ended set of
+              types that cause problems, but if we encounter more problematic types, we can
+              provide additional overloads.
+            </indent-block>
           </details>
         </indent-block>
         <indent-block class="pad10">
           <details>
             <summary class="labelStyle lightItem">template classes</summary>
-            <div class="pad10-15 codeStyle" style="max-width:95%;">
-
-            </div>
+            <indent-block class="pad10" style="max-width:95%;">
+              <c-s>
+                template &lt;typename T&gt;<br />
+                class stack {<br />
+                public:<br />
+                &nbsp;&nbsp;void push(T t);<br />
+                &nbsp;&nbsp;T pop();<br />
+                &nbsp;&nbsp;T top();<br />
+                &nbsp;&nbsp;std::size_type size();<br />
+                private:<br />
+                &nbsp;&nbsp;// data members elided<br />
+                };
+                <spacer-10></spacer-10>
+                template &lt;typename T&gt;<br />
+                void stack&lt;T&gt;::push(T t) {<br />
+                &nbsp;&nbsp;// details elided<br />
+                }
+                <spacer-10></spacer-10>
+                // other member function definitions elided
+              </c-s>
+              <spacer-15></spacer-15>
+              With this template declaration we can define:
+              <spacer-10></spacer-10>
+              <c-s>
+                stack&lt;int&gt; intStk;<br />
+                stack&lt;std::pair&lt;std::string, int&gt;&gt; prStk;<br />
+                stack&lt;Widget&gt; WdgStk;<br />
+              </c-s>
+              <spacer-10></spacer-10>
+              Without templates we would have to declare a <c-s>stack</c-s> class for each of these
+              types.  With templates the compiler does all that extra work for us.
+              <spacer-10></spacer-10>
+              For each instantiation, the compiler generates a class for that type.  Syntactically,
+              each of the above declarations defines a distinct class.  That is,
+              <c-s>stack&lt;int&gt;</c-s> is not the same type as 
+              <c-s>stack&lt;std::pair&lt;std::string, int&gt;&gt; prStk;</c-s>
+            </indent-block>
           </details>
         </indent-block>
         <indent-block class="pad10">
           <details>
             <summary class="labelStyle lightItem">template class specialization</summary>
-            <div class="pad10-15 codeStyle" style="max-width:95%;">
-
-            </div>
+            <indent-block class="pad10" style="max-width:95%;">
+              Suppose that, for the user-defined type <c-s>Widget</c-s>, some <c-s>stack&lt;T&gt;</c-s>
+              methods fail to compile or process a <c-s>Widget</c-s> incorrectly.  
+              That could happen if the stack provides copy and assignment operations, but
+              <c-s>Widget</c-s> instances are not copyable or assignable.
+              <spacer-10></spacer-10>
+              For that, we can use template
+              specialization to fix that problem, in much the same way as we did by overloading
+              <c-s>max&lt;T, T&gt;</c-s> in the discussion of overloading template functions.
+              For the <c-s>Widget</c-s> specialization we would declare the 
+              <c-s>stack&lt;Widget&gt;</c-s> copy and assignment operations as deleted
+              with <c-s>=delete</c-s> postfix qualifiers.
+              <spacer-15></spacer-15>
+              The generic class is defined as:
+              <spacer-10></spacer-10>
+              <background-block class="pad10 indent">
+                <c-s>
+                  template &lt;typename T&gt;<br />
+                  class stack {<br />
+                  public:<br />
+                  &nbsp;&nbsp;stack();<br />
+                  &nbsp;&nbsp;stack(const stack&lt;T&gt;&amp; stk);<br />
+                  &nbsp;&nbsp;stack&lt;T&gt;&amp; operator=(const stack&lt;T&gt;&amp; stk);<br />
+                  &nbsp;&nbsp;void push(T t);<br />
+                  &nbsp;&nbsp;T pop();<br />
+                  &nbsp;&nbsp;T top();<br />
+                  &nbsp;&nbsp;std::size_type size();<br />
+                  private:<br />
+                  &nbsp;&nbsp;// data members elided<br />
+                  };
+                  <spacer-10></spacer-10>
+                  template &lt;typename T&gt;<br />
+                  void stack&lt;T&gt;::push(T t) {<br />
+                  &nbsp;&nbsp;// details elided<br />
+                  }
+                  <spacer-10></spacer-10>
+                  // other member function definitions elided
+                </c-s>
+                <spacer-15></spacer-15>
+                <c-s>
+                  stack&lt;Widget&gt; WdgStk;
+                </c-s>
+                // fails to compile or exhibits incorrect operation.
+              </background-block>
+              <spacer-15></spacer-15>
+              So, we define a <c-s>stack</c-s> class specialization for <c-s>Widgets</c-s>
+              like this:
+              <spacer-10></spacer-10>
+              <background-block class="pad10 indent">
+                <c-s>
+                  template &lt;&gt;<br />
+                  class stack&lt;Widget&gt; {<br />
+                  public:<br />
+                  &nbsp;&nbsp;stack();<br />
+                  &nbsp;&nbsp;stack(const stack&lt;T&gt;&amp; stk) = delete;<br />
+                  &nbsp;&nbsp;stack&lt;T&gt;&amp; operator=(const stack&lt;T&gt;&amp; stk) = delete;<br />
+                  &nbsp;&nbsp;void push(Widget w);<br />
+                  &nbsp;&nbsp;Widget pop();<br />
+                  &nbsp;&nbsp;Widget top();<br />
+                  &nbsp;&nbsp;std::size_type size();<br />
+                  private:<br />
+                  &nbsp;&nbsp;// elided data members may be different from the generic class<br />
+                  };
+                  <spacer-10></spacer-10>
+                  template &lt;typename T&gt;<br />
+                  void stack&lt;T&gt;::push(T t) {<br />
+                  &nbsp;&nbsp;// elided details may be different from the generic class<br />
+                  }
+                  <spacer-10></spacer-10>
+                  // other member function definitions elided
+                </c-s>
+                <spacer-10></spacer-10>
+                <c-s class="pad10">
+                  stack&lt;Widget&gt; WdgStk;
+                </c-s>
+                <spacer-10></spacer-10>
+                // now compiles if we don&apos;t try to copy or assign instances<br />
+                // and exhibits correct operation
+              </background-block>
+              <spacer-15></spacer-15>
+              The C++ language guarantees that a specialization will be compiled instead of the
+              generic class whenever the class is instantiated with a specialized type, like
+              <c-s>Widget</c-s>
+            </indent-block>
           </details>
         </indent-block>
       </indent-blocks>
