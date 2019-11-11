@@ -1205,23 +1205,23 @@ private:
       on some unspecified type or types.  STL containers like <c-s>std::vector&lt;T&gt;</c-s>
       are examples.  
       <spacer-15></spacer-15>
-      Template functions and types need to be instantiated by using applications
+      Template functions and classes need to be instantiated by using applications
       with specific type(s) before they can be used, e.g., <c-s>std::vector&lt;std::string&gt;</c-s>.
       <indent-blocks>
         <indent-block class="pad10">
           <details>
             <summary class="labelStyle lightItem">template functions</summary>
             <indent-block class="pad10" style="max-width:95%;">
+              The template function <c-s>max&lt;T, T&gt;</c-s> accepts two arguments of the same
+              type and returns an instance of that type with the value of the larger of the
+              arguments.
+              <spacer-10></spacer-10>
               <c-s>
                 template &lt;typename T&gt;<br />
                 T max(const T&amp; t1, const T&amp; t2) {<br />
                 &nbsp;&nbsp;return t1 &gt; t2 ? t1; t2;<br />
                 }
               </c-s>
-              <spacer-10></spacer-10>
-              The template function <c-s>max&lt;T, T&gt;</c-s> accepts two arguments of the same
-              type and returns an instance of that type with the value of the larger of the
-              arguments.
               <spacer-10></spacer-10>
               This function, when instantiated with a specific type, will compile successfully
               provided that T has defined <c-s>operator&gt;(T&amp; t)</c-s>. Otherwise, compilation
@@ -1235,8 +1235,8 @@ private:
                 <c-s>const char* pStr = max&lt;&quot;aardvark&quot;, &quot;zebra&quot;&gt;;</c-s>
               </indent-block>
               <spacer-10></spacer-10>
-              the function compiles, but we may not get a result we expect.  
-              <c-s>max&lt;T, T&gt;</c-s> returns the larger of
+              the function compiles, but we may not get a result we expect.
+              <c-s>max&lt;const char*, const char*&gt;</c-s> returns the larger of
               its two arguments, which, in this case are pointers, so we will get a pointer to whichever
               string is stored in the higher memory location, having nothing to do with lexicographic
               ordering of its arguments.
@@ -1249,23 +1249,30 @@ private:
           <details>
             <summary class="labelStyle lightItem">overloading template functions</summary>
             <indent-block class="pad10" style="max-width:95%;">
-              <c-s>
-                template &lt;typename T&gt;<br />
-                T max(const T&amp; t1, const T&amp; t2) {<br />
-                &nbsp;&nbsp;return t1 &gt; t2 ? t1; t2;<br />
-                }
-                <spacer-10></spacer-10>
-                template &lt;&gt;<br />
-                using pStr = const char*;
-                pStr max(pStr s1, pStr s2) {<br />
-                &nbsp;&nbsp;return ((strcmp(s1,s2)>0) ? S1 : s2);<br />
-                }
-              </c-s>
+              Here&apos;s the original <c-s>max&lt;T, T&gt;</c-s> declaration:
+              <background-block class="pad10 indent">
+                <c-s>
+                  template &lt;typename T&gt;<br />
+                  T max(const T&amp; t1, const T&amp; t2) {<br />
+                  &nbsp;&nbsp;return t1 &gt; t2 ? t1; t2;<br />
+                  }
+                </c-s>
+              </background-block>
+              and here is a function overload declaration for the case of <c-s>const char*</c-s>:
+              <background-block class="pad10 indent">
+                <c-s>
+                  using pStr = const char*;<br />
+                  template &lt;&gt;<br />
+                  pStr max(pStr s1, pStr s2) {<br />
+                  &nbsp;&nbsp;return ((strcmp(s1,s2)>0) ? S1 : s2);<br />
+                  }
+                </c-s>
+              </background-block>
               <spacer-10></spacer-10>
               The C++ language guarantees that the most specific function overload will be
-              applied to compile a function.  In this case, <c-s>pStr</c-s> is more specific
+              applied to compile a function.  In the case of <c-s>const char*</c-s>, <c-s>pStr</c-s> is more specific
               than the template type <c-s>T</c-s>, so the second version will be compiled
-              an the result will return the string with largest lexicographic order because
+              and the result will return the string with largest lexicographic order because
               that is what the C function <c-s>strcmp</c-s> returns.
               <spacer-10></spacer-10>
               This overloading guarantee is very important.  It means that we can define a
@@ -1282,6 +1289,8 @@ private:
           <details>
             <summary class="labelStyle lightItem">template classes</summary>
             <indent-block class="pad10" style="max-width:95%;">
+              C++ classes can be declared as templates too.  Here&apos;s an example:
+              <spacer-10></spacer-10>
               <c-s>
                 template &lt;typename T&gt;<br />
                 class stack {<br />
@@ -1327,7 +1336,8 @@ private:
               Suppose that, for the user-defined type <c-s>Widget</c-s>, some <c-s>stack&lt;T&gt;</c-s>
               methods fail to compile or process a <c-s>Widget</c-s> incorrectly.  
               That could happen if the stack provides copy and assignment operations, but
-              <c-s>Widget</c-s> instances are not copyable or assignable.
+              <c-s>Widget</c-s> instances are not copyable or assignable, or those operations
+              are incorrect for <c-s>Widget</c-s> due to an incomplete design<sup>1</sup>.
               <spacer-10></spacer-10>
               For that, we can use template
               specialization to fix that problem, in much the same way as we did by overloading
@@ -1406,6 +1416,13 @@ private:
               The C++ language guarantees that a specialization will be compiled instead of the
               generic class whenever the class is instantiated with a specialized type, like
               <c-s>Widget</c-s>
+              <hr class="spread" />
+              <ol style="font-size:0.8em;">
+                <li>
+                  We will discuss how incomplete designs happen and how to ensure your designs 
+                  are complete in Chapter 4.
+                </li>
+              </ol>
             </indent-block>
           </details>
         </indent-block>
