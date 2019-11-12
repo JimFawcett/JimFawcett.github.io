@@ -621,9 +621,9 @@
               <c-s>X* pX = new X;</c-s>
               <indent-block class="pad10">
                 Allocates storage for the pointer <c-s>pX</c-s> in the local stack frame, and
-                allocates storage in the native heap for an un-named instance of X.  The storage
-                for <c-s>pX</c-s> is initialized with the heap address of the X instance, and
-                the storage of the instance of X is initialized by X&apos;s default constructor.
+                allocates storage in the native heap for an un-named instance of <c-s>X</c-s>.  The storage
+                for <c-s>pX</c-s> is initialized with the heap address of the <c-s>X</c-s> instance, and
+                the storage of the instance of <c-s>X</c-s> is initialized by <c-s>X</c-s>&apos;s default constructor.
                 <spacer-10></spacer-10>
                 <background-block>
                   Life-time for this storage extends from the time the new operator is invoked
@@ -661,7 +661,10 @@
                   <c-s>namespace N { ... }</c-s>
                 </li>
                 <li>
-                  <c-s>class X { ... };</c-s>
+                  <c-s>class C { ... };</c-s>
+                </li>
+                <li>
+                  <c-s>struct S { ... }</c-s>
                 </li>
                 <li>
                   <c-s>enum class E { ... }</c-s>
@@ -673,29 +676,29 @@
                   <c-s>try { ... } catch(execption&amp; ex) { ... }</c-s>
                 </li>
                 <li>
-                  <c-s>for(start; end; increment) { ... }</c-s>
+                  <c-s>for(startExpression; endExpression; incrementExpression) { ... }</c-s>
                 </li>
                 <li>
-                  <c-s>for(T t : container) { ... }</c-s>
+                  <c-s>for(T t : container) { ... }&nbsp;&nbsp;T</c-s> may be replaced by <c-s>auto</c-s>
                 </li>
                 <li>
                   <c-s>while(predicate) { ... }</c-s>
                 </li>
                 <li>
-                  <c-s>do { ... } while(predicate)</c-s>
+                  <c-s>do { ... } while(predicate);</c-s>
                 </li>
                 <li>
                   <c-s>if(predicate) { ... } else { ... }</c-s>
                 </li>
               </ul>
-              The first three are compile-time artifacts that define names, allowed operations,
+              The first four are compile-time artifacts that define names, allowed operations,
               and accessibility.  They disappear after compilation.
               <spacer-10></spacer-10>
-              The rest are compile-time and run-time constructs that affect execution and 
+              The rest are compile-time and run-time constructs that affect execution and
               execution flow. Any entity declared within these scopes has a life-time that
               starts at the point of declaration and ends when the thread of execution leaves the scope.
               <spacer-10></spacer-10>
-              We will discuss all of these run-time operations in this section, below. 
+              We will discuss all of these run-time operations in this section, below.
             </indent-block>
           </details>
         </indent-block>
@@ -1203,7 +1206,7 @@ private:
       <h4>Templates and specialization</h4>
       C++ templates provide a way of defining library functions and classes that depend
       on some unspecified type or types.  STL containers like <c-s>std::vector&lt;T&gt;</c-s>
-      are examples.  
+      are examples.
       <spacer-15></spacer-15>
       Template functions and classes need to be instantiated by using applications
       with specific type(s) before they can be used, e.g., <c-s>std::vector&lt;std::string&gt;</c-s>.
@@ -1263,7 +1266,7 @@ private:
                 <c-s>
                   using pStr = const char*;<br />
                   template &lt;&gt;<br />
-                  pStr max(pStr s1, pStr s2) {<br />
+                  pStr max(const pStr&amp; s1, const pStr&amp; s2) {<br />
                   &nbsp;&nbsp;return ((strcmp(s1,s2)>0) ? S1 : s2);<br />
                   }
                 </c-s>
@@ -1324,7 +1327,7 @@ private:
               <spacer-10></spacer-10>
               For each instantiation, the compiler generates a class for that type.  Syntactically,
               each of the above declarations defines a distinct class.  That is,
-              <c-s>stack&lt;int&gt;</c-s> is not the same type as 
+              <c-s>stack&lt;int&gt;</c-s> is not the same type as
               <c-s>stack&lt;std::pair&lt;std::string, int&gt;&gt; prStk;</c-s>
             </indent-block>
           </details>
@@ -1334,7 +1337,7 @@ private:
             <summary class="labelStyle lightItem">template class specialization</summary>
             <indent-block class="pad10" style="max-width:95%;">
               Suppose that, for the user-defined type <c-s>Widget</c-s>, some <c-s>stack&lt;T&gt;</c-s>
-              methods fail to compile or process a <c-s>Widget</c-s> incorrectly.  
+              methods fail to compile or process a <c-s>Widget</c-s> incorrectly.
               That could happen if the stack provides copy and assignment operations, but
               <c-s>Widget</c-s> instances are not copyable or assignable, or those operations
               are incorrect for <c-s>Widget</c-s> due to an incomplete design<sup>1</sup>.
@@ -1342,7 +1345,7 @@ private:
               For that, we can use template
               specialization to fix that problem, in much the same way as we did by overloading
               <c-s>max&lt;T, T&gt;</c-s> in the discussion of overloading template functions.
-              For the <c-s>Widget</c-s> specialization we would declare the 
+              For the <c-s>Widget</c-s> specialization we would declare the
               <c-s>stack&lt;Widget&gt;</c-s> copy and assignment operations as deleted
               with <c-s>=delete</c-s> postfix qualifiers.
               <spacer-15></spacer-15>
@@ -1419,8 +1422,8 @@ private:
               <hr class="spread" />
               <ol style="font-size:0.8em;">
                 <li>
-                  We will discuss how incomplete designs happen and how to ensure your designs 
-                  are complete in Chapter 4.
+                  We will discuss, in Chapter 4., how incomplete designs happen and how to ensure your designs
+                  are complete.
                 </li>
               </ol>
             </indent-block>
@@ -1429,27 +1432,326 @@ private:
       </indent-blocks>
       <hr class="spread" />
       <h4>Libraries</h4>
+      The C++ standard libraries collection is very large, perhaps overwhelming.
+      Many of us are quite familiar with a small subset, and browse through the
+      rest when we need some functionality that could be there.
+      <spacer-15></spacer-15>
       <indent-blocks>
         <indent-block class="pad10">
           <details>
             <summary class="labelStyle lightItem">standard C++ libraries</summary>
-            <div class="pad10-15 codeStyle" style="max-width:95%;">
+            <indent-block class="pad10" style="max-width:95%;">
+              I&apos;ve enumerated a lot of the libraries and some of their contents in order
+              to support your browsing process.
+              <div style="border:2px solid darkred; width:max-content; max-width:95%; padding:10px; margin:15px 0px;">
+                This material was drawn from resources provided by
+                <a href="https://en.cppreference.com/w/cpp">cppreference.com</a>.<br />
+                Only the organization has been changed (slightly) and a few of the more
+                obscure libraries omitted.  I&apos;ve annotated the material and emphasized
+                those libraries I use frequently.  You will see most of them in examples
+                throughout this story.
+              </div>
+              Here are some categories:
+              <ul>
+                <li>
+                  Language Support libraries
+                  <ul class="tight">
+                    <li>
+                      <span class="notice">&lt;initializer_list&gt;</span> - supports uniform initialization for user-defined types,
+                      examples in Chapter 2.
+                    </li>
+                    <li>
+                      <span class="notice">&lt;type_traits&gt;</span> - used for template metadata programming, examples in Chapter 3.
+                    </li>
+                    <li>&lt;limits&gt; - Numeric limits</li>
+                    <li>&lt;cstdlib&gt; - Managing OS Processes and Signals</li>
+                  </ul>
+                </li>
+                <li>
+                  General Utilities libraries
+                  <ul class="tight">
+                    <li><span class="notice">&lt;memory&gt;</span> - Smart pointers and allocators, examples in Chapter 4</li>
+                    <li>&lt;chrono&gt; - Time durations, times, and dates</li>
+                    <li>
+                      Function objects and qualilfiers:
+                      <indent-block>
+                        <div>
+                          <span class="notice">&lt;functional&gt;</span> - function, mem_fn, bind, invoke, ref
+                        </div>
+                        <div>
+                          <span class="notice">&lt;utility&gt;</span> - move, forward, pair, tuple, examples in Chapters 2 and 3
+                        </div>
+                        <span class="notice">&lt;tuple&gt;</span> - examples in Chapters 1 and 2
+                      </indent-block>
+                    </li>
+                    <li>&lt;charconv&gt; - to_chars, from_chars, chars_format</li>
+                    <li><span class="notice">&lt;optional&gt;</span> - return instance or empty</li>
+                    <li><span class="notice">&lt;any&gt;</span> - holds instance of almost any type, example in Chapter 4</li>
+                    <li>&lt;variant&gt; - holds instances of any specified set of types</li>
+                  </ul>
+                </li>
+                <li>
+                  <span class="notice">&lt;string&gt;</span> - std::basic_string --> std::string, std::wstring
+                </li>
+                <li>
+                  Containers libraries:
+                  <indent-block>
+                    &lt;array&gt;, &lt;deque&gt;, &lt;list&gt;, &lt;map&gt;,
+                    &lt;multimap&gt; &lt;multiset&gt;
+                    &lt;queue&gt;,
+                    &lt;set&gt;, &lt;singleList&gt;, &lt;stack&gt;, &lt;string&gt;,
+                    <span class="notice">&lt;unordered_map&gt;</span>,
+                    &lt;unordered_multimap&gt;, &lt;unordered_multiset&gt;,
+                    &lt;unordered_set&gt;, <span class="notice">&lt;vector&gt;</span>
+                  </indent-block>
+                </li>
+                <li>
+                  &lt;algorithm&gt; - Algorithms library
+                  <spacer-10></spacer-10>
+                  <indent-block>
+                    Non-modifying sequence operations:
+                    <background-block class="indent">
+                      all_of, any_of, none_of, for_each, for_each_n, count, count_if,
+                      mismatch, find, find_if, find_if_not, find_end, find_first_of,
+                      adjacent_find, search, search_n
+                    </background-block>
+                    Modifying sequence operations:
+                    <background-block class="indent">
+                      copy, copy_if, copy_n, copy_backward,
+                      move, move_backward, fill, fill_n, transform, generate, generate_n,
+                      remove, remove_if, remove_copy, remove_copy_if, replace, replace_if,
+                      replace_copy, replace_copy_if, swap, swap_ranges, iter_swap,
+                      reverse, reverse_copy, rotate, shift_left, shift_right,
+                      random_shuffle, shuffle, sample, unique, unique_copy
+                    </background-block>
+                    Partitioning operations:
+                    <background-block class="indent">
+                      is_partitioned, partition, partition_copy, stable_partition, partition_point
+                    </background-block>
+                    Sorting operations:
+                    <background-block class="indent">
+                      is_sorted, is_sorted_until, sort, partial_sort, stable_sort, nth_element
+                    </background-block>
+                    Binary search on sorted ranges:
+                    <background-block class="indent">
+                      lower_bound, upper_bound, binary_search, equal_range
+                    </background-block>
+                    Other operations on sorted ranges:
+                    <background-block class="indent">
+                      merge, inplace_merge
+                    </background-block>
+                    Set operations on sorted ranges:
+                    <background-block class="indent">
+                      includes, set_differences, set_intersection, set_symmetric_distance, set_union
+                    </background-block>
+                    Heap operations:
+                    <background-block class="indent">
+                      is_heap, is_heap_until, make_heap, push_heap, pop_heap, sort_heap
+                    </background-block>
+                    Min/Max operations:
+                    <background-block class="indent">
+                      max, max_element, min, min_element, minmax, minmax_element, clamp
+                    </background-block>
+                    Comparison operations:
+                    <background-block class="indent">
+                      equal, lexicographical_compare, lexicographical_compare_three_way
+                    </background-block>
+                    Permutation operations:
+                    <background-block class="indent">
+                      is_permutation, next_permutation, prev_permutation
+                    </background-block>
+                    Numeric operations:
+                    <background-block class="indent">
+                      iota, accumulate, inner_product, adjacent_difference, partial_sum,
+                      reduce, exclusive_scan, inclusive_scan, transform_reduce,
+                      transform_exclusive_scan, transform_inclusive_scan
+                    </background-block>
+                  </indent-block>
+                </li>
+                <li>
+                  Numerics libraries
+                  <ul class="tight">
+                    <li>
+                      &lt;cstdlib&gt;, &lt;cmath&gt; - Common math functions
+                    </li>
+                    <li>&lt;cmath&gt; - Special math functions</li>
+                    <li>&lt;numeric&gt;, &lt;cmath&gt; - Numeric algorithms</li>
+                    <li>&lt;random&gt;, &lt;cstdlib&gt; - Pseudo-random number generators</li>
+                    <li>&lt;cfenv&gt; - Floating-point environment</li>
+                    <li>&lt;complex&gt; - Complex numbers, operations</li>
+                  </ul>
+                </li>
+                <li>
+                  Input/Output libraries:
+                  <ul class="tight">
+                    <li>
+                      Terminal I/O:
+                      <background-block class="indent">
+                        <span class="notice">
+                          &lt;ios&gt;, &lt;streambuf&gt;, &lt;ostream&gt;, &lt;istream&gt;,
+                          &lt;iostream&gt;
+                        </span>
+                      </background-block>
+                    </li>
+                    <li>
+                      File I/O:
+                      <background-block class="indent">
+                        <span class="notice">&lt;fstream&gt;</span>
+                      </background-block>
+                    </li>
+                    <li>
+                      String I/O:
+                      <background-block class="indent">
+                        <span class="notice">&lt;sstream&gt;</span>
+                      </background-block>
+                    </li>
+                    <li>
+                      Synchronized I/O:
+                      <background-block class="indent">
+                        &lt;syncstream&gt;
+                      </background-block>
+                    </li>
+                    <li>
+                      I/O manipulators:
+                      <background-block class="indent">
+                        <scan class="notice">&lt;iomanip&gt;</scan>
+                      </background-block>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <span class="notice">&lt;regex&gt;</span> - Regular Expressions library
+                </li>
+                <li>
+                  Thread Support libraries:
+                  <div>
+                    C++17:
+                    <background-block class="indent">
+                      <span class="notice">
+                        &lt;thread&gt;, &lt;mutex&gt;, &lt;shared_mutex&gt;,
+                        &lt;condition_variable&gt;, &lt;future&gt;, &lt;atomic&gt;
+                      </span>
+                    </background-block>
+                    C++20:
+                    <background-block class="indent">
+                      &lt;semiphore&gt;, &lt;latch&gt;, &lt;stop_token&gt;
 
-            </div>
+                    </background-block>
+                  </div>
+                </li>
+                <li>
+                  <span class="notice">&lt;filesystem&gt;</span> - Filesystem library
+                </li>
+                <li>
+                  Error Handling libraries:
+                  <background-block class="indent">
+                    <span class="notice">&lt;exception&gt;</span>, &lt;stdexcept&gt;, &lt;cerrno&gt;, &lt;cassert&gt;
+                    &lt;system_error&gt;
+                  </background-block>
+                </li>
+                <li>
+                  Other libraries
+                  <ul class="tight">
+                    <li>Localizations</li>
+                    <li>Iterators</li>
+                    <li>Concepts (C++20)</li>
+                    <li>Named Requirements (C++20)</li>
+                    <li>Ranges (C++20)</li>
+                  </ul>
+                </li>
+              </ul>
+            </indent-block>
           </details>
         </indent-block>
       </indent-blocks>
+      <spacer-10></spacer-10>
+      The standard library collection is very large, but still there are a few surprising
+      omissions. Until C++17 there was no filesystem library and there still is no support
+      for:
+      <ul style="margin-top:10px; margin-bottom:10px;">
+        <li style="padding-bottom:2px;">Network programming and inter-process communication</li>
+        <li style="padding-bottom:2px;">Processing XML or JSON data formats</li>
+        <li>Building Graphical User Interfaces</li>
+      </ul>
+      However, building these is not too difficult using platform APIs and/or third party libraries, especially
+      the extensive <a href="https://Boost.org">Boost</a> library.
+      <spacer-10></spacer-10>
       <indent-blocks>
         <indent-block class="pad10">
           <details>
             <summary class="labelStyle lightItem">custom libraries</summary>
-            <div class="pad10-15 codeStyle" style="max-width:95%;">
-
-            </div>
+            <indent-block class="pad10" style="max-width:95%;">
+              Libraries, written entirely in C++, using platform APIs as necessary,
+              that fill in some omissions from the standard C++ library.
+              <spacer-15></spacer-15>
+              <table>
+                <tr>
+                  <th>Library</th>
+                  <th>Description</th>
+                </tr>
+                <tr>
+                  <td>FileSystem</td>
+                  <td>
+                    Provides interfaces used by many of the applications in code repositories
+                    in this site.  It was developed using Windows and Linux platform APIs.
+                    I plan to turn this into a wrapper for the std::filesystem which provides
+                    a different set of interfaces, incompatible with the existing applications.
+                    <spacer-10></spacer-10>
+                    <a href="FileSystem.html">FileSystem.html</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>XmlDocument</td>
+                  <td>
+                    A fairly complete processing library for reading, parsing, building,
+                    and writing XML to and from strings and files.
+                    <spacer-10></spacer-10>
+                    <a href="XmlDocument.html">XmlDocument.html</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>CppCommWithFileXfer</td>
+                  <td>
+                    Supports asynchronous message-passing communication between multiple
+                    endpoints, using the Sockets library, below.
+                    <spacer-10></spacer-10>
+                    <a href="CppCommWithFileXfer.html">CppCommWithFileXfer.html</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Sockets</td>
+                  <td>
+                    A sockets class hierarchy that handles IP4 and IP6 protocols
+                    for stream-based sockets.  The library has versions for both Windows
+                    and Linux.
+                    <spacer-10></spacer-10>
+                    <a href="Sockets.html">Sockets.html</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>CppParser</td>
+                  <td>
+                    A rule based parser suitable for analyzing C, C++, C#, and Java.
+                    <spacer-10></spacer-10>
+                    <a href="BlogParser.html">Parsing Blog</a>,
+                    <a href="CppParser.html">CppParser Repository</a>,
+                    <a href="CppLexicalScanner.html">CppLexicalScanner.html</a>
+                  </td>
+                </tr>
+              </table>
+            </indent-block>
           </details>
         </indent-block>
       </indent-blocks>
     </indent-blocks>
+    <spacer-15></spacer-15>
+    This completes our survey of the C++ programming language.  We will be expanding on each
+    of these topics: 
+    <indent-block class="pad10">
+      <span class="notice">Data, Operations, Classes, Templates, and Libraries</span>
+    </indent-block>
+    in the following chapters of this story, with lots of discussion and code examples,
+    and a few videos here and there.
   </indent-blocks>
   <spacer-25></spacer-25>
   <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
