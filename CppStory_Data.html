@@ -110,6 +110,29 @@
       #github ol.footnote li {
         padding-bottom:0px;
       }
+      #github defn-block {
+        display:flex;
+        flex-direction:column;
+        width:max-content;
+        max-width:95%;
+        /*border:1px solid darkred;*/
+      }
+      #github defn-head {
+        padding:3px 15px;
+        border:1px solid darkred;
+        border-bottom:none;
+      }
+      #github defn-body {
+        padding:3px 15px;
+        border:1px solid darkred;
+      }
+      #github defn-body ul {
+        margin-top:3px;
+        padding: 0px 15px;
+      }
+      #github defn-body ul > li {
+        padding-bottom: 3px;
+      }
   </style>
 </head>
 <body id="github" onload="initializeMenu()">
@@ -141,6 +164,162 @@
   <hr class="spread" />
   <indent-blocks>
     <h3>Data:</h3>
+    This chapter focuses on data, e.g., types, type qualifiers, type conversions, data values, initialization, value conversions, and memory layout.
+    
+    <h3>Types:</h3>
+    C++ is a statically typed language.  All data is defined with a type and name, using a declaration statement,  
+    and the language enforces a definition first rule: variable use must occur after its definition, in compiler scan order.
+    <!--<spacer-15></spacer-15>-->
+
+    <defn-block class="indent pad10">
+      <defn-head>
+        Type
+      </defn-head>
+      <defn-body>
+        <ul>
+          <li>A set of allowed values</li>
+          <li>Operations that may be applied to these values</li>
+        </ul>
+      </defn-body>
+    </defn-block>
+    A collection of fundamental types are built into the C++ language.
+    <defn-block class="indent pad10">
+      <defn-head>
+        Fundamental Data Types
+      </defn-head>
+      <defn-body>
+        <ul>
+          <li>
+            integral: byte, bool, int, char, char16_t, char32_t, wchar_t
+          </li>
+          <li>
+            floating point: float, double
+          </li>
+          <li>
+            derived types: array, pointer, reference
+          </li>
+        </ul>
+      </defn-body>
+    </defn-block>
+    These are augmented with an open-ended collection of library and user defined types:
+    <defn-block class="pad10 indent">
+      <defn-head>
+        User defined types
+      </defn-head>
+      <defn-body>
+        <ul>
+          <li><c-s>struct S { ... }</c-s></li>
+          <li><c-s>class C { ... }</c-s></li>
+          <li><c-s>enum class { ... }</c-s></li>
+          <li>alias: <c-s>using [NewName] = [TypeName]</c-s></li>
+        </ul>
+      </defn-body>
+    </defn-block>
+    <h3>Type Qualifiers:</h3>
+    The language defines two qualifiers that modify how an instance of a type may be used: const and volatile.
+    <defn-block class="pad10 indent">
+      <defn-head>
+        Type Qualifiers
+      </defn-head>
+      <defn-body>
+        <div class="pad10"><span class="notice">const</span> qualifier</div>
+        <ul>
+          <li>
+            const prepended on a type declaration
+            <indent-block>
+              <c-s>const int ci;</c-s>
+            </indent-block>
+            makes <c-s>ci</c-s> immutable
+          </li>
+          <li>
+            function and method parameters
+            <indent-block>
+              <c-s>void f(const std:string&amp; s)</c-s>
+            </indent-block>
+            prevent&apos;s the user variable s from being changed in f
+          </li>
+          <li>
+            const postpended to a method declaration and definition
+            <indent-block>
+              <c-s>void X::f(int i) const { ... }</c-s>
+            </indent-block>
+            prevents changes to an instance, <c-s>x &epsilon; X</c-s>, when invoked as x.f(i);
+          </li>
+          <li>
+            const applied to pointers
+            <indent-block>
+              <c-s>const X* pX = &amp;x</c-s>
+            </indent-block>
+            prevents x from being changed via pX, e.g., *pX = x2; will fail to compile
+            <indent-block>
+              <c-s>X* const pX = &amp;x</c-s>
+            </indent-block>
+            prevents pX being assigned a new address
+          </li>
+        </ul>
+        <div class="pad10"><span class="notice">short and long</span> qualifiers may affect storage sizes</div>
+        <ul>
+          <li>
+            short prepended on a type definition for int
+            <indent-block>
+              <c-s>short int i;</c-s>
+            </indent-block>
+            guarantees that <c-s>sizeof(short int) <= sizeof(int);</c-s>
+          </li>
+          <li>
+            long prepended on a type definition for int or double
+            <indent-block>
+              <c-s>long double d;</c-s>
+            </indent-block>
+            guarantees that <c-s>sizeof(double) <= sizeof(long double) <= sizeof(long long double)</c-s>
+          </li>
+        </ul>
+        <div class="pad10"><span class="notice">signed and unsigned</span> qualifiers</div>
+        <ul>
+          <li>
+            signed and unsigned may be prepended on a type definition for int or char
+            <indent-block>
+              signed int i;
+            </indent-block>
+            acceptable values of i occupy a range symetric around the value 0
+            <indent-block>
+              unsigned int j;
+            </indent-block>
+            acceptible values of j lie in a range bounded at the bottom with 0
+          </li>
+        </ul>
+        <div class="pad10"><span class="notice">auto</span> qualifier</div>
+        <ul>
+          <li>
+            auto as a type definition
+            <indent-block>
+              <c-s>auto r{ 3 }; auto s{ 1.5 }</c-s>
+            </indent-block>
+            instructs compiler to use type deduction to suppy the type, so <c-s>r</c-s> is type int and <c-s>s</c-s> is type double.
+          </li>
+          <li>
+            auto is frequently used to deduce the type of a function return value and as the type of a variable enumerated in
+            a range-based for:
+            <indent-block>
+              <c-s>auto r = f();</c-s><br />
+              <c-s>for(auto item : container) { ... }</c-s>
+            </indent-block>
+          </li>
+        </ul>
+        <div class="pad10"><span class="notice">volatile</span> qualifier</div>
+        <ul>
+          <li>
+            volatile prepended on a type definition
+            <indent-block>
+              volatile int i;
+            </indent-block>
+            instructs the compiler that the variable, i, may be changed by some event external to the program
+            and so should not be optimized to a compile-time constant.
+          </li>
+        </ul>
+      </defn-body>
+    </defn-block>
+    C++ also defines the qualifiers
     <h3>Sizes and Layout</h3>
     <h3>Initialization</h3>
     <h3>New Types</h3>
