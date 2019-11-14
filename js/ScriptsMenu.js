@@ -60,6 +60,7 @@ function initializeMenu() {
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
         <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a>\
+        <a href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a>\
         <a href='DesignProcess.html'>Design Process</a>\
         <a href='ProjectsList.html'>Project suggestions</a>\
         <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
