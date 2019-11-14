@@ -133,6 +133,17 @@
       #github defn-body ul > li {
         padding-bottom: 3px;
       }
+      #github defn-example {
+        font-family:Consolas, monospace;
+        padding:3px 15px;
+        border:1px solid darkred;
+        border-top:none;
+      }
+      #github pre-b {
+        display:block;
+        white-space:pre;
+        font-size:0.9em;
+      }
   </style>
 </head>
 <body id="github" onload="initializeMenu()">
@@ -169,7 +180,6 @@
     <h3>Types:</h3>
     C++ is a statically typed language.  All data is defined with a type and name, using a declaration statement,
     and the language enforces a definition first rule: variable use must occur after its definition, in compiler scan order.
-    <!--<spacer-15></spacer-15>-->
 
     <defn-block class="indent pad10">
       <defn-head>
@@ -216,12 +226,18 @@
       </defn-body>
     </defn-block>
     <h3>Type Qualifiers:</h3>
-    The language defines two qualifiers that modify how an instance of a type may be used: const and volatile.  It also
-    defines qualifiers that affect the storage of data: short, long, signed, unsigned, extern, and constexpr.
-
+    The C++ language defines qualifiers that modify how an instance of a type may be used: const, constexpr, and volatile.  
+    It also defines qualifiers that affect storage of data: short, long, signed, unsigned, and extern.
+    <spacer-15></spacer-15>
+    The const qualifier affects what operations apply and what methods may be applied to a data item.
+    The qualifier volatile affects what compiler optimizers may do with a data storage.  Note that,
+    unlike Java and C#, volatile qualification does not affect flushing of the cache for reads and writes.
+    <indent-block class="pad10">
+      <details>
+        <summary><span>const and volatile qualifiers</span></summary>
     <defn-block class="pad10 indent">
       <defn-head>
-        Type Qualifiers
+        Qualifiers affecting allowable operations
       </defn-head>
       <defn-body>
         <div class="pad10"><span class="notice">const</span> qualifier</div>
@@ -259,23 +275,93 @@
             prevents pX being assigned a new address
           </li>
         </ul>
-        <div class="pad10"><span class="notice">short and long</span> qualifiers may affect storage sizes</div>
+        <div class="pad10"><span class="notice">volatile</span> qualifier</div>
         <ul>
           <li>
-            short prepended on a type definition for int
+            volatile prepended on a type definition
             <indent-block>
-              <c-s>short int i;</c-s>
+              volatile int i;
             </indent-block>
-            guarantees that <c-s>sizeof(short int) <= sizeof(int);</c-s>
-          </li>
-          <li>
-            long prepended on a type definition for int or double
-            <indent-block>
-              <c-s>long double d;</c-s>
-            </indent-block>
-            guarantees that <c-s>sizeof(double) <= sizeof(long double) <= sizeof(long long double)</c-s>
+            instructs compiler that variable i may be changed by an event external to the program
+            and so should not be optimized to a compile-time constant.
           </li>
         </ul>
+      </defn-body>
+      <defn-example>
+        <div style="padding-top:10px;"><span class="notice">Code example:</span></div>
+        <pre-b>
+  void f(const std::string&amp; s) {
+    if(s.size() > 0) {
+      char first = s[0];  // ok
+      // s[0] = 'z'; -- fails to compile since s is const
+    }
+  }
+        </pre-b>
+      </defn-example>
+      <defn-example>
+        <div style="padding-top:10px;"><span class="notice">Code example:</span></div>
+        <pre-b>
+  X x{3};
+  const X* pX = &amp;x;
+  X x1 = *pX;   // ok
+  *pX = 2;      // fails to compile
+        </pre-b>
+      </defn-example>
+    </defn-block>
+      </details>
+    </indent-block>
+    Qualifiers short and long affect the amount of storage allocated and hence the range of
+    values a qualified data item may hold.
+    <spacer-10></spacer-10>
+    <indent-block>
+      <details>
+        <summary><span>short and long Qualifiers</span></summary>
+        <defn-block class="pad10 indent">
+          <defn-head>
+            Qualifiers compressing or expanding range of values
+          </defn-head>
+          <defn-body>
+            <div class="pad10"><span class="notice">short and long</span> qualifiers may affect storage sizes</div>
+            <ul>
+              <li>
+                short prepended on a type definition for int
+                <indent-block>
+                  <c-s>short int i;</c-s>
+                </indent-block>
+                guarantees that <c-s>sizeof(short int) <= sizeof(int);</c-s>
+              </li>
+              <li>
+                long prepended on a type definition for int or double
+                <indent-block>
+                  <c-s>long double d;</c-s>
+                </indent-block>
+                guarantees that <c-s>sizeof(double) <= sizeof(long double) <= sizeof(long long double)</c-s>
+              </li>
+            </ul>
+          </defn-body>
+          <defn-example>
+            <div style="padding-top:10px;"><span class="notice">Code example:</span></div>
+            <pre-b>
+  short int iArrs[5]{ 1, 2, 3, 4, 5 };      // size of iArrs is 10 bytes
+  int iArr[5]{ 1, 2, 3, 4, 5 };             // size of iArr is 20 bytes
+  long int iArrl[5]{ 1, 2, 3, 4, 5 };       // size of iArrl is 20 bytes
+  long long int iArrll[5]{ 1, 2, 3, 4, 5 }  // size of iArrll is 40 bytes
+            </pre-b>
+          </defn-example>
+        </defn-block>
+      </details>
+    </indent-block>
+    <spacer-5></spacer-5>
+    Qualifiers signed and unsigned affect the placement of ranges of values an int may hold.
+    <spacer-10></spacer-10>
+    <indent-block>
+      <details>
+        <summary><span>signed and unsigned Qualifiers</span></summary>
+    <defn-block class="pad10 indent">
+      <defn-head>
+        Qualifiers affecting limit values
+      </defn-head>
+      <defn-body>
         <div class="pad10"><span class="notice">signed and unsigned</span> qualifiers</div>
         <ul>
           <li>
@@ -290,17 +376,31 @@
             acceptible values of j lie in a range bounded at the bottom with 0
           </li>
         </ul>
-        <div class="pad10"><span class="notice">volatile</span> qualifier</div>
-        <ul>
-          <li>
-            volatile prepended on a type definition
-            <indent-block>
-              volatile int i;
-            </indent-block>
-            instructs the compiler that the variable, i, may be changed by some event external to the program
-            and so should not be optimized to a compile-time constant.
-          </li>
-        </ul>
+      </defn-body>
+      <defn-example>
+        <div style="padding-top:10px;"><span class="notice">Code example:</span></div>
+        <pre-b>
+  signed int i = -25;         // range is -2,147,483,648 to 2,147,483,647
+  unsigned int j = 15;        // range is 0 to 4,294,967,295 
+  unsigned int k = UINT_MAX;  // UINT_MAX is defined in &lt;limits&gt;
+  k + 1 == 0;                 // value roll-over, statement is true, no compiler warning
+        </pre-b>
+      </defn-example>
+    </defn-block>
+      </details>
+    </indent-block>
+    <spacer-10></spacer-10>
+    The extern qualifier disables allocation of storage.  Qualifer constexpr makes initialized
+    value known at compile-time.
+    <spacer-10></spacer-10>
+    <indent-block>
+      <details>
+        <summary><span>extern and constexpr Qualifiers</span></summary>
+    <defn-block class="pad10 indent">
+      <defn-head>
+        Other qualifiers
+      </defn-head>
+      <defn-body>
         <div class="pad10"><span class="notice">extern</span> qualifier</div>
         <ul>
           <li>
@@ -315,20 +415,34 @@
         <div class="pad10"><span class="notice">constexpr</span> qualifier</div>
         <ul>
           <li>
-            constexpr prepended on a const type definition with initialized with constant variable(s)
+            constexpr prepended on a const integral type definition initialized with constant variable
             <indent-block>
               <c-s>constexpr int N = 10;</c-s>
             </indent-block>
-            allows N to be used in an array declaration, e.g., <c-s>double dArr[N];</c-s> or as a template parameter.
+            allows N to be used for compile time constructs like native arrays and templates.
             <spacer-10></spacer-10>
             we will discuss use of constexpr with an if selection when we discuss template meta programming.
           </li>
         </ul>
       </defn-body>
+      <defn-example>
+        <div style="padding-top:10px;"><span class="notice">Code example:</span></div>
+        <pre-b>
+  constexpr unsigned int N = 10;
+  double dArr[N] { 0.5, 1.0, 1.5 };  // compiles because N and initializers are known at compile-time
+        </pre-b>
+      </defn-example>
     </defn-block>
-    C++ also defines type specifiers: auto and decltype
+      </details>
+    </indent-block>
+    <spacer-10></spacer-10>
+    auto and decltype don&apos;t qualify declarations, they are declarations.
+    <spacer-10></spacer-10>
+    <indent-block>
+      <details>
+        <summary><span>auto and decltype specifiers</span></summary>
     <defn-block class="pad10 indent">
-      <defn-head>Type Specifiers</defn-head>
+      <defn-head>Computed declarations</defn-head>
       <defn-body>
         <div class="pad10"><span class="notice">auto</span> specifier</div>
         <ul>
@@ -362,7 +476,24 @@
           </li>
         </ul>
       </defn-body>
+      <defn-example>
+        <div style="padding-top:10px;"><span class="notice">Code example:</span></div>
+        <pre-b>
+  std::vector&lt;int&gt; vecInt { 1, 2, 3 };
+  for(auto& item : vecInt) {
+    item *= 2;
+  }
+        </pre-b>
+      </defn-example>
+      <defn-example>
+        <div style="padding-top:10px;"><span class="notice">Code example:</span></div>
+        <pre-b>
+  decltype(vecInt) vecInt2;  // results in std::vector&lt;int&gt; instance, named vecInt2, with default initialization
+        </pre-b>
+      </defn-example>
     </defn-block>
+      </details>
+    </indent-block>
     <h3>Sizes and Layout</h3>
     <h3>Initialization</h3>
     <h3>New Types</h3>
