@@ -16,6 +16,8 @@
   <script src="js/ScriptsTemplate.js"></script>
   <script src="js/ScriptsKeyboard.js"></script>
   <script src="js/ScriptsMenu.js"></script>
+  <script src="js/ScriptsWebComponents.js"></script>
+  <link rel="stylesheet" href="css/StylesWebComponents.css" />
   <link rel="stylesheet" href="css/StylesTemplate.css" />
   <link rel="stylesheet" href="css/StylesMenu.css" />
   <link rel="stylesheet" href="css/StylesBlueTheme.css" />
@@ -97,6 +99,13 @@
         border:none;
         color:darkred;
       }
+      #github .background-block {
+        display:block;
+        background-color:#ddd;
+        max-width:90%;
+        width:max-content;
+        padding:10px 15px;
+      }
       #github background-block {
         display:block;
         background-color:#ddd;
@@ -167,7 +176,7 @@
 
   <header>
     <hgroup id="pagetitle">
-      <h1 id="title">Chapter #2 - C++ Data</h1>
+      <h1 id="title">Chapter #2 - C++ Data Types and Data</h1>
       <h3 id="subtitle">sizes, initialization, standard types</h3>
     </hgroup>
   </header>
@@ -547,14 +556,127 @@
     <h3>Exploring Types - Sizes and Layout</h3>
     Occasionally it is important to know the sizes of variables in our designs.  For example, if
     we need to serialize an object into a byte array to pass over a socket, we need to know the
-    size of the object.
+    size of the object. Also, knowing the sizes of types may help us understand how they work.
+    That&apos;s illustrated in the lambda example, below.
     <spacer-15></spacer-15>
-    The operator <c-s>sizeof(arg)</c-s> returns the size of the arg parameter in bytes for all types
+    The operator <c-s>sizeof</c-s> can be applied to a type or an expression: 
+    <indent-block class="pad10">
+      <c-s>size_t sz = sizeof(arg);</c-s>
+    </indent-block>
+    It returns the size of the arg parameter in bytes for all types
     except references.  For references sizeof(X&) returns the size of the referenced type, not the
     size of the reference. The size of a reference equals the size of a pointer, which, on my work
     machine, is 4 bytes, e.g., 32 bits.
     You can verify this by constructing a class Xref with a single reference member and evaluating
     sizeof(Xref).
+    <spacer-15></spacer-15>
+    The operator <c-s>typeid</c-s> can be applied to a type or an expression as:
+    <indent-block class="pad10">
+    <c-s>std::type_info ti = typeid(CT)</c-s>
+    </indent-block>
+    where CT is any complete type. In order to use <c-s>typeid</c-s> you need to include
+    <c-s>&lt;typeinfo&gt;</c-s>.  There is much less information in <c-s>type_info</c-s> 
+    instances like <c-s>ti</c-s> than you would get from 
+    reflection results with languages like C# and Java. 
+    <spacer-15></spacer-15>
+    However, <c-s>type_info</c-s> has  
+    useful methods: <c-s>operator==(const type_info&)</c-s>, 
+    <c-s>operator!=(const type_info&)</c-s>, and <c-s>name()</c-s>.  So we can query whether
+    two instances belong to the same type, and we can discover the full name of the type of
+    some instance.
+    <spacer-15></spacer-15>
+    Here is a template function, useful for exploring types that uses both <c-s>sizeof</c-s>
+    and <c-s>typeid</c-s>:
+    <pre class="background-block">
+  <c-s>template&lt;typename T&gt;
+  void displayType(const T&amp; t, const std::string&amp; msg = "", bool showSize = true)
+  {
+    std::cout &lt;&lt; "\n  ";
+    if (showSize)
+      std::cout &lt;&lt; sizeof(t) &lt;&lt; " = size of ";
+    std::string typeName = typeid(t).name();
+    if (typeName.size() &gt; 75)
+      typeName = typeName.substr(0, 75) + "...";
+    std::cout &lt;&lt; typeName;
+    if (msg.size() &gt; 0)
+      std::cout &lt;&lt; msg;
+  }</c-s>
+</pre>
+    It provides one way to begin understanding how lambdas work:
+    <pre class="background-block">
+  <c-s>int i{ 42 };
+  auto f = [i](const std::string& s) {  
+    std::cout << s << i;
+  };
+  f("\n  The meaning of life is ");
+  displayType(f);</c-s>
+</pre>
+    Here, f is a lambda, declared with auto because we don&apos;t know the lambda type.
+    the <c-s>[i]</c-s> part of the expression says that this lambda captures the value of i, e.g., 42.
+    The <c-s>(const std::string&amp; s)</c-s> defines a string parameter, passed to the lambda code
+    by const reference. The body <c-s>{ ... }</c-s> simply displays the parameter and the
+    captured integer value.
+    <spacer-15></spacer-15>
+    The output of this code is:
+    <pre class="background-block">
+  <c-s>The meaning of life is 42
+  4 = size of class &lt;lambda_1bed100c18f4584a5d93f1a5d7e27280&gt;</c-s>
+</pre>
+    So, the displayType function has informed us that the lambda is a class, it disclosed the
+    lambda&apos;s type name, obviously not intended for human consumption, and showed us that its
+    size is just the size of the captured int value.
+    <spacer-15></spacer-15>
+    It&apos;s highly likely that the compiler created a functor, something like this:
+    <pre>
+  <c-s>class lambda_1bed1... {
+  public:
+    void operator() {
+      std::cout << s << i;    
+    }
+  private:
+    int i = 42;
+  };</c-s>
+</pre>
+    So lambdas can capture data, be passed into or returned from functions, taking their data
+    with them (as long as they hold a value, not a reference). We say that the lambda and its
+    local scope are a closure.  A lambda can use any data in its closure as part of its
+    operation. 
+    <spacer-15></spacer-15>
+    Essentially, a lambda has two sets of inputs: from its capture list <c-s>[i, j, x]</c-s> 
+    which come from the lambda&apos;s closure, and <c-s>(T1 arg1, T2 arg2, ... )</c-s>
+    which are passed in from the scope where the lambda is invoked. The lambda&apos;s designer
+    provides the capture inputs and the lambda user provides the arguments.
+    <spacer-15></spacer-15>
+    <hidephotosizer-block src="Pictures/StringLayout.JPG" width="400" class="photoSizerBlock right" style="margin-top:0;">
+      <span style="font-family:'Comic Sans MS, Tahoma';">
+        Fig 1. String Layout
+      </span>
+    </hidephotosizer-block>
+
+    There is an issue of type structure we need to think about.  The fundamental types place
+    all their value information in one place, in the stack frame where they are declared.
+    However, not all types are structured that way. A std::string, for example, stores its
+    control state, iterator, character count, etc., in the stack frame where it is declared, 
+    but all its user state, e.g., its character sequence, is stored in the heap.
+    <spacer-15></spacer-15>
+    The <c-s>sizeof</c-s> operator measures only the stack allocation.  So, for example, it will
+    return the same size for an empty string and a string with 100 characters.  For all of the
+    STL sequential containers with contiguous memory, e.g., <c-s>string</c-s>, <c-s>vector</c-s>,
+    and <c-s>deque</c-s>, you can call their <c-s>capacity()</c-s> method to measure that allocation.
+    Here&apos;s an example:
+    <pre class="background-block"><c-s>  std::string str("content of a std::string");
+  std::cout << "\n  " << str;
+  std::cout << "\n  string size = " << (str.size() + 1) * sizeof(char);
+  std::cout << "\n  allocation size = " << str.capacity() * sizeof(char);</c-s>
+</pre>
+    When this code executes you get:
+    <pre class="background-block"><c-s>  content of a std::string
+  string size = 25  // counts terminating null
+  allocation size = 31</c-s>
+</pre>
+    For all the other containers measuring heap allocation is much more effort, but the ideas
+    will be about the same.  You would have to iterate through the container, measuring each of
+    the elements, accessed by the container&apos;s iterator.
 
     <h3>Initialization</h3>
     <h3>New Types</h3>
