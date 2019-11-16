@@ -1022,13 +1022,14 @@
             <summary>
               <span class="labelStyle lightItem">
                 Lambda:&nbsp;&nbsp;
-                <span class="codeStyle">[](/* args here */) { /* code block here */ };</span>
+                <span class="codeStyle">[/* capture here */](/* args here */) { /* code block here */ };</span>
               </span>
             </summary>
             <indent-block class="pad10 codeStyle">
-              auto makeTitle = [](const std::string&amp; title) {<br />
+              char ul = '-';<br />
+              auto makeTitle = [ul](const std::string&amp; title) {<br />
               &nbsp;&nbsp;std::cout << "\n  " << title;<br />
-              &nbsp;&nbsp;std::cout << "\n " << std::string(title.size() + 2, '-');<br />
+              &nbsp;&nbsp;std::cout << "\n " << std::string(title.size() + 2, ul);<br />
               };
               <spacer-15></spacer-15>
               makeTitle("demonstrate lambda");
@@ -1038,11 +1039,14 @@
               &nbsp;&nbsp;demonstrate lambda<br />
               &nbsp;--------------------
               <spacer-15></spacer-15>
+              [ul] <t-s>captures the value of local variable</t-s> ul <t-s>from the local scope
+              and uses it for an underline character, below the title message. The title is passed in
+              as a parameter when lambda, </t-s>makeTitle<t-s>, is invoked.</t-s>
             </indent-block>
           </details>
         </indent-block>
         Lambdas maybe defined in namespace, function, and method scopes, and so, can serve the role
-        of inner functions.  They are useful for much more, as we will see in Chapter 2.
+        of inner functions.  They are useful for much more, as we will see below and in Chapter 2.
       </indent-blocks>
       <hr class="spread" style="border:2px solid #999;" />
       <h4>Classes and class relationships:</h4>
@@ -1766,10 +1770,12 @@ private:
         </indent-block>
       </indent-blocks>
       <spacer-10></spacer-10>
-      Here&apos;s an example:
-      <pre class="background-block"><c-s>  std::vector<int> test{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18 };
+      Here&apos;s an example using the STL vector container and for_each algorithm with lambda fold:
+      <pre class="background-block"><c-s>  std::vector&lt;int&gt; test{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 };
+  
   size_t N = 4;
-  auto f = [N](auto t) {
+  
+  auto fold = [N](auto t) {
     static size_t count = 0;
     if (++count > N) {
       count = 1;
@@ -1777,14 +1783,16 @@ private:
     }
     std::cout << t << " ";
   };
+
   std::cout << "\n  ";
-  std::for_each(test.begin(), test.end(), f);</c-s>
+  std::for_each(test.begin(), test.end(), fold);
+        </c-s>
 </pre>
       with output:<pre class="background-block"><c-s>  1 2 3 4
   5 6 7 8
   9 10 11 12
-  13 14 15 17
-  18</c-s></pre>
+  13 14 15 16
+  17</c-s></pre>
       <spacer-15></spacer-15>
       The standard library collection is very large, but still there are a few surprising
       omissions. Until C++17 there was no filesystem library and there still is no support
