@@ -257,6 +257,11 @@
             <spacer-15></spacer-15>
           </details>
           <spacer-10></spacer-10>
+          <details>
+            <summary>
+              <span class="labelStyle darkItem">Example:&nbsp;&nbsp;Reading command line arguments</span>
+            </summary>
+            <indent-block class="pad10">
           In this example, of arrays and pointers, command line arguments are displayed on 
           the console using 
           main&apos;s argv[] array, then again using equivalent pointers.
@@ -296,6 +301,8 @@
   /R ^template
   /H</c-s>
 </pre>
+            </indent-block>
+          </details>
           <spacer-15></spacer-15>
           C++ references are used to pass function arguments by reference:
           <spacer-15></spacer-15>
@@ -384,11 +391,19 @@
               </indent-blocks>
             </indent-block>
           </details>
-          <spacer-15></spacer-15>
-          Example using <c-s>std::vector&lt;int&gt;</c-s> and <c-s>for_each</c-s> algorithm:
+          <spacer-10></spacer-10>
+          <details>
+            <summary>
+              <span class="labelStyle darkItem">Example: Sum elements in container using std::vector and std::for_each</span>
+            </summary>
+            <indent-block>
+              <spacer-10></spacer-10>
+              Example using <c-s>std::vector&lt;int&gt;</c-s> and <c-s>for_each</c-s> algorithm.  We
+              will use lambdas in this example, so you may wish to first peek at the lambda discussion at
+              the end of the Operations section.
           <pre class="background-block"><c-s>  std::vector<int> test{ 1, 2, 3, 4, 5 };
   std::string prefix = "\n  ";
-  auto show = [&](auto element) {  // peek at lambda, below  
+  auto show = [&](auto element) {  // peek at lambda, below     
     std::cout << prefix << element;
     prefix = ", ";
   };
@@ -403,6 +418,8 @@
           <pre class="background-block"><c-s>  1, 2, 3, 4, 5  
   sum = 15</c-s>
 </pre>
+            </indent-block>
+          </details>
           <spacer-10></spacer-10>
           <details>
             <summary>
@@ -529,24 +546,81 @@
               </indent-blocks>
             </indent-block>
           </details>
+          <spacer-15></spacer-15>
+          <details>
+            <summary>
+              <span class="labelStyle darkItem">
+                Example: Write file using file stream and std::optional
+              </span>
+            </summary>
+            <indent-block>
+              <pre class="background-block"><c-s>  std::ofstream ofstrm;
+
+  /*--- attempt to open file for writing ---*/
+
+  auto fout = [&ofstrm](const std::string& filename) {     
+    ofstrm.open(filename, std::ios::out);
+    std::optional<std::ofstream*> opt = &ofstrm;
+    if (!ofstrm.good())
+      opt = nullptr;
+    return opt;
+  };
+  /*--- attempt to write file ---*/
+
+  auto opto = fout("testWrite.txt");
+  if (opto.has_value()) {
+    std::string test("\n  this is a test\n");
+    auto foptr = opto.value();
+    *foptr << test;
+    foptr->close();
+  }
+
+                </c-s>
+</pre>
+            </indent-block>
+          </details>
         </indent-block>
         User defined types:
         <indent-block class="pad10">
           <details>
             <summary>
-              <span class="labelStyle lightItem">enum, struct, and class</span>
+              <span class="labelStyle lightItem">scoped enum: enum class E { ... };</span>
             </summary>
             <indent-block class="pad10">
               scoped enum:
               <indent-block class="pad10 codeStyle">
                 enum class Color { red, green, blue };<br />
-                Color r = Color::red;
+                Color color;<br />
+                ---<br />
+                if(color == Color::red) {<br />
+                &nbsp;&nbsp;doRedThing();<br />
+                }<br />
+                ---<br />
+
               </indent-block>
+            </indent-block>
+          </details>
+          <spacer-15></spacer-15>
+          <details>
+            <summary>
+              <span class="labelStyle lightItem">struct S { ... };</span>
+            </summary>
+            <indent-block class="pad10">
               struct:
               <indent-block class="pad10 codeStyle">
                 struct S { int i; double d; };<br />
-                S s { 2, 3.1415927 };
+                S s { 2, 3.1415927 };<br />
+                int j = s.i;<br />
+                double e = s.d;<br />
               </indent-block>
+            </indent-block>
+          </details>
+          <spacer-15></spacer-15>
+          <details>
+            <summary>
+              <span class="labelStyle lightItem">class C { ... };</span>
+            </summary>
+            <indent-block class="pad10">
               class:
               <indent-block class="pad10 codeStyle">
                 class X {<br />
@@ -562,16 +636,16 @@
           <spacer-15></spacer-15>
           <details>
             <summary>
-              <span class="labelStyle lightItem">type alias</span>
+              <span class="labelStyle lightItem">type alias: using AliasName = Sometype;</span>
             </summary>
             <indent-block class="pad10">
               alias - c++11:
               <indent-block class="pad10 codeStyle">
-                using [aliasName] = [typeName];
+                using VecStr = std::vector&lt;std::string&gt;;
               </indent-block>
               alias - C++98:
               <indent-block class="pad10 codeStyle">
-                typedef [typeName] [aliasName];
+                typedef std::vector&lt;std::string&gt; VecStr;
               </indent-block>
             </indent-block>
           </details>
@@ -583,15 +657,23 @@
               <span class="labelStyle lightItem">compile-time and run-time testing</span>
             </summary>
             <indent-block class="pad10">
-              compile-time type tests:
+              compile-time type tests:&nbsp;&nbsp;<a href="https://en.cppreference.com/w/cpp/header/type_traits">std::type_traits</a><br />
+
               <indent-block class="pad10 codeStyle">
-                <a href="https://en.cppreference.com/w/cpp/header/type_traits">std::type_traits</a>
-                <span class="normal">, user-defined</span> type-traits;
+                <spacer-10></spacer-10>
+                template&lt;typename T&gt;<br />
+                void display(const T&amp; t) {<br />
+                &nbsp;&nbsp;if constexpr (std::is_fundamental&lt;T&gt;::value) {<br />
+                &nbsp;&nbsp;// do display operations consistent with fundamental types<br />
+                }
+                <spacer-10></spacer-10>
+                <span class="normal">Its fairly simple to create user-defined </span>type-traits;
               </indent-block>
-              run-time type tests:
-              <indent-block class="pad10 codeStyle">
-                <a href="https://en.cppreference.com/w/cpp/types/type_info">std::type_info</a>
-              </indent-block>
+              run-time type tests:&nbsp;&nbsp;
+              <a href="https://en.cppreference.com/w/cpp/types/type_info"><c-s>std::type_info</c-s></a>
+              <spacer-10></spacer-10>
+              In the next chapter we will use <c-s>std::type_info</c-s> to display information about
+              types in several examples.
             </indent-block>
           </details>
           <spacer-15></spacer-15>
@@ -1834,8 +1916,19 @@ private:
         </indent-block>
       </indent-blocks>
       <spacer-10></spacer-10>
+      <indent-blocks>
+      <indent-block class="pad10">
+        <details>
+          <summary>
+            <span class="labelStyle darkItem">
+              Example:&nbsp;&nbsp;Display container contents using std::vector, std::for_each, and a lambda
+            </span>
+          </summary>
+          <indent-block class="pad10">
       Here&apos;s an example using the STL vector container and for_each algorithm with lambda fold:
-      <pre class="background-block"><c-s>  std::vector&lt;int&gt; test{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 };  
+      <pre class="background-block"><c-s>  std::vector&lt;int&gt; test{ 
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 
+  };  
   
   size_t N = 4;
   
@@ -1856,6 +1949,10 @@ private:
   9 10 11 12
   13 14 15 16  
   17</c-s></pre>
+          </indent-block>
+        </details>
+      </indent-block>
+      </indent-blocks>
       <spacer-15></spacer-15>
       The standard library collection is very large, but still there are a few surprising
       omissions. Until C++17 there was no filesystem library and there still is no support
