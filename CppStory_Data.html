@@ -689,7 +689,72 @@
     will be about the same.  You would have to iterate through the container, measuring each of
     the elements, accessed by the container&apos;s iterator.
 
+    <h3>Managing C++ Type System with Casts</h3>
+
+    Since the introduction of C++11 we&apos;ve had four cast forms:
+    <spacer-10></spacer-10>
+    <indent-block class="pad10">
+      <table>
+        <tr>
+          <th>Cast Syntax</th>
+          <th>Cast Symantics</th>
+        </tr>
+        <tr>
+          <td><c-s>T<sub>2</sub> t<sub>2</sub> = static_cast&lt;T<sub>2</sub>&gt;(t<sub>1</sub>);</c-s></td>
+          <td>
+            Convert <c-s>t<sub>1</sub> &epsilon; T<sub>1</sub></c-s> to an instance of
+            <c-s>T<sub>2</sub></c-s> usually by
+            constructing a new <c-s>T<sub>2</sub></c-s> instance using data from <c-s>t<sub>1</sub></c-s>.
+            <spacer-10></spacer-10>
+            Example: <c-s>int i = static_cast&lt;int&gt;(1.75);</c-s>  truncates 1.75 to 1, no compiler warning
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <c-s>T&amp;&nbsp;tRef&nbsp;=&nbsp;const_cast&lt;T&amp;&gt;(t);</c-s>
+          </td>
+          <td>
+            Strip off const qualifier from a const type.  Intent is to pass const variable to platform API functions
+            which don&apos;t inform compiler that they won&apos;t change variable, but designer knows they
+            won&apos;t.<br />
+            Example:<br /> 
+            <c-s>const std::string&amp; str("...");</c-s><br />
+            ---<br />
+            <c-s>std::string& sRef = const_cast&lt;std::string&amp;&gt;(str);</c-s><br />
+            <c-s>Platform::someFunc(sRef);</c-s>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <c-s style="white-space:nowrap;">Derived* pDer = dynamic_cast&lt;Derived*&gt;(pBase)</c-s><br />
+            <c-s>if(pDer != nullptr) {<br />
+            &nbsp;&nbsp;pDer->Derived::memFun();<br />
+            }</c-s>
+          </td>
+          <td>
+            Intent is to call, starting with <c-s>Base</c-s> pointer, <c-s>Derived</c-s> member function, 
+            not in <c-s>Base</c-s> interface.
+            If <c-s>Base</c-s> pointer does point to instance of the requested type, the cast returns 
+            <c-s>pBase</c-s>
+            address, typed as a <c-s>Derived</c-s> pointer, otherwise it returns <c-s>nullptr</c-s>.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <c-s>T<sub>dst</sub>* pT<sub>dst</sub> = 
+            reinterpret_cast&lt;T<sub>dst</sub>*&gt;(pT<sub>src</sub>);</c-s>
+          </td>
+          <td>
+            Apply type rules of <c-s>T<sub>dst</sub></c-s> to <c-s>t<sub>src</sub> &epsilon; T<sub>src</sub></c-s>.<br />
+            Usually used for packing data into byte arrays and unpacking back to original type.
+          </td>
+        </tr>
+      </table>
+    </indent-block>
     <h3>Initialization</h3>
+    We&apos;ve already encountered initialization of data.  The section will take a closer look
+    to see how it really works.
+    For the fundamental types, there are four sets of syntax
     <h3>New Standard Types</h3>
     <h3>Building Data Structures with STL</h3>
     <h3>Serialization</h3>
