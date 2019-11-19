@@ -720,8 +720,8 @@
 
     Cast operations are a mechanism for mapping an instance of one type into an instance of another
     type or modifying the type rules applied to a given instance.
-    Since the introduction of C++11 we&apos;ve had four cast forms:
-    <spacer-10></spacer-10>
+    Since the introduction of C++11 we&apos;ve had four modern cast forms:
+    <spacer-15></spacer-15>
     <indent-block class="pad10">
       <table>
         <tr>
@@ -751,7 +751,7 @@
             <c-s>const std::string&amp; str("...");</c-s><br />
             ---<br />
             <c-s>std::string& sRef = const_cast&lt;std::string&amp;&gt;(str);</c-s><br />
-            <c-s>Platform::someFunc(sRef);</c-s>
+            <c-s>Platform::someFunc(&sRef);</c-s>
           </td>
         </tr>
         <tr>
@@ -782,6 +782,227 @@
       </table>
     </indent-block>
     <spacer-15></spacer-15>
+    <indent-block>
+      <details>
+        <summary><span class="labelStyle darkItem">Example: static_cast&lt;T&gt;</span></summary>
+        <spacer-10></spacer-10>
+        <indent-block class="background-block">
+          <pre><c-s>/*--------------------------------------------------------------------------------------
+ purpose of static_cast is to create a new instance of a destination type, based on
+ data stored in the source type.
+--------------------------------------------------------------------------------------*/  
+
+  int i = 1.75;  // i = 1, with compiler warning of loss of significance
+  int j = static_cast&lt;int&gt;(1.75);  // j = 1, no compiler warning</c-s>
+</pre>
+        </indent-block>
+      </details>
+    </indent-block>
+    <spacer-15></spacer-15>
+    <indent-block>
+      <details>
+        <summary><span class="labelStyle darkItem">Example: const_cast&lt;T&gt;</span></summary>
+        <spacer-10></spacer-10>
+        <indent-block class="background-block">
+<pre><c-s>/*--------------------------------------------------------------------------------------
+ purpose of const_cast is to allow passing const data to functions that won't change
+ value even though not declared as const functions, OS API calls for example.
+--------------------------------------------------------------------------------------*/
+
+void mockAPIfunction(std::string* pStr) {
+  std::cout &lt;&lt; "\n  inside mock API function: " &lt;&lt; *pStr;
+}
+
+void demoConstCast(const std::string&amp; str) {
+
+  displaySubtitle("const_cast");
+
+  std::cout &lt;&lt; "\n  " &lt;&lt; str;
+  //mockAPIfunction(&amp;str);  fails to compile since str is const
+
+  /*--- useful operation using sRef ---*/
+
+  std::string&amp; sRef = const_cast&lt;std::string&amp;&gt;(str);
+  // created non-const reference to const str
+
+  mockAPIfunction(&amp;sRef);  // succeeds since sRef is not const
+
+  /*--- evil operation on sRef, violates contract of function interface ---*/
+  /* don't do this */
+  sRef = "changed";
+  std::cout &lt;&lt; "\n  " &lt;&lt; str;  // now has changed value
+  std::cout &lt;&lt; "\n";
+}</c-s>
+</pre>
+        </indent-block>
+        <spacer-10></spacer-10>
+        <indent-block class="background-block">
+<pre><c-s>  const_cast
+ ------------
+  const string
+  inside mock API function: const string   
+  changed</c-s></pre>
+        </indent-block>
+        <div class="pad10 indent">
+          This illustrates that the compiler will let you change the source of the const_cast
+          but you should never do that.
+        </div>
+      </details>
+    </indent-block>
+    <spacer-15></spacer-15>
+    <indent-block>
+      <details>
+        <summary><span class="labelStyle darkItem">Example: dynamic_cast&lt;T&gt;</span></summary>
+        <spacer-10></spacer-10>
+        <indent-block class="background-block">
+<pre><c-s>/*--------------------------------------------------------------------------------------
+ dynamic_cast grants access to derived class interfaces starting with base pointer
+--------------------------------------------------------------------------------------*/
+
+class Base {
+public:
+  virtual ~Base() {}
+  virtual void say() {
+    std::cout &lt;&lt; "\n  hello from Base::say() via " &lt;&lt; typeid(*this).name();
+  }
+};
+
+class Derived1 : public Base {
+public:
+  virtual ~Derived1() {}
+  void say1() {
+    std::cout &lt;&lt; "\n  hello from Derived1::say1() via " &lt;&lt; typeid(*this).name();
+  }
+};
+
+class Derived2 : public Base {
+public:
+  virtual ~Derived2() {}
+  void say2() {
+    std::cout &lt;&lt; "\n  hello from Derived2::say2() via " &lt;&lt; typeid(*this).name();
+  }
+};
+
+auto putline = [](int n=1) { 
+  for(int i=0; i&lt;n; ++i)
+    std::cout &lt;&lt; std::endl; 
+};
+
+void demoDynamicCast() {
+
+  displaySubtitle("dynamic_cast");
+
+  std::cout &lt;&lt; "\n --- calls from objects ---\n";
+  Base b; b.say();
+  putline();
+  Derived1 d1; d1.say(); d1.say1();
+  putline();
+  Derived2 d2; d2.say(); d2.say2();
+  putline();
+
+  std::cout &lt;&lt; "\n --- call via base pointer ---\n";
+  Base* pBase = &amp;d1; pBase-&gt;say(); // pBase-&gt;say1(); not accessible from B*
+  putline();
+
+  std::cout &lt;&lt; "\n --- call via dynamic_cast derived pointer ---\n";
+
+  Derived1* pDer1 = dynamic_cast&lt;Derived1*&gt;(pBase);
+  if (pDer1) {
+    pDer1-&gt;say1();
+  }
+  putline();
+}</c-s>
+</pre>
+        </indent-block>
+        <spacer-10></spacer-10>
+        <indent-block class="background-block"><pre><c-s>  dynamic_cast
+ --------------
+
+ --- calls from objects ---
+  hello from Base::say() via class Base
+
+  hello from Base::say() via class Derived1
+  hello from Derived1::say1() via class Derived1
+
+  hello from Base::say() via class Derived2
+  hello from Derived2::say2() via class Derived2    
+
+ --- call via base pointer ---
+  hello from Base::say() via class Derived1
+
+ --- call via dynamic_cast derived pointer ---
+  hello from Derived1::say1() via class Derived1
+          </c-s></pre>
+        </indent-block>
+      </details>
+    </indent-block>
+    <spacer-15></spacer-15>
+    <indent-block>
+      <details>
+        <summary><span class="labelStyle darkItem">Example: reinterpret_cast&lt;T&gt;</span></summary>
+        <spacer-10></spacer-10>
+        <indent-block class="background-block">
+            <pre><c-s>/*--------------------------------------------------------------------------------------
+  purpose of reinterpret_cast is to apply new type rules to an existing instance.
+  - packing double's bytes into byte array
+  - unpacking byte array into another double
+  - illustrates how data might be marshalled over a socket channel, where the
+    byte array pretends to be the socket channel
+  --------------------------------------------------------------------------------------*/
+
+void demoReinterpretCast() {
+
+  displaySubtitle("reinterpret_cast");
+
+  double d1{ 3.5 };
+  double d2;
+  size_t Max = sizeof(d1);
+
+  /* create byte array on heap referenced by std::unique_ptr&lt;std::byte&gt; */
+
+  std::unique_ptr&lt;std::byte&gt; pBuffer(new std::byte[Max]);  // owning pointer
+  std::byte* pBuffIndex = pBuffer.get();                   // non-owning pointer
+
+  /* pack double d1 into byte array */
+
+  std::byte* pByteSrc = reinterpret_cast&lt;std::byte*&gt;(&amp;d1);
+  std::byte* pSrcIndex = pByteSrc;  			   // non-owning pointers
+
+  for (size_t i = 0; i &lt; Max; ++i) {
+    *pBuffIndex++ = *pSrcIndex++;
+  }
+
+  /* unpack byte array into double d2 */
+
+  if (sizeof(d2) == sizeof(d1)) {
+    std::byte* pByteDst = reinterpret_cast&lt;std::byte*&gt;(&amp;d2);
+    std::byte* pDstIndex = pByteDst;  			   // non-owning pointers
+    pBuffIndex = pBuffer.get();
+    for (size_t i = 0; i &lt; Max; ++i) {
+      *pDstIndex++ = *pBuffIndex++;
+    }
+  }
+
+  /* show that src and dst have the same values */
+
+  std::cout &lt;&lt; "\n  src double = " &lt;&lt; d1;
+  std::cout &lt;&lt; "\n  dst double = " &lt;&lt; d2;
+
+  // byte array on heap will be deallocated here
+  // as std::unique_ptr goes out of scope
+}</c-s>
+</pre>
+        </indent-block>
+        <spacer-10></spacer-10>
+        <indent-block class="background-block">
+          <pre><c-s>  reinterpret_cast
+ ------------------
+  src double = 3.5
+  dst double = 3.5</c-s></pre>
+        </indent-block>
+      </details>
+    </indent-block>
+    <spacer-25></spacer-25>
     C++ also defines a member function cast operator that supports creating an instance of a
     specified destination type from an instance of the casting class:
     <indent-block class="pad10">
@@ -816,6 +1037,51 @@
         </c-s>
       </indent-block>
     </indent-block>
+    <h3>New Standard Types</h3>
+    The std::pair container has been part of standard C++ libraries prior to C++11.
+    The remaining containers were all introduced with or after C++11.  You&apos;ll see
+    std::pair and std::tuple used in the examples below. All of the rest have been used
+    in sample code that accompanies this chapter.
+    <spacer-15></spacer-15>
+    <indent-blocks>
+      <defn-block>
+        <defn-head style="border:none;">
+          Special Containers
+        </defn-head>
+        <defn-body style="border:none;">
+          <table>
+            <tr>
+              <td>pair</td>
+              <td class="normal">contains two elements which may have distinct types</td>
+            </tr>
+            <tr>
+              <td>tuple</td>
+              <td class="normal">contains finite number of elements with distinct types</td>
+            </tr>
+            <tr>
+              <td>initializer_list</td>
+              <td class="normal">
+                contains sequence of elements, all of the same type
+                normally filled with initialization list, e.g., { 1, 2, 3, ... }
+              </td>
+            </tr>
+            <tr>
+              <td>any</td>
+              <td class="normal">holds value of any type, provides std::any_cast for retrieval</td>
+            </tr>
+            <tr>
+              <td>optional</td>
+              <td class="normal">used to return values or signal failure to return</td>
+            </tr>
+            <tr>
+              <td>variant</td>
+              <td class="normal">similar to any, but only holds values from a specified set of types</td>
+            </tr>
+          </table>
+        </defn-body>
+      </defn-block>
+    </indent-blocks>
+
     <h3>Initialization</h3>
     We&apos;ve already encountered initialization of data.  The section will take a closer look
     to see how it really works.
@@ -847,13 +1113,134 @@
       <indent-block class="pad10">
         <c-s>int i = 1.75;  // size of int is 4 bytes, size of double is 8 bytes</c-s>
       </indent-block>
-      will succeed with a compiler warning.  But that is not true for braced initialization:
+      will succeed with either of the first two, with a compiler warning.  
+      But that is not true for braced initialization:
       <indent-block class="pad10">
         <c-s>int j{ 1.75 };  // fails to compile</c-s>
       </indent-block>
+      <spacer-10></spacer-10>
+      Braced initialization, like case 4, above, applies for most data definitions, and 
+      has be named uniform initialization.  
+      <div style="padding-top:15px; padding-bottom:5px;">
+        Examples of <strong>&quot;uniform initialization&quot;</strong>
+      </div>
+      <spacer-5></spacer-5>
+      <indent-block class="pad10 background-block">
+        <c-s>
+          std::string s4{ "four" };
+          <spacer-10></spacer-10>
+          double pi{ 3.1415729 };<br />
+          double* pDouble{ &pi };<br />
+          double& rDouble{ pi };
+          <spacer-10></spacer-10>
+          std::pair&lt;int, double&gt; pair1{ 4, 4.5 };
+          <spacer-10></spacer-10>
+          std::vector&lt;std::pair&lt;int, double&gt;&gt; pVec{ pair1, pair2, pair3, pair4 };&nbsp;&nbsp;
+          <spacer-10></spacer-10>
+          std::unordered_map&lt;std::string, int&gt; umap{ { "two", 2}, {"three", 3} };
+          <spacer-10></spacer-10>
+          std::unique_ptr&lt;double&gt; uPtr1{ std::make_unique&lt;double&gt;(pi) };<br />
+          std::shared_ptr&lt;double&gt; sPtr1{ std::make_shared&lt;double&gt;(pi) };
+        </c-s>
+      </indent-block>
+      <div style="padding:15px 0px 5px 0px;">
+        Uniform initialization makes putting data into containers easy.  Since C++17 it&apos;s
+        been just as easy to extract data using structured bindings.
+      </div>
+      <div style="padding:10px 0px 10px 0px;">
+        Examples of <strong>&quot;structured binding&quot;</strong>
+      </div>
+      <indent-block class="pad10 background-block">
+        <c-s>
+          auto [i5, i6] = std::pair{ 5, 6 };<br />
+          auto [d, i, s] = std::tuple&lt;double, int, std::string&gt;{ 2.5, 3, "four" };
+          <spacer-10></spacer-10>
+          struct S { int i; char c; std::string s; };<br />
+          S foobar{ 2, 'Z', "a string" };<br />
+          auto [fee, fie, foe] = foobar;
+        </c-s>
+      </indent-block>
       <spacer-15></spacer-15>
+      The identifiers: <c-s>i5, i6, d, i, s, fee, fie, foe</c-s> are all instances with 
+      types deduced by auto, based on the types in the containers to which they are bound.
+      You can use them, just like any other identifier, after the binding statement.
+      <spacer-5></spacer-5>
+      <div style="padding:15px 0px 5px 0px;">
+        Note that these are declarations, so the identifier names must be different than
+        any used before the binding statement in the same scope.
+      </div>
+      <div style="padding:10px 0px 10px 0px;">
+        Example of where <strong>&quot;structured binding&quot;</strong> does not work.
+      </div>
+      <indent-block class="pad10 background-block">
+      <c-s>
+        class C {<br />
+        public:<br />
+        &nbsp;&nbsp;C(const std::string& str) : str_(str) {}     // promotion ctor&nbsp;&nbsp;<br />
+        &nbsp;&nbsp;void say() { std::cout << "\n  " << str_; }<br />
+        &nbsp;&nbsp;operator std::string() { return str_; }      // cast operator<br />
+        private:<br />
+        &nbsp;&nbsp;std::string str_;<br />
+        };
+        <spacer-10></spacer-10>
+        /* uniform initialization works with promotion ctors */<br />
+        C c{ "hello world" };<br />
+        <spacer-10></spacer-10>
+        /* these fail to compile: can only bind to public data */<br />
+        //auto [gotit] {c};<br />
+        //auto [gotit] = { static_cast<std::string>(c) };
+        <spacer-10></spacer-10>
+        auto gotit = c;  // this works via the cast operator,<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;// but is not structured binding
+        <spacer-10></spacer-10>
+      </c-s>
     </indent-block>
-    <h3>New Standard Types</h3>
+    </indent-block>
+    <!--<h3>New Standard Types</h3>
+    The std::pair container has been part of standard C++ libraries prior to C++11.
+    The remaining containers were all introduced with or after C++11.  You&apos;ve seen
+    std::pair and std::tuple used in the examples above. All of the rest have been used
+    in sample code that accompanies this chapter.
+    <spacer-15></spacer-15>
+    <indent-blocks>
+      <defn-block>
+        <defn-head style="border:none;">
+          Special Containers
+        </defn-head>
+        <defn-body style="border:none;">
+          <table>
+            <tr>
+              <td>pair</td>
+              <td class="normal">contains two elements which may have distinct types</td>
+            </tr>
+            <tr>
+              <td>tuple</td>
+              <td class="normal">contains finite number of elements with distinct types</td>
+            </tr>
+            <tr>
+              <td>initializer_list</td>
+              <td class="normal">
+                contains sequence of elements, all of the same type
+                normally filled with initialization list, e.g., { 1, 2, 3, ... }
+              </td>
+            </tr>
+            <tr>
+              <td>any</td>
+              <td class="normal">holds value of any type, provides std::any_cast for retrieval</td>
+            </tr>
+            <tr>
+              <td>optional</td>
+              <td class="normal">used to return values or signal failure to return</td>
+            </tr>
+            <tr>
+              <td>variant</td>
+              <td class="normal">similar to any, but only holds values from a specified set of types</td>
+            </tr>
+          </table>
+        </defn-body>
+      </defn-block>
+    </indent-blocks>-->
     <h3>Building Data Structures with STL</h3>
     <h3>Serialization</h3>
     <h3>Persistance</h3>
