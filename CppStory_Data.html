@@ -730,13 +730,14 @@
     </indent-block>
 
     <h3>Type Structure:</h3>
-
+    <hr />
+    <spacer-10></spacer-10>
     <hidephotosizer-block src="Pictures/StringLayout.JPG" width="400" class="photoSizerBlock right" style="margin-top:0;">
       <span style="font-family:'Comic Sans MS, Tahoma';">
         Fig 1. String Layout
       </span>
     </hidephotosizer-block>
-    There is also an issue of type structure we need to think about.  The fundamental types place
+    There are also issues of type structure we need to think about.  The fundamental types place
     all their value information in one place, in the stack frame where they are declared.
     However, not all types are structured that way. A std::string, for example, stores its
     control state, iterator, character count, etc., in the stack frame where it is declared, 
@@ -760,7 +761,133 @@
     For all the other containers measuring heap allocation is much more effort, but the ideas
     will be about the same.  You would have to iterate through the container, measuring each of
     the elements, accessed by the container&apos;s iterator.
+    <hr class="spread" />
+    Even the fundamental types differ in structure:
+    <ul>
+      <li>
+        All of the fundamental types except floats have a simple structure consisting of
+        a sequence of bytes in one location.
+      </li>
+      <li>
+        The float type partitions its storage into:
+        <ul class="tight">
+          <li>1 bit sign</li>
+          <li>8 bit exponent</li>
+          <li>23 bit fraction</li>
+        </ul>
+      </li>
+      <li>
+        The double type has the partitions:
+        <ul class="tight">
+          <li>1 bit sign</li>
+          <li>11 bit exponent</li>
+          <li>52 bit fraction</li>
+        </ul>
+      </li>
+    </ul>
+    This float/double structure has consequences:
+    <ul>
+      <li>
+        The majority of values don&apos;t have an exact representation.  All of the intergers
+        have exact floating representations, but numbers like 1.0/3.0 have an infinite number
+        of trailing digits, e.g., 0.33333333333333...., and will be stored imprecisely.
+      </li>
+      <li>
+        So these values have granularity with differences within granules that can&apos;t be
+        represented.
+      </li>
+      <li>
+        The size of the granularity depends on the magnitude of the float.  The fractional value
+        of one float may be the same as the fractional value of another, but if the exponent of 
+        one is larger than the other, the absolute values of granularity will differ. 
+      </li>
+      <li>
+        It is entirely possible for two floats that are conceptually distinct to have the same
+        floating representation, so you need to be careful with equality comparisons.
+      </li>
+      <li>
+        Repeating operations on a float in a loop may exhibit increasing error in computed
+        results due to the accumulation of granularity errors.
+      </li>
+    </ul>
+    Here&apos;s data from an experiment with floats:
+    <spacer-10></spacer-10>
+    <div class="background-block indent" style="display:flex;">
+    <pre><c-s>  --- demo float granularity ---  
 
+  float f =             1.00000
+  f = (f + 1.0)/3.0 ==> 0.666667
+  f = (f + 1.0)/3.0 ==> 0.555556
+  f = (f + 1.0)/3.0 ==> 0.518519
+  f = (f + 1.0)/3.0 ==> 0.506173
+  f = (f + 1.0)/3.0 ==> 0.502058
+  f = (f + 1.0)/3.0 ==> 0.500686
+  f = (f + 1.0)/3.0 ==> 0.500229
+  f = (f + 1.0)/3.0 ==> 0.500076
+  f = (f + 1.0)/3.0 ==> 0.500025
+  f = (f + 1.0)/3.0 ==> 0.500008
+
+  Reversing process:
+
+  f = 3.0 * f - 1.0 ==> 0.500025
+  f = 3.0 * f - 1.0 ==> 0.500076
+  f = 3.0 * f - 1.0 ==> 0.500229
+  f = 3.0 * f - 1.0 ==> 0.500686
+  f = 3.0 * f - 1.0 ==> 0.502057
+  f = 3.0 * f - 1.0 ==> 0.506170
+  f = 3.0 * f - 1.0 ==> 0.518510
+  f = 3.0 * f - 1.0 ==> 0.555531
+  f = 3.0 * f - 1.0 ==> 0.666594
+  f = 3.0 * f - 1.0 ==> 0.999782
+      </c-s>
+</pre>
+      <div class="indent">
+        <spacer-25></spacer-25>
+        <spacer-25></spacer-25>
+        There are many domains where float granularity matters:
+        <ul>
+          <li>
+            Scientific computing, e.g., processing models for particles, gravity,
+            super-conductors, gene expression, climate dynamics, ...
+          </li>
+          <li>
+            Processing financial models for derivative and currency trading
+          </li>
+          <li>
+            Graphics processing using projections and ray-tracing
+          </li>
+          <li>
+            Medical imaging
+          </li>
+          <li>
+            Radar and Sonar signal processing
+          </li>
+          <li>
+            Finite-element analysis for fluid flow
+          </li>
+          <li>
+            Navigation computing for aircraft and spacecraft
+          </li>
+          <li>
+            Autonomous vehicle control.
+          </li>
+          <li>
+            Neural network modeling
+          </li>
+          <li>
+            Marketing models
+          </li>
+          <li>
+            Control of numberical machines used to create manufactured products
+          </li>
+          <li>....</li>
+        </ul>
+        The point is that you may well, during the course of your career, work in domains
+        where floating point granularity matters.
+      </div>
+      </div>
+    <spacer-15></spacer-15>
+    <hr class="spread" />
     <h3>Managing C++ Type System with Casts</h3>
 
     Cast operations are a mechanism for mapping an instance of one type into an instance of another
@@ -1199,6 +1326,8 @@ void demoReinterpretCast() {
           std::pair&lt;int, double&gt; pair1{ 4, 4.5 };
           <spacer-10></spacer-10>
           std::vector&lt;std::pair&lt;int, double&gt;&gt; pVec{ pair1, pair2, pair3, pair4 };&nbsp;&nbsp;
+          <spacer-10></spacer-10>
+          std::tuple&lt;int, double, std::string&gt; aTuple{ 1, 3.1415927, "some string" }; 
           <spacer-10></spacer-10>
           std::unordered_map&lt;std::string, int&gt; umap{ { "two", 2}, {"three", 3} };
           <spacer-10></spacer-10>
