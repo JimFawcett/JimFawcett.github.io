@@ -1403,6 +1403,92 @@ private:
           </details>
         </indent-block>
         <spacer-10></spacer-10>
+        <indent-block>
+          <details>
+            <summary>
+              <span class="labelStyle darkItem">function overloading example</span>
+            </summary>
+            <spacer-10></spacer-10>
+            <indent-block class="background-block">
+              <pre><c-s>  /*---- find first and last elements of collection, may throw ----*/
+
+using PD = std::pair&lt;double, double&gt;
+
+PD firstAndLast(double dArr[], size_t N) {
+  if (N &lt; 1)
+    throw std::exception("no contents in array");
+  return PD{ dArr[0], dArr[N - 1] };
+}
+
+using PI = std::pair&lt;int, int&gt;
+
+PI firstAndLast(const std::vector&lt;int&gt;& vecInt) {
+  if (vecInt.size() &lt; 1)
+    throw std::exception("no contents in vector");
+  return PI{ vecInt[0], vecInt[vecInt.size() - 1] };
+}
+
+/*---- find first and last elements of collection, using optional ----*/
+
+std::optional&lt;PD&gt; firstAndLastOpt(double dArr[], size_t N) {
+  std::optional&lt;PD&gt; opt;
+  if(N &gt; 0)
+    opt = std::pair{ dArr[0], dArr[N - 1] };
+  return opt;
+}
+
+std::optional&lt;PI&gt; firstAndLastOpt(const std::vector&lt;int&gt;&amp; vecInt) {
+  std::optional&lt;PI&gt; opt;
+  if (vecInt.size() &gt; 0)
+    opt = std::pair{ vecInt[0], vecInt[vecInt.size() - 1] };
+  return opt;
+}
+
+/*---- demonstrate first and last ----*/
+
+int main() {
+
+  std::cout &lt;&lt; "\n  Demonstrating Function Overloading";
+  std::cout &lt;&lt; "\n ====================================\n";
+
+  double dArr[]{ 1.5, -0.5, 3.0 };
+  std::vector&lt;int&gt; vecInt{ 1,2,3,4,5 };
+
+  try {
+    auto [firstd1, lastd1] = firstAndLast(dArr, 3);
+    std::cout &lt;&lt; "\n  first = " &lt;&lt; firstd1 &lt;&lt; ", last = " &lt;&lt; lastd1;
+
+    auto [firsti1, lasti1] = firstAndLast(vecInt);
+    std::cout &lt;&lt; "\n  first = " &lt;&lt; firsti1 &lt;&lt; ", last = " &lt;&lt; lasti1;
+  }
+  catch (std::exception & ex) {
+    std::cout &lt;&lt; "\n  " &lt;&lt; ex.what() &lt;&lt; std::endl;
+  }
+
+  std::optional&lt;PD&gt; optd = firstAndLastOpt(dArr, 3);
+  if (optd.has_value()) {
+    auto [firstd2, lastd2] = optd.value();
+    std::cout &lt;&lt; "\n  first = " &lt;&lt; firstd2 &lt;&lt; ", last = " &lt;&lt; lastd2;
+  }
+  else {
+    std::cout &lt;&lt; "\n  array query failed";
+  }
+
+  std::optional&gt;PI&lt; opti = firstAndLastOpt(vecInt);
+  if (opti.has_value()) {
+    auto [firsti2, lasti2] = opti.value();
+    std::cout &lt;&lt; "\n  first = " &lt;&lt; firsti2 &lt;&lt; ", last = " &lt;&lt; lasti2;
+  }
+  else {
+    std::cout &lt;&lt; "\n  vector query failed";
+  }
+  
+  std::cout &lt;&lt; "\n\n";
+}</c-s></pre>
+            </indent-block>
+          </details>
+        </indent-block>
+        <spacer-15></spacer-15>
         There are five relationships between C++ classes: inheritance, composition, aggregation, using, and friendship.
         The first four of these are supported by most object oriented languages.
         <spacer-10></spacer-10>
@@ -1519,6 +1605,215 @@ private:
               functions that are qualified as <c-s>virtual</c-s> in the base class.
             </indent-block>
           </details>
+        </indent-block>
+        <spacer-10></spacer-10>
+        <indent-block>
+          <details>
+            <summary>
+              <span class="labelStyle darkItem">function overriding example</span>
+            </summary>
+            <spacer-10></spacer-10>
+            <indent-block class="background-block" style="display:flex;">
+            <pre><c-s>  /*--- abstract base class ---*/
+
+  class SWDev {
+  public:
+    using WorkItems = std::vector<std::string>;
+
+    SWDev(const std::string& name) : name_(name) {}
+    virtual ~SWDev() {}
+    virtual void doWork() = 0;
+    void getCoffee();
+    void name(const std::string& nm);
+    std::string name();
+  protected:
+    std::string name_ = "anonymous";
+    static WorkItems workItem;
+  };
+
+  /*--- shared data ---*/
+
+  inline SWDev::WorkItems SWDev::workItem = {
+    "process email",
+    "pull requests for today's work",
+    "work off bugs",
+    "add new features",
+    "write up developer evaluations",
+    "write up project stories",
+    "schedule agile meeting",
+    "discuss requirements with customer",
+    "go golfing with customer"
+  };
+
+  inline auto show = [](const std::string& task) {
+    std::cout << "\n  " << task;
+  };
+
+  /*--- non-virtual functions, don't override ---*/
+
+  inline void SWDev::name(const std::string& name) {
+    name_ = name;
+  }
+
+  inline std::string SWDev::name() {
+    return name_;
+  }
+
+  inline void SWDev::getCoffee() {
+    std::cout << 
+      "\n  get coffee from cafeteria, chat";
+  }
+
+  /*--- derived classes override virtual do work ---*/
+
+  class Dev : public SWDev {
+  public:
+    Dev(const std::string& name) : SWDev(name) {}
+    virtual void doWork() override {
+      show("\n  Dev: " + name());
+      getCoffee();
+      show(workItem[0]);
+      show(workItem[1]);
+      show(workItem[2]);
+      show(workItem[3]);
+    }
+  };
+
+  class TeamLead : public SWDev {
+  public:
+    TeamLead(const std::string& name) : SWDev(name) {}
+    virtual void doWork() override {
+      show("\n  TeamLead: " + name());
+      getCoffee();
+      show(workItem[0]);
+      show(workItem[5]);
+      show(workItem[6]);
+      show(workItem[1]);
+      show(workItem[2]);
+      show(workItem[3]);
+    }
+  };
+
+  class ProjMgr : public SWDev {
+  public:
+    ProjMgr(const std::string& name) : SWDev(name) {}
+    virtual void doWork() override {
+      show("\n  Project Mgr: " + name());
+      getCoffee();
+      show(workItem[0]);
+      show(workItem[4]);
+      show(workItem[7]);
+      show(workItem[8]);
+    }
+  };</c-s>
+</pre>
+              <pre><c-s>
+#include "Overriding.h"
+
+int main() {
+
+  std::cout << "\n  Demonstrating Overriding";
+  std::cout << "\n ==========================\n";
+
+  /* form project team */
+  ProjMgr Frank("Frank");
+
+  TeamLead Ashok("Ashok");
+  Dev Joe("Joe");
+  Dev Charley("Charley");
+  Dev Sue("Sue");
+
+  TeamLead Ming("Ming");
+  Dev Barbara("Barbara");
+  Dev Samir("Samir");
+
+  std::vector<SWDev*> ProjectTeam{
+    &Frank,
+    &Ashok, &Joe, &Charly, &Sue,
+    &Ming, &Barbara, &Samir
+  };
+
+  /* get to work */
+
+  show("Monday, starting work");
+  for (auto swDev : ProjectTeam) {
+    swDev->doWork();
+  }
+  show("\n  That's all Folks\n\n");
+
+ ------------------------------------
+  Demonstrating Overriding
+ ==========================
+
+  Monday, starting work
+
+  Project Mgr: Frank
+  get coffee from cafeteria, chat
+  process email
+  write up developer evaluations
+  discuss requirements with customer
+  go golfing with customer
+
+  TeamLead: Ashok
+  get coffee from cafeteria, chat
+  process email
+  write up project stories
+  schedule agile meeting
+  pull requests for today's work
+  work off bugs
+  add new features
+
+  Dev: Joe
+  get coffee from cafeteria, chat
+  process email
+  pull requests for today's work
+  work off bugs
+  add new features
+
+  Dev: Charley
+  get coffee from cafeteria, chat
+  process email
+  pull requests for today's work
+  work off bugs
+  add new features
+
+  Dev: Sue
+  get coffee from cafeteria, chat
+  process email
+  pull requests for today's work
+  work off bugs
+  add new features
+
+  TeamLead: Ming
+  get coffee from cafeteria, chat
+  process email
+  write up project stories
+  schedule agile meeting
+  pull requests for today's work
+  work off bugs
+  add new features
+
+  Dev: Barbara
+  get coffee from cafeteria, chat
+  process email
+  pull requests for today's work
+  work off bugs
+  add new features
+
+  Dev: Samir
+  get coffee from cafeteria, chat
+  process email
+  pull requests for today's work
+  work off bugs
+  add new features
+
+  That's all Folks</c-s></pre>
+              </indent-block>
+          </details>
+        </indent-block>
+        <spacer-15></spacer-15>
+        <indent-block class="pad10">
+          We will discuss the details of techniques used in this example in Chapter 4.
         </indent-block>
         <spacer-10></spacer-10>
         Most C++ projects use classes extensively.  Usually almost all of the code is devoted to implementing
