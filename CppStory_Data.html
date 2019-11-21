@@ -1393,14 +1393,208 @@ void demoReinterpretCast() {
       </c-s>
     </indent-block>
     </indent-block>
-    <h3>Building Data Structures with STL</h3>
+    <h3>Building Data Structures with the STL</h3>
     In this section we will see how easy it is to &quot;snap together&quot; STL containers 
     into complex, useful data structures. Details of the STL will be deferred to Chapter 6.
     <spacer-15></spacer-15>
+    In this example we want to save file and path information from a directory tree, starting
+    with a specified root path.  Our goal is to save each distinct filename and each distinct
+    path only once.  We accomplish that by using several STL container classes.
+    <spacer-15></spacer-15>
+    Each file name encountered may appear in more than one directory. Instead of saving multiple
+    path names, we save multiple iterators (much smaller than the path names) into a path set.
+    <spacer-15></spacer-15>
+    We&apos;ve simply connected them together, as shown in the using declarations, below.
+    The structure of the STL, using iterators to point to specific contents, works very well.
+    The complete declaration of the file information container is:
+    <indent-block class="pad10">
+    <c-s>
+      std::map&lt;std::string,std::vector&lt;std::set&lt;std::string&gt;::iterator&gt;&gt;
+      &nbsp;-->&nbsp;std::set&lt;std::string&gt;
+    </c-s>
+    </indent-block>
+    The using declarations make that much more readable:
+    <indent-block class="pad10">
+      <c-s>
+        FileInfo&lt;File, PathRefs&gt;&nbsp;-->&nbsp;PathSet&lt;Path&gt;
+      </c-s>
+    </indent-block>
+    The class declaration and class diagram are show in Fig 1., below.
+    <spacer-25></spacer-25>
+    <div class="background-block" style="display:flex;">
+    <pre class="background-block"><c-s>
+  class FileInfoContainer {
+  public:
+    // file to path structure
+    using File = std::string;
+    using Path = std::string;
+    using PathSet = std::set&lt;Path&gt;;
+    using PathRef = PathSet::iterator;
+    using PathRefs = std::vector&lt;PathRef&gt;;
+    using FileInfo = std::map&lt;File, PathRefs&gt;;
+    using iterator = FileInfo::iterator;
+    using PathInfo = FileInfo;
 
-    <h3>Serialization</h3>
-    <h3>Persistance</h3>
+    FileInfoContainer& add(const File& file, const Path& path);
+    FileInfoContainer invertFileInfo(FileInfoContainer* pFIC);
+    FileInfo fileInfo();
+    iterator begin() { return fileInfo_.begin(); }
+    iterator end() { return fileInfo_.end(); }
+    size_t fileCount();
+    size_t pathCount();
+
+  private:
+    FileInfo fileInfo_;
+    PathSet pathSet_;
+    PathInfo pathInfo_;
+  };
+
+</c-s></pre>
+    <hidephotosizer-block src="Pictures/FileInfoDataStructure.JPG" width="400" class="photoSizerBlock right" style="margin-top:25px;">
+      <span style="font-family:'Comic Sans MS, Tahoma';">
+        Fig 1. FileInfo Data Structure
+      </span>
+    </hidephotosizer-block>
+    </div>
+    <spacer-15></spacer-15>
+    Output from a directory navigator that stores its file and directory information in a FileInfo
+    container is shown below.  There are two collections of output.  The one on the left uses
+    the FileInfo container.  The one of the right uses another FileInfo container to hold the
+    results of inverting the path and file relationships.  
+    <spacer-15></spacer-15>
+    Instead of using file names as keys and sets of path names as values, we swap the roles of 
+    file and path.  Instead of using
+    <c-s>fileInfoContainer.add(file, path)</c-s> we invert that to 
+    <c-s>fileInfoContainer.add(path, file)</c-s>.
+    Both sets of output are useful.  The one on the left, showing for each file name all the paths
+    where it is found, can be used to find the latest version of a file, or older files to be 
+    discarded.
+    <spacer-15></spacer-15>
+    The output on the right would be useful for understanding how files are grouped into applications.
+    <spacer-15></spacer-15>
+    <div class="background-block" style="display:flex;">
+    <pre><c-s>  FileInfo from path ".."
+ -------------------------
+  Chap1.cpp
+    c:\github\JimFawcett\CppStory\Chapter1
+  Chap1.h
+    c:\github\JimFawcett\CppStory\Chapter1
+  Classes.cpp
+    c:\github\JimFawcett\CppStory\Chapter4-classes
+  CustomTraits.h
+    c:\github\JimFawcett\CppStory\CustomTraits
+  Data.cpp
+    c:\github\JimFawcett\CppStory\Chapter2-Data
+  DateTime.cpp
+    c:\github\JimFawcett\CppStory\Chapter2-STL
+    c:\github\JimFawcett\CppStory\DirWalker
+  DateTime.h
+    c:\github\JimFawcett\CppStory\Chapter2-STL
+    c:\github\JimFawcett\CppStory\DirWalker
+  Dev.cpp
+    c:\github\JimFawcett\CppStory\Chapter1-Dev
+  Dev.h
+    c:\github\JimFawcett\CppStory\Chapter1-Dev
+  DirWalker.cpp
+    c:\github\JimFawcett\CppStory\Chapter2-STL
+    c:\github\JimFawcett\CppStory\DirWalker
+  DirWalker.h
+    c:\github\JimFawcett\CppStory\Chapter2-STL
+    c:\github\JimFawcett\CppStory\DirWalker
+
+      -- output data elided --
+
+  TestPerson.cpp
+    c:\github\JimFawcett\CppStory\Chapter4-classes
+  ToHTML.cpp
+    c:\github\JimFawcett\CppStory\Webber\ToHTML
+  const_cast.cpp
+    c:\github\JimFawcett\CppStory
+  const_cast1.cpp.html
+    c:\github\JimFawcett\CppStory
+  const_cast1.txt.html
+    c:\github\JimFawcett\CppStory
+  dynamic_cast.cpp
+    c:\github\JimFawcett\CppStory
+  dynamic_cast1.cpp.html
+    c:\github\JimFawcett\CppStory
+  dynamic_cast2.cpp.html
+    c:\github\JimFawcett\CppStory
+  reinterpret_cast.cpp
+    c:\github\JimFawcett\CppStory
+  reinterpret_cast1.cpp.html
+    c:\github\JimFawcett\CppStory
+  static_cast.cpp
+    c:\github\JimFawcett\CppStory
+  static_cast1.cpp.html
+    c:\github\JimFawcett\CppStory
+
+  number of files: 46
+  number of paths: 17
+</pre>
+      <pre class="indent">
+<c-s>
+  PathInfo from path ".."
+ -------------------------
+  c:\github\JimFawcett\CppStory
+    const_cast.cpp
+    const_cast1.cpp.html
+    const_cast1.txt.html
+    dynamic_cast.cpp
+    dynamic_cast1.cpp.html
+    dynamic_cast2.cpp.html
+    reinterpret_cast.cpp
+    reinterpret_cast1.cpp.html
+    static_cast.cpp
+    static_cast1.cpp.html
+
+     -- output data elided
+
+  c:\github\JimFawcett\CppStory\Chapter2-STL
+    DateTime.cpp
+    DateTime.h
+    DirWalker.cpp
+    DirWalker.h
+    STL_DataStructures.cpp
+  c:\github\JimFawcett\CppStory\Chapter4-classes
+    Classes.cpp
+    TestPerson.cpp
+  c:\github\JimFawcett\CppStory\CustomTraits
+    CustomTraits.h
+  c:\github\JimFawcett\CppStory\DirWalker
+    DateTime.cpp
+    DateTime.h
+    DirWalker.cpp
+    DirWalker.h
+  c:\github\JimFawcett\CppStory\Display
+    Display.h
+  c:\github\JimFawcett\CppStory\Webber\ToHTML
+    IPerson - Copy.h
+    IPerson.h
+    IPerson1.h.html
+    IPerson2.h.html
+    IPerson3.h.html
+    IPerson4.h.html
+    IPerson5.h.html
+    IPerson6.h.html
+    IPerson7.h.html
+    IPerson8.h.html
+    IPerson9.h.html
+    Person.cpp
+    Person.h
+    ToHTML.cpp
+
+  number of files: 46
+  number of paths: 17
+</c-s>
+</pre>
+    </div>
   </indent-blocks>
+  <spacer-15></spacer-15>
+  This example should give us an idea of how useful the STL types are.  We will dig into the
+  details in Chapter 6.
+  <spacer-15></spacer-15>
+  That concludes Chapter 2.  Next we will look at C++ operations in Chapter 3.
   <spacer-25></spacer-25>
   <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
 
