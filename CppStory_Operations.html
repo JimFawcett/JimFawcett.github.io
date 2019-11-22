@@ -146,8 +146,187 @@
   <hr class="spread" />
   <indent-blocks>
     <h3>Operations:</h3>
-    <h3>Functors</h3>
-    <h3>Lambdas</h3>
+    In this chapter we focus on ways that operations on data are implemented.
+    <hr class="spreadup" />
+    <h3>Type Coercions:</h3>
+    The fundamental C++ types support coercions between selected types.
+    <indent-block class="pad10">
+      <defn-block>
+        <defn-head>
+          Type Coercion
+        </defn-head>
+        <defn-body class="pad10">
+          Coercion is the conversion of the representation of a value in one type
+          into the representation of the value in another type. For example when the
+          statements below are executed: 
+          <indent-block class="pad10">
+            <c-s>
+              int i{ 5 };<br />
+              double d = i; 
+            </c-s>
+          </indent-block>
+          the value of <c-s>i</c-s>, e.g., <c-s>5</c-s>, is converted to the corresponding double precision 
+          representation with sign bit, exponent, and fractional part.
+          <spacer-15></spacer-15>
+          For the fundamental types, any time the conversion source has the same or smaller size than
+          the destination, the conversion will succeed, silently.  These are called numeric promotions or widening.
+          <spacer-15></spacer-15>
+          If the conversion has source type larger than destination type the conversion may or may not
+          succeed.  These are called numeric conversions or narrowing.
+        </defn-body>
+        <defn-example class="pad10">
+          <t-s>Here are some examples of numeric promotions:</t-s>
+          <indent-block class="pad10">
+            long int li{ 5 };<br />
+            int i = short int{ 2 };<br />
+            long long int {2L}<br />
+            double d{ 3.0F };
+          </indent-block>
+          <t-s>and here are examples of numeric conversions:</t-s>
+          <indent-block class="pad10">
+            int j = 2.5; &nbsp;&nbsp;// succeeds with warning, truncates <c-s>2.5</c-s> to <c-s>2</c-s><br />
+            int j{ 2.5 };  &nbsp;// compile failure (see initialization section of Chapter 2)<br />
+            float f = 1.5; // succeeds with warning
+          </indent-block>
+          <div class="pad10">
+            The suffixes L and F denote long int and float.  Suffix LL denotes a long long int.
+            If there are no suffixes an integral number has the type int and a floating point
+            number has the type double.
+          </div>
+        </defn-example>
+      </defn-block>
+      <spacer-15></spacer-15>
+      Coercions can be implemented for user-defined types using promotion constructors 
+      and cast operators.  We will cover that below, and in detail in Chapter 4.
+    </indent-block>
+    <h3>Functions:</h3>
+    Functions have a name, a sequence of zero or more arguments, and a return type or void return,
+    wrapped around a block of code.
+    <spacer-10></spacer-10>
+    <indent-block class="background-block">
+      <c-s>
+        void putline(size_t n = 1) {<br />
+        &nbsp;&nbsp;for(size_t i = 0; i &lt; n; ++i)<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;std::cout << "\n";<br />
+        }
+      </c-s>
+    </indent-block>
+    <spacer-10></spacer-10>
+    They may have default arguments, as shown in this example, so calling <c-s>putline()</c-s>
+    results in a single new line being pushed into the terminal stream.
+    <spacer-15></spacer-15>
+    The name of a function is just a pointer to its code. That can be demonstrated by 
+    declaring function pointers and setting them equal to a function name.  That&apos;s
+    illustrated in this example:
+    <spacer-10></spacer-10>
+    <indent-block>
+      <details>
+        <summary>
+          <span class="labelStyle darkItem">
+            function pointer example
+          </span>
+        </summary>
+        <spacer-10></spacer-10>
+    <indent-block class="background-block">
+<pre><c-s>  // Functions.cpp
+
+  #include &lt;iostream&gt;
+  #include &lt;string&gt;
+  #include "../Display/Display.h"
+
+  /*------------------------------------------------------ 
+    Test functions: 
+    we will construct pointers to putLine and message
+    and show that they give the same results as calling
+    these test functions.
+  */
+
+  void putLine(size_t n = 1) {
+    for (size_t i = 0; i &lt; n; ++i)
+      std::cout &lt;&lt; "\n";
+  }
+
+  template &lt;typename T&gt;
+  void message(T t) {
+    std::cout &lt;&lt; t;
+  }
+
+  /////////////////////////////////////////////////////
+  // declare template alias - C++17
+  // templates must be declared at namespace scope,
+  // e.g., not inside functions
+
+  template&lt;class T&gt;
+  using FP2 = void(*)(T t);
+
+  /*--- function demonstrating use of function pointers ---*/
+
+  void demoFunctionPointers() {
+
+    displayDemo("--- demoFunctionPointers ---");
+    putLine();
+
+    /*--- non-template function pointer declaration ---*/ 
+    using FP1 = void(*)(size_t n);
+    FP1 pl1 = putLine;
+  
+    /*--- instantiate template function pointers ---*/
+    FP2&lt;size_t&gt; pl2 = putLine;
+    FP2&lt;const std::string&amp;&gt; msg1 = message;
+  
+    /*--- auto declarations of function pointers ---*/
+    auto&amp; pl3 = putLine;
+    auto&amp; msg2 = message&lt;const std::string&amp;&gt;;
+    auto&amp; msg3 = message&lt;const char*&gt;;
+
+    /*--- now we are using these function pointers ---*/
+    message("\n ------------------------");  // original function
+    msg1("\n  testing PL1");                 // first fun ptr to message
+    pl1(1);                                  // first fun ptr to putLine
+    msg2("\n  testing PL2");                 // second fun ptr to message   
+    pl2(1);                                  // second fun ptr to putLine
+    msg3("\n --------------");               // third fun ptr to message
+    pl3(1);                                  // third fun ptr to putLine
+    message("\n  done with testing");
+    message("\n ------------------------\n");
+  }
+
+  int main() {
+    demoFunctionPointers();
+    putline(2);
+  }</c-s></pre>
+      </details>
+    </indent-block>
+    <spacer-15></spacer-15>
+    Each function should have a single responsibility and be small and simple enough to make
+    it (relatively) easy to understand and test.  A good default size is 50 lines of code - that
+    can fit on a single page, so we can quickly see all the parts.
+    <spacer-15></spacer-15>
+    One measure of complexity that I use is a count of all scopes within a function body.  
+    That is simply 1 + the count of all the open braces &quot;{&quot; inside
+    the body<sup>1</sup>, but does&apos;t count the complexity of functions that are called. Those we will
+    think about some other time.
+    <hr class="spreadup" />
+    <indent-blocks class="footnote">
+      <ol>
+        <li>
+          This complexity measure is closely related to the McCabe Cyclomatic Complexity metric.
+          That has been discredited in an often quoted article in the academic literature.
+          However, I believe that research was flawed - the metric values were correlated with change
+          metrics and found to be weakly correlated.  The authors concluded that Cyclomatic
+          Complexity was therefore of little value.  However, they didn&apos;t account for the
+          fact that developers are very reluctant to change complex code because it is so hard
+          to accomplish without introducing new errors. I contend that this result demonstrates
+          the usefulness of the metric.  In many years of developing code, I&apos;ve found it
+          to be very useful. Functions that have high complexity, by this measure, are very hard
+          to understand and test.
+        </li>
+      </ol>
+    </indent-blocks>
+
+    <h3>Methods:</h3>
+    <h3>Functors:</h3>
+    <h3>Lambdas:</h3>
     <h3>Callable Objects</h3>
     <h3>Testing</h3>
     <h3>STL Algorithms</h3>
