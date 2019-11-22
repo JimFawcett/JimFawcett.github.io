@@ -32,6 +32,7 @@ function initializeMenu() {
         <a href='CppUtilities.html'>CppUtilities</a>\
         <a href='FileUtilities.html'>FileUtilities</a>\
         <a href='Logger.html'>Logger</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -45,6 +46,7 @@ function initializeMenu() {
         <a href='FindFiles.html'>FindFiles</a>\
         <a href='CodeWebifier.html'>CodeWebifier</a>\
         <a href='PrettyPrint.html'>PrettyPrint</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -60,6 +62,7 @@ function initializeMenu() {
         <a href='CppConcurrentFileAccess.html'>CppConcurrentFileAccess</a>\
         <a href='CppLexicalScanner.html'>CppLexicalScanner</a>\
         <a href='RetryWrapper.html'>RetryWrapper</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -72,6 +75,7 @@ function initializeMenu() {
         <a class='disable' href='Sockets.html'>Sockets-Linux</a>\
         <a href='XmlDocument.html'>XmlDocument</a>\
         <a href='CppGraph.html'>CppGraph</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -82,6 +86,7 @@ function initializeMenu() {
         <a href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a>\
         <a href='CppCommWithFileXfer.html'>CppCommWithFileXfer</a>\
         <a href='CppHttpClientServer.html'>CppHttpClientServer</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:smaller;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
@@ -98,7 +103,9 @@ function initializeMenu() {
         <a href='CppThreads.html'>CppThreads</a>\
         <a href='ProcsAndThreads.html'>ProcsAndThreads</a>\
         <a href='Interop.html'>Interop</a>\
+        <a href='CppStoryRepo.html'>C++ Story</a>\
         <a class='lightItem' href='CppExamples.html'>More&nbsp;Examples</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
