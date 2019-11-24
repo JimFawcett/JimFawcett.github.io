@@ -174,24 +174,25 @@
           If the conversion has source type larger than destination type the conversion may or may not
           succeed.  These are called numeric conversions or narrowing.
         </defn-body>
-        <defn-example class="pad10">
+        <defn-example class="pad10"><c-s>
           <t-s>Here are some examples of numeric promotions:</t-s>
           <indent-block class="pad10">
             long int li{ 5 };<br />
             int i = short int{ 2 };<br />
             long long int {2L}<br />
             double d{ 3.0F };
-          </indent-block>
-          <t-s>and here are examples of numeric conversions:</t-s>
+          </indent-block></c-s>
+          <t-s>and here are examples of numeric conversions:</t-s><c-s>
           <indent-block class="pad10">
             int j = 2.5; &nbsp;&nbsp;// succeeds with warning, truncates <c-s>2.5</c-s> to <c-s>2</c-s><br />
             int j{ 2.5 };  &nbsp;// compile failure (see initialization section of Chapter 2)<br />
             float f = 1.5; // succeeds with warning
-          </indent-block>
+          </indent-block></c-s>
           <div class="pad10">
-            The suffixes L and F denote long int and float.  Suffix LL denotes a long long int.
-            If there are no suffixes an integral number has the type int and a floating point
-            number has the type double.
+            The suffixes <c-s>L</c-s> and <c-s>F</c-s> denote <c-s>long int <t-s>and</t-s> float</c-s>.  
+            Suffix <c-s>LL</c-s> denotes a <c-s>long long int</c-s>.
+            If there are no suffixes an integral number has the type <c-s>int</c-s> and a floating point
+            number has the type <c-s>double</c-s>.
           </div>
         </defn-example>
       </defn-block>
@@ -205,14 +206,14 @@
     Functions have a name, a sequence of zero or more arguments, and a return type or void return,
     wrapped around a block of code.
     <spacer-10></spacer-10>
-    <indent-block class="background-block">
+    <defn-block class="indent defnBorders pad10-15">
       <c-s>
         void putline(size_t n = 1) {<br />
         &nbsp;&nbsp;for(size_t i = 0; i &lt; n; ++i)<br />
         &nbsp;&nbsp;&nbsp;&nbsp;std::cout << "\n";<br />
         }
       </c-s>
-    </indent-block>
+    </defn-block>
     <spacer-10></spacer-10>
     They may have default arguments, as shown in this example, so calling <c-s>putline()</c-s>
     results in a single new line being pushed into the terminal stream.
@@ -267,15 +268,28 @@
     </ul>
     <spacer-10></spacer-10>
     These kinds of applications can be built without using function pointers, but when using existing
-    frameworks, it&apos;s likely that you may need them. 
+    frameworks, it&apos;s likely that you will need them, especially with platform APIs. 
     <spacer-15></spacer-15>
     Function pointers can bind to any function as long as its return type and parameter types
-    match the function pointer declaration.  We show how that is done below, for both specific
-    and generic function pointer declarations. The syntax is a bit complicated, so
+    match the function pointer declaration. 
+    <defn-block>
+      <defn-code class="noBorder pad10">  FP pL = putline;
+  using FP = void(*)(size_t n); // function pointer type
+  pL(1)  // push a newline to terminal - func ptrs don&apos;t honor default params</defn-code>
+    </defn-block>
+    We show more about how that is done in the syntax details, below, for both specific
+    and generic function pointer declarations. It&apos;s a bit complicated, so
     we&apos;ve shown several cases.
-    <spacer-25></spacer-25>
+    <spacer-15></spacer-15>
+
     <indent-block style="min-width:100%;">
-      <defn-block style="min-width:80%;">
+      <details>
+        <summary>
+          <span class="labelStyle lightItem">
+            function pointer syntax
+          </span>
+        </summary>
+      <defn-block class="indent" style="min-width:60%;">
         <defn-head class="pad10">
           Here&apos;s how you declare, define, and use specific function pointers:
         </defn-head>
@@ -344,93 +358,12 @@
       </c-s></pre>
         </defn-body>
       </defn-block>
+      </details>
     </indent-block>
-    <!--That can be demonstrated by 
-    declaring function pointers and setting them equal to a function name, then invoking
-    them.  That&apos;s illustrated in this example:
-    <spacer-10></spacer-10>
-    <indent-block>
-      <details>
-        <summary>
-          <span class="labelStyle darkItem">
-            function pointer example
-          </span>
-        </summary>
-        <spacer-10></spacer-10>
-    <indent-block class="background-block">
-<pre><c-s>  // Functions.cpp
+    <spacer-15></spacer-15>
+    Function pointers are used in the Windows and Linux APIs, in the C Language libraries,
+    in Qt - a cross platform GUI framework, ...
 
-  #include &lt;iostream&gt;
-  #include &lt;string&gt;
-  #include "../Display/Display.h"
-
-  /* test functions */
-
-  void putLine(size_t n = 1) {
-    for (size_t i = 0; i &lt; n; ++i)
-      std::cout &lt;&lt; "\n";
-  }
-
-  size_t size(const std::string&amp; s) {
-    return s.size();
-  }
-
-  template &lt;typename T&gt;
-  void message(T t) {
-    std::cout &lt;&lt; t;
-  }
-
-  /* defining function pointers */
-
-  /* templates must be declared at namespace scope */
-
-  /* #1 function pointer declaration - creates generic fun ptr type */
-
-  template&lt;class Tr, class Ta&gt;
-  using FP2 = Tr(*)(Ta t);
-
-  void demoFunctionPointers() {
-
-    displayDemo("--- demoFunctionPointers ---");
-    putLine();
-
-    /* #2 function pointer declaration - creates */
-    /*    pointer to specific function signature */
-
-    using FP1 = void(*)(size_t n);
-
-    /* declaring function pointers with initialization */
-
-    FP1 pl1 = putLine;
-    FP2&lt;void, size_t&gt; pl2 = putLine;
-    FP2&lt;size_t, const std::string&amp;&gt; pSz = size;
-    FP2&lt;void, const std::string&amp;&gt; msg1 = message;
-  
-    /* can also define function pointers using auto */
-
-    auto&amp; pl3 = putLine;
-    auto&amp; msg2 = message&lt;const std::string&amp;&gt;;
-    auto&amp; msg3 = message&lt;const char*&gt;;
-
-    /* test code */
-
-    message("\n ------------------------");
-    msg1("\n  testing PL1");
-    pl1(1);
-    msg2("\n  testing PL2");
-    pl2(1);
-    size_t sz = pSz("this is a string");
-    msg2("\n  size of \"this is a string\" = " + std::to_string(sz));
-    msg3("\n --------------");
-    message("\n  done with testing");
-    message("\n ------------------------\n");
-  }
-
-  int main() {
-    demoFunctionPointers();
-    putline(2);
-  }</c-s></pre>      </details>
-    </indent-block>-->
     <h3>Methods:</h3>
     Functions bound to classes and structs are called methods.  Methods have access to all the
     member data of the class.  If a class inherits from one or more base classes, it inherits all 
@@ -508,9 +441,34 @@
     they can use member data from the invoking instance.
     Method pointers can be bound to any method of the specified type provided that the
     function arguments and return value match the method pointer declaraton.
-    <spacer-25></spacer-25>
-    <indent-block style="min-width:100%;">
-      <defn-block style="min-width:80%;">
+    <spacer-15></spacer-15>
+    <defn-block class="noBorder">
+      <defn-code class="noBorder">  using FP1 = void(D::B::*)(const std::string&);
+  FP1 pNameSetter = &D::B::name;  // binds to void B::name(const std::string&)
+  D d;
+  (d.*pNameSetter)("Tom");
+
+  using FP2 = std::string(D::B::*)();
+  FP2 pNameGetter = &D::B::name;  // binds to std::string B::name()
+  std::string name = (d.*pNameGetter)();
+  std::cout << "\n  d1.name() --> " << name;
+      </defn-code>
+    </defn-block>
+    <spacer-15></spacer-15>
+    Note that binding to the inherited name functions requires using the class specifier
+    D::B instructing the compiler that it will find the code (to point to) in the base
+    class definition.  When binding to the occupation names you will just use the D class
+    specifier.  Look at the syntax details, below, to see all the details.
+    <spacer-15></spacer-15>
+    <indent-block>
+      <details>
+        <summary>
+          <span class="labelStyle lightItem">
+            method pointer syntax
+          </span>
+        </summary>
+        <spacer-10></spacer-10>
+      <defn-block class="indent" style="min-width:60%;">
         <defn-head class="pad10">
           Here&apos;s how you declare, define, and use specific method pointers:<br />
           -- all the cases are included because syntax is a bit complex --
@@ -569,15 +527,66 @@
 </c-s></pre>
         </defn-body>
       </defn-block>
+      </details>
     </indent-block>
     <spacer-15></spacer-15>
+    Here&apos;s a plausible example application for method pointers: you have a set of events that
+    require different processing for each event, but there are common parts of that processing
+    and data needs to be shared between the handlers.
+    <spacer-15></spacer-15>
+    For this, we could create a class that provides methods for each event along with methods
+    for shared processing and data members appropriate for the application. Now, an event
+    dispatcher provides a map with items <c-s>{ eventId, [pointer to method for that id] }</c-s>.
+    So event dispatching looks like this: <c-s>dispatcher[eventId](event args)</c-s>.
     <h3>Functors:</h3>
     Functors are instances of classes that implement operator() so they can be invoked.
     In modern frameworks they often take the place of function pointers, e.g., used for
     callbacks and to inject processing into some other class&apos;s instance.
-    <spacer-25></spacer-25>
-    <indent-block style="min-width:100%;">
-      <defn-block style="min-width:80%;">
+    <defn-block>
+      <defn-code class="noBorder">
+  class AFunctor {
+  public:
+    void operator()(const std::string&amp; s);
+    // other members elided
+  }
+  private:
+    // member data elided
+  };
+
+  AFunctor fun;
+  fun("called like a function");
+      </defn-code>
+    </defn-block>
+    <spacer-15></spacer-15>
+    The Standard Template Library (STL) algorithms
+    were designed to be used with functors to inject processing into library defined operations,
+    like std::for_each.  Here&apos;s an example:
+    <defn-block>
+      <defn-code class="noBorder">
+  struct display {
+    template&lt;typename T&gt;
+    void operator()(T t) {
+      std::cout << t << " ";
+    }
+  };
+
+  std::vector&lt;std::string&gt; coll{ "one", "two", "three", "four" };
+  std::for_each(coll.begin(), coll.end(), display);
+      </defn-code>
+    </defn-block>
+    <c-s>std::for_each</c-s> simply calls display on each of its elements.  Since we
+    created the functor display as a template function, that will work for any collection
+    type for which elements can be inserted into <c-s>std::cout</c-s>.
+    <spacer-15></spacer-15>
+    This example code fragment is expanded to show all the parts in the details below.
+    <spacer-15></spacer-15>
+    <indent-block>
+      <details>
+        <summary>
+          <span class="labelStyle lightItem">functor details</span>
+        </summary>
+        <spacer-10></spacer-10>
+      <defn-block class="indent" style="min-width:60%;">
         <defn-head class="pad10">
           Functors
         </defn-head>
@@ -635,8 +644,11 @@
             </c-s></pre>
         </defn-body>
       </defn-block>
+      </details>
     </indent-block>
     <spacer-15></spacer-15>
+    Functors are widely used in C++ code. In addition to being used as presented here, they 
+    are the basis for implementing the lambda construct, introduced with C++11.
     <h3>Lambdas:</h3>
     <h3>Callable Objects:</h3>
     <h3>Standard Invoke:</h3>
