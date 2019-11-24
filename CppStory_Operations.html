@@ -144,7 +144,7 @@
   </header>
 
   <hr class="spread" />
-  <indent-blocks>
+  <indent-block>
     <h3>Operations:</h3>
     In this chapter we focus on ways that operations on data are implemented.
     <hr class="spreadup" />
@@ -223,89 +223,7 @@
     or struct scope.  All functions defined at namespace scope will simply be referred to
     as functions.  If there is a possible ambiguity, we will use the qualifier global or unbound
     to indicate that they are not methods.  So, putline is a global function.
-    <spacer-15></spacer-15>
-    The name of a function is just a pointer to its code. That can be demonstrated by 
-    declaring function pointers and setting them equal to a function name, then invoking
-    them.  That&apos;s illustrated in this example:
-    <spacer-10></spacer-10>
-    <indent-block>
-      <details>
-        <summary>
-          <span class="labelStyle darkItem">
-            function pointer example
-          </span>
-        </summary>
-        <spacer-10></spacer-10>
-    <indent-block class="background-block">
-<pre><c-s>  // Functions.cpp
-
-  #include &lt;iostream&gt;
-  #include &lt;string&gt;
-  #include "../Display/Display.h"
-
-  /*------------------------------------------------------ 
-    Test functions: 
-    we will construct pointers to putLine and message
-    and show that they give the same results as calling
-    these test functions.
-  */
-
-  void putLine(size_t n = 1) {
-    for (size_t i = 0; i &lt; n; ++i)
-      std::cout &lt;&lt; "\n";
-  }
-
-  template &lt;typename T&gt;
-  void message(T t) {
-    std::cout &lt;&lt; t;
-  }
-
-  /////////////////////////////////////////////////////
-  // declare template alias - C++17
-  // templates must be declared at namespace scope,
-  // e.g., not inside functions
-
-  template&lt;class T&gt;
-  using FP2 = void(*)(T t);
-
-  /*--- function demonstrating use of function pointers ---*/
-
-  void demoFunctionPointers() {
-
-    displayDemo("--- demoFunctionPointers ---");
-    putLine();
-
-    /*--- non-template function pointer declaration ---*/ 
-    using FP1 = void(*)(size_t n);
-    FP1 pl1 = putLine;
-  
-    /*--- instantiate template function pointers ---*/
-    FP2&lt;size_t&gt; pl2 = putLine;
-    FP2&lt;const std::string&amp;&gt; msg1 = message;
-  
-    /*--- auto declarations of function pointers ---*/
-    auto&amp; pl3 = putLine;
-    auto&amp; msg2 = message&lt;const std::string&amp;&gt;;
-    auto&amp; msg3 = message&lt;const char*&gt;;
-
-    /*--- now we are using these function pointers ---*/
-    message("\n ------------------------");  // original function
-    msg1("\n  testing PL1");                 // first fun ptr to message
-    pl1(1);                                  // first fun ptr to putLine
-    msg2("\n  testing PL2");                 // second fun ptr to message   
-    pl2(1);                                  // second fun ptr to putLine
-    msg3("\n --------------");               // third fun ptr to message
-    pl3(1);                                  // third fun ptr to putLine
-    message("\n  done with testing");
-    message("\n ------------------------\n");
-  }
-
-  int main() {
-    demoFunctionPointers();
-    putline(2);
-  }</c-s></pre>
-      </details>
-    </indent-block>
+    The name of a function is just a pointer to its code. 
     <spacer-15></spacer-15>
     Each function should have a single responsibility and be small and simple enough to make
     it (relatively) easy to understand and test.  A good default size is 50 lines of code - that
@@ -334,15 +252,394 @@
       </ol>
     </indent-blocks>
 
+    <h3>Function Pointers:</h3>
+    Function pointers are used to:
+    <spacer-10></spacer-10>
+    <ul class="tight">
+      <li>create callbacks</li>
+      <li>pass processing to platform API functions</li>
+      <li>
+        modify the way library functions operate, e.g., qsort accepts a comparator function pointer
+      </li>
+      <li>pass processing to plug-in interfaces</li>
+    </ul>
+    <spacer-10></spacer-10>
+    These kinds of applications can be built without using function pointers, but when using existing
+    frameworks, it&apos;s likely that you may need them. 
+    <spacer-15></spacer-15>
+    Function pointers can bind to any function as long as its return type and parameter types
+    match the function pointer declaration.  We show how that is done below, for both specific
+    and generic function pointer declarations. The syntax is a bit complicated, so
+    we&apos;ve shown several cases.
+    <spacer-25></spacer-25>
+    <indent-block>
+      <defn-block>
+        <defn-head class="pad10">
+          Here&apos;s how you declare, define, and use specific function pointers:
+        </defn-head>
+        <defn-body>
+    <pre><c-s><t-s>   For the function:</t-s>
+
+     void putLine(size_t n = 1) {
+        for (size_t i = 0; i < n; ++i)
+        std::cout << "\n";
+     }
+
+  <t-s>Define a function pointer for that specific signature:</t-s>
+
+     using FP1 = void(*)(size_t n);&nbsp;&nbsp;// function pointer type
+     FP1 pl1 = putLine;
+     pl1(1);  // push single newline to terminal
+
+  <t-s>You can define a function pointer more directly using auto</t-s>
+  
+     auto& pl2 = putLine;
+     pl2(2);  // push two newlines to the terminal
+
+</c-s></pre>
+      </defn-body>
+      <defn-head class="pad10">
+        And here&apos;s how you make them generic:
+      </defn-head>
+      <defn-body>
+<pre><c-s>  <t-s>For the functions:</t-s>
+
+     size_t size(const std::string& s) {
+        return s.size();
+     }
+  
+     template <typename T>
+     void message(T t) {
+        std::cout << t;
+     }
+
+  <t-s>Declare a generic function pointer type</t-s>
+  
+     template&lt;class Tr, Ta&gt;
+     using FP2 = Tr(*)(Ta t);
+
+  <t-s>and instantiate it for the second and third test functions:</t-s>
+
+     FP2&lt;size_t, const std::string&&gt; pSz = size;
+     size_t sz = pSz("a test string");
+
+     FP2&lt;void, const std::string&&gt; msg1 = message;
+     msg1("\n  a test message");
+
+  You can also define function pointers in a generic way using auto   
+
+     auto& msg2 = message&lt;const std::string&&gt;
+     msg2("\n  another test message");
+
+     auto& msg3 = message&lt;const char*&gt;
+     msg3("\n  still another test message!");
+   
+     auto& pSz2 = size;
+     msg2(
+        "\n  size of \"another, somewhat longer, string\" = " + 
+        std::to_string(sz)
+     );
+      </c-s></pre>
+        </defn-body>
+      </defn-block>
+    </indent-block>
+    <!--That can be demonstrated by 
+    declaring function pointers and setting them equal to a function name, then invoking
+    them.  That&apos;s illustrated in this example:
+    <spacer-10></spacer-10>
+    <indent-block>
+      <details>
+        <summary>
+          <span class="labelStyle darkItem">
+            function pointer example
+          </span>
+        </summary>
+        <spacer-10></spacer-10>
+    <indent-block class="background-block">
+<pre><c-s>  // Functions.cpp
+
+  #include &lt;iostream&gt;
+  #include &lt;string&gt;
+  #include "../Display/Display.h"
+
+  /* test functions */
+
+  void putLine(size_t n = 1) {
+    for (size_t i = 0; i &lt; n; ++i)
+      std::cout &lt;&lt; "\n";
+  }
+
+  size_t size(const std::string&amp; s) {
+    return s.size();
+  }
+
+  template &lt;typename T&gt;
+  void message(T t) {
+    std::cout &lt;&lt; t;
+  }
+
+  /* defining function pointers */
+
+  /* templates must be declared at namespace scope */
+
+  /* #1 function pointer declaration - creates generic fun ptr type */
+
+  template&lt;class Tr, class Ta&gt;
+  using FP2 = Tr(*)(Ta t);
+
+  void demoFunctionPointers() {
+
+    displayDemo("--- demoFunctionPointers ---");
+    putLine();
+
+    /* #2 function pointer declaration - creates */
+    /*    pointer to specific function signature */
+
+    using FP1 = void(*)(size_t n);
+
+    /* declaring function pointers with initialization */
+
+    FP1 pl1 = putLine;
+    FP2&lt;void, size_t&gt; pl2 = putLine;
+    FP2&lt;size_t, const std::string&amp;&gt; pSz = size;
+    FP2&lt;void, const std::string&amp;&gt; msg1 = message;
+  
+    /* can also define function pointers using auto */
+
+    auto&amp; pl3 = putLine;
+    auto&amp; msg2 = message&lt;const std::string&amp;&gt;;
+    auto&amp; msg3 = message&lt;const char*&gt;;
+
+    /* test code */
+
+    message("\n ------------------------");
+    msg1("\n  testing PL1");
+    pl1(1);
+    msg2("\n  testing PL2");
+    pl2(1);
+    size_t sz = pSz("this is a string");
+    msg2("\n  size of \"this is a string\" = " + std::to_string(sz));
+    msg3("\n --------------");
+    message("\n  done with testing");
+    message("\n ------------------------\n");
+  }
+
+  int main() {
+    demoFunctionPointers();
+    putline(2);
+  }</c-s></pre>      </details>
+    </indent-block>-->
     <h3>Methods:</h3>
-    <indent-blocks>
-      Methods are 
-    </indent-blocks>
+    Functions bound to classes and structs are called methods.  Methods have access to all the
+    member data of the class.  If a class inherits from one or more base classes, it inherits all 
+    the methods and data members of its base classes, and has access to any of that qualified as 
+    &quot;public: or protected:&quot; for methods and qualified as &quot;protected:&quot; for
+    data. 
+    <spacer-15></spacer-15>
+    <div class="indent" style="display:flex;">
+      <defn-block>
+        <defn-head>
+          Base class
+        </defn-head>
+        <defn-body>
+          <pre>
+<c-s>  class B {
+  public:
+    void name(const std::string&amp; aname) {
+      name_ = aname;
+    }
+    std::string name() {
+      return name_;
+    }
+  protected:
+    std::string name_;
+  };
+</c-s></pre>
+        </defn-body>
+      </defn-block>
+      <defn-block>
+        <defn-head>
+          Derived class
+        </defn-head>
+        <defn-body>
+          <pre><c-s>  class D : public B {
+  public:
+    void occupation(const std::string&amp; occup) {
+      occupation_ = occup;
+    }
+    std::string occupation() {
+      return ocupation_;
+    }
+  private:
+    std::string occupation_;
+  };
+</c-s></pre>
+        </defn-body>
+      </defn-block>
+    </div>
+    <spacer-25></spacer-25>
+    The class D, in the block above, has public methods:
+    <ul class="tight">
+      <li>
+        <c-s>void name(const std::string&amp; aname)</c-s>
+      </li>
+      <li>
+        <c-s>std::string name()</c-s>
+      </li>
+      <li>
+        <c-s>void occupation(const std::string&amp;; occup)</c-s>
+      </li>
+      <li>
+        <c-s>std::string occupation()</c-s>
+      </li>
+    </ul>
+    <spacer-15></spacer-15>
+    The two name methods it inherited from B and those are accessible to clients. It implemented
+    the two occupation methods and those are also accessible to clients.
+    <spacer-15></spacer-15>
+    The derived class D not only contains its occupation_ string, but it also contains the
+    Base::name_ string, inside an image of B that is part of its memory footprint.  We will 
+    demonstrate that in the next chapter3 classes.
+
+    <h3>Method Pointers:</h3>
+    Method pointers have the same uses as function pointers.  They have an advantage that
+    they can use member data from the invoking instance.
+    Method pointers can be bound to any method of the specified type provided that the
+    function arguments and return value match the method pointer declaraton.
+    <spacer-25></spacer-25>
+    <indent-block>
+      <defn-block>
+        <defn-head class="pad10">
+          Here&apos;s how you declare, define, and use specific method pointers:<br />
+          -- all the cases are included because syntax is a bit complex --
+        </defn-head>
+        <defn-body>
+    <pre><c-s><t-s>   Using classes B and D defined above:</t-s>
+
+  /* accessing inherited overloaded methods name */
+
+  using FP1 = void(D::B::*)(const std::string&);
+  FP1 pNameSetter = &D::B::name;
+  D d;
+  (d.*pNameSetter)("Tom");
+
+  using FP2 = std::string(D::B::*)();
+  FP2 pNameGetter = &D::B::name;
+  std::string name = (d.*pNameGetter)();
+  std::cout << "\n  d1.name() --> " << name;
+
+  /* accessing overloaded methods occupation in D */
+
+  using FP3 = void(D::*)(const std::string&);
+  FP3 pOccupSetter = &D::occupation;
+  (d.*pOccupSetter)("derivatives analyst");
+
+  using FP4 = std::string(D::*)();
+  FP4 pOccupGetter = &D::occupation;
+  std::string myJob = (d.*pOccupGetter)();
+  std::cout << "\n  d1.Occupation() -- > " << myJob;
+
+  /* std::invoke */
+
+  <t-s>using</t-s> std::invoke with a method pointer:
+
+  std::invoke(pNameSetter, d, "Darth Vader");
+  std::string darth = std::invoke(pNameGetter, d);
+  std::cout << "\n  his name is " << darth;
+
+  /*-- alternate definitions --*/
+
+  auto pOccuSetter2 = static_cast&lt;std::string(D::*)()&gt;(&D::occupation);
+  auto pOccuGetter2 = static_cast&lt;void(D::*)(const std::string&)&gt;(&D::occupation);  
+
+  std::string(D:: * pOccuGetter3)() = &D::occupation;
+  void(D:: * pOccuSetter3)(const std::string&) = &D::occupation;
+
+      </c-s></pre>
+        </defn-body>
+        <defn-head class="pad10">
+          Here&apos;s the output:
+        </defn-head>
+        <defn-body>
+          <pre><c-s>  d1.name() --> Tom
+  d1.Occupation() -- > derivatives analyst
+  his name is Darth Vader
+</c-s></pre>
+        </defn-body>
+      </defn-block>
+    </indent-block>
+    <spacer-15></spacer-15>
     <h3>Functors:</h3>
+    Functors are instances of classes that implement operator() so they can be invoked.
+    In modern frameworks they often take the place of function pointers, e.g., used for
+    callbacks and to inject processing into some other class&apos;s instance.
+    <spacer-25></spacer-25>
+    <indent-block>
+      <defn-block>
+        <defn-head class="pad10">
+          Functors
+        </defn-head>
+        <defn-body>
+            <pre><c-s>  class Functor {
+  public:
+    template<typename T>
+    void operator()(T element) {
+      ++count_;
+      std::cout << "\n  " << element;
+    }
+    size_t count() {
+      return count_;
+    }
+    void name(const std::string& nm) {
+      name_ = nm;
+    }
+    std::string name() {
+      return name_;
+    }
+  private:
+    std::string name_;
+    size_t count_ = 0;
+  };
+            </c-s></pre>
+          </defn-body>
+        <defn-head class="pad10">
+          Using functor:
+        </defn-head>
+        <defn-body>
+          <pre><c-s>  Functor fun;
+  fun.name("counter");
+
+  std::vector<std::string> numbers{ "one", "two", "three", "four", "five" };  
+
+  /* std::for_each invokes fun on each element in numbers  */
+  /* it then returns a copy of fun to be interrogated later */
+
+  fun = std::for_each(numbers.begin(), numbers.end(), fun);
+
+  std::cout << "\n  " << fun.name() << " processed " 
+            << fun.count() << " elements";  
+</c-s></pre>
+        </defn-body>
+        <defn-head class="pad10">
+          Output:
+        </defn-head>
+        <defn-body>
+          <pre><c-s>  one
+  two
+  three
+  four
+  five
+  counter processed 5 elements
+            </c-s></pre>
+        </defn-body>
+      </defn-block>
+    </indent-block>
+    <spacer-15></spacer-15>
     <h3>Lambdas:</h3>
-    <h3>Callable Objects</h3>
-    <h3>Testing</h3>
-    <h3>STL Algorithms</h3>
+    <h3>Callable Objects:</h3>
+    <h3>Standard Invoke:</h3>
+    <h3>Testing:</h3>
+    <h3>STL Algorithms:</h3>
     <indent-blocks>
     </indent-blocks>
     <spacer-25></spacer-25>
