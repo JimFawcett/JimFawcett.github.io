@@ -650,35 +650,86 @@
     Functors are widely used in C++ code. In addition to being employed as presented here, they 
     are the basis for implementing lambda constructs, introduced with C++11.
     <h3>Lambdas:</h3>
+    Lambdas are locally defined callable  objects that can capture state from their local
+    scope.  That is often described as the lambda&apos;s closure.  They are widely used
+    to inject processing into STL algorithms.  You&apos;ve already seen a couple of examples
+    of that in Chapter #1.
+    <spacer-15></spacer-15>
     <defn-block class="indent">
       <defn-head class="pad10" style="border-bottom:1px solid darkred;">
-        Lambda: anonymous locally defined functor in abreviated syntax
+        <span class="notice">Lambda:</span> anonymous locally defined functor in abreviated syntax
       </defn-head>
-      <defn-code> [] <t-s>no capture</t-s>
- [](T1 t1, T2 t2, ...) { // code to execute };
+      <defn-code>  
+ <t-s>Lambda syntax example:</t-s>
 
- [=] <t-s>all variables in closure by value</t-s>
- [=](T1 t1, T2 t2, ...) { // code to execute };
-
- [&] <t-s>all variables in closure by reference</t-s>
- [&](T1 t1, T2 t2, ...){ // code to execute };
-
- [c1, &c2] <t-s>capture c1 by value, c2 by reference from local scope</t-s>
- [c1, &c2](T1 t1, T2 t2, ...){ // code to execute };
-
- {
+ auto l1 = example() {
    std::string s1 = "this is a demonstration";
    
-   auto l1 = [s1](const std::string&amp; s2) {
+   auto lam = [s1](const std::string&amp; s2) {
      std::cout << "\n  " << s1 << " of " << s2;
+   };
+   return lam;
  };
 
  l1("lambda syntax");
  <t-s>displays message &quot;this is a demonstration of lambda sytax&quot;</t-s>
-
-
+ <t-s>
+   Here&apos;s what happened:
+   1. string <c-s>s1</c-s> was constructed in example scope, e.g., the lambda&apos;s closure
+   2. lambda <c-s>lam</c-s> was defined capturing <c-s>s1</c-s> by value
+   3. the lambda code sends a string to <c-s>std::cout</c-s> using the captured <c-s>s1</c-s> copy
+      and a string, <c-s>s2</c-s>, passed by the using code as an invocation parameter
+   4. this created a lambda object, which will be executed later, and returned it to   
+      be copied to <c-s>l1</c-s>.
+   5. <c-s>l1</c-s> executes the lambda passing it <c-s>s2</c-s> = <c-s>&quot;lambda sytax&quot;</c-s>
+ </t-s>
       </defn-code>
     </defn-block>
+    <spacer-15></spacer-15>
+    Lambdas are used with STL algorithms, for providing threads with their processing semantics,
+    and used like stored scripts for handling message and event dispatching.
+    <spacer-15></spacer-15>
+    The details dropdown, below, defines capture and discusses syntax options for capture and return value.
+    
+    <spacer-15></spacer-15>
+    <indent-block>
+      <details>
+        <summary>
+          <span class="labelStyle lightItem">Lambda Syntax:</span>
+        </summary>
+        <spacer-10></spacer-10>
+        <defn-block class="indent">
+          <defn-head class="pad10">
+            <span class="notice">Lambda Syntax</span> - closure is local scope where lambda is defined
+          </defn-head>
+          <defn-code style="border-top:1px solid darkred;">
+ auto f = [capture specifier](argument list)[->optional return specification] {
+   body with code to execute
+ };
+
+ <ts><span class="notice">Capture specifier:</span></ts>
+ [] ==> no capture
+ [=] ==> capture all variables in closure by value
+ [&] ==> capture all variables in closure by reference
+ [v1, &v2] ==> capture, from closure, variable v1 by value and v2 by reference
+
+ <t-s><span class="notice">argument list</span> - same as function:</t-s>
+ (T1 t1, T2 t2, ...) <t-s>supplied by the caller</t-s>
+
+ <t-s><span class="notice">optional return specification:</span></t-s>
+ Only needed if auto f can&apos;t deduce the return type.
+
+ <t-s><span class="notice">body:</span></t-s>
+ Same sytax as ordinary function, except that it may use captured variables as
+ well as variables from the parameter list, if any.
+          </defn-code>
+        </defn-block>
+      </details>
+    </indent-block>
+    <spacer-15></spacer-15>
+    I think you may be surprised how often you use lambdas once you get used to them.
+    Lambdas help to organize code by keeping the definition of a set of operations close
+    to the site where they are invoked.
     <h3>Callable Objects:</h3>
     <h3>Standard Invoke:</h3>
     <h3>Testing:</h3>
