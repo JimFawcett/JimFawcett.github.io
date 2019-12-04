@@ -210,13 +210,33 @@
       <c-s>
         void putline(size_t n = 1) {<br />
         &nbsp;&nbsp;for(size_t i = 0; i &lt; n; ++i)<br />
-        &nbsp;&nbsp;&nbsp;&nbsp;std::cout << "\n";<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; "\n";<br />
         }
       </c-s>
     </defn-block>
     <spacer-10></spacer-10>
     They may have default arguments, as shown in this example, so calling <c-s>putline()</c-s>
     results in a single new line being pushed into the terminal stream.
+    <spacer-15></spacer-15>
+    Function arguments may be passed by value, as shown above, or by reference
+    as shown in the code below.
+    <spacer-10></spacer-10>
+    <defn-block class="indent defnBorders pad10-15">
+      <c-s>
+        void show(const std::vector&lt;int&gt;&amp; vInt) {<br />
+        &nbsp;&nbsp;for(int item : vInt)<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;std::cout &lt;&lt; item &lt;&lt; " ";<br />
+        }
+      </c-s>
+    </defn-block>
+    <spacer-10></spacer-10>
+    The &amp; before vInt indicates that the vector argument is passed by
+    reference.  To avoid side effects, we pass reference arguments as const
+    references.  On rare occasions we may choose to pass a non-const reference
+    so the function may change the argument in the caller&apos;s scope, but this
+    makes the code harder to understand, requiring the designer to understand
+    what the function does to the passed arguments.  Furthermore, literals
+    can only be passed by value or by const reference.
     <spacer-15></spacer-15>
     functions can only be defined at namespace scope or class or struct scope.  They cannot be
     defined within function scope.  That means that C++ does not support inner functions.  When
@@ -675,13 +695,12 @@
  <t-s>displays message &quot;this is a demonstration of lambda sytax&quot;</t-s>
  <t-s>
    Here&apos;s what happened:
-   1. string <c-s>s1</c-s> was constructed in example scope, e.g., the lambda&apos;s closure
-   2. lambda <c-s>lam</c-s> was defined capturing <c-s>s1</c-s> by value
-   3. the lambda code sends a string to <c-s>std::cout</c-s> using the captured <c-s>s1</c-s> copy
-      and a string, <c-s>s2</c-s>, passed by the using code as an invocation parameter
-   4. this created a lambda object, which will be executed later, and returned it to   
-      be copied to <c-s>l1</c-s>.
-   5. <c-s>l1</c-s> executes the lambda passing it <c-s>s2</c-s> = <c-s>&quot;lambda sytax&quot;</c-s>
+   1.  string <c-s>s1</c-s> was constructed in example scope, e.g., the lambda&apos;s closure
+   2.  lambda <c-s>lam</c-s> was defined capturing <c-s>s1</c-s> by value
+   3.  the lambda code sends a string to <c-s>std::cout</c-s> using the captured <c-s>s1</c-s> copy
+       and a string, <c-s>s2</c-s>, passed by the using code as an invocation parameter
+   4.  this created a lambda object, which will be executed later, and returned it to be copied to <c-s>l1</c-s>.
+   5.  <c-s>l1</c-s> executes the lambda passing it <c-s>s2</c-s> = <c-s>&quot;lambda sytax&quot;</c-s>
  </t-s>
       </defn-code>
     </defn-block>
@@ -722,6 +741,15 @@
  <t-s><span class="notice">body:</span></t-s>
  Same sytax as ordinary function, except that it may use captured variables as
  well as variables from the parameter list, if any.
+
+ <t-s><span class="notice">Note:
+ </span>You need to be very careful with capture by reference and with capture of pointers by value.
+  If a lamda is passed out of its scope of definition, references and pointers will point to no longer 
+  existing resources.
+            
+  It is a good idea to use only specific capture specifiers for each captured variable used by the
+  the lambda code, like v1 and &amp;v2, above.  If you expect to return the lambda outside its scope
+  of definition, you would only use captured values, like v1, avoiding captures by reference like &amp;v2.</t-s>
           </defn-code>
         </defn-block>
       </details>
@@ -731,6 +759,16 @@
     Lambdas help to organize code by keeping the definition of a set of operations close
     to the site where they are invoked.
     <h3>Callable Objects:</h3>
+    Any entity that can be invoked, e.g., functions, function pointers, methods, method pointers,
+    functors, and lambdas, are all referred to as callable objects.  The STL algorithms accept 
+    any of the STL containers and most accept any callable object to act on elements of the
+    container.
+    C++ threads accept any callable object that returns void.
+    <spacer-15></spacer-15>
+    The function std::invoke(...) accepts, as its first argument, any callable object.
+    If that is a method pointer, the next argument must be the address of an instance on which
+    the method pointer acts.  Any remaining arguments - an arbitry finite number - are passed by
+    value to the callable object.
     <h3>Standard Invoke:</h3>
     <h3>Testing:</h3>
     <h3>STL Algorithms:</h3>
