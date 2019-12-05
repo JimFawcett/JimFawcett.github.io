@@ -146,7 +146,7 @@
   <hr class="spread" />
   <indent-block>
     <h3>Operations:</h3>
-    In this chapter we focus on ways that operations on data are implemented.
+    In this chapter we focus on ways that C++ operations on data are implemented and tested.
     <hr class="spreadup" />
     <h3>Type Coercions:</h3>
     The fundamental C++ types support coercions between selected types.
@@ -554,10 +554,17 @@
     require different processing for each event, but there are common parts of that processing
     and data needs to be shared between the handlers.
     <spacer-15></spacer-15>
-    For this, we could create a class that provides methods for each event along with methods
+    For this, we could create a class that provides methods to handle each event along with methods
     for shared processing and data members appropriate for the application. Now, an event
-    dispatcher provides a map with items <c-s>{ eventId, [pointer to method for that id] }</c-s>.
-    So event dispatching looks like this: <c-s>dispatcher[eventId](event args)</c-s>.
+    dispatcher provides a map with items:
+    <indent-block class="pad10">
+      <c-s>{ eventId, [pointer to method for that id] }</c-s>.
+    </indent-block>
+    So event dispatching looks like this:
+    <indent-block class="pad10">
+      <c-s>dispatcher[eventId](event args)</c-s>.
+    </indent-block>
+    We will see an example in Chapter #4 - classes.
     <h3>Functors:</h3>
     Functors are instances of classes that implement operator() so they can be invoked.
     In modern frameworks they often take the place of function pointers, e.g., used for
@@ -608,7 +615,7 @@
         <spacer-10></spacer-10>
       <defn-block class="indent" style="min-width:60%;">
         <defn-head class="pad10">
-          Functors
+          <span class="notice">functors</span>
         </defn-head>
         <defn-body>
             <pre><c-s>  class Functor {
@@ -634,7 +641,7 @@
             </c-s></pre>
           </defn-body>
         <defn-head class="pad10">
-          Using functor:
+          <span class="notice">Using functor:</span>
         </defn-head>
         <defn-body>
           <pre><c-s>  Functor fun;
@@ -652,7 +659,7 @@
 </c-s></pre>
         </defn-body>
         <defn-head class="pad10">
-          Output:
+          <span class="notice">Output:</span>
         </defn-head>
         <defn-body>
           <pre><c-s>  one
@@ -769,14 +776,514 @@
     If that is a method pointer, the next argument must be the address of an instance on which
     the method pointer acts.  Any remaining arguments - an arbitry finite number - are passed by
     value to the callable object.
-    <h3>Standard Invoke:</h3>
-    <h3>Testing:</h3>
+    <spacer-15></spacer-15>
+    <div class="autoX">
+      <defn-block>
+        <defn-head>
+          <span class="notice">demo of std::invoke</span>
+        </defn-head>
+        <defn-code style="border-top:1px solid darkred;">
+  std::invoke(f, "function via std::invoke", 1);
+  std::invoke(pFun, "function pointer via std::invoke", 2);
+  std::invoke(F(), "functor via std::invoke", 3);
+  std::invoke(lam, "lambda via std::invoke", 4)
+  std::invoke(pMethod, C(), "method pointer via std::invoke", 5);
+        </defn-code>
+      </defn-block>
+    </div>
+    <spacer-15></spacer-15>
+    In this example, <c-s>f</c-s> is a function taking a constant string reference and an unsigned int.
+    <c-s>pFun</c-s> is a function pointer to the same function.
+    <c-s>F</c-s> is a functor and <c-s>F()</c-s> is a temporary instance of <c-s>F</c-s>.
+    <c-s>lam</c-s> is a lambda.
+    <c-s>C</c-s> is a class with a method to call
+    and <c-s>C()</c-s> is an instance of <c-s>C</c-s>.  <c-s>pMethod</c-s> is a pointer to <c-s>C</c-s>&apos;s method.
+    <spacer-15></spacer-15>
+    A complete listing of this code is shown in the details below.
+    <spacer-15></spacer-15>
+    <details>
+      <summary>
+        <span class="labelStyle darkItem">Complete Example</span>
+      </summary>
+      <spacer-10></spacer-10>
+      <indent-block class="autoX" style="padding:0; width:100%;">
+        <defn-block>
+          <defn-code style="border-top:1px solid darkred; padding-right:50px;">
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;functional&gt;
+#include "../Display/Display.h"
+
+std::string suffix(size_t i) {
+  std::string sfx;
+  switch (i)
+  {
+  case 1:
+    sfx = "st";
+    break;
+  case 2:
+    sfx = "nd";
+    break;
+  case 3:
+    sfx = "rd";
+    break;
+  default:
+    sfx = "th";
+    break;
+  }
+  return sfx;
+}
+
+void f(const std::string& type, size_t i) {
+  std::cout &lt;&lt; "\n  " &lt;&lt; std::to_string(i) &lt;&lt; suffix(i) + " invocation, a " + type;
+}
+
+void(*pFun)(const std::string&, size_t) = f;
+
+class F {
+public:
+  void operator()(const std::string& type, size_t i) {
+    std::cout &lt;&lt; "\n  " &lt;&lt; std::to_string(i) &lt;&lt; suffix(i) + " invocation, a " + type;
+  }
+};
+
+auto lam = [](const std::string& type, size_t i) {
+  std::cout << "\n  " << std::to_string(i) << suffix(i) + " invocation, a " + type;
+};
+
+class C {
+public:
+  void method(const std::string& type, size_t i) {
+    std::cout &lt;&lt; "\n  " &lt;&lt; std::to_string(i) &lt;&lt; suffix(i) + " invocation, a " + type;
+  }
+};
+
+using MPtr = void(C::*)(const std::string&, size_t);
+MPtr pMethod = &C::method;
+
+template&lt;typename T&gt;
+void doInvoke(T t, const std::string& type, size_t count) {
+  t(type, count);
+}
+
+template&lt;typename U, typename V&gt;
+void doInvoke(U u, V v, const std::string& type, size_t count) {
+  (u.*v)(type, count);
+}
+
+int main() {
+  displayDemo("--- Callable Objects Demo ---");
+
+  doInvoke(f, "function", 1);
+  doInvoke(pFun, "function pointer", 2);
+  doInvoke(F(), "functor", 3);
+  doInvoke(lam, "lambda", 4);
+  doInvoke(C(), pMethod, "method pointer", 4);
+  putline();
+  /* 
+    std::invoke is more powerful than doInvoke as it takes an arbitry
+    number of arguments.
+    - the first may be a function, function pointer, or functor
+      that take any number of arguments
+    - the first may also be a method pointer.  That requires the second
+      to be an instance of the class.  It accepts an arbitrary number
+      of succeeding arguments.
+    That is implemented with a variadic template.  Those will be discussed
+    in Chapter #4 - Templates.
+  */
+  std::invoke(f, "function via std::invoke", 1);
+  std::invoke(pFun, "function pointer via std::invoke", 2);
+  std::invoke(F(), "functor via std::invoke", 3);
+  std::invoke(lam, "lambda via std::invoke", 4)
+  std::invoke(pMethod, C(), "method pointer via std::invoke", 5);
+  std::cout &lt;&lt; "\n\n";
+}
+          </defn-code>
+          <defn-code style="border-top:1px solid darkred;">
+  --- Callable Objects Demo ---
+  1st invocation, a function
+  2nd invocation, a function pointer
+  3rd invocation, a functor
+  4th invocation, a lambda
+  5th invocation, a method pointer
+
+  1st invocation, a function via std::invoke
+  2nd invocation, a function pointer via std::invoke
+  3rd invocation, a functor via std::invoke
+  4th invocation, a lambda via std::invoke
+  5th invocation, a method pointer via std::invoke
+          </defn-code>
+        </defn-block>
+      </indent-block>
+    </details>
+    <spacer-15></spacer-15>
+    Callable objects are used in many of the standard C++ libraries.  Also, they are used frequently for
+    event handling and message dispatching.  You will see examples of that in the next two chapters.
     <h3>STL Algorithms:</h3>
+    Most of the STL algorithms take a container range bounded by 
+    [<c-s>contr.begin()</c-s>, <c-s>contr.end()</c-s>), where
+    <c-s>contr</c-s> is some STL container and <c-s>begin()</c-s> and <c-s>end()</c-s> return iterators to the 
+    first element of the container and one past the last element.  
+    Algorithms take a subsequent argument that defines what to do with each
+    element of the container.
+    <spacer-15></spacer-15>
+    In the example below, we use the std::copy_if algorithm which takes the input range and an
+    iterator, std::back_inserter, to insert elements into a destination container.  Finally,
+    we pass a lambda expression to determine which elements to insert.
+    <spacer-25></spacer-25>
+    <div class="autoX">
+      <defn-block>
+        <defn-head style="border-bottom:1px solid darkred;">
+          <span class="notice">std::copy_if example</span>
+        </defn-head>
+        <defn-code>
+#include &lt;algorithm&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;iostream&gt;
+#include "../Display/Display.h"
+
+template&lt;typename T&gt;
+void show(T t) {
+  for (auto item : t)
+    std::cout &lt;&lt; "\n  " &lt;&lt; item;
+}
+
+int main() {
+
+  std::vector&lt;std::string&gt; src{ 
+    "first string", "second str", "third collection", "another string" 
+  };
+  std::vector&lt;std::string&gt; dst;
+
+  std::string s = "string";          // lambda capture
+
+  std::copy_if(
+    src.begin(), src.end(),          // range of source to copy
+    std::back_inserter(dst),         // insertion iterator push_backs into dst
+
+    [&s](const std::string& item) {  // lambda predicate defines src items to push_back   
+      if (item.find(s) != std::string::npos) {
+        return false;
+      }
+      return true;
+    }
+  );
+  
+  show(dst);
+  putline(2);
+}
+        </defn-code>
+      </defn-block>
+    </div>
+    <spacer-25></spacer-25>
+    One could argue that it would be no more complex just to use a for loop to iterate over the container
+    instead of the copy_if algorithm.  When to use the algorithms is largely a matter of taste.  
+    <spacer-15></spacer-15>
+    However,
+    some of the algorithms implement quite complex operations and are the simplest choice when applicable.  Also,
+    the algorithms are carefully designed to provide the fastest practical processing, and that is often a
+    distinct advantage.
+    <h3>Testing:</h3>
+    All of the earlier sections in this chapter have explored facilities that C++ provides
+    to operate on data.  This section looks at ways to verify that the operations deliver what we expect.
+    <spacer-15></spacer-15>
+    There are three kinds of testing needed for the code in this site&apos;s repositories:
+    <ol>
+      <li>
+        <span class="notice">Construction Tests:</span>
+        <div>
+          These tests are implemented as an integral part of the implementation of a package&apos;s
+          code<sup>1</sup>. We add a few lines of code or a small function, then add a test to ensure that the
+          new code functions as expected.  If we need more than one simple test to verify the new code, then
+          we aren&apos;t testing often enough.  If the test fails, we know where to find the problem - in
+          the last few lines of code.  The test code may be part of the package&apos;s main function or may
+          reside in a separate test package.
+        </div>
+      </li>
+      <li>
+        <span class="notice">Unit Tests:</span>
+        <div>
+          The intent of unit testing is to attempt to ensure that tested code meets all its obligations
+          in a robust manner.  That entails testing every path through the code and testing boundary conditions,
+          e.g., beginning and end of the computational range, all cases that it may need to execute, and success or 
+          failure when executing operations that may fail, like opening streams or connecting a socket.
+          Unit tests are labor intensive, and we may elect to unit test only those packages on which other
+          packages depend.
+        </div>
+      </li>
+      <li>
+        <span class="notice">Regression Tests:</span>
+        <div>
+          Regression tests are tests typically conducted over a library or large subsystem during their
+          implementation.  Each regression test contains a set of test cases that are executed individually
+          usually in a predetermined sequence.  It is very common to use a test harness to aggregate all the
+          tests and apply them to the library or subsystem whenever there is significant change.  The idea is
+          to discover problems early that are due to changes in dependencies or the platform on which
+          the code executes.
+        </div>
+      </li>
+    </ol>
+    For construction tests, we provide simple tests that are quick to write and don&apos;t require
+    a lot of analysis to build.  For unit and regression tests we need to be more careful. These tests should
+    satisfy three properties:
+    <ol>
+      <li>
+        <span class="notice">Tests should be repeatable</span> with the same results every time.
+        <div>
+          That implies that each test has a &quot;setup&quot; process that guarentees the testing
+          environment is in a fixed state at the beginning of testing. We may choose to do that with
+          an initialize function or may use a test class for each test that sets up the
+          environment in its constructor.
+        </div>
+      </li>
+      <li>
+        <span class="notice">Test normal and abnormal conditions</span> as completely as practical.
+        <div>
+          We do that by planning each test, defining input data to provide both expected and
+          possible but unexpected conditions. It helps to define functions:
+          <ul class="tight">
+            <li>
+              <span class="notice">Requires(pred)</span>
+              <div>
+                defines condtions that are expected
+                to hold before an operation begins.
+              </div>
+            </li>
+            <li>
+              <span class="notice">Ensures(pedicate)</span>
+              <div>
+                defines condtions that are expected to hold after an operation.
+              </div>
+            </li>
+            <li>
+              <span class="notice">Assert(predicate)</span>
+              <div>
+                defines conditions that should be true at specific places in an operation.
+              </div>
+            </li>
+          </ul>
+        </div>
+        where predicate is a boolean valued operation on the test environment and/or code
+        state.
+      </li>
+      <li>
+        <span class="notice">Visualize operation results.</span>
+        <div>
+          Evaluating all the conditions above often results in a lot of raw data about the 
+          environment and code states.  We need a way to selectively display that to a test
+          developer. That means we need a logging facility that can write to the console, to
+          test data files, or both.  We want to be able to select the levels of display, so
+          we get very little output when the tests are running successfully, but with a lot
+          more detail when operations fail or are not as expected.
+        </div>
+      </li>
+    </ol>
+    For these thorough tests it is common to write a test specification which clearly defines
+    the expected test results, initial setup, and any additional instructions for test developers
+    that may be needed (ideally none).
+    <spacer-15></spacer-15>
+    When unit or regression tests are concluded, a test report, generated by the logging
+    facility, is saved in the appropriate code repository. This should have a summary of
+    what passed and what failed, along with whatever data was logged during the final tests.
+    <spacer-15></spacer-15>
+    Below, find code declarations for a logger that provides the ability to record information
+    about the test in a &quot;head&quot; message, and then add additional log messages as needed.
+    <spacer-15></spacer-15>
+    <indent-block>
+      <details style="position:relative;">
+        <summary>
+          <span class="darkItem labelStyle">Logger Code</span>
+        </summary>
+        <spacer-10></spacer-10>
+        <indent-block>
+    <div style="display:flex; width:100%; position:relative; left:-14px;">
+    <div class="autoX">
+      <defn-block>
+        <defn-head style="border-bottom:1px solid darkred;">
+          <span class="notice">template logger facility</span>
+        </defn-head>
+        <defn-code style="padding-right:50px;">
+  enum Level { results = 1, demo = 2, debug = 4, all = 7 };
+
+  /*--- logger interface ------------------------------------------*/
+
+  template &lt;typename T, size_t C = 0&gt;
+  struct ILogger {
+    virtual ~ILogger() {}
+    virtual ILogger&lt;T, C&gt;& add(std::ostream*) = 0;
+    virtual ILogger&lt;T, C&gt;& write(T t, size_t level = Level::all) = 0;
+    virtual void head(T t = "") = 0;
+    virtual void prefix(T prfix = "\n  ") = 0;
+    virtual void wait() = 0;
+    virtual void waitForWrites() = 0;
+    virtual void level(size_t lv) = 0;
+    virtual void name(const std::string& nm) = 0;
+  };
+  /*--- concrete logger -------------------------------------------*/
+
+  template &lt;typename T, size_t C = 0&gt;
+  class Logger : public ILogger&lt;T, C&gt; {
+  public:
+    Logger(const std::string& nm = "");
+    ~Logger();
+    ILogger&lt;T, C&gt;& add(std::ostream* pOstrm);
+    virtual ILogger&lt;T, C&gt;& write(T t, size_t level = 0x7);
+    virtual void head(T t = "");
+    virtual void prefix(T prfix = "\n  ");
+    virtual void level(size_t lv);
+    void name(const std::string& nm);
+    std::string name();
+    void wait();
+    void waitForWrites();
+  protected:
+    std::vector&lt;std::ostream*&gt; dstStrm;
+    BlockingQueue&lt;T&gt; blockingQueue_;
+    void threadProc();
+    std::string name_;
+    std::thread writeThread_;
+    T head_;
+    std::string prefix_ = "\n  ";
+    size_t level_ = 0x7; // Level::debug + Level::demo + Level::results;   
+  };
+  /*--- object factory ----------------------------------------------
+   *
+   *  Creates static logger, so everyone calling makeLogger with
+   *  the same value for C will use the same logger.
+   */
+  template&lt;typename T, size_t C&gt;
+  inline ILogger&lt;T, C&gt;& makeLogger() {
+    static Logger&lt;T, C&gt; logger;
+    return logger;
+  }
+        </defn-code>
+      </defn-block>
+    </div>
+    <div style="flex:1;">
+      <spacer-15></spacer-15>
+      At the bottom of this code listing you will find an object factory that returns a reference
+      to a static logger, typed as an ILogger interface.  That means that any part of the test code
+      that includes the logger header file, Logger.h, will be able to access a single static logger.
+      <spacer-15></spacer-15>
+      In case the test code needs two or more unique loggers, the logger&apos;s
+      template parameter C is used to define a category. Logger&lt;T, 0&gt; is a different type
+      than an instance of Logger&lt;T, 1&gt; so it does not share the same static logger.
+      <spacer-15></spacer-15>
+      The design of this logger includes a blocking queue, designed to receive log messages,
+      and a write thread that dequeues messages and writes them to the available streams, perhaps
+      the console and a test file. This was done so that logging minimizes write times for the 
+      logging thread as much as practical.
+      <spacer-15></spacer-15>
+      Each call to the logger&apos;s write method accepts the message and a level.  A test-wide
+      comparison level can be set with the method level(size_t lv). So if we set the test-wide
+      level to debug, any call to write(msg, lv) where lv sets a bit that matches one in the
+      test-wide level will be logged.  Otherwise, it will not be recorded.  The test-wide level
+      is set, by default, to match all of the cases: results, demo, and debug.
+      <spacer-15></spacer-15>
+      You can find all the code for this logger in the
+      <a href="https://github.com/JimFawcett/CppStory">CppStory</a> C++ repository. Eventually it
+      will be moved to its own Logger repository.
+      <spacer-15></spacer-15>
+    </div>
+    </div>
+        </indent-block>
+      </details>
+    </indent-block>
+    <spacer-25></spacer-25>
+    Below find code for functions that will write to the console or throw an exception when an
+    unexpected condition occurs.  Eventually these will use the logger instead of simply writing
+    to the console, but I need to use them in some significant testing to be sure how to configure
+    them before I make that change.
+    <spacer-15></spacer-15>
+    <div class="indent" style="position:relative;">
+      <details>
+        <summary>
+          <span class="labelStyle darkItem">Requires, Ensures, and Assert</span>
+        </summary>
+        <spacer-10></spacer-10>
+        <indent-block>
+    <!--<div class="autoXs">-->
+      <defn-block style="position:relative; left:-13px;">
+        <defn-head class="defnBorder pad10">
+          <span class="notice">Requires</span>, <span class="notice">Ensures</span>, and 
+          <span class="notice">Assert</span>
+        </defn-head>
+        <defn-code style="padding-right:75px;">
+  /*--- raised on unexpected condition ----------------------------*/
+
+  inline void Assert(
+    bool predicate, 
+    const std::string& message = "", 
+    size_t ln = 0, 
+    bool doThrow = false) 
+  {
+    if (predicate)
+      return;
+    std::string sentMsg = "Assertion raised";
+    if (ln > 0)
+      sentMsg += " at line number " + std::to_string(ln);
+    if (message.size() > 0)
+      sentMsg += "\n  message: \"" + message + "\"";
+    if (doThrow)
+      throw std::exception(sentMsg.c_str());
+    else
+      std::cout << "\n  " + sentMsg;
+  }
+  /*--- raised when input conditions are not satisfied ------------*/
+
+  inline void Requires(
+    bool predicate, 
+    const std::string& message, 
+    size_t lineNo, bool doThrow = false) 
+  {
+    if (predicate)
+      return;
+    std::string sentMsg = "Requires " + message + " raised";
+    sentMsg += " at line number " + std::to_string(lineNo);
+    if (doThrow)
+      throw std::exception(sentMsg.c_str());
+    else
+      std::cout << "\n  " + sentMsg;
+  }
+  /*--- raised when output conditions are not satisfied -----------*/
+
+  inline void Ensures(
+    bool predicate, 
+    const std::string& message, 
+    size_t lineNo, 
+    bool doThrow = false) 
+  {   
+    if (predicate)
+      return;
+    std::string sentMsg = "Ensures " + message + " raised";
+    sentMsg += " at line number " + std::to_string(lineNo);
+    if (doThrow)
+      throw std::exception(sentMsg.c_str());
+    else
+      std::cout << "\n  " + sentMsg;
+  }
+        </defn-code>
+      </defn-block>
+    <!--</div>-->
+        </indent-block>
+      </details>
+    </div>
+    <spacer-15></spacer-15>
+    This concludes Chapter #3 - Operations.  In the next chapter we will look at the details of
+    classes and class relationships.
+    <spacer-25></spacer-25>
+    <hr class="spread" />
     <indent-blocks>
+      <ol>
+        <li>
+          A C++ package usually consists of a header file, [packageName].h, and implementation file
+          [packageName].cpp.  If the package is an executive with no dependency parents, then it consists
+          of the single [executiveName].cpp file. Infrequently, we define utility packages with only a 
+          header file [utilityName].h.
+        </li>
+      </ol>
     </indent-blocks>
     <spacer-25></spacer-25>
-    <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
-
-    <info-bar></info-bar>
+  <info-bar></info-bar>
 </body>
-</html></html>
+</html>
