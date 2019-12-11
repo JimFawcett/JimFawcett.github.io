@@ -71,7 +71,7 @@
         <defn-head class="pad10">
           First Class Example:
         </defn-head>
-        <defn-code style="border-top:1px solid darkred;">
+        <defn-code style="border-top:2px solid darkred;">
   class X1 {
   public:
     X1(const std::string& name) : name_(name) {
@@ -106,12 +106,219 @@
       </defn-block>
       <defn-block>
         <defn-head class="pad10" style="border-left:none;">
+          Using code:
+        </defn-head>
+        <defn-code style="border-top:2px solid darkred; border-left:none;">
+  X1 xa("xa");
+  show(xa);
+  X1 xb = xa;
+  xb.name() = "xb";
+  show(xb);
+        </defn-code>
+        <defn-head class="pad10" style="border-left:none; border-top:none;">
           Output:
         </defn-head>
-        <defn-code style="border-top:1px solid darkred; border-left:none;">
- --- Demo Basic Classes ---
-  X1
+        <defn-code style="border-top:2px solid darkred; border-left:none;">
+--- class X1 ---
+  xa
   0 1 2 3 4
+
+  xb
+  0 1 2 3 4
+        </defn-code>
+      </defn-block>
+    </div>
+    <spacer-15></spacer-15>
+    There are two things I don&apos;t like about this code:
+    <ol class="tight">
+      <li>
+        Class methods are defined in-line in the body of the class declaration, Java style.
+        That makes reading the interface harder.  It&apos;s better C++ style to move the method
+        definitions out of the class declaration.
+      </li>
+      <li>
+        This is an unnecessarily inflexible design.  Defining the class&apos;s buffer as a composed
+        member means that we must define the array size at compile time, because the array will be
+        placed in static memory and the compiler does that. One of the primary reasons for using
+        the native heap is to allow allocating memory at run-time.  In the revision, shown below,
+        we will will use std::vector that does that internally.
+      </li>
+    </ol>
+    <spacer-25></spacer-25>
+    <div style="display:flex;">
+      <defn-block>
+        <defn-head class="pad10">
+          Revised Class Example:
+        </defn-head>
+        <defn-code style="border-top:2px solid darkred;">
+  class X2 {
+  public:
+    X2(const std::string&amp; name, size_t N = 1);
+    std::string&amp; name();
+    int& operator[](size_t i);
+    int operator[](size_t i) const;
+    size_t size() const;
+  private:
+    std::string name_;
+    std::vector&lt;int&gt; buffer_;
+  };
+  /*--- constructor ---*/
+  X2::X2(const std::string& name, size_t N)
+    : name_(name), buffer_(N) {
+  }
+  /*--- name accessor ---*/
+  std::string&amp; X2::name() {
+    return name_;
+  }
+  /*--- indexer for non-const instances ---*/
+  int& X2::operator[](size_t i) {
+    if (i &lt; 0 || buffer_.size() &lt;= i)
+      throw std::exception("index out of range");
+    return buffer_[i];
+  }
+  /*--- indexer for const instances ---*/
+  int X2::operator[](size_t i) const {
+    if (i &lt; 0 || buffer_.size() &lt;= i)
+      throw std::exception("index out of range");
+    return buffer_[i];
+  }
+  /*--- buffer size accessor ---*/
+  size_t X2::size() const {
+    return buffer_.size();
+  }
+  /*--- generic display function ---*/
+  template&lt;typename T&gt;
+  void show(T t) {
+    std::cout << "\n  " << t.name() << "\n  ";
+    for (size_t i = 0; i < t.size(); ++i) {
+      std::cout << t[i] << " ";
+    }
+    std::cout << std::endl;
+  }
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head class="pad10" style="border-left:none;">
+          Using code:
+        </defn-head>
+        <defn-code style="border-top:2px solid darkred; border-left:none;">
+  X2 xc("xc",3);
+  xc[0] = 1;
+  xc[1] = 2;
+  xc[2] = 3;
+  show(xc);
+    
+  X2 xd("xd");
+  xd = xc;
+  show(xd);
+        </defn-code>
+        <defn-head class="pad10" style="border-left:none; border-top:none;">
+          Output:
+        </defn-head>
+        <defn-code style="border-top:2px solid darkred; border-left:none;">
+--- class X2 ---
+  xc
+  1 2 3
+
+  xc
+  1 2 3
+        </defn-code>
+      </defn-block>
+    </div>
+    <spacer-25></spacer-25>
+    <div style="display:flex;">
+      <defn-block>
+        <defn-head class="pad10">
+          Revised again Example:
+        </defn-head>
+        <defn-code style="border-top:2px solid darkred;">
+  class X3 {
+  public:
+    X3(const std::string& name, size_t N = 1);
+    X3(const X3& x);
+    ~X3();
+    X3& operator=(const X3& x);
+    std::string& name();
+    int& operator[](size_t i);
+    int operator[](size_t i) const;
+    size_t size() const;
+  private:
+    std::string name_;
+    int* pBuffer_ = nullptr;
+    size_t bufSize_ = 0;
+  };
+  /*--- constructor ---*/
+  X3::X3(const std::string& name, size_t N)
+    : name_(name), bufSize_(N), pBuffer_(new int[N]) {
+  }
+  /*--- copy constructor ---*/
+  X3::X3(const X3& x)
+    : bufSize_(x.bufSize_), pBuffer_(new int[x.bufSize_]) {
+    name_ = x.name_;
+    memcpy(pBuffer_, x.pBuffer_, bufSize_ * sizeof(int));
+  }
+  /*--- destructor ---*/
+  X3::~X3() {
+    delete[] pBuffer_;
+  }
+  /*--- copy assignment operator ---*/
+  X3& X3::operator=(const X3& x) {
+    if (this != &x) {
+      /* won't assign name */
+      bufSize_ = x.bufSize_;
+      delete pBuffer_;
+      pBuffer_ = new int[bufSize_];
+      memcpy(pBuffer_, x.pBuffer_, bufSize_ * sizeof(int));
+    }
+    return *this;
+  }
+  /*--- name accessor ---*/
+  std::string& X3::name() {
+    return name_;
+  }
+  /*--- indexer for non-const instances ---*/
+  int& X3::operator[](size_t i) {
+    if (i < 0 || bufSize_ <= i)
+      throw std::exception("index out of range");
+    return *(pBuffer_ + i);
+  }
+  /*--- indexer for const instances ---*/
+  int X3::operator[](size_t i) const {
+    if (i < 0 || bufSize_ <= i)
+      throw std::exception("index out of range");
+    return *(pBuffer_ + i);
+  }
+  /*--- buffer size accessor ---*/
+  size_t X3::size() const {
+    return bufSize_;
+  }
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head class="pad10" style="border-left:none;">
+          Using code:
+        </defn-head>
+        <defn-code style="border-top:2px solid darkred; border-left:none;">
+  X3 xe("xe", 3);
+  xe[0] = 1;
+  xe[1] = 2;
+  xe[2] = 1;
+  show(xe);
+
+  X3 xf("xf");
+  xf = xe;
+  show(xf);
+        </defn-code>
+        <defn-head class="pad10" style="border-left:none; border-top:none;">
+          Output:
+        </defn-head>
+        <defn-code style="border-top:2px solid darkred; border-left:none;">
+--- class X3 ---
+  xe
+  1 2 1
+
+  xf
+  1 2 1
         </defn-code>
       </defn-block>
     </div>
