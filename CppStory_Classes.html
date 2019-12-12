@@ -59,49 +59,60 @@
       <num-item1>4.1</num-item1><num-item4>Basic Classes</num-item4>
     </num-cont>
     A class is like a &quot;cookie cutter&quot;.  It stamps out a section of memory in the stackframe
-    of its local scope, and initializes the memory with data required to become a valid object.
+    of its local scope, and initializes that memory with data required to become a valid object.
     Each time it&apos;s used to declare an instance another piece of memory is allocated and 
     initialized.
     <spacer-15></spacer-15>
     Each class has a set of methods - functions associated with that specific class - providing
-    operations on its allocated data when invoked. Here&apos;s an example (see comments at end).
-    <spacer-25></spacer-25>
+    operations on its allocated data when invoked. Each has one set of code that is stored
+    in static memory, and potentially many instances usually stored in stackframe of the function
+    wherer it is declared.
+    <spacer-15></spacer-15>
+    In the example below, we implement a point class. That might be used in a drawing program to 
+    define lines, rectangles, and other polygonal figures.  This Point example stores its 
+    x, y, z coordinate information in an array of doubles composed by the class, along with a std::string
+    to hold the Point&apos;s name.
+    <spacer-15></spacer-15>
+    <details>
+      <summary class="labelStyle lightItem">Example1: Point</summary>
+      <spacer-10></spacer-10>
     <div style="display:flex;">
       <defn-block>
         <defn-head class="pad10">
-          First Class Example:
+          First Class Example - Point:
         </defn-head>
         <defn-code style="border-top:2px solid darkred;">
-  class X1 {
-  public:
-    X1(const std::string& name) : name_(name) {
-      for (size_t i = 0; i < 5; ++i) {
-        buffer[i] = i;
-      }
-    }
-    std::string name() const {
-      return name_;
-    }
-    int& operator[](size_t i) {
-      if (i < 0 || 5 <= i)
-        throw std::exception("invalid index");
-      return buffer[i];
-    }
-    size_t size() const {
-      return 5;
-    }
-  private:
-    std::string name_;
-    int buffer[5];
-  };
+  namespace Example1 {
 
-  void show(X1 x) {
-    std::cout << "\n  " << x.name() << "\n  ";
-    for (size_t i = 0; i < x.size(); ++i) {
-      std::cout << x[i] << " ";
+    class Point {
+    public:
+      Point(const std::string& name = "none") 
+        : name_(name), coordinates_{ 0.0, 0.0, 0.0 } {
+      }
+      std::string& name() {
+        return name_;
+      }
+      double& operator[](size_t i) {
+        if (i &lt; 0 || 3 &lt;= i)
+          throw std::exception("invalid index");
+        return coordinates_[i];
+      }
+      size_t size() const {
+        return 3;
+      }
+    private:
+      std::string name_;
+      double coordinates_[3];
+    };
+
+    void show(Point p) {
+      std::cout &lt;&lt; "\n  " &lt;&lt; p.name() &lt;&lt; "\n  ";
+      for (size_t i = 0; i &lt; p.size(); ++i) {
+        std::cout &lt;&lt; p[i] &lt;&lt; " ";
+      }
+      std::cout &lt;&lt; std::endl;
     }
-    std::cout << std::endl;
-  }  
+  }
         </defn-code>
       </defn-block>
       <defn-block>
@@ -109,91 +120,130 @@
           Using code:
         </defn-head>
         <defn-code style="border-top:2px solid darkred; border-left:none;">
-  X1 xa("xa");
-  show(xa);
-  X1 xb = xa;
-  xb.name() = "xb";
-  show(xb);
+  displayDemo("--- Example1::Point ---");
+  Example1::Point p1("p1");
+  p1[0] = 1.0;
+  p1[1] = 2.0;
+  p1[2] = 3.0;
+  show(p1);
+  displayDemo("--- copy constr of p2 using src p1 ---");
+  Example1::Point p2{ p1 };
+  p2.name() = "p2";
+  show(p2);
+  displayDemo("--- copy assignment of p3 from src p2");
+  Example1::Point p3("p3");
+  p3 = p2;
+  p3.name() = "p3";
+  show(p3);
         </defn-code>
         <defn-head class="pad10" style="border-left:none; border-top:none;">
           Output:
         </defn-head>
         <defn-code style="border-top:2px solid darkred; border-left:none;">
---- class X1 ---
-  xa
-  0 1 2 3 4
-
-  xb
-  0 1 2 3 4
+  --- Example1::Point ---
+  p1
+  1 2 3
+  --- copy construction of p2 using src p1 ---
+  p2
+  1 2 3
+  --- copy assignment of p3 from src p2
+  p3
+  1 2 3
         </defn-code>
       </defn-block>
     </div>
+    </details>
     <spacer-15></spacer-15>
-    There are two things I don&apos;t like about this code:
+    This class doesn&apos;t need to provide means to support copying and assignment.  The
+    compiler will generate methods for that, doing member-wise copy and assignment.  The name_
+    member has correct copy semantics, providing those as part of its class design.  The 
+    coordinate array requires a memory copy operation that is provided by the compiler generated
+    copy construction and copy assignment operations. Look at sections 3.2 and 3.3 to see an
+    example for a struct.
+    <spacer-15></spacer-15>
+    While this design works, and correctly supports locating points in three physical
+    dimensions, there are two things I don&apos;t like about this code:
+    <spacer-10></spacer-10>
     <ol class="tight">
       <li>
         Class methods are defined in-line in the body of the class declaration, Java style.
-        That makes reading the interface harder.  It&apos;s better C++ style to move the method
-        definitions out of the class declaration.
+        That makes reading the interface harder than necessary.  It&apos;s better C++ style 
+        to move the method definitions out of the class declaration.
       </li>
       <li>
-        This is an unnecessarily inflexible design.  Defining the class&apos;s buffer as a composed
-        member means that we must define the array size at compile time, because the array will be
-        placed in static memory and the compiler does that. One of the primary reasons for using
-        the native heap is to allow allocating memory at run-time.  In the revision, shown below,
-        we will will use std::vector that does that internally.
+        This is an unnecessarily inflexible design.  Defining the class&apos;s coordinate buffer 
+        as a composed member means that we must define the array size at compile time, because 
+        the array will be placed in static memory and the compiler does that. 
       </li>
     </ol>
-    <spacer-25></spacer-25>
+    <spacer-15></spacer-15>
+    If we wanted to use instances of this class in an air-traffic control system, we probably
+    would want to store the time of observation as part of the point&apos;s coordinates, e.g.,
+    location in both time and space. An effective way to support configuring a class for needs
+    of a specific application is to define its storage at run-time, based on some parameter
+    passed to the class.  We can do that by creating the buffer in the native heap, providing
+    the array size as needed.
+    <spacer-15></spacer-15>
+    One of the primary reasons for using the native heap is to allow allocating memory with 
+    size determined by the application, at run-time.  In the revision, shown 
+    below, we will will use std::vector that does that internally.
+    <spacer-15></spacer-15>
+    <details>
+      <summary class="labelStyle lightItem">Example2: Revised Point</summary>
+      <spacer-10></spacer-10>
     <div style="display:flex;">
       <defn-block>
         <defn-head class="pad10">
-          Revised Class Example:
+          Revised Class Example - Point:
         </defn-head>
         <defn-code style="border-top:2px solid darkred;">
-  class X2 {
-  public:
-    X2(const std::string&amp; name, size_t N = 1);
-    std::string&amp; name();
-    int& operator[](size_t i);
-    int operator[](size_t i) const;
-    size_t size() const;
-  private:
-    std::string name_;
-    std::vector&lt;int&gt; buffer_;
-  };
-  /*--- constructor ---*/
-  X2::X2(const std::string& name, size_t N)
-    : name_(name), buffer_(N) {
+  namespace Example2 {
+
+    class Point {
+    public:
+      Point(const std::string& name = "none", size_t N = 3);
+      std::string& name();
+      double& operator[](size_t i);
+      double operator[](size_t i) const;
+      size_t size() const;
+    private:
+      std::string name_;
+      std::vector&lt;double&gt; coordinates_;
+    };
+    /*--- constructor ---*/
+    Point::Point(const std::string& name, size_t N)
+      : name_(name), coordinates_(N) {
+    }
+    /*--- name accessor ---*/
+    std::string& Point::name() {
+      return name_;
+    }
+    /*--- indexer for non-const instances ---*/
+    double& Point::operator[](size_t i) {
+      if (i &lt; 0 || coordinates_.size() &lt;= i)
+        throw std::exception("index out of range");
+      return coordinates_[i];
+    }
+    /*--- indexer for const instances ---*/
+    double Point::operator[](size_t i) const {
+      if (i &lt; 0 || coordinates_.size() &lt;= i)
+        throw std::exception("index out of range");
+      return coordinates_[i];
+    }
+    /*--- buffer size accessor ---*/
+    size_t Point::size() const {
+      return coordinates_.size();
+    }
   }
-  /*--- name accessor ---*/
-  std::string&amp; X2::name() {
-    return name_;
-  }
-  /*--- indexer for non-const instances ---*/
-  int& X2::operator[](size_t i) {
-    if (i &lt; 0 || buffer_.size() &lt;= i)
-      throw std::exception("index out of range");
-    return buffer_[i];
-  }
-  /*--- indexer for const instances ---*/
-  int X2::operator[](size_t i) const {
-    if (i &lt; 0 || buffer_.size() &lt;= i)
-      throw std::exception("index out of range");
-    return buffer_[i];
-  }
-  /*--- buffer size accessor ---*/
-  size_t X2::size() const {
-    return buffer_.size();
-  }
+
   /*--- generic display function ---*/
   template&lt;typename T&gt;
   void show(T t) {
-    std::cout << "\n  " << t.name() << "\n  ";
-    for (size_t i = 0; i < t.size(); ++i) {
-      std::cout << t[i] << " ";
+    std::cout &lt;&lt; "\n  " &lt;&lt; t.name() &lt;&lt; "\n  ";
+    for (size_t i = 0; i &lt; t.size(); ++i) {
+      std::cout &lt;&lt; t[i] &lt;&lt; " ";
     }
-    std::cout << std::endl;
+    std::cout &lt;&lt; std::endl;
   }
         </defn-code>
       </defn-block>
@@ -202,95 +252,146 @@
           Using code:
         </defn-head>
         <defn-code style="border-top:2px solid darkred; border-left:none;">
-  X2 xc("xc",3);
-  xc[0] = 1;
-  xc[1] = 2;
-  xc[2] = 3;
-  show(xc);
-    
-  X2 xd("xd");
-  xd = xc;
-  show(xd);
+  displayDemo("--- Example2::Point ---");
+  Example2::Point p4("p4", 3);
+  p4[0] = -1.0;
+  p4[1] = 0.0;
+  p4[2] = 1.0;
+  show(p4);
+  displayDemo("--- copy constr of p5 using src p4 ---");
+  Example2::Point p5{ p4 };
+  p5.name() = "p5";
+  show(p5);
+  displayDemo("--- copy assignment of p6 from src p5");
+  Example2::Point p6("p6");
+  p6 = p5;
+  p6.name() = "p6";
+  show(p6);
         </defn-code>
         <defn-head class="pad10" style="border-left:none; border-top:none;">
           Output:
         </defn-head>
         <defn-code style="border-top:2px solid darkred; border-left:none;">
---- class X2 ---
-  xc
-  1 2 3
+ --- Example2::Point ---
+  p4
+  -1 0 1
 
-  xc
-  1 2 3
+  --- copy construction of p5 using src p4 ---
+  p5
+  -1 0 1
+
+  --- copy assignment of p6 from src p5
+  p6
+  -1 0 1
         </defn-code>
       </defn-block>
     </div>
-    <spacer-25></spacer-25>
+    </details>
+    <spacer-15></spacer-15>
+    The implementation of Example2::Point is better:
+    <ol>
+      <li>
+        Method definitions are factored out of Example2::Point class declaration which makes
+        the class interface easier to comprehend.  We&apos;ve also provided a prologue
+        comment for each method.
+      </li>
+      <li>
+        We&apos;ve added an index operator for constant points, as without that using
+        code cannot index a const point.
+      </li>
+      <li>
+        Like Example1::Point, this implementation doesn&apos;t need a copy constructor,
+        copy assignment operator, or destructor since the compiler generated methods work
+        correctly.  The reason for that is that all the data members have correct copy,
+        assignment, and destruction semantics - all of the STL containers, like
+        std::string and std::vector, have that property.
+      </li>
+    </ol>
+    <spacer-5></spacer-5>
+    This isn&apos;t the end of the Point story though; some applications may need very small,
+    and fast components.  Suppose that we want to implement an air quality monitor, for things
+    like temperature, humidity, carbon monoxide, radon emissions, and volatile organic
+    compounds. This application will probably run on a controller chip or Arduno, with limited
+    storage.  It will need to handle storage of an open ended number of measurements, each one
+    a coordinate in the air quality space and do that relatively quickly to keep up with a
+    specified logging cycle.
+    <spacer-15></spacer-15>
+    For this, we&apos;ve decided to go back to using a buffer as it will be slightly smaller
+    and substantially faster than a <c-s>std::vector&lt;double&gt;</c-s>.  To provide the
+    flexability to handle an open-ended number of measurements, we will store the coordinate
+    buffer in heap memory, allowing us to specify buffer size at run-time.
+    <spacer-15></spacer-15>
+    <details>
+      <summary class="labelStyle lightItem">Example3: Point Revised Again</summary>
+      <spacer-10></spacer-10>
     <div style="display:flex;">
       <defn-block>
         <defn-head class="pad10">
           Revised again Example:
         </defn-head>
         <defn-code style="border-top:2px solid darkred;">
-  class X3 {
-  public:
-    X3(const std::string& name, size_t N = 1);
-    X3(const X3& x);
-    ~X3();
-    X3& operator=(const X3& x);
-    std::string& name();
-    int& operator[](size_t i);
-    int operator[](size_t i) const;
-    size_t size() const;
-  private:
-    std::string name_;
-    int* pBuffer_ = nullptr;
-    size_t bufSize_ = 0;
-  };
-  /*--- constructor ---*/
-  X3::X3(const std::string& name, size_t N)
-    : name_(name), bufSize_(N), pBuffer_(new int[N]) {
-  }
-  /*--- copy constructor ---*/
-  X3::X3(const X3& x)
-    : bufSize_(x.bufSize_), pBuffer_(new int[x.bufSize_]) {
-    name_ = x.name_;
-    memcpy(pBuffer_, x.pBuffer_, bufSize_ * sizeof(int));
-  }
-  /*--- destructor ---*/
-  X3::~X3() {
-    delete[] pBuffer_;
-  }
-  /*--- copy assignment operator ---*/
-  X3& X3::operator=(const X3& x) {
-    if (this != &x) {
-      /* won't assign name */
-      bufSize_ = x.bufSize_;
-      delete pBuffer_;
-      pBuffer_ = new int[bufSize_];
-      memcpy(pBuffer_, x.pBuffer_, bufSize_ * sizeof(int));
+  namespace Example3 {
+
+    class Point {
+    public:
+      Point(const std::string& name = "none", size_t N = 3);
+      Point(const Point& x);
+      ~Point();
+      Point& operator=(const Point& x);
+      std::string& name();
+      double& operator[](size_t i);
+      double operator[](size_t i) const;
+      size_t size() const;
+    private:
+      std::string name_;
+      double* pBuffer_ = nullptr;
+      size_t bufSize_ = 0;
+    };
+    /*--- constructor ---*/
+    Point::Point(const std::string& name, size_t N)
+      : name_(name), bufSize_(N), pBuffer_(new double[N]) {
     }
-    return *this;
-  }
-  /*--- name accessor ---*/
-  std::string& X3::name() {
-    return name_;
-  }
-  /*--- indexer for non-const instances ---*/
-  int& X3::operator[](size_t i) {
-    if (i < 0 || bufSize_ <= i)
-      throw std::exception("index out of range");
-    return *(pBuffer_ + i);
-  }
-  /*--- indexer for const instances ---*/
-  int X3::operator[](size_t i) const {
-    if (i < 0 || bufSize_ <= i)
-      throw std::exception("index out of range");
-    return *(pBuffer_ + i);
-  }
-  /*--- buffer size accessor ---*/
-  size_t X3::size() const {
-    return bufSize_;
+    /*--- copy constructor ---*/
+    Point::Point(const Point& x)
+      : bufSize_(x.bufSize_), pBuffer_(new double[x.bufSize_]) {
+      name_ = x.name_;
+      memcpy(pBuffer_, x.pBuffer_, bufSize_ * sizeof(double));
+    }
+    /*--- destructor ---*/
+    Point::~Point() {
+      delete[] pBuffer_;
+    }
+    /*--- copy assignment operator ---*/
+    Point& Point::operator=(const Point& x) {
+      if (this != &x) {
+        /* won't assign name */
+        bufSize_ = x.bufSize_;
+        delete pBuffer_;
+        pBuffer_ = new double[bufSize_];
+        memcpy(pBuffer_, x.pBuffer_, bufSize_ * sizeof(int));
+      }
+      return *this;
+    }
+    /*--- name accessor ---*/
+    std::string& Point::name() {
+      return name_;
+    }
+    /*--- indexer for non-const instances ---*/
+    double& Point::operator[](size_t i) {
+      if (i &lt; 0 || bufSize_ &lt;= i)
+        throw std::exception("index out of range");
+      return *(pBuffer_ + i);
+    }
+    /*--- indexer for const instances ---*/
+    double Point::operator[](size_t i) const {
+      if (i &lt; 0 || bufSize_ &lt;= i)
+        throw std::exception("index out of range");
+      return *(pBuffer_ + i);
+    }
+    /*--- buffer size accessor ---*/
+    size_t Point::size() const {
+      return bufSize_;
+    }
   }
         </defn-code>
       </defn-block>
@@ -299,30 +400,117 @@
           Using code:
         </defn-head>
         <defn-code style="border-top:2px solid darkred; border-left:none;">
-  X3 xe("xe", 3);
-  xe[0] = 1;
-  xe[1] = 2;
-  xe[2] = 1;
-  show(xe);
-
-  X3 xf("xf");
-  xf = xe;
-  show(xf);
+    displayDemo("--- Example3::Point ---");
+    Example3::Point p7("p7", 3);
+    p7[0] = -0.5;
+    p7[1] = 0.0;
+    p7[2] = 0.5;
+    show(p7);
+    displayDemo("--- copy constr of p8 using src p7 ---");
+    Example3::Point p8{ p7 };
+    p8.name() = "p8";
+    show(p8);
+    displayDemo("--- copy assignment of p9 from src p8");
+    Example3::Point p9("p9");
+    p9 = p8;
+    show(p8);
         </defn-code>
         <defn-head class="pad10" style="border-left:none; border-top:none;">
           Output:
         </defn-head>
         <defn-code style="border-top:2px solid darkred; border-left:none;">
---- class X3 ---
-  xe
-  1 2 1
+  --- Example3::Point ---
+  p7
+  -0.5 0 0.5
 
-  xf
-  1 2 1
+  --- copy construction of p8 using src p7 ---
+  p8
+  -0.5 0 0.5
+
+  --- copy assignment of p9 from src p8
+  p8
+  -0.5 0 0.5
         </defn-code>
       </defn-block>
     </div>
-    <h3>RAII</h3>
+    </details>
+    <spacer-15></spacer-15>
+    There are some things to note about this design:
+    <ol>
+      <li>
+        Now, instead of composing the data buffer, as we did in Example1::Point, we aggregate
+        it, e.g., we point to a heap-based buffer with the pointer pBuffer_.
+      </li>
+      <li>
+        We are now obliged to provide a copy constructior, copy assignment operator, and 
+        destructor.  The presence of the pointer, pBuffer_, means that all the class data
+        members no longer have correct copy, assignment, and destruction semantics.  The
+        class&apos;s generated methods would simply copy and assign  
+        <span class="notice">pBuffer_</span>, not what it points to.  That would result
+        in incorrect operation, as you can verify by commenting out those operations
+        and running <a href="https://github.com/JimFawcett/CppStory">code</a>, in
+        the Chapter4-classes folder.
+      </li>
+      <li>
+        This example shows you how to implement copy, assignment, and destruction operations for
+        this common scenario.
+      </li>
+    </ol>
+    If some of the implementation seems hard to understand, pause and look at 
+    <a href="../JimFawcett.github.io/STRCode.html">STRCode.html</a> presentation.  It describes all the
+    details of each of these methods, using a demonstration string class.
+    <spacer-15></spacer-15>
+    All three of the example Point implementations are value types.
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>4.2</num-item1><num-item4>Value Types:</num-item4>
+    </num-cont>
+    <spacer-15></spacer-15>
+    <defn-block>
+      <defn-head class="notice" style="border:2px solid darkred;">Value Types:</defn-head>
+      <defn-body class="pad10" style="border-top:none;">
+        Value types can be copied and assigned.  When a copy or assignment operation completes
+        there are two instances of the type which, immediately following the operation, have
+        the same state values, but are independent. Should using code change the state
+        of one, the other&apos;s state is not affected.  Note that this is not true for user-defined
+        types built from classes in managed languages like C# and Java.
+        <spacer-15></spacer-15>
+        The C++ programming language was designed, from the ground up, to support value semantics.
+        It does that by:
+        <spacer-10></spacer-10>
+        <ol class="tight">
+          <li>
+            Providing compiler generated copy constructors, copy assignment operators, and
+            destructors, for cases where all the class&apos;s base classes and data members
+            have correct copy, assignment, and destruction semantics. For those cases, e.g.,
+            data members are fundamental types and/or STL containers, you should not implement
+            those methods - the compiler will.
+          </li>
+          <li>
+            When data members do not have correct copy, assignment, and destruction
+            behaviours, the language supports definition of those operations as class
+            methods, as we have done in Example3::Point.  In these cases, e.g., when
+            the class holds a pointer member to data in the native heap, you either
+            implement those methods or disallow them.
+          </li>
+          <li>
+            The compiler will not generate constructors or assignment operators if you
+            declare them and use a <c-s>= delete</c-s> suffix.
+          </li>
+        </ol>
+        <spacer-10></spacer-10>
+      </defn-body>
+    </defn-block>
+    <spacer-15></spacer-15>
+    Because of its support for value types, C++ is very effective for scientific 
+    and financial computing.
+    Our libraries supporting those domains will need to be able
+    to make copies and assign instances of library classes.  Matrix and vector operations are
+    typical. 
+    <spacer-15></spacer-15>
+    <num-cont>
+      <num-item1>4.3</num-item1><num-item4>Scope-based Resource Allocation:</num-item4>
+    </num-cont>
     <h3>Class Anatomy</h3>
     <h3>Value Types</h3>
     <h3>Event Handlers</h3>
