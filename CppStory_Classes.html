@@ -16,6 +16,8 @@
   <script src="js/ScriptsTemplate.js"></script>
   <script src="js/ScriptsKeyboard.js"></script>
   <script src="js/ScriptsMenu.js"></script>
+  <script src="js/ScriptsWebComponents.js"></script>
+  <link rel="stylesheet" href="css/StylesWebComponents.css" />
   <link rel="stylesheet" href="css/StylesTemplate.css" />
   <link rel="stylesheet" href="css/StylesMenu.css" />
   <link rel="stylesheet" href="css/StylesBlueTheme.css" />
@@ -73,7 +75,39 @@
     by the reserved word &quot;<c-s>this</c-s>&quot;.  You may occasionally see references to <c-s>this</c-s> in
     methods of the class.  Most use is implicit, but occasionally it must be explicitly used, as in
     assignment operators that return <c-s>*this</c-s>.
+    <num-cont>
+      <num-item1>4.11</num-item1><num-item4>Point Class Examples</num-item4>
+    </num-cont>
+    We will explore here three example variations of a &quot;simple&quot; <c-s>Point</c-s> class,
+    considering class data structure and its consequences on flexibility, complexity, and performance.
+    Point is an abstraction of a physical point in some space with coordinates and name.  There are
+    choices for how we represent Point&apos;s state and the results of those choices are significant.
     <spacer-15></spacer-15>
+    In Example1::Point we store coordinates in a composed buffer and name in a composed string, as
+    shown in Figure 1, below. This turns out to be rather inflexible, so we design Example2::Point
+    to compose a <c-s>std::vector&lt;double&gt;</c-s> to hold coordinate information and a string
+    for its name. The third design, Example3::Point, uses an array of doubles, for performance,
+    created on the heap this time to configure the number of coordinates held by a <c-s>Point</c-s>.
+    <spacer-15></spacer-15>
+    <hidephotosizer-block src="Pictures/Example1Layout.JPG" width="350" class="photoSizerBlock left" style="margin-top:0px;">
+      <span style="font-family:'Comic Sans MS, Tahoma';">
+        Fig 1. Example1 Class Layout
+      </span>
+    </hidephotosizer-block>
+    <hidephotosizer-block src="Pictures/Example2Layout.JPG" width="350" class="photoSizerBlock left" style="margin-top:0px;">
+      <span style="font-family:'Comic Sans MS, Tahoma';">
+        Fig 2. Example2 Class Layout
+      </span>
+    </hidephotosizer-block>
+    <hidephotosizer-block src="Pictures/Example3Layout.JPG" width="350" class="photoSizerBlock left" style="margin-top:0px;">
+      <span style="font-family:'Comic Sans MS, Tahoma';">
+        Fig 3. Example3 Class Layout
+      </span>
+    </hidephotosizer-block>
+    <div class="clear"></div>
+    <num-cont>
+      <num-item1>4.12</num-item1><num-item4>Point Examples Code</num-item4>
+    </num-cont>
     In the example below, we implement a point class. That might be used in a drawing program to 
     define lines, rectangles, and other polygonal figures.  This Point example stores its 
     x, y, z coordinate information in an array of doubles composed by the class, along with a std::string
@@ -174,7 +208,7 @@
       <li>
         Class methods are defined in-line in the body of the class declaration, Java style.
         That makes reading the interface harder than necessary.  It&apos;s better C++ style 
-        to move the method definitions out of the class declaration.
+        to move method definitions out of the class declaration.
       </li>
       <li>
         This is an unnecessarily inflexible design.  Defining the class&apos;s coordinate buffer 
@@ -193,7 +227,7 @@
     <spacer-15></spacer-15>
     One of the primary reasons for using the native heap is to allow allocating memory with 
     size determined by the application, at run-time.  In the revision, shown 
-    below, we will will use std::vector that does that internally.
+    below, we will use std::vector&lt;double&gt; that does the buffer management internally for us.
     <spacer-15></spacer-15>
     <details>
       <summary class="labelStyle lightItem">Example2: Revised Point</summary>
@@ -303,7 +337,7 @@
         comment for each method.
       </li>
       <li>
-        We&apos;ve added an index operator for constant points, as without that using
+        We&apos;ve added an index operator for constant points, as without that, using
         code cannot index a const point.
       </li>
       <li>
@@ -319,8 +353,8 @@
     and fast components.  Suppose that we want to implement an air quality monitor, for things
     like temperature, humidity, carbon monoxide, radon emissions, and volatile organic
     compounds. This application will probably run on a controller chip or Arduno, with limited
-    storage.  It will need to handle storage of an open ended number of measurements, each one
-    a coordinate in the air quality space and do that relatively quickly to keep up with a
+    storage.  It will need to handle storage of an open-ended number of measurements, each one
+    a coordinate in the air quality space, and do that relatively quickly to keep up with a
     specified logging cycle.
     <spacer-15></spacer-15>
     For this, we&apos;ve decided to go back to using a buffer as it will be slightly smaller
@@ -356,11 +390,13 @@
     };
     /*--- constructor ---*/
     Point::Point(const std::string& name, size_t N)
-      : name_(name), bufSize_(N), pBuffer_(new double[N]) {
+      : name_(name), 
+        bufSize_(N), pBuffer_(new double[N]) {
     }
     /*--- copy constructor ---*/
     Point::Point(const Point& x)
-      : bufSize_(x.bufSize_), pBuffer_(new double[x.bufSize_]) {
+      : bufSize_(x.bufSize_), 
+        pBuffer_(new double[x.bufSize_]) {
       name_ = x.name_;
       memcpy(pBuffer_, x.pBuffer_, bufSize_ * sizeof(double));
     }
@@ -375,7 +411,7 @@
         bufSize_ = x.bufSize_;
         delete pBuffer_;
         pBuffer_ = new double[bufSize_];
-        memcpy(pBuffer_, x.pBuffer_, bufSize_ * sizeof(int));
+        memcpy(pBuffer_, x.pBuffer_, bufSize_ * sizeof(double));
       }
       return *this;
     }
@@ -407,20 +443,20 @@
           Using code:
         </defn-head>
         <defn-code style="border-top:2px solid darkred; border-left:none;">
-    displayDemo("--- Example3::Point ---");
-    Example3::Point p7("p7", 3);
-    p7[0] = -0.5;
-    p7[1] = 0.0;
-    p7[2] = 0.5;
-    show(p7);
-    displayDemo("--- copy constr of p8 using src p7 ---");
-    Example3::Point p8{ p7 };
-    p8.name() = "p8";
-    show(p8);
-    displayDemo("--- copy assignment of p9 from src p8");
-    Example3::Point p9("p9");
-    p9 = p8;
-    show(p8);
+  displayDemo("--- Example3::Point ---");
+  Example3::Point p7("p7", 3);
+  p7[0] = -0.5;
+  p7[1] = 0.0;
+  p7[2] = 0.5;
+  show(p7);
+  displayDemo("--- copy constr p8 using src p7 ---");
+  Example3::Point p8{ p7 };
+  p8.name() = "p8";
+  show(p8);
+  displayDemo("--- copy assign p9 from src p8 ---");
+  Example3::Point p9("p9");
+  p9 = p8;
+  show(p8);
         </defn-code>
         <defn-head class="pad10" style="border-left:none; border-top:none;">
           Output:
@@ -463,9 +499,9 @@
         this common scenario.
       </li>
       <li>
-        The Point design is now more complex that either of the first two, due to the need for
-        implementing copies, assignment, and destruction. We would probably do some performance testing to
-        be sure that improvement was significant enought to warrant this choice.
+        The Point design is now more complex that either of the first two, since we now must
+        implement copies, assignment, and destruction. We would probably do some performance testing to
+        be sure the improvement over Example2::Point was significant enough to warrant this choice.
       </li>
     </ol>
     If some of the implementation seems hard to understand, pause and look at 
@@ -478,7 +514,7 @@
     </num-cont>
     All three of the example Point implementations, above, provide value types.
     <spacer-15></spacer-15>
-    <defn-block>
+    <defn-block style="max-width:100%;">
       <defn-head class="notice" style="border:2px solid darkred;">Value Types:</defn-head>
       <defn-body class="pad10" style="border-top:none;">
         Value types can be copied and assigned.  When a copy or assignment operation completes
@@ -521,9 +557,9 @@
     <spacer-25></spacer-25>
     Because of its support for value types, C++ is very effective for scientific 
     and financial computing.
-    Our libraries supporting those domains will need to be able
+    Libraries supporting those domains will need to be able
     to make copies and assign instances of library classes.  Matrix and vector operations are
-    typical. 
+    typical examples. 
     <spacer-15></spacer-15>
     <num-cont>
       <num-item1>4.3</num-item1><num-item4>Scope-based Resource Allocation:</num-item4>
