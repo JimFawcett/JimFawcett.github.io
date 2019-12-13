@@ -21,6 +21,50 @@
   <link rel="stylesheet" href="css/StylesTemplate.css" />
   <link rel="stylesheet" href="css/StylesMenu.css" />
   <link rel="stylesheet" href="css/StylesBlueTheme.css" />
+  <style>
+    #github .container {
+      display: grid;
+      grid-template-columns: 17em 18em 1fr;
+      padding: 0.0em;
+      margin: 0em 0.25em 1em 0.25em;
+      /*border: 2px solid darkred;*/
+    }
+
+    #github .item1 {
+      grid-column: 1;
+      padding: 0.2em 1em;
+      border: 2px solid darkred;
+      border-bottom:none;
+    }
+
+    #github .item2 {
+      grid-column: 2;
+      padding: 0.2em 1em;
+      border: 2px solid darkred;
+      border-left:none;
+      border-bottom:none;
+      font-family:Consolas monospace;
+      font-weight:bold;
+      font-size:1.1em;
+    }
+
+    #github .item3 {
+      grid-column: 3;
+      padding: 0.2em 1em;
+      border: 2px solid darkred;
+      border-left:none;
+      border-bottom:none;
+    }
+
+    #github .header {
+      background-color:darkred;
+      color:#fefefa;
+    }
+
+    #github .borderBottom {
+      border-bottom:2px solid darkred;
+    }
+  </style>
 </head>
 <body id="github" onload="initializeMenu()">
 
@@ -89,22 +133,23 @@
     for its name. The third design, Example3::Point, uses an array of doubles, for performance,
     created on the heap this time to configure the number of coordinates held by a <c-s>Point</c-s>.
     <spacer-15></spacer-15>
-    <hidephotosizer-block src="Pictures/Example1Layout.JPG" width="350" class="photoSizerBlock left" style="margin-top:0px;">
-      <span style="font-family:'Comic Sans MS, Tahoma';">
-        Fig 1. Example1 Class Layout
-      </span>
-    </hidephotosizer-block>
-    <hidephotosizer-block src="Pictures/Example2Layout.JPG" width="350" class="photoSizerBlock left" style="margin-top:0px;">
-      <span style="font-family:'Comic Sans MS, Tahoma';">
-        Fig 2. Example2 Class Layout
-      </span>
-    </hidephotosizer-block>
-    <hidephotosizer-block src="Pictures/Example3Layout.JPG" width="350" class="photoSizerBlock left" style="margin-top:0px;">
-      <span style="font-family:'Comic Sans MS, Tahoma';">
-        Fig 3. Example3 Class Layout
-      </span>
-    </hidephotosizer-block>
-    <div class="clear"></div>
+    <div style="display:flex; margin-top:0px;" class="autoX">
+      <hidephotosizer-block src="Pictures/Example1Layout.JPG" width="350" class="photoSizerBlock">
+        <span style="font-family:'Comic Sans MS, Tahoma';">
+          Fig 1. Example1 Class Layout
+        </span>
+      </hidephotosizer-block>
+      <hidephotosizer-block src="Pictures/Example2Layout.JPG" width="350" class="photoSizerBlock">
+        <span style="font-family:'Comic Sans MS, Tahoma';">
+          Fig 2. Example2 Class Layout
+        </span>
+      </hidephotosizer-block>
+      <hidephotosizer-block src="Pictures/Example3Layout.JPG" width="350" class="photoSizerBlock">
+        <span style="font-family:'Comic Sans MS, Tahoma';">
+          Fig 3. Example3 Class Layout
+        </span>
+      </hidephotosizer-block>
+    </div>
     <num-cont>
       <num-item1>4.12</num-item1><num-item4>Point Examples Code</num-item4>
     </num-cont>
@@ -227,7 +272,7 @@
     <spacer-15></spacer-15>
     One of the primary reasons for using the native heap is to allow allocating memory with 
     size determined by the application, at run-time.  In the revision, shown 
-    below, we will use std::vector&lt;double&gt; that does the buffer management internally for us.
+    below, we will use std::vector&lt;double&gt; that does that buffer management internally for us.
     <spacer-15></spacer-15>
     <details>
       <summary class="labelStyle lightItem">Example2: Revised Point</summary>
@@ -512,7 +557,7 @@
     <num-cont>
       <num-item1>4.2</num-item1><num-item4>Value Types:</num-item4>
     </num-cont>
-    All three of the example Point implementations, above, provide value types.
+    All three of the example Point implementations, above, have value type semantics.
     <spacer-15></spacer-15>
     <defn-block style="max-width:100%;">
       <defn-head class="notice" style="border:2px solid darkred;">Value Types:</defn-head>
@@ -560,11 +605,331 @@
     Libraries supporting those domains will need to be able
     to make copies and assign instances of library classes.  Matrix and vector operations are
     typical examples. 
-    <spacer-15></spacer-15>
+    <hr class="spread" />
     <num-cont>
       <num-item1>4.3</num-item1><num-item4>Scope-based Resource Allocation:</num-item4>
     </num-cont>
-    <h3>Class Anatomy</h3>
+    The C++ language provides a very elegant mechanism for managing class resources.  
+    <spacer-15></spacer-15>
+    <defn-block style="max-width:100%;">
+      <defn-head>
+        Scoped-based Resource Management
+      </defn-head>
+      <defn-body class="pad10-15">
+        Instances of classes allocate resources they need in constructors and, occasionally,
+        in other member functions. All resources are deallocated in the class destructor.
+        <spacer-15></spacer-15>
+        The C++ language guarantees that the destructor will be called when an instance goes out 
+        of scope, e.g., the thread of execution leaves the scope in which the instance was 
+        declared.  This includes abnormal exit when an exception is thrown.
+      </defn-body>
+    </defn-block>
+    <spacer-25></spacer-25>
+    This mechanism, often referred to as Resource Acquisition Is Initialization 
+    (<span class="notice">RAII</span>), makes handling
+    pointer-based operations safe and simple.  We wrap all heap operations in classes and handle
+    pointer and heap interactions in class constructors and destructor.  That avoids memory leaks
+    and invalid memory access.  Only one person has to get that right - the class designer - and
+    since that processing happens only in the wrapping class it is easy to do that correctly.
+    <spacer-15></spacer-15>
+    For those rare cases when we elect to access the heap outside confines of a class, C++
+    provides <c-s>std::unique_ptr&lt;T&gt;</c-s> and <c-s>std::shared_ptr&lt;T&gt;</c-s> 
+    that automatically delete heap allocations when they go out of scope.
+    <spacer-15></spacer-15>
+    Users of a class can be blissfully ignorant of resource management details.  They just
+    create and use instances of the class and don&apos;t have to participate in management of  
+    resources it needs to function.
+    <spacer-15></spacer-15>
+    Compare that to the resource management process for managed languages like Java and C#.
+    Managed languages return allocated resources with garbage collection.  That usually works
+    well, but is non-deterministic.  To ensure that shared resources like database readers and file
+    streams are deallocated in a timely fashion every user has to know which classes are disposable
+    and remember to call dispose on instances when their processing is done.
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>4.4</num-item1><num-item4>Class Anatomy:</num-item4>
+    </num-cont>
+
+    <details>
+      <summary class="labelStyle lightItem">Class Anatomy Code</summary>
+      <spacer-10></spacer-10>
+      <div class="autoX" style="display:flex;">
+      <defn-block>
+        <defn-head><span class="notice">Anatomy Class</span></defn-head>
+        <defn-code style="border-top:2px solid darkred;">
+  class Anatomy {
+  public:
+    Anatomy();                                 // default ctor
+    Anatomy(const std::string& nameStr);       // promotion ctor
+    Anatomy(const Anatomy& a);                 // copy ctor
+    Anatomy(Anatomy&& a) noexcept;             // move ctor
+    Anatomy& operator=(const Anatomy& a);      // copy assignment
+    Anatomy& operator=(Anatomy&& a) noexcept;  // move assignment
+    ~Anatomy();                                // dtor
+    void name(const std::string& nameStr);
+    std::string name() const;
+    size_t objNumber() const;
+    template&lt;typename T&gt;
+    void setValue(const T& t);
+    template&lt;typename T&gt;
+    T getValue() const;
+    void showMsg(
+      size_t n, const std::string& msg
+    );
+  private:
+    std::string name_;
+    static size_t count;
+    size_t myCount = 0;
+    std::any value;
+    constexpr static size_t MaxMsg = 6;
+    std::string invMsg[MaxMsg]{
+      "default ctor invoked",
+      "copy ctor invoked",
+      "move ctor invoked",
+      "copy assignment invoked",
+      "move assignment invoked",
+      "dtor invoked"
+    };
+  };
+
+  size_t Anatomy::count = 0;
+
+  void Anatomy::showMsg(size_t n, const std::string& msg) {
+    if (Assert(0 &lt;= n && n &lt; MaxMsg))
+      return;
+    std::string localMsg = invMsg[n];
+    std::cout &lt;&lt; "\n  " &lt;&lt; localMsg;
+    if (msg.size() &gt; 0)
+      std::cout &lt;&lt; ", " &lt;&lt; msg;
+  }
+  /*--- default constructor ---*/
+  Anatomy::Anatomy() : value(std::any()), name_("unknown") {
+    myCount = ++count;
+    showMsg(0, "obj #" + std::to_string(myCount));
+  }
+  /*--- promotion constructor ---*/
+  Anatomy::Anatomy(const std::string& nameStr)
+    : value(std::any()), name_(nameStr) {
+    myCount = ++count;
+    showMsg(0, "obj #" + std::to_string(myCount));
+  }
+  /*--- copy constructor ---*/
+  Anatomy::Anatomy(const Anatomy& a)
+    : value(a.value), name_(a.name_) {
+    myCount = ++count;
+    showMsg(1, "obj #" + std::to_string(myCount));
+  }
+  /*--- move constructor ---*/
+  Anatomy::Anatomy(Anatomy&& a) noexcept
+    : value(std::move(a.value)), name_(std::move(a.name_)) {
+    myCount = ++count;
+    showMsg(2, "obj #" + std::to_string(myCount));
+  }
+  /*--- copy assignment operator ---*/
+  Anatomy& Anatomy::operator=(const Anatomy& a) {
+    if (this != &a) {
+      // don't want to rename, so no copy
+      value = a.value;
+    }
+    showMsg(3, "obj #" + std::to_string(myCount));
+    return *this;
+  }
+  /*--- move assignment operator ---*/
+  Anatomy& Anatomy::operator=(Anatomy&& a) noexcept {
+    if (this != &a) {
+      // don't want to rename, so no copy
+      value = std::move(a.value);
+    }
+    showMsg(4, "obj #" + std::to_string(myCount));
+    return *this;
+  }
+  /*--- destructor ---*/
+  Anatomy::~Anatomy() {
+    showMsg(5, "obj #" + std::to_string(myCount));
+    // name_ & value are composed, so their dtors are called here
+  }
+  /*--- name setter ----*/
+  void Anatomy::name(const std::string& nameStr) {
+    name_ = nameStr;
+  }
+  /*--- name getter ---*/
+  std::string Anatomy::name() const {
+    return name_;
+  }
+  /*--- objNumber getter ---*/
+  size_t Anatomy::objNumber() const {
+    return myCount;
+  }
+  /*--- value setter ---*/
+  template&lt;typename T&gt;
+  void Anatomy::setValue(const T& t) {
+    value = t;
+  }
+  /*--- value getter ---*/
+  template&lt;typename T&gt;
+  T Anatomy::getValue() const {
+    try {
+      return std::any_cast&lt;T&gt;(value);
+    }
+    catch (...) {
+      std::cout &lt;&lt; " --- can't retrieve value for " &lt;&lt; name_ &lt;&lt; " ---";
+      return T();
+    }
+  }
+  /*--- Anatomy object factory ---*/
+  template&lt;typename T&gt;
+  Anatomy makeAnatomy(const T& t = T()) {
+    Anatomy temp("created");
+    temp.setValue(t);
+    return temp;
+  }
+  /*--- show Anatomy state ---*/
+  template&lt;typename T&gt;
+  void showAnatomy(const Anatomy& a, size_t line = 0) {
+    if (line &gt; 0)
+      std::cout &lt;&lt; "\n  at line #" &lt;&lt; line;
+    std::cout &lt;&lt; "\n  " &lt;&lt; a.name() &lt;&lt; ", obj#" &lt;&lt; a.objNumber()
+      &lt;&lt; ", has value " &lt;&lt; a.getValue&lt;T&gt;() &lt;&lt; std::endl;
+  }
+
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head style="border-left:none;">
+          <span class="notice">Using Code:</span>
+        </defn-head>
+        <defn-code style="border-top:2px solid darkred; border-left:none;">
+ 362  std::cout &lt;&lt; "\n  Demonstrate Class Anatomy";
+ 363  std::cout &lt;&lt; "\n ===========================\n";
+ 364
+ 365  Anatomy a1;
+ 366  a1.setValue(1.5);
+ 367  showAnatomy&lt;double>(a1, __LINE__ - 2);
+ 368
+ 369  Anatomy a2{ a1 };
+ 370  a2.name("a2");
+ 371  showAnatomy&lt;double>(a2, __LINE__ - 2);
+ 372
+ 373  a1 = a2;
+ 374  showAnatomy&lt;double>(a1, __LINE__ - 1);
+ 375
+ 376  Anatomy a3 = makeAnatomy(std::string("some string"));
+ 377  showAnatomy&lt;std::string>(a3, __LINE__ - 1);
+ 378
+ 379  Anatomy a4;
+ 380  a4 = makeAnatomy(5);
+ 381  showAnatomy&lt;int>(a4, __LINE__ - 1);
+        </defn-code>
+        <defn-head style="border-left:none;">
+          <span class="notice">Output:</span>
+        </defn-head>
+        <defn-code style="border-top:2px solid darkred; border-left:none;">
+  Demonstrate Class Anatomy
+ ===========================
+
+  default ctor invoked, obj #1
+  at line #365
+  unknown, obj#1, has value 1.5
+
+  copy ctor invoked, obj #2
+  at line #369
+  a2, obj#2, has value 1.5
+
+  copy assignment invoked, obj #1
+  at line #373
+  unknown, obj#1, has value 1.5
+
+  default ctor invoked, obj #3
+  move ctor invoked, obj #4
+  dtor invoked, obj #3
+  at line #376
+  created, obj#4, has value some string
+
+  default ctor invoked, obj #5
+  default ctor invoked, obj #6
+  move ctor invoked, obj #7
+  dtor invoked, obj #6
+  move assignment invoked, obj #5
+  dtor invoked, obj #7
+  at line #380
+  unknown, obj#5, has value 5
+
+  dtor invoked, obj #5
+  dtor invoked, obj #4
+  dtor invoked, obj #2
+  dtor invoked, obj #1
+        </defn-code>
+      </defn-block>
+      </div>
+    </details>
+    <spacer-25></spacer-25>
+    <div class="container">
+      <div class="item1 header">Generated Operation</div>
+      <div class="item2 header">Syntax</div>
+      <div class="item3 header">Conditions</div>
+      <div class="item1 notice">
+        default constructor
+      </div>
+      <div class="item2">
+        X();
+      </div>
+      <div class="item3">
+        Compiler will generate if, and only if, no constructors are declared.
+      </div>
+
+      <div class="item1 notice">
+        copy constructor
+      </div>
+      <div class="item2">
+        X(const X&amp; x);
+      </div>
+      <div class="item3">
+        Compiler will always generate if not declared.
+      </div>
+
+      <div class="item1 notice">
+        Move constructor
+      </div>
+      <div class="item2">
+        X(X&& x);
+      </div>
+      <div class="item3">
+        Compiler will generate if, and only if, no copy and no move constructors and assignment
+        operators are declared.
+      </div>
+
+      <div class="item1 notice">
+        Copy assignment operator
+      </div>
+      <div class="item2">
+        X& operator=(const X& x);
+      </div>
+      <div class="item3">
+        Compiler will always generate if not declared.
+      </div>
+
+      <div class="item1 notice">
+        Move assignment operator
+      </div>
+      <div class="item2">
+        X&amp; operator=(X&amp;&amp; x);
+      </div>
+      <div class="item3">
+        Compiler will generate if, and only if, no copy and no move constructors and assignment
+        operators are declared.
+      </div>
+
+      <div class="item1 notice borderBottom">
+        destructor
+      </div>
+      <div class="item2 borderBottom">
+        ~X();
+      </div>
+      <div class="item3 borderBottom">
+        Compiler will always generate if not declared.
+      </div>
+
+    </div>
     <h3>Value Types</h3>
     <h3>Event Handlers</h3>
     <h3>Examples from the Repositories</h3>
