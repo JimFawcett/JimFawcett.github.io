@@ -521,10 +521,10 @@
         </defn-body>
       </defn-block>
       <defn-block style="min-width:40%;">
-        <defn-head>
+        <defn-head style="border-left:none;">
           Derived class
         </defn-head>
-        <defn-body>
+        <defn-body style="border-left:none;">
           <pre><c-s>  class D : public B {
   public:
     void occupation(const std::string&amp; occup) {
@@ -806,7 +806,7 @@
     of that in Chapter #1.
     <spacer-15></spacer-15>
     <defn-block class="">
-      <defn-head class="pad10" style="border-bottom:1px solid darkred;">
+      <defn-head class="pad10" style="border-bottom:2px solid darkred;">
         <span class="notice">Lambda:</span> anonymous locally defined functor in abreviated syntax
       </defn-head>
       <defn-code>  
@@ -851,7 +851,7 @@
           <defn-head class="pad10">
             <span class="notice">Lambda Syntax</span> - closure is local scope where lambda is defined
           </defn-head>
-          <defn-code style="border-top:1px solid darkred;">
+          <defn-code style="border-top:2px solid darkred;">
  auto f = [capture specifier](argument list)[->optional return specification] {
    body with code to execute
  };
@@ -911,7 +911,7 @@
         <defn-head>
           <span class="notice">demo of std::invoke</span>
         </defn-head>
-        <defn-code style="border-top:1px solid darkred;">
+        <defn-code style="border-top:2px solid darkred;">
   std::invoke(f, "function via std::invoke", 1);
   std::invoke(pFun, "function pointer via std::invoke", 2);
   std::invoke(F(), "functor via std::invoke", 3);
@@ -937,98 +937,104 @@
       <spacer-10></spacer-10>
       <div class="autoX" style="padding:0; width:100%;">
         <defn-block>
-          <defn-code style="border-top:1px solid darkred; padding-right:50px;">
-#include &lt;iostream&gt;
-#include &lt;string&gt;
-#include &lt;functional&gt;
-#include "../Display/Display.h"
+          <defn-head>
+            <span class="notice">CallableObjects.cpp</span>
+          </defn-head>
+          <defn-code style="border-top:2px solid darkred; padding-right:50px;">
+  #include &lt;iostream&gt;
+  #include &lt;string&gt;
+  #include &lt;functional&gt;
+  #include "../Display/Display.h"
 
-std::string suffix(size_t i) {
-  std::string sfx;
-  switch (i)
-  {
-  case 1:
-    sfx = "st";
-    break;
-  case 2:
-    sfx = "nd";
-    break;
-  case 3:
-    sfx = "rd";
-    break;
-  default:
-    sfx = "th";
-    break;
+  std::string suffix(size_t i) {
+    std::string sfx;
+    switch (i)
+    {
+    case 1:
+      sfx = "st";
+      break;
+    case 2:
+      sfx = "nd";
+      break;
+    case 3:
+      sfx = "rd";
+      break;
+    default:
+      sfx = "th";
+      break;
+    }
+    return sfx;
   }
-  return sfx;
-}
 
-void f(const std::string& type, size_t i) {
-  std::cout &lt;&lt; "\n  " &lt;&lt; std::to_string(i) &lt;&lt; suffix(i) + " invocation, a " + type;
-}
-
-void(*pFun)(const std::string&, size_t) = f;
-
-class F {
-public:
-  void operator()(const std::string& type, size_t i) {
+  void f(const std::string& type, size_t i) {
     std::cout &lt;&lt; "\n  " &lt;&lt; std::to_string(i) &lt;&lt; suffix(i) + " invocation, a " + type;
   }
-};
 
-auto lam = [](const std::string& type, size_t i) {
-  std::cout << "\n  " << std::to_string(i) << suffix(i) + " invocation, a " + type;
-};
+  void(*pFun)(const std::string&, size_t) = f;
 
-class C {
-public:
-  void method(const std::string& type, size_t i) {
-    std::cout &lt;&lt; "\n  " &lt;&lt; std::to_string(i) &lt;&lt; suffix(i) + " invocation, a " + type;
+  class F {
+  public:
+    void operator()(const std::string& type, size_t i) {
+      std::cout &lt;&lt; "\n  " &lt;&lt; std::to_string(i) &lt;&lt; suffix(i) + " invocation, a " + type;
+    }
+  };
+
+  auto lam = [](const std::string& type, size_t i) {
+    std::cout << "\n  " << std::to_string(i) << suffix(i) + " invocation, a " + type;
+  };
+
+  class C {
+  public:
+    void method(const std::string& type, size_t i) {
+      std::cout &lt;&lt; "\n  " &lt;&lt; std::to_string(i) &lt;&lt; suffix(i) + " invocation, a " + type;
+    }
+  };
+
+  using MPtr = void(C::*)(const std::string&, size_t);
+  MPtr pMethod = &C::method;
+
+  template&lt;typename T&gt;
+  void doInvoke(T t, const std::string& type, size_t count) {
+    t(type, count);
   }
-};
 
-using MPtr = void(C::*)(const std::string&, size_t);
-MPtr pMethod = &C::method;
+  template&lt;typename U, typename V&gt;
+  void doInvoke(U u, V v, const std::string& type, size_t count) {
+    (u.*v)(type, count);
+  }
 
-template&lt;typename T&gt;
-void doInvoke(T t, const std::string& type, size_t count) {
-  t(type, count);
-}
+  int main() {
+    displayDemo("--- Callable Objects Demo ---");
 
-template&lt;typename U, typename V&gt;
-void doInvoke(U u, V v, const std::string& type, size_t count) {
-  (u.*v)(type, count);
-}
-
-int main() {
-  displayDemo("--- Callable Objects Demo ---");
-
-  doInvoke(f, "function", 1);
-  doInvoke(pFun, "function pointer", 2);
-  doInvoke(F(), "functor", 3);
-  doInvoke(lam, "lambda", 4);
-  doInvoke(C(), pMethod, "method pointer", 4);
-  putline();
-  /* 
-    std::invoke is more powerful than doInvoke as it takes an arbitry
-    number of arguments.
-    - the first may be a function, function pointer, or functor
-      that take any number of arguments
-    - the first may also be a method pointer.  That requires the second
-      to be an instance of the class.  It accepts an arbitrary number
-      of succeeding arguments.
-    That is implemented with a variadic template.  Those will be discussed
-    in Chapter #4 - Templates.
-  */
-  std::invoke(f, "function via std::invoke", 1);
-  std::invoke(pFun, "function pointer via std::invoke", 2);
-  std::invoke(F(), "functor via std::invoke", 3);
-  std::invoke(lam, "lambda via std::invoke", 4)
-  std::invoke(pMethod, C(), "method pointer via std::invoke", 5);
-  std::cout &lt;&lt; "\n\n";
-}
+    doInvoke(f, "function", 1);
+    doInvoke(pFun, "function pointer", 2);
+    doInvoke(F(), "functor", 3);
+    doInvoke(lam, "lambda", 4);
+    doInvoke(C(), pMethod, "method pointer", 4);
+    putline();
+    /* 
+      std::invoke is more powerful than doInvoke as it takes an arbitry
+      number of arguments.
+      - the first may be a function, function pointer, or functor
+        that take any number of arguments
+      - the first may also be a method pointer.  That requires the second
+        to be an instance of the class.  It accepts an arbitrary number
+        of succeeding arguments.
+      That is implemented with a variadic template.  Those will be discussed
+      in Chapter #4 - Templates.
+    */
+    std::invoke(f, "function via std::invoke", 1);
+    std::invoke(pFun, "function pointer via std::invoke", 2);
+    std::invoke(F(), "functor via std::invoke", 3);
+    std::invoke(lam, "lambda via std::invoke", 4)
+    std::invoke(pMethod, C(), "method pointer via std::invoke", 5);
+    std::cout &lt;&lt; "\n\n";
+  }
           </defn-code>
-          <defn-code style="border-top:1px solid darkred;">
+          <defn-head>
+            <span class="notice">Output</span>
+          </defn-head>
+          <defn-code style="border-top:2px solid darkred;">
   --- Callable Objects Demo ---
   1st invocation, a function
   2nd invocation, a function pointer
@@ -1068,46 +1074,46 @@ int main() {
     <spacer-25></spacer-25>
     <div class="autoX">
       <defn-block>
-        <defn-head style="border-bottom:1px solid darkred;">
+        <defn-head style="border-bottom:2px solid darkred;">
           <span class="notice">std::copy_if example</span>
         </defn-head>
         <defn-code>
-#include &lt;algorithm&gt;
-#include &lt;string&gt;
-#include &lt;vector&gt;
-#include &lt;iostream&gt;
-#include "../Display/Display.h"
+  #include &lt;algorithm&gt;
+  #include &lt;string&gt;
+  #include &lt;vector&gt;
+  #include &lt;iostream&gt;
+  #include "../Display/Display.h"
 
-template&lt;typename T&gt;
-void show(T t) {
-  for (auto item : t)
-    std::cout &lt;&lt; "\n  " &lt;&lt; item;
-}
+  template&lt;typename T&gt;
+  void show(T t) {
+    for (auto item : t)
+      std::cout &lt;&lt; "\n  " &lt;&lt; item;
+  }
 
-int main() {
+  int main() {
 
-  std::vector&lt;std::string&gt; src{ 
-    "first string", "second str", "third collection", "another string" 
-  };
-  std::vector&lt;std::string&gt; dst;
+    std::vector&lt;std::string&gt; src{ 
+      "first string", "second str", "third collection", "another string" 
+    };
+    std::vector&lt;std::string&gt; dst;
 
-  std::string s = "string";          // lambda capture
+    std::string s = "string";          // lambda capture
 
-  std::copy_if(
-    src.begin(), src.end(),          // range of source to copy
-    std::back_inserter(dst),         // insertion iterator push_backs into dst
+    std::copy_if(
+      src.begin(), src.end(),          // range of source to copy
+      std::back_inserter(dst),         // insertion iterator push_backs into dst
 
-    [&s](const std::string& item) {  // lambda predicate defines src items to push_back   
-      if (item.find(s) != std::string::npos) {
-        return false;
+      [&s](const std::string& item) {  // lambda predicate defines src items to push_back   
+        if (item.find(s) != std::string::npos) {
+          return false;
+        }
+        return true;
       }
-      return true;
-    }
-  );
+    );
   
-  show(dst);
-  putline(2);
-}
+    show(dst);
+    putline(2);
+  }
         </defn-code>
       </defn-block>
     </div>
@@ -1266,7 +1272,7 @@ int main() {
     <div style="display:flex; width:100%; position:relative; left:0px;">
     <div class="autoX">
       <defn-block>
-        <defn-head style="border-bottom:1px solid darkred;">
+        <defn-head style="border-bottom:2px solid darkred;">
           <span class="notice">template logger facility</span>
         </defn-head>
         <defn-code style="padding-right:30px;">
@@ -1325,7 +1331,7 @@ int main() {
         </defn-code>
       </defn-block>
     </div>
-    <div style="flex:1; min-width:30%;">
+    <div style="flex:1; min-width:30%;padding-left:25px;">
       At the bottom of this code listing you will find an object factory that returns a reference
       to a static logger, typed as an ILogger interface.  That means that any part of the test code
       that includes the logger header file, Logger.h, will be able to access a single static logger.
