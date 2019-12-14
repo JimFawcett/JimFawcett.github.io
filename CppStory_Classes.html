@@ -40,7 +40,7 @@
 
     #github .container3 {
       display: grid;
-      grid-template-columns: 16em 1fr;
+      grid-template-columns: 17em 1fr;
       padding: 0.0em;
       margin: 0em 0.25em 1em 0.25em;
       max-width:100%;
@@ -109,7 +109,7 @@
   <header>
     <hgroup id="pagetitle">
       <h1 id="title">Chapter #4 - C++ Classes</h1>
-      <h3 id="subtitle">classes, value types, class relationships</h3>
+      <h3 id="subtitle">classes and value types</h3>
     </hgroup>
   </header>
 
@@ -141,7 +141,34 @@
     methods of the class.  Most use is implicit, but occasionally it must be explicitly used, as in
     assignment operators that return <c-s>*this</c-s>.
     <num-cont>
-      <num-item1>4.11</num-item1><num-item4>Point Class Examples</num-item4>
+      <num-item1>4.11</num-item1><num-item4>Class Methods</num-item4>
+    </num-cont>
+    C++ classes define special methods: constructors, assignment operators, and destructors.  Constructors
+    method names are all the name of the class. Assignment operators use the <c-s>operator=</c-s> name and
+    destructor names are the class name prepended with a <c-s>~</c-s> character.
+    <spacer-15></spacer-15>
+    <h4>Table 1. - Class Methods</h4>
+    <div class="container3">
+      <div class="item1 header">Method Syntax</div>
+      <div class="item2 header">Description</div>
+      <div class="item1 notice"><c-s>X()</c-s></div>
+      <div class="item2">Default constructor builds instance of X with default state values.</div>
+      <div class="item1 notice"><c-s>X(const X&amp; x)</c-s></div>
+      <div class="item2">Copy constructor builds instance of X with copy of the state of an existing instance, <c-s>x</c-s>.</div>
+      <div class="item1 notice"><c-s>X(X&amp;&amp; x)</c-s></div>
+      <div class="item2">Move constructor builds an instance and transfers ownership of a source object&apos;s state.</div>
+      <div class="item1 notice"><c-s>~X()</c-s></div>
+      <div class="item2">Destructor returns class resources when instance goes out of scope.</div>
+      <div class="item1 notice"><c-s>X&amp; operator=(const X&amp; x)</c-s></div>
+      <div class="item2">Copy assignment copies the state of a source instance to the state of an existing destination instance.</div>
+      <div class="item1 notice" style="border-bottom:2px solid darkred;">
+        <c-s>X&amp; operator=(X&amp;&amp; x)</c-s>
+      </div>
+      <div class="item2" style="border-bottom:2px solid darkred;">Move assignment transfers ownership of a source instance&apos;s state to the destination instance.</div>
+    </div>
+    Each of these methods will be used and explained in the examples that follow.
+    <num-cont>
+      <num-item1>4.12</num-item1><num-item4>Point Class Examples</num-item4>
     </num-cont>
     We will explore here three example variations of a &quot;simple&quot; <c-s>Point</c-s> class,
     considering class data structure and its consequences on flexibility, complexity, and performance.
@@ -172,7 +199,7 @@
       </hidephotosizer-block>
     </div>
     <num-cont>
-      <num-item1>4.12</num-item1><num-item4>Point Examples Code</num-item4>
+      <num-item1>4.13</num-item1><num-item4>Point Examples Code</num-item4>
     </num-cont>
     In the example below, we implement a point class. That might be used in a drawing program to 
     define lines, rectangles, and other polygonal figures.  This Point example stores its 
@@ -598,14 +625,15 @@
             destructors, for cases where all the class&apos;s base classes and data members
             have correct copy, assignment, and destruction semantics. For those cases, e.g.,
             data members are fundamental types and/or STL containers, you should not implement
-            those methods - the compiler will.
+            those methods - the compiler will implement them correctly.
           </li>
           <li>
             When data members do not have correct copy, assignment, and destruction
             behaviours, the language supports definition of those operations as class
             methods, as we have done in Example3::Point.  In these cases, e.g., when
             the class holds a pointer member to data in the native heap, you either
-            implement those methods or disallow them.
+            implement those methods or disallow them, preventing the compiler from
+            generating them.
           </li>
           <li>
             The compiler will not generate constructors or assignment operators if you
@@ -900,6 +928,105 @@
       </div>
     </details>
     <spacer-15></spacer-15>
+    This is the first time we&apos;ve seen move operations in action. The move constructor, 
+    <c-s class="noWrap">Anatomy(Anatomy&& a)</c-s>, and move assignment operator, 
+    <c-s class="noWrap">Anatomy&amp; Anatomy(Anatomy&& a)</c-s>, transfer ownership of the source
+    instance state to the destination instance. 
+    <spacer-25></spacer-25>
+    <defn-block>
+      <defn-head>
+        <span class="notice">Move Construction : <c-s>X(X&& x)</c-s></span>
+      </defn-head>
+      <defn-body style="border-top:2px solid darkred;">
+        The <c-s>X&&</c-s> is an rvalue reference bound to input <c-s>x</c-s>. Rvalue references accept
+        either lvalues - named variables - or rvalues - temporaries like <c-s>X()</c-s><sup>1</sup>.
+        <spacer-15></spacer-15>
+        Move construction transfers ownership of the state of a temporary X to state for a new X as part of its construction,
+        e.g.:
+        <indent-block class="pad10">
+          X x2 = std::move(x1);
+        </indent-block>
+        Usually we won&apos;t see a move construction written that way. Instead, the move happens when
+        a temporary is returned from a function:
+        <indent-block class="pad10">
+          <c-s>
+            X makeAnX() {<br /> 
+              &nbsp;&nbsp;X temp;<br />
+              &nbsp;&nbsp;// configure temp<br />
+              &nbsp;&nbsp;return temp;<br />
+            }
+            <spacer-10></spacer-10>
+            X x = makeAnX();
+          </c-s>
+        </indent-block>
+        Ownership transfer often amounts to a pointer swap.  If we <c-s>std::move(str)</c-s>,
+        where <c-s>str</c-s> is a <c-s>std::string</c-s>, ownership transfer passes 
+        <c-s>str</c-s>&apos;s character pointer to the destination string rather than copying
+        all of its characters, and replaces <c-s>str</c-s>&apos;s character pointer with 
+        <c-s>nullptr</c-s>.  For the <c-s>makeAnX()</c-s> example above, the temporary is
+        destroyed immediately after the return, so the <c-s>str</c-s> destructor calls
+        <c-s>delete</c-s> on its character pointer, causing no harm (because it is nullptr).
+        The compiler will use a copy constructor if the source object is not a temporary
+        or if the source does not define move construction.
+        <spacer-15></spacer-15>
+        Move construction allows us to build functions that define complex data structures
+        and return them efficiently, with moves, to the using code.
+        <spacer-15></spacer-15>
+      </defn-body>
+      <defn-head style="border-top:none;">
+        <span class="notice">Move Assignment : <c-s>X&amp; (X&& x)</c-s></span>
+      </defn-head>
+      <defn-body style="border-top:2px solid darkred">
+        <spacer-10></spacer-10>
+        Move assignment works just like move construction, but is used to transfer ownership
+        to an existing instance:
+        <indent-block class="pad10">
+          <c-s>
+            X x;<br />
+            x = makeAnX();
+          </c-s>
+        </indent-block>
+        <hr class="spreadup" />
+        <ol class="tightList" style="font-size:small; margin-top:3px;">
+          <li>
+            lvalue and rvalue references were part of the C language lore. An lvalue is a
+            named instance that would be defined on the left side of a declaration, e.g.:
+            <indent-block class="pad5">
+              <c-s>int i{5};</c-s>
+            </indent-block>
+            Here i is an lvalue.  An rvalue is an anonymous instance that would appear on the right side of an
+            expression, e.g.:
+            <indent-block class="pad5">
+              <c-s>i = 7;</c-s>
+            </indent-block>
+            Here the literal 7 is an rvalue.
+            <spacer-10></spacer-10>
+            These classifications become slightly more complicated for C++.  See 
+            <a href="https://accu.org/index.php/journals/227">Lvalues and Rvalues</a>
+          </li>
+        </ol>
+      </defn-body>
+    </defn-block>
+    <spacer-25></spacer-25>
+    If we return by value a temporary instance of Anatomy
+    from a function that creates it, as in <c-s>makeAnatomy</c-s>, the compiler uses 
+    move construction to return to a newly created instance, as in line 376 of the Anatomy output, 
+    above. If we return to an existing instance, as in line 380, the compiler uses move assignment.  
+    <spacer-15></spacer-15>
+    The <c-s class="noWrap">std::move(a.name_)</c-s> in Anatomy&apos;s move constructor
+    simply copies the a.name_ character pointer to name_ instead of copying all its characters.
+    The source instance is a temporary and will be destroyed as soon as the return has
+    completed, so that loss of ownership has no effect.
+    <spacer-15></spacer-15>
+    We&apos;ve used, in the Anatomy class, std::any to hold a value it uses.  Std::any,
+    added in C++17, will hold an instance of any type.  When we call 
+    <c-s class="noWrap">std::move(a.value)</c-s> that uses the move constructor of the type
+    held by any.  If that type does not provide a move constructor, the compiler simply uses
+    the value&apos;s copy constructor.
+    Move assigning to an already existing instance works the same way, e.g., transferring
+    ownership of the temporary Anatomy&apos;s resource, inside <c-s>makeAnatomy</c-s>, to
+    the destination via a move assignment operation.
+    <spacer-15></spacer-15>
     <hr class="spread" />
     <num-cont>
       <num-item1>4.5</num-item1><num-item4>Compiler-Generated Methods</num-item4>
@@ -936,9 +1063,9 @@
     For a large fraction of the classes we write, the class syntax is really quite simple, because
     the compiler implicitly generates a lot of the methods for us.
 
-    When that happens is described in Table 1.
+    When that happens is described in Table 2.
     <spacer-15></spacer-15>
-    <h4>Table 1. - Compiler generated methods</h4>
+    <h4>Table 2. - Compiler generated methods</h4>
     <spacer-10></spacer-10>
     <div class="container1">
       <div class="item1 header">Generated Operation</div>
@@ -1009,9 +1136,9 @@
     <spacer-15></spacer-15>
     The only difficulty with this process is to remember when you should or should not let
     the compiler generate those methods.  That isn&apos;t to difficult - the conditions are
-    presented in Table 2., below. 
+    presented in Table 3., below. 
     <spacer-25></spacer-25>
-    <h4>Table 2. - When Value Methods should (not) be implemented</h4>
+    <h4>Table 3. - When Value Methods should (not) be implemented</h4>
     <div class="container2">
       <div class="item1 header">
         Define Value Methods
@@ -1061,7 +1188,7 @@
     You need to (almost always) obey the <span class="notice">law of threes</span>: if you provide any one of the three methods:
     copy constructor, copy assignment operator, and destructor, you should provide all three.
     <spacer-15></spacer-15>
-    There are three cases:
+    There are three cases, as cited in Table 3:
     <spacer-10></spacer-10>
     <ul class="tight">
       <li>Let the compiler generate methods - true for a large fraction of the classes we design.</li>
@@ -1072,7 +1199,7 @@
     <num-cont>
       <num-item1>4.6</num-item1><num-item4>Class Examples from the Repositories:</num-item4>
     </num-cont>
-    In Table 3., below, you will find many more examples of classes. They are listed in order
+    In Table 4., below, you will find many more examples of classes. They are listed in order
     of relevance to the material in this chapter. For Windows, download code you want to study, and,
     using Windows explorer, open the solution (*.sln) in Visual Studio Community Edition, 2019 or
     later.  Each project needs to be built with the C++17 option set.  That should already be
@@ -1085,7 +1212,7 @@
     That will allow you to run this code in Linux or MacOS.  But that won&apos;t appear for
     awhile.
     <spacer-15></spacer-15>
-    <h4>Table 3. - Examples from C++ Repositories</h4>
+    <h4>Table 4. - Examples from C++ Repositories</h4>
     <spacer-10></spacer-10>
     <indent-blocks>
       <div class="container3">
@@ -1153,6 +1280,9 @@
         </div>
       </div>
     </indent-blocks>
+    <spacer-25></spacer-25>
+    This concludes our study of classes.  In the next chapter we explore class
+    relationships - the glue that holds object-oriented programs together. Ciao.
     <spacer-25></spacer-25>
     <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
 
