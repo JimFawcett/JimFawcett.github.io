@@ -117,6 +117,7 @@ function initializeMenu() {
         <a href='https://www.pocoproject.org/'>poco&nbsp;Library&nbsp;(C++ networking)</a>\
         <a href='https://openframeworks.cc/'>openFrameworks&nbsp;(C++ graphics)</a>\
         <a href='https://github.com/microsoft'>github.com/Microsoft</a>\
+        <a href='https://www.taniarascia.com/'>taniarascia.com (JavaScript, CSS)</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div >\
     </div>\
