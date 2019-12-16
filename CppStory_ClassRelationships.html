@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="css/StylesMenu.css" />
   <link rel="stylesheet" href="css/StylesBlueTheme.css" />
   <style>
-    #github .pad10-15 {
+    /*#github .pad10-15 {
       padding: 10px 15px;
     }
 
@@ -36,7 +36,6 @@
 
     #github .labelStyle {
       font-family: sans-serif;
-      /*font-weight:bold;*/
       font-size: 1.0em;
     }
 
@@ -62,7 +61,6 @@
         max-width: 95%;
         padding-left: 20px;
         padding-right: 20px;
-        /*background-color: #eee;*/
       }
 
     #github photosizer-block {
@@ -117,6 +115,9 @@
 
     #github ol.footnote li {
       padding-bottom: 0px;
+    }*/
+    #github summary {
+      width:max-content;
     }
   </style>
 </head>
@@ -147,83 +148,443 @@
   </header>
 
   <hr class="spread" />
-  <indent-blocks>
+  <div>
     <num-cont>
       <num-item1>5.0</num-item1><num-item4>Class Relationships</num-item4>
     </num-cont>
     Object-oriented design and implementation consists of the construction of classes and binding them together
     with class relationships.  There are five relations: inheritance, composition, aggregation, using, and friendship.
     Of these, all but the last are found in most implementations of C++ programs.
+    <hr class="spread" />
     <num-cont>
       <num-item1>5.1</num-item1><num-item4>Defining Class Relationships:</num-item4>
     </num-cont>
-    <photosizer-block src="Pictures/ClassRelationships.JPG" width="600" class="photoSizerBlock right">
+    <photosizer-block src="Pictures/ClassRelationships.JPG" width="500" class="photoSizerBlock right">
       <span style="font-family:'Comic Sans MS, Tahoma';">
         Fig 1. Class Relationships
       </span>
     </photosizer-block>
-    It is surprising, that virtually all domain models can be represented by classes with these four relationships.
+    It is surprising, that virtually all domain models can be represented by classes using these four relationships.
     <ol class="tightList">
       <li>
         <strong>Inheritance:</strong>
-        <indent-block>
+        <div>
           Models an &quot;is-a&quot; relationship, e.g., a derived class is a specialization of its base.
           The base class is always an inner part of the derived - it resides within the memory footprint
           of the derived class.
-        </indent-block>
+        </div>
       </li>
       <li>
         <strong>Composition:</strong>
-        <indent-block>
+        <div>
           Represents a strong &quot;part-of&quot; relationship.  The composer always contains its composed parts.
           They have the same life-times, and the parts reside within the memory footprint of the composer.
-        </indent-block>
+        </div>
       </li>
       <li>
         <strong>Aggregation:</strong>
-        <indent-block>
+        <div>
           Represents a weaker &quot;part-of&quot; relationship.  The aggregator holds a reference to the
           aggregated, e.g., usually a pointer to an instance of the aggregated, created by the aggregator,
           in the native heap.  They do not have the same life-times, and the parts reside outside the memory
           footprint of their aggregator.
-        </indent-block>
+        </div>
       </li>
       <li>
         <strong>Using:</strong>
-        <indent-block>
+        <div>
           This is a non-owning relationship.  The user holds a reference to the
           used, e.g., a pointer to an instance of the used, passed as an argument of a user method.
           The used lifetime is independent of the user, but for correctness, it must be concurrent
           with the user's access.  Used resides outside the memory footprint of the user. 
-        </indent-block>
+        </div>
       </li>
     </ol>
     <div class="clear"></div>
-
+    <hr class="spread" />
     <num-cont>
-      <num-item1>5.2</num-item1><num-item4>Example - Person Class Hierarchy:</num-item4>
+      <num-item1>5.2</num-item1><num-item4>Object Layout:</num-item4>
+    </num-cont>
+    <photosizer-block src="Pictures/ObjectRelationships.JPG" width="500" class="photoSizerBlock right">
+      <span style="font-family:'Comic Sans MS, Tahoma';">
+        Fig 2. Object Layout
+      </span>
+    </photosizer-block>
+    In Fig 2. we show a compound object, defined by the classes B, C, D, and U. The corresponding objects
+    are shown in the bottom
+    half of the Figure.  They are shown using two dimensions for clarity of presentations, but are actually 
+    simply segments in a section of the process&apos;s virtual address space.
+    <spacer-15></spacer-15>
+    There are several things to note about the object layout:
+    <ol class="tightList">
+      <li>
+        class B composes C with the result that C lies inside the memory footprint of B.
+      </li>
+      <li>
+        class D derives publically from B and B&apos;s memory footprint lies entirely inside that of D.
+      </li>
+      <li>
+        D uses an instance of class U so U&apos;s footprint is disjoint from that of D.
+      </li>
+      <li>
+        Client aggregates an instance of D and their footprints are disjoint.
+      </li>
+      <li>
+        A friend class has access to D&apos;s private members but the footprints of friend and D are disjoint.
+      </li>
+      <li>
+        The bumps on the top of the objects represent their public member functions. D shares all the member
+        functions of B (unaffected by access specification) but may also declare new public functions.
+      </li>
+    </ol>
+    Consequences of this object structure are:
+    <ol class="tightList">
+      <li>
+        When <c-s>D</c-s>&apos;s constructor is called, it must construct its inner <c-s>B</c-s>, usually by 
+        explicitly invoking a <c-s>B</c-s> constructor in its initialization sequence - more about that later.
+      </li>
+      <li>
+        When <c-s>B</c-s> is constructed by <c-s>D</c-s> its first action is to construct its inner <c-s>C</c-s>, 
+        usually in its initialization sequence.
+      </li>
+      <li>
+        <c-s>D</c-s>&apos;s construction is independent of the lifetime of <c-s>u &epsilon; U</c-s>. That means
+        that our design must insure that <c-s>u</c-s> is in a valid state when <c-s>D</c-s> invokes its methods.
+      </li>
+    </ol>
+    <div class="clear"></div>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>5.3</num-item1><num-item4>Compound Object Layout Demonstration:</num-item4>
+    </num-cont>
+    Demonstration code in the details dropdown, below, has the same structure as shown in Fig 2.  Each
+    class instance displays its memory footprint on the console when its say() method is called.
+    <spacer-15></spacer-15>
+    <details>
+      <summary class="labelStyle lightItem">Demo - Class Layout</summary>
+      <spacer-10></spacer-10>
+      <div class="autoX" style="display:flex; width:100%; border:1px solid black;">
+        <defn-block style="width:60%;">
+          <defn-head>
+            <span class="notice">Class Layout Code:</span>
+          </defn-head>
+          <defn-code style="border-top:2px solid darkred;">
+  /////////////////////////////////////////////////////////////////////
+  // Used class is used by Derived, shows its statistics
+
+  class Used
+  {
+  public:
+    Used(const std::string& msg) : msg_(msg)
+    {
+      std::cout << "\n  Used(const std::string&) called";
+    }
+    ~Used() { std::cout << "\n  ~Used() called"; }
+    void say()
+    {
+      std::cout << "\n\n  Used::say()";
+      showStatistics(this);
+      showString("Used", msg_);
+    }
+  private:
+    std::string msg_;
+  };
+  /////////////////////////////////////////////////////////////////////
+  // Composed class is a data member of Base, shows its statistics
+
+  class Composed
+  {
+  public:
+    Composed(const std::string& msg) : msg_(msg)
+    {
+      std::cout << "\n  Composed(const std::string&) called";
+    }
+    ~Composed() { std::cout << "\n  ~Composed() called"; }
+    void say()
+    {
+      std::cout << "\n\n  Composed::say()";
+      showStatistics(this);
+      showString("Composed", msg_);
+    }
+  private:
+    std::string msg_;
+  };
+  /////////////////////////////////////////////////////////////////////
+  // Base class holds Composed and displays its layout statistics
+
+  class Base
+  {
+  public:
+    Base(const std::string& msg) : composed_(msg)
+    {
+      std::cout << "\n  Base(const std::string&) called";
+    }
+
+    // If you remove virtual qualifier on ~Base() only 
+    // Base destructor is called in main when created
+    // on heap.  Both called if created on stack.
+
+    virtual ~Base()
+    {
+      std::cout << "\n  ~Base() called";
+    }
+    virtual void say()
+    {
+      std::cout << "\n\n  Base::say()";
+      showStatistics(this);
+      std::cout << "\n\n  Base invoking my Composed::say(): ";
+      composed_.say();
+    }
+  protected:
+    Composed composed_;
+  };
+  /////////////////////////////////////////////////////////////////////
+  // Derived inherits from Base and displays its layout statistics.
+
+  class Derived : public Base
+  {
+  public:
+    Derived(const std::string& msg) : Base(msg)
+    {
+      std::cout << "\n  Derived(const std::string&) called";
+    }
+    ~Derived() { std::cout << "\n  ~Derived() called"; }
+    virtual void say(Used& used)
+    {
+      std::cout << "\n\n  Derived::say()";
+      showStatistics(this);
+
+      std::cout << "\n\n  Derived calling Base::say(): ";
+      Base::say();
+      std::cout << std::endl;
+
+      std::cout << "\n\n  Derived calling Used::say(): ";
+      used.say();
+      std::cout << std::endl;
+    }
+  private:
+  };
+
+
+          </defn-code>
+        </defn-block>
+        <defn-block style="width:50%;">
+          <defn-head style="border-left:none;">
+            <span class="notice">Using Code:</span>
+          </defn-head>
+          <defn-code style="border-top:2px solid darkred; border-left:none;">
+  std::string arg = "string entered as constructor argument";
+  std::cout << "\n  String, below, will be used in this demonstration:";
+  std::cout << "\n    \"" << arg << "\"";
+  std::cout << "\n  It's object size is " << sizeof(arg) << " bytes";
+  std::cout << "\n  It contains " << arg.size() << " characters\n";
+
+  std::cout << "\n  creating used object on stack";
+  std::cout << "\n -------------------------------";
+  Used u(arg);
+  u.say();
+
+  std::cout << std::endl;
+
+  std::cout << "\n  creating base object on stack";
+  std::cout << "\n -------------------------------";
+  Base b(arg);
+  b.say();
+
+  std::cout << std::endl;
+
+  /////////////////////////////////////////////////////////////////////
+  // Works the same whether Derived created on stack or on heap, but
+  // you will notice differences in the region of memory occupied
+  //
+  std::cout << "\n  creating derived object on stack";
+  std::cout << "\n ----------------------------------";
+  Derived d(arg);
+  d.say(u);
+
+  std::cout << "\n  creating derived object on heap";
+  std::cout << "\n ---------------------------------";
+  Base* pB = new Derived(arg);
+  pB->say();
+  delete pB;
+          </defn-code>
+          <defn-head style="border-top:none; border-left:none;">
+            <span class="notice">Output:</span>
+          </defn-head>
+          <defn-code style="border-top:2px solid darkred; border-left:none;">
+  creating derived object on stack
+ ----------------------------------
+  Composed(const std::string&) called
+  Base(const std::string&) called
+  Derived(const std::string&) called
+
+  Derived::say()
+  class Derived
+  my size is: 32 bytes -- holds Base and Composed
+  my starting address is 6420740 (0x61F904)
+  my ending address is   6420772 (0x61F924)
+
+  Derived calling Base::say():
+
+  Base::say()
+  class Derived
+  my size is: 32 bytes -- holds string and pointer to vtbl
+  my starting address is 6420740 (0x61F904)
+  my ending address is   6420772 (0x61F924)
+
+  Base invoking my Composed::say():
+
+  Composed::say()
+  class Composed
+  my size is: 28 bytes -- holds string
+  my starting address is 6420744 (0x61F908)
+  my ending address is   6420772 (0x61F924)
+  "This Composed string entered as constructor argument" has 54 characters
+
+  Derived calling Used::say():
+
+  Used::say()
+  class Used
+  my size is: 28 bytes
+  my starting address is 6420820 (0x61F954)
+  my ending address is   6420848 (0x61F970)
+  "This Used string entered as constructor argument" has 50 characters
+
+  creating derived object on heap
+ ---------------------------------
+  Composed(const std::string&) called
+  Base(const std::string&) called
+  Derived(const std::string&) called
+
+  Base::say()
+  class Derived
+  my size is: 32 bytes -- holds string and pointer to vtbl
+  my starting address is 12524472 (0xBF1BB8)
+  my ending address is   12524504 (0xBF1BD8)
+
+  Base invoking my Composed::say():
+
+  Composed::say()
+  class Composed
+  my size is: 28 bytes -- holds string
+  my starting address is 12524476 (0xBF1BBC)
+  my ending address is   12524504 (0xBF1BD8)
+  "This Composed string entered as constructor argument" has 54 characters
+          </defn-code>
+        </defn-block>
+      </div>
+    </details>
+    <spacer-25></spacer-25>
+    Looking at the demonstration output we see instance memory start and end points as shown in Table 1.
+    This data is consistant with the layout properties shown in Fig. 1. This inclusion of bases and members
+    is a fundamental part of the object model for value types.
+    <spacer-10></spacer-10>
+    <h4>Table 1. - Memory Footprints of Class Layout Instances</h4>
+    <table class="indent pad10">
+      <tr>
+        <th class="darkItem">class</th>
+        <th class="darkItem">start</th>
+        <th class="darkItem">end</th>
+        <th class="darkItem">size</th>
+        <th class="darkItem">parts</th>
+      </tr>
+      <tr>
+        <td><c-s>Derived</c-s></td><td>2096532 (0x1FFD94)</td><td>2096564 (0x1FFDB4)</td><td>32 bytes</td>
+        <td><c-s>Base</c-s> (32 bytes - including slot for VFPT pointer)</td>
+      </tr>
+      <tr>
+        <td><c-s>Base</c-s></td><td>2096532 (0x1FFD94)</td><td>2096564 (0x1FFDB4)</td><td>32 bytes</td>
+        <td><c-s>Composed</c-s> (28 bytes) + VFPT pointer</td>
+      </tr>
+      <tr>
+        <td><c-s>Composed</c-s></td><td>2096536 (0x1FFD98)</td><td>2096564 (0x1FFDB4)</td><td>28 bytes</td>
+        <td><c-s>std::string</c-s> (28 bytes)</td>
+      </tr>
+      <tr>
+        <td>Used</td><td>2096612 (0x1FFDE4)</td><td>2096640 (0x1FFE00)</td><td>28 bytes</td>
+        <td><c-s>std::string</c-s> (28 bytes)</td>
+      </tr>
+    </table>
+    <spacer-15></spacer-15>
+    The <c-s>Composed</c-s> class instance holds a <c-s>std::string</c-s> which has a size of 28 bytes.
+    The <c-s>Base</c-s> instance holds a composed instance plus a Virtual Function Pointer Table (VFPT) pointer
+    which is 4 bytes.
+    The <c-s>Derived</c-s> instance holds its inner <c-s>Base</c-s> instance plus its VFPT pointer, placed
+    in the slot its inner <c-s>Base</c-s> provides.
+    <spacer-15></spacer-15>
+    If you look at the code you will see that each including class has constructors with initialization
+    sequences.  Here&apos;s code snippets that show them. When the <c-s>Derived</c-s> class is constructed
+    it calls the <c-s>Base</c-s> constructor for its inner <c-s>Base</c-s> part in its initialization sequence.  
+    When the <c-s>Base</c-s> inner instance is constructed it calls the <c-s>Composed</c-s> constructor on
+    its inner composed part.  Similarly, the <c-s>Composed</c-s> part constructs its inner <c-s>std::string</c-s>.
+    <spacer-15></spacer-15>
+    <defn-block class="indent">
+      <defn-head>
+        <span class="notice">Constructor Initialization Sequences</span>
+      </defn-head>
+      <defn-code style="border-top:2px solid darkred;">
+  Derived(const std::string& msg) : Base(msg)
+  {
+    std::cout << "\n  Derived(const std::string&) called";
+  }
+
+  Base(const std::string& msg) : composed_(msg)
+  {
+    std::cout << "\n  Base(const std::string&) called";
+  }
+
+  Composed(const std::string& msg) : msg_(msg)
+  {
+    std::cout << "\n  Composed(const std::string&) called";
+  }
+      </defn-code>
+    </defn-block>
+    <spacer-25></spacer-25>
+    We didn&apos;t have to implement copy constructors, copy assignment operators, and destructors because
+    the compiler generated value methods are correct.  The <c-s>Composed</c-s> data member of <c-s>Base</c-s>
+    is a <c-s>std::string</c-s> which has the value methods.  And the <c-s>Base</c-s> from which <c-s>Derived</c-s>
+    inherits has correct compiler generated value methods.
+    <spacer-15></spacer-15>
+    We did implement destructors for each class to announce when each instance was destroyed.  Otherwise, we
+    could have allowed the compiler to generate those too.
+
+    <hr class="spread clear" />
+    <num-cont>
+      <num-item1>5.4</num-item1><num-item4>Virtual Dispatching:</num-item4>
+    </num-cont>
+    <photosizer-block src="Pictures/vtbl.jpg" width="500" class="photoSizerBlock right">
+      <span style="font-family:'Comic Sans MS, Tahoma';">
+        Fig 3. Virtual Function Pointer Table
+      </span>
+    </photosizer-block>
+
+
+    <hr class="spread clear" />
+    <num-cont>
+      <num-item1>5.5</num-item1><num-item4>Example - Person Class Hierarchy:</num-item4>
     </num-cont>
     <photosizer-block src="Pictures/PersonClassHierarchy.JPG" width="400" class="photoSizerBlock right">
       <span style="font-family:'Comic Sans MS, Tahoma';">
-        Fig 2. Person Class Hierarchy
+        Fig 4. Person Class Hierarchy
       </span>
     </photosizer-block>
     You may recall, from Chapter1 - Survey, the Person class hierarchy, used for a quick look at class relationships.
-    Figure 2. shows the diagram we used there.
+    Figure 4. shows the diagram we used there.
 
 
-    <h3>Class Relationships:</h3>
-    <h3>Composition</h3>
-    <h3>Aggregation</h3>
-    <h3>Inheritance</h3>
-    <h3>Using</h3>
-    <h3>XmlDocument</h3>
-    <h3>CppParser</h3>
-    <indent-blocks>
-    </indent-blocks>
+    <hr class="spread clear" />
+    <num-cont>
+      <num-item1>5.6</num-item1><num-item4>Example - XmlDocument:</num-item4>
+    </num-cont>
+
+    <hr class="spread clear" />
+    <num-cont>
+      <num-item1>5.6</num-item1><num-item4>Example - CppParser:</num-item4>
+    </num-cont>
+
     <spacer-25></spacer-25>
     <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
-
-    <info-bar></info-bar>
+  </div>
+  <info-bar></info-bar>
 </body>
-</html></html>
+</html>
