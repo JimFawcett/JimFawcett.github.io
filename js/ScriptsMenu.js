@@ -25,7 +25,6 @@ function initializeMenu() {
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
-    <a href='Videos.html' class='menuItem'>Videos</a>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Blogs &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
@@ -59,6 +58,7 @@ function initializeMenu() {
       <button class='dropbutton'>Resources &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
+        <a href='Videos.html' class='menuItem'>Videos</a>\
         <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a>\
         <a href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a>\
         <a href='DesignProcess.html'>Design Process</a>\

@@ -50,7 +50,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Cmpnts &#9662;</button>\
+      <button class='dropbutton'>Cmps &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Components</div>\
         <a href='CppBlockingQueue.html'>CppBlockingQueue</a>\
@@ -90,7 +90,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Demos &#9662;</button>\
+      <button class='dropbutton'>Dems &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Demonstrations</div>\
         <a href='CppBasicDemos.html'>C++&nbsp;Basic&nbsp;Demos</a>\
@@ -109,7 +109,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Build &#9662;</button>\
+      <button class='dropbutton'>Bld &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Builds</div>\
         <a class='disable' href='#'>Build Demo</a>\
