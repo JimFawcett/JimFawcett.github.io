@@ -40,7 +40,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Cmpnts &#9662;</button>\
+      <button class='dropbutton'>Cmps &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Components</div>\
         <a href='WebComponents.html'>WebComponents</a>\
@@ -54,7 +54,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Projs &#9662;</button>\
+      <button class='dropbutton'>Prjs &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Projects</div>\
         <a href='SitePages.html'>SitePages</a>\
@@ -62,7 +62,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Demos &#9662;</button>\
+      <button class='dropbutton'>Dems &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Demonstrations</div>\
         <a href='Tests.html'>Tests</a>\

@@ -79,7 +79,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Projs &#9662;</button>\
+      <button class='dropbutton'>Prjs &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Projects</div>\
         <a href='CppParser.html'>CppParser</a>\
