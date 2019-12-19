@@ -487,7 +487,7 @@
     <t-b class="indents">
     Looking at the demonstration output we see instance memory start and end points as shown in Table&nbsp;1.
     This data is consistant with the layout properties shown in Fig.&nbsp;1. This inclusion of bases and members
-    is a fundamental part of the object model for value types.
+    is a fundamental part of the object model for C++ value types.
     </t-b>
 
     <spacer-10></spacer-10>
@@ -568,22 +568,74 @@
     <num-cont>
       <num-item1>5.4</num-item1><num-item4>Run-Time Polymorphism and Virtual Dispatching:</num-item4>
     </num-cont>
-    The inheritance relationship affords a very powerful sharing and reuse mechanism through substitution.
+    Inheritance relationships afford a very powerful sharing and reuse mechanism through substitution.
     <spacer-15></spacer-15>
-    <div style="display:flex;">
     <defn-block>
       <defn-head>
         <span class="notice">Liskov Substitution</span>
       </defn-head>
       <defn-body>
-        Two decades ago, Barbara Liskov authored a paper &quot;Data Abstraction&quot; in which she provided
+        Barbara Liskov authored a paper &quot;Data Abstraction&quot; in which she provided
         a useful model for polymorphism, which I&apos;ve paraphrased in a way appropriate for C++:
         <indent-block class="pad10">
           Functions that accept pointers or C++ references statically typed to some base class must be able
           to use objects of classes derived from the base through those pointers or references without any
           knowledge specialized to the derived classes.
         </indent-block>
-        That means that we can design a function or method using the base class interface which will, for each derived
+        <t-b>
+          That means that we can design a function or method accepting a base class pointer, then pass to the
+          function a base pointer bound to an instance of any class derived from that base.  When the function
+          invokes any method in the base interface through that pointer, the method is called on the derived
+          object bound to the pointer.
+        </t-b>
+        <t-b>
+          If the invoked method is a virtual function, redefined by the derived class, the redefined method
+          will be called.
+        </t-b>
+      </defn-body>
+    </defn-block>
+    <s-10px></s-10px>
+    <t-b>
+      For any Base-Derived relationship:
+      <i-b class="pad10">
+        <c-s>class Derived : public Base { ... };</c-s>
+      </i-b>
+      The consequences are:
+      <ul class="tight">
+        <li>
+          Any Derived instance can be bound to a Base pointer:
+          <defn-block class="pad10-15 indent">
+            <c-s>
+              Derived d;<br />
+              Base* pBase = &amp;d;
+            </c-s>
+          </defn-block>
+        </li>
+        <li>
+          Any virtual function in the Base class can be redefined in the Derived class:
+          <defn-block class="pad10-15 indent">
+            <c-b>class Base {
+public:
+  virtual void f() { ... };
+  ... 
+};
+
+class Derived : public Base {
+public:
+  void f() override { ... }
+  ...
+};</c-b>
+          </defn-block>
+        </li>
+        <li>
+          When dispatching calls:
+          <defn-body class="pad10-15 indent">
+            If <c-s>pBase</c-s> is bound to a Base instance, <c-s>pBase->f()</c-s> calls <c-s>Base::f()</c-s><br />
+            If <c-s>pBase</c-s> is bound to a Derived instance, <c-s>pBase->f()</c-s> calls <c-s>Derived::f()</c-s>
+          </defn-body>
+        </li>
+      </ul>
+    </t-b>
         class, appropriately invoke methods on the referenced instance for any derived class.
         <spacer-15></spacer-15>
         For the Person class hierarchy shown in Fig.3, if the base Person class provides a virtual method <c-s>void doWork()</c-s>,
