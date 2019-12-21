@@ -567,6 +567,7 @@ public:
         </t-b>
       </defn-body>
     </defn-block>
+    <s-quarterEm></s-quarterEm>
     <num-cont>
       <num-item1>5.41</num-item1><num-item4>Virtual Dispatching via Virtual Function Pointer Table:</num-item4>
     </num-cont>
@@ -762,53 +763,870 @@ public:
       </details>
     </div>
     
-
-
-    <num-cont class="clear">
-      <num-item1>5.5</num-item1><num-item4>Person Hierarhy Example:</num-item4>
-    </num-cont>
-
-        For the Person class hierarchy shown in Fig.3, if the base Person class provides a virtual method <c-s>void doWork()</c-s>,
-        and the derived Dev, QA, TeamLead, and ProjectMgr classes each redefine that in a way appropriate for their job
-        descriptions, Then any code that holds a Person pointer, bound to one of the derived classes, can invoke doWork()
-        resulting in processing appropriate for the specific derived class.
-        <indent-block class="pad10 codeStyle">
-  Dev dev;<br />
-  Person* pPerson = &dev;<br />
-  pPerson->doWork();
-        </indent-block>
-        results in work done as a developer, and:
-        <indent-block class="pad10 codeStyle">
-  ProjectMgr pMgr;<br />
-  pPerson = &pMgr;<br />
-  pPerson->doWork();
-        </indent-block>
-        results in work done as a project manager.
-        <spacer-10></spacer-10>
-      </defn-body>
-    </defn-block>
-    <div style="margin-top:0px; padding-top:0px;">
-      <photosizer-block src="Pictures/PersonInheritance.jpg" width="400" class="photoSizerBlock">
-        <span style="font-family:'Comic Sans MS, Tahoma';">
-          Fig 3. Inheritance Hierarchy
-        </span>
-      </photosizer-block>
-      </div>
-    </div>
-
-
     <hr class="spread clear" />
     <num-cont>
       <num-item1>5.5</num-item1><num-item4>Example - Person Class Hierarchy:</num-item4>
     </num-cont>
+    <t-b>
+      You may recall, from Chapter1 - Survey, the Person class hierarchy, used for a quick look at class relationships.
+      Figure 4. shows the diagram we used there. The example isn&apos;t very useful for professional code, but it makes
+      a nice example of the class relationships. All of them, with the exception of friendship, are used
+      here to build an effective model for a software developement project organization.
+    </t-b>
     <photosizer-block src="Pictures/PersonClassHierarchy.JPG" width="400" class="photoSizerBlock right">
       <span style="font-family:'Comic Sans MS, Tahoma';">
         Fig 4. Person Class Hierarchy
       </span>
     </photosizer-block>
-    You may recall, from Chapter1 - Survey, the Person class hierarchy, used for a quick look at class relationships.
-    Figure 4. shows the diagram we used there.
+    <t-b>
+      The classes are:
+      <ul class="tight">
+        <li>
+          <n-s>IPerson:</n-s>
+          <tt-b>
+            An interface for the Person class.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>Person:</n-s> derives from IPerson
+          <tt-b>
+            Class that provides attributes: name, occupation, and age for all the other 
+            concrete classes.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>ISW_Eng:</n-s>
+          <tt-b>
+            Interface for all people who develop software.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>SW-Eng:</n-s> derives from Person and ISW_Eng
+          <tt-b>
+            Abstract class that shares select code and a Person reference with all software engingeer classes.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>Dev:</n-s> derives from SW_Eng and uses Baseline
+          <tt-b>
+            Class that represents software developers - those who focus on building and verifying software
+            components.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>TestLead:</n-s> derives from Dev and uses Baseline
+          <tt-b>
+            Class for people who lead software development teams and also develop software.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>ProgMgr:</n-s> derives from SW_Eng and aggregates Project
+          <tt-b>
+            Represents people who manage software development product teams. 
+          </tt-b>
+        </li>
+        <li>
+          <n-s>Project:</n-s> composes Budget and aggregates Baseline
+          <tt-b>
+            Collection of Project Manager, TeamLeads, Devs that also includes Budget and Baseline.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>Budget:</n-s>
+          <tt-b>
+            Class holding original budget, current budget, projected empty date.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>BaseLine:</n-s>
+          <tt-b>
+            Class holding collections of code modules and documents.
+          </tt-b>
+        </li>
+      </ul>
+    </t-b>
+    <t-b>
+      Inheritance provides an &quot;is-a&quot; relationship, so <c-s>dev &epsilon; Dev</c-s> and 
+      <c-s>projMgr &epsilon; ProjMgr</c-s>
+      are <c-s>SW_Engs</c-s>, and a <c-s>teamLead &epsilon; TeamLead</c-s> is a <c-s>Dev</c-s>.
+      Aggregation provides a temporary owner relationship, so <c-s>projMgr &epsilon; ProjMgr</c-s> owns, 
+      temporarily the <c-s>project &epsilon; Project</c-s> instance.
+      Some time later that manager will own another <c-s>Project</c-s>. Composition is a permanent owner 
+      relationship. <c-s>Projects</c-s> always have a <c-s>budget &epsilon; Budget</c-s>, but only temporarily 
+      have a <c-s>baseline &epsilon; Baseline</c-s>. When a project starts it has no code and no documents.
+    </t-b>
+    <t-b>
+      <n-s>Notice</n-s> how effectively these four relationships model the workings of a software development
+      organization.
+    </t-b>
+    <t-b>
+      <div class="left" style="padding-right:1em;">
+      <defn-block>
+        <defn-head>
+          Liskov Substitution at work:
+        </defn-head>
+        <defn-code>
+  using ProjectName = std::string;
+  using TeamName = std::string;
+  using Team = std::pair&lt;TeamName, std::vector&lt;SW_Eng*&gt;&gt;
+  using ProjectStaff = std::vector&lt;Team&gt;
+  using Project = std::tuple&lt;ProjectName, ProjMgr, ProjectStaff&gt;
 
+ --------------------------------------------------------------------
+  // defined in SW_Eng
+  // pPer_ is a pointer to the SW_Eng inner Person
+
+  std::string SW_Eng::nameAndTitle() {
+    return pPer_->name() + ", " + pPer_->occupation();
+  }
+ --------------------------------------------------------------------
+
+  void showTeam(Team&amp; team) {
+    std::cout &lt;&lt; "\n  Team " &lt;&lt; team.first;
+    for (auto pSweng : team.second)
+      std::cout &lt;&lt; "\n    " &lt;&lt; pSweng-&gt;nameAndTitle();
+  }
+  void showProject(Project&amp; prj) {
+    auto [prjName, prjMgr, staff] = prj;
+    std::cout &lt;&lt; "\n  " &lt;&lt; prjName;
+    std::cout &lt;&lt; "\n  " &lt;&lt; prjMgr.nameAndTitle();
+    for (auto team : staff) {
+      showTeam(team);
+    }
+  }
+        </defn-code>
+      </defn-block>
+
+      </div>
+      <s-halfEm></s-halfEm>
+      In the block at right we show a code fragment taken from the PeopleHierarchy example, below.
+      There are using declarations for ProjectName, TeamName, Team, ProjectStaff, and Project.
+    </t-b>
+    <t-b>
+      The <s-c>showTeam</s-c> function is passed a std::tuple representing team name and a vector
+      of pointers to the abstract <c-s>SW_Eng</c-s> class. The range-based for is extracting individual pointers
+      to each of the team members, as <c-s>SW_Eng</c-s>s.  The simplicity of this function comes from
+      Liskov Substitution.  <c-s>pSweng->nameAndTitle()</c-s> calls that function as if called by each
+      of the appropriate types, e.g., <c-s>TeamLead</c-s> and <c-s>Dev</c-s>.
+    </t-b>
+    <t-b>
+      Using inheritance with Liskov Substitution is one very useful way of building flexible code.
+      If we chose to add another <c-s>SW_Eng</c-s>, say <c-s>QA</c-s>, nothing would change in any of
+      the other code because it is ignorant of the specialized types we are using, e.g., look at
+      <c-s>showTeam</c-s> and <c-s>showProject</c-s> again.
+    </t-b>
+    <s-halfEm class="clear"></s-halfEm>
+    <t-d>
+      All of the code for this example is contained in the details dropdown, below. The example is
+      worth a significant amount of your time to understand how it does what it does. If you go to
+      the <a href="CppStoryRepo.html">CppStory Repository</a> and download that code, you can look
+      at the example below and simultaneously look at and run the repository code.
+    </t-d>
+    <s-1em></s-1em>
+    <div tabindex="2" class="autoX" style="margin:0px; padding:0px;">
+      <details>
+        <summary class="labelStyle darkItem">People Hierarchy Code Example</summary>
+        <s-1Em></s-1Em>
+        <table class="tdefn">
+          <tr>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-head>
+                  Person Interface and header Code:
+                </tdefn-head>
+                <tdefn-code style="width:100%;">
+/////////////////////////////////////////////////////////////
+// IPerson.h - declares interface for inner person         //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include <string>
+#include <memory>
+
+namespace Chap4 {
+
+  struct IPerson {
+    using Name = std::string;
+    using Occupation = std::string;
+    using Age = int;
+    using Stats = std::tuple<Name, Occupation, Age>;
+
+    virtual ~IPerson() {}
+    virtual Stats stats() const = 0;
+    virtual void stats(const Stats& sts) = 0;
+    virtual Name name() const = 0;
+    virtual Occupation occupation() const = 0;
+    virtual void occupation(const Occupation& occup) = 0;
+    virtual Age age() const = 0;
+    virtual void age(const Age& ag) = 0;
+    virtual bool isValid() const = 0;
+  };
+
+  std::unique_ptr<IPerson> createPerson(const IPerson::Stats& stats);
+}
+
+/////////////////////////////////////////////////////////////
+// Person.h - defines inner person attributes              //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "IPerson.h"
+
+namespace Chap4 {
+
+  class Person : public IPerson {
+  public:
+    virtual ~Person();
+    Person();
+    Person(const Stats& sts);
+    virtual Stats stats() const;
+    virtual void stats(const Stats& sts);
+    virtual Name name() const;
+    virtual Occupation occupation() const;
+    virtual void occupation(const Occupation& occup);
+    virtual Age age() const;
+    virtual void age(const Age& ag);
+    virtual bool isValid() const;
+  private:
+    Stats personStats;
+  };
+}
+
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-head>
+                  Person Implementation Code
+                </tdefn-head>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// Person.cpp - defines inner person attributes            //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "IPerson.h"
+#include <tuple>
+#include <string>
+#include <iostream>
+#include "Person.h"
+
+namespace Chap4 {
+
+  Person::Person() {}
+
+  Person::Person(const Stats& sts) {
+    personStats = sts;
+  }
+
+  Person::~Person() {
+  }
+  Person::Stats Person::stats() const {
+    return personStats;
+  }
+
+  void Person::stats(const Stats& sts) {
+    personStats = sts;
+  }
+
+  Person::Name Person::name() const {
+    return std::get<0>(personStats);
+  }
+
+  Person::Occupation Person::occupation() const {
+    return std::get<1>(personStats);
+  }
+
+  void Person::occupation(const Occupation& occup) {
+    std::get<1>(personStats) = occup;
+  }
+
+  Person::Age Person::age() const {
+    return std::get<2>(personStats);
+  }
+
+  void Person::age(const Age& ag) {
+    std::get<2>(personStats) = ag;
+  }
+
+  bool Person::isValid() const {
+    return name() != "" && age() >= 0;
+  }
+
+  std::unique_ptr<IPerson> createPerson(const IPerson::Stats& stats) {             
+    return std::move(std::make_unique<Person>(*new Person(stats)));
+  }
+
+  template<typename P>
+  void displayPerson(const P& person)
+  {
+    std::cout << "\n  " << person.name() << ", " 
+              << person.age() << ", " << person.occupation();
+  }
+
+  template<typename P>
+  void displayInvalid(const P& person) {
+    std::cout << "\n  " << person.name() << " has invalid data";
+  }
+
+  template<typename P>
+  void checkedDisplay(const P& person) {
+    displayPerson(person);
+    if (!person.isValid())
+      displayInvalid(person);
+  }
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+          </tr>
+          <tr>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-head>
+                  SW_Eng Interface and Header
+                </tdefn-head>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// ISW_Eng.h - defines interface for all SW Eng's          //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "IPerson.h"
+
+namespace Chap4 {
+
+  struct ISW_Eng {
+    virtual ~ISW_Eng() {}
+    virtual void doWork() = 0;
+    virtual void attendMeeting() = 0;
+    virtual IPerson* person() = 0;
+  };
+}
+
+/////////////////////////////////////////////////////////////
+// SW_Eng.h - defines attributes for all SW Eng's          //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "Person.h"
+#include "ISW_Eng.h"
+#include <string>
+#include <memory>
+
+namespace Chap4 {
+
+  class SW_Eng : public ISW_Eng, public Person {
+  public:
+    SW_Eng() {}
+    SW_Eng(IPerson::Stats stats);
+    virtual ~SW_Eng() {}
+    virtual void doWork() = 0;
+    virtual void attendMeeting() = 0;
+    virtual IPerson* person();
+    std::string nameAndTitle();
+  protected:
+    void getCoffee();
+    void checkEmail();
+    void developSoftware();
+    void reviewTeamActivities();
+    void performanceAppraisals();
+    void introductions(const std::string& name);
+    void presentStatus(const std::string& progress);
+    void assignActionItems();
+    IPerson* pPer_ = nullptr;
+  };
+}                </tdefn-code>
+              </tdefn-block>
+            </td>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-head>
+                  SW_Eng implementation
+                </tdefn-head>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// SW_Eng.cpp - defines attributes for all SW Eng's        //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "SW_Eng.h"
+#include "Person.h"
+#include <iostream>
+#include <string>
+
+namespace Chap4 {
+
+  /*--- initialize inner person ---*/
+
+  SW_Eng::SW_Eng(IPerson::Stats stats) {
+    Person::stats(stats);
+    pPer_ = person();
+  }
+
+  /*--- return inner person ---*/
+
+  IPerson* SW_Eng::person() {
+    return dynamic_cast<IPerson*>(this);
+  }
+
+  std::string SW_Eng::nameAndTitle() {
+    return pPer_->name() + ", " + pPer_->occupation();
+  }
+
+  void SW_Eng::getCoffee() {
+    std::cout << "\n    go to cafetria for coffee, chat with friends";
+  }
+
+  void SW_Eng::checkEmail() {
+    std::cout << "\n    open mail server and slog through messages";
+  }
+
+  void SW_Eng::developSoftware() {
+    std::cout << "\n    pull current work from repository";
+    std::cout << "\n    chase bugs";
+    std::cout << "\n    design new module";
+    std::cout << "\n    start module implementation";
+    std::cout << "\n    push current work to repository";
+  }
+
+  void SW_Eng::reviewTeamActivities() {
+    std::cout << "\n    review current work status";
+    std::cout << "\n    review each individual's accomplishments";
+  }
+
+  void SW_Eng::performanceAppraisals() {
+    std::cout << "\n    summarize and record individual accomplishments"; 
+    std::cout << "\n    summarize areas needing improvement";
+    std::cout << "\n    summarize contributions to the team";
+  }
+
+  void SW_Eng::introductions(const std::string& name) {
+    std::cout << "\n    Hi everyone, my name is " << name 
+              << " and I'm pleased to see you all";
+  }
+  void SW_Eng::presentStatus(const std::string& progress) {
+    std::cout << "\n    I'm happy to report that " << progress;
+  }
+  void SW_Eng::assignActionItems() {
+    std::cout << "\n    I will post action items for each of you "
+              << "before the end of the day";
+  }
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+          </tr>
+          <tr>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-head>
+                  Dev Header
+                </tdefn-head>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// Dev.h - defines attributes for developer                //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "SW_Eng.h"
+#include <iostream>
+
+namespace Chap4 {
+
+  class Dev : public SW_Eng {
+  public:
+    Dev(IPerson::Stats stats);
+    virtual void doWork();
+    virtual void attendMeeting();
+  private:
+    //IPerson* pPer_;
+  };
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-head>
+                  Dev Implementation
+                </tdefn-head>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// Dev.cpp - defines attributes for developer              //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "Dev.h"
+
+namespace Chap4 {
+
+  Dev::Dev(IPerson::Stats stats) : SW_Eng(stats) {
+  }
+
+  void Dev::doWork() {
+    std::cout << "\n  " << pPer_->name() << " starting work";
+    getCoffee();
+    checkEmail();
+    developSoftware();
+    std::cout << std::endl;
+  }
+
+  void Dev::attendMeeting() {
+
+    std::cout << "\n  " << pPer_->name() << " attending meeting";         
+    introductions(pPer_->name());
+    presentStatus(
+      "I've completed 90% of my assigned tasks for this sprint"
+    );
+    std::cout << std::endl;
+  }
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+          </tr>
+          <tr>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-head>
+                  TeamLead Header
+                </tdefn-head>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// TeamLead.h - defines attributes for Team Leaders        //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "Dev.h"
+#include <iostream>
+
+namespace Chap4 {
+
+  class TeamLead : public Dev {
+  public:
+    TeamLead(IPerson::Stats stats);
+    virtual void doWork();
+    virtual void attendMeeting();
+  private:
+    //IPerson* pPer_;
+  };
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-head>
+                  TeamLead Implementation
+                </tdefn-head>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// TeamLead.cpp - defines attributes for Team Leaders      //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "TeamLead.h"
+
+namespace Chap4 {
+
+  TeamLead::TeamLead(IPerson::Stats stats) : Dev(stats) {
+  }
+
+  void TeamLead::doWork() {
+    std::cout << "\n  " << nameAndTitle() << ", starting work";
+    getCoffee();
+    checkEmail();
+    reviewTeamActivities();
+    developSoftware();
+    std::cout << std::endl;
+  }
+
+  void TeamLead::attendMeeting() {
+
+    std::cout << "\n  " << nameAndTitle() << ", attending meeting";
+    introductions(pPer_->name());
+    presentStatus(
+      "our team has completed 95% of our assigned stories for this sprint"
+    );
+    std::cout << std::endl;
+  }
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+          </tr>
+          <tr>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-head>
+                  ProjMgr Header
+                </tdefn-head>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// ProjMgr.h - defines attributes for Project Managers     //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "SW_Eng.h"
+#include <iostream>
+
+namespace Chap4 {
+
+  class ProjMgr : public SW_Eng {
+  public:
+    ProjMgr(IPerson::Stats stats);
+    virtual void doWork();
+    virtual void attendMeeting();
+  private:
+    //IPerson* pPer_;
+  };
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-head>
+                  ProjMgr Implementation
+                </tdefn-head>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// ProjMgr.cpp - defines attributes for Project Managers   //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "ProjMgr.h"
+
+namespace Chap4 {
+
+  ProjMgr::ProjMgr(IPerson::Stats stats) : SW_Eng(stats) {
+  }
+
+  void ProjMgr::doWork() {
+    std::cout << "\n  " << nameAndTitle() << ", starting work";
+    getCoffee();
+    checkEmail();
+    reviewTeamActivities();
+    performanceAppraisals();
+    std::cout << std::endl;
+  }
+
+  void ProjMgr::attendMeeting() {
+
+    std::cout << "\n  " << nameAndTitle() << ", attending meeting";
+    introductions(pPer_->name());
+    presentStatus(
+      "My teams have completed 85% of their assigned work for this sprint"
+    );
+    std::cout << "\n  Take customer golfing - make sure he wins";
+    std::cout << std::endl;
+  }
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+          </tr>
+          <tr>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-head>
+                  Using Code
+                </tdefn-head>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// TestPeopleHierarchy.cpp - demonstrates hierarchy        //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#ifdef TEST_HIERARCHY
+
+#include <vector>
+#include "SW_Eng.h"
+#include "Dev.h"
+#include "TeamLead.h"
+#include "ProjMgr.h"
+
+namespace Chap4 {
+
+  using ProjectName = std::string;
+  using TeamName = std::string;
+  using Team = std::pair&lt;TeamName, std::vector&lt;SW_Eng*&gt;&gt;
+  using ProjectStaff = std::vector&lt;Team&gt;
+  using Project = std::tuple&lt;ProjectName, ProjMgr, ProjectStaff&gt;
+
+  void showTeam(Team&amp; team) {
+    std::cout &lt;&lt; "\n  Team " &lt;&lt; team.first;
+    for (auto pSweng : team.second)
+      std::cout &lt;&lt; "\n    " &lt;&lt; pSweng-&gt;nameAndTitle();
+  }
+  void showProject(Project&amp; prj) {
+    auto [prjName, prjMgr, staff] = prj;
+    std::cout &lt;&lt; "\n  " &lt;&lt; prjName;
+    std::cout &lt;&lt; "\n  " &lt;&lt; prjMgr.nameAndTitle();
+    for (auto team : staff) {
+      showTeam(team);
+    }
+  }
+}
+
+int main() {
+  using namespace Chap4;
+
+  ProjMgr Devin({ "Devin", "Project Manager", 45 });
+
+  TeamLead Jill({ "Jill", "Team Lead & Web dev", 32 });
+  Dev Jack({ "Jack", "UI dev", 28 });
+  Dev Zhang({ "Zhang", "System dev", 37 });
+  Dev Charley({ "Charley", "QA dev", 27 });
+  Team FrontEnd{ "FrontEnd", { &Jill, &Jack, &Zhang, &Charley } };
+
+  TeamLead Tom({ "Tom", "Team Lead & Backend Dev", 38 });
+  Dev Ming({ "Ming", "Comm dev", 26 });
+  Dev Sonal({ "Sonal", "Server dev", 27 });
+  Team BackEnd{ "BackEnd", { &Tom, &Ming, &Sonal } };
+
+  Project ProductX{ "ProductX", Devin, { FrontEnd, BackEnd } };
+
+  showProject(ProductX);
+  std::cout &lt;&lt; std::endl;
+
+  std::cout &lt;&lt; "\n  Team " &lt;&lt; FrontEnd.first &lt;&lt; " at work";
+  for (auto pDev : FrontEnd.second) {
+    pDev-&gt;doWork();
+    pDev-&gt;attendMeeting();
+  }
+  std::cout &lt;&lt; std::endl;
+
+  std::cout &lt;&lt; "\n  Project Manager " &lt;&lt; Devin.nameAndTitle() 
+            &lt;&lt; " at work";
+  Devin.doWork();
+  Devin.attendMeeting();
+
+  std::cout &lt;&lt; "\n\n";
+}
+
+#endif
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-head>
+                  Output
+                </tdefn-head>
+                <tdefn-code>
+  ProductX
+  Devin, Project Manager
+  Team FrontEnd
+    Jill, Team Lead & Web dev
+    Jack, UI dev
+    Zhang, System dev
+    Charley, QA dev
+  Team BackEnd
+    Tom, Team Lead & Backend Dev
+    Ming, Comm dev
+    Sonal, Server dev
+
+  Team FrontEnd at work
+  Jill, Team Lead & Web dev, starting work
+    go to cafetria for coffee, chat with friends
+    open mail server and slog through messages
+    review current work status
+    review each individual's accomplishments
+    pull current work from repository
+    chase bugs
+    design new module
+    start module implementation
+    push current work to repository
+
+  Jill, Team Lead & Web dev, attending meeting
+    Hi everyone, my name is Jill and I'm pleased to see you all
+    I'm happy to report that our team has completed 95% of our 
+    assigned stories for this sprint
+
+  Jack starting work
+    go to cafetria for coffee, chat with friends
+    open mail server and slog through messages
+    pull current work from repository
+    chase bugs
+    design new module
+    start module implementation
+    push current work to repository
+
+  Jack attending meeting
+    Hi everyone, my name is Jack and I'm pleased to see you all
+    I'm happy to report that I've completed 90% of my assigned 
+    tasks for this sprint
+
+  Zhang starting work
+    go to cafetria for coffee, chat with friends
+    open mail server and slog through messages
+    pull current work from repository
+    chase bugs
+    design new module
+    start module implementation
+    push current work to repository
+
+  Zhang attending meeting
+    Hi everyone, my name is Zhang and I'm pleased to see you all
+    I'm happy to report that I've completed 90% of my assigned 
+    tasks for this sprint
+
+  Charley starting work
+    go to cafetria for coffee, chat with friends
+    open mail server and slog through messages
+    pull current work from repository
+    chase bugs
+    design new module
+    start module implementation
+    push current work to repository
+
+  Charley attending meeting
+    Hi everyone, my name is Charley and I'm pleased to see you all
+    I'm happy to report that I've completed 90% of my assigned 
+    tasks for this sprint
+
+
+  Project Manager Devin, Project Manager at work
+  Devin, Project Manager, starting work
+    go to cafetria for coffee, chat with friends
+    open mail server and slog through messages
+    review current work status
+    review each individual's accomplishments
+    summarize and record individual accomplishments
+    summarize areas needing improvement
+    summarize contributions to the team
+
+  Devin, Project Manager, attending meeting
+    Hi everyone, my name is Devin and I'm pleased to see you all
+    I'm happy to report that My teams have completed 85% of their 
+    assigned work for this sprint
+  Take customer golfing - make sure he wins
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+          </tr>
+        </table>
+      </details>
+    </div>
+    <t-d>
+      In the next section we will look at code from 
+    </t-d>
     <hr class="spread clear" />
     <num-cont>
       <num-item1>5.6</num-item1><num-item4>Example - CppParser:</num-item4>
