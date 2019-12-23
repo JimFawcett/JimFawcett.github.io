@@ -16,106 +16,12 @@
   <script src="js/ScriptsTemplate.js"></script>
   <script src="js/ScriptsKeyboard.js"></script>
   <script src="js/ScriptsMenu.js"></script>
+  <script src="js/ScriptsWebComponents.js"></script>
+  <link rel="stylesheet" href="css/StylesWebComponents.css" />
   <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesDefault.css" />
   <link rel="stylesheet" href="css/StylesMenu.css" />
   <link rel="stylesheet" href="css/StylesBlueTheme.css" />
-  <style>
-    #github .pad10-15 {
-      padding: 10px 15px;
-    }
-
-    #github .codeStyle {
-      overflow: hidden;
-      font-family: Consolas, monospace;
-      font-weight: bold;
-      font-size: 1.0em;
-    }
-
-    #github .labelStyle {
-      font-family: sans-serif;
-      /*font-weight:bold;*/
-      font-size: 1.0em;
-    }
-
-    #github .normal {
-      font-weight: normal;
-      font-size: 1.0em;
-      font-family: Tahoma;
-    }
-
-    #github summary {
-      padding: 3px 0px 5px 0px;
-      font-weight: bold;
-      width: max-content;
-    }
-
-      #github summary ~ div {
-        width: max-content;
-        max-width: 95%;
-      }
-
-      #github summary ~ indent-block {
-        width: max-content;
-        max-width: 95%;
-        padding-left: 20px;
-        padding-right: 20px;
-        /*background-color: #eee;*/
-      }
-
-    #github photosizer-block {
-      position: relative;
-      z-index: 2;
-      background-color: white;
-    }
-
-    #github comment-block {
-      width: max-content;
-      max-width: 95%;
-      padding: 10px 15px;
-      background-color: #eee;
-      font-weight: normal;
-      font-size: 1.0em;
-      font-family: Tahoma;
-    }
-
-    #github c-s {
-      overflow: hidden;
-      font-family: Consolas, monospace;
-      font-weight: bold;
-      font-size: 1.0em;
-    }
-
-    #github t-s {
-      font-weight: normal;
-      font-size: 1.0em;
-      font-family: Tahoma;
-    }
-
-    #github .notice {
-      font-size: 1.1em;
-      font-weight: bolder;
-      font-style: italic;
-      font-family: Consolas, sans-serif;
-      border: none;
-      color: darkred;
-    }
-
-    #github background-block {
-      display: block;
-      background-color: #ddd;
-      max-width: 90%;
-      width: max-content;
-      padding: 10px 15px;
-    }
-
-    #github .footnote {
-      font-size: 0.85em;
-    }
-
-    #github ol.footnote li {
-      padding-bottom: 0px;
-    }
-  </style>
 </head>
 <body id="github" onload="initializeMenu()">
 
@@ -144,6 +50,237 @@
   </header>
 
   <hr class="spread" />
+  <num-cont>
+    <num-item1>6.0</num-item1><num-item4>Templates</num-item4>
+  </num-cont>
+  <t-b>
+    Templates support building parameterized types and functions that accept an unspecified type which gets 
+    resolved only when an application instantiates the code with a concrete type. Parameterized code will 
+    accept, without compilation error, arbitrary calls on instances of the template type. When an application 
+    instantiates the parameterized code with a concrete type, compilation of the instantiated code succeeds 
+    if the type supports specified operations, else it fails.
+  </t-b>
+  <t-b>
+    So there are two C++ template compilation phases:
+    <ol class="tight">
+      <li>
+        Compilation of the template library code does a syntax check to identify known errors. No object code 
+        is generated since the type of the template parameter is not specified.
+      </li>
+      <li>
+        Compilation of instantiated application code generates an object file if instantiated syntax is correct, 
+        otherwise it fails.
+      </li>
+    </ol>
+    This lazy syntax checking is very useful. C# and Java generics do eagar type checking so many operations 
+    that would succeed for useful types are not allowed because the compiler can't ensure that they will 
+    succeed.
+  </t-b>
+  <t-b>
+    An implication of lazy compilation is that all of the template definition code must go in a 
+    header file, because the application that uses the template definition has to see all of it's code 
+    to compile successfully, and it gets that only by including a header file.
+  </t-b>
+  <hr class="spread" />
+  <num-cont>
+    <num-item1>6.1</num-item1><num-item4>Template Functions</num-item4>
+  </num-cont>
+  <t-b>
+    Template functions may take one of several forms:
+    <defn-block style="flex-direction:row; flex-wrap:wrap;">
+    <defn-code>
+template&lt;typename T&gt;
+void f(T t) { ... }
+      </defn-code>
+      <defn-code>
+template&lt;R, A1, A2&gt;
+R g(A1 a1, A2 a2) { ... }
+      </defn-code>
+      <defn-code>
+template&lt;T&gt;
+void h() {
+  // t &epsilon; T used in function scope 
+}
+      </defn-code>
+    </defn-block>
+    For the first two forms using code provides arguments and the compiler will infer the types and compile
+    a function using those types. For the
+    third case, type inference is not possible from the arguments and the compiler does not attempt to
+    analyze the body code to figure that out, so we have to help by providing the type we want, as shown, below.
+    <defn-block style="flex-direction:row; flex-wrap:wrap;">
+    <defn-code>
+int i{ 3 };
+f(i);
+      </defn-code>
+      <defn-code>
+double d{ 3.1415927 };
+int j = g(d, 'z');
+      </defn-code>
+      <defn-code>
+h&lt;std::string&gt;();
+      </defn-code>
+    </defn-block>
+    For the first case the compiler knows the type of <c-s>i</c-s> 
+    and will compile <c-s>f</c-s> as if the
+    function was defined as:
+    <c-b>
+  void f(int i) { ... }
+    </c-b>
+    and does the same thing with the remaining two cases.
+  </t-b>
+  <hr class="spread" />
+  <num-cont>
+    <num-item1>6.2</num-item1><num-item4>Overloading Template Functions</num-item4>
+  </num-cont>
+  <t-b>
+    Template functions provide generic recipes for their operation.  That is often all we need
+    for a program we are implementing.  However, frequently we need to handle a range of types,
+    some of which may not compile or operate correctly with the generic pattern.  In those cases we
+    look for a function overload that will work correctly.
+  </t-b>
+  <t-b>
+    In the code below, we&apos;ve expanded the <c-s>T max(T t1,T t2)</c-s> example from Chapter #1
+    by allowing the two arguments to have different types. That results in some interesting
+    processing activities.
+  </t-b>
+  <t-b>
+    Looking at the output of the using code, we see that:
+    <ol class="tight">
+      <li>
+        In the first use case, the arguments are 4 and 2, each inferred to be int and the generic
+        version is compiled for that case.
+      </li>
+      <li>
+        In the second case, the arguments are 3.5, a double, and 2L, a long int. The C++ language 
+        supports comparing a value of double with an integral value, so the generic template is compiled.
+      </li>
+      <li>
+        For the third case the arguments are 3.5 and 4L. When compared, the 4L is promoted to a double
+        with value 4 and that is returned.  Note that the return type is double, not long int.  Since
+        there is only one type for the return value, that is inferred to be the more inclusive type.
+      </li>
+      <li>
+        The fourth case matches the overload, and the C++ language guarantees that if an overload
+        matches it will be the form compiled.
+      </li>
+      <li>
+        The fifth and last case has arguments of std::string and const char*.  That cannot match the
+        overload, but the generic version works correctly.  The string is compared to the const char*
+        value by promoting the const char* to a std::string using a string constructor, and the two
+        strings are compared.
+        The larger value, passed as the const char*, is returned as a std::string. 
+      </li>
+    </ol>
+  </t-b>
+  <t-b>
+    Using two unique parameter types allows <c-s>max</c-s> to compile successfully in cases that would
+    fail if we required both arguments to be the same type.  Returning the result as an auto gets around
+    the problem of how to state the return type if more than one type could be returned, e.g., 
+    <c-s>T1</c-s> or <c-s>T2</c-s>.
+  </t-b>
+  <s-halfEm></s-halfEm>
+  <table class="tdefn">
+    <tr>
+      <th class="tdefn" style="border-right:2px solid darkred;">Template Code</th>
+      <th class="tdefn">Output</th>
+    </tr>
+    <tr>
+      <td class="tdefn" style="border-bottom:2px solid darkred; border-right:2px solid darkred;">
+        <tdefn-block>
+          <tdefn-code>
+template&lt;typename T1, typename T2&gt;
+auto max(T1 t1, T2 t2) {
+  displayDemo("--- using generic template ---");
+  return t1 &gt; t2 ? t1 : t2;
+}
+
+using pChar = const char*;
+auto max(pChar s1, pChar s2) {
+  displayDemo("--- using overload for const char* ---");
+  return ((strcmp(s1, s2) &gt; 0) ? s1 : s2);
+}
+          </tdefn-code>
+        </tdefn-block>
+      </td>
+      <td class="tdefn" style="border-bottom:2px solid darkred;">
+        <tdefn-block>
+          <tdefn-code>
+Demonstrate Template Functions
+================================
+--- using generic template ---
+max(4,2) returns 4
+the return type of the last statement is: int
+--- using generic template ---
+max(3.5, 2L) returns 3.5
+the return type of the last statement is: double
+--- using generic template ---
+max(3.5, 4L) returns 4
+the return type of the last statement is: double
+--- using overload for const char* ---
+max("aardvark", "zebra") returns zebra
+the return type of the last statement is: char const *
+--- using generic template ---
+max(std::string("a string"), "b string") returns "b string"
+the return type of the last statement is:
+class std::basic_string&lt;
+  char,struct std::char_traits&lt;char&gt;,
+  class std::allocator&lt;char&gt; 
+&gt;
+
+          </tdefn-code>
+        </tdefn-block>
+      </td>
+    </tr>
+    <tr>
+      <th class="tdefn" colspan="2">Using Code</th>
+    </tr>
+    <tr>
+      <td class="tdefn" colspan="2">
+        <tdefn-block>
+          <tdefn-code>
+auto test1 = max(4, 2);
+std::cout &lt;&lt; "\n  max(4,2) returns " &lt;&lt; test1;
+
+auto test2 = max(3.5, 2L);
+std::cout &lt;&lt; "\n  max(3.5, 2L) returns " &lt;&lt; test2;
+std::cout &lt;&lt; "\n  the return type of the last statement is: ";
+std::cout &lt;&lt; typeid(test2).name();
+  
+auto test3 = max(3.5, 4L);
+std::cout &lt;&lt; "\n  max(3.5, 4L) returns " &lt;&lt; test3;
+std::cout &lt;&lt; "\n  the return type of the last statement is: ";
+std::cout &lt;&lt; typeid(test3).name();
+
+auto test4 = max("aardvark", "zebra");
+std::cout &lt;&lt; "\n  max(\"aardvark\", \"zebra\") returns " &lt;&lt; test4;
+std::cout &lt;&lt; "\n  the return type of the last statement is: ";
+std::cout &lt;&lt; typeid(test4).name();
+
+auto test5 = max(std::string("a string"), "b string");
+std::cout &lt;&lt; "\n  max(std::string(\"a string\"), \"b string\") returns " 
+          &lt;&lt; "\"" &lt;&lt; test5 &lt;&lt; "\"";
+decltype(test5) what;
+std::cout &lt;&lt; "\n  the return type of the last statement is:";
+std::cout &lt;&lt; "\n  " &lt;&lt; typeid(what).name();
+          </tdefn-code>
+        </tdefn-block>
+      </td>
+    </tr>
+  </table>
+  <t-b>
+    We will look at template functions again, in Chapter #7 - Template Metaprogramming, where we explore
+    some of the functions used to provide displays for code demonstrations throughout this story.
+  </t-b>
+  <hr class="spread" />
+  <num-cont>
+    <num-item1>6.3</num-item1><num-item4>Template Classes</num-item4>
+  </num-cont>
+  <hr class="spread" />
+  <num-cont>
+    <num-item1>6.3</num-item1><num-item4>Template Class Specialization</num-item4>
+  </num-cont>
+
+  <spacer-25></spacer-25>
   <indent-blocks>
     <h3>Templates:</h3>
     <h3>Template Functions:</h3>
