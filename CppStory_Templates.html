@@ -93,8 +93,8 @@ template&lt;typename T&gt;
 void f(T t) { ... }
       </defn-code>
       <defn-code>
-template&lt;class R, class A1, class A2&gt;
-R g(A1 a1, A2 a2) { ... }
+template&lt;class R, class A1, class A2, class A3&gt;
+R g(A1 a1, A2& a2, A3&& a3) { ... }
       </defn-code>
       <defn-code>
 template&lt;typename T&gt;
@@ -105,11 +105,20 @@ T h() {
       </defn-code>
     </defn-block>
     For the first two forms using code provides arguments and the compiler will infer the types and compile
-    a function using those types. For the
+    a function using those types. In the second form <c-s>g</c-s> takes arguments: <c-s>a1</c-s> by value, 
+    <c-s>a2</c-s> by lvalue reference, and <c-s>a3</c-s> by rvalue reference.
+    <s-1em></s-1em>
+    Passing by value makes a copy of the argument in the function&apos;s stackframe.  Passing with an lvalue
+    reference creates a reference in the function&apos;s stackframe, bound to the argument in the caller&apos;s
+    scope.  lvalue references will not bind to non-const temporaries. rvalue references behave like lvalue
+    references except that they can bind to a temporary, e.g., an rvalue.
+    <s-1em></s-1em>
+    For the
     third case, type inference is not possible from the arguments and the compiler does not attempt to
     analyze the body code to figure that out, so we have to help by providing the type we want, as shown, below.
     In the second form we&apos;ve used &quot;<c-s>class</c-s>&quot; instead of &quot;<c-s>typename</c-s>&quot;.
     Both forms are supported, but <c-s>typename</c-s> is preferred syntax.
+    <s-halfEm></s-halfEm>
     <defn-block style="flex-direction:row; flex-wrap:wrap;">
     <defn-code>
 int i{ 3 };
@@ -117,7 +126,8 @@ f(i);
       </defn-code>
       <defn-code>
 double d{ 3.1415927 };
-int j = g(d, 'z');
+const std::string s = "a demo string";
+int j = g&lt;int&gt;(d, s, 'z');
       </defn-code>
       <defn-code>
 std::string s = h&lt;std::string&gt;();
