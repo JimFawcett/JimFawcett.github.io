@@ -240,8 +240,7 @@ the return type of the last statement is: char const *
 max(std::string("a string"), "b string") returns "b string"
 the return type of the last statement is:
 class std::basic_string&lt;
-  char,struct std::char_traits&lt;char&gt;,
-  class std::allocator&lt;char&gt; 
+  char,struct std::char_traits&lt;char&gt;, class std::allocator&lt;char&gt; 
 &gt;
 
           </tdefn-code>
@@ -289,10 +288,192 @@ std::cout &lt;&lt; "\n  " &lt;&lt; typeid(what).name();
     </tr>
   </table>
   <t-b>
+    To understand how template functions work, we need to look at type categories and type inference, the process
+    compilation uses to establish the types that arguments take after being passed to template functions.
+  </t-b>
+   <num-cont>
+    <num-item1>6.21</num-item1><num-item4>Type Categories</num-item4>
+  </num-cont>
+  <t-b>
+    Before C++11, there were only two type categories, lvalue and rvalue:
+    <ol class="tight">
+      <li>
+        lvalue refers to any named variable, e.g., anything for which we can evaluate an address.
+        It was called lvalue because it could by used on the left side of an assignment expression:
+        <c-b class="indent pad5">char ch = 'z';</c-b>
+        Here, ch is an lvalue.
+      </li>
+      <li>
+        rvalue refers to any entity for which you cannot evaluate an address, as it has no name
+        and is usually a temporary.  rvalues can only appear on the right side of an assignment
+        expression, e.g., the 'z' of the previous item.
+      </li>
+    </ol>
+  </t-b>
+  <t-b>
+    Things are now, with C++17, somewhat more complicated.  rvalues split into xvalues and prvalues:
+    <ol class="tight">
+      <li>
+        An xvalue is an entity that can be the source of a move operation.  These are almost always
+        values of temporary objects created in the scope of some function, and are syntactically returned
+        by value.  An xvalue is not copied, but instead moved by transferring its resources to the
+        entity that is the target of the return operation.   
+      </li>
+      <li>
+        A prvalue is an expression that defines the initialization of the destination.  Under return
+        value optimization the prvalue initializes the creation of a target instance.  When rvo does
+        not apply, the prvalue initializes an xvalue as part of a move operation, provided the
+        returned object has a move constructor and move assignment operator.
+      </li>
+    </ol>
+  </t-b>
+  <t-b>
+    You don&apos;t need to think about these categories when designing, but knowing about them helps
+    you understand how the process works.
+  </t-b>
+   <num-cont>
+    <num-item1>6.22</num-item1><num-item4>Type Transformations</num-item4>
+  </num-cont>
+  <t-b>
+    When passing arguments to functions, the type of an argument may change as it is placed in the function&apos;s
+    stackframe.  For non-template functions there is only one such transformation that occurs if the argument is
+    an array. When the stackframe is constructed for that case, a pointer is created in stack memory, bound to
+    the first element of the array, instead of copying the array.  
+  </t-b>
+  <t-b>
+    All access to the array, within the function,
+    accesses the caller&apos;s array via that pointer. It is common to refer to this process as type decay.  That is, 
+    the array decays to a pointer in the function&apos;s scope.
+  </t-b>
+  <t-b>
+    In this section we will look at type transformations that occur when passing arguments to functions,
+    especially template functions. Unfortunately you cannot use the C++ typeid operator to explore these
+    effects.  We see below, that passing an argument to a template function by value strips its constant,
+    volatile, and reference (cvr) qualifiers.  But typeid is a template function, so it will strip off 
+    some of the things we are looking for.
+    The Boost libraries have a work-around with their <c-s>boost::typeindex::type_id_with_cvr<T>()</c-s>
+    operator. I&apos;ve used that for all of the type analysis reported below.
+  </t-b>
+  <t-b>
+    We see, from Table 1., that in all non-template cases tested, the only case with type decay is the array argument.
+    This is true in general, e.g., for non-template functions, the only type decay that happens is with array 
+    arguments.
+  </t-b>
+  <h3>Table 1. - Type of arg in bodies of non-template functions</h3>
+  <table class="pad10" style="font-size:1rem;">
+    <tr class="defn">
+      <th class="darkItem">arg definition</th>
+      <th class="darkItem"><c-s>f(int arg)</c-s></th>
+      <th class="darkItem"><c-s>f(const int* arg)</c-s></th>
+      <th class="darkItem"><c-s>f(int arg[3])</c-s></th>
+    </tr>
+    <tr>
+      <td class="defn"><c-s>int i{ 3 };</c-s></td>
+      <td class="defn"><c-s>int</c-s></td>
+      <td class="defn"></td>
+      <td class="defn"></td>
+    </tr>
+    <tr>
+      <td class="defn"><c-s>const int&amp; j = &amp;i;</c-s></td>
+      <td class="defn"><c-s>int</c-s></td>
+      <td class="defn"></td>
+      <td class="defn"></td>
+    </tr>
+    <tr>
+      <td class="defn"><c-s>const int* pI = &amp;i;</c-s></td>
+      <td class="defn"></td>
+      <td class="defn"><c-s>int const *</c-s></td>
+      <td class="defn"></td>
+    </tr>
+    <tr>
+      <td class="defn"><c-s>int iarr[4]</c-s></td>
+      <td class="defn"></td>
+      <td class="defn"></td>
+      <td class="defn"><c-s>int *</c-s></td>
+    </tr>
+  </table>
+  <s-halfEm></s-halfEm>
+  <t-b>
+    Template functions are a different story.  When compiling an instantiated template, the compiler infers
+    argument types from syntax of invocations. That inference has several rules:
+  </t-b>
+  <ol class="tight">
+    <li>
+      Passing an argument by value removes all const, volatile, and reference (cvr) qulifiers.
+      Array arguments decay to pointers.
+    </li>
+    <li>
+      Passing an argument by lvalue reference (&amp;) doesn&apos;t remove qualifiers and arrays do not
+      decay (because they won&apos;t be copied). lvalue reference can only bind to lvalues or const rvalues.
+    </li>
+    <li>
+      Passing argument by pointer doesn&apos;t remove qualifiers, but arrays do decay (because the argument
+      is a pointer).
+    </li>
+    <li>
+      Passing argument by rvalue reference (&amp;&amp;) doesn&apos;t strip qualifiers and arrays do not
+      decay. Rvalue references can bind to both lvalues and rvalues.
+    </li>
+  </ol>
+  <s-halfEm></s-halfEm>
+  <h3>Table 2. - Type Transformations for template functions</h3>
+  <table class="pad10" style="font-size:0.85rem;">
+    <tr class="defn">
+      <th class="darkItem" style="vertical-align:middle;text-align:center;">arg definition</th>
+      <th class="darkItem"><c-s>template&lt;class T&gt;<br />f1(T arg)</c-s></th>
+      <th class="darkItem"><c-s>template&lt;class T&gt;<br />f2(T& arg)</c-s></th>
+      <th class="darkItem"><c-s>template&lt;class T&gt;<br />f2C(const T& arg)</c-s></th>
+      <th class="darkItem"><c-s>template&lt;class T&gt;<br />f3(T* arg)</c-s></th>
+      <th class="darkItem"><c-s>template&lt;class T&gt;<br />f3C(const T* arg)</c-s></th>
+      <th class="darkItem"><c-s>template&lt;class T&gt;<br />f4(T&& arg)</c-s></th>
+    </tr>
+    <tr>
+      <td class="defn"><c-s>int i{ 3 };</c-s></td> 
+      <td class="defn">T = int </td>
+      <td class="defn">T = int </td>
+      <td class="defn">T = int</td>
+      <td class="defn"></td>
+      <td class="defn"></td>
+      <td class="defn">T = int &</td>
+    </tr>
+    <tr>
+      <td class="defn"><c-s>const int&amp; j = &amp;i;</c-s></td>
+      <td class="defn">T = int</td>
+      <td class="defn">T = int const</td>
+      <td class="defn">T = int</td>
+      <td class="defn"></td>
+      <td class="defn"></td>
+      <td class="defn">T = int const &</td>
+    </tr>
+    <tr>
+      <td class="defn"><c-s>const int* pI = &amp;i;</c-s></td>
+      <td class="defn">T = int const *</td>
+      <td class="defn">T = int const *</td>
+      <td class="defn">T = int const *</td>
+      <td class="defn">T = int const</td>
+      <td class="defn">T = int</td>
+      <td class="defn">T = int const * &amp;</td>
+    </tr>
+    <tr>
+      <td class="defn"><c-s>iarr[4]</c-s></td>
+      <td class="defn">T = int *</td>
+      <td class="defn">T = int [4]</td>
+      <td class="defn">T = int [4]</td>
+      <td class="defn">T = int</td>
+      <td class="defn">T = int</td>
+      <td class="defn">T = int (&)[4]</td>
+    </tr>
+  </table>
+  <t-b>
+    Usually you don&apos;t have to think about the rules.  Interence just works as you would expect.
+    On rare occasions you may need to thing about the rules to understand compilation or run-time
+    behavior of template code when it doesn&apos;t behave as you expect.
+  </t-b>
+  <t-b>
     We will look at template functions again, in Chapter #7 - Template Metaprogramming, where we explore
     some of the functions used to provide displays for code demonstrations throughout this story.
   </t-b>
-  <hr class="spread" />
+ <hr class="spread" />
   <num-cont>
     <num-item1>6.3</num-item1><num-item4>Template Classes</num-item4>
   </num-cont>
