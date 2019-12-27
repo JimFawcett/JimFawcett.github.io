@@ -88,7 +88,7 @@
   <t-b>
     Template function syntax may take one of several forms:
     <defn-block style="flex-direction:row; flex-wrap:wrap; border:none;">
-    <defn-code style="margin:3px;">
+      <defn-code style="margin:3px;">
 template&lt;typename T&gt;
 void f(T t) { ... }
       </defn-code>
@@ -336,15 +336,17 @@ std::cout &lt;&lt; "\n  " &lt;&lt; typeid(what).name();
     <num-item1>6.22</num-item1><num-item4>Type Transformations</num-item4>
   </num-cont>
   <t-b>
-    When passing arguments to functions, the type of an argument may change as it is placed in the function&apos;s
-    stackframe.  For non-template functions there is only one such transformation that occurs if the argument is
-    an array. When the stackframe is constructed for that case, a pointer is created in stack memory, bound to
+    When passing arguments to functions, the result of template type deduction is not necessarily the same as
+    the time of the argument in the caller&apos;s scope.  This is not an inference error, but it an intentional
+    transformation made for reasons of performance or usability.
+    For non-template functions there is only one such transformation. That occurs for array arguments.
+    When the function&apos;s stackframe is constructed, a pointer is created in stack memory, bound to
     the first element of the array, instead of copying the array.  
   </t-b>
   <t-b>
     All access to the array, within the function,
     accesses the caller&apos;s array via that pointer. It is common to refer to this process as type decay.  That is, 
-    the array decays to a pointer in the function&apos;s scope.
+    the array type decays to a pointer type in the function&apos;s scope.
   </t-b>
   <t-b>
     In this section we will look at type transformations that occur when passing arguments to functions,
@@ -353,7 +355,7 @@ std::cout &lt;&lt; "\n  " &lt;&lt; typeid(what).name();
     volatile, and reference (cvr) qualifiers.  But typeid is a template function, so it will strip off 
     some of the things we are looking for.
     The Boost libraries have a work-around with their <c-s>boost::typeindex::type_id_with_cvr<T>()</c-s>
-    operator. I&apos;ve used that for all of the type analysis reported below.
+    operator<sup>1</sup>. I&apos;ve used that for all of the type analysis reported below.
   </t-b>
   <t-b>
     We see, from Table 1., that in all non-template cases tested, the only case with type decay is the array argument.
@@ -419,15 +421,16 @@ std::cout &lt;&lt; "\n  " &lt;&lt; typeid(what).name();
   </ol>
   <s-halfEm></s-halfEm>
   <h3>Table 2. - Type Transformations for template functions</h3>
-  <table class="pad10" style="font-size:0.85rem;">
+  <div class="autoX">
+  <table class="pad10" style="table-layout:fixed; width:78em; font-size:0.85rem;">
     <tr class="defn">
-      <th class="darkItem" style="vertical-align:middle;text-align:center;">arg definition</th>
-      <th class="darkItem"><c-s>template&lt;class T&gt;<br />f1(T arg)</c-s></th>
-      <th class="darkItem"><c-s>template&lt;class T&gt;<br />f2(T& arg)</c-s></th>
-      <th class="darkItem"><c-s>template&lt;class T&gt;<br />f2C(const T& arg)</c-s></th>
-      <th class="darkItem"><c-s>template&lt;class T&gt;<br />f3(T* arg)</c-s></th>
-      <th class="darkItem"><c-s>template&lt;class T&gt;<br />f3C(const T* arg)</c-s></th>
-      <th class="darkItem"><c-s>template&lt;class T&gt;<br />f4(T&& arg)</c-s></th>
+      <th class="darkItem" style="width:12em; vertical-align:middle;text-align:center;">arg definition</th>
+      <th class="darkItem" style="width:11em;"><c-s>template&lt;class T&gt;<br />f1(T arg)</c-s></th>
+      <th class="darkItem" style="width:11em;"><c-s>template&lt;class T&gt;<br />f2(T& arg)</c-s></th>
+      <th class="darkItem" style="width:11em;"><c-s>template&lt;class T&gt;<br />f2C(const T& arg)</c-s></th>
+      <th class="darkItem" style="width:11em;"><c-s>template&lt;class T&gt;<br />f3(T* arg)</c-s></th>
+      <th class="darkItem" style="width:11em;"><c-s>template&lt;class T&gt;<br />f3C(const T* arg)</c-s></th>
+      <th class="darkItem" style="width:11em;"><c-s>template&lt;class T&gt;<br />f4(T&& arg)</c-s></th>
     </tr>
     <tr>
       <td class="defn"><c-s>int i{ 3 };</c-s></td> 
@@ -466,32 +469,1657 @@ std::cout &lt;&lt; "\n  " &lt;&lt; typeid(what).name();
       <td class="defn">T = int (&)[4]</td>
     </tr>
   </table>
+  </div>
   <t-b>
     Usually you don&apos;t have to think about the rules.  Inference just works as you would expect.
     On rare occasions you may need to thing about the rules to understand compilation or run-time
     behavior of template code when it doesn&apos;t behave as you expect.
   </t-b>
+  <hr class="spreadup" />
+  <ol class="footnote">
+    <li>
+      Boost libraries are available from their site, <a href="https://boost.org">boost.org</a>. The use
+      of <c-s>boost::typeindex::type_id_with_cvr<T>()</c-s> for this purpose was cited in 
+      <a href="https://www.amazon.com/Effective-Modern-Specific-Ways-Improve/dp/1491903996/ref=sr_1_1?crid=28XKCOZTMHOY7&keywords=effective+modern+c%2B%2B+by+scott+meyers&qid=1577367547&s=books&sprefix=effective+modern+c%2B%2B%2Cstripbooks%2C158&sr=1-1">Effective Modern C++</a>
+      by Scott Meyers.
+    </li>
+  </ol>
+  <hr class="spread" />
+  <num-cont>
+    <num-item1>6.3</num-item1><num-item4>Template Function Examples</num-item4>
+  </num-cont>
+  <t-b>
+    Both examples, below, are from the <a href="CppUtilities.html">CppUtilities Repository</a>. 
+    <c-s>Converter&lt;T&gt;::toString(t)</c-s>, in the CodeUtilities folder, converts the value of <c-s>t &epsilon; T</c-s>
+    to its string representation.
+    And, given the conversion string, ConvStr, <c-s>Converter&lt;T&gt;::toValue(ConvStr)</c-s>
+    converts back to a new instance with the original value.
+
+  </t-b>
+  <details>
+    <summary class="labelStyle darkItem">Converter Example</summary>
+    <s-halfEm></s-halfEm>
+  <defn-block>
+    <defn-head>Converter function</defn-head>
+    <defn-code>
+  /////////////////////////////////////////////////////////////////////
+  // Converter class
+  // - supports converting unspecified types to and from strings
+  // - a type is convertible if it provides insertion and extraction
+  //   operators
+
+  template &lt;typename T&gt;
+  class Converter
+  {
+  public:
+    static std::string toString(const T&amp; t);
+    static T toValue(const std::string&amp; src);
+  };
+  //----&lt; convert t to a string &gt;--------------------------------------
+
+  template &lt;typename T&gt;
+  std::string Converter&lt;T&gt;::toString(const T&amp; t)
+  {
+    std::ostringstream out;
+    out &lt;&lt; t;
+    return out.str();
+  }
+  //----&lt; convert a string to an instance of T &gt;-----------------------
+  /*
+  *  - the string must have been generated by Converter&lt;T&gt;::toString(const T&amp; t)
+  *  - T::operator>> must be the inverse of T::operator&lt;&lt; 
+  */
+  template&lt;typename T&gt;
+  T Converter&lt;T&gt;::toValue(const std::string&amp; src)
+  {
+    std::istringstream in(src);
+    T t;
+    in &gt;&gt; t;
+    return t;
+  }
+    </defn-code>
+  </defn-block>
+  <defn-block>
+    <defn-head>Using Code</defn-head>
+    <defn-code>
+  title("test std::string Converter&lt;T&gt;::toString(T)");
+
+  std::string conv1 = Converter&lt;double&gt;::toString(3.1415927);
+  std::string conv2 = Converter&lt;int&gt;::toString(73);
+  std::string conv3 = Converter&lt;std::string&gt;::toString("a_test_string plus more");
+
+  std::cout &lt;&lt; "\n  Converting from values to strings: ";
+  std::cout &lt;&lt; conv1 &lt;&lt; ", " &lt;&lt; conv2 &lt;&lt; ", " &lt;&lt; conv3;
+  putline();
+
+  title("test T Converter&lt;T&gt;::toValue(std::string)");
+
+  std::cout &lt;&lt; "\n  Converting from strings to values: ";
+  std::cout &lt;&lt; Converter&lt;double>::toValue(conv1) &lt;&lt; ", ";
+  std::cout &lt;&lt; Converter&lt;int>::toValue(conv2) &lt;&lt; ", ";
+  std::cout &lt;&lt; Converter&lt;std::string>::toValue(conv3);
+    </defn-code>
+  </defn-block>
+  <defn-block>
+    <defn-head>Output</defn-head>
+    <defn-code>
+  test std::string Converter<T>::toString(T)
+ --------------------------------------------
+  Converting from values to strings: 3.14159, 73, a_test_string plus more
+
+  test T Converter<T>::toValue(std::string)
+ -------------------------------------------
+  Converting from strings to values: 3.14159, 73, a_test_string
+    </defn-code>
+  </defn-block>
+  </details>
+  <t-b>
+    <c-s>Converter</c-s> is simple because it uses <c-s>std::ostringstream</c-s> to convert from
+    values to their string representation, and it uses <c-s>std::istringstream</c-s> to convert back.
+    Thus, the std::stringstream library classes do all the heavy lifting.
+  </t-b>
+  <t-b>
+    The second example, found in the StringUtilities folder, presents string utility functions 
+    <c-s>trim</c-s> and <c-s>split</c-s> with capabilities similar those in the C# string class.
+  </t-b>
+  <details>
+    <summary class="labelStyle darkItem">String Utilities</summary>
+    <s-halfEm></s-halfEm>
+    <defn-block>
+      <defn-head>String Utilities Code</defn-head>
+      <defn-code>
+  /*--- remove whitespace from front and back of string argument ---*/
+  /*
+  *  - does not remove newlines
+  */
+  template &lt;typename T&gt;
+  inline std::basic_string&lt;T&gt; trim(const std::basic_string&lt;T&gt;& toTrim)
+  {
+    if (toTrim.size() == 0)
+      return toTrim;
+    std::basic_string&lt;T&gt; temp;
+    std::locale loc;
+    typename std::basic_string&lt;T&gt;::const_iterator iter = toTrim.begin();
+    while (isspace(*iter, loc) && *iter != '\n')
+    {
+      if (++iter == toTrim.end())
+      {
+        break;
+      }
+    }
+    for (; iter != toTrim.end(); ++iter)
+    {
+      temp += *iter;
+    }
+    typename std::basic_string&lt;T&gt;::reverse_iterator riter;
+    size_t pos = temp.size();
+    for (riter = temp.rbegin(); riter != temp.rend(); ++riter)
+    {
+      --pos;
+      if (!isspace(*riter, loc) || *riter == '\n')
+      {
+        break;
+      }
+    }
+    if (0 &lt;= pos && pos &lt; temp.size())
+      temp.erase(++pos);
+    return temp;
+  }
+
+  /*--- split sentinel separated strings into a vector of trimmed strings ---*/
+
+  template &lt;typename T&gt;
+  inline std::vector&lt;std::basic_string&lt;T&gt;&gt; split(const std::basic_string&lt;T&gt;& toSplit, T splitOn = ',')
+  {
+    std::vector&lt;std::basic_string&lt;T&gt;&gt; splits;
+    std::basic_string&lt;T&gt; temp;
+    typename std::basic_string&lt;T&gt;::const_iterator iter;
+    for (iter = toSplit.begin(); iter != toSplit.end(); ++iter)
+    {
+      if (*iter != splitOn)
+      {
+        temp += *iter;
+      }
+      else
+      {
+        splits.push_back(trim(temp));
+        temp.clear();
+      }
+    }
+    if (temp.length() &gt; 0)
+      splits.push_back(trim(temp));
+    return splits;
+  }
+  /*--- show collection of string splits ------------------------------------*/
+
+  template &lt;typename T&gt;
+  inline void showSplits(const std::vector&lt;std::basic_string&lt;T&gt;&gt;& splits, std::ostream& out = std::cout)
+  {
+    out &lt;&lt; "\n";
+    for (auto item : splits)
+    {
+      if (item == "\n")
+        out &lt;&lt; "\n--" &lt;&lt; "newline";
+      else
+        out &lt;&lt; "\n--" &lt;&lt; item;
+    }
+    out &lt;&lt; "\n";
+  }
+}
+      </defn-code>
+    </defn-block>
+    <defn-block>
+      <defn-head>Using Code</defn-head>
+      <defn-code>
+#include &lt;cctype&gt;
+#include &lt;iostream&gt;
+#include "StringUtilities.h"
+#include "../CodeUtilities/CodeUtilities.h"
+
+#ifdef TEST_STRINGUTILITIES
+
+using namespace Utilities;
+
+int main()
+{
+  Title("Testing Utilities Package");
+  putline();
+
+  title("test split(std::string, ',')");
+
+  std::string test = "a, \n, bc, de, efg, i, j k lm nopq rst";
+  std::cout &lt;&lt; "\n  test string = " &lt;&lt; test;
+
+  std::vector&lt;std::string&gt; result = split(test);
+  showSplits(result);
+
+  title("test split(std::string, ' ')");
+
+  std::cout &lt;&lt; "\n  test string = " &lt;&lt; test;
+
+  result = split(test, ' ');
+  showSplits(result);
+
+  putline(2);
+  return 0;
+}
+#endif
+      </defn-code>
+    </defn-block>
+    <defn-block>
+      <defn-head>Output</defn-head>
+      <defn-code>
+  Testing Utilities Package
+ ===========================
+
+  test split(std::string, ',')
+ ------------------------------
+  test string = a,
+, bc, de, efg, i, j k lm nopq rst
+
+--a
+--newline
+--bc
+--de
+--efg
+--i
+--j k lm nopq rst
+
+  test split(std::string, ' ')
+ ------------------------------
+  test string = a,
+, bc, de, efg, i, j k lm nopq rst
+
+--a,
+--
+,
+--bc,
+--de,
+--efg,
+--i,
+--j
+--k
+--lm
+--nopq
+--rst
+      </defn-code>
+    </defn-block>
+  </details>
   <t-b>
     We will look at template functions again, in Chapter #7 - Template Metaprogramming, where we explore
     some of the functions used to provide displays for code demonstrations throughout this story.
   </t-b>
- <hr class="spread" />
-  <num-cont>
-    <num-item1>6.3</num-item1><num-item4>Template Classes</num-item4>
-  </num-cont>
+  <s-halfEm></s-halfEm>
+
   <hr class="spread" />
   <num-cont>
-    <num-item1>6.3</num-item1><num-item4>Template Class Specialization</num-item4>
+    <num-item1>6.4</num-item1><num-item4>Template Classes</num-item4>
+  </num-cont>
+  <t-b>
+    Template classes use syntax as shown in the blocks below.  Everywhere that the class name <c-s>SynDemo</c-s> is used
+    as a type it needs the template parameter, e.g., <c-s>SynDemo&lt;T&gt;</c-s>.
+  </t-b>
+  <t-b>
+    Remember that both template declarations <span class="notice">and</span>
+    definitions must appear in the class&apos;s header file, as shown below.
+    <s-halfEm></s-halfEm>
+    <defn-block style="flex-direction:row; flex-wrap:wrap; padding:0px; border:none;">
+      <defn-block style="margin:3px; border:2px solid darkred;">
+        <defn-head style="border:none; border-bottom:2px solid darkred;">Template Code in SynDemo.h</defn-head>
+        <defn-code style="border:none;">
+namespace Chap6 {
+
+  template&lt;typename T&gt;
+  class SynDemo {
+  public:
+    void value(T t);
+    T value();
+  private:
+    T t_;
+  };
+
+  template&lt;typename T&gt;
+  void SynDemo&lt;T&gt;::value(T t) {
+    t_ = t;
+  }
+
+  template&lt;typename T&gt;
+  T SynDemo&lt;T&gt;::value() {
+    return t_;
+  }
+}
+        </defn-code>
+      </defn-block>
+      <defn-block style="margin:3px; border:2px solid darkred;">
+        <defn-head style="border:none; border-bottom:2px solid darkred;">Using Code in Demo.cpp</defn-head>
+        <defn-code style="border:none;">
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include "../Display/Display.h"
+#include "SynDemo.h"
+
+int main() {
+
+  displayTitle("Demonstrating Template Syntax");
+
+  using namespace Chap6;
+
+  SynDemo&lt;std::string&gt; sd;
+  sd.value("hello world");
+  std::cout &lt;&lt; "\n  " &lt;&lt; sd.value();
+  putline(2);
+}
+        </defn-code>
+        <defn-head style="border-left:none; border-right:none;">Output</defn-head>
+        <defn-code style="border:none; border-top:2px solid darkred;">
+  Demonstrating Template Syntax
+ ===============================
+
+  hello world
+
+        </defn-code>
+      </defn-block>
+    </defn-block>
+  </t-b>
+  <s-halfEm></s-halfEm>
+  <t-b>
+    The <c-s>Stack&lt;T&gt;</c-s> class example, below, illustrates this syntax
+    in a typical production class.  It also illustrates using:
+    <ol class="tight">
+      <li>
+        <strong>Template members:</strong><br />
+        A copy constructor <c-s>template &lt;class U&gt; stack(const stack&lt;U&gt;&);</c-s> and
+        assignment operator 
+        <c-s>template &lt;class U&gt; stack&lt;U&gt;&amp; operator=(const stack&lt;U&gt;&);</c-s>
+        are declared as methods with a potentially different type <c-s>U</c-s>.  That could be
+        the same as <c-s>T</c-s>, providing the usual copy and assignment operations, but could
+        also be different, allowing one, for example, to assign a <c-s>stack&lt;int&gt;</c-s> to a 
+        <c-s>stack&lt;double&gt;</c-s>. The example code illustrates that use. Template type inference
+        is the reason we can design this flexibility.
+      </li>
+      <li>
+        <strong>Inner class</strong><br />
+        Inner classes aren&apos;t often used for C++ programs, but if a parent class needs
+        services of a small and simple class that is specialized for the parent, then using an
+        inner class for the child makes sense.  The <c-s>struct stacknode</c-s> is an example
+        of that use.
+      </li>
+      <li>
+        <strong>Friend relationship</strong><br />
+        We try to avoid using <c-s>friend</c-s> relationships because they expand the encapsulate
+        from the granting class to include the friend as well.  However, when needed it&apos;s
+        easy to use, as shown here.  This <c-s>stack&lt;T&gt;</c-s> class needs to allow the
+        template members, cited in the first item, to access its private data. That&apos;s because
+        <c-s>stack&lt;T&gt;</c-s> is a different class than <c-s>stack&lt;U&lt;</c-s>.
+      </li>
+    </ol>
+  </t-b>
+  <t-b>
+    This example was adapted from one presented in Effective C++, by Scott Meyers.
+  </t-b>
+  <t-b>
+    <details>
+      <summary class="labelStyle darkItem">Stack Class</summary>
+      <s-halfEm></s-halfEm>
+      <defn-block style="flex-direction:row; flex-wrap:wrap; padding:0px; border:none;">
+      <defn-block style="margin:3px; border:2px solid darkred;">
+        <defn-head style="border:none; border-bottom:2px solid darkred;">Stack Code</defn-head>
+        <defn-code style="border:none;">
+template&lt;class T&gt; class stack {
+
+  template &lt;class U&gt; friend class stack;
+
+  private:
+    struct stacknode {
+      T data;
+      stacknode *next;
+      stacknode(const T&amp; newdata, stacknode *nextnode)
+	       : data(newdata), next(nextnode) { }
+    };
+    stacknode *top;
+  public:
+    stack();
+    ~stack();
+    void push(const T&amp; object);
+    T pop(void);
+    void flush();
+    int size() const;
+    
+    // member templates
+
+    template &lt;class U&gt; stack(const stack&lt;U&gt;&amp;);
+    template &lt;class U&gt; stack&lt;T&gt;&amp; operator=(const stack&lt;U&gt;&amp;);
+};
+
+//
+//----&lt; void constructor &gt;---------------------------------------------
+
+template&lt;class T&gt; stack&lt;T&gt;::stack() : top(0) { }
+
+//----&lt; destructor &gt;---------------------------------------------------
+
+template &lt;class T&gt; stack&lt;T&gt;::~stack(void) {
+
+  while (top) {
+    stacknode *next_to_die = top;
+    top = top-&gt;next;
+    delete next_to_die;
+  }
+}
+//----&lt; push data onto stack &gt;-----------------------------------------
+
+template&lt;class T&gt; void stack&lt;T&gt;::push(const T &amp;object) {
+  top = new stacknode(object, top);
+}
+//----&lt; pop data from stack &gt;------------------------------------------
+
+template &lt;class T&gt; T stack&lt;T&gt;::pop(void) {
+
+  if (!top) {
+    throw std::out_of_range("\n  attempt to pop empty stack\n");
+  }
+  stacknode *save = top;
+  top = top-&gt;next;
+  T data = save-&gt;data;
+  delete save;
+  return data;
+}
+//----&lt; empty stack &gt;--------------------------------------------------
+
+template &lt;class T&gt; void stack&lt;T&gt;::flush()
+{
+  stacknode* node = top;
+  while(node)
+  {
+    stacknode *next_to_die = node;
+    node = node-&gt;next;
+    delete next_to_die;
+  }
+}
+//----&lt; return number of elements on stack &gt;---------------------------
+
+template &lt;class T&gt; int stack&lt;T&gt;::size() const
+{
+  stacknode* node = top;
+  int count = 0;
+  while(node)
+  {
+    count++;
+    node = node-&gt;next;
+  }
+  return count;
+}
+//
+//----&lt; copy and promotion constructor, a member template &gt;------------
+
+template &lt;class T&gt; 
+template &lt;class U&gt; stack&lt;T&gt;::stack(const stack&lt;U&gt;&amp; s) : top(0)
+{
+  stack&lt;U&gt;::stacknode* node = const_cast&lt;stack&lt;U&gt;::stacknode*&gt;(s.top);
+  while(node)
+  {
+    this-&gt;push(node-&gt;data);
+    node = node-&gt;next;
+  }
+}
+//----&lt; assignment from stack of possibly a compatible type &gt;----------
+
+template &lt;class T&gt; 
+template &lt;class U&gt; stack&lt;T&gt;&amp; stack&lt;T&gt;::operator=(const stack&lt;U&gt;&amp; s)
+{
+  if((void*)this == (void*)&amp;s)
+    return *this;
+
+  flush();
+  stack&lt;U&gt;::stacknode* node2 = const_cast&lt;stack&lt;U&gt;::stacknode*&gt;(s.top);
+  while(node2)
+  {
+    this-&gt;push(static_cast&lt;T&gt;(node2-&gt;data));
+    node2 = node2-&gt;next;
+  }
+  return *this;
+}
+        </defn-code>
+      </defn-block>
+      <defn-block style="margin:3px; border:2px solid darkred;">
+        <defn-head style="border:none; border-bottom:2px solid darkred;">Using Code</defn-head>
+        <defn-code style="border:none;">
+#include &lt;iostream&gt;
+#include "stack.h"
+using namespace std;
+
+template &lt;class T&gt; void print_field(T t) {  // template function
+
+  cout.width(10);
+  cout &lt;&lt; t;
+}
+//----&lt; test stub &gt;--------------------------------------------------
+void main() {
+
+  cout &lt;&lt; "\nTesting Template Based Stack Class\n";
+
+  try
+  {
+    stack&lt;int&gt;    int_stack;
+    stack&lt;double&gt; double_stack;
+
+    int    x=1,    y=2,   z=3;
+    double u=-1.5, v=0.5, w=2.5;
+
+    cout &lt;&lt; "\n  pushing stack: "; print_field(x); int_stack.push(x);
+    cout &lt;&lt; "\n  pushing stack: "; print_field(y); int_stack.push(y);
+    cout &lt;&lt; "\n  pushing stack: "; print_field(z); int_stack.push(z);
+    cout &lt;&lt; endl;
+    cout &lt;&lt; "\n  stack size = " &lt;&lt; int_stack.size() &lt;&lt; endl;
+
+    stack&lt;double&gt; copyStack = int_stack;  // copy construction
+                                          //   with data conversion
+
+    cout &lt;&lt; "\n  popping stack: "; print_field(int_stack.pop());
+    cout &lt;&lt; "\n  popping stack: "; print_field(int_stack.pop());
+    cout &lt;&lt; "\n  popping stack: "; print_field(int_stack.pop());
+    cout &lt;&lt; "\n";
+
+    cout &lt;&lt; "\n  stack size = " &lt;&lt; int_stack.size() &lt;&lt; endl;
+
+    cout &lt;&lt; "\n  popping double copy of int stack:";
+    cout &lt;&lt; "\n  popping stack: "; print_field(copyStack.pop());
+    cout &lt;&lt; "\n  popping stack: "; print_field(copyStack.pop());
+    cout &lt;&lt; "\n  popping stack: "; print_field(copyStack.pop());
+    cout &lt;&lt; "\n";
+
+    cout &lt;&lt; "\n  pushing stack: "; print_field(u); double_stack.push(u);
+    cout &lt;&lt; "\n  pushing stack: "; print_field(v); double_stack.push(v);
+    cout &lt;&lt; "\n  pushing stack: "; print_field(w); double_stack.push(w);
+    cout &lt;&lt; endl;
+
+//
+    stack&lt;int&gt; int2_stack;
+    int2_stack = double_stack;  // assignment with data conversion
+
+    cout &lt;&lt; "\n  popping stack: "; print_field(double_stack.pop());
+    cout &lt;&lt; "\n  popping stack: "; print_field(double_stack.pop());
+    cout &lt;&lt; "\n  popping stack: "; print_field(double_stack.pop());
+    cout &lt;&lt; "\n";
+
+    cout &lt;&lt; "\n  popping int copy of double stack:";
+    cout &lt;&lt; "\n  popping stack: "; print_field(int2_stack.pop());
+    cout &lt;&lt; "\n  popping stack: "; print_field(int2_stack.pop());
+    cout &lt;&lt; "\n  popping stack: "; print_field(int2_stack.pop());
+    cout &lt;&lt; "\n";
+
+    int2_stack.pop(); // popping empty stack
+
+    cout &lt;&lt; "\n\n";
+  }
+  catch(exception&amp; ex)
+  {
+    cout &lt;&lt; "\n  " &lt;&lt; ex.what() &lt;&lt; endl;
+  }
+  catch(...)
+  {
+    cout &lt;&lt; "\n  stack error\n\n";
+  }
+}
+        </defn-code>
+        <defn-head style="border:none; border-top:2px solid darkred; border-bottom:2px solid darkred;">Output</defn-head>
+        <defn-code style="border:none;">
+Testing Template Based Stack Class
+
+  pushing stack:          1
+  pushing stack:          2
+  pushing stack:          3
+
+  stack size = 3
+
+  popping stack:          3
+  popping stack:          2
+  popping stack:          1
+
+  stack size = 0
+
+  popping double copy of int stack:
+  popping stack:          1
+  popping stack:          2
+  popping stack:          3
+
+  pushing stack:       -1.5
+  pushing stack:        0.5
+  pushing stack:        2.5
+
+  popping stack:        2.5
+  popping stack:        0.5
+  popping stack:       -1.5
+
+  popping int copy of double stack:
+  popping stack:         -1
+  popping stack:          0
+  popping stack:          2
+
+
+  attempt to pop empty stack
+        </defn-code>
+      </defn-block>
+      </defn-block>
+    </details>
+  </t-b>
+  <t-b>
+    You won&apos;t use this class for your own designs.  The Standard Template Library (STL) provides
+    a stack adapter class<sup>1</sup> and C++ developers know how that works, so you should use that.
+    The STL provides a rich set of examples of template classes including one for each of the STL
+    containers.  You will find a demonstration of each of them in 
+    <a href="STL-Containers.html">STL-Containers.html</a> in the Demonstrations part of the
+    <a href="CppRepositories.html">CppRepositories.html</a>.
+  </t-b>
+  <hr class="spreadup" />
+  <ol class="footnote">
+    <li>
+      There are two STL adapters, <c-s>stack&lt;T&gt;</c-s> and <c-s>queue&lt;T&gt;</c-s>. These were
+      built as adapters, wrapping by default the <c-s>deque&lt;T&gt;</c-s>, because they intent to provide
+      access only to the top for the <c-s>stack</c-s> and ends for the <c-s>queue</c-s>. That behavior
+      voilates the model for STL container classes that provide iteration over entire container
+      contents.
+    </li>
+  </ol>
+  <hr class="spread" />
+  <num-cont>
+    <num-item1>6.5</num-item1><num-item4>Template Parameters</num-item4>
+  </num-cont>
+  <t-b>
+    Template parameters may be:
+    <ol class="tight">
+      <li>
+        <strong>Type Parameters:</strong>
+        <i-b>
+          <c-s>typename TypeName [= defaultTypeName]</c-s><br />
+          TypeName is a formal parameter that represents an unspecified struct or class<br />
+          defaultTypeName is the name of a class or struct.<br />
+          Example: <c-s>template&lt;typename X=std::string&gt; class Y { ... };</c-s>
+        </i-b>
+      </li>
+      <li>
+        <strong>Template type parameters:</strong>
+        <i-b>
+          <c-s>typename TypeName, template&lt;class TypeName&gt; class TemplateTypeName</c-s><br />
+          TemplateTypeName is a formal parameter that represents an unspecified template struct or class<br />
+          Example: <c-s>template&lt;typename C, template &lt;class C&gt; class X&gt; class Y { ... };</c-s><br />
+          This specifies that <c-s>X</c-s> is a template class that has the parameter <c-s>C</c-s>,
+          e.g., the second parameter <c-s>X</c-s> is templated on the first parameter <c-s>C</c-s>.
+        </i-b>
+      </li>
+      <li>
+        <strong>Value parameters:</strong>
+        <i-b>
+          <c-s>Type [ = value]</c-s><br />
+          Example: <c-s>size_t N = 10</c-s><br />
+          <c-s>template&lt;size_t N=10> class Array { ... };</c-s><br />
+          This specifies that the templated class uses <c-s>N</c-s> with value <c-s>10</c-s> unless 
+          specified otherwise.
+        </i-b>
+      </li>
+    </ol>
+  </t-b>
+  <t-b>
+    In the Logger class example, below, <c-s>Logger</c-s> takes a template parameter <c-s>T</c-s>, 
+    the type of message being logged, and parameter type <c-s>C</c-s>, representing a logger category. 
+    <c-s>Logger</c-s> uses its <c-s>C</c-s> parameter to define a logging level, e.g., debug or 
+    demonstration or results or some combination of the three. For <c-s>Logger</c-s> the <c-s>C</c-s>
+    represents an initial value for its logging level.  That may be changed at run-time.
+  </t-b>
+  <t-b>
+    <details>
+      <summary class="labelStyle darkItem">Logger Class</summary>
+      <s-halfEm></s-halfEm>
+      <defn-block style="flex-direction:row; flex-wrap:wrap; padding:0px; border:none;">
+      <defn-block style="margin:3px; border:2px solid darkred;">
+        <defn-head style="border:none; border-bottom:2px solid darkred;">Logger Code</defn-head>
+        <defn-code style="border:none;">
+namespace Utilities {
+  
+  enum Level { results = 1, demo = 2, debug = 4, all = 7 };
+
+  template &lt;typename T, size_t C = 0&gt;
+  struct ILogger {
+    virtual ~ILogger() {}
+    virtual ILogger&lt;T, C&gt;&amp; add(std::ostream*) = 0;
+    virtual ILogger&lt;T, C&gt;&amp; write(T t, size_t level = Level::all) = 0;
+    virtual void head(T t = "") = 0;
+    virtual void prefix(T prfix = "\n  ") = 0;
+    virtual void wait() = 0;
+    virtual void waitForWrites() = 0;
+    virtual void level(size_t lv) = 0;
+    virtual void name(const std::string&amp; nm) = 0;
+  };
+
+  template &lt;typename T, size_t C = 0&gt;
+  class Logger : public ILogger&lt;T, C&gt; {
+  public:
+    Logger(const std::string&amp; nm = "");
+    ~Logger();
+    ILogger&lt;T, C&gt;&amp; add(std::ostream* pOstrm);
+    virtual ILogger&lt;T, C&gt;&amp; write(T t, size_t level = 0x7);
+    virtual void head(T t = "");
+    virtual void prefix(T prfix = "\n  ");
+    virtual void level(size_t lv);
+    void name(const std::string&amp; nm);
+    std::string name();
+    void wait();
+    void waitForWrites();
+  protected:
+    std::vector&lt;std::ostream*&gt; dstStrm;
+    BlockingQueue&lt;T&gt; blockingQueue_;
+    void threadProc();
+    std::string name_;
+    std::thread writeThread_;
+    T head_;
+    std::string prefix_ = "\n  ";
+    size_t level_ = 0x7; // Level::debug + Level::demo + Level::results;
+  };
+  /*--- object factory ----------------------------------------------
+   *
+   *  Creates static logger, so everyone calling makeLogger with
+   *  the same value for C will use the same logger.
+   */
+  template&lt;typename T, size_t C&gt;
+  inline ILogger&lt;T, C&gt;&amp; makeLogger() {
+    static Logger&lt;T, C&gt; logger;
+    return logger;
+  }
+  /*--- initialize logger with name -------------------------------*/
+
+  template&lt;typename T, size_t C&gt;
+  Logger&lt;T, C&gt;::Logger(const std::string&amp; nm) : name_(nm) {
+    dstStrm.push_back(&amp;std::cout);
+    std::thread temp(&amp;Logger&lt;T, C&gt;::threadProc, this);
+    writeThread_ = std::move(temp);
+  }
+  /*--- wait for all writes to be sent ----------------------------*/
+
+  template&lt;typename T, size_t C&gt;
+  Logger&lt;T, C&gt;::~Logger() {
+    if (writeThread_.joinable())
+      writeThread_.detach();
+    for (auto ptrStrm : dstStrm) {
+      std::ofstream* ptrOfStrm = dynamic_cast&lt;std::ofstream*&gt;(ptrStrm);
+      if (ptrOfStrm) {
+        ptrOfStrm-&gt;close();
+        delete ptrOfStrm;
+      }
+    }
+  }
+  /*--- reset name ------------------------------------------------*/
+
+  template&lt;typename T, size_t C&gt;
+  void Logger&lt;T, C&gt;::name(const std::string&amp; nm) {
+    name_ = nm;
+  }
+  /*--- retrieve name ---------------------------------------------*/
+
+  template&lt;typename T, size_t C&gt;
+  std::string Logger&lt;T, C&gt;::name() {
+    return name_;
+  }
+  /*--- deQ thread processing -------------------------------------*/
+
+  template&lt;typename T, size_t C&gt;
+  void Logger&lt;T,C&gt;::threadProc() {
+    while (true) {
+      T t = blockingQueue_.deQ();
+      if (t == "quit")
+        break;
+      for (auto item : dstStrm) {
+        (*item) &lt;&lt; t;
+      }
+    }
+  }
+  /*--- enQ stop message and wait for write thread exit -----------*/
+
+  template&lt;typename T, size_t C&gt;
+  void Logger&lt;T, C&gt;::wait() {
+    blockingQueue_.enQ("quit");
+    writeThread_.join();
+  }
+  /*--- wait for Q to empty before writing again ------------------*/
+
+  template&lt;typename T, size_t C&gt;
+  void Logger&lt;T, C&gt;::waitForWrites() {
+    while (blockingQueue_.size() &gt; 0)
+      std::this_thread::sleep_for(std::chrono::milliseconds(20));
+  }
+  /*--- add another stream for concurrent writes ------------------*/
+
+  template&lt;typename T, size_t C&gt;
+  ILogger&lt;T, C&gt;&amp; Logger&lt;T, C&gt;::add(std::ostream* pOstrm) {
+    if(pOstrm != nullptr)
+      dstStrm.push_back(pOstrm);
+    return *this;
+  }
+  /*-----------------------------------------------------------------
+  *  write a log message
+  *  - probably one of many in a log stream
+  */
+
+  template&lt;typename T, size_t C&gt;
+  ILogger&lt;T, C&gt;&amp; Logger&lt;T, C&gt;::write(T t, size_t lv) {
+    if (lv &amp; level_) {
+      blockingQueue_.enQ(prefix_ + t);
+    }
+    return *this;
+  }
+  /*-----------------------------------------------------------------
+   *  write a head message
+   *  - expected to be the first in a log conversation
+   */
+  template&lt;typename T, size_t C&gt;
+  void Logger&lt;T, C&gt;::head(T t) {
+    T temp = (t.size() &gt; 0) ? t : name();
+    T prfix = (prefix_ == "") ? "\n" : prefix_;
+    head_ = temp + prfix + DateTime().now();
+    write(head_);
+  }
+  /*--- set message prefix ----------------------------------------*/
+
+  template&lt;typename T, size_t C&gt;
+  void Logger&lt;T,C&gt;::prefix(T prfix) {
+    prefix_ = prfix;
+  }
+  /*-----------------------------------------------------------------
+   *  set logging level
+   *  - results ==&gt; normal output
+   *  - demo    ==&gt; demonstration output
+   *  - debug   --&gt; show debugging information
+   *  can be any combination, e.g., demo + results
+   */
+  template&lt;typename T, size_t C&gt;
+  void Logger&lt;T, C&gt;::level(size_t lv) {
+    level_ = lv;
+  }
+  /*--- helper to open file stream --------------------------------*/
+
+  inline std::ostream* makeStream(const std::string&amp; fileName) {
+    std::ofstream* pOfstrm = new std::ofstream;
+    pOfstrm-&gt;open(fileName);
+    if (pOfstrm-&gt;good())
+      return pOfstrm;
+    else
+      return nullptr;
+  }
+        </defn-code>
+      </defn-block>
+      <defn-block style="margin:3px; border:2px solid darkred;">
+        <defn-head style="border:none; border-bottom:2px solid darkred;">Using Code</defn-head>
+        <defn-code style="border:none;">
+#include &lt;string&gt;
+#include "Logger.h"
+
+int main() {
+
+  displayTitle("Testing Logger");
+  using namespace Utilities;
+
+  Logger&lt;std::string&gt; logger("test");
+
+  // to see logger demo-ing its own test stub comment out the next statement
+  logger.level(Level::results);
+  logger.write("-- constructed logger --\n", Level::demo);
+  logger.add(makeStream("test.log"));
+  logger.write("\n -- added stream --\n", Level::demo);
+  logger.add(makeStream("does not exist"));
+  //logger.prefix("  ");
+  logger.head();
+  logger.write("\n -- called head --\n", Level::demo);
+  logger.prefix("");
+  logger.write("\n -- called write --\n", Level::demo);
+  logger.write("\n  Hi ").write("there ");
+  logger.write("from Logger.cpp");
+  logger.write("\n");
+  logger.write("\n -- waiting for writes to complete --\n", Level::demo);
+  logger.waitForWrites();
+
+  logger.write("\n  setting level = results");
+  logger.level(Level::results);
+  logger.write("\n  a debug msg", Level::debug);
+  logger.write("\n  a demo", Level::demo);
+  logger.write("\n  a result", Level::results);
+  logger.write("\n -- waiting for writes to complete --\n", Level::demo);
+  logger.waitForWrites();
+
+  logger.write("\n  setting level = demo");
+  logger.level(Level::demo);
+  logger.write("\n  a debug msg", Level::debug);
+  logger.write("\n  a demo", Level::demo);
+  logger.write("\n  a result", Level::results);
+  logger.waitForWrites();
+
+  logger.write("\n  setting level = debug");
+  logger.level(Level::debug);
+  logger.write("\n  a debug msg", Level::debug);
+  logger.write("\n  a demo", Level::demo);
+  logger.write("\n  a result", Level::results);
+  logger.waitForWrites();
+
+  logger.write("\n  setting level = results + demo");
+  logger.level(Level::results + Level::demo);
+  logger.write("\n  a debug msg", Level::debug);
+  logger.write("\n  a demo", Level::demo);
+  logger.write("\n  a result", Level::results);
+  logger.waitForWrites();
+  
+  // to see logger demo-ing its own test stub comment out the next statement
+  logger.level(Level::results);
+  logger.write("\n -- calling makeLogger factory --\n", Level::demo);
+  ILogger&lt;std::string, 0&gt;&amp; logInstance = makeLogger&lt;std::string, 0&gt;();
+  logInstance.add(makeStream("staticlog.log"));
+  logInstance.head("test logger factory");
+  logInstance.write("log msg #1").write("log msg #2");
+  
+  ILogger&lt;std::string, 0&gt;&amp; logInstance2 = makeLogger&lt;std::string, 0&gt;();
+  logInstance2.head("test 2nd instance of logger factory");
+  logInstance2.write("log2 msg #1").write("log2 msg #2");
+  logInstance2.write("log2 msg #3").write("log2 msg #4");
+
+  const auto&amp; logFactory = 
+    []()-&gt;ILogger&lt;std::string,0&gt;&amp; { 
+      return makeLogger&lt;std::string, 0&gt;(); 
+  };
+  logFactory().write("\n  using makeLogger");
+
+  logger.wait();
+  logInstance.write("\n  done waiting for logger");
+  logInstance.wait();
+  putline();
+  
+  displaySubtitle("Testing Assertions");
+
+  Assert(true, "if you see this Assert raised with true predicate");
+  Assert(false, "a message", __LINE__);
+  try {
+    Assert(false, "another message", __LINE__, true);
+  }
+  catch (std::exception &amp; ex) {
+    std::cout &lt;&lt; std::string("\n  ") + ex.what();
+  }
+  putline();
+  Requires(1 == 1, "1 == 1", __LINE__);
+  Requires(1 == 2, "1 == 2", __LINE__);
+  try {
+    Requires(1 == 3, "1 == 3", __LINE__, true);
+  }
+  catch (std::exception &amp; ex) {
+    std::cout &lt;&lt; std::string("\n  ") + ex.what();
+  }
+  putline();
+  Ensures(1 == 1, "1 == 1", __LINE__);
+  Ensures(1 == 2, "1 == 2", __LINE__);
+  try {
+    Ensures(1 == 3, "1 == 3", __LINE__, true);
+  }
+  catch (std::exception &amp; ex) {
+    std::cout &lt;&lt; std::string("\n  ") + ex.what();
+  }
+  putline(2);
+}        
+        </defn-code>
+        <defn-head style="border:none; border-top:2px solid darkred; border-bottom:2px solid darkred;">Output</defn-head>
+        <defn-code style="border:none;">
+  test
+  Wed Dec  4 08:20:27 2019
+  Hi there from Logger.cpp
+
+  setting level = results
+  a result
+  setting level = demo
+  a demo
+  setting level = debug
+  a debug msg
+  setting level = results + demo
+  a demo
+  a result
+        </defn-code>
+      </defn-block>
+      </defn-block>
+    </details>
+  </t-b>
+  <t-b>
+    The Template Functors code example, below, has a global function <c-s>Traverse</c-s> that is
+    defined with a template parameter, <c-s>C</c-s>, and a template template parameter, 
+    <c-s>X&lt;C&gt;</c-s>:
+    <i-b class="pad5">
+      <c-s>
+  template &lt;class C, template &lt;class C&gt; class X&gt;<br />
+  void tranverse(<br />
+    &nbsp;&nbsp;typename C::iterator&amp; Begin, typename C::iterator&amp; End,<br />
+    &nbsp;&nbsp;X&lt;C&gt;&amp; x,<br />
+    &nbsp;&nbsp;void(X&lt;C&gt;::*fptr)(typename C::iterator&amp;)<br />
+  ) {<br />
+    &nbsp;&nbsp;...<br />
+  }
+      </c-s>
+    </i-b>
+    where <c-s>C</c-s> represents an STL container, and <c-s>X</c-s> is a function
+    object that operates on <c-s>C</c-s> in a way specified by the application that defines
+    <c-s>X&lt;C&gt;</c-s>.
+  </t-b>
+  <t-b>
+    <details>
+      <summary class="labelStyle darkItem">Template Functors</summary>
+      <s-halfEm></s-halfEm>
+      <defn-block style="flex-direction:row; flex-wrap:wrap; padding:0px; border:none;">
+        <defn-block style="margin:3px; border:2px solid darkred;">
+          <defn-head style="border:none; border-bottom:2px solid darkred;">Template Functor Code</defn-head>
+          <defn-code style="border:none;">
+/////////////////////////////////////////////////////////////////////////
+// FunctorsEtc.cpp - Demonstrate Functors and Function Pointers with   //
+//                   template arguments                                //
+//                                                                     //
+// Jim Fawcett, CSE67 - Object Oriented Design, Spring 2009            //
+/////////////////////////////////////////////////////////////////////////
+
+#include &lt;iterator&gt;
+#include &lt;string&gt;
+
+// Functor interface, to support substitutability
+
+template &lt;typename C&gt;
+struct IFunctor
+{
+  virtual void operator()(typename C::iterator&amp; iter)=0;
+};
+
+// Global function that accepts iterators and base functor reference,
+// templatized on a container argument.
+
+template &lt;typename C&gt;
+void Traverse(
+  typename C::iterator&amp; Begin, typename C::iterator&amp; End,
+  IFunctor&lt;C&gt;&amp; funct
+)
+{
+  C::iterator iter;
+  for(iter=Begin; iter!=End; ++iter)
+    funct(iter);
+}
+
+// Global function accepts iterators and function pointer to member
+// templatized on a container argument
+
+template &lt;class C, template &lt;class C&gt; class X&gt;
+void Traverse(
+  typename C::iterator&amp; Begin, 
+  typename C::iterator&amp; End, 
+  X&lt;C&gt;&amp; x, 
+  void(X&lt;C&gt;::*fptr)(typename C::iterator&amp;)
+)
+{
+  C::iterator iter;
+  for(iter=Begin; iter!=End; ++iter)
+  {
+    (x.*fptr)(iter);
+  }
+}
+          </defn-code>
+        </defn-block>
+        <defn-block style="margin:3px; border:2px solid darkred;">
+          <defn-head style="border:none; border-bottom:2px solid darkred;">Using Code</defn-head>
+          <defn-code style="border:none;">
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+
+// one of many possible operations to apply to some container
+
+class aFunctor : public IFunctor&lt;std::string&gt;
+{
+  void operator()(std::string::iterator&amp; iter)
+  {
+    std::cout &lt;&lt; *iter &lt;&lt; " ";
+  }
+};
+
+// template class that has a member function we will point to
+
+template &lt;typename C&gt;
+class X
+{
+public:
+  void doOp(typename C::iterator&amp; iter)
+  {
+    std::cout &lt;&lt; *iter &lt;&lt; " ";
+  }
+};
+
+// alias for this convoluted template function pointer to member syntax
+
+typedef void (X&lt;std::string&gt;::*fptr)(std::string::iterator&amp;);
+
+void main()
+{
+  std::string test = "CSE687 - Object Oriented Design";
+  
+  // testing functor
+  aFunctor func;
+  std::cout &lt;&lt; "\n  ";
+  Traverse(test.begin(), test.end(), func);
+  
+  // testing function pointer to member
+
+  std::cout &lt;&lt; "\n  ";
+  X&lt;std::string&gt; x;
+  fptr f = &amp;X&lt;std::string&gt;::doOp;
+  Traverse&lt;std::string&gt;(test.begin(), test.end(), x, f); 
+
+  // this syntax works too
+  
+  std::cout &lt;&lt; "\n  ";
+  Traverse&lt;std::string&gt;(test.begin(), test.end(), x, &amp;X&lt;std::string&gt;::doOp); 
+
+  std::cout &lt;&lt; "\n\n";
+}
+          </defn-code>
+          <defn-head style="border:none; border-top:2px solid darkred; border-bottom:2px solid darkred;">Output</defn-head>
+          <defn-code style="border:none;">
+  C S E 6 8 7   -   O b j e c t   O r i e n t e d   D e s i g n 
+  C S E 6 8 7   -   O b j e c t   O r i e n t e d   D e s i g n 
+  C S E 6 8 7   -   O b j e c t   O r i e n t e d   D e s i g n 
+          </defn-code>
+        </defn-block>
+      </defn-block>
+    </details>
+  </t-b>
+  <t-b>
+    The last example in this section is a Directed Graph class.  You can find the complete code
+    in the <a href="CppGraph.html">CppGraph.html</a> repository. A directed graph consists of vertices
+    that are connected with directed edges, from parent vertex to child vertex. Graphs are used to
+    represent hierarchal relationships, e.g., package dependency or social network friend relationships.
+  </t-b>
+  <t-b>
+    This example is here, because it uses two template parameters, <c-s>V</c-s> and <c-s>E</c-s>, that
+    represent information held in each vertex and each edge.  For example, a class dependency graph
+    would probably contain a class name in each vertex and a class relationship
+    type, e.g., inheritance, composition, aggregation, or using, in each edge.
+  </t-b>
+  <t-b>
+    Before looking at the example, it will help to look at the <a href="CppGraph.html">Graph Documentation</a>
+    for the CppGraph repository.  We show diagrams there that will help you understand the code below.
+  </t-b>
+  <t-b>
+  <details>
+    <summary class="labelStyle darkItem">Directed Graph Class</summary>
+    <s-halfEm></s-halfEm>
+    <defn-block style="flex-direction:row; flex-wrap:wrap; padding:0px; border:none;">
+    <defn-block style="margin:3px; border:2px solid darkred;">
+      <defn-head style="border:none; border-bottom:2px solid darkred;">Vertex and Graph Code</defn-head>
+      <defn-code style="border:none;">
+namespace GraphLib 
+{
+  ///////////////////////////////////////////////////////////////
+  // Vertex class
+
+  template&lt;typename V, typename E&gt; 
+  class Vertex
+  {
+  public:
+    typedef std::pair&lt;int, E&gt; Edge;  // graph index of target vertex, edge type
+    typename typedef std::vector&lt;Edge&gt;::iterator iterator;
+    iterator begin();
+    iterator end();
+    Vertex(V v, size_t id);
+    Vertex(V v);
+    void add(Edge& edge);
+    // Vertex(const Vertex&lt;V,E&gt;& v);                  compiler generated is correct
+    // Vertex&lt;V,E&gt;& operator=(const Vertex&lt;V,E&gt;& v);  compiler generated is correct
+    Edge& operator[](size_t i);
+    Edge operator[](size_t i) const;
+    V& value();
+    size_t& id(); 
+    size_t size();
+    bool& mark();
+  private:
+    std::vector&lt;Edge&gt; _edges;
+    V _v;
+    size_t _id;
+    static size_t count;
+    bool _mark;
+  };
+  //----&lt; reserve memory for, and initialize, static count &gt;-----
+  template&lt;typename V, typename E&gt;
+  size_t Vertex&lt;V,E&gt;::count = 0;
+
+  //----&lt; set and return boolean mark, used for traversal &gt;------
+  template&lt;typename V, typename E&gt;
+  bool& Vertex&lt;V,E&gt;::mark() { return _mark; }
+
+  //----&lt; return iterator pointing to first edge &gt;---------------
+  template&lt;typename V, typename E&gt;
+  typename Vertex&lt;V,E&gt;::iterator Vertex&lt;V,E&gt;::begin() { return _edges.begin(); }
+
+  //----&lt; return iterator pointing to one past last edge &gt;-------
+  template&lt;typename V, typename E&gt;
+  typename Vertex&lt;V,E&gt;::iterator Vertex&lt;V,E&gt;::end() { return _edges.end(); }
+
+  //----&lt; construct instance, specifying id - must be unique &gt;---
+  template&lt;typename V, typename E&gt;
+  Vertex&lt;V,E&gt;::Vertex(V v, size_t id) : _v(v), _id(id), _mark(false) {}
+
+  //----&lt; construct instance - creates id sequentially &gt;-------
+  template&lt;typename V, typename E&gt;
+  Vertex&lt;V,E&gt;::Vertex(V v) : _v(v), _id(count++), _mark(false) {}
+
+  //----&lt; add edge to vertex edge collection &gt;-------------------
+  template&lt;typename V, typename E&gt;
+  void Vertex&lt;V,E&gt;::add(Edge& edge) { _edges.push_back(edge); }
+
+  //----&lt; index non-const vertex's edges &gt;-----------------------
+  template&lt;typename V, typename E&gt;
+  typename Vertex&lt;V,E&gt;::Edge& Vertex&lt;V,E&gt;::operator[](size_t i) { return _edges[i]; }
+  
+  //----&lt; index const vertex's edges &gt;---------------------------
+  template&lt;typename V, typename E&gt;
+  typename Vertex&lt;V,E&gt;::Edge Vertex&lt;V,E&gt;::operator[](size_t i) const { return _edges[i]; }
+  
+  //----&lt; set and read value of vertex's held type, V &gt;----------
+  template&lt;typename V, typename E&gt;
+  V& Vertex&lt;V,E&gt;::value() { return _v; }
+  
+  //----&lt; return vertex's id &gt;-----------------------------------
+  template&lt;typename V, typename E&gt;
+  size_t& Vertex&lt;V,E&gt;::id() { return _id; }
+  
+  //----&lt; return number of edges &gt;-------------------------------
+  template&lt;typename V, typename E&gt;
+  size_t Vertex&lt;V,E&gt;::size() { return _edges.size(); }
+
+  ///////////////////////////////////////////////////////////////
+  // Graph class
+
+  template&lt;typename V, typename E&gt;
+  class Graph
+  {
+  public:
+    typename typedef std::vector&lt; Vertex&lt;V,E&gt; &gt;::iterator iterator;
+    iterator begin();
+    iterator end();
+    // Graph(const Graph&lt;V,E&gt;& g);                  compiler generated is correct
+    // Graph&lt;V,E&gt;& operator=(const Graph&lt;V,E&gt;& g);  compiler generated is correct
+    Vertex&lt;V,E&gt;& operator[](size_t i);
+    Vertex&lt;V,E&gt; operator[](size_t i) const;
+    void addVertex(Vertex&lt;V,E&gt; v);
+    void addEdge(E eval, Vertex&lt;V,E&gt;& parent, Vertex&lt;V,E&gt;& child);
+    size_t findVertexIndexById(size_t id);
+    size_t size();
+    template&lt;typename F&gt;
+    void dfs(Vertex&lt;V,E&gt;& v, F f);
+  private:
+    std::vector&lt; Vertex&lt;V,E&gt; &gt; adj;
+    std::unordered_map&lt;size_t, size_t&gt; idMap; // id maps to graph index
+    template&lt;typename F&gt;
+    void dfsCore(Vertex&lt;V,E&gt;& v, F f);
+  };
+  //----&lt; return iterator pointing to first vertex &gt;-------------
+  template&lt;typename V, typename E&gt;
+  typename Graph&lt;V,E&gt;::iterator Graph&lt;V,E&gt;::begin() { return adj.begin(); }
+
+  //----&lt; return iterator pointing one past last vertex &gt;--------
+  template&lt;typename V, typename E&gt;
+  typename Graph&lt;V,E&gt;::iterator Graph&lt;V,E&gt;::end() { return adj.end(); }
+  
+  //----&lt; index non-const graph's vertex collection &gt;------------
+  template&lt;typename V, typename E&gt;
+  typename Vertex&lt;V,E&gt;& Graph&lt;V,E&gt;::operator[](size_t i) { return adj[i]; }
+ 
+  //----&lt; index const graph's vertex collection &gt;----------------
+  template&lt;typename V, typename E&gt;
+  typename Vertex&lt;V,E&gt; Graph&lt;V,E&gt;::operator[](size_t i) const { return adj[i]; }
+  
+  //----&lt; add vertex to graph's vertex collection &gt;--------------
+  template&lt;typename V, typename E&gt;
+  void Graph&lt;V,E&gt;::addVertex(Vertex&lt;V,E&gt; v) 
+  { 
+    adj.push_back(v);
+    idMap[v.id()] = adj.size() - 1;
+  }
+  //----&lt; return number of vertices in graph's collection &gt;------
+  template&lt;typename V, typename E&gt;
+  size_t Graph&lt;V,E&gt;::size() { return adj.size(); }
+
+  //----&lt; return index of vertex with specified id &gt;-------------
+  template&lt;typename V, typename E&gt;
+  size_t Graph&lt;V,E&gt;::findVertexIndexById(size_t id)
+  {
+    return idMap[id];
+  }
+  //----&lt; add edge from specified parent to child vertices &gt;-----
+  template&lt;typename V, typename E&gt;
+  void Graph&lt;V,E&gt;::addEdge(E eVal, Vertex&lt;V,E&gt;& parent, Vertex&lt;V,E&gt;& child)
+  {
+    size_t childIndex = findVertexIndexById(child.id());
+    if(childIndex == adj.size())
+      throw std::exception("no edge child");
+    size_t parentIndex = findVertexIndexById(parent.id());
+    if(parentIndex == adj.size())
+      throw std::exception("no edge parent");
+    Vertex&lt;V,E&gt;::Edge e;
+    e.first = childIndex;
+    e.second = eVal;
+    adj[parentIndex].add(e);
+  }
+  //----&lt; recursive depth first search with action f &gt;-----------
+  template&lt;typename V, typename E&gt;
+  template&lt;typename F&gt;
+  void Graph&lt;V,E&gt;::dfsCore(Vertex&lt;V,E&gt;& v, F f)
+  {
+    f(v);
+    v.mark() = true;
+    for(auto edge : v)
+    {
+      if(adj[edge.first].mark() == false)
+        dfsCore(adj[edge.first], f);
+    }
+    for(auto& vert : adj)
+    {
+      if(vert.mark() == false)
+        dfsCore(vert, f);
+    }
+  }
+  //----&lt; depth first search, clears marks for next search &gt;-----
+  template&lt;typename V, typename E&gt;
+  template&lt;typename F&gt;
+  void Graph&lt;V,E&gt;::dfs(Vertex&lt;V,E&gt;& v, F f)
+  {
+    dfsCore(v, f);
+    for(auto& vert : adj)
+      vert.mark() = false;
+  }
+      </defn-code>
+    </defn-block>
+    <defn-block style="margin:3px; border:2px solid darkred;">
+      <defn-head style="border:none; border-bottom:2px solid darkred;">Using Code</defn-head>
+      <defn-code style="border:none;">
+#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+#include "Graph.h"
+using namespace GraphLib;
+
+typedef Graph&lt;std::string, std::string&gt; graph;
+typedef Vertex&lt;std::string, std::string&gt; vertex;
+typedef Display&lt;std::string, std::string&gt; display;
+
+void showVert(Vertex&lt;std::string, std::string&gt;& v)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; v.id();
+}
+
+template&lt;typename V, typename E&gt;
+void TshowVert(Vertex&lt;V,E&gt;& v)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; v.id();
+}
+
+#ifdef TEST_GRAPH
+
+int main()
+{
+  std::cout &lt;&lt; "\n  Testing Graph Library";
+  std::cout &lt;&lt; "\n =======================\n";
+  try
+  {
+    std::cout &lt;&lt; "\n  Constructing Graph instance";
+    std::cout &lt;&lt; "\n -----------------------------";
+    graph g;
+    vertex v1("v1");
+    vertex v2("v2");
+    vertex v3("v3");
+    vertex v4("v4");
+    vertex v5("v5", 50);
+    g.addVertex(v2);
+    g.addVertex(v1);
+    g.addVertex(v3);
+    g.addVertex(v4);
+    g.addVertex(v5);
+    g.addEdge("e1",v1,v2);
+    g.addEdge("e2",v1,v3);
+    g.addEdge("e3",v2,v3);
+    g.addEdge("e4",v4,v3);
+    g.addEdge("e5",v5,v2);
+
+    display::show(g);
+    std::cout &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Making copy of instance";
+    std::cout &lt;&lt; "\n -------------------------";
+    graph gcopy = g;
+    display::show(gcopy);
+    std::cout &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Modifying copy's values";
+    std::cout &lt;&lt; "\n -------------------------";
+    for(auto& v : gcopy)
+      v.value() += "copy";
+
+    display::show(gcopy);
+    std::cout &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Assigning original instance to copy";
+    std::cout &lt;&lt; "\n -------------------------------------";
+    gcopy = g;
+    display::show(gcopy);
+    std::cout &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Vertices with no Parents:";
+    std::cout &lt;&lt; "\n ---------------------------";
+
+    std::vector&lt; vertex &gt; verts = display::vertsWithNoParents(g);
+    std::cout &lt;&lt; "\n  ";
+    for(size_t i=0; i&lt;verts.size(); ++i)
+      std::cout &lt;&lt; verts[i].value().c_str() &lt;&lt; " ";
+    std::cout &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Testing Depth First Search with function pointer";
+    std::cout &lt;&lt; "\n --------------------------------------------------";
+    for(auto& vert : g)
+    {
+      std::cout &lt;&lt; "\n  starting at id " &lt;&lt; vert.id();
+      g.dfs(vert, TshowVert&lt;std::string, std::string&gt;);
+      // this works too: 
+      // g.dfs(vert, showVert);
+    }
+    std::cout &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Testing Depth First Search with Functor";
+    std::cout &lt;&lt; "\n -----------------------------------------";
+
+    class showFunctor
+    {
+    public:
+      void operator()(Vertex&lt;std::string, std::string&gt;& vert)
+      {
+        std::cout &lt;&lt; "\n  From functor: vertix id = " &lt;&lt; vert.id();
+        std::cout &lt;&lt; ", number of edges = " &lt;&lt; vert.size();
+      }
+    };
+
+    g.dfs(g[0], showFunctor());
+    std::cout &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Testing Serialization to XML";
+    std::cout &lt;&lt; "\n ------------------------------";
+    std::string str = GraphToXmlString(g);
+    std::cout &lt;&lt; str &lt;&lt; "\n";
+    std::ofstream out("testGraph.xml");
+    out &lt;&lt; str &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Testing Graph construction from XML";
+    std::cout &lt;&lt; "\n -------------------------------------";
+    graph gtest;
+    GraphFromXmlString(gtest, str);
+    display::show(gtest);
+    std::cout &lt;&lt; "\n\n";
+  }
+  catch(std::exception& ex)
+  {
+    std::cout &lt;&lt; "\n\n  " &lt;&lt; ex.what() &lt;&lt; "\n\n";
+  }
+  std::cout &lt;&lt; "\n\n";
+  return 0;
+}
+
+#endif
+      </defn-code>
+      <defn-head style="border:none; border-top:2px solid darkred; border-bottom:2px solid darkred;">Output</defn-head>
+      <defn-code style="border:none;">
+  Testing Graph Library
+ =======================
+
+  Constructing Graph instance
+ -----------------------------
+  vertex id = 1, value = v2
+    edge points to vertex with id = 2 and value = v3, edge value = e3
+  vertex id = 0, value = v1
+    edge points to vertex with id = 1 and value = v2, edge value = e1
+    edge points to vertex with id = 2 and value = v3, edge value = e2
+  vertex id = 2, value = v3
+  vertex id = 3, value = v4
+    edge points to vertex with id = 2 and value = v3, edge value = e4
+  vertex id = 50, value = v5
+    edge points to vertex with id = 1 and value = v2, edge value = e5
+
+  Making copy of instance
+ -------------------------
+  vertex id = 1, value = v2
+    edge points to vertex with id = 2 and value = v3, edge value = e3
+  vertex id = 0, value = v1
+    edge points to vertex with id = 1 and value = v2, edge value = e1
+    edge points to vertex with id = 2 and value = v3, edge value = e2
+  vertex id = 2, value = v3
+  vertex id = 3, value = v4
+    edge points to vertex with id = 2 and value = v3, edge value = e4
+  vertex id = 50, value = v5
+    edge points to vertex with id = 1 and value = v2, edge value = e5
+
+  Modifying copy's values
+ -------------------------
+  vertex id = 1, value = v2copy
+    edge points to vertex with id = 2 and value = v3copy, edge value = e3
+  vertex id = 0, value = v1copy
+    edge points to vertex with id = 1 and value = v2copy, edge value = e1
+    edge points to vertex with id = 2 and value = v3copy, edge value = e2
+  vertex id = 2, value = v3copy
+  vertex id = 3, value = v4copy
+    edge points to vertex with id = 2 and value = v3copy, edge value = e4
+  vertex id = 50, value = v5copy
+    edge points to vertex with id = 1 and value = v2copy, edge value = e5
+
+  Assigning original instance to copy
+ -------------------------------------
+  vertex id = 1, value = v2
+    edge points to vertex with id = 2 and value = v3, edge value = e3
+  vertex id = 0, value = v1
+    edge points to vertex with id = 1 and value = v2, edge value = e1
+    edge points to vertex with id = 2 and value = v3, edge value = e2
+  vertex id = 2, value = v3
+  vertex id = 3, value = v4
+    edge points to vertex with id = 2 and value = v3, edge value = e4
+  vertex id = 50, value = v5
+    edge points to vertex with id = 1 and value = v2, edge value = e5
+
+  Vertices with no Parents:
+ ---------------------------
+  v1 v4 v5
+
+  Testing Depth First Search with function pointer
+ --------------------------------------------------
+  starting at id 1
+  1
+  2
+  0
+  3
+  50
+  starting at id 0
+  0
+  1
+  2
+  3
+  50
+  starting at id 2
+  2
+  1
+  0
+  3
+  50
+  starting at id 3
+  3
+  2
+  1
+  0
+  50
+  starting at id 50
+  50
+  1
+  2
+  0
+  3
+
+  Testing Depth First Search with Functor
+ -----------------------------------------
+  From functor: vertix id = 1, number of edges = 1
+  From functor: vertix id = 2, number of edges = 0
+  From functor: vertix id = 0, number of edges = 2
+  From functor: vertix id = 3, number of edges = 1
+  From functor: vertix id = 50, number of edges = 1
+
+  Testing Serialization to XML
+ ------------------------------
+&lt;graph&gt;
+  &lt;vertex id="1" value="v2"&gt;
+    &lt;edge targetId="2" value="e3"&gt;
+    &lt;/edge&gt;
+  &lt;/vertex&gt;
+  &lt;vertex id="0" value="v1"&gt;
+    &lt;edge targetId="1" value="e1"&gt;
+    &lt;/edge&gt;
+    &lt;edge targetId="2" value="e2"&gt;
+    &lt;/edge&gt;
+  &lt;/vertex&gt;
+  &lt;vertex id="2" value="v3"&gt;
+  &lt;/vertex&gt;
+  &lt;vertex id="3" value="v4"&gt;
+    &lt;edge targetId="2" value="e4"&gt;
+    &lt;/edge&gt;
+  &lt;/vertex&gt;
+  &lt;vertex id="50" value="v5"&gt;
+    &lt;edge targetId="1" value="e5"&gt;
+    &lt;/edge&gt;
+  &lt;/vertex&gt;
+&lt;/graph&gt;
+
+  Testing Graph construction from XML
+ -------------------------------------
+  vertex id = 1, value = v2
+    edge points to vertex with id = 2 and value = v3, edge value = e3
+  vertex id = 0, value = v1
+    edge points to vertex with id = 1 and value = v2, edge value = e1
+    edge points to vertex with id = 2 and value = v3, edge value = e2
+  vertex id = 2, value = v3
+  vertex id = 3, value = v4
+    edge points to vertex with id = 2 and value = v3, edge value = e4
+  vertex id = 50, value = v5
+    edge points to vertex with id = 1 and value = v2, edge value = e5
+      </defn-code>
+    </defn-block>
+    </defn-block>
+  </details>
+  </t-b>
+  <t-b>
+    In section 6.6 we discuss template class specialization, a mechanism for providing not only a
+    generic pattern for implementing a template class, but also alternate implementations for special
+    cases for which the generic pattern may not work well.
+  </t-b>
+  <hr class="spread" />
+  <num-cont>
+    <num-item1>6.6</num-item1><num-item4>Template Class Specialization</num-item4>
   </num-cont>
 
   <spacer-25></spacer-25>
   <indent-blocks>
-    <h3>Templates:</h3>
-    <h3>Template Functions:</h3>
-    <h3>Type_Traits</h3>
-    <h3>Overloading Template Functions:</h3>
-    <h3>Template Classes:</h3>
-    <h3>Template Meta Programming:</h3>
     <h3>Template Class Specialization:</h3>
     <h3>Variadic Templates</h3>
     <h3>CppProperties</h3>
