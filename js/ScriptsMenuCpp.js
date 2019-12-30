@@ -54,7 +54,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Resources &#9662;</button>\
+      <button class='dropbutton'>Res &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
         <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a>\
