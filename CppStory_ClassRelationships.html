@@ -124,7 +124,8 @@
     are shown in the bottom
     half of the Figure.  They are shown using two dimensions for clarity of presentations, but are actually 
     simply segments in a section of the process&apos;s virtual address space.
-    <spacer-15></spacer-15>
+    </t-b>
+    <t-b>
     There are several things to note about the object layout:
     <ol class="tight">
       <li>
@@ -147,22 +148,25 @@
         functions of B (unaffected by access specification) but may also declare new public functions.
       </li>
     </ol>
-    <s-15px></s-15px>
-    Consequences of this object structure are:
-    <ol class="tight">
-      <li>
-        When <c-s>D</c-s>&apos;s constructor is called, it must construct its inner <c-s>B</c-s>, usually by 
-        explicitly invoking a <c-s>B</c-s> constructor in its initialization sequence - more about that later.
-      </li>
-      <li>
-        When <c-s>B</c-s> is constructed by <c-s>D</c-s> its first action is to construct its inner <c-s>C</c-s>, 
-        usually in its initialization sequence.
-      </li>
-      <li>
-        <c-s>D</c-s>&apos;s construction is independent of the lifetime of <c-s>u &epsilon; U</c-s>. That means
-        that our design must insure that <c-s>u</c-s> is in a valid state when <c-s>D</c-s> invokes its methods.
-      </li>
-    </ol>
+    </t-b>
+    <t-b>
+      Consequences of this object structure are:
+    </t-b>
+    <t-b>
+      <ol class="tight">
+        <li>
+          When <c-s>D</c-s>&apos;s constructor is called, it must construct its inner <c-s>B</c-s>, usually by
+          explicitly invoking a <c-s>B</c-s> constructor in its initialization sequence - more about that later.
+        </li>
+        <li>
+          When <c-s>B</c-s> is constructed by <c-s>D</c-s> its first action is to construct its inner <c-s>C</c-s>,
+          usually in its initialization sequence.
+        </li>
+        <li>
+          <c-s>D</c-s>&apos;s construction is independent of the lifetime of <c-s>u &epsilon; U</c-s>. That means
+          that our design must insure that <c-s>u</c-s> is in a valid state when <c-s>D</c-s> invokes its methods.
+        </li>
+      </ol>
     </t-b>
     <div class="clear"></div>
     <hr class="spread" />
@@ -177,227 +181,215 @@
     <details>
       <summary class="labelStyle lightItem">Demo - Class Layout</summary>
       <s-10px></s-10px>
-      <div tabindex="0" class="autoX">
-      <table class="codeTable">
-        <tr>
-          <td style="margin:0px; padding:0px; font-size:0.9em;">
-        <defn-block style="margin:0px; border:none;">
-          <defn-head style="border:none;">
-            <span class="notice">Class Layout Code:</span>
-          </defn-head>
-          <defn-code tabindex="0" style="border:none; border-top:2px solid darkred;">
-  /////////////////////////////////////////////////////////
-  // Used class is used by Derived, shows its statistics
+      <div>
+      <defn-outerBlock>
+        <defn-block>
+          <defn-head>Class Layout Code</defn-head>
+          <defn-code style="font-size:0.9rem;">
+/////////////////////////////////////////////////////////
+// Used class is used by Derived, shows its statistics
 
-  class Used
+class Used
+{
+public:
+  Used(const std::string& msg) : msg_(msg)
   {
-  public:
-    Used(const std::string& msg) : msg_(msg)
-    {
-      std::cout << "\n  Used(const std::string&) called";
-    }
-    ~Used() { std::cout << "\n  ~Used() called"; }
-    void say()
-    {
-      std::cout << "\n\n  Used::say()";
-      showStatistics(this);
-      showString("Used", msg_);
-    }
-  private:
-    std::string msg_;
-  };
-  /////////////////////////////////////////////////////////
-  // Composed class is a data member of Base, 
-  // shows its statistics
-
-  class Composed
+    std::cout << "\n  Used(const std::string&) called";
+  }
+  ~Used() { std::cout << "\n  ~Used() called"; }
+  void say()
   {
-  public:
-    Composed(const std::string& msg) : msg_(msg)
-    {
-      std::cout << "\n  Composed(const std::string&) called";
-    }
-    ~Composed() { std::cout << "\n  ~Composed() called"; }
-    void say()
-    {
-      std::cout << "\n\n  Composed::say()";
-      showStatistics(this);
-      showString("Composed", msg_);
-    }
-  private:
-    std::string msg_;
-  };
-  /////////////////////////////////////////////////////////
-  // Base class holds Composed and displays 
-  // its layout statistics
+    std::cout << "\n\n  Used::say()";
+    showStatistics(this);
+    showString("Used", msg_);
+  }
+private:
+  std::string msg_;
+};
+/////////////////////////////////////////////////////////
+// Composed class is a data member of Base, 
+// shows its statistics
 
-  class Base
+class Composed
+{
+public:
+  Composed(const std::string& msg) : msg_(msg)
   {
-  public:
-    Base(const std::string& msg) : composed_(msg)
-    {
-      std::cout << "\n  Base(const std::string&) called";
-    }
-
-    // If you remove virtual qualifier on ~Base() only 
-    // Base destructor is called in main when created
-    // on heap.  Both called if created on stack.
-
-    virtual ~Base()
-    {
-      std::cout << "\n  ~Base() called";
-    }
-    virtual void say()
-    {
-      std::cout << "\n\n  Base::say()";
-      showStatistics(this);
-      std::cout << "\n\n  Base invoking my Composed::say(): ";
-      composed_.say();
-    }
-  protected:
-    Composed composed_;
-  };
-  /////////////////////////////////////////////////////////
-  // Derived inherits from Base and displays 
-  // its layout statistics.
-
-  class Derived : public Base
+    std::cout << "\n  Composed(const std::string&) called";
+  }
+  ~Composed() { std::cout << "\n  ~Composed() called"; }
+  void say()
   {
-  public:
-    Derived(const std::string& msg) : Base(msg)
-    {
-      std::cout << "\n  Derived(const std::string&) called";
-    }
-    ~Derived() { std::cout << "\n  ~Derived() called"; }
-    virtual void say(Used& used)
-    {
-      std::cout << "\n\n  Derived::say()";
-      showStatistics(this);
+    std::cout << "\n\n  Composed::say()";
+    showStatistics(this);
+    showString("Composed", msg_);
+  }
+private:
+  std::string msg_;
+};
+/////////////////////////////////////////////////////////
+// Base class holds Composed and displays 
+// its layout statistics
 
-      std::cout << "\n\n  Derived calling Base::say(): ";
-      Base::say();
-      std::cout << std::endl;
+class Base
+{
+public:
+  Base(const std::string& msg) : composed_(msg)
+  {
+    std::cout << "\n  Base(const std::string&) called";
+  }
 
-      std::cout << "\n\n  Derived calling Used::say(): ";
-      used.say();
-      std::cout << std::endl;
-    }
-  private:
-  };
+  // If you remove virtual qualifier on ~Base() only 
+  // Base destructor is called in main when created
+  // on heap.  Both called if created on stack.
 
+  virtual ~Base()
+  {
+    std::cout << "\n  ~Base() called";
+  }
+  virtual void say()
+  {
+    std::cout << "\n\n  Base::say()";
+    showStatistics(this);
+    std::cout << "\n\n  Base invoking my Composed::say(): ";
+    composed_.say();
+  }
+protected:
+  Composed composed_;
+};
+/////////////////////////////////////////////////////////
+// Derived inherits from Base and displays 
+// its layout statistics.
 
+class Derived : public Base
+{
+public:
+  Derived(const std::string& msg) : Base(msg)
+  {
+    std::cout << "\n  Derived(const std::string&) called";
+  }
+  ~Derived() { std::cout << "\n  ~Derived() called"; }
+  virtual void say(Used& used)
+  {
+    std::cout << "\n\n  Derived::say()";
+    showStatistics(this);
+
+    std::cout << "\n\n  Derived calling Base::say(): ";
+    Base::say();
+    std::cout << std::endl;
+
+    std::cout << "\n\n  Derived calling Used::say(): ";
+    used.say();
+    std::cout << std::endl;
+  }
+private:
+};
           </defn-code>
         </defn-block>
-          </td>
-          <td style="margin:0px; padding:0px; font-size:0.9em;"">
-        <defn-block style="margin:0px; border:none;">
-          <defn-head style="border:none;">
-            <span class="notice">Using Code:</span>
-          </defn-head>
-          <defn-code tabindex="1" style="border:none; border-top:2px solid darkred;">
-  std::string arg = "string entered as constructor argument";
-  std::cout << "\n  String, below, will be used in this demonstration:";
-  std::cout << "\n    \"" << arg << "\"";
-  std::cout << "\n  It's object size is " << sizeof(arg) << " bytes";
-  std::cout << "\n  It contains " << arg.size() << " characters\n";
+        <defn-block>
+          <defn-head>Using Code:</defn-head>
+          <defn-code style="font-size:0.9rem;">
+std::string arg = "string entered as constructor argument";
+std::cout << "\n  String, below, will be used in this demonstration:";
+std::cout << "\n    \"" << arg << "\"";
+std::cout << "\n  It's object size is " << sizeof(arg) << " bytes";
+std::cout << "\n  It contains " << arg.size() << " characters\n";
 
-  std::cout << "\n  creating used object on stack";
-  std::cout << "\n -------------------------------";
-  Used u(arg);
-  u.say();
+std::cout << "\n  creating used object on stack";
+std::cout << "\n -------------------------------";
+Used u(arg);
+u.say();
 
-  std::cout << std::endl;
+std::cout << std::endl;
 
-  std::cout << "\n  creating base object on stack";
-  std::cout << "\n -------------------------------";
-  Base b(arg);
-  b.say();
+std::cout << "\n  creating base object on stack";
+std::cout << "\n -------------------------------";
+Base b(arg);
+b.say();
 
-  std::cout << std::endl;
+std::cout << std::endl;
 
-  /////////////////////////////////////////////////////////
-  // Works same whether Derived created on stack or heap,
-  // but you will notice differences in the region of
-  // memory occupied
+/////////////////////////////////////////////////////////
+// Works same whether Derived created on stack or heap,
+// but you will notice differences in the region of
+// memory occupied
   
-  std::cout << "\n  creating derived object on stack";
-  std::cout << "\n ----------------------------------";
-  Derived d(arg);
-  d.say(u);
+std::cout << "\n  creating derived object on stack";
+std::cout << "\n ----------------------------------";
+Derived d(arg);
+d.say(u);
 
-  std::cout << "\n  creating derived object on heap";
-  std::cout << "\n ---------------------------------";
-  Base* pB = new Derived(arg);
-  pB->say();
-  delete pB;
+std::cout << "\n  creating derived object on heap";
+std::cout << "\n ---------------------------------";
+Base* pB = new Derived(arg);
+pB->say();
+delete pB;
           </defn-code>
-          <defn-head style="border:none; border-top:2px solid darkred;">
-            <span class="notice">Output:</span>
+          <defn-head class="defnBorderTop">
+            Output:
           </defn-head>
-          <defn-code tabindex="2" style=" border:none; border-top:2px solid darkred;">
-  creating derived object on stack
- ----------------------------------
-  Composed(const std::string&) called
-  Base(const std::string&) called
-  Derived(const std::string&) called
+          <defn-code style="font-size:0.9rem;">
+creating derived object on stack
+----------------------------------
+Composed(const std::string&) called
+Base(const std::string&) called
+Derived(const std::string&) called
 
-  Derived::say()
-  class Derived
-  my size is: 32 bytes -- holds Base and Composed
-  my starting address is 6420740 (0x61F904)
-  my ending address is   6420772 (0x61F924)
+Derived::say()
+class Derived
+my size is: 32 bytes -- holds Base and Composed
+my starting address is 6420740 (0x61F904)
+my ending address is   6420772 (0x61F924)
 
-  Derived calling Base::say():
+Derived calling Base::say():
 
-  Base::say()
-  class Derived
-  my size is: 32 bytes -- holds string and pointer to vtbl
-  my starting address is 6420740 (0x61F904)
-  my ending address is   6420772 (0x61F924)
+Base::say()
+class Derived
+my size is: 32 bytes -- holds string and pointer to vtbl
+my starting address is 6420740 (0x61F904)
+my ending address is   6420772 (0x61F924)
 
-  Base invoking my Composed::say():
+Base invoking my Composed::say():
 
-  Composed::say()
-  class Composed
-  my size is: 28 bytes -- holds string
-  my starting address is 6420744 (0x61F908)
-  my ending address is   6420772 (0x61F924)
-  "This Composed string entered as constructor argument" has 54 characters
+Composed::say()
+class Composed
+my size is: 28 bytes -- holds string
+my starting address is 6420744 (0x61F908)
+my ending address is   6420772 (0x61F924)
+"This Composed string entered as constructor argument" has 54 characters
 
-  Derived calling Used::say():
+Derived calling Used::say():
 
-  Used::say()
-  class Used
-  my size is: 28 bytes
-  my starting address is 6420820 (0x61F954)
-  my ending address is   6420848 (0x61F970)
-  "This Used string entered as constructor argument" has 50 characters
+Used::say()
+class Used
+my size is: 28 bytes
+my starting address is 6420820 (0x61F954)
+my ending address is   6420848 (0x61F970)
+"This Used string entered as constructor argument" has 50 characters
 
-  creating derived object on heap
- ---------------------------------
-  Composed(const std::string&) called
-  Base(const std::string&) called
-  Derived(const std::string&) called
+creating derived object on heap
+---------------------------------
+Composed(const std::string&) called
+Base(const std::string&) called
+Derived(const std::string&) called
 
-  Base::say()
-  class Derived
-  my size is: 32 bytes -- holds string and pointer to vtbl
-  my starting address is 12524472 (0xBF1BB8)
-  my ending address is   12524504 (0xBF1BD8)
+Base::say()
+class Derived
+my size is: 32 bytes -- holds string and pointer to vtbl
+my starting address is 12524472 (0xBF1BB8)
+my ending address is   12524504 (0xBF1BD8)
 
-  Base invoking my Composed::say():
+Base invoking my Composed::say():
 
-  Composed::say()
-  class Composed
-  my size is: 28 bytes -- holds string
-  my starting address is 12524476 (0xBF1BBC)
-  my ending address is   12524504 (0xBF1BD8)
-  "This Composed string entered as constructor argument" has 54 characters
+Composed::say()
+class Composed
+my size is: 28 bytes -- holds string
+my starting address is 12524476 (0xBF1BBC)
+my ending address is   12524504 (0xBF1BD8)
+"This Composed string entered as constructor argument" has 54 characters
           </defn-code>
         </defn-block>
-          </td>
-        </tr>
-      </table>
+      </defn-outerBlock>
       </div>
     </details>
     <spacer-10></spacer-10>
@@ -408,7 +400,7 @@
     </t-b>
 
     <spacer-10></spacer-10>
-    <h4 class="indents">Table 1. - Memory Footprints of Class Layout Instances</h4>
+    <h4 class="indent">Table 1. - Memory Footprints of Class Layout Instances</h4>
     <table class="indent pad10">
       <tr>
         <th class="darkItem">class</th>
@@ -449,11 +441,11 @@
     its inner composed part.  Similarly, the <c-s>Composed</c-s> part constructs its inner <c-s>std::string</c-s>.
     </t-b>
     <spacer-15></spacer-15>
-    <defn-block class="indents">
+    <defn-block class="indent">
       <defn-head>
-        <span class="notice">Constructor Initialization Sequences</span>
+        Constructor Initialization Sequences
       </defn-head>
-      <defn-code style="border-top:2px solid darkred;">
+      <defn-code>
   Derived(const std::string& msg) : Base(msg)
   {
     std::cout << "\n  Derived(const std::string&) called";
