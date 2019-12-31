@@ -434,3 +434,12 @@ function mouseAction(event) {
     }
   }
 }
+//----< close TOC bar >----------------------------------------------
+/*
+ *  Developed for CppStory pages
+ */
+function closeTOC() {
+  let toc = document.getElementById("toc");
+  toc.style.display = "none";
+}
+
