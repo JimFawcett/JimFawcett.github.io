@@ -199,6 +199,12 @@ storyTeller.next = function () {
   storyTeller.render(storyTeller.curr);
 };
 /* --------------------------------------------------------------
+ *  Exit to url of current page
+ */  
+storyTeller.exitToCurrUrl = function () {
+  window.location = storyTeller.pages[storyTeller.curr].url;
+};
+/* --------------------------------------------------------------
  *  Return to story after navigating away in displayed page
  */
 storyTeller.returnToCurr = function () {
@@ -435,7 +441,8 @@ storyTeller.keyAction = function (keyEvent) {
     storyTeller.prev();
   }
   if (key === 'E') {
-    window.location = 'index.html';
+    window.location = storyTeller.pages[storyTeller.curr].url;
+    //window.location = 'index.html';
   }
   if (key === 'H') {
     storyTeller.openHelp();
