@@ -131,9 +131,162 @@
     </num-cont>
     <t-b>
       Classes and class relationships are the building blocks for object-oriented design.  The results
-      are an collection of objects - instances of classes - that cooperate to conduct operations
-      required of their program.
+      are a collection of objects - instances of classes - that cooperate to conduct operations
+      required of their program. We structure the designs using:
+      inheritance, composition, aggregation, using, and friend class relationships.
     </t-b>
+    <details class="indent">
+      <summary class="labelStyle lightItem">Quick Starter Example</summary>
+      <s-halfEm></s-halfEm>
+    <div class="" style="border:2px solid darkred; padding:0em 3em 2em 2em;">
+    <t-b>
+      This example creates and demonstrates a relatively simple logger, e.g., a class whose
+      instances write messages into a stream.  It&apos;s here to illustrate techniques for 
+      upcoming discussions:
+      <div class="indent">
+        <ol class="tight indent">
+          <li>
+            Use of the &quot;= delete&quot; suffix, discussed later in this chapter.
+          </li>
+          <li>
+            Use of std::ostream pointer data member, but casting that to a derived std::fstream
+            pointer with dynamic_cast in the open method and destructor. Doing this allows us
+            to log to std::cout, a std::ostream instance, but also log to derived std::fstreams.
+            We discuss this in chapter 5, and will refer back to this example at that time.
+          </li>
+        </ol>
+      </div>
+    </t-b>
+    <t-b>
+      We&apos;ve used some file stream operations in this demo.  If you aren&apos;t 
+      comfortable with those, you can skip over them - those we discuss in detail in
+      chapter 8.
+    </t-b>
+    <t-b>
+      <defn-outerBlock class="indents" style="width:100%;">
+      <defn-block>
+        <defn-head>Code: Relatively Simple Logger</defn-head>
+        <defn-code>
+class Logger {
+public:
+  Logger() : pStream_(nullptr) {}
+  Logger(std::ostream* pStr) 
+    : pStream_(pStr) {}
+  Logger(const Logger& logger) = delete;
+  ~Logger() {
+    <span class="notice">std::ofstream* pFStrm = 
+      dynamic_cast<std::ofstream*>(pStream_);
+    if (pFStrm != nullptr)
+      pFStrm->close();</span>
+  }
+  Logger& operator=(const Logger& logger) 
+    = delete;
+  void open(const std::string& fileName) {
+    <span class="notice">std::ofstream* pFStrm =
+      dynamic_cast<std::ofstream*>(pStream_);
+    if (pFStrm != nullptr)
+      pFStrm->open(fileName);</span>
+  }
+  void write(const std::string& msg) {
+    (*pStream_) << prefix_ << msg;
+  }
+private:
+  std::string prefix_ = "\n  ";
+  std::ostream* pStream_;
+};
+
+std::unique_ptr<std::ofstream> 
+makeOutFileStream(
+  const std::string& fileName
+) {
+  std::unique_ptr<std::ofstream> 
+    pStrm(new std::ofstream(fileName));
+  return pStrm;
+}
+
+std::unique_ptr<std::ifstream> 
+makeInFileStream(
+  const std::string& fileName
+) {
+  std::unique_ptr<std::ifstream> 
+    pStrm(new std::ifstream(fileName));
+  return pStrm;
+}
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head>Using Code</defn-head>
+        <defn-code>
+int main() {
+
+  displayDemo("-- simple logger --");
+
+  std::string fileName = "log.txt";
+  /*-----------------------------------------
+     Create anonymous scope for logging so
+     logger destructor will be called before
+     trying to open log file.
+  */
+  {
+    auto pOStrm = makeOutFileStream(fileName);
+    if (!pOStrm->good()) {
+      std::cout << "\n  couldn't open \"" 
+                << fileName 
+                << " for writing\n\n";
+      return 1;
+    }
+    Logger logger(pOStrm.get());
+    logger.write("first log item");
+    logger.write("second log item");
+    logger.write("last log item");
+  }
+  auto pIStrm = makeInFileStream(fileName);
+  if (!pIStrm->good())
+  {
+    std::cout << "\n  couldn't open \"" 
+              << fileName 
+              << " for reading\n\n";
+    return 1;
+  }
+
+  std::cout << "\n  " << pIStrm->rdbuf();
+  putline(2);
+}
+        </defn-code>
+        <defn-head class="defnBorderTop">Output</defn-head>
+        <defn-code>
+-- simple logger --
+
+  first log item
+  second log item
+  last log item
+        </defn-code>
+      </defn-block>
+      </defn-outerBlock>
+    </t-b>
+    <t-b>
+      We&apos;ve seen a significantly more ambitious logger at the end of Chapter 3, in our
+      discussion of testing.  This example lays out, in a simpler way, the basic mechanisms needed to build
+      a logger.
+    </t-b>
+    <t-b>
+      <defn-block class="indents" style="width:30em;">
+        <defn-head>Conclusion:</defn-head>
+        <defn-body>
+          C++ classes bind together data members and methods to provide a useful facility.
+          They should have a single focus and be as simple as it is practical to make them.
+          That&apos;s true for this example.
+          <t-b>
+            To keep the class simple, we factored out file opening functions <c-s>makeOutFileStream</c-s>
+            and <c-s>makeInFileStream</c-s>.  We don&apos;t need them if we just want to log to the
+            console.
+          </t-b>
+        </defn-body>
+      </defn-block>
+    </t-b>
+      </div>
+     <s-1em></s-1em>
+    </details>
 
     <a id="Basic"></a>
     <hr class="spread" />

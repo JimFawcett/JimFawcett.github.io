@@ -71,6 +71,217 @@
     with class relationships.  There are five relations: inheritance, composition, aggregation, using, and friendship.
     Of these, all but the last are found in many implementations of C++ programs.
     </t-b>
+    <details class="indent">
+      <summary class="labelStyle lightItem">Quick Starter Example</summary>
+      <s-halfEm></s-halfEm>
+    <div class="" style="border:2px solid darkred; padding:0em 3em 2em 2em;">
+    <t-b>
+      C++ class inheritance has two very useful features:
+      <ol class="tight indent">
+        <li>
+          It supports building flexible code by allowing base class pointers to bind to
+          derived class instances. So a function that accepts a base pointer can accept
+          derived instances through that pointer.
+        </li>
+        <li>
+          Occasionally we use inheritance just to use the base class implementation in a derived class. 
+          That&apos;s what we do in this example.
+        </li>
+      </ol>
+      <t-b>
+        Here, we extend the std::string class to add new features, e.g.:
+      </t-b>
+      <t-b class="indent">
+        <c-s>class stringEx : public std::string, private StrUtils { ... }</c-s>
+      </t-b>
+      <t-b>
+      <c-s>stringEx</c-s> derives publically from <c-s>std::string</c-s> to inherit its public
+      interface.  It derives privately from <c-s>StrUtils</c-s> to hide the interface of that struct
+      while using its methods internally.
+      </t-b>
+    </t-b>
+    <t-b>
+      <defn-outerBlock class="indents" style="width:100%;">
+      <defn-block>
+        <defn-head>Code: Inheriting from std::string</defn-head>
+        <defn-code>
+struct StrUtils {
+
+  /*-----------------------------------------
+     remove whitespace from front and back 
+     of string argument
+     - does not remove newlines
+  */
+  std::string trim(const std::string& toTrim)
+  {
+    if (toTrim.size() == 0)
+      return toTrim;
+    std::string temp;
+    std::locale loc;
+    typename 
+      std::string::const_iterator iter = 
+      toTrim.begin();
+    while (
+      isspace(*iter, loc) && *iter != '\n'
+    )
+    {
+      if (++iter == toTrim.end())
+      {
+        break;
+      }
+    }
+    for (; iter != toTrim.end(); ++iter)
+    {
+      temp += *iter;
+    }
+    typename 
+      std::string::reverse_iterator riter;
+    size_t pos = temp.size();
+    for (
+      riter = temp.rbegin(); 
+      riter != temp.rend(); 
+      ++riter
+    )
+    {
+      --pos;
+      if (
+        !isspace(*riter, loc) 
+        || *riter == '\n'
+      )
+      {
+        break;
+      }
+    }
+    if (0 <= pos && pos < temp.size())
+      temp.erase(++pos);
+    return temp;
+  }
+  /*-----------------------------------------
+    split sentinel separated strings into a 
+    vector of trimmed strings
+  */
+  template <typename T>
+  std::vector<std::string> split(
+    const std::string& toSplit, 
+    T splitOn = ','
+  )
+  {
+    std::vector<std::string> splits;
+    std::string temp;
+    typename 
+      std::string::const_iterator iter;
+    for (
+      iter = toSplit.begin(); 
+      iter != toSplit.end(); 
+      ++iter
+    )
+    {
+      if (*iter != splitOn)
+      {
+        temp += *iter;
+      }
+      else
+      {
+        splits.push_back(trim(temp));
+        temp.clear();
+      }
+    }
+    if (temp.length() > 0)
+      splits.push_back(trim(temp));
+    return splits;
+  }
+};
+class stringEx : 
+  public std::string, private StrUtils {
+public:
+  stringEx() {}
+  stringEx(const std::string& str) 
+    : std::string(str) {}
+  stringEx(const char* pStr) 
+    : std::string(pStr) {}
+  std::string trim() {
+    StrUtils::trim(*this);
+  }
+  std::vector<std::string> 
+    splits(char splitOn = ',') {
+    return StrUtils::split(*this, splitOn);
+  }
+};
+/*--- show collection of string splits ----*/
+
+void showSplits(
+  const std::vector<std::string>& splits, 
+  std::ostream& out = std::cout
+)
+{
+  out << "\n";
+  for (auto item : splits)
+  {
+    if (item == "\n")
+      out << "\n--" << "newline";
+    else
+      out << "\n--" << item;
+  }
+  out << "\n";
+}
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head>Using Code</defn-head>
+        <defn-code>
+using Splits = std::vector<std::string>;
+
+int main() {
+  displayDemo("-- SuperString demo --\n");
+  std::string arg = "one, ";
+  arg += "this is two, ";
+  arg += "and finally three";
+  stringEx superStr{ arg };
+  std::cout 
+    << "\n  superStr has the value: " 
+    << superStr;
+  Splits splits = superStr.splits();
+  std::cout << "\n  superStr splits are:";
+  for (auto split : splits) {
+    std::cout << "\n    " << split;
+  }
+  putline(2);
+}
+        </defn-code>
+        <defn-head class="defnBorderTop">Output</defn-head>
+        <defn-code>
+-- SuperString demo --
+
+superStr has the value: 
+  one, this is two, and finally three
+
+superStr splits are:
+  one
+  this is two
+  and finally three
+        </defn-code>
+      </defn-block>
+      </defn-outerBlock>
+    </t-b>
+    <t-b>
+      C++ has two facilities that are very useful for building flexible code:
+      <span class="notice">inheritance</span> and <span class="notice">templates</span>.
+      We discuss inheritance and the other class relationships in this chapter. Templates 
+      come in Chapter 6.
+    </t-b>
+    <t-b>
+      <defn-block class="indents" style="width:30em;">
+        <defn-head>Conclusion:</defn-head>
+        <defn-body>
+          Its relatively easy to incorporate functionality from the standard C++ libraries
+          in our own classes. That ability makes us significantly more productive.  We just
+          have to know how and when to use it. Cheers!
+        </defn-body>
+      </defn-block>
+    </t-b>
+      </div>
+     <s-1em></s-1em>
+    </details>
 
     <a id="ClassRel"></a>
     <hr class="spread" />
