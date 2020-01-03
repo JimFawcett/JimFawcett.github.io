@@ -202,12 +202,20 @@ storyTeller.next = function () {
  *  Exit to url of current page
  */  
 storyTeller.exitToCurrUrl = function () {
-  window.location = storyTeller.pages[storyTeller.curr].url;
+  //alert('curr = ' + storyTeller.curr);
+  //alert('numItems = ' + storyTeller.numItems);
+  if (!isDefined(storyTeller.curr) || storyTeller.numItems === 0) {
+    window.location = 'index.html';
+  }
+  else {
+    window.location = storyTeller.pages[storyTeller.curr - 1].url;
+  }
 };
 /* --------------------------------------------------------------
  *  Return to story after navigating away in displayed page
  */
 storyTeller.returnToCurr = function () {
+  //alert('curr = ' + storyTeller.curr);
   storyTeller.render(storyTeller.curr);
 };
 /* --------------------------------------------------------------
