@@ -204,7 +204,7 @@ storyTeller.next = function () {
 storyTeller.exitToCurrUrl = function () {
   //alert('curr = ' + storyTeller.curr);
   //alert('numItems = ' + storyTeller.numItems);
-  if (!isDefined(storyTeller.curr) || storyTeller.numItems === 0) {
+  if (!isDefined(storyTeller.curr) || storyTeller.numItems === 0 || storyTeller.curr === 0) {
     window.location = 'index.html';
   }
   else {
