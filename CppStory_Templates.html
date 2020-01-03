@@ -39,7 +39,7 @@
     <div id="navbar"></div>
   </nav>
 
-  <a id="Next" href="CppStory_Libraries.html">N</a>
+  <a id="Next" href="CppStory_TemplateMetaprog.html">N</a>
   <a id="Prev" href="CppStory_ClassRelationships.html">P</a>
 
   <header>
@@ -69,7 +69,7 @@
     resolved only when an application instantiates the code with a concrete type. Parameterized code will 
     accept, without compilation error, arbitrary calls on instances of the template type. When an application 
     instantiates the parameterized code with a concrete type, compilation of the instantiated code succeeds 
-    if the type supports specified operations, else it fails.
+    if the type supports specified operations that are used by the application, else it fails.
   </t-b>
   <t-b>
     So there are two C++ template compilation phases:
@@ -91,6 +91,127 @@
     An implication of lazy compilation is that all of the template definition code must go in a 
     header file, because the application that uses the template definition has to see all of it's code 
     to compile successfully, and it gets that only by including a header file.
+  </t-b>
+  <t-b class="indent">
+    <details class="indent">
+      <summary class="labelStyle lightItem">Quick Starter Example - Lazy Template Compilation</summary>
+      <s-halfEm></s-halfEm>
+    <div class="" style="border:2px solid darkred; padding:0em 3em 2em 2em;">
+    <t-b>
+      This example builds two classes: <c-s>Parameter</c-s>, used to provide a
+      template parameter, and <c-s>LazyDemo</c-s> which uses the Parameter type as an
+      parameter. The <c-s>LazyDemo&lt;P&gt;</c-s> class
+      has two methods: <c-s>LazyDemo::say()</c-s> which calls <c-s>Parameter::say()</c-s> and
+      <c-s>LazyDemo::shout()</c-s> which calls <c-s>Parameter::shout()</c-s>.
+    </t-b>
+    <t-b>
+      If we comment out <c-s>Parameter::shout()</c-s>, the code will compile provided that
+      it does not call <c-s>LazyDemo::shout()</c-s>, even though <c-s>LazyDemo::shout()</c-s>
+      depends on <c-s>Parameter::shout()</c-s>! That&apos;s because a template method that is
+      never called won&apos;t be compiled.
+    </t-b>
+    <t->
+      You can demonstrate that for yourself by looking at the project&apos;s assembly code.
+      That&apos;s fairly large due to its include files, but you can just search on &quot;shout&quot;
+      and discover that it isn&apos;t in the assembly.
+    </t->
+    <t-b>
+      <defn-outerBlock class="indents" style="width:100%;">
+      <defn-block>
+        <defn-head>Code: Demo of Lazy Template Compil'n</defn-head>
+        <defn-code>
+class Parameter {
+public:
+  void say() {
+    std::cout << "\n  Parameter here";
+  }
+  /*-----------------------------------
+    when commented out, illustrates lazy
+    compilation
+   */
+  //void shout() {
+  //  std::string msg = 
+  //    "\n  [very loudly] ";
+  //  msg += "Parameter here";
+  //  std::cout << msg;
+  //}
+};
+
+template&lt;typename P&gt;
+class LazyDemo {
+public:
+  void say() {
+    std::cout 
+      << "\n  LazyDemo here with ";
+    p_.say();
+  }
+  void shout() {
+    std::string msg = 
+      "\n  [very loudly] ";
+    msg += "LazyDemo here with ";
+    std::cout << msg;
+    <span class="notice">p_.shout();</span>
+  }
+private:
+  P p_;
+};
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head>Using Code</defn-head>
+        <defn-code>
+int main() {
+
+  displayDemo("-- Lazy Templ Compl --");
+
+  LazyDemo&lt;Parameter&gt; ld;
+  ld.say();
+
+  /*-----------------------------------
+     Uncommenting next line will cause
+     compilation error, because 
+     Parameter does not define shout.
+
+     It&apos;s not compiled if it isn&apos;t
+     used.
+  */
+  //ld.shout();
+
+  std::cout << "\n\n";
+}
+          </defn-code>
+        <defn-head class="defnBorderTop">Output</defn-head>
+        <defn-code>
+-- Lazy Templ Compil --
+  LazyDemo here with
+  Parameter here
+        </defn-code>
+      </defn-block>
+      </defn-outerBlock>
+    </t-b>
+    <t-b>
+      Lazy template compilation is very important.  It allows us to build template classes that,
+      for some parameters, may want to call a method on that parameter, but for other parameters
+      it still works as long as we don&apos;t call a missing method.
+    </t-b>
+    <t-b>
+      I&apos;ve used this effect in several of the demo codes for this story and other codes
+      in the C++ Repository, most notably the
+      Property&lt;T&gt; class example, presented later in this chapter.
+    </t-b>
+    <t-b>
+      <defn-block class="indents" style="width:30em;">
+        <defn-head>Conclusion:</defn-head>
+        <defn-body>
+          Lazy template compilation makes template classes very forgiving of their parameter
+          types.  If a type doesn&apos;t have a method that&apos;s used for other parameter types,
+          that causes no problems as long as we don&apos;t call the missing method.
+        </defn-body>
+      </defn-block>
+    </t-b>
+    </div>
+    <s-1em></s-1em>
+    </details>
   </t-b>
 
   <a id="TmplFun"></a>
