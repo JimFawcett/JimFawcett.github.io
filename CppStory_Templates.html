@@ -2610,6 +2610,173 @@ int main()
   </num-cont>
   <div>
     <details>
+      <summary class="labelStyle darkItem">Specialized Logger</summary>
+      <s-halfEm></s-halfEm>
+      <defn-outerBlock>
+        <defn-block>
+          <defn-head>Code: Specialized Logger</defn-head>
+          <defn-code>
+  struct TNull {};
+
+  template&lt;typename S&gt;
+  struct FNull {};
+
+  template&lt;
+    typename S, 
+    template&lt;typename&gt; typename F = FNull, 
+    typename T = TNull
+  &gt;
+  class Logger { 
+    /*-- used for specializ'n structure --*/ 
+  };
+  /*---------------------------------------
+     unadorned Logger
+  ---------------------------------------*/
+
+  template&lt;typename S&gt;
+  class Logger&lt;S, FNull, TNull&gt; {
+  public:
+    Logger(std::ostream* pStr) 
+      : pStream_(pStr) {}
+    ~Logger() {}
+    void write(S s) {
+      (*pStream_) &lt;&lt; prefix_ &lt;&lt; s;
+    }
+  private:
+    std::string prefix_ = "\n  ";
+    std::ostream* pStream_;
+  };
+
+  /*---------------------------------------
+    template class partial specialization 
+    on Formatter class
+    - this is partial class specialization
+      since S is still unspecified
+  ---------------------------------------*/
+
+  template&lt;typename S&gt;
+  struct Formatter {
+    const char* prefix_ = "\n  &lt;-- ";
+    const char* suffix_ = " --&gt;";
+    std::string transform(const S&amp; s) {
+      return prefix_ + s + suffix_;
+    }
+  };
+
+  template&lt;
+    typename S, 
+    template&lt;typename&gt; typename F
+  &gt;
+  class Logger&lt;S, F, TNull&gt; {
+  public:
+    Logger(std::ostream* pStr) 
+      : pStream_(pStr) {}
+    ~Logger() {}
+    void write(S s) {
+      (*pStream_) &lt;&lt; f.transform(s);
+    }
+  private:
+    std::string prefix_ = "\n  ";
+    std::ostream* pStream_;
+    F&lt;S&gt; f;
+  };
+  
+  /*---------------------------------------
+    template class partial specialization 
+    on Timer class
+    - See Timer.h for details
+  ---------------------------------------*/
+
+  template&lt;typename S, typename T&gt;
+  class Logger&lt;S, FNull, T&gt; {
+  public:
+    Logger(std::ostream* pStr) 
+      : pStream_(pStr) {}
+    ~Logger() {
+      timer_.stop();
+    }
+    void start() {
+      timer_.start();
+    }
+    void stop() {
+      timer_.stop();
+    }
+    void write(S s) {
+      (*pStream_) 
+        &lt;&lt; prefix_ &lt;&lt; std::setw(6) 
+        &lt;&lt; timer_.elapsedMicroseconds() 
+        &lt;&lt; " microsec : " &lt;&lt; s;
+    }
+  private:
+    std::string prefix_ = "\n  ";
+    T timer_;
+    std::ostream* pStream_;
+  };
+          </defn-code>
+        </defn-block>
+        <defn-block>
+          <defn-head>Using Code</defn-head>
+          <defn-code>
+int main() {
+  
+  displayTitle("Demonstrate Logger Specializ'n");
+
+  displayDemo("--- Unadorned Logger ---\n");
+  /* using defaults F=FNull, T=TNull */
+  Logger&lt;std::string&gt; log(&amp;std::cout);
+  log.write("first log item");
+  log.write("second log item");
+
+  displayDemo(
+    "\n  -- Specializ'n for format logs --\n"
+  );
+  /* using default T = TNull */
+  Logger&lt;std::string, Formatter&gt; 
+    flog(&amp;std::cout);
+  flog.write("first formatted log item");
+  flog.write("second formatted log item");
+
+  displayDemo(
+    "\n  -- Specializ'n for timed logs --\n"
+  );
+  /* cite FNull because defaults only at end */
+  Logger&lt;std::string, FNull, Timer&gt; 
+    tlog(&amp;std::cout);
+  tlog.start();
+  tlog.write("first timed log item");
+  tlog.write("second timed log item");
+  tlog.write("third timed log item");
+
+  std::cout &lt;&lt; "\n\n";
+}
+          </defn-code>
+          <defn-head class="defnBorderTop">Output</defn-head>
+          <defn-code>
+Demonstrate Logger Specializ'n
+===============================
+
+--- Unadorned Logger ---
+
+first log item
+second log item
+
+--- Specializ'n for format logs ---
+
+<-- first formatted log item -->
+<-- second formatted log item -->
+
+--- Specializ'n for timed logs ---
+
+    41 microsec : first timed log item
+    482 microsec : second timed log item
+    790 microsec : third timed log item
+          </defn-code>
+        </defn-block>
+      </defn-outerBlock>
+    </details>
+  </div>
+  <div>
+    <details>
       <summary class="labelStyle darkItem">Property Class Specialization</summary>
       <s-halfEm></s-halfEm>
       <defn-outerBlock>
