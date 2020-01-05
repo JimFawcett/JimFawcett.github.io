@@ -54,7 +54,8 @@
     <a href="#Overload">Overload</a>, <a href="#TypeCat">Type Cat</a>, 
     <a href="#TypeTran">Type Tran</a>, <a href="#SFINAE">SFINAE</a>, 
     <a href="#FunExpl">Fun Expl</a>, <a href="#TmplClass">Tmpl Class</a>, 
-    <a href="#Params">Params</a>, <a href="#ClassSpec">Tmpl Class Spec</a>, 
+    <a href="#Params">Params</a>, <a href="#ClassSpec">Tmpl Class Spec</a>,
+    <a href="#Ref">Refs</a>, 
     <a href="Javascript:;" onclick="closeTOC()" style="color:darkred;">Close</a>
   </toc-b>
 
@@ -73,6 +74,7 @@
   </t-b>
   <t-b>
     So there are two C++ template compilation phases:
+    <indent-block>
     <ol class="tight">
       <li>
         Compilation of the template library code does a syntax check to identify known errors. No object code 
@@ -83,6 +85,7 @@
         otherwise it fails.
       </li>
     </ol>
+    </indent-block>
     This lazy syntax checking is very useful. C# and Java generics do eagar type checking so many operations 
     that would succeed for useful types are not allowed because the compiler can't ensure that they will 
     succeed.
@@ -92,17 +95,21 @@
     header file, because the application that uses the template definition has to see all of it's code 
     to compile successfully, and it gets that only by including a header file.
   </t-b>
-  <t-b class="indent">
+  <t-b>
     <details class="indent">
       <summary class="labelStyle lightItem">Quick Starter Example - Lazy Template Compilation</summary>
       <s-halfEm></s-halfEm>
     <div class="" style="border:2px solid darkred; padding:0em 3em 2em 2em;">
     <t-b>
+      <div style="padding-top:0rem; padding-bottom:1rem;">
+        &quot;You only pay for what you need&quot;<br />
+        - Liberty Mutual advertisement
+      </div>
       This example builds two classes: <c-s>Parameter</c-s>, used to provide a
-      template parameter, and <c-s>LazyDemo</c-s> which uses the Parameter type as an
-      parameter. The <c-s>LazyDemo&lt;P&gt;</c-s> class
-      has two methods: <c-s>LazyDemo::say()</c-s> which calls <c-s>Parameter::say()</c-s> and
-      <c-s>LazyDemo::shout()</c-s> which calls <c-s>Parameter::shout()</c-s>.
+      template parameter, and <c-s>LazyDemo</c-s> which uses that type. 
+      The <c-s>LazyDemo&lt;P&gt;</c-s> class
+      has two methods: <c-s>LazyDemo&lt;P&gt;::say()</c-s> which calls <c-s>Parameter::say()</c-s> and
+      <c-s>LazyDemo&lt;P&gt;::shout()</c-s> which calls <c-s>Parameter::shout()</c-s>.
     </t-b>
     <t-b>
       If we comment out <c-s>Parameter::shout()</c-s>, the code will compile provided that
@@ -261,7 +268,7 @@ T h() {
     </t-b>
     <t-b>
       For the
-      third case, type inference is not possible from the arguments and the compiler does not attempt to
+      third case, type inference is not possible from the arguments, as there are none, and the compiler does not attempt to
       analyze the body code to figure that out, so we have to help by providing the type we want, as shown
       in the last line of code, below.
     </t-b>
@@ -514,7 +521,12 @@ std::cout &lt;&lt; "\n  " &lt;&lt; typeid(what).name();
           (cvr) qualifiers
         </li>
         <li>
-          rvalue references (T&amp;&amp;) can bind to both lvalues and rvalues
+          lvalue references (T&amp;) can bind only to lvalues and const rvalues. The resulting type
+          is always an lvalue reference. C++ classifies literal strings as lvalues. All other literals,
+          e.g., 42 and 3.14159, are classified as rvalues.
+        </li>
+        <li>
+          rvalue references (T&amp;&amp;) can bind to both lvalues and const and non-const rvalues
         </li>
       </ol>
     </t-b>
@@ -550,26 +562,32 @@ std::cout &lt;&lt; "\n  " &lt;&lt; typeid(what).name();
     <tr>
       <td class="defn"><c-s>int i{ 3 };</c-s></td>
       <td class="defn"><c-s>int</c-s></td>
-      <td class="defn"></td>
-      <td class="defn"></td>
+      <td class="defn notice">NA</td>
+      <td class="defn notice">NA</td>
     </tr>
     <tr>
       <td class="defn"><c-s>const int&amp; j = &amp;i;</c-s></td>
       <td class="defn"><c-s>int</c-s></td>
-      <td class="defn"></td>
-      <td class="defn"></td>
+      <td class="defn notice">NA</td>
+      <td class="defn notice">NA</td>
     </tr>
     <tr>
       <td class="defn"><c-s>const int* pI = &amp;i;</c-s></td>
-      <td class="defn"></td>
+      <td class="defn notice">NA</td>
       <td class="defn"><c-s>int const *</c-s></td>
-      <td class="defn"></td>
+      <td class="defn notice">NA</td>
     </tr>
     <tr>
       <td class="defn"><c-s>int iarr[4]</c-s></td>
-      <td class="defn"></td>
-      <td class="defn"></td>
+      <td class="defn notice">NA</td>
+      <td class="defn notice">NA</td>
       <td class="defn"><c-s>int *</c-s></td>
+    </tr>
+    <tr>
+      <td class="defn"><c-s>42</c-s></td>
+      <td class="defn">int</td>
+      <td class="defn notice">NA</td>
+      <td class="defn notice">NA</td>
     </tr>
   </table>
   <s-halfEm></s-halfEm>
@@ -586,6 +604,7 @@ std::cout &lt;&lt; "\n  " &lt;&lt; typeid(what).name();
       <li>
         Passing an argument by lvalue reference (&amp;) doesn&apos;t remove qualifiers and arrays do not
         decay (because they won&apos;t be copied). An lvalue reference can only bind to lvalues or const rvalues.
+        Note that C++ classifies literal strings as lvalues.  All other literals, e.g., ints and doubles, are rvalues.
       </li>
       <li>
         Passing an argument by pointer doesn&apos;t remove qualifiers, but arrays do decay (because the argument
@@ -611,25 +630,25 @@ std::cout &lt;&lt; "\n  " &lt;&lt; typeid(what).name();
       <th class="darkItem" style="width:11em;"><c-s>template&lt;class T&gt;<br />f4(T&& arg)</c-s></th>
     </tr>
     <tr>
-      <td class="defn"><c-s>int i{ 3 };</c-s></td> 
+      <td class="defn"><c-s>int i{ 3 };<br />lvalue</c-s></td> 
       <td class="defn">T = int </td>
       <td class="defn">T&amp; = int &amp;</td>
       <td class="defn">const T&amp; = int&nbsp;const&nbsp;&amp;</td>
-      <td class="defn"></td>
-      <td class="defn"></td>
+      <td class="defn notice">NA</td>
+      <td class="defn notice">NA</td>
       <td class="defn">T&amp;&amp; = int &amp;</td>
     </tr>
     <tr>
-      <td class="defn"><c-s>const int&amp; j = &amp;i;</c-s></td>
+      <td class="defn"><c-s>const int&amp; j = &amp;i;<br />lvalue</c-s></td>
       <td class="defn">T = int</td>
       <td class="defn">T&amp; = int const &amp;</td>
       <td class="defn">const T&amp; = int&nbsp;const&nbsp;&amp;</td>
-      <td class="defn"></td>
-      <td class="defn"></td>
+      <td class="defn notice">NA</td>
+      <td class="defn notice">NA</td>
       <td class="defn">T&amp;&amp; = int&nbsp;const&nbsp;&amp;</td>
     </tr>
     <tr>
-      <td class="defn"><c-s>const int* pI = &amp;i;</c-s></td>
+      <td class="defn"><c-s>const int* pI = &amp;i;<br />lvalue</c-s></td>
       <td class="defn">T = int const *</td>
       <td class="defn">T&amp; = int&nbsp;const&nbsp;*&nbsp;&amp;</td>
       <td class="defn">const T&amp; = int&nbsp;const&nbsp;*&nbsp;const&nbsp;&amp;</td>
@@ -638,13 +657,31 @@ std::cout &lt;&lt; "\n  " &lt;&lt; typeid(what).name();
       <td class="defn">T&amp;&amp; = int&nbsp;const&nbsp;*&nbsp;&amp;</td>
     </tr>
     <tr>
-      <td class="defn"><c-s>iarr[4]</c-s></td>
+      <td class="defn"><c-s>iarr[4]</c-s><br />lvalue</td>
       <td class="defn">T = int *</td>
       <td class="defn">T&amp; = int&nbsp;(&amp;)[4]</td>
       <td class="defn">const T&amp; = int&nbsp;const&nbsp;(&amp;)[4]</td>
       <td class="defn">T* = int *</td>
       <td class="defn">const T* = int&nbsp;const&nbsp;*</td>
       <td class="defn">T&amp;&amp; = int&nbsp;(&amp;)[4]</td>
+    </tr>
+    <tr>
+      <td class="defn"><c-s>"a string literal"</c-s><br />lvalue</td>
+      <td class="defn">T = char const *</td>
+      <td class="defn">T&amp; = char const (&amp;)[17]</td>
+      <td class="defn">const T&amp; = char const (&amp;)[17]</td>
+      <td class="defn">T* = const char *</td>
+      <td class="defn">const T* = char&nbsp;const&nbsp;*</td>
+      <td class="defn">T&amp;&amp; = char&nbsp;const&nbsp;&amp;&nbsp;*</td>
+    </tr>
+    <tr>
+      <td class="defn"><c-s>42</c-s><br />rvalue</td>
+      <td class="defn">T = int</td>
+      <td class="defn">doesn&apos;t compile</td>
+      <td class="defn">const T&amp; = int const &amp;</td>
+      <td class="defn notice">NA</td>
+      <td class="defn notice">NA</td>
+      <td class="defn">T&amp;&amp; = int&nbsp;&amp&amp;</td>
     </tr>
   </table>
   </div>
@@ -1562,8 +1599,28 @@ Testing Template Based Stack Class
     </ol>
   </t-b>
   <t-b>
-    In the Logger class example, below, <c-s>Logger</c-s> takes a template parameter <c-s>T</c-s>, 
-    the type of message being logged, and parameter type <c-s>C</c-s>, representing a logger category. 
+    <span class="notice">Type parameters</span> may hold processing that customizes behavior of 
+    a template class for specific applications.
+    they may also be used to define specific data structures
+    for an application. Often an application defines type parameters for 
+    its unique processing to be used with and existing template class framework.
+  </t-b>
+  <t-b>
+    <span class="notice">Template type parameters</span> are themselves templates. You will see in
+    the Template Functors example, below, use of a functor, <c-s>X&lt;C&gt;</c-s> that is parameterized on
+    <c-s>C</c-s>, the type of an STL container. It is used in a traversal function to operate on all 
+    the members of the STL container.
+  </t-b>
+  <t-b>
+    <span class="notice">Value parameters</span> are values rather than classes. 
+    The <c-s>std::Array&lt;T,N&gt; class</c-s>
+    uses a value parameter, <c-s>N</c-s> to define the number of elements it holds.
+  </t-b>
+  <t-b>
+    In the Logger class example, below, <c-s>Logger</c-s> takes a 
+    <span class="notice">template type parameter <c-s>T</c-s></span>, 
+    the type of message being logged, and <span class="notice">value parameter <c-s>size_t C</c-s></span>, 
+    representing a logger category. 
     <c-s>Logger</c-s> uses its <c-s>C</c-s> parameter to define a logging level, e.g., debug or 
     demonstration or results or some combination of the three. For <c-s>Logger</c-s> the <c-s>C</c-s>
     represents an initial value for its logging level.  That may be changed at run-time.
@@ -1915,8 +1972,8 @@ int main() {
   </t-b>
   <t-b>
     The Template Functors code example, below, has a global function <c-s>Traverse</c-s> that is
-    defined with a template parameter, <c-s>C</c-s>, and a template template parameter, 
-    <c-s>X&lt;C&gt;</c-s>:
+    defined with a template parameter, <c-s>C</c-s>, and a 
+    <span class="notice">template template parameter, <c-s>X&lt;C&gt;</c-s></span>:
     <i-b class="pad5">
       <c-s>
   template &lt;class C, template &lt;class C&gt; class X&gt;<br />
@@ -2072,10 +2129,11 @@ C S E 6 8 7   -   O b j e c t   O r i e n t e d   D e s i g n
     represent hierarchal relationships, e.g., package dependency or social network friend relationships.
   </t-b>
   <t-b>
-    This example is here, because it uses two template parameters, <c-s>V</c-s> and <c-s>E</c-s>, that
+    This example is here, because it uses two template
+    <span class="notice">type parameters, <c-s>V</c-s> and <c-s>E</c-s></span>, that
     represent information held in each vertex and each edge.  For example, a class dependency graph
-    would probably contain a class name in each vertex and a class relationship
-    type, e.g., inheritance, composition, aggregation, or using, in each edge.
+    would probably contain a class name in each vertex and in each edge a class relationship
+    type, e.g., inheritance, composition, aggregation, or using.
   </t-b>
   <t-b>
     Before looking at the example, it will help to look at the <a href="CppGraph.html">Graph Documentation</a>
@@ -2085,6 +2143,11 @@ C S E 6 8 7   -   O b j e c t   O r i e n t e d   D e s i g n
   <details>
     <summary class="labelStyle darkItem">Directed Graph Class</summary>
     <s-halfEm></s-halfEm>
+    <div class="indent pad10">
+      <a href="Resources/Graph.h.html">Graph.h</a>, 
+      <a href="Resources/Graph.cpp.html">Graph.cpp</a>, 
+      <a href="Resources/Graph.out.html">Graph.out</a>
+    </div>
     <defn-outerBlock>
     <defn-block>
       <defn-head>Vertex and Graph Code</defn-head>
@@ -2608,9 +2671,219 @@ int main()
   <num-cont>
     <num-item1>6.6</num-item1><num-item4>Template Class Specialization</num-item4>
   </num-cont>
+  <t-b>
+    Templates provide the means to define classes that are configured with other subordinate
+    classes. In the code block, below, we&apos;re configuring class <c-s>X</c-s> to use helper
+    classes <c-s>P</c-s> and <c-s>Q</c-s>.  Each application can decide which helpers to use
+    and/or implement another set of helpers specific to that application.
+  </t-b>
+  <t-b>
+    Template <span class="notice">specialization</span> gives us another degree of design freedom.  
+    Specialization occurs when
+    we define a template class with one or more template arguments, but also provide one or more
+    additional classes with the same name, but with at least one of the arguments specialized.
+  </t-b>
+  <t-b>
+    In the code below, we&apos;ve specialized <c-s>X&lt;P,Q&gt;</c-s> for the cases:
+    <c-s>X&lt;P,Q1&gt;</c-s>, <c-s>X&lt;P1,Q&gt;</c-s>, and <c-s>X&lt;P1,Q1&gt;</c-s>. Each
+    specialization provides its own class implementation and each will be different in some
+    way needed for those specific cases. Note that these are different classes.  The compiler
+    is required, when compiling a template class, to look for specializations, and if one matches
+    the declaration it&apos;s compiling, it must compile the specialized class.
+  </t-b>
+  <t-b>
+    The code block below illustrates template specialization syntax. The following logger example
+    demonstrates how specialization is used for practical applications.
+  </t-b>
+  <t-b>
+    <defn-outerBlock class="indent">
+    <defn-block>
+      <defn-head>Template Class</defn-head>
+      <defn-code>
+/*----------------------------------------
+   Classes P0, P1,Q0, and Q1 defined 
+   before this code.
+*/
+/*-----------------------------------------
+   Class used for generic operations
+*/
+template&lt;typename P = P0, typename Q = Q0&gt;
+class X {
+public:
+  X() {
+    std::cout &lt;&lt; "\n  Generic X Template";
+  }
+  void doProc() {
+    p_.doProc();
+    q_.doProc();
+  }
+private:
+  P p_;
+  Q q_;
+};
+/*-----------------------------------------
+   Class specialized to use Q1
+*/
+template&lt;typename P&gt;
+class X&lt;P, Q1&gt; {
+public:
+  X() {
+    std::cout &lt;&lt; 
+      "\n  X partially specialized for Q1";
+  }
+  void doProc() {
+    p_.doProc();
+    q_.doProc();
+  }
+private:
+  P p_;
+  Q1 q_;
+};
+/*-----------------------------------------
+   Class specialized to use P1
+*/
+template&lt;typename Q&gt;
+class X&lt;P1, Q&gt; {
+public:
+  X() {
+    std::cout &lt;&lt; 
+      "\n  X partially specialized for P1";
+  }
+  void doProc() {
+    p_.doProc();
+    q_.doProc();
+  }
+private:
+  P1 p_;
+  Q q_;
+};
+/*-----------------------------------------
+  Class fully specialized to use P1 and Q1
+*/
+template&lt;&gt;
+class X&lt;P1, Q1&gt; {
+public:
+  X() {
+    std::cout &lt;&lt; 
+      "\n  X fully specialized for P1 &amp; Q1";
+  }
+  void doProc() {
+    p_.doProc();
+    q_.doProc();
+  }
+private:
+  P1 p_;
+  Q1 q_;
+};
+      </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head>Using Code:</defn-head>
+        <defn-code>
+int main() {
+
+  displayDemo("-- generic processing --");
+  X&lt;P0, Q0&gt; x1;
+  x1.doProc();
+
+  displayDemo(
+    "\n  -- using default template args --"
+  );
+  X&lt;&gt; x2;
+  x2.doProc();
+
+  displayDemo(
+    "\n  -- Using full specializ'n --"
+  );
+  X&lt;P1, Q1&gt; x3;
+  x3.doProc();
+
+  displayDemo(
+    "\n  -- Using specializ'n for P1 --"
+  );
+  X&lt;P1, Q0&gt; x4;
+  x4.doProc();
+
+  displayDemo(
+    "\n  -- Using specializ'n for Q1 --"
+  );
+  X&lt;P0, Q1&gt; x5;
+  x5.doProc();
+
+  putline(2);
+}
+        </defn-code>
+      <defn-head class="defnBorderTop">Output</defn-head>
+      <defn-code>
+  -- generic processing --
+  Generic X Template
+  doing P0 processing
+  doing Q0 processing
+
+  -- using default template args --
+  Generic X Template
+  doing P0 processing
+  doing Q0 processing
+
+  -- Using full specializ'n --
+  X fully specialized for P1 & Q1
+  doing P1 processing
+  doing Q1 processing
+
+  -- Using specializ'n for P1 --
+  X partially specialized for P1
+  doing P1 processing
+  doing Q0 processing
+
+  -- Using specializ'n for Q1 --
+  X partially specialized for Q1
+  doing P0 processing
+  doing Q1 processing
+      </defn-code>
+    </defn-block>
+    </defn-outerBlock>
+  </t-b>
+  <s-halfEm></s-halfEm>
+  <t-b>
+    Template specialization provides a generic class, expected to handle common program needs.
+    Each specialization adds another class that replaces the generic one for a specific case, e.g.
+    a specific parameter type when instantiated.  There may be as many specializations as you need.
+  </t-b>
+  <t-b>
+    The logger example, below, is simpler than that presented above.  It is here to illustrate
+    template specialization.  It uses specialization to provide:
+    <indent-block>
+    <ol class="tight indent">
+      <li>
+        A generic logger class, Logger&lt;S, F, T&gt;, describing Logger structure.
+        It&apos;s not intended for use, but provides the layout for template
+        arguments. S is a text-based message, F is a message formatter, and T is a timer.
+      </li>
+      <li>
+        An unadorned logger, Logger&lt;S, FNull, TNull&gt;, that provides basic logging, i.e.,
+        writes text to a specified stream. The first argument, S, will usually be a std::string,
+        but could also be a structured message. The FNull argument provides a do nothing formatter,
+        and the TNull argument provides a do nothing timer.
+      </li>
+      <li>
+        A partial specialization on F, to provide application specific formatting. Note that this
+        parameter is a template, e.g., F&lt;S&gt;, allowing F to handle different types of text messages.
+      </li>
+      <li>
+        A partial specialization on T, to provide elapsed time annotations on each message.
+      </li>
+    </ol>
+    </indent-block>
+  </t-b>
+  <t-b>
+    This example deviates from the usual pattern in that the generic class is just used to provide a
+    framework for subsequent specializations, so every template the application instantiates is
+    a specialization. This design style is used less often than providing a working generic class,
+    but sometimes it&apos;s easier to build this way.
+  </t-b>
   <div>
     <details>
-      <summary class="labelStyle darkItem">Specialized Logger</summary>
+      <summary class="labelStyle darkItem">Simplified Logger illustrates specialization</summary>
       <s-halfEm></s-halfEm>
       <defn-outerBlock>
         <defn-block>
@@ -2623,7 +2896,7 @@ int main()
 
   template&lt;
     typename S, 
-    template&lt;typename&gt; typename F = FNull, 
+    template&lt;typename S&gt; typename F = FNull, 
     typename T = TNull
   &gt;
   class Logger { 
@@ -2651,7 +2924,7 @@ int main()
     template class partial specialization 
     on Formatter class
     - this is partial class specialization
-      since S is still unspecified
+      since S and F are still unspecified
   ---------------------------------------*/
 
   template&lt;typename S&gt;
@@ -2665,7 +2938,7 @@ int main()
 
   template&lt;
     typename S, 
-    template&lt;typename&gt; typename F
+    template&lt;typename S&gt; typename F
   &gt;
   class Logger&lt;S, F, TNull&gt; {
   public:
@@ -2773,9 +3046,14 @@ second log item
           </defn-code>
         </defn-block>
       </defn-outerBlock>
+      <t-b>
+        A more fully featured implementation would probably also provide a full specialization for both
+        formatting and timing.
+      </t-b>
     </details>
   </div>
-  <div>
+
+  <!--<div>
     <details>
       <summary class="labelStyle darkItem">Property Class Specialization</summary>
       <s-halfEm></s-halfEm>
@@ -2996,19 +3274,20 @@ int main() {
         </defn-block>
       </defn-outerBlock>
     </details>
-  </div>
+  </div>-->
+    <t-b>
+      This concludes our discussion of templates, overloading, and specialization.  In the next
+      chapter we discuss Template Metaprogramming.
+    </t-b>
+    <a id="Ref"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>6.7</num-item1><num-item4>References</num-item4>
+    </num-cont>
+
   </bb-55>
   <spacer-25></spacer-25>
-  <indent-blocks>
-    <h3>Template Class Specialization:</h3>
-    <h3>Variadic Templates</h3>
-    <h3>CppProperties</h3>
-
-    <indent-blocks>
-    </indent-blocks>
-    <spacer-25></spacer-25>
     <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
-
-    <info-bar></info-bar>
+  <info-bar></info-bar>
 </body>
 </html>

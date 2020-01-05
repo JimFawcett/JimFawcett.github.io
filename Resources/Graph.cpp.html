@@ -1,0 +1,141 @@
+<pre>///////////////////////////////////////////////////////////////
+// Graph.cpp - Graph Library                                 //
+// Ver 1.5                                                   //
+// Language:    Visual C++ 2012                              //
+// Platform:    Lenova ThinkPad E420s, Windows 7             //
+// Application: Help for CSE687 - OOD, Pr#1, Spring 2013     //
+// Author:      Jim Fawcett, CST 4-187, Syracuse University  //
+//              (315) 443-3948, jfawcett@twcny.rr.com        //
+///////////////////////////////////////////////////////////////
+
+#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+#include "Graph.h"
+using namespace GraphLib;
+
+typedef Graph&lt;std::string, std::string&gt; graph;
+typedef Vertex&lt;std::string, std::string&gt; vertex;
+typedef Display&lt;std::string, std::string&gt; display;
+
+void showVert(Vertex&lt;std::string, std::string&gt;&amp; v)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; v.id();
+}
+
+template&lt;typename V, typename E&gt;
+void TshowVert(Vertex&lt;V,E&gt;&amp; v)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; v.id();
+}
+
+#ifdef TEST_GRAPH
+
+int main()
+{
+  std::cout &lt;&lt; "\n  Testing Graph Library";
+  std::cout &lt;&lt; "\n =======================\n";
+  try
+  {
+    std::cout &lt;&lt; "\n  Constructing Graph instance";
+    std::cout &lt;&lt; "\n -----------------------------";
+    graph g;
+    vertex v1("v1");
+    vertex v2("v2");
+    vertex v3("v3");
+    vertex v4("v4");
+    vertex v5("v5", 50);
+    g.addVertex(v2);
+    g.addVertex(v1);
+    g.addVertex(v3);
+    g.addVertex(v4);
+    g.addVertex(v5);
+    g.addEdge("e1",v1,v2);
+    g.addEdge("e2",v1,v3);
+    g.addEdge("e3",v2,v3);
+    g.addEdge("e4",v4,v3);
+    g.addEdge("e5",v5,v2);
+
+    display::show(g);
+    std::cout &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Making copy of instance";
+    std::cout &lt;&lt; "\n -------------------------";
+    graph gcopy = g;
+    display::show(gcopy);
+    std::cout &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Modifying copy's values";
+    std::cout &lt;&lt; "\n -------------------------";
+    for(auto&amp; v : gcopy)
+      v.value() += "copy";
+
+    display::show(gcopy);
+    std::cout &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Assigning original instance to copy";
+    std::cout &lt;&lt; "\n -------------------------------------";
+    gcopy = g;
+    display::show(gcopy);
+    std::cout &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Vertices with no Parents:";
+    std::cout &lt;&lt; "\n ---------------------------";
+
+    std::vector&lt; vertex &gt; verts = display::vertsWithNoParents(g);
+    std::cout &lt;&lt; "\n  ";
+    for(size_t i=0; i&lt;verts.size(); ++i)
+      std::cout &lt;&lt; verts[i].value().c_str() &lt;&lt; " ";
+    std::cout &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Testing Depth First Search with function pointer";
+    std::cout &lt;&lt; "\n --------------------------------------------------";
+    for(auto&amp; vert : g)
+    {
+      std::cout &lt;&lt; "\n  starting at id " &lt;&lt; vert.id();
+      g.dfs(vert, TshowVert&lt;std::string, std::string&gt;);
+      // this works too: 
+      // g.dfs(vert, showVert);
+    }
+    std::cout &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Testing Depth First Search with Functor";
+    std::cout &lt;&lt; "\n -----------------------------------------";
+
+    class showFunctor
+    {
+    public:
+      void operator()(Vertex&lt;std::string, std::string&gt;&amp; vert)
+      {
+        std::cout &lt;&lt; "\n  From functor: vertix id = " &lt;&lt; vert.id();
+        std::cout &lt;&lt; ", number of edges = " &lt;&lt; vert.size();
+      }
+    };
+
+    g.dfs(g[0], showFunctor());
+    std::cout &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Testing Serialization to XML";
+    std::cout &lt;&lt; "\n ------------------------------";
+    std::string str = GraphToXmlString(g);
+    std::cout &lt;&lt; str &lt;&lt; "\n";
+    std::ofstream out("testGraph.xml");
+    out &lt;&lt; str &lt;&lt; "\n";
+
+    std::cout &lt;&lt; "\n  Testing Graph construction from XML";
+    std::cout &lt;&lt; "\n -------------------------------------";
+    graph gtest;
+    GraphFromXmlString(gtest, str);
+    display::show(gtest);
+    std::cout &lt;&lt; "\n\n";
+  }
+  catch(std::exception&amp; ex)
+  {
+    std::cout &lt;&lt; "\n\n  " &lt;&lt; ex.what() &lt;&lt; "\n\n";
+  }
+  std::cout &lt;&lt; "\n\n";
+  return 0;
+}
+
+#endif
+
+</pre>
