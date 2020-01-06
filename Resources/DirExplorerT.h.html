@@ -1,0 +1,228 @@
+<pre>#pragma once
+/////////////////////////////////////////////////////////////////////
+// DirExplorerT.h - Template directory explorer                    //
+// ver 1.2                                                         //
+// Jim Fawcett, CSE687 - Object Oriented Design, Fall 2018         //
+/////////////////////////////////////////////////////////////////////
+/*
+* Package Operations:
+* -------------------
+* DirExplorerT provides a class, of the same name, that executes a
+* depth first search of a directory tree rooted at a specified path.
+* Each time it enters a directory, it invokes its member function
+* doDir, and for every file in that directory, it invokes doFile.
+*
+* We call this a "Template Directory Explorer" because, it carries
+* out its assigned responsibilities well, and allows the using
+* application to modify what the doDir and doFiles do, by using
+* a template type parameter to supply those methods.
+* This is an improvement over DirExplorerN because the application
+* does not need to change any part of the DirExplorerT class.
+*
+* Two other projects in this solution also do that, in different
+* ways.  We'll be using this solution to illustrate techniques for
+* building flexible software.
+*
+* Required Files:
+* ---------------
+* DirExplorerT.h, DirExplorerT.cpp
+* Application.h, Application.cpp    // provides defn's for doDir and doFile
+* FileSystem.h, FileSystem.cpp      // Directory and Path classes
+* StringUtilities.h                 // Title function
+* CodeUtilities.h                   // ProcessCmdLine class
+*
+* Maintenance History:
+* --------------------
+* ver 1.2 : 24 Jun 2019
+* - minor fixes due to CodeUtilities::ProcessCmdLine changes
+* ver 1.1 : 16 Aug 2018
+* - made no recursion default, added option /s for recursion
+* ver 1.0 : 11 Aug 2018
+* - first release
+*
+*/
+#include &lt;vector&gt;
+#include "../FileSystem/FileSystem.h"
+
+namespace FileSystem
+{
+  template&lt;typename App&gt;
+  class DirExplorerT
+  {
+  public:
+    using patterns = std::vector&lt;std::string&gt;;
+
+    static std::string version() { return "ver 1.2"; }
+
+    DirExplorerT(const std::string&amp; path);
+
+    void addPattern(const std::string&amp; patt);
+    void hideEmptyDirectories(bool hide);
+    void maxItems(size_t numFiles);
+    void showAllInCurrDir(bool showAllCurrDirFiles);
+    bool showAllInCurrDir();
+    void recurse(bool doRecurse = true);
+    
+    void search();
+    void find(const std::string&amp; path);
+    bool done();
+
+    void showStats();
+    size_t fileCount();
+    size_t dirCount();
+
+  private:
+    App app_;
+    std::string path_;
+    patterns patterns_;
+    bool hideEmptyDir_ = false;
+    bool showAll_ = false;      // show files in current dir even if maxItems_ has been exceeded
+    size_t maxItems_ = 0;
+    size_t dirCount_ = 0;
+    size_t fileCount_ = 0;
+    bool recurse_ = false;
+  };
+
+  //----&lt; construct DirExplorerN instance with default pattern &gt;-----
+
+  template&lt;typename App&gt;
+  DirExplorerT&lt;App&gt;::DirExplorerT(const std::string&amp; path) : path_(path)
+  {
+    patterns_.push_back("*.*");
+  }
+  //----&lt; add specified patterns for selecting file names &gt;----------
+
+  template&lt;typename App&gt;
+  void DirExplorerT&lt;App&gt;::addPattern(const std::string&amp; patt)
+  {
+    if (patterns_.size() == 1 &amp;&amp; patterns_[0] == "*.*")
+      patterns_.pop_back();
+    patterns_.push_back(patt);
+  }
+  //----&lt; set option to hide empty directories &gt;---------------------
+
+  template&lt;typename App&gt;
+  void DirExplorerT&lt;App&gt;::hideEmptyDirectories(bool hide)
+  {
+    hideEmptyDir_ = hide;
+  }
+  //----&lt; set the maximum number of files to display &gt;---------------
+
+  template&lt;typename App&gt;
+  void DirExplorerT&lt;App&gt;::maxItems(size_t numFiles)
+  {
+    maxItems_ = numFiles;
+    app_.maxItems(maxItems_);
+  }
+  //----&lt; stop display before showing all files in dir &gt;-------------
+
+  template&lt;typename App&gt;
+  void DirExplorerT&lt;App&gt;::showAllInCurrDir(bool showAllCurrDirFiles)
+  {
+    showAll_ = showAllCurrDirFiles;
+  }
+  //----&lt; stop display before showing all files in dir? &gt;------------
+
+  template&lt;typename App&gt;
+  bool DirExplorerT&lt;App&gt;::showAllInCurrDir()
+  {
+    return showAll_;
+  }
+  //----&lt; set option to recusively walk dir tree &gt;-------------------
+
+  template&lt;typename App&gt;
+  void DirExplorerT&lt;App&gt;::recurse(bool doRecurse)
+  {
+    recurse_ = doRecurse;
+  }
+  //----&lt; start Depth First Search at path held in path_ &gt;-----------
+
+  template&lt;typename App&gt;
+  void DirExplorerT&lt;App&gt;::search()
+  {
+    if (showAllInCurrDir())
+      app_.showAllInCurrDir(true);
+
+    find(path_);
+  }
+  //----&lt; search for directories and their files &gt;-------------------
+  /*
+    Recursively finds all the dirs and files on the specified path,
+    executing doDir when entering a directory and doFile when finding a file
+  */
+  template&lt;typename App&gt;
+  void DirExplorerT&lt;App&gt;::find(const std::string&amp; path)
+  {
+    if (done())  // stop searching
+      return;
+
+    bool hasFiles = false;
+    std::string fpath = FileSystem::Path::getFullFileSpec(path);
+    if (!hideEmptyDir_)
+      app_.doDir(fpath);
+
+    for (auto patt : patterns_)
+    {
+      std::vector&lt;std::string&gt; files = FileSystem::Directory::getFiles(fpath, patt);
+      if (!hasFiles &amp;&amp; hideEmptyDir_)
+      {
+        if (files.size() &gt; 0)
+        {
+          app_.doDir(fpath);
+          hasFiles = true;
+        }
+      }
+      for (auto f : files)
+      {
+        app_.doFile(f);
+      }
+    }
+
+    if (done())  // stop recursion
+      return;
+
+    std::vector&lt;std::string&gt; dirs = FileSystem::Directory::getDirectories(fpath);
+  
+    for (auto d : dirs)
+    {
+      if (d == "." || d == "..")
+        continue;
+      std::string dpath = fpath + "\\" + d;
+      if (recurse_)
+      {
+        find(dpath);
+      }
+      else
+      {
+        app_.doDir(dpath);
+      }
+    }
+  }
+  //----&lt; return number of files processed &gt;-------------------------
+
+  template&lt;typename App&gt;
+  size_t DirExplorerT&lt;App&gt;::fileCount()
+  {
+    return App.fileCount();
+  }
+  //----&lt; return number of directories processed &gt;-------------------
+
+  template&lt;typename App&gt;
+  size_t DirExplorerT&lt;App&gt;::dirCount()
+  {
+    return App.dirCount();
+  }
+  //----&lt; show final counts for files and dirs &gt;---------------------
+
+  template&lt;typename App&gt;
+  void DirExplorerT&lt;App&gt;::showStats()
+  {
+    app_.showStats();
+  }
+
+  template&lt;typename App&gt;
+  bool DirExplorerT&lt;App&gt;::done()
+  {
+    return app_.done();
+  }
+}</pre>
