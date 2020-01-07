@@ -140,25 +140,116 @@
   <header>
     <hgroup id="pagetitle">
       <h1 id="title">Chapter #7 - TemplateMetaprog</h1>
-      <h3 id="subtitle">example code</h3>
+      <h3 id="subtitle">Code Generators</h3>
     </hgroup>
   </header>
-  <bb-55>
-  <hr class="spread" />
-  <indent-block>
-    <h3>C++ TMP:</h3>
-    <h3>Variatic Templates</h3>
-    <h3>TypeTraits</h3>
-    <h3>Compile-Time Selections</h3>
-    <h3>Examples</h3>
-    <indent-blocks>
-    </indent-blocks>
-    <hr class="spread" />
-    <h3>References:</h3>
-    <indent-block>
-      <a href="https://www.fluentcpp.com/2020/01/03/dry-comparisons-a-c-library-to-shorten-redundant-if-statements/">any_of</a><br />
-    </indent-block>
+  <bb-55 class="indent">
+    <t-b>
+      Implementing C++ templates required compilers to develop a meta language that executes at compile-time.
+      It manipulates types and constants to build function and class templates - entities that generate
+      functions and classes - directed by types that are supplied by an application.
+    </t-b>
+    <t-b>
+      The result is a two phase compilation process:
+      <indent-block>
+        <ol class="tight indent">
+          <li>
+            compile template code with unspecified template parameter <c-s>A</c-s>: 
+            <indent-block class="pad5">
+              <c-s>template&lt;class A&gt; class X { ... };</c-s>
+            </indent-block>          </li>
+          <li>compile instantiations of the template with a defined type <c-s>AppClass</c-s>: 
+            <indent-block class="pad5">
+              <c-s>X&ltAppClass&gt x;</c-s>
+            </indent-block>
+          </li>
+        </ol>
+      </indent-block>
+      Template Metaprograms run during the first compilation phase.
+    </t-b>
   </bb-55>
+    <t-b class="indent">
+      <details>
+        <summary class="labelStyle lightItem">Quick Starter Example</summary>
+        <div class="pad15">
+          <a href="https://stackoverflow.com/questions/1198260/how-can-you-iterate-over-the-elements-of-an-stdtuple">
+             stackoverflow source
+          </a>
+        </div>
+        <bb-55 class="pad10">
+          Like other functional languages, Template MetaProgramming (TMP) implements loops with
+          recursion.  It has to do that because there are no variables at compile-time, e.g., no
+          way to change a loop iterator&apos;s value.
+        </bb-55>
+        <s-halfEm></s-halfEm>
+        <defn-outerblock>
+          <defn-block>
+            <defn-head>TMP Code:</defn-head>
+            <defn-code>
+#include &lt;iostream&gt;
+#include &lt;typeinfo&gt;
+#include &lt;tuple&gt;
+#include "../Display/Display.h"
+
+namespace Chap7 {
+
+  // recursive showTuple definition
+  template&lt;size_t I = 0, typename... Tp&gt;
+  void showTuple(std::tuple&lt;Tp...&gt;&amp; t) {
+    std::cout &lt;&lt; std::get&lt;I&gt;(t) &lt;&lt; " ";    // get Ith item
+    if constexpr (I + 1 != sizeof...(Tp))  // I = I + 1
+      showTuple&lt;I + 1&gt;(t);
+  }
+}
+
+// if constexpr (pred) { /* code to conditionally compile */ }
+// - pred == true  => block is compiled so recurse
+// - pred == false => block is not compiled, stops recursion
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using code:</defn-head>
+            <defn-code>
+int main() {
+
+  displayTitle("Demonstrate TMP");
+
+  std::tuple t{ 1, 2.5, 'a', "a string" };
+  std::cout &lt;&lt; "\n  ";
+  Chap7::showTuple(t);
+
+  std::cout &lt;&lt; "\n\n";
+}
+            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+ Demonstrate TMP
+=================  
+
+ 1 2.5 a a string
+            </defn-code>
+          </defn-block>
+        </defn-outerblock>
+        <s-1em></s-1em>
+      </details>
+    </t-b>
+  <bb-55 class="indent">
+    <hr class="spread" />
+    <indent-block>
+      <h3>C++ TMP:</h3>
+      <h3>Variatic Templates</h3>
+      <h3>TypeTraits</h3>
+      <h3>Compile-Time Selections</h3>
+      <h3>Examples</h3>
+      <indent-blocks>
+      </indent-blocks>
+      <hr class="spread" />
+      <h3>References:</h3>
+      <indent-block>
+        <a href="https://www.fluentcpp.com/2020/01/03/dry-comparisons-a-c-library-to-shorten-redundant-if-statements/">any_of</a><br />
+        <a href="file:///C:/Users/jfawc/Downloads/from_metaprogramming_tricks_to_elegance__vincent_reverdy__cppcon_2018%20(1).pdf">Metaprogramming tricks to elegance</a><br />
+      </indent-block>
+    </bb-55>
     <spacer-25></spacer-25>
     <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
 
