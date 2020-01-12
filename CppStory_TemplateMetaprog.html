@@ -143,7 +143,11 @@
       <h3 id="subtitle">Code Generators</h3>
     </hgroup>
   </header>
+  <hr class="spread" />
   <bb-55 class="indent">
+    <num-cont>
+      <num-item1>7.0</num-item1><num-item4>Template Metaprogramming</num-item4>
+    </num-cont>
     <t-b>
       Implementing C++ templates required compilers to develop a meta language that executes at compile-time.
       It manipulates types and constants to build function and class templates - entities that generate
@@ -165,15 +169,14 @@
           </li>
         </ol>
       </indent-block>
-      Template Metaprograms run during the first compilation phase.
+      Template Metaprograms run during the second compilation phase.
     </t-b>
-  </bb-55>
     <t-b class="indent">
       <details>
         <summary class="labelStyle lightItem">Quick Starter Example</summary>
         <div class="pad15">
           <a href="https://stackoverflow.com/questions/1198260/how-can-you-iterate-over-the-elements-of-an-stdtuple">
-             stackoverflow source
+              stackoverflow source
           </a>
         </div>
         <bb-55 class="pad10">
@@ -223,20 +226,136 @@ int main() {
             </defn-code>
             <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
- Demonstrate TMP
+  Demonstrate TMP
 =================  
 
- 1 2.5 a a string
+  1 2.5 a a string
             </defn-code>
           </defn-block>
         </defn-outerblock>
         <s-1em></s-1em>
       </details>
     </t-b>
-  <bb-55 class="indent">
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>7.1</num-item1><num-item4>Variadic Functions</num-item4>
+    </num-cont>
+    <t-b>
+      A variadic function takes an arbitrary
+      finite number of arguments.  Variadic function templates build a sequence of functions one for each parameter
+      arity, up to the largest number of arguments used in an application program.  Only those functions that are
+      actually called are compiled into code in the second phase translation.
+    </t-b>
+    <t-b>
+      Variadic functions are a classic Template MetaProgramming (TMP) construct. Each function is defined in terms of
+      the function with one fewer arguments.  A template function overload for a single argument is provided, and C++
+      guarantees that that specialization will be compiled if matched.  That specialization is used to stop
+      recursion.
+    </t-b>
+    <details>
+      <summary class="labelStyle darkItem">Example: Variadic Function displaying its arguments</summary>
+      <s-halfEm></s-halfEm>
+      <defn-outerBlock>
+        <defn-block>
+          <defn-head>Code: Variadic Function</defn-head>
+          <defn-code>
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include "../Display/Display.h"
+
+/*-- Helper function --*/
+
+std::string strTrunc(
+  const std::string&amp; src, size_t Max = 50
+) {
+  if (src.size() &gt; Max) {
+    return src.substr(0, Max - 4) + " ...";
+  }
+  else {
+    return src;
+  }
+}
+
+/*-- Templ specializ'n stops recursive eval --*/
+
+template&lt;typename T&gt;
+void f(T t)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
+    &lt;&lt; strTrunc(typeid(t).name(), 40)
+    &lt;&lt; std::endl;
+}
+
+/*-- Recursive definition of template function --
+   Args is a "parameter pack
+   https://en.cppreference.com
+*/
+template&lt;typename T, typename... Args&gt;
+void f(T t, Args... args)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
+    &lt;&lt; typeid(t).name() &lt;&lt; std::endl;
+  f(args...);
+}
+          </defn-code>
+        </defn-block>
+        <defn-block>
+          <defn-head>Using Code</defn-head>
+          <defn-code>
+int main()
+{
+  std::cout &lt;&lt;
+    "\n  Demonstrate Variatic Functions";
+  std::cout &lt;&lt;
+    "\n ================================\n";
+
+  displayDemo("-- function with 5 args --\n");
+  f(
+    1, 3.5, 'z',
+    "a literal string",
+    std::string("a std::string")
+  );
+  putline();
+  displayDemo("-- function with 2 args --\n");
+  f('q', "only two args");
+
+  std::cout &lt;&lt; "\n\n";
+  return 0;
+}
+          </defn-code>
+          <defn-head class="defnBorderTop">Output</defn-head>
+          <defn-code>
+ Demonstrate Variatic Functions
+================================
+
+ -- function with 5 args --
+
+ 1 : int
+
+ 3.5 : double
+
+ z : char
+
+ a literal string : char const *
+
+ a std::string : 
+   class std::basic_string&lt;char,struct  ...
+
+
+ -- function with 2 args --
+
+ q : char
+
+ only two args : char const *
+          </defn-code>
+        </defn-block>
+      </defn-outerBlock>
+    </details>
     <hr class="spread" />
     <indent-block>
       <h3>C++ TMP:</h3>
+      <h3>std functions</h3>
+      std::ref, std::move, std::forward, std::apply, std::invoke, 
       <h3>Variatic Templates</h3>
       <h3>TypeTraits</h3>
       <h3>Compile-Time Selections</h3>
@@ -246,16 +365,17 @@ int main() {
       <hr class="spread" />
       <h3>References:</h3>
       <indent-block>
+        <a href="https://github.com/AnthonyCalandra/modern-cpp-features#folding-expressions">modern-cpp-features AnthoneCalandra</a><br />
+        <a href="https://www.amazon.com/Effective-Modern-Specific-Ways-Improve/dp/1491903996/ref=sr_1_1?crid=1CA7256H250RY&keywords=effective+modern+c%2B%2B+by+scott+meyers&qid=1578761973&s=books&sprefix=effective+moder%2Caps%2C152&sr=1-1">Effective Modern C++ - Scott Meyers</a><br />
         <a href="https://www.fluentcpp.com/2020/01/03/dry-comparisons-a-c-library-to-shorten-redundant-if-statements/">any_of</a><br />
         <a href="file:///C:/Users/jfawc/Downloads/from_metaprogramming_tricks_to_elegance__vincent_reverdy__cppcon_2018%20(1).pdf">Metaprogramming tricks to elegance</a><br />
-        <a href="https://www.youtube.com/watch?v=PFdWqa68LmA&feature=youtu.be">Modern C++ Interfaces - Stephen Dewhurst</a>,
-        <a href="http://stevedewhurst.com/interfaces-Triangle-Developers-Group.pdf">slides</a>,
-        <a href="http://stevedewhurst.com">stevedewhurst.com</a>, 
-        <a href="https://www.fluentcpp.com/2018/05/15/make-sfinae-pretty-1-what-value-sfinae-brings-to-code/">
-          fluentcpp.com - How to make SFINAE pretty
-        </a>
-      </indent-block>
-    </bb-55>
+        <a href="https://www.youtube.com/watch?v=PFdWqa68LmA&feature=youtu.be">video: Modern C++ Interfaces - Stephen Dewhurst</a>, 
+        <a href="http://stevedewhurst.com/interfaces-Triangle-Developers-Group.pdf">slides</a>, 
+        <a href="http://stevedewhurst.com">stevedewhurst.com</a><br />
+        <a href="https://www.fluentcpp.com/2018/05/15/make-sfinae-pretty-1-what-value-sfinae-brings-to-code/">make sfinae pretty - part 1</a><br />
+        
+    </indent-block>
+  </bb-55>
     <spacer-25></spacer-25>
     <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
 

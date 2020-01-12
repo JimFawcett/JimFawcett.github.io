@@ -489,8 +489,8 @@ std::cout &lt;&lt; "\n  " &lt;&lt; typeid(what).name();
     </ol>
   </t-b>
   <t-b>
-    You don&apos;t need to think about these categories when designing, but knowing about them helps
-    you understand how the process works.
+    For most of your implementations, you won&apos;t have to think about these categories unless you are
+    writing code that runs partially at compile-time, e.g., template metaprogramming.
   </t-b>
 
   <a id="TypeTran"></a>
@@ -526,8 +526,33 @@ std::cout &lt;&lt; "\n  " &lt;&lt; typeid(what).name();
           e.g., 42 and 3.14159, are classified as rvalues.
         </li>
         <li>
-          rvalue references (T&amp;&amp;) can bind to both lvalues and const and non-const rvalues
+          rvalue references (T&amp;&amp; in a context with no type deduction) can bind only to rvalues.
+          <indent-block>
+            <ul class="tight indent">
+              <li>
+                <c-s>Widget&& w = createWidget();</c-s>
+              </li>
+              <li>
+                <c-s>void f(Widget&& w);</c-s>
+              </li>
+            </ul>
+          </indent-block>
         </li>
+        <li>
+          universal a.k.a. forwarding references (T&amp;&amp; in a context with type deduction) can bind to anything.
+          <indent-block>
+            <ul class="tight indent">
+              <li>
+                <c-s>
+                  template&lt;typename T&gt;<br />
+                  void f(T&amp;&amp; t);
+                </c-s>
+              </li>
+              <li>
+                <c-s>auto&amp;&amp; x1 = x2;</c-s>
+              </li>
+            </ul>
+          </indent-block>        </li>
       </ol>
     </t-b>
     For the details look here:
@@ -601,7 +626,7 @@ std::cout &lt;&lt; "\n  " &lt;&lt; typeid(what).name();
         Array arguments decay to pointers.
       </li>
       <li>
-        Passing an argument by lvalue reference (&amp;) doesn&apos;t remove qualifiers and arrays do not
+        Passing an argument by lvalue reference (T&amp;) doesn&apos;t remove qualifiers and arrays do not
         decay (because they won&apos;t be copied). An lvalue reference can only bind to lvalues or const rvalues.
         Note that C++ classifies literal strings as lvalues.  All other literals, e.g., ints and doubles, are rvalues.
       </li>
@@ -610,8 +635,8 @@ std::cout &lt;&lt; "\n  " &lt;&lt; typeid(what).name();
         is a pointer).
       </li>
       <li>
-        Passing an argument by rvalue reference (&amp;&amp;) doesn&apos;t strip qualifiers and arrays do not
-        decay. Rvalue references can bind to both lvalues and rvalues.
+        Passing an argument by universal reference (T&amp;&amp; where T is being deduced) doesn&apos;t strip qualifiers and arrays do not
+        decay. Universal references can bind to both lvalues and rvalues.
       </li>
     </ol>
   </t-b>
@@ -1113,8 +1138,11 @@ int main()
     <span class="notice">generic lambdas</span>.
     They are defined using auto parameters, as shown.  This is equivalent to a 
     template function, but doesn&apos;t use template syntax.  That it is generic is
-    due to type deduction generated for the auto declarator.
+    due to type deduction generated for the auto declarators.
     <s-1em></s-1em>
+    <details>
+      <summary class="labelStyle darkItem">Generic Lambda Code</summary>
+      <s-halfEm></s-halfEm>
     <defn-outerBlock>
       <defn-block>
         <defn-head>
@@ -1146,6 +1174,7 @@ int main()
         </defn-code>
       </defn-block>
     </defn-outerBlock>
+    </details>
   </t-b>
   <t-b>
     We will look at template functions again, in Chapter #7 - Template Metaprogramming, where we explore
