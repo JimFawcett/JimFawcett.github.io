@@ -252,6 +252,7 @@ int main() {
       guarantees that that specialization will be compiled if matched.  That specialization is used to stop
       recursion.
     </t-b>
+    <indent-block>
     <details>
       <summary class="labelStyle darkItem">Example: Variadic Function displaying its arguments</summary>
       <s-halfEm></s-halfEm>
@@ -351,9 +352,161 @@ int main()
         </defn-block>
       </defn-outerBlock>
     </details>
+    </indent-block>
+    <t-b>
+      Here&apos;s a somewhat more useful function that can display the contents of either sequential or
+      associative STL containers.
+    </t-b>    <indent-block>
+      <details>
+        <summary class="labelStyle darkItem">Example: Recursive display</summary>
+        <s-halfEm></s-halfEm>
+        <indent-block class="pad10">
+          <a href="https://eli.thegreenplace.net/2014/variadic-templates-in-c/">Code Source</a>
+        </indent-block>
+        <defn-outerBlock>
+          <defn-block>
+            <defn-head>Code: display function</defn-head>
+            <defn-code>
+#include &lt;iostream&gt;
+
+template &lt;
+  template &lt;
+    typename, typename...
+  &gt; class ContainerType,
+  typename ValueType, typename... Args&gt;
+  void print_container(
+    const ContainerType&lt;
+      ValueType, Args...
+    &gt;&amp; c
+  ) 
+{
+  for (const auto&amp; v : c) {
+    std::cout &lt;&lt; v &lt;&lt; ' ';
+  }
+  std::cout &lt;&lt; '\n';
+}
+
+// Implement &lt;&lt; for pairs: this is needed
+// to print out mappings where range
+// iteration goes over (key, value) pairs.
+template &lt;typename T, typename U&gt;
+std::ostream&amp; operator&lt;&lt;(
+  std::ostream&amp; out, 
+  const std::pair&lt;T, U&gt;&amp; p
+) 
+{
+  out &lt;&lt; "[" &lt;&lt; p.first &lt;&lt; ", " 
+      &lt;&lt; p.second &lt;&lt; "]";
+  return out;
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code</defn-head>
+            <defn-code>
+#include "Chap7Vdisplay.h"
+#include "../Display/Display.h"
+#include <vector>
+#include <unordered_map>
+#include <string>
+
+int main() {
+
+  displayTitle("Demo Variadic Display Function");
+
+  std::vector<int> vInt{ 1,2,3,4 };
+  std::cout << "\n  ";
+  print_container(vInt);
+
+  std::unordered_map<int, std::string> 
+  mIntStr { 
+    {1, "one"}, { 2,"two" }, { 3, "three" }
+  };
+  std::cout << "\n  ";
+  print_container(mIntStr);
+
+  putline(2);
+}            </defn-code>
+            <defn-head class="defnBorderTop">Output</defn-head>
+            <defn-code>
+ Demo Variadic Display Function
+================================
+
+ 1 2 3 4
+
+ [1, one] [2, two] [3, three]
+
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+      </details>
+    </indent-block>
+    <t-b>
+      If you&apos;re puzzled by some of the syntax in the examples we&apos;ve looked at so far, the next
+      section should help.
+    </t-b>
     <hr class="spread" />
+    <num-cont>
+      <num-item1>7.11</num-item1><num-item4>Variadic Function Syntax:</num-item4>
+    </num-cont>
+    <defn-outerBlock>
+      <defn-block>
+        <defn-head>Fragment from 1st Example:</defn-head>
+        <defn-code>
+/*-- Templ specializ'n stops recursive eval --*/
+
+template&lt;typename T&gt;
+void f(T t)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
+    &lt;&lt; strTrunc(typeid(t).name(), 40)
+    &lt;&lt; std::endl;
+}
+
+/*-- Recursive definition of template function --
+   Args is a "parameter pack
+   https://en.cppreference.com
+*/
+template&lt;typename T, typename... Args&gt;
+void f(T t, Args... args)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
+    &lt;&lt; typeid(t).name() &lt;&lt; std::endl;
+  f(args...);
+}
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head>Syntax Explained:</defn-head>
+        <defn-body style="width:30rem;">
+          <t-b>
+            Start with the function at the bottom of the left panel:
+            Looking at the template declaration we see <c-s class="notice">typename... Args</c-s>. That&apos;s
+            known as a template parameter pack.
+          </t-b>
+          <t-b>
+            Think of the template declaration parameters as a list of types, with <c-s class="notice">typename t</c-s>
+            being the head of the list and
+            <c-s class="notice">typename... Args</c-s> being the tail.  The ellipsis ... means there
+            are a finite number, possibly zero, of types in the list tail.
+          </t-b>
+          <t-b>
+            The corresponding <c-s class="notice">Args... args</c-s> in the function arguments list is called a 
+            function parameter pack. The function body does what it is supposed to do with t, then executes a
+            tail recursion, stripping off the head of the list.
+          </t-b>
+          <t-b>
+            So, the function executes on the first <c-s>t</c-s> argument,
+            then recursively executes on the remaining list without the t head. For this to work, we need to
+            define what happens with the last item on the list, when the function parameter pack is empty.
+            That&apos;s taken care of by the specialization shown in the top of the left panel. That matches
+            only when the function parameter pack is empty.
+          </t-b>
+        </defn-body>
+      </defn-block>
+    </defn-outerBlock>
     <indent-block>
-      <h3>C++ TMP:</h3>
+      <!--<h3>C++ TMP:</h3>
       <h3>std functions</h3>
       std::ref, std::move, std::forward, std::apply, std::invoke, 
       <h3>Variatic Templates</h3>
@@ -361,20 +514,190 @@ int main()
       <h3>Compile-Time Selections</h3>
       <h3>Examples</h3>
       <indent-blocks>
-      </indent-blocks>
-      <hr class="spread" />
-      <h3>References:</h3>
-      <indent-block>
-        <a href="https://github.com/AnthonyCalandra/modern-cpp-features#folding-expressions">modern-cpp-features AnthoneCalandra</a><br />
-        <a href="https://www.amazon.com/Effective-Modern-Specific-Ways-Improve/dp/1491903996/ref=sr_1_1?crid=1CA7256H250RY&keywords=effective+modern+c%2B%2B+by+scott+meyers&qid=1578761973&s=books&sprefix=effective+moder%2Caps%2C152&sr=1-1">Effective Modern C++ - Scott Meyers</a><br />
-        <a href="https://www.fluentcpp.com/2020/01/03/dry-comparisons-a-c-library-to-shorten-redundant-if-statements/">any_of</a><br />
-        <a href="file:///C:/Users/jfawc/Downloads/from_metaprogramming_tricks_to_elegance__vincent_reverdy__cppcon_2018%20(1).pdf">Metaprogramming tricks to elegance</a><br />
-        <a href="https://www.youtube.com/watch?v=PFdWqa68LmA&feature=youtu.be">video: Modern C++ Interfaces - Stephen Dewhurst</a>, 
-        <a href="http://stevedewhurst.com/interfaces-Triangle-Developers-Group.pdf">slides</a>, 
-        <a href="http://stevedewhurst.com">stevedewhurst.com</a><br />
-        <a href="https://www.fluentcpp.com/2018/05/15/make-sfinae-pretty-1-what-value-sfinae-brings-to-code/">make sfinae pretty - part 1</a><br />
-        
+      </indent-blocks>-->
     </indent-block>
+      <hr class="spread" />
+      <num-cont>
+        <num-item1>7.?</num-item1><num-item4>References:</num-item4>
+      </num-cont>
+      As I started writing this chapter it became evident that to make this really effective I need to know more:
+      <indent-block>
+        <ul class="tight">
+          <li>
+            Some of the relatively obscure additions to C++14 and C++17
+          </li>
+          <li>
+            Understand some of the more technical, very good, work already done in this area
+          </li>
+          <li>
+            Some of the functional programming ideas that are common knowledge in that community, but not to me
+          </li>
+        </ul>
+      </indent-block>
+      <t-b>
+        After spending several days digging, I concluded that this is a very deep well. So, I am going to continue
+        working on this chapter, learning as I go, but trying to finish quickly. My intent is to then continue
+        exploring quietly until I know enough to do a very well crafted revision.
+      </t-b>        
+      <t-b>
+        So I&apos;ve collected a set of references I&apos;ve used so far, below.  Some I know to be excellent 
+        resources, some I&apos;m not so sure about.  As I continue to dig, some will disappear, others will appear,
+        so keep posted.
+      </t-b>
+    <ol class="tight">
+      <li>
+        <strong>Templates:</strong>
+        <ol class="tight">
+          <li>
+            <a href="https://github.com/CppCon/CppCon2016/blob/master/Tutorials/Template%20Normal%20Programming%2C%20Part%201/Template%20Normal%20Programming%2C%20Part%201%20-%20Arthur%20O'Dwyer%20-%20CppCon%202016.pdf">Template Normal Programming - Part 1 - Arthur O'Dwyer</a>
+          </li>
+          <li>
+            <a href="https://github.com/CppCon/CppCon2016/blob/master/Tutorials/Template%20Normal%20Programming%2C%20Part%202/Template%20Normal%20Programming%2C%20Part%202%20-%20Arthur%20O'Dwyer%20-%20CppCon%202016.pdf">Template Normal Programming - Part 2 - Arthur O'Dwyer</a>
+          </li>
+          <li>
+            <a href="https://github.com/CppCon/CppCon2018/blob/master/Presentations/class_template_argument_deduction_for_everyone/class_template_argument_deduction_for_everyone__stephan_t_lavavej__cppcon_2018.pdf">Class Template Argument Deduction for Everyone - Stephan T. Lavavej</a>
+          </li>
+          <li>
+            <a href="https://devblogs.microsoft.com/cppblog/how-to-use-class-template-argument-deduction/">How to Use Class Template Argument Deduction - Stephan T. Lavavej</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <strong>Template Metaprogramming:</strong>
+        <ol class="tight">
+          <li>
+            <a href="http://ericniebler.com/2014/11/13/tiny-metaprogramming-library/">Tiny Metaprogramming Library - Eric Niebler</a>
+          </li>
+          <li>
+            <a href="https://crascit.com/2015/03/21/practical-uses-for-variadic-templates/">Practical uses for variadic templates - Craig Scott</a>
+          </li>
+          <li>
+            <a href="https://eli.thegreenplace.net/2014/variadic-templates-in-c/">Variadic templates in C++ - Eli Bendersky</a>
+          </li>
+          <li>
+            <a href="https://arne-mertz.de/2016/11/modern-c-features-variadic-templates/">Modern C++ Features - Variadic Templates - Arne Mertz</a>
+          </li>
+          <li>
+            <a href="https://www.modernescpp.com/index.php/c-core-guidelines-rules-for-variadic-templates">C++ Core Guidelines: Rules for Variadic Templates</a>
+          </li>
+          <li>
+            <a href="https://www.codingame.com/playgrounds/2205/7-features-of-c17-that-will-simplify-your-code/introduction">C++17 - fenbf</a>
+          </li>
+          <li>
+            <a href="https://www.codingame.com/playgrounds/2205/7-features-of-c17-that-will-simplify-your-code/constexpr-if">constexpr if - fenbf</a>
+          </li>
+          <li>
+            <a href="https://www.codingame.com/playgrounds/2205/7-features-of-c17-that-will-simplify-your-code/fold-expressions">Fold Expressions - fenbf</a>
+          </li>
+          <li>
+            <a href="https://en.cppreference.com/w/cpp/language/parameter_pack">Parameter pack - cppreference.com</a>
+          </li>
+          <li>
+            <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0341r0.html">parameter packs outside of templates - Mike Spertus</a>
+          </li>
+          <li>
+            <a href="https://www.codeproject.com/Articles/1077852/TypeLists-and-a-TypeList-Toolbox-via-Variadic-Temp">TypeLists and a TypeList Toolbox via Variadic Templates - geoyar</a>
+          </li>
+          <li>
+            <a href="https://www.rangakrish.com/index.php/2018/10/14/c17-stdapply-and-stdinvoke/">C++17 - std::apply() and std::invoke() Rangarajan Krishnamoorthy</a>
+          </li>
+          <li>
+            <a href="https://kevinushey.github.io/blog/2016/01/27/introduction-to-c++-variadic-templates/">Intro to C++ Variadic Templates - Kevin Ushey</a>
+          </li>
+          <li>
+            <a href="https://www.fluentcpp.com/2018/05/15/make-sfinae-pretty-1-what-value-sfinae-brings-to-code/">How to Make SFINAE Pretty - Part 1, Jonathan Boccara</a>
+          </li>
+          <li>
+            <a href="http://stevedewhurst.com/interfaces-Triangle-Developers-Group.pdf">Modern C++ Interfaces - Stephan Dewhurst</a>
+          </li>
+          <li>
+            <a href="https://www.youtube.com/watch?v=PFdWqa68LmA&feature=youtu.be">Modern C++ Interfaces (video) - Stephan Dewhurst</a>
+          </li>
+          <li>
+            <a href="https://en.cppreference.com/w/cpp/header/type_traits">type_traits - cppreference.com</a>
+          </li>
+          <li>
+            <a href="https://www.fluentcpp.com/2020/01/03/dry-comparisons-a-c-library-to-shorten-redundant-if-statements/">any_of</a><br />
+          </li>
+          <li>
+            <a href="https://github.com/CppCon/CppCon2018/blob/master/Presentations/from_metaprogramming_tricks_to_elegance/from_metaprogramming_tricks_to_elegance__vincent_reverdy__cppcon_2018.pdf">tricks to elegance - Vincent Reverdy</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <strong>Modern C++</strong>
+        <ol class="tight">
+          <li>
+            <a href="https://github.com/AnthonyCalandra/modern-cpp-features#folding-expressions">modern-cpp-features - Anthony Calandra</a>
+          </li>
+          <li>
+            <a href="https://www.codingame.com/playgrounds/2205/7-features-of-c17-that-will-simplify-your-code/introduction">C++17 - fenbf</a>
+          </li>
+          <li>
+            <a href="https://www.fluentcpp.com/2018/04/06/strong-types-by-struct/">Strong Types by Struct - Vincent Zalzal</a>
+          </li>
+          <li>
+            <a href="https://arne-mertz.de/">Simplify C++ - arne-mertz.de</a>
+          </li>
+          <li>
+            <a href="https://github.com/abseil/abseil-cpp">abseil-cpp</a>
+          </li>
+          <li>
+            <a href="https://devblogs.microsoft.com/oldnewthing/">The Old New Thing - Raymond Chen</a>
+          </li>
+          <li>
+            <a href="https://www.youtube.com/watch?v=bXkWuUe9V2I">(All The) STL Algorithms - Jonathan Boccara</a>
+          </li>
+          <li>
+            <a href="https://www.youtube.com/user/lefticus1">C++ Weekly</a>
+          </li>
+          <li>
+            <a href="https://docs.microsoft.com/en-us/cpp/cpp/lambda-expressions-in-cpp?view=vs-2019">Lambda Expressions in C++ - MSDN</a>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <strong>Functional Programming:</strong>
+        <ol class="tight">
+          <li>
+            <a href="https://bartoszmilewski.com/2009/10/21/what-does-haskell-have-to-do-with-c/">What Does Haskell Have to Do with C++?</a>
+          </li>
+          <li>
+            <a href="https://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/">Category Theory for Programmers - Bartosz Milewski</a>
+          </li>
+          <li>
+            <a href="https://www.youtube.com/watch?v=I8LbkfSSR58&list=PLbgaMIhjbmEnaH_LTkxLI7FMa2HsnawM_&index=1">(video playlist) Category Theory for Programmsers - Bartosz Milewski</a>
+          </li>
+          <li>
+            <a href="https://people.cs.umass.edu/~yannis/fc++/fcpp-jfp.pdf">FC++ Library - McNamara &amp; Smaragdakis</a>
+          </li>
+          <li>
+            <a href="http://blog.madhukaraphatak.com/functional-programming-in-c++/">Functional programming in C++ - Madhukara Phatak</a>
+          </li>
+          <li>
+            <a href="https://gist.github.com/phatak-dev/766eccf8c72484ad623b">Phatak Repository</a>
+          </li>
+          <li>
+            <a href="https://www.codeproject.com/Articles/1267996/Functional-Programming-in-Cplusplus">Functional Programming in C++ - Mehreen Tahir</a>
+          </li>
+          <li>
+            <a href="https://www.codeproject.com/Articles/682455/Generic-Lazy-Evaluation-in-Cplusplus">Generic Lazy Evaluation in C++ - Ali AslRousta</a>
+          </li>
+          <li>
+            <a href="https://github.com/GJDuck/libf">LIBF++ 0.2 -- C++ as a Pure Functional Language - GJDuck</a>
+          </li>
+          <li>
+            <a href="https://www.modernescpp.com/index.php/the-definition-of-functional-programming">The Definition of Functional Programming - modernescpp.com</a>
+          </li>
+          <li>
+            <a href="https://www.geeksforgeeks.org/functional-programming-paradigm/">Functional Programming Paradigm - geeksforgeeks.org</a>
+          </li>
+          <li>
+            <a href="https://www.guru99.com/functional-programming-tutorial.html">What is Functional Programming? - Guru99.com</a>
+          </li>
+        </ol>
+      </li>
+    </ol>
   </bb-55>
     <spacer-25></spacer-25>
     <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
