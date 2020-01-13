@@ -865,7 +865,89 @@ int main() {
     <num-item1>6.3</num-item1><num-item4>Template Function Examples</num-item4>
   </num-cont>
   <t-b>
-    Both examples, below, are from the <a href="CppUtilities.html">CppUtilities Repository</a>. 
+    There are a number of standard template functions that prove useful, especially for template metaprogramming:
+  </t-b>
+  <bb-full>
+    <h3>Table 1. - Standard template functions</h3>
+    <table class="tdefns" style="width:calc(100vw - 12rem);">
+      <tr>
+        <th class="defn darkItem">Function name</th>
+        <th class="defn darkItem">Return Type</th>
+        <th class="defn darkItem">Semantics</th>
+      </tr>
+      <tr>
+        <td class="defn">std::move(T&amp;&nbsp;t)</td>
+        <td class="defn">static_cast&lt;typename std::remove_reference&lt;T&gt;::type&amp;&amp;(t)</td>
+        <td class="defn">
+          Casts t to an r value type, e.g., can be moved from. Nothing is actually moved.
+        </td>
+      </tr>
+      <tr>
+        <td class="defn">std::forward(T&amp;&amp;&nbsp;t)</td>
+        <td class="defn">type of t in the caller&apos;s context</td>
+        <td class="defn">
+          Used in a function to un-decay T&apos;s type<sup>1</sup>.
+          Revert back to caller&apos;s value category (rvalue or lvalue).
+          This is a cast operation. Nothing is actually forwarded.
+        </td>
+      </tr>
+      <tr>
+        <td class="defn">std::apply&lt;F&&&nbsp;f,&nbsp;Tuple&&&nbsp;t&gt;</td>
+        <td class="defn">value&nbsp;returned&nbsp;by&nbsp;f</td>
+        <td class="defn">
+          Use tuple items as arguments of function f. The t argument may be a std::tuple, std::array, or
+          std::pair.
+        </td>
+      </tr>
+      <tr>
+        <td class="defn">std::invoke(F&&&nbsp;f,&nbsp;Args&&...&nbsp;args)</td>
+        <td class="defn">std::Invoke_Result_t&lt;F,&nbsp;Args...&gt;</td>
+        <td class="defn">
+          Invoke the callable object f with parameters Args.
+        </td>
+      </tr>
+    </table>
+    <hr class="spreadup" />
+    <div class="footnote indent">
+      <ol class="tight indent">
+        <li>
+          Remember that passed arguments are always lvalues because they have their parameter name and a location
+          in the function&apos;s stackframe.
+        </li>
+      </ol>
+    </div>
+    <t-b>
+      This next table holds type traits that are often associated with the standard functions cited in the
+      previous table.
+    </t-b>
+    <h3>Table 2. - Selected type_traits</h3>
+    <table class="tdefns" style="width:calc(100vw - 12rem);">
+      <tr>
+        <th class="defn darkItem">type_trait</th>
+        <th class="defn darkItem">Semantics</th>
+      </tr>
+      <tr>
+        <td class="defn">template&lt;class T&gt; struct decay</td>
+        <td class="defn">
+          decay has a public member type which converts T to the decayed type that results from making a call
+          <c-s>f(T t)</c-s> inside the scope of <c-s>f</c-s>.  That is, decay&lt;T&gt;::type is the decayed type.
+        </td>
+      </tr>
+      <tr>
+        <td class="defn">template&lt;class&nbsp;T&gt;&nbsp;struct&nbsp;remove_reference</td>
+        <td class="defn">
+          remove_reference::type evaluates as T with a reference removed if T is a reference type, otherwise
+          evaluates as T.
+        </td>
+      </tr>
+    </table>
+  </bb-full>
+  <s-halfEm></s-halfEm>
+  <t-b>
+    Next we will look at some example template function designs.  The first two come from the 
+    <a href="CppUtilities.html">CppUtilities</a> repository.
+  </t-b>
+  <t-b>
     <c-s>Converter&lt;T&gt;::toString(t)</c-s>, in the CodeUtilities folder, converts the value of <c-s>t &epsilon; T</c-s>
     to its string representation.
     And, given the conversion string, ConvStr, <c-s>Converter&lt;T&gt;::toValue(ConvStr)</c-s>
@@ -1134,7 +1216,7 @@ int main()
       </defn-block>
     </defn-outerBlock>  </details>
   <t-b>
-    For our last template function example, the table below shows how to create 
+    For our last template function example, the code below shows how to create 
     <span class="notice">generic lambdas</span>.
     They are defined using auto parameters, as shown.  This is equivalent to a 
     template function, but doesn&apos;t use template syntax.  That it is generic is

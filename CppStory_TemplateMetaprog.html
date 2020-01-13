@@ -360,8 +360,16 @@ int main()
       <details>
         <summary class="labelStyle darkItem">Example: Recursive display</summary>
         <s-halfEm></s-halfEm>
+        <hr class="defnBorderTop" />
+        <t-b>
+          This is a nice example of a if a template function that gains a lot of versatility from
+          accepting an arbitrary number of parameters (variadic) and overloading the insertion operator
+          <cl-s>operator<<</cl-s> to extend its functionality from sequential containers with scalar
+          <cl-s>value_type</cl-s>s to associative containers with <cl-s>value_type</cl-s>s that are 
+          <cl-s>std::pair&lt;Key, Value&gt;</cl-s>s.
+        </t-b>
         <indent-block class="pad10">
-          <a href="https://eli.thegreenplace.net/2014/variadic-templates-in-c/">Code Source</a>
+          <a href="https://eli.thegreenplace.net/2014/variadic-templates-in-c/">Code Source</a> - Eli Bendersky
         </indent-block>
         <defn-outerBlock>
           <defn-block>
@@ -370,15 +378,12 @@ int main()
 #include &lt;iostream&gt;
 
 template &lt;
-  template &lt;
-    typename, typename...
-  &gt; class ContainerType,
-  typename ValueType, typename... Args&gt;
-  void print_container(
-    const ContainerType&lt;
-      ValueType, Args...
-    &gt;&amp; c
-  ) 
+  template &lt; typename, typename... &gt; class ContainerType,
+  typename ValueType, typename... Args
+&gt;
+void print_container(
+  const ContainerType&lt; ValueType, Args... &gt;&amp; c
+) 
 {
   for (const auto&amp; v : c) {
     std::cout &lt;&lt; v &lt;&lt; ' ';
@@ -389,14 +394,15 @@ template &lt;
 // Implement &lt;&lt; for pairs: this is needed
 // to print out mappings where range
 // iteration goes over (key, value) pairs.
+
 template &lt;typename T, typename U&gt;
 std::ostream&amp; operator&lt;&lt;(
   std::ostream&amp; out, 
   const std::pair&lt;T, U&gt;&amp; p
 ) 
 {
-  out &lt;&lt; "[" &lt;&lt; p.first &lt;&lt; ", " 
-      &lt;&lt; p.second &lt;&lt; "]";
+  out &lt;&lt; "{" &lt;&lt; p.first &lt;&lt; ", " 
+      &lt;&lt; p.second &lt;&lt; "}";
   return out;
 }
             </defn-code>
@@ -426,7 +432,8 @@ int main() {
   print_container(mIntStr);
 
   putline(2);
-}            </defn-code>
+}
+              </defn-code>
             <defn-head class="defnBorderTop">Output</defn-head>
             <defn-code>
  Demo Variadic Display Function
@@ -434,11 +441,18 @@ int main() {
 
  1 2 3 4
 
- [1, one] [2, two] [3, three]
+ {1, one} {2, two} {3, three}
 
             </defn-code>
           </defn-block>
         </defn-outerBlock>
+        <t-b>
+          The template specification at the top of the left panel matches the STL containers, e.g.,
+          <cl-s>std::vector&lt;T, Alloc&gt;</cl-s> and <cl-s>std::set&lt;Key, Compare, Alloc&gt;</cl-s>. 
+          That allows us to pass any STL container into the <cl-s>print_container</cl-s> function.
+        </t-b>
+        <hr class="defnBorderBottom" />
+        <s-1em></s-1em>
       </details>
     </indent-block>
     <t-b>
@@ -449,6 +463,15 @@ int main() {
     <num-cont>
       <num-item1>7.11</num-item1><num-item4>Variadic Function Syntax:</num-item4>
     </num-cont>
+    <t-b>
+      The expression <c-s>typename... Args</c-s> is a parameter pack, something close to a list of types. 
+      The only thing you can do with a template parameter pack is to use it in a template declaration to 
+      define an unspecified finite collection of types.
+    </t-b>
+    <t-b>
+      The expression <c-s>Args... args</c-s> is a function parameter pack, a list of values.  The only thing
+      you can do with a function parameter pack is to expand it, or pass to a function.
+    </t-b>
     <defn-outerBlock>
       <defn-block>
         <defn-head>Fragment from 1st Example:</defn-head>
@@ -505,6 +528,13 @@ void f(T t, Args... args)
         </defn-body>
       </defn-block>
     </defn-outerBlock>
+    <t-b>
+      This syntax can be simplified using fold expressions, the next topic.
+    </t-b>
+      <hr class="spread" />
+      <num-cont>
+        <num-item1>7.12</num-item1><num-item4>Fold Expressions:</num-item4>
+      </num-cont>
     <indent-block>
       <!--<h3>C++ TMP:</h3>
       <h3>std functions</h3>
@@ -565,6 +595,9 @@ void f(T t, Args... args)
       <li>
         <strong>Template Metaprogramming:</strong>
         <ol class="tight">
+          <li>
+            <a href="https://arne-mertz.de/2016/11/more-variadic-templates/">More variadic templates - arne-mertz.de</a>
+          </li>
           <li>
             <a href="http://ericniebler.com/2014/11/13/tiny-metaprogramming-library/">Tiny Metaprogramming Library - Eric Niebler</a>
           </li>
