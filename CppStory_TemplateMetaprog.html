@@ -531,10 +531,649 @@ void f(T t, Args... args)
     <t-b>
       This syntax can be simplified using fold expressions, the next topic.
     </t-b>
-      <hr class="spread" />
-      <num-cont>
-        <num-item1>7.12</num-item1><num-item4>Fold Expressions:</num-item4>
-      </num-cont>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>7.12</num-item1><num-item4>Fold Expressions:</num-item4>
+    </num-cont>
+    <t-b>
+      Fold expressions allow us to delegate recursive parts of the definition of variadic structures 
+      to standard library code instead of implementing recursive functions as illustrated above.  
+      This only works for a relatively small, but useful, subset of functions we may wish to build.
+    </t-b>
+    <t-b>
+      We will look at an example, then explain the syntax.
+    </t-b>
+    <indent-block>
+      <details>
+        <summary class="labelStyle darkItem">Example: folds over binary operator</summary>
+        <s-halfEm></s-halfEm>
+        <defn-outerBlock>
+          <defn-block>
+            <defn-head>Code: folds over binary operator</defn-head>
+            <defn-code>
+template&lt;typename ...Args&gt;
+auto accumulateOrs(Args... args) {
+  return ((args) || ...);
+}
+
+template&lt;typename ...Args&gt;
+auto accumulateAnds(Args... args) {
+  return ((args) &amp;&amp; ...);
+}
+
+template&lt;typename T, typename ...Args&gt;
+auto sum(T t, Args... args) {
+  return (t + ... + args);
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using code:</defn-head>
+            <defn-code>
+displayDemo("\n  -- fold on logical operator --");
+std::cout &lt;&lt; std::boolalpha;
+std::cout &lt;&lt; "\n  " &lt;&lt; accumulateOrs(0, 0, 0);
+std::cout &lt;&lt; "\n  " &lt;&lt; accumulateOrs(false, true, false);
+std::cout &lt;&lt; "\n  " &lt;&lt; accumulateAnds(false, true, false);
+
+displayDemo("\n  -- fold on addition operator --");
+std::cout &lt;&lt; "\n  " &lt;&lt; sum(1, 2.5, -2);
+std::string s1 = "first";
+std::string s2 = " and ";
+std::string s3 = "second";
+std::cout &lt;&lt; "\n  " &lt;&lt; sum(s1, s2, s3);
+            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+ -- fold on logical operator --
+ false
+ true
+ false
+
+ -- fold on addition operator --
+ 1.5
+ first and second
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+      </details>
+    </indent-block>
+    <s-1em></s-1em>
+    <indent-block>
+      <defn-outerBlock>
+        <defn-block>
+          <defn-head>Code fragment from previous example:</defn-head>
+          <defn-code>
+template&lt;typename ...Args&gt;
+auto accumulateOrs(Args... args) {
+  return ((args) || ...);
+}
+
+template&lt;typename T, typename ...Args&gt;
+auto sum(T t, Args... args) {
+  return (t + ... + args);
+}
+          </defn-code>
+        </defn-block>
+        <defn-block style="max-width:25rem;">
+          <defn-head>Syntax explained:</defn-head>
+          <defn-body>
+            <t-b>
+              The function arguments for <c-s>accumulateOrs</c-s> and <c-s>sum</c-s> are just like the function
+              arguments without fold expressions.
+            </t-b>
+            <t-b>
+              What&apos;s new are the fold expressions:
+              <indent-block>
+                <ol class="tight">
+                  <li>
+                    <c-s>((args) || ...)</c-s>&nbsp;&nbsp;-- unary right fold
+                  </li>
+                  <li>
+                    <c-s>(t + ... + args)</c-s>&nbsp;-- binary left fold
+                  </li>
+                </ol>
+              </indent-block>              
+            </t-b>
+            <t-b>
+              The first expands to <c-s>args1 || args2 || ...</c-s> and the second expands to
+              <c-s>t + args1 + args2 + ...</c-s>.
+            </t-b>
+          </defn-body>
+        </defn-block>
+      </defn-outerBlock>
+    </indent-block>
+    <t-b>
+      This example is a classic use of fold expressions.  Next, we will show, in <c-s>pushToCout1</c-s> 
+      that this simple code structure is often not quite what we want.
+    </t-b>
+    <indent-block>
+      <details>
+        <summary class="labelStyle darkItem">Example: pushToCout1</summary>
+        <s-halfEm></s-halfEm>
+        <t-b>
+          This example folds over the insertion operator <c-s><<</c-s>, but that does not afford us
+          a direct way to add spaces or comma seperation between inserts.  See the results at the
+          bottom of the right panel. Everything is mashed together.
+        </t-b>
+        <s-halfEm></s-halfEm>
+        <defn-outerBlock>
+          <defn-block>
+            <defn-head>Code: push to std::cout</defn-head>
+            <defn-code>
+template&lt;typename ...Args&gt;
+void pushToCout1(Args&amp;&amp;... args) {
+  (std::cout &lt;&lt; ... &lt;&lt; std::forward&lt;Args&gt;(args));
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using code:</defn-head>
+            <defn-code>
+displayDemo("-- pushToCout1 -- fold on operator<< --");
+std::cout << "\n  ";
+pushToCout1("argggghhh!", 1, 2.5, 'z');
+std::cout << "\n  ";
+pushToCout1('z', 2.5, 1, "argggghhh!");
+            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+ -- pushToCout1 -- fold on operator<< --
+ argggghhh!12.5z
+ z2.51argggghhh!
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+      </details>
+    </indent-block>
+    <t-b>
+      The next examples, <c-s>pushToCout2</c-s> and <c-s>pushToCout3</c-s> generalize 
+      that a bit by using functions of parameter packs.
+    </t-b>
+    <indent-block>
+      <details>
+        <summary class="labelStyle darkItem">Example: pushToCout2 - uses fixed function object</summary>
+        <s-halfEm></s-halfEm>
+        <defn-outerBlock>
+          <defn-block>
+            <defn-head>Code: push to std::cout ver2</defn-head>
+            <defn-code>
+auto makeHelper(std::string prefix = ", ") {
+  auto f = [&amp;prefix](auto a) {
+    static std::ostringstream out2;
+    out2 &lt;&lt; a;
+    std::string temp = prefix + out2.str();
+    out2.str("");
+    prefix = ", ";
+    return temp;
+  };
+  return f;
+}
+
+template&lt;typename ...Args&gt;
+void pushToCout2(const Args&amp;... args) {
+  auto f = makeHelper();
+  (std::cout &lt;&lt; ... &lt;&lt; (f(args)));
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using code:</defn-head>
+            <defn-code>
+displayDemo(
+  "\n  -- pushToCout2 -- fold on operator&lt;&lt; --"
+);
+std::cout &lt;&lt; "\n  ";
+pushToCout2("argggghhh!", 1, 2.5, 'z');
+std::cout &lt;&lt; "\n  ";
+pushToCout2('z', 2.5, 1, "argggghhh!");
+            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+ -- pushToCout2 -- fold on operator<< --
+ argggghhh!, 1, 2.5, z
+ z, 2.5, 1, argggghhh!
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+      </details>
+    </indent-block>
+    <indent-block>
+      <details>
+        <summary class="labelStyle darkItem">Example: pushToCout3 - accepts function object</summary>
+        <s-halfEm></s-halfEm>
+        <defn-outerBlock>
+          <defn-block>
+            <defn-head>Code: push to std::cout ver3</defn-head>
+            <defn-code>
+auto makeHelper(std::string prefix = ", ") {
+  auto f = [&amp;prefix](auto a) {
+    static std::ostringstream out2;
+    out2 &lt;&lt; a;
+    std::string temp = prefix + out2.str();
+    out2.str("");
+    prefix = ", ";
+    return temp;
+  };
+  return f;
+}
+
+template&lt;typename F, typename ...Args&gt;
+void pushToCout3(F f, const Args&amp;... args) {
+  (std::cout &lt;&lt; ... &lt;&lt; (f(args)));
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using code:</defn-head>
+            <defn-code>
+displayDemo("\n  -- pushToCout3 -- fold on operator&lt;&lt; --");
+std::cout &lt;&lt; "\n  ";
+pushToCout3(makeHelper(), "argggghhh!", 1, 2.5, 'z');
+std::cout &lt;&lt; "\n  ";
+pushToCout3(makeHelper(), 'z', 2.5, 1, "argggghhh!");
+            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+ -- pushToCout3 -- fold on operator<< --
+ argggghhh!, 1, 2.5, z
+ z, 2.5, 1, argggghhh!
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+      </details>
+    </indent-block>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>7.2</num-item1><num-item4>Variadic Classes:</num-item4>
+    </num-cont>
+    <t-b>
+      Variadic template classes build instantiations with a finite arbitrary number of class parameters.
+      We specify a list of template parameter types with typename... Args and a list of template function
+      arguments with Args... args.
+    </t-b>
+    <t-b>
+      The first example constructs a derived class that inherits an arbitrary number of unspecified
+      classes.  That supports building a customizable product that can mixin features as needed by
+      an application. Over time we build up a set of base capabilities that are reused for each new
+      product.
+    </t-b>
+    <indent-block>
+      <details>
+        <summary class="labelStyle darkItem">Variadic Template Class Mixins</summary>
+        <s-halfEm></s-halfEm>
+        <defn-outerBlock>
+          <defn-block>
+            <defn-head>Code: Template Mixins</defn-head>
+            <defn-code>
+#include &lt;iostream&gt;
+
+namespace Chap7 {
+
+  class A {
+  public:
+    A() { 
+      std::cout &lt;&lt; "\n  an A here"; 
+    }
+    A(const A&amp; a) { 
+      std::cout &lt;&lt; "\n  copy A here"; 
+    }
+    virtual ~A() {}
+  };
+
+  class B {
+  public:
+    B() { 
+      std::cout &lt;&lt; "\n  a B here"; 
+    }
+    B(const B&amp; b) { 
+      std::cout &lt;&lt; "\n  copy B here"; 
+    }
+    virtual ~B() {}
+  };
+
+  class C {
+  public:
+    C() { 
+      std::cout &lt;&lt; "\n  a C here"; 
+    }
+    C(const C&amp; c) { 
+      std::cout &lt;&lt; "\n  copy C here"; 
+    }
+    virtual ~C() {}
+    void do_C_op() { 
+      std::cout &lt;&lt; 
+        "\n  doing C's operation"; 
+    }
+  };
+
+  <span class=notice>template&lt;typename... Mixins&gt;
+  class D : public Mixins...</span>
+  {
+  private:
+    bool hasMixins = false;
+  public:
+    // D() fails to compile because same as
+    // D(const Mixins&amp; ... mixins)
+    // when there are no mixins
+    // D() { 
+    //   std::cout &lt;&lt; "\n  a D here"; 
+    // }
+
+  <span class="notice">
+    D(const Mixins&amp; ... mixins)
+    : Mixins(mixins)... {
+        if (sizeof...(mixins) == 0)</span>
+        std::cout &lt;&lt; "\n  a D here";
+      else
+      {
+        hasMixins = true;
+        std::cout &lt;&lt; "\n  copy D here";
+      }
+    }
+    virtual ~D() {}
+    void say()
+    {
+      if (!hasMixins)
+        std::cout &lt;&lt; 
+          "\n  class D with no mixins here";
+      else {
+        std::cout &lt;&lt; "\n  " 
+                  &lt;&lt; typeid(this).name();
+        //std::cout &lt;&lt; "\n  " 
+        //  &lt;&lt; typeid(this).raw_name();
+      }
+      C* pC = dynamic_cast&lt;C*&gt;(this);
+      if (pC)
+        pC-&gt;do_C_op();
+      std::cout &lt;&lt; "\n";
+    }
+  };
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code:</defn-head>
+            <defn-code>
+#include "Chap7VariadicClassMixins.h"
+
+using namespace Chap7;
+
+int main()
+{
+  std::cout &lt;&lt; 
+    "\n  Variadic mixin template classes";
+  std::cout &lt;&lt; 
+    "\n =================================\n";
+
+  A a;
+  B b;
+  C c;
+  D&lt;&gt; d;
+  d.say();
+
+  D&lt;A&gt; dA(a);
+  dA.say();
+
+  D&lt;B, C&gt; dBC(b, c);
+  dBC.say();
+
+  // Will fail to compile 
+  // - incomplete argument list
+  // D&lt;B, C&gt; dBC(b);
+
+  std::cout &lt;&lt; "\n\n";
+  return 0;
+}
+            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+ Variadic mixin template classes
+=================================
+
+ an A here
+ a B here
+ a C here
+ a D here
+ class D with no mixins here
+
+ copy A here
+ copy D here
+ class Chap7::D&lt;class Chap7::A&gt; * __ptr64
+
+ copy B here
+ copy C here
+ copy D here
+ class Chap7::D&lt;
+   class Chap7::B,class Chap7::C
+ &gt; * __ptr64
+ doing C's operation
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+      </details>
+    </indent-block>
+    <t-b>
+      The next example creates a class with an arbitrary number of composed members of unspecified classes.
+      Where the mixin example demonstrated composing functionality from base mixins, this example
+      demonstrates composition of data into a heterogeneous data structure.
+    </t-b>
+    <indent-block>
+      <details>
+        <summary class="labelStyle darkItem">Variadic Template Class Compositions</summary>
+        <s-halfEm></s-halfEm>
+        <defn-outerblock>
+          <defn-block>
+            <defn-head>Code: Variadic Class Composition</defn-head>
+            <defn-code>
+template&lt;typename ... T&gt;
+struct DataStructure {};
+
+template&lt;size_t id, typename T&gt;
+struct GetHelper;
+
+template&lt;typename T, typename ... Rest&gt;
+struct DataStructure&lt;T, Rest ...&gt;
+{
+  DataStructure(
+    const T&amp; first, const Rest&amp; ... rest
+  )
+    : first(first), rest(rest...)
+  {}
+
+  T first;
+  DataStructure&lt;Rest ... &gt; rest;
+
+  template&lt;size_t id&gt;
+  auto get()
+  {
+    return GetHelper&lt;
+      id, DataStructure&lt;T, Rest...&gt;
+    &gt;::get(*this);
+  }
+};
+
+template&lt;typename T, typename ... Rest&gt;
+struct GetHelper&lt;
+  0, DataStructure&lt;T, Rest ... &gt;
+&gt;
+{
+  static T get(
+    DataStructure&lt;T, Rest...&gt;&amp; data
+  )
+  {
+    return data.first;
+  }
+};
+
+template&lt;
+  size_t id, typename T, typename ... Rest
+&gt;
+struct GetHelper&lt;
+  id, DataStructure&lt;T, Rest ... &gt;
+&gt;
+{
+  static auto get(
+    DataStructure&lt;T, Rest...&gt;&amp; data
+  )
+  {
+    return GetHelper&lt;
+      id - 1, 
+      DataStructure&lt;Rest ...&gt;
+    &gt;::get(data.rest);
+  }
+};
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code:</defn-head>
+            <defn-code>
+#include "Chap7VariadicClassComp.h"
+#include "../Display/Display.h"
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+int main()
+{
+  displayTitle(
+    "Variadic Class Data by Composition"
+  );
+
+  DataStructure&lt;
+    int, float, std::string
+  &gt; data1(1, 2.1, "Hello");
+
+  std::cout &lt;&lt; 
+    "\n  " &lt;&lt; data1.get&lt;0&gt;();
+  std::cout &lt;&lt; 
+    "\n  " &lt;&lt; data1.get&lt;1&gt;();
+  std::cout &lt;&lt; 
+    "\n  " &lt;&lt; data1.get&lt;2&gt;();
+  putline();
+
+  DataStructure&lt;
+    int, float, std::string
+  &gt; data2{ 2, 3.1, "Hello again" };
+  std::cout &lt;&lt; "\n  " 
+            &lt;&lt; data2.get&lt;0&gt;();
+  std::cout &lt;&lt; "\n  " 
+            &lt;&lt; data2.get&lt;1&gt;();
+  std::cout &lt;&lt; "\n  " 
+            &lt;&lt; data2.get&lt;2&gt;();
+  putline();
+
+  DataStructure&lt;std::vector&lt;int&gt;&gt; 
+    data3(std::vector&lt;int&gt;{1, 2, 3, 4, 5});
+  std::vector&lt;int&gt; out 
+    = data3.get&lt;0&gt;();
+  std::cout &lt;&lt; "\n  ";
+  for (auto item : out) {
+    std::cout &lt;&lt; item &lt;&lt; " ";
+  }
+  putline(2);
+  return 0;
+}            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+
+ Variadic Class Data by Composition
+====================================
+
+ 1
+ 2.1
+ Hello
+
+ 2
+ 3.1
+ Hello again
+
+ 1 2 3 4 5
+            </defn-code>
+          </defn-block>
+        </defn-outerblock>
+      </details>
+    </indent-block>
+    <num-cont>
+      <num-item1>7.21</num-item1><num-item4>Variadic Class Syntax:</num-item4>
+    </num-cont>
+    <t-b>
+      Variadic class syntax is the same parameter pack syntax used for functions,
+      simply adapted to the class template syntax.
+    </t-b>
+    <indent-block>
+      <defn-outerBlock>
+        <defn-block>
+          <defn-head>Code fragment from 1st example:</defn-head>
+          <defn-code>
+  <span class=notice>template&lt;typename... Mixins&gt;
+  class D : public Mixins...</span>
+  {
+  private:
+    bool hasMixins = false;
+  public:
+    <span class="notice">
+    D(const Mixins&amp; ... mixins)
+    : Mixins(mixins)... {
+        if (sizeof...(mixins) == 0)</span>
+        std::cout &lt;&lt; "\n  a D here";
+      else
+      {
+        hasMixins = true;
+        std::cout &lt;&lt; "\n  copy D here";
+      }
+    }
+    virtual ~D() {}
+    void say()
+    {
+      if (!hasMixins)
+        std::cout &lt;&lt; 
+          "\n  class D with no mixins here";
+      else {
+        std::cout &lt;&lt; "\n  " 
+                  &lt;&lt; typeid(this).name();
+      }
+      C* pC = dynamic_cast&lt;C*&gt;(this);
+      if (pC)
+        pC-&gt;do_C_op();
+      std::cout &lt;&lt; "\n";
+    }
+  };
+          </defn-code>
+        </defn-block>
+        <defn-block>
+          <defn-head>Syntax Explained:</defn-head>
+          <defn-body style="max-width:30rem;">
+            <t-b>
+              The parameter pack <c-s class="notice">typename... Mixins</c-s> declares a list of a finite
+              arbitrary number of unspecified class types to be used by <c-s>class D</c-s>.
+            </t-b>
+            <t-b>
+              The second line in the left panel declares that <c-s>D</c-s> inherits from all of the classes
+              specified by an application.  Other uses of variadic class templates could use them in other
+              ways.
+            </t-b>
+            <t-b>
+              The constructor 
+              <indent-block class="pad10">
+                <c-s class="notice">D(const Mixins&amp; ... mixins) : Mixins(mixins)...</c-s>
+              </indent-block>
+              Accepts an initializing value for each mixin class and calls its constructor in an
+              initialization sequence, the last part of the expression above.
+            </t-b>
+            <t-b>
+              The ellipsis, &quot;<c-s>...</c-s>&quot; causes an expansion of the parameter packs, e.g.,
+              <c-s class="notice">Mixins& ... mixins</c-s> expands into a comma separated list of arguments,
+              <c-s class="notice">Mixin1&amp; mixin1, Mixin2&amp; mixin2, ..</c-s>.
+            </t-b>
+            <t-b>
+              The term <c-s class="notice">Mixins(mixins)...</c-s> expands into a comma separated list
+              of <c-s>Mixin1(mixin1), Misin2(mixin2), ..</c-s>.  This is just what we need to create
+              a valid constructor syntax.
+            </t-b>
+          </defn-body>
+        </defn-block>
+      </defn-outerBlock>
+    </indent-block>
     <indent-block>
       <!--<h3>C++ TMP:</h3>
       <h3>std functions</h3>
