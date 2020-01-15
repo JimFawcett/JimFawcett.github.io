@@ -688,31 +688,46 @@ pushToCout1('z', 2.5, 1, "argggghhh!");
     </indent-block>
     <t-b>
       The next examples, <c-s>pushToCout2</c-s> and <c-s>pushToCout3</c-s> generalize 
-      that a bit by using functions of parameter packs.
+      that a bit by using functions on expanded items from the parameter pack.  This example uses a fixed
+      lambda.  You can customize only by the arguments passed to the lambda.
     </t-b>
     <indent-block>
       <details>
         <summary class="labelStyle darkItem">Example: pushToCout2 - uses fixed function object</summary>
         <s-halfEm></s-halfEm>
+        <t-b>
+          This version defines a lambda that operates on each expanded args item by prefixing with &quot;,&nbsp;&quot;.
+          We create the lambda inside a creational function that prepends the prefix by inserting into a <c-s>std::ostringstream</c-s>
+          instance followed by the item.  The purpose of the creational function is to manage the stringstream instance.
+        </t-b>
+        <t-b>
+          In the next version we will extend this idea by allowing the user to inject an application specific creational function.
+        </t-b>
         <defn-outerBlock>
           <defn-block>
             <defn-head>Code: push to std::cout ver2</defn-head>
             <defn-code>
-auto makeHelper(std::string prefix = ", ") {
-  auto f = [&amp;prefix](auto a) {
+auto makeHelper(
+  std::string prefix = ", ", 
+  std::string firstPrefix = ""
+) 
+{
+  int debug = 0;
+  auto f = [prefix, firstPrefix](auto a) mutable {
     static std::ostringstream out2;
     out2 &lt;&lt; a;
-    std::string temp = prefix + out2.str();
+    std::string temp = firstPrefix + out2.str();
     out2.str("");
-    prefix = ", ";
+    firstPrefix = prefix;
     return temp;
   };
+  debug++;
   return f;
 }
 
 template&lt;typename ...Args&gt;
 void pushToCout2(const Args&amp;... args) {
-  auto f = makeHelper();
+  static auto f = makeHelper(", ");
   (std::cout &lt;&lt; ... &lt;&lt; (f(args)));
 }
             </defn-code>
@@ -720,24 +735,28 @@ void pushToCout2(const Args&amp;... args) {
           <defn-block>
             <defn-head>Using code:</defn-head>
             <defn-code>
-displayDemo(
-  "\n  -- pushToCout2 -- fold on operator&lt;&lt; --"
-);
-std::cout &lt;&lt; "\n  ";
-pushToCout2("argggghhh!", 1, 2.5, 'z');
-std::cout &lt;&lt; "\n  ";
-pushToCout2('z', 2.5, 1, "argggghhh!");
+  displayDemo(
+    "\n  -- pushToCout2 -- fold on operator&lt;&lt; --"
+  );
+  std::cout &lt;&lt; "\n  ";
+  pushToCout2("aaaahhhhh!", 1, 2.5, 'z');
+  std::cout &lt;&lt; "\n  ";
+  pushToCout2('z', 2.5, 1, "aaaahhhhh!");
             </defn-code>
             <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
  -- pushToCout2 -- fold on operator<< --
- argggghhh!, 1, 2.5, z
- z, 2.5, 1, argggghhh!
+ aaaahhhhh!, 1, 2.5, z
+ z, 2.5, 1, aaaahhhhh!
             </defn-code>
           </defn-block>
         </defn-outerBlock>
       </details>
     </indent-block>
+    <t-b>
+      The final version, <c-s>pushToCout3</c-s>, improves the design by passing an unspecified lambda into
+      <c-s>pushToCout3</c-s> so an application can provide its own preferred operation.
+    </t-b>
     <indent-block>
       <details>
         <summary class="labelStyle darkItem">Example: pushToCout3 - accepts function object</summary>
@@ -746,17 +765,22 @@ pushToCout2('z', 2.5, 1, "argggghhh!");
           <defn-block>
             <defn-head>Code: push to std::cout ver3</defn-head>
             <defn-code>
-auto makeHelper(std::string prefix = ", ") {
-  auto f = [&amp;prefix](auto a) {
+auto makeHelper(
+  std::string prefix = ", ", 
+  std::string firstPrefix = ""
+) 
+{
+  int debug = 0;
+  auto f = [prefix, firstPrefix](auto a) mutable {
     static std::ostringstream out2;
     out2 &lt;&lt; a;
-    std::string temp = prefix + out2.str();
+    std::string temp = firstPrefix + out2.str();
     out2.str("");
-    prefix = ", ";
+    firstPrefix = prefix;
     return temp;
   };
+  debug++;
   return f;
-}
 
 template&lt;typename F, typename ...Args&gt;
 void pushToCout3(F f, const Args&amp;... args) {
@@ -767,22 +791,28 @@ void pushToCout3(F f, const Args&amp;... args) {
           <defn-block>
             <defn-head>Using code:</defn-head>
             <defn-code>
-displayDemo("\n  -- pushToCout3 -- fold on operator&lt;&lt; --");
-std::cout &lt;&lt; "\n  ";
-pushToCout3(makeHelper(), "argggghhh!", 1, 2.5, 'z');
-std::cout &lt;&lt; "\n  ";
-pushToCout3(makeHelper(), 'z', 2.5, 1, "argggghhh!");
+  displayDemo(
+    "\n  -- pushToCout3 -- fold on operator&lt;&lt; --"
+  );
+  std::cout &lt;&lt; "\n  ";
+  pushToCout3(makeHelper(), "aaaahhhhh!", 1, 2.5, 'z');
+  std::cout &lt;&lt; "\n  ";
+  pushToCout3(makeHelper(), 'z', 2.5, 1, "aaaahhhhh!");
             </defn-code>
             <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
  -- pushToCout3 -- fold on operator<< --
- argggghhh!, 1, 2.5, z
- z, 2.5, 1, argggghhh!
+ aaaahhhhh!, 1, 2.5, z
+ z, 2.5, 1, aaaahhhhh!
             </defn-code>
           </defn-block>
         </defn-outerBlock>
       </details>
     </indent-block>
+    <t-b>
+      We&apos;ve looked at features provided by C++ to build generic functions aided by template metaprogramming constructs.
+      Now it&apos;s time to turn to template metaprogramming for classes.
+    </t-b>
     <hr class="spread" />
     <num-cont>
       <num-item1>7.2</num-item1><num-item4>Variadic Classes:</num-item4>
@@ -802,6 +832,14 @@ pushToCout3(makeHelper(), 'z', 2.5, 1, "argggghhh!");
       <details>
         <summary class="labelStyle darkItem">Variadic Template Class Mixins</summary>
         <s-halfEm></s-halfEm>
+        <t-b>
+          The top half of the left panel presents code for three test classes <c-s>A</c-s>, <c-s>B</c-s>, and <c-s>C</c-s>.  
+          They have no significance other than supporting the demonstration of mixins.  Class <c-s>D</c-s> is the class that
+          inherits an arbitray number of mixin classes.
+        </t-b>
+        <t-b>
+
+        </t-b>
         <defn-outerBlock>
           <defn-block>
             <defn-head>Code: Template Mixins</defn-head>
@@ -962,6 +1000,9 @@ int main()
       <details>
         <summary class="labelStyle darkItem">Variadic Template Class Compositions</summary>
         <s-halfEm></s-halfEm>
+        <t-b>
+          [ need citation link here ] [ can we generate getter setter functions? ]
+        </t-b>
         <defn-outerblock>
           <defn-block>
             <defn-head>Code: Variadic Class Composition</defn-head>
@@ -1174,6 +1215,9 @@ int main()
         </defn-block>
       </defn-outerBlock>
     </indent-block>
+    <num-cont>
+      <num-item1>7.3</num-item1><num-item4>Type Traits:</num-item4>
+    </num-cont>
     <indent-block>
       <!--<h3>C++ TMP:</h3>
       <h3>std functions</h3>
