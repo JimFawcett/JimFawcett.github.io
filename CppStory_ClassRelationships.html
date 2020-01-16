@@ -59,6 +59,7 @@
     <a href="#ObjLO">Obj Layout</a>, <a href="#CompObj">Comp Obj</a>, 
     <a href="#Inherit">Inherit</a>, <a href="#VFPT">VFPT</a>, 
     <a href="#Person">Person</a>, <a href="#Parser">Parser</a>, 
+    <a href="#epilog">Epilogue</a>, <a href="#refs">Refs</a>, 
     <a href="Javascript:;" onclick="closeTOC()" style="color:darkred;">Close</a>
     <up-b id="chaps" onmouseout="storyMenu.chaps()">
       <a href="CppStory_Prologue.html">Prologue</a><br />
@@ -78,10 +79,10 @@
   <hr class="spread" />
   <bb-55 class="indent">
     <num-cont>
-      <num-item1>5.0</num-item1><num-item4>Class Relationships</num-item4>
+      <num-item1>5.0</num-item1><num-item4>Class Relationships Prologue</num-item4>
     </num-cont>
     <t-b class="indents">
-    Object-oriented design and implementation consists of constructing of classes and binding them together
+    Object-oriented design and implementation consists of constructing classes and binding them together
     with class relationships.  There are five relations: inheritance, composition, aggregation, using, and friendship.
     Of these, all but the last are found in many implementations of C++ programs.
     </t-b>
@@ -208,8 +209,8 @@ struct StrUtils {
 /*-------------------------------------------
    super string
 */
-class stringEx : 
-  public std::string, private StrUtils {
+<span class="notice">class stringEx : 
+  public std::string, private StrUtils {</span>
 public:
   stringEx() {}
   stringEx(const std::string& str) 
@@ -298,7 +299,16 @@ superStr splits are:
     </t-b>
       </div>
     </details>
-
+    <t-b>
+      This example constructs a <c-s>StringEx</c-s> class by inheriting publically from <c-s>std::string</c-s>
+      and privately from a string utilities class.  The effect is to provide all of the facilities of the
+      <c-s>std::string</c-s> to <c-s>StringEx</c-s> along with extensions provided by the utilities.
+    </t-b>
+    <t-b>
+      The effect is similar to <c-s>C#</c-s> extension methods, but implemented in a different way. It would
+      be easy to continue extensions by inheriting from additional base classes.  That is often referred to
+      as use of &quot;mixin&quot; classes.  We will talk in more detail about them in Chapter 7.
+    </t-b>
     <a id="ClassRel"></a>
     <hr class="spread" />
     <num-cont>
@@ -852,7 +862,7 @@ void f() override { ... }
     <a id="VFPT"></a>
     <s-halfEm></s-halfEm>
     <num-cont>
-      <num-item1>5.41</num-item1><num-item4>Virtual Dispatching via Virtual Function Pointer Table:</num-item4>
+      <num-item1>5.4.1</num-item1><num-item4>Virtual Dispatching via Virtual Function Pointer Table:</num-item4>
     </num-cont>
     <div style="width:calc(100vw - 12rem);">
     <photosizer-block src="Pictures/Polymorphism.jpg" width="500" class="photoSizerBlock right clear">
@@ -1980,60 +1990,75 @@ int main() {
             <td class="tdefn">
               <tdefn-block>
                 <tdefn-code>
-  class IBuilder
+class IBuilder
+{
+public:
+  virtual ~IBuilder() {}
+  virtual Parser* Build() = 0;
+};
+
+///////////////////////////////////////////////
+// abstract base class for parsing actions
+//   - when a rule succeeds, it invokes any 
+//     registered action
+
+class IAction
+{
+public:
+  virtual ~IAction() {}
+  virtual void doAction(
+    const Scanner::ITokCollection* pTc
+  ) = 0;
+};
+
+///////////////////////////////////////////////
+// abstract base class for parser language 
+// construct detections
+//   - rules are registered with parser for use
+
+class IRule
+{
+public:
+  static const bool Continue = true;
+  static const bool Stop = false;
+  virtual ~IRule() {}
+  void addAction(IAction* pAction);
+  void doActions(const Scanner::ITokCollection* pTc);
+  virtual bool doTest(
+    const Scanner::ITokCollection* pTc
+  ) = 0;
+protected:
+  std::vector&lt;IAction*&gt; actions;
+};
+
+class Parser
+{
+public:
+  Parser(Scanner::ITokCollection* pTokCollection);
+  ~Parser();
+  void addRule(IRule* pRule);
+  bool parse();
+  bool next();
+private:
+  Scanner::ITokCollection* pTokColl;
+  std::vector&lt;IRule*&gt; rules;
+};
+
+//----&lt; parse SemiExp by applying all rules to it &gt;--------
+
+bool Parser::parse()
+{
+  for (size_t i = 0; i&lt;rules.size(); ++i)
   {
-  public:
-    virtual ~IBuilder() {}
-    virtual Parser* Build() = 0;
-  };
+    std::string debug = pTokColl-&gt;show();
 
-  ///////////////////////////////////////////////
-  // abstract base class for parsing actions
-  //   - when a rule succeeds, it invokes any 
-  //     registered action
-
-  class IAction
-  {
-  public:
-    virtual ~IAction() {}
-    virtual void doAction(
-      const Scanner::ITokCollection* pTc
-    ) = 0;
-  };
-
-  ///////////////////////////////////////////////
-  // abstract base class for parser language 
-  // construct detections
-  //   - rules are registered with parser for use
-
-  class IRule
-  {
-  public:
-    static const bool Continue = true;
-    static const bool Stop = false;
-    virtual ~IRule() {}
-    void addAction(IAction* pAction);
-    void doActions(const Scanner::ITokCollection* pTc);
-    virtual bool doTest(
-      const Scanner::ITokCollection* pTc
-    ) = 0;
-  protected:
-    std::vector&lt;IAction*&gt; actions;
-  };
-
-  class Parser
-  {
-  public:
-    Parser(Scanner::ITokCollection* pTokCollection);
-    ~Parser();
-    void addRule(IRule* pRule);
-    bool parse();
-    bool next();
-  private:
-    Scanner::ITokCollection* pTokColl;
-    std::vector&lt;IRule*&gt; rules;
-  };
-                </tdefn-code>
+    bool doWhat = rules[i]-&gt;doTest(pTokColl);
+    if (doWhat == IRule::Stop)
+      break;
+  }
+  return true;
+}
+              </tdefn-code>
               </tdefn-block>
             </td>
             <td class="tdefn">
@@ -2189,6 +2214,58 @@ int main() {
         </a>&quot; and many web tutorials and blogs.
       </li>
     </ol>
+    <a id="epilog"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>5.7</num-item1><num-item4>Epilogue:</num-item4>
+    </num-cont>
+    <t-b>
+      Each of the class relationships has a particular mission:
+      <indent-block>
+        <ol class="tight indent">
+          <li>
+            <strong>Inheritance:</strong><br />
+            Provides a specialization of some base type.  If we pass pointers to, or references of, a base instance to a function,
+            the function can accept pointers or references bound to any class that derives from that base.  This makes using code very
+            flexible.  If we need to add a new derived class the function won&apos;t be modified in any way.
+          </li>
+          <li>
+            <strong>Composition:</strong><br />
+            Allows us to factor some complex processing into a class with composed members, each of which, handle some small
+            cohesive part of the computation.  That simplifies building, debugging, testing, and enhances reading comprehension.
+          </li>
+          <li>
+            <strong>Aggregation:</strong><br />
+            Has the same utility as composition for aggregates that need to be constructed dynamically, perhaps because we
+            don&apos;t have enough information to initialize at compile time, or perhaps we may elect not to create them
+            because the execution path hasn&apos;t needed them. To do so, we pay a performance penalty for the dynamic
+            memory allocation.
+          </li>
+          <li>
+            <strong>Using:</strong><br />
+            Allows a class to use facilities that it does not own, perhaps because they are shared or must be created by
+            another entity that has the information needed to create.
+          </li>
+          <li>
+            <strong>Friend:</strong><br />
+            We try not to use friendship because it increases the scope of class encapsulation.  There are times when 
+            there is no other alternative.  For example, the friend may not be a candidate, for technical reasons, to be a class 
+            member, but its functionality is needed in the current program.
+          </li>
+        </ol>
+        <t-b>
+          There are two powerful ways of writing flexible code. One uses dynamic polymorphism via class inheritance heirarchies,
+          as we have demonstrated in this chapter.  The other uses static polymorphism with templates, as we will see in the 
+          next chapter.
+        </t-b>
+      </indent-block>
+    </t-b>
+    <a id="refs"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>5.8</num-item1><num-item4>References:</num-item4>
+    </num-cont>
+
     <spacer-25 class="clear"></spacer-25>
     <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
   </bb-55>
