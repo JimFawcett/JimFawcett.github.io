@@ -1421,7 +1421,7 @@ int, 3
     </t-b>
     <t-b>
       <c-s>constexpr</c-s> functions must use only types and values that can be represented at compile-time
-      in order to run at compile-time. Otherwise the compile generates code to execute them at run-time.
+      in order to run at compile-time. Otherwise the compiler generates code to execute them at run-time.
     </t-b>
     <t-b>
       Here&apos;s another example that adds two more constexpr functions.
@@ -1441,6 +1441,29 @@ struct ExpRep2 {
   static constexpr T addOne() { return (v + 1); }
   static constexpr T subOne() { return (v - 1); }
 };
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head>Using Code:</defn-head>
+        <defn-code>
+constexpr int v = 0;
+std::cout &lt;&lt; "\n  " 
+          &lt;&lt; typeid(ExpRep2&lt;size_t, v&gt;).name() 
+          &lt;&lt; ", " 
+          &lt;&lt; ExpRep2&lt;size_t, v&gt;::get();
+std::cout &lt;&lt; "\n  " 
+          &lt;&lt; ExpRep2&lt;int, v&gt;::addOne();
+std::cout &lt;&lt; "\n  " 
+          &lt;&lt; ExpRep2&lt;int, v&gt;();
+std::cout &lt;&lt; "\n  " 
+          &lt;&lt; ExpRep2&lt;int, v&gt;::subOne();
+        </defn-code>
+        <defn-head class="defnBorderTop">Output:</defn-head>
+        <defn-code>
+struct ExpRep2<unsigned __int64,0>, 0
+1
+0
+-1
         </defn-code>
       </defn-block>
     </defn-outerBlock>
@@ -1529,6 +1552,10 @@ false
       </defn-block>
     </defn-outerBlock>
     <t-b>
+      <c-s>std::is_void&lt;T&gt;</c-s> is one of the simplest std type traits.  The example above shows how it
+      is implemented.  All the traits use this approach, but of course some are more complex.
+    </t-b>
+    <t-b>
       If you look at the code in <a href="CppStoryRepo.html">CppStory repository</a> in folder Chapter7-TypeTraits,
       you will see all the code presented here and can run it. It just mimics what the standard library code
       implements.
@@ -1540,16 +1567,80 @@ false
       <num-item1>7.4</num-item1><num-item4>Type Traits:</num-item4>
     </num-cont>
     <t-b>
-      Type traits are template classes that test for specific type attributes:
-      <indent-block>
-        <div class="defn-code">
-template&lt;typename T&gt; bool is_SomeAttribute() { ... }
-        </div>
-      </indent-block>
-      Examples from the standard library <c-s>type_traits</c-s> are: <c-s>is_void</c-s>, <c-s>is_class</c-s>, and 
-      <c-s>is_rvalue_reference</c-s>.  Here&apos;s a complete list 
-      <a href="https://en.cppreference.com/w/cpp/header/type_traits">cppreference.com/.../type_traits</a>. 
+      Type traits are template expression classes that test for specific type attributes, like <c-s>is_void</c-s>,
+      above.
+      Examples from the standard <c-s>type_traits</c-s> library are: <c-s>is_void</c-s>, <c-s>is_class</c-s>, and 
+      <c-s>is_rvalue_reference</c-s>.  Here&apos;s a complete list of standard  
+      <a href="https://en.cppreference.com/w/cpp/header/type_traits">type_traits</a>. 
     </t-b>
+    <t-b>
+      The <c-s>type_traits</c-s> library does not provide traits to detect STL containers, so we will do one
+      for <c-s>std::vector</c-s> in this next example. The code follows closely an example provided in
+      <a href="https://stackoverflow.com/questions/9407367/determine-if-a-type-is-an-stl-container-at-compile-time/31105859#31105859">stackoverflow</a>.
+    </t-b>
+    <defn-outerBlock class="indent">
+      <defn-block>
+        <defn-head>Custom type_trait is_vector</defn-head>
+        <defn-code>
+namespace impl {
+  template&lt;typename T&gt; struct 
+    is_vector : std::false_type {};
+  template &lt;typename... Args&gt; struct 
+    is_vector&lt; 
+      std::vector&lt;Args...&gt;
+    &gt;:std::true_type {};
+}
+template&lt;typename T&gt; struct is_vector {
+  static constexpr bool const value = 
+    impl::is_vector&lt;std::decay_t&lt;T &gt;&gt;::value;
+};
+
+/*-----------------------------------------------------
+  The core part of the definition is in impl namespace.
+  That is then used in the final definition, stripping
+  cvr qualifiers from T with std::decay_t&lt;T&gt;.
+
+  Namespace impl is needed to avoid an infinite recurse
+  in that final definition fix-up.
+-----------------------------------------------------*/
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head>Using Code:</defn-head>
+        <defn-code>
+displayDemo("--- is_vector ---");
+std::cout &lt;&lt; "\n  " 
+          &lt;&lt; is_vector&lt;
+               std::vector&lt;int&gt;
+              &gt;::value;
+std::cout &lt;&lt; "\n  " 
+          &lt;&lt; is_vector&lt;
+               std::vector&lt;double&gt;
+              &gt;::value;
+std::cout &lt;&lt; "\n  " 
+          &lt;&lt; is_vector&lt;
+               std::unordered_map&lt;int, std::string&gt;
+              &gt;::value;
+        </defn-code>
+        <defn-head class="defnBorderTop">Output:</defn-head>
+        <defn-code>
+--- is_vector ---
+true
+true
+false
+        </defn-code>
+      </defn-block>
+    </defn-outerBlock>
+    <t-b>
+      We&apos;ve used a variadic template in the example above so that both
+      <c-s>std::vector&lt;T&gt;</c-s> and <c-s>std::vector&lt;T,Allocator&gt;</c-s>
+      would be detected.  Without the variadic template only the first would be detected. Many of the
+      STL containers have several template arguments, so this solution covers all those cases.
+      For each of the STL containers we can define traits using the above code and merely substitute
+      the name of the container for <c-s>vector</c-s>.
+    </t-b>
+
+
     <a id="selections"></a>
     <hr class="spread" />
     <num-cont>
