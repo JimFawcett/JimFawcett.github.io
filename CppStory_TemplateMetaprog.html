@@ -1062,6 +1062,41 @@ int main()
           <a href="https://riptutorial.com/cplusplus/example/19276/variadic-template-data-structures">riptutorial.com</a>
           [ can we generate getter setter functions? ]
         </t-b>
+        <hr style="border-top:2px solid darkred" />
+        <hidephotosizer-block src="Pictures/Compositions.jpg" width="300" class="photoSizerBlock right">
+          <span style="font-family:'Comic Sans MS, Tahoma';">
+            Fig 2. Composition Structure
+          </span>
+        </hidephotosizer-block>
+        <t-b>
+          In the left panel we have:
+          <div class="indent">
+            <ol class="tight indent">
+              <li>
+                Declaration of a generic DataStructure
+              </li>
+              <li>
+                Forward declaration of a helper function, used to retrieve data from the structure
+              </li>
+              <li>
+                A specialization of the DataStructure that provides for storage and retrieval of
+                a finite number of composed classes.
+              </li>
+              <li>
+                Definitions of a helper function that gets composed items by index 
+                (similar to the mechanism used by std::tuple)
+              </li>
+            </ol>
+          </div>
+        </t-b>
+        <t-b>
+          A use case for this is a help system. Suppose we are building a mixin product family like the
+          one in the previous example.  We want to provide a main help for the core product in
+          <c-s>DataStructure</c-s> and then
+          plug in help modules for each product feature class included in the product. Here, we will
+          simply define plug in modules <c-s>A</c-s>, <c-s>B</c-s>, <c-s>C</c-s>, etc. and plug in the
+          ones that match our product.
+        </t-b>
         <defn-outerblock>
           <defn-block>
             <defn-head>Code: Variadic Class Composition</defn-head>
@@ -1274,12 +1309,247 @@ int main()
         </defn-block>
       </defn-outerBlock>
     </indent-block>
+    <a id="compileEntities"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>7.3</num-item1><num-item4>Compile-Time Entities:</num-item4>
+    </num-cont>
+    <t-b>
+      Implementing templates required C++ compilers to develop a compile-time functional language.  
+      That language handles types, type lists, and constant integral values while compiling template code.
+    </t-b>
+    <t-b>
+      The template metaprogramming language (TMPL) needs representations for types, constant integral values
+      and compile-time expressions (an association of a type and a constant value). Let&apos;s see how that
+      can be done.
+    </t-b>
+    <defn-outerBlock class="indent">
+      <defn-block>
+        <defn-head>
+          Type Representation:
+        </defn-head>
+        <defn-code>
+template&lt;typename T&gt;
+struct TypeRep {
+  using type = T;
+};
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head>Using Code:</defn-head>
+        <defn-code>
+std::cout &lt;&lt; "\n  " 
+          &lt;&lt; typeid(TypeRep&lt;double&gt;::type).name();
+        </defn-code>
+        <defn-head class="defnBorderTop">Output:</defn-head>
+        <defn-code>
+double
+        </defn-code>
+      </defn-block>
+    </defn-outerBlock>
+    <t-b>
+      The declaration <c-s>using type = T;</c-s> creates a <c-s>type</c-s> member in <c-s>TypeRep</c-s> accessed
+      by the expression <c-s>TypeRep&lt;T&gt;::type</c-s>. The code listed in the top panel on the right is
+      generated at compile-time and executed at run-time.
+    </t-b>
+    <t-b>
+      Why do we need this? We&apos;ll see in several examples to come.
+    </t-b>
+    <defn-outerBlock class="indent">
+      <defn-block>
+        <defn-head>
+          Value Representation:
+        </defn-head>
+        <defn-code>
+template&lt;typename T, T v&gt;
+struct ValueRep {
+  static constexpr T value = v;
+};
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head>Using Code:</defn-head>
+        <defn-code>
+std::cout &lt;&lt; "\n  " 
+          &lt;&lt; ValueRep&lt;int, 3&gt;::value;
+        </defn-code>
+        <defn-head class="defnBorderTop">Output:</defn-head>
+        <defn-code>
+3
+        </defn-code>
+      </defn-block>
+    </defn-outerBlock>
+    <t-b>
+      Values at compile-time have to be integral constants, e.g., <c-s>ints</c-s>, <c-s>long ints</c-s>, 
+      pointers, etc. The
+      <c-s>constexpr</c-s> qualifier declares that T is one of these.  If not, compilation will fail.
+    </t-b>
+    <defn-outerBlock class="indent">
+      <defn-block>
+        <defn-head>
+          Expression Representation:
+        </defn-head>
+        <defn-code>
+template&lt;typename T, T v&gt;
+struct ExpressionRep {
+  using type = T;
+  static constexpr T value = v;
+  constexpr operator T() { return v; }
+};
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head>Using Code:</defn-head>
+        <defn-code>
+std::cout &lt;&lt; "\n  " 
+          &lt;&lt; typeid(ExpressionRep&lt;int, 3&gt;::type).name() 
+          &lt;&lt; ", " &lt;&lt; ExpressionRep&lt;int, 3&gt;::value;
+        </defn-code>
+        <defn-head class="defnBorderTop">Output:</defn-head>
+        <defn-code>
+int, 3
+        </defn-code>
+      </defn-block>
+    </defn-outerBlock>
+    <t-b>
+      All C++ expressions have types and most have values. The template struct <c-s>ExpressionRep</c-s>
+      combines <c-s>TypeRep</c-s> and <c-s>ValueRep</c-s> to represent expressions at compile-time.
+    </t-b>
+    <t-b>
+      It also includes something new - a <c-s>constexpr</c-s> function <c-s>operator T()</c-s> which
+      is a cast that can execute at compile-time.
+    </t-b>
+    <t-b>
+      <c-s>constexpr</c-s> functions must use only types and values that can be represented at compile-time
+      in order to run at compile-time. Otherwise the compile generates code to execute them at run-time.
+    </t-b>
+    <t-b>
+      Here&apos;s another example that adds two more constexpr functions.
+    </t-b>
+    <defn-outerBlock class="indent">
+      <defn-block>
+        <defn-head>
+          Another Expression Representation:
+        </defn-head>
+        <defn-code>
+template&lt;typename T, T v&gt;
+struct ExpRep2 {
+  using type = T;
+  static constexpr T value = v;
+  constexpr operator T() { return v; }
+  static constexpr T get() { return v; }
+  static constexpr T addOne() { return (v + 1); }
+  static constexpr T subOne() { return (v - 1); }
+};
+        </defn-code>
+      </defn-block>
+    </defn-outerBlock>
+    <t-b>
+      The addition of these two constexpr functions are not very useful except to illustrate how
+      compile-time functions work. Again, remember that the compiler generated this result at compile-time
+      and generated code at compile-time to display it at run-time.
+    </t-b>
+
+    <num-cont>
+      <num-item1>7.3.1</num-item1><num-item4>Standard Compile-Time Entities:</num-item4>
+    </num-cont>
+    <t-b>
+      Standard C++17 defines a number of useful compile-time entities.  Here&apos;s a complete list of
+      entities in the &lt;type_traits&gt; library:
+      <a href="https://en.cppreference.com/w/cpp/header/type_traits">cppreference.com</a>.
+    </t-b>
+    <t-b>
+      One important entity is a standard representation for compile-time expressions, <c-s>integral_constant</c-s>,
+      similar to the ExpressionRep we looked at at the beginning of this section.
+
+    </t-b>
+    <defn-outerBlock class="indent">
+      <defn-block>
+        <defn-head>
+          std::integral_const&nbsp;&nbsp;&nbsp;&nbsp;
+          <a href="http://www.cplusplus.com/reference/type_traits/integral_constant/">cplusplus.com</a>
+        </defn-head>
+        <defn-code>
+template &lt;class T, T v&gt;
+struct integral_constant {
+  static constexpr T value = v;
+  typedef T value_type;
+  typedef integral_constant&lt;T,v&gt; type;
+  constexpr operator T() const noexcept { return v; }
+  constexpr T operator()() const noexcept { return v; }
+};        
+        </defn-code>
+      </defn-block>
+    </defn-outerBlock>
+    <t-b>
+      This struct serves as the base for a number of representation classes used in TMP. It adds two things
+      to note: a definition of <c-s>type</c-s> that is equivalent to itself and an <c-s>operator()()</c-s>
+      that makes it a functor, i.e., a callable object.
+    </t-b>
+    <t-b>
+      The next example uses <c-s>integral_const</c-s> to define a type trait <c-s>is_void</c-s>.  Remember that
+      <c-s>integral_const</c-s> is a struct that has a value member. We define aliases <c-s>false_type</c-s>
+      and <c-s>true_type</c-s> to be structs containing values that are <c-s>false</c-s> and <c-s>true</c-s>
+      respectively.
+    </t-b>
+    <t-b>
+      We then define a generic version of <c-s>is_void&lt;T&gt;</c-s> that inherits from <c-s>false_type</c-s>
+      so it contains a false value and a 
+      specialization <c-s>is_void&lt;void&gt;</c-s> that inherits from <c-s>true_type</c-s> and so contains a 
+      true value. Now, we can use this trait to test at compile time whether a type is <c-s>void</c-s> or not, 
+      as shown below.
+    </t-b>
+    <defn-outerBlock class="indent">
+      <defn-block>
+        <defn-head>Defining a type trait:</defn-head>
+        <defn-code>
+typedef integral_const&lt;bool, false&gt; false_type;
+typedef integral_const&lt;bool, true&gt; true_type;
+
+/* generic type is false */
+template&lt;typename T&gt;
+struct is_void : std::false_type {};
+
+/* specialization for void is true */
+template&lt;&gt;
+struct is_void&lt;void&gt; : std::true_type {};
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head>Using Code:</defn-head>
+        <defn-code>
+std::cout << "\n  " << is_void&lt;void&gt;::value;
+std::cout << "\n  " << is_void&lt;int&gt;::value;
+        </defn-code>
+        <defn-head class="defnBorderTop">Output:</defn-head>
+        <defn-code>
+true
+false
+        </defn-code>
+      </defn-block>
+    </defn-outerBlock>
+    <t-b>
+      If you look at the code in <a href="CppStoryRepo.html">CppStory repository</a> in folder Chapter7-TypeTraits,
+      you will see all the code presented here and can run it. It just mimics what the standard library code
+      implements.
+    </t-b>
+
     <a id="typetraits"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>7.3</num-item1><num-item4>Type Traits:</num-item4>
+      <num-item1>7.4</num-item1><num-item4>Type Traits:</num-item4>
     </num-cont>
-
+    <t-b>
+      Type traits are template classes that test for specific type attributes:
+      <indent-block>
+        <div class="defn-code">
+template&lt;typename T&gt; bool is_SomeAttribute() { ... }
+        </div>
+      </indent-block>
+      Examples from the standard library <c-s>type_traits</c-s> are: <c-s>is_void</c-s>, <c-s>is_class</c-s>, and 
+      <c-s>is_rvalue_reference</c-s>.  Here&apos;s a complete list 
+      <a href="https://en.cppreference.com/w/cpp/header/type_traits">cppreference.com/.../type_traits</a>. 
+    </t-b>
     <a id="selections"></a>
     <hr class="spread" />
     <num-cont>
