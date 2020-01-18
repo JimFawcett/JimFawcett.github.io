@@ -1,0 +1,306 @@
+<pre>#pragma once
+
+#include &lt;iostream&gt;
+#include &lt;type_traits&gt;
+#include &lt;array&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;deque&gt;
+#include &lt;forward_list&gt;
+#include &lt;list&gt;
+#include &lt;set&gt;
+#include &lt;map&gt;
+#include &lt;unordered_set&gt;
+#include &lt;unordered_map&gt;
+#include &lt;stack&gt;
+#include &lt;queue&gt;
+
+//#include "..//Display/Display.h"
+
+template&lt;typename T&gt;
+struct TypeRep {
+  using type = T;
+};
+
+template&lt;typename T, T v&gt;
+struct ValueRep {
+  static constexpr T value = v;
+};
+
+template&lt;typename T, T v&gt;
+struct ExpressionRep {
+  using type = T;
+  static constexpr T value = v;
+  constexpr operator T() { return v; }
+};
+
+template&lt;typename T, T v&gt;
+struct ExpRep2 {
+  using type = T;
+  static constexpr T value = v;
+  constexpr operator T() { return v; }
+  static constexpr T get() { return v; }
+  static constexpr T addOne() { return (v + 1); }
+  static constexpr T subOne() { return (v - 1); }
+};
+
+template&lt;typename T, T v&gt;
+using integral_constant_t = typename std::integral_constant&lt;T, v&gt;::type;
+
+template&lt;typename T, T v&gt;
+auto integral_constant_v = std::integral_constant&lt;T, v&gt;::value;
+
+template&lt;typename T&gt;
+struct is_void : std::false_type {};
+
+template&lt;&gt;
+struct is_void&lt;void&gt; : std::true_type {};
+
+
+
+// https://stackoverflow.com/questions/9407367/determine-if-a-type-is-an-stl-container-at-compile-time/31105859#31105859
+
+namespace impl {
+
+  template&lt;typename T&gt; struct is_pair :std::false_type {};
+  template &lt;typename... Args&gt; struct is_pair &lt; std::pair&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_tuple :std::false_type {};
+  template &lt;typename... Args&gt; struct is_tuple &lt; std::tuple&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_array :std::false_type {};
+  template &lt;typename T, size_t N&gt; struct is_array &lt; std::array&lt;T, N&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_basic_string :std::false_type {};
+  template &lt;typename... Args&gt; struct is_basic_string &lt; std::basic_string&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_vector :std::false_type {};
+  template &lt;typename... Args&gt; struct is_vector &lt; std::vector&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_deque :std::false_type {};
+  template &lt;typename... Args&gt; struct is_deque &lt; std::deque&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_forward_list :std::false_type {};
+  template &lt;typename... Args&gt; struct is_forward_list &lt; std::forward_list&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_list :std::false_type {};
+  template &lt;typename... Args&gt; struct is_list &lt; std::list&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_set :std::false_type {};
+  template &lt;typename... Args&gt; struct is_set &lt; std::set&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_multiset :std::false_type {};
+  template &lt;typename... Args&gt; struct is_multiset &lt; std::multiset&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_map :std::false_type {};
+  template &lt;typename... Args&gt; struct is_map &lt; std::map&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_multimap :std::false_type {};
+  template &lt;typename... Args&gt; struct is_multimap &lt; std::multimap&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_unordered_set :std::false_type {};
+  template &lt;typename... Args&gt; struct is_unordered_set &lt; std::unordered_set&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_unordered_multiset :std::false_type {};
+  template &lt;typename... Args&gt; struct is_unordered_multiset &lt; std::unordered_multiset&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_unordered_map :std::false_type {};
+  template &lt;typename... Args&gt; struct is_unordered_map &lt; std::unordered_map&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_unordered_multimap :std::false_type {};
+  template &lt;typename... Args&gt; struct is_unordered_multimap &lt; std::unordered_multimap&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_queue :std::false_type {};
+  template &lt;typename... Args&gt; struct is_queue &lt; std::queue&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_stack :std::false_type {};
+  template &lt;typename... Args&gt; struct is_stack &lt; std::stack&lt;Args...&gt;&gt; :std::true_type {};
+
+  template&lt;typename T&gt; struct is_priority_queue :std::false_type {};
+  template &lt;typename... Args&gt; struct is_priority_queue &lt; std::priority_queue&lt;Args...&gt;&gt; :std::true_type {};
+}
+
+template&lt;typename T&gt; struct is_pair {
+  static constexpr bool const value = impl::is_pair&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_tuple {
+  static constexpr bool const value = impl::is_tuple&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_string :std::false_type {};
+template&lt;&gt; struct is_string&lt;std::string&gt; : std::true_type {};
+
+template&lt;typename T&gt; struct is_array {
+  static constexpr bool const value = impl::is_array&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_basic_string {
+  static constexpr bool const value = impl::is_basic_string&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_vector {
+  static constexpr bool const value = impl::is_vector&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_deque {
+  static constexpr bool const value = impl::is_deque&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_forward_list {
+  static constexpr bool const value = impl::is_forward_list&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_list {
+  static constexpr bool const value = impl::is_list&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_set {
+  static constexpr bool const value = impl::is_set&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_multiset {
+  static constexpr bool const value = impl::is_multiset&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_map {
+  static constexpr bool const value = impl::is_map&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_multimap {
+  static constexpr bool const value = impl::is_multimap&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_unordered_set {
+  static constexpr bool const value = impl::is_unordered_set&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_unordered_multiset {
+  static constexpr bool const value = impl::is_unordered_multiset&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_unordered_map {
+  static constexpr bool const value = impl::is_unordered_map&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_unordered_multimap {
+  static constexpr bool const value = impl::is_unordered_multimap&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_stack {
+  static constexpr bool const value = impl::is_stack&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_queue {
+  static constexpr bool const value = impl::is_queue&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_priority_queue {
+  static constexpr bool const value = impl::is_priority_queue&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+std::string truncStr(const std::string&amp; s) {
+  if (s.size() &lt; 47)
+    return s;
+  return s.substr(0, 46) + " ...";
+}
+
+template&lt;typename T&gt;
+using is_seqcont = std::integral_constant&lt;
+  bool,
+  is_array&lt;T&gt;::value ||
+  is_string&lt;T&gt;::value ||
+  is_basic_string&lt;T&gt;::value ||
+  is_vector&lt;T&gt;::value ||
+  is_deque&lt;T&gt;::value ||
+  is_forward_list&lt;T&gt;::value ||
+  is_list&lt;T&gt;::value
+&gt;;
+
+template&lt;typename T&gt;
+using is_assoccont = std::integral_constant&lt;
+  bool,
+  is_set&lt;T&gt;::value ||
+  is_multiset&lt;T&gt;::value ||
+  is_map&lt;T&gt;::value ||
+  is_multimap&lt;T&gt;::value ||
+  is_unordered_set&lt;T&gt;::value ||
+  is_unordered_multiset&lt;T&gt;::value ||
+  is_unordered_map&lt;T&gt;::value ||
+  is_unordered_multimap&lt;T&gt;::value
+&gt;;
+
+template&lt;typename T&gt;
+using is_adaptercont = std::integral_constant&lt;
+  bool,
+  is_stack&lt;T&gt;::value ||
+  is_queue&lt;T&gt;::value ||
+  is_priority_queue&lt;T&gt;::value
+&gt;;
+
+template&lt;typename T&gt;
+void testSTL_Traits(const T&amp; t) {
+  if constexpr (is_seqcont&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is sequential container";
+  }
+  if constexpr (is_assoccont&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is associative container";
+  }
+  if constexpr (is_adaptercont&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is adapter container";
+  }
+  if constexpr (is_array&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is array: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_string&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::string: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_basic_string&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::basic_string: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_vector&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::vector: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_deque&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::deque: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_forward_list&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::forward_list: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_list&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::list: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_set&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::set: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_multiset&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::multiset: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_map&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::map: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_multimap&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::multimap: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_unordered_set&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::unordered_set: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_unordered_multiset&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::unordered_multiset: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_unordered_map&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::unordered_map: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_unordered_multimap&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::unordered_multimap: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_stack&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::stack: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_queue&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::queue: " &lt;&lt; truncStr(typeid(t).name());
+  }
+  if constexpr (is_priority_queue&lt;T&gt;::value) {
+    std::cout &lt;&lt; "\n  is std::priority_queue: " &lt;&lt; truncStr(typeid(t).name());
+  }
+}</pre>

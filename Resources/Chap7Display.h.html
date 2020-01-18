@@ -1,0 +1,163 @@
+<pre>#pragma once
+// Chap7Display.h
+
+/////////////////////////////////////////////////////////////////////////
+// Chap7Display.h - template display functions                         //
+//                - most require use of custom type traits             //
+//                                                                     //
+// Jim Fawcett, Emeritus Teaching Professor, EECS, Syracuse University //
+/////////////////////////////////////////////////////////////////////////
+
+#include "../Chapter7-TypeTraits/Chap7TypeTraits.h"
+//#include "../CustomTraits/CustomTraits.h"
+#include &lt;iostream&gt;
+#include &lt;typeinfo&gt;
+
+inline auto putline = [](size_t n = 1, const std::string&amp; msg = "") {
+  for (size_t i = 0; i &lt; n; ++i) {
+    std::cout &lt;&lt; "\n";
+  }
+  if (msg.size() &gt; 0)
+    std::cout &lt;&lt; msg;
+};
+
+inline void displayTitle(const std::string&amp; title)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; title;
+  std::cout &lt;&lt; "\n " &lt;&lt; std::string(title.size() + 2, '=') &lt;&lt; std::endl;
+}
+inline void displaySubtitle(const std::string&amp; title)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; title;
+  std::cout &lt;&lt; "\n " &lt;&lt; std::string(title.size() + 2, '-');
+}
+inline void displayDemo(const std::string&amp; msg)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; msg;
+}
+
+/*---- display selected type values ----*/
+
+// https://stackoverflow.com/questions/1198260/how-can-you-iterate-over-the-elements-of-an-stdtuple
+
+template&lt;std::size_t I = 0, typename... Tp&gt;
+inline typename std::enable_if&lt;I == sizeof...(Tp), void&gt;::type
+displayTuple(const std::tuple&lt;Tp...&gt;&amp; t) { }
+
+template&lt;std::size_t I = 0, typename... Tp&gt;
+inline typename std::enable_if &lt; I &lt; sizeof...(Tp), void&gt;::type
+  displayTuple(const std::tuple&lt;Tp...&gt; &amp; t)
+{
+  std::cout &lt;&lt; std::get&lt;I&gt;(t) &lt;&lt; " ";
+  displayTuple&lt;I + 1, Tp...&gt;(t);
+}
+
+
+template &lt;typename T&gt;
+void displayValues(const std::initializer_list&lt;T&gt;&amp; lst, const std::string&amp; msg = "", std::string prefix = "\n  ")
+{
+  for (auto item : lst)
+  {
+    try {
+      if constexpr (std::is_scalar&lt;T&gt;::value || is_string&lt;T&gt;::value)
+      {
+        std::cout &lt;&lt; prefix &lt;&lt; item;
+      }
+      else if constexpr (is_pair&lt;T&gt;::value)
+      {
+        std::cout &lt;&lt; prefix &lt;&lt; "{ " &lt;&lt; item.first &lt;&lt; ", " &lt;&lt; item.second &lt;&lt; " }";
+      }
+      else if constexpr (is_tuple&lt;T&gt;::value)
+      {
+        std::cout &lt;&lt; prefix;
+        displayTuple(item);
+      }
+      else if constexpr (is_vector&lt;T&gt;::value)
+      {
+        for (auto elem : item)
+        {
+          displayValues({ elem }, "", prefix);
+          prefix = ", ";
+        }
+      }
+      else if constexpr (is_unordered_map&lt;T&gt;::value)
+      {
+        for (auto elem : item)
+        {
+          std::cout &lt;&lt; prefix &lt;&lt; "{ " &lt;&lt; elem.first &lt;&lt; ", " &lt;&lt; elem.second &lt;&lt; " }";
+        }
+      }
+      prefix = ", ";
+      if (msg.size() &gt; 0)
+        std::cout &lt;&lt; msg;
+    }
+    catch (std::exception &amp; ex)
+    {
+      std::cout &lt;&lt; "\n  " &lt;&lt; ex.what();
+    }
+  }
+}
+
+/*---- display type sizes ----*/
+
+template&lt;typename T&gt;
+void displayType(T&amp;&amp; t, const std::string&amp; msg = "", bool showSize = true)
+{
+  std::cout &lt;&lt; "\n  ";
+  if (showSize)
+    std::cout &lt;&lt; sizeof(t) &lt;&lt; " = size of ";
+  std::string typeName = typeid(t).name();
+  if (typeName.size() &gt; 75)
+    typeName = typeName.substr(0, 75) + "...";
+  std::cout &lt;&lt; typeName;
+  if (msg.size() &gt; 0)
+    std::cout &lt;&lt; msg;
+}
+
+template&lt;typename T&gt;
+void displayOnlyType(const T&amp; t, const std::string&amp; msg = "")
+{
+  std::cout &lt;&lt; "\n  ";
+  std::string typeName = typeid(t).name();
+  if (typeName.size() &gt; 75)
+    typeName = typeName.substr(0, 75) + "...";
+  std::cout &lt;&lt; typeName;
+  if (msg.size() &gt; 0)
+    std::cout &lt;&lt; msg;
+}
+
+template&lt;typename T&gt;
+void displayTypeArgument(const std::string&amp; msg = "", bool showSize = true) {
+  std::cout &lt;&lt; "\n  ";
+  if (showSize)
+    std::cout &lt;&lt; sizeof(T) &lt;&lt; " = size of ";
+  std::string typeName = typeid(T).name();
+  if (typeName.size() &gt; 50)
+    typeName = typeName.substr(0, 46) + " ...";
+  std::cout &lt;&lt; typeName;
+  if (msg.size() &gt; 0)
+    std::cout &lt;&lt; msg;
+}
+
+/*--- variadic display function ---*/
+
+// Template specialization that stops recursive evaluation
+
+template&lt;typename T&gt;
+void displayValues(T t)
+{
+  displayValues({ t });
+  std::cout &lt;&lt; "\n";
+}
+
+// Recursive definition of template function
+// Args is a "parameter pack
+// https://en.cppreference.com/w/cpp/language/parameter_pack
+
+template&lt;typename T, typename... Args&gt;
+void displayValues(T t, Args... args)
+{
+  displayValues({ t });
+  displayValues(args...);
+}
+</pre>

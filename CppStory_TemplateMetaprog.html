@@ -1762,7 +1762,268 @@ do_stuff(s);
     <num-cont>
       <num-item1>7.4</num-item1><num-item4>TMP Applications:</num-item4>
     </num-cont>
-    <indent-block>
+    <t-b>
+      <!--<indent-block class="pad10 flex right">
+        <div class="pad10-15" style="background-color:cornsilk; border:1px solid darkred;">
+          <a href="Resources/Chap7Display.h.html">Chap7Display.h</a>
+          <s-halfEm></s-halfEm>
+          <a href="Resources/Chap7Display.cpp.html">Chap7Display.cpp</a><br />
+          <s-halfEm></s-halfEm>
+          <a href="Resources/Chap7TypeTraits.h.html">Chap7TypeTraits.h</a>
+          <s-halfEm></s-halfEm>
+          <a href="Resources/Chap7TypeTraits.cpp.html">Chap7TypeTraits.cpp</a><br />
+        </div>
+      </indent-block>-->
+      Most of the data generated for this story was displayed using functions with a lot of TMP. All of the
+      display functionality was developed in code for project <a href="CppStoryRepo.html">Chapter7-Display</a>.
+      That depends on traits definitions provided by <a href="CppStoryRepo.html">Chapter7-TypeTraits</a>.
+      We&apos;ve shown fragments of that below.
+    </t-b>
+    <indent-blocks class="clear">
+      <defn-outerBlock>
+        <defn-block>
+          <defn-head>Code Fragment: Chap7TypeTraits.h</defn-head>
+          <defn-code>
+/* ----------------------------------------------
+   define type traits not supplied by 
+   the standard type_traits library 
+*/
+
+namespace impl {
+
+  template&lt;typename T&gt; 
+  struct is_pair :std::false_type {};
+  template &lt;typename... Args&gt; 
+  struct is_pair &lt; std::pair&lt;Args...&gt;&gt; 
+    :std::true_type {};
+
+  template&lt;typename T&gt; 
+  struct is_tuple :std::false_type {};
+  template &lt;typename... Args&gt; struct is_tuple &lt; 
+    std::tuple&lt;Args...&gt;
+  &gt; :std::true_type {};
+
+  template&lt;typename T&gt; 
+  struct is_array :std::false_type {};
+  template &lt;typename T, size_t N&gt; 
+  struct is_array &lt; std::array&lt;T, N&gt;&gt; 
+    :std::true_type {};
+
+  template&lt;typename T&gt; 
+  struct is_basic_string :std::false_type {};
+  template &lt;typename... Args&gt; 
+  struct is_basic_string &lt; 
+    std::basic_string&lt;Args...&gt;
+  &gt; :std::true_type {};
+
+  template&lt;typename T&gt; 
+  struct is_vector :std::false_type {};
+  template &lt;typename... Args&gt; 
+  struct is_vector &lt; std::vector&lt;Args...&gt;&gt; 
+    :std::true_type {};
+
+  template&lt;typename T&gt; 
+  struct is_deque :std::false_type {};
+  template &lt;typename... Args&gt; 
+  struct is_deque &lt; std::deque&lt;Args...&gt;&gt; 
+    :std::true_type {};
+
+  /* code elided */
+
+  template&lt;typename T&gt; 
+  struct is_priority_queue :std::false_type {};
+  template &lt;typename... Args&gt; 
+  struct is_priority_queue &lt; 
+    std::priority_queue&lt;Args...&gt;
+  &gt; :std::true_type {};
+}
+
+template&lt;typename T&gt; struct is_pair {
+  static constexpr bool const value = 
+    impl::is_pair&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_tuple {
+  static constexpr bool const value = 
+    impl::is_tuple&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; 
+struct is_string :std::false_type {};
+template&lt;&gt; struct is_string&lt;std::string&gt; 
+  : std::true_type {};
+
+template&lt;typename T&gt; struct is_array {
+  static constexpr bool const value = 
+    impl::is_array&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_basic_string {
+  static constexpr bool const value = 
+    impl::is_basic_string&lt;
+      std::decay_t&lt;T &gt;
+    &gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_vector {
+  static constexpr bool const value = 
+    impl::is_vector&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+template&lt;typename T&gt; struct is_deque {
+  static constexpr bool const value = 
+    impl::is_deque&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
+
+/* code elided */
+
+template&lt;typename T&gt; struct is_priority_queue {
+  static constexpr bool const value = 
+    impl::is_priority_queue&lt;
+      std::decay_t&lt;T &gt;
+  &gt; ::value;
+};
+
+template&lt;typename T&gt;
+using is_seqcont = std::integral_constant&lt;
+  bool,
+  is_array&lt;T&gt;::value ||
+  is_string&lt;T&gt;::value ||
+  is_basic_string&lt;T&gt;::value ||
+  is_vector&lt;T&gt;::value ||
+  is_deque&lt;T&gt;::value ||
+  is_forward_list&lt;T&gt;::value ||
+  is_list&lt;T&gt;::value
+&gt;;
+
+template&lt;typename T&gt;
+using is_assoccont = std::integral_constant&lt;
+  bool,
+  is_set&lt;T&gt;::value ||
+  is_multiset&lt;T&gt;::value ||
+  is_map&lt;T&gt;::value ||
+  is_multimap&lt;T&gt;::value ||
+  is_unordered_set&lt;T&gt;::value ||
+  is_unordered_multiset&lt;T&gt;::value ||
+  is_unordered_map&lt;T&gt;::value ||
+  is_unordered_multimap&lt;T&gt;::value
+&gt;;
+
+template&lt;typename T&gt;
+using is_adaptercont = std::integral_constant&lt;
+  bool,
+  is_stack&lt;T&gt;::value ||
+  is_queue&lt;T&gt;::value ||
+  is_priority_queue&lt;T&gt;::value
+&gt;;
+          </defn-code>
+        </defn-block>
+        <defn-block>
+          <defn-head>Using Code: Chap7TypeTraits.cpp</defn-head>
+          <defn-code>
+#include "Chap7TypeTraits.h"
+#include "../Chapter7-Display/Chap7Display.h"
+
+/* code elided */
+
+int main() {
+
+  /* code elided */
+
+  displayDemo("--- is_vector ---");
+  std::cout &lt;&lt; "\n  " 
+            &lt;&lt; is_vector&lt;std::vector&lt;int&gt;&gt;::value;
+  std::cout &lt;&lt; "\n  " 
+            &lt;&lt; is_vector&lt;std::vector&lt;double&gt;&gt;::value;
+  std::cout &lt;&lt; "\n  " 
+            &lt;&lt; is_vector&lt;
+                 std::unordered_map&lt;int, std::string&gt;
+                &gt;::value;
+
+  displayDemo("--- enable_if ---");
+  class X {};
+  X x;
+  int i = 42;
+  do_stuff(i);
+  do_stuff(x);
+  std::string s("a string");
+  do_stuff(s);
+  std::cout &lt;&lt; "\n\n";
+
+  displayDemo("--- std containers ---");
+  testSTL_Traits(std::array&lt;int, 1&gt;{1});
+  testSTL_Traits(std::string{});
+  testSTL_Traits(std::basic_string&lt;char&gt;{""});
+  testSTL_Traits(std::vector&lt;int&gt;{});
+  testSTL_Traits(std::deque&lt;int&gt;{});
+  testSTL_Traits(std::forward_list&lt;int&gt;{});
+  testSTL_Traits(std::list&lt;int&gt;{});
+  testSTL_Traits(std::set&lt;int&gt;{});
+  testSTL_Traits(std::multiset&lt;int&gt;{});
+  testSTL_Traits(std::map&lt;int,int&gt;{});
+  testSTL_Traits(std::multimap&lt;int,int&gt;{});
+  testSTL_Traits(std::unordered_set&lt;int&gt;{});
+  testSTL_Traits(std::unordered_multiset&lt;int&gt;{});
+  testSTL_Traits(std::unordered_map&lt;int, int&gt;{});
+  testSTL_Traits(std::unordered_multimap&lt;int, int&gt;{});
+  testSTL_Traits(std::stack&lt;int&gt;{});
+  testSTL_Traits(std::queue&lt;int&gt;{});
+  testSTL_Traits(std::priority_queue&lt;int&gt;{});
+  putline(2);
+}
+          </defn-code>
+          <defn-head class="defnBorderTop">Output:</defn-head>
+          <defn-code>
+/* output elided */
+
+--- std containers ---
+is sequential container
+is array: class std::array&lt;int,1&gt;
+is sequential container
+is std::string: 
+   class std::basic_string&lt;char,struct std::char ...
+is std::basic_string: 
+   class std::basic_string&lt;char,struct std::char ...
+is sequential container
+is std::string: 
+  class std::basic_string&lt;char,struct std::char_ ...
+is std::basic_string: 
+  class std::basic_string&lt;char,struct std::char_ ...
+is sequential container
+is std::vector: 
+  class std::vector&lt;int,class std::allocator&lt; ...
+is sequential container
+is std::deque: 
+  class std::deque&lt;int,class std::allocator&lt;i ...
+is sequential container
+is std::forward_list: class std::forward_list&lt;in ...
+is sequential container
+is std::list: class std::list&lt;int,class std::all ...
+is associative container
+is std::set: class std::set&lt;int,struct std::less ...
+is associative container
+is std::multiset: class std::multiset&lt;int,struct ...
+is associative container
+is std::map: class std::map&lt;int,int,struct std:: ...
+is associative container
+is std::multimap: class std::multimap&lt;int,int,st ...
+is associative container
+is std::unordered_set: class std::unordered_set&lt; ...
+is associative container
+is std::unordered_multiset: class std::unordered_mu ...
+is associative container
+is std::unordered_map: class std::unordered_map&lt; ...
+is associative container
+is std::unordered_multimap: class std::unordered_mu ...
+is adapter container
+is std::stack: class std::stack&lt;int,class std::d ...
+is adapter container
+is std::queue: class std::queue&lt;int,class std::d ...
+is adapter container
+is std::priority_queue: class std::priority_queue&l ...
+          </defn-code>
+        </defn-block>
+      </defn-outerBlock>
       <!--<h3>C++ TMP:</h3>
       <h3>std functions</h3>
       std::ref, std::move, std::forward, std::apply, std::invoke, 
@@ -1772,7 +2033,7 @@ do_stuff(s);
       <h3>Examples</h3>
       <indent-blocks>
       </indent-blocks>-->
-    </indent-block>
+    </indent-blocks>
     <a id="epilog"></a>
     <hr class="spread" />
     <num-cont>
