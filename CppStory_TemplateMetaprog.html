@@ -1553,7 +1553,7 @@ false
     </defn-outerBlock>
     <t-b>
       <c-s>std::is_void&lt;T&gt;</c-s> is one of the simplest std type traits.  The example above shows how it
-      is implemented.  All the traits use this approach, but of course some are more complex.
+      is implemented.  All the traits use this approach, but of course some are more complex (see next example).
     </t-b>
     <t-b>
       If you look at the code in <a href="CppStoryRepo.html">CppStory repository</a> in folder Chapter7-TypeTraits,
@@ -1640,12 +1640,123 @@ false
       the name of the container for <c-s>vector</c-s>.
     </t-b>
 
-
     <a id="selections"></a>
     <hr class="spread" />
     <num-cont>
       <num-item1>7.4</num-item1><num-item4>Compile-Time Selections:</num-item4>
     </num-cont>
+    <t-b>
+      When writing template code, we often have to perform different operations depending on the types
+      of the template parameters.  But when writing the library code we don&apos;t know what types the
+      using application has supplied.
+    </t-b>
+    <t-b>
+      It is quite common that some operation will compile for some types and not other types.  In that
+      case we want to select the code to use based on type traits.  However, we can&apos;t use run-time
+      selection.  When our template code is translated, the compiler can&apos;t know what will happen at
+      run-time so all of the code compiled has to be valid for each type used by the application. But that
+      is unlikely to be the case.
+    </t-b>
+    <t-b>
+      What we need is a compile-time selection process that will only compile code valid for the applied
+      type and ignore code intended for other types. constexpr if works 
+      very well in this situation.
+    </t-b>
+    <defn-outerBlock class="indent">
+      <defn-block>
+        <defn-head>constexpr if</defn-head>
+        <defn-code>
+if constexpr(pred) {
+  /* compiled only if code for pred == true */
+}
+else {
+  /* compiled only if code for pred == false */
+}
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head>Example:</defn-head>
+        <defn-code>
+/*--------------------------------- 
+   suppose function has to deal
+   with vectors and stacks 
+ */
+
+/* assumes v is know in code body */
+
+if constexpr(is_vector&lt;T&gt;) {
+  T.push_back(v);
+}
+else {
+  T.push(v);
+}
+      </defn-block>
+    </defn-outerBlock>
+    <t-b>
+      There is another selection mechanism that works differently.  <c-s>std::enable_if&lt;pred&gt;</c-s> is a template
+      struct that will have an embedded type if pred evaluates to true and otherwise will not have an embedded type.
+    </t-b>
+    <t-b>
+      The idea is to use <c-s>std::enable_if&lt;predicate&gt;</c-s> as a template argument.  If the predicate is false overload
+      resolution will fail due to the missing type.  So overload resolution will only succeed for that overload when the
+      predicate condition is true. Otherwise some other overload is chosen if available, or compilation fails.
+    </t-b>
+    <t-b>
+      This example uses code from a <a href="https://eli.thegreenplace.net/2014/sfinae-and-enable_if/">post</a> by Eli Bendersky.
+    </t-b>
+    <defn-outerBlock class="indent">
+      <defn-block>
+        <defn-head>std::enable_if</defn-head>
+        <defn-code>
+template &lt;
+  class T,
+  class std::enable_if&lt;
+    std::is_integral&lt;T&gt;::value, T
+   &gt;::type * = nullptr
+&gt;
+void do_stuff(T&amp; t) {
+  std::cout &lt;&lt; 
+    "\n  doing integral stuff with type " 
+    &lt;&lt; typeid(t).name();
+}
+
+template &lt;
+  class T,
+  class std::enable_if&lt;
+    std::is_class&lt;T&gt;::value, T
+   &gt;::type * = nullptr
+&gt;
+void do_stuff(T&amp; t) {
+  std::cout &lt;&lt; 
+    "\n  doing class stuff with type " 
+    &lt;&lt; typeid(t).name();
+}
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head>Using Code:</defn-head>
+        <defn-code>
+displayDemo("--- enable_if ---");
+class X {};
+X x;
+int i = 42;
+do_stuff(i);
+do_stuff(x);
+std::string s("a string");
+do_stuff(s);
+        </defn-code>
+        <defn-head class="defnBorderTop">Output:</defn-head>
+        <defn-code>
+  --- enable_if ---
+  doing integral stuff with type int
+  doing class stuff with type 
+    class `int __cdecl main(void)'::`2'::X
+  doing class stuff with type 
+    class std::basic_string&lt;char,struct ...
+        </defn-code>
+      </defn-block>
+    </defn-outerBlock>
+
     <a id="applications"></a>
     <hr class="spread" />
     <num-cont>
