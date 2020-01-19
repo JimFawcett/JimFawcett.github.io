@@ -76,7 +76,8 @@
      <rt-b id="sects">
       <a href="#top">Top</a>, <a href="#Data">Data</a>, <a href="#Ops">Operations</a>, 
       <a href="#Class">Classes</a>, <a href="#Templ">Templates</a>, 
-      <a href="#Lib">Libraries</a>, <a href="#epilog">Epilogue</a>, <a href="#refs">References</a>, 
+      <a href="#Lib">Libraries</a>, <a href="#epilog">Epilogue</a>,
+      <a href="#exer">Exercises</a>, <a href="#refs">References</a>, 
      </rt-b>
    </toc-b>
 
@@ -238,7 +239,9 @@ one two three
             </defn-block>
             </div>
           </details>
-          <spacer-15></spacer-15>
+          <t-b>
+          </t-b>
+          </t-b>
           <details>
             <summary class="labelStyle lightItem">
               pointers
@@ -275,7 +278,58 @@ one two three
             </defn-outerBlock>
             </div>
           </details>
-          <spacer-10></spacer-10>
+          <t-b>
+            Pointers are often used to manage data stored on the C++ native heap:
+          </t-b>
+          <t-b>
+            <defn-block>
+              <defn-head>Manually allocating storage on heap</defn-head>
+              <defn-code>
+double* pDbl = new double[2] {1.5, -4.3};
+std::cout << "\n  1st element on heap = " << *pDbl;
+std::cout << "\n  2nd element on heap = " << *(pDbl + 1) << std::endl;
+delete[] pDbl;
+// allocator has to remember array size and remember to delete when
+// array is no longer needed.
+              </defn-code>
+            </defn-block>
+          <t-b>
+            We rarely write code like this outside a class that carefully manages allocation
+            and deallocation.  We will hear a lot more about this in subsequent chapters.
+            One safe way to manage heap storage is with standard smart pointers, <c-s>std::unique_ptr</c-s>
+            and <c-s>std::shared_ptr</c-s>.
+          </t-b>
+            <defn-block>
+              <defn-head>Using std::unique_ptr</defn-head>
+              <defn-code>
+/*-- std::unique_ptr to scalar uses pointer syntax --*/
+
+displayDemo("--- creating double on heap with unique_ptr ---");
+auto ptr0 = std::unique_ptr&lt;double&gt;(new double{ -1.5 });
+std::cout << "\n  element on heap = " << *ptr0 << std::endl;
+ptr0.release();
+
+/*-- std::unique_ptr to array uses array syntax --*/
+
+displayDemo("--- creating small array of doubles on heap with unique_ptr ---");
+auto ptr1 = std::unique_ptr&lt;double[]&gt;(new double[2]{ -1.5, 3.2 });
+std::cout << "\n  1st element on heap = " << ptr1[0];
+std::cout << "\n  2nd element on heap = " << ptr1[1] << std::endl;
+ptr1.release();
+
+/*-- see references at end of chapter for unique_ptr --*/
+              </defn-code>
+            </defn-block>
+          </t-b>
+          <t-b>
+            This is safer than manual allocation.  The heap allocation will always be returned.
+            If we didn&apos;t call <c-s>release()</c-s> the allocation would be returned when the
+            unique_ptr went out of scope.
+          </t-b>
+          <t-b>
+            It is usually preferable to use a <c-s>std::vector</c-s> instead of smart pointers.
+          </t-b>
+          <s-5px></s-5px>
           <details>
             <summary class="darkItem labelStyle">
               Example:&nbsp;&nbsp;Reading command line arguments
@@ -2733,10 +2787,47 @@ int main() {
       This simple view of the language is all you need to build useful C++ programs. If you encounter requirements
       that can&apos;t be implemented with them then look into the following chapters.
     </t-b>
+    <a id="exer"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>1.7</num-item1><num-item4>Survey - Programming Exercises:</num-item4>
+    </num-cont>
+      <indent-blocks>
+    <div style="width:80%">
+      <ol>
+        <li>
+          Write code that saves an array of strings where the size of the array is specified at
+          run-time. Show how to access stored items and how to deallocate the storage.
+        </li>
+        <li>
+          Write a lambda that accepts a std::string message and displays it on the console with a second
+          line composed of &apos;-&apos; characters.
+          <hr />
+          If the lambda prepends the message with a newline, indents it two spaces, and makes the underline
+          string two characters longer, with a one character indent, the result creates a nice title.
+          Can you create the lambda so it also accepts an underline character which defaults to &apos;-&apos;?
+        </li>
+        <li>
+          Develop a class that accepts an initializer_list of strings when constructed and save the elements 
+          of the list in a std::vector. Write a member function that adds an additional string to the list.
+          Demonstrate this class in a main() where you supply a list of your friends. Then add two additional
+          new friends.
+        </li>
+        <li>
+          Generalize the friends class to accept a list of std::tuples where the tuples provide a bit more
+          information about your friends.  Can you make this work for types other than std::tuple, perhaps
+          a struct with the same information.  The intent here is that, after the first change, you can use 
+          more than one data type without changing your friends class.
+        </li>
+      </ol>
+    </div>
+  </indent-blocks>
+
+
     <a id="refs"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>1.7</num-item1><num-item4>References:</num-item4>
+      <num-item1>1.8</num-item1><num-item4>References:</num-item4>
     </num-cont>
     <indent-block>
       <a href="https://cppreference.com">cppreference.com</a><br />
