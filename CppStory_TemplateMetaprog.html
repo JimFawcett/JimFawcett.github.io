@@ -1769,9 +1769,6 @@ do_stuff(s);
           <s-halfEm></s-halfEm>
           <a href="Resources/Chap7Display.cpp.html">Chap7Display.cpp</a><br />
           <s-halfEm></s-halfEm>
-          <a href="Resources/Chap7TypeTraits.h.html">Chap7TypeTraits.h</a>
-          <s-halfEm></s-halfEm>
-          <a href="Resources/Chap7TypeTraits.cpp.html">Chap7TypeTraits.cpp</a><br />
         </div>
       </indent-block>-->
       Most of the data generated for this story was displayed using functions with a lot of TMP. All of the
@@ -1779,6 +1776,13 @@ do_stuff(s);
       That depends on traits definitions provided by <a href="CppStoryRepo.html">Chapter7-TypeTraits</a>.
       We&apos;ve shown fragments of that below.
     </t-b>
+    <details>
+      <summary class="labelStyle lightItem">Demonstration: Custom Type Traits</summary>
+      <s-halfEm></s-halfEm>
+      <indent-blocks>
+        <a href="Resources/Chap7TypeTraits.h.html">Chap7TypeTraits.h</a>,
+        <a href="Resources/Chap7TypeTraits.cpp.html">Chap7TypeTraits.cpp</a><br />
+      </indent-blocks>      <s-halfEm></s-halfEm>
     <indent-blocks class="clear">
       <defn-outerBlock>
         <defn-block>
@@ -2024,21 +2028,335 @@ is std::priority_queue: class std::priority_queue&l ...
           </defn-code>
         </defn-block>
       </defn-outerBlock>
-      <!--<h3>C++ TMP:</h3>
-      <h3>std functions</h3>
-      std::ref, std::move, std::forward, std::apply, std::invoke, 
-      <h3>Variatic Templates</h3>
-      <h3>TypeTraits</h3>
-      <h3>Compile-Time Selections</h3>
-      <h3>Examples</h3>
-      <indent-blocks>
-      </indent-blocks>-->
-    </indent-blocks>
+    </details>
+      <t-b>
+        The custom type traits demonstrated in the previous example were used to build a very flexible
+        display system.  The <c-s>displayValues</c-s> function can accept one or more comma separated
+        arguments due to its variadic design.  It also accepts some of the STL containers, <c-s>std::pair</c-s>s,
+        and <c-s>std::tuple</c-s>s, due to TMP selections in the body of the function.
+      </t-b>
+    <details>
+      <summary class="labelStyle lightItem">Demonstration: Flexible Display using TMP</summary>
+      <s-halfEm></s-halfEm>
+      <a href="Resources/Chap7Display.h.html">Chap7Display.h</a>, 
+      <a href="Resources/Chap7Display.cpp.html">Chap7Display.cpp</a>
+      <s-halfEm></s-halfEm>
+      <defn-outerBlock>
+        <defn-block>
+          <defn-head>Code Fragment: Chap7Display.h</defn-head>
+          <defn-code>
+#include "../Chapter7-TypeTraits/Chap7TypeTraits.h"
+//#include "../CustomTraits/CustomTraits.h"
+#include &lt;iostream&gt;
+#include &lt;typeinfo&gt;
+
+inline auto putline = [](
+  size_t n = 1, const std::string&amp; msg = ""
+) {
+  for (size_t i = 0; i &lt; n; ++i) {
+    std::cout &lt;&lt; "\n";
+  }
+  if (msg.size() &gt; 0)
+    std::cout &lt;&lt; msg;
+};
+
+inline void displayTitle(const std::string&amp; title)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; title;
+  std::cout &lt;&lt; "\n " 
+            &lt;&lt; std::string(title.size() + 2, '=') 
+            &lt;&lt; std::endl;
+}
+inline void displaySubtitle(const std::string&amp; title)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; title;
+  std::cout &lt;&lt; "\n " 
+            &lt;&lt; std::string(title.size() + 2, '-');
+}
+inline void displayDemo(const std::string&amp; msg)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; msg;
+}
+
+/*---- display selected type values ----*/
+
+// https://stackoverflow.com/questions/1198260/
+// how-can-you-iterate-over-the-elements-of-an-stdtuple
+
+template&lt;std::size_t I = 0, typename... Tp&gt;
+inline typename std::enable_if&lt;
+  I == sizeof...(Tp), void
+&gt;::type
+displayTuple(const std::tuple&lt;Tp...&gt;&amp; t) { }
+
+template&lt;std::size_t I = 0, typename... Tp&gt;
+inline typename std::enable_if &lt;
+  I &lt; sizeof...(Tp), void
+&gt;::type
+  displayTuple(const std::tuple&lt;Tp...&gt; &amp; t)
+{
+  std::cout &lt;&lt; std::get&lt;I&gt;(t) &lt;&lt; " ";
+  displayTuple&lt;I + 1, Tp...&gt;(t);
+}
+
+
+template &lt;typename T&gt;
+void displayValues(
+  const std::initializer_list&lt;T&gt;&amp; lst, 
+  const std::string&amp; msg = "", 
+  std::string prefix = "\n  "
+)
+{
+  for (auto item : lst)
+  {
+    try {
+      if constexpr (
+        std::is_scalar&lt;T&gt;::value || 
+        is_string&lt;T&gt;::value
+      )
+      {
+        std::cout &lt;&lt; prefix &lt;&lt; item;
+      }
+      else if constexpr (is_pair&lt;T&gt;::value)
+      {
+        std::cout &lt;&lt; prefix 
+                  &lt;&lt; "{ " 
+                  &lt;&lt; item.first 
+                  &lt;&lt; ", " 
+                  &lt;&lt; item.second 
+                  &lt;&lt; " }";
+      }
+      else if constexpr (is_tuple&lt;T&gt;::value)
+      {
+        std::cout &lt;&lt; prefix;
+        displayTuple(item);
+      }
+      else if constexpr (is_vector&lt;T&gt;::value)
+      {
+        for (auto elem : item)
+        {
+          displayValues({ elem }, "", prefix);
+          prefix = ", ";
+        }
+      }
+      else if constexpr (
+        is_unordered_map&lt;T&gt;::value
+      )
+      {
+        for (auto elem : item)
+        {
+          std::cout &lt;&lt; prefix 
+                    &lt;&lt; "{ " 
+                    &lt;&lt; elem.first 
+                    &lt;&lt; ", " 
+                    &lt;&lt; elem.second 
+                    &lt;&lt; " }";
+        }
+      }
+      prefix = ", ";
+      if (msg.size() &gt; 0)
+        std::cout &lt;&lt; msg;
+    }
+    catch (std::exception &amp; ex)
+    {
+      std::cout &lt;&lt; "\n  "
+                &lt;&lt; ex.what();
+    }
+  }
+}
+
+/*---- display type sizes ----*/
+
+template&lt;typename T&gt;
+void displayType(
+  T&amp;&amp; t, 
+  const std::string&amp; 
+  msg = "", bool showSize = true
+)
+{
+  std::cout &lt;&lt; "\n  ";
+  if (showSize)
+    std::cout &lt;&lt; sizeof(t) 
+              &lt;&lt; " = size of ";
+  std::string typeName = typeid(t).name();
+  if (typeName.size() &gt; 75)
+    typeName = typeName.substr(0, 75) + "...";
+  std::cout &lt;&lt; typeName;
+  if (msg.size() &gt; 0)
+    std::cout &lt;&lt; msg;
+}
+
+template&lt;typename T&gt;
+void displayOnlyType(
+  const T&amp; t, 
+  const std::string&amp; msg = ""
+)
+{
+  std::cout &lt;&lt; "\n  ";
+  std::string typeName = typeid(t).name();
+  if (typeName.size() &gt; 75)
+    typeName = typeName.substr(0, 75) + "...";
+  std::cout &lt;&lt; typeName;
+  if (msg.size() &gt; 0)
+    std::cout &lt;&lt; msg;
+}
+
+template&lt;typename T&gt;
+void displayTypeArgument(
+  const std::string&amp; msg = "", 
+  bool showSize = true
+) 
+{
+  std::cout &lt;&lt; "\n  ";
+  if (showSize)
+    std::cout &lt;&lt; sizeof(T) 
+              &lt;&lt; " = size of ";
+  std::string typeName = typeid(T).name();
+  if (typeName.size() &gt; 50)
+    typeName = typeName.substr(0, 46) + " ...";
+  std::cout &lt;&lt; typeName;
+  if (msg.size() &gt; 0)
+    std::cout &lt;&lt; msg;
+}
+
+/*--- variadic display function ---*/
+
+// Template specialization that stops 
+// recursive evaluation
+
+template&lt;typename T&gt;
+void displayValues(T t)
+{
+  displayValues({ t });
+  std::cout &lt;&lt; "\n";
+}
+
+// Recursive definition of template function
+// Args is a "parameter pack
+// https://en.cppreference.com/w/cpp
+// /language/parameter_pack
+
+template&lt;typename T, typename... Args&gt;
+void displayValues(T t, Args... args)
+{
+  displayValues({ t });
+  displayValues(args...);
+}
+          </defn-code>
+        </defn-block>
+        <defn-block>
+          <defn-head>Using Code: Chap7Display.cpp</defn-head>
+          <defn-code>
+#include &lt;tuple&gt;
+#include "Chap7Display.h"
+
+int main() {
+
+  displayTitle("Testing Chap7Display");
+
+  displayDemo("--- displayTuple ---\n  ");
+
+  std::tuple tp{ 1, 2.5 , 'a', "a string" };
+  displayTuple(tp);
+  putline(1, "  ");
+  displayTuple(std::tuple{ 1, 2.5 , 'a', "a string" });
+
+  displayDemo("\n  --- displayValues ---\n  ");
+  displayValues(
+    1, 3, 4.5, "a string", std::pair{ 1, "one" }
+  );
+  displayValues(
+    std::vector&lt;int&gt;{-1, 0, 1}, 
+    std::unordered_map&lt;int, std::string&gt;{
+      {1, "one"}, { 2, "two" }
+    }
+  );
+  displayValues({ 1.0, 1.5, 2.0, 2.5 });
+
+  displayDemo("\n  --- displayType ---\n  ");
+  displayType(1);
+  displayType(2.5);
+  displayType('z');
+  displayType("another string");
+
+  displayDemo("\n  --- displayOnlyType ---\n  ");
+  displayOnlyType(1);
+  displayOnlyType(2.5);
+  displayOnlyType('z');
+  displayOnlyType("another string");
+
+  displayDemo("\n  --- displayTypeArgument ---\n  ");
+  displayTypeArgument&lt;int&gt;();
+  displayTypeArgument&lt;double&gt;();
+  displayTypeArgument&lt;char&gt;();
+  displayTypeArgument&lt;std::string&gt;();
+
+  putline(2);
+}
+          </defn-code>
+          <defn-head class="defnBorderTop"></defn-head>
+          <defn-code>
+  Testing Chap7Display
+ ======================
+
+  --- displayTuple ---
+  1 2.5 a a string
+  1 2.5 a a string
+
+  --- displayValues ---
+
+  1
+  3
+  4.5
+  a string
+  { 1, one }
+
+  -1, 0, 1
+  { 1, one }
+  { 2, two }
+
+  1, 1.5, 2, 2.5
+
+  --- displayType ---
+
+  4 = size of int
+  8 = size of double
+  1 = size of char
+  15 = size of char const [15]
+
+  --- displayOnlyType ---
+
+  int
+  double
+  char
+  char const [15]
+
+  --- displayTypeArgument ---
+
+  4 = size of int
+  8 = size of double
+  1 = size of char
+  40 = size of class std::basic_string&lt;char...
+          </defn-code>
+        </defn-block>
+      </defn-outerBlock>
+          </details>
+    <t-b>
+      It wouldn&apos;t be difficult to make the <c-s>displayValues</c-s> function work for all of the
+      STL containers.  The only reason this code doesn&apos;t is that I built and used it for display before
+      I finished the type traits shown in the first dropdown.
+    </t-b>
+
     <a id="epilog"></a>
     <hr class="spread" />
     <num-cont>
       <num-item1>7.5</num-item1><num-item4>Epilogue</num-item4>
     </num-cont>
+    <t-b>
+      I&apos;ve learned a lot preparing this chapter. I&apos;m relatively satisfied with the material as-is.
+      However, I think with some more-informed design it can be simplified and made more readable.  That is
+      on the agenda, but it&apos;s time to move on to other things for a while.
+    </t-b>
     <a id="refs"></a>
     <hr class="spread" />
     <num-cont>
