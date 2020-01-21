@@ -405,7 +405,68 @@ void main() {
       </t-b>
     </details>
     <t-b>
-
+      The next example illustrates working with file streams.  Many of the things you will need to
+      do when working with files are presented in the example. 
+    </t-b>
+    <t-b>
+      Files can be opened in two ways and closed:
+      <t-b>
+        <indent-block>
+          <ol class="tight">
+            <li><c-s>std::ifstream in(filename, ios::in);</c-s></li>
+            <li><c-s>std::ifstream in; in.open(filename, ios::in);</c-s></li>
+            <li><c-s>in.close();</c-s></li>
+          </ol>
+        </indent-block>
+      </t-b>      When file streams go out of scope their destructors call <c-s>close()</c-s>, but it does no
+      harm to close the file before it goes out of scope, freeing the internal OS file handle.
+    </t-b>
+    <t-b>
+      The example illustrates standard error handling.
+      When you attempt to open a file that may or may not succeed.
+      <t-b>
+        <indent-block>
+          <ol class="tight">
+            <li>The file name may be incorrect or the file may not exist.</li>
+            <li>Other code may have that file opened.</li>
+            <li>The user may not have permissions to open the file.</li>
+          </ol>
+        </indent-block>
+      </t-b>      For this, standard streams have a simple error handling process.  Streams can be in any of
+      three states:
+      <t-b>
+        <indent-block>
+          <ol class="tight">
+            <li>
+              <span class="notice">good</span> state, tested with the function <c-s>bool good()</c-s>.  When good is true the
+              stream operates normally.
+            </li>
+            <li>
+              <span class="notice">bad</span> state, tested with <c-s>bool bad()</c-s>. Streams in a bad state are fully
+              functional, but will not respond to any commands until the stream error is cleared with
+              <c-s>void clear()</c-s>. A state can go bad when it attempts to read an end of file
+              integer, <c-s>eof</c-s>. To restore normal operation, clear the error and back up at
+              least one character by calling <c-s>strm.seek(-1);</c-s>
+            </li>
+            <li>
+              <span class="notice">fail</span> state, tested with <c-s>bool fail()</c-s>. Streams in a fail state have been corrupted.
+              The only thing you can do with a failed stream is to destroy it or re-initialize with an
+              <c-s>open(filename, ios attributes);</c-s>.
+            </li>
+          </ol>
+        </indent-block>
+      </t-b>
+      You should <span class="notice">always</span> check filestream state after opening, before any attempt
+      to use it.  We often do that with:
+      <indent-block class="pad10">
+        <c-s>
+          std::ofstream out(filename, ios::out);<br />
+          if(!out.good()) {
+          /* do some clean up and return */
+          }
+        </c-s>
+      </indent-block>
+      Finally, here&apos;s the example:
     </t-b>
     <details>
       <summary class="labelStyle lightItem">Example: std::fstreams I/O</summary>
@@ -583,7 +644,9 @@ this is the sixth and final line
       </t-b>
     </details>
     <t-b>
-
+      The next example illustrates that most things you can do with a standard stream object you can
+      also do with its internal filebuf. In other words, the stream object presents a (non-virtual)
+      interface and its filebuf does all the work.
     </t-b>
     <details>
       <summary class="labelStyle lightItem">Example: std::Filebuf I/O</summary>
@@ -701,7 +764,19 @@ this is the sixth and final line
       </t-b>
     </details>
     <t-b>
-
+      The next example illustrates that you can read and write to the same file using a single filebuf
+      for both reading and writing.  You might do that if you were building a database record manager
+      where you need to read existing data but also enter new data into the same file.
+    </t-b>
+    <t-b>
+      In order to make this work for something useful you will have to devise a schema which defines
+      regions of the file where you read and write specific columns of a record.  That&apos;s what
+      SQL databases do.
+    </t-b>
+    <t-b>
+      This example just demonstrates that you can both read and write.  It doesn&apos;t do any schema-based
+      record management (but that wouldn&apos;t be too hard to do). The way we get that to work is to
+      wrap a common filebuf with both an input stream and an output stream.  Here&apos;s the details:
     </t-b>
     <details>
       <summary class="labelStyle lightItem">Read/Write Streams</summary>
@@ -827,7 +902,16 @@ this text is added to the end
       </t-b>
     </details>
     <t-b>
-
+      The final example demonstrates stringstreams.  These are particularly useful for doing object to
+      string and string to object transformations.  That&apos;s what a std::ostream does.  If you write:
+      <indent-block class="pad10">
+        double d{ 3.14159 };<br />
+        std::cout << d;
+      </indent-block>
+      <c-s>std::cout</c-s> transforms its double input into a sequence of characters written to your
+      terminal, e.g., a string. All the standard streams do this, and, with stringstream objects, we
+      can retrieve the string for processing rather than write it to a terminal.
+      Here&apos;s the demo:
     </t-b>
     <details>
       <summary class="labelStyle lightItem">Example: std::stringstreams</summary>

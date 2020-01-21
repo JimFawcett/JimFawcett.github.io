@@ -75,7 +75,8 @@
        <a href="#top">Top</a>, <a href="#Data">Data</a>, <a href="#Types">Types</a>, 
        <a href="#TypeQual">Type Quals</a>, <a href="#TypeSpec">Type Spec</a>, <a href="#ExplTypes">Expl Types</a>, 
        <a href="#TypeStr">Type Str</a>, <a href="#Casts">Casts</a>, <a href="#NewTypes">New Types</a>, 
-       <a href="#Init">Init</a>, <a href="#DataStr">DataStr</a>, <a href="#epilog">Epilogue</a>, 
+       <a href="#Init">Init</a>, <a href="#smartPtr">SmartPtr</a>, <a href="#DataStr">DataStr</a>, 
+       <a href="#epilog">Epilogue</a>, 
        <a href="#exer">Exercises</a>, <a href="#refs">Refs</a> 
      </rt-b>
    </toc-b>
@@ -1378,6 +1379,7 @@ k + 1 == 0;                 // value roll-over, statement is true, no compiler w
         </ol>
       </c-s>
     </t-b>
+    <t-b>
       Where u &epsilon; U is some type that can be coerced to a T type or
       promoted through a <c-s>T(U&nbsp;u)</c-s> constructor.  The first two are equivalent,
       invoking <c-s>T(U&nbsp;u)</c-s>.  Note that there is no assignment in the first.  The
@@ -1483,11 +1485,273 @@ k + 1 == 0;                 // value roll-over, statement is true, no compiler w
               <spacer-10></spacer-10>
           </c-s>
         </defn-body>
-      </defn-block>    </t-b>
+      </defn-block>
+    </t-b>
+    <a id="smartPtr"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>2.7</num-item1><num-item4>Managing Allocation with Smart Pointers</num-item4>
+    </num-cont>
+    <t-b>
+      C++ has a large collection of containers in the Standard Template Library that manage allocations
+      very effectively. They are our first choice for managing data on the native heap<sup>1</sup>.
+      When building our own data managers and creational functions, using smart pointers,
+      <c-s>std::unique_ptr</c-s> and <c-s>std::shared_ptr</c-s>, is preferred over working with raw
+      pointers.
+    </t-b>
+    <t-b>
+      There are two benefits of doing that:
+      <indent-block>
+        <ol class="tight">
+          <li>
+            There are no memory leaks because smart pointers delete their allocations when they
+            go out of scope.
+          </li>
+          <li>
+            Users of creational funtions that return smart pointers can ignore allocation management.
+            The smart pointers do that for them.
+          </li>
+        </ol>
+      </indent-block>
+    </t-b>
+    <t-b>
+      The demonstration, below, illustrates use of smart pointers and also illustrates the
+      <span class="notice">Dependency Inversion Principle</span>.  The demo provides
+      factory functions that return <c-s>std::unique_ptr&lt;IWidget&gt;</c-s> to provide access
+      to <c-s>Widget</c-s> instances on the heap.  Because the user gets access only through an interface,
+      <c-s>IWidget</c-s>, she doesn&apos;t depend on any of the implementation details for processing in the
+      <c-s>Widget</c-s> class.  Because she uses a factory, she doesn&apos;t depend on the details
+      of creation, so she is completely isolated from the Widget implemenation.
+    </t-b>
+    <t-b>
+      <details>
+        <summary class="labelStyle lightItem">Smart Pointers</summary>
+        <t-b>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Chap2SmartPtrs.cpp</defn-head>
+              <defn-code>
+#include &lt;memory&gt;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+#include "../Chapter7-Display/Chap7Display.h"
+
+std::string displayHelper(
+  const std::string&amp; str
+) 
+{
+  std::string insert = 
+    (str.size() &gt; 0 ? " " + str + " " : " ");
+  return insert;
+}
+/*-- interface for Widget class --*/
+
+struct IWidget {
+  virtual ~IWidget() {}
+  virtual void say() = 0;
+  virtual std::string name() = 0;
+  virtual void name(const std::string&amp; nm) = 0;
+};
+/*-- Widget class --*/
+
+class Widget : public IWidget {
+public:
+  Widget() = default;
+  Widget(const std::string&amp; nm) {
+    name_ = nm;
+  }
+  ~Widget() {
+    std::cout &lt;&lt; "\n  destroying "
+              &lt;&lt; displayHelper(name_);
+  }
+  virtual void say() override {
+    std::cout &lt;&lt; "\n  Widget instance" 
+              &lt;&lt; displayHelper(name_) 
+              &lt;&lt; "here";
+    std::cout &lt;&lt; "\n  my address is " 
+              &lt;&lt; reinterpret_cast&lt;long long&gt;(this);
+  }
+  virtual std::string name() override {
+    return name_;
+  }
+  virtual void name(const std::string&amp; nm) {
+    name_ = nm;
+  }
+private:
+  std::string name_;
+};
+              </defn-code>
+              <defn-head class="defnBorderTop">Smart Pointer Factories:</defn-head>
+              <defn-code>
+/*-------------------------------------------
+  first factory function uses unique_ptr
+*/
+
+std::unique_ptr&lt;IWidget&gt; createWidget1() {
+  return std::unique_ptr&lt;Widget&gt;(new Widget);
+}
+/*--------------------------------------------
+  second factory function uses make_unique
+*/
+
+std::unique_ptr&lt;IWidget&gt; createWidget2() {
+  return std::make_unique&lt;Widget&gt;();
+}
+/*-------------------------------------------
+  third factory function uses initialized
+  make_unique
+*/
+std::unique_ptr&lt;IWidget&gt;
+createWidget3(const std::string&amp; name) {
+  return std::make_unique&lt;Widget&gt;(
+    Widget(name)
+    );
+}
+
+/*-------------------------------------------
+  fourth factory function uses static Widget
+  for make_unique avoiding repeated constr.
+*/
+std::unique_ptr&lt;IWidget&gt;
+createWidget4(const std::string&amp; name) {
+  static Widget widget;
+  widget.name(name);
+  return std::make_unique&lt;Widget&gt;(
+    widget
+  );
+}
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Using Code:</defn-head>
+              <defn-code>
+int main() {
+
+  displayTitle("Demonstrating Smart Pointers");
+
+  displayDemo(
+    "--- createWidget1 with std::unique_ptr ---"
+  );
+  std::unique_ptr&lt;IWidget&gt; pWidget = 
+    createWidget1();
+  pWidget-&gt;say();
+  pWidget-&gt;name("Joe");
+  pWidget-&gt;say();
+  putline();
+
+  displayDemo(
+    "--- createWidget2 with std::make_unique ---"
+  );
+  pWidget = createWidget2();
+  pWidget-&gt;name("Zhang");
+  pWidget-&gt;say();
+  putline();
+
+  displayDemo(
+    "--- createWidget3 with initialized "
+    "std::make_unique ---"
+  );
+  pWidget = createWidget3("Ashok");
+  pWidget-&gt;say();
+  putline();
+
+  displayDemo(
+    "--- createWidget4 with "
+    "static initialized "
+    "std::make_unique ---"
+  );
+  pWidget = createWidget4("Priyaa");
+  pWidget-&gt;say();
+  putline();
+
+  displayDemo(
+    "--- std::shared_ptr ---"
+  );
+  std::shared_ptr&lt;IWidget&gt; pS1Widget = 
+    std::make_shared&lt;Widget&gt;(Widget("Mike"));
+  pS1Widget-&gt;say();
+  std::shared_ptr&lt;IWidget&gt; 
+  pS2Widget = pS1Widget;
+  pS2Widget-&gt;say();
+  putline();
+
+  displayDemo(
+    "--- std::shared_ptr via factory---"
+  );
+  std::shared_ptr&lt;IWidget&gt;
+  pS3Widget = createWidget4("Sally");
+  pS3Widget-&gt;say();
+  std::shared_ptr&lt;IWidget&gt;
+  pS4Widget = pS3Widget;
+  pS4Widget-&gt;say();
+  putline();
+}
+              </defn-code>
+              <defn-head class="defnBorderTop">Output:</defn-head>
+              <defn-code>
+  Demonstrating Smart Pointers
+ ==============================
+
+  --- createWidget1 with std::unique_ptr ---
+  Widget instance here
+  my address is 2786941491616
+  Widget instance Joe here
+  my address is 2786941491616
+
+  --- createWidget2 with std::make_unique ---
+  destroying  Joe
+  Widget instance Zhang here
+  my address is 2786941490384
+
+  --- createWidget3 with 
+             initialized std::make_unique ---
+  destroying  Ashok
+  destroying  Zhang
+  Widget instance Ashok here
+  my address is 2786941490272
+
+  --- createWidget4 with static 
+            initialized std::make_unique ---
+  destroying  Ashok
+  Widget instance Priyaa here
+  my address is 2786941491504
+
+  --- std::shared_ptr ---
+  destroying  Mike
+  Widget instance Mike here
+  my address is 2786941451616
+  Widget instance Mike here
+  my address is 2786941451616
+
+  --- std::shared_ptr via factory---
+  Widget instance Sally here
+  my address is 2786941491280
+  Widget instance Sally here
+  my address is 2786941491280
+
+  destroying  Sally
+  destroying  Mike
+  destroying  Priyaa
+  destroying  Sally
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </t-b>
+      </details>
+    </t-b>
+    <hr class="spreadup" />
+    <div class="footnote indent">
+      <ol class="tight">
+        <li>
+          All of the STL containers manage data with heap allocations except for the <c-s>std::array</c-s>.
+          That class uses stack allocation for a fixed number of data items.
+        </li>
+      </ol>
+    </div>
     <a id="DataStr"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>2</num-item1><num-item2>.</num-item2><num-item3>7</num-item3>
+      <num-item1>2.8</num-item1>
       <num-item4>Building Data Structures with STL Containers:</num-item4>
     </num-cont>
     In this section we will see how easy it is to &quot;snap together&quot; STL containers 
@@ -1816,7 +2080,7 @@ k + 1 == 0;                 // value roll-over, statement is true, no compiler w
     <a id="epilog"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>2.8</num-item1><num-item4>Data Epilogue</num-item4>
+      <num-item1>2.9</num-item1><num-item4>Data Epilogue</num-item4>
     </num-cont>
     <t-b>
       There are two parts to the data story, types and values.  We&apos;ve explored in some detail the C++ type
@@ -1837,7 +2101,7 @@ k + 1 == 0;                 // value roll-over, statement is true, no compiler w
     <a id="exer"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>2.9</num-item1><num-item4>Data - Programming Exercises</num-item4>
+      <num-item1>2.10</num-item1><num-item4>Data - Programming Exercises</num-item4>
     </num-cont>
       <indent-blocks>
     <div style="width:80%">
@@ -1876,7 +2140,7 @@ k + 1 == 0;                 // value roll-over, statement is true, no compiler w
     <a id="refs"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>2.10</num-item1><num-item4>References:</num-item4>
+      <num-item1>2.11</num-item1><num-item4>References:</num-item4>
     </num-cont>
   </bb-55>
   <spacer-25></spacer-25>
