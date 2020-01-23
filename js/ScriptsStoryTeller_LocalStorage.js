@@ -383,7 +383,7 @@ storyTeller.loadTOC = function () {
     let item = document.createElement('a');
     item.setAttribute('href', '#');
     item.setAttribute('onclick', 'storyTeller.render(' + i.toString() + ')');
-    item.innerHTML = i.toString() + '&nbsp;&nbsp;' + storyTeller.pages[i - 1].name;
+    item.innerHTML = (i-1).toString() + '&nbsp;&nbsp;' + storyTeller.pages[i - 1].name;
     itemList.appendChild(item);
   }
   // leave blank line at end of TOC
