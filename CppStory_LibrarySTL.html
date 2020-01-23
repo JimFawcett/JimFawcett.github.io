@@ -503,7 +503,7 @@
     </num-cont>
     <t-b>
       <details>
-        <summary class="labelStyle darkItem">Examples: Simple Uses</summary>
+        <summary class="labelStyle darkItem">Example: Standard Uses</summary>
         <t-b>
           <defn-outerBlock>
             <defn-block>
@@ -621,6 +621,7 @@ int main() {
 
   displayDemo("\n  -- copy with inserter --");
   auto inserter = 
+
     std::inserter(dstVec, ++++dstVec.begin());
   std::copy(begin(), end(), inserter);
   show(dstVec);
@@ -651,12 +652,307 @@ int main() {
         </t-b>
       </details>
     </t-b>
+    <t-b>
+      <details>
+        <summary class="labelStyle darkItem">Example: Uses Range-Like Construct</summary>
+        <t-b>
+          <t-b>
+            In the left panel we define som operations: ShowOp, SumOp and a Range-like
+            construction: Collection that holds first and last iterators and optionally
+            an operation.
+          </t-b>
+          <t-b>
+            In the right panel we show that, using Collections, we get a very readable
+            syntax: 
+            <indent-block class="pad10">
+              <c-s>ShowOp&lt;std::string&gt; showCout</c-s><br />
+            <c-s>foreach(rFriends, showCout)</c-s>
+            </indent-block> 
+            That tells the reader that we are showing each of our friends names on std::cout.
+          </t-b>
+          <t-b>
+            The traditional for_each is much more verbose:
+            <indent-block class="pad10">
+              <c-s>std::for_each(vecSt.begin(), vecStr.end(), ShowOp&lt;std::string&gt;());</c-s>
+            </indent-block>
+            The meaning is not particularly obvious until you look at the code in detail.
+          </t-b>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Chap8ModifiedDemos.cpp</defn-head>
+              <defn-code>
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;list&gt;
+#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;type_traits&gt;
+#include "../Chapter7-Display/Chap7Display.h"
+
+template&lt;typename V&gt;
+class ShowOp {
+public:
+  ShowOp(const std::string&amp; prefix = ", ") 
+    : prefix_(prefix) {}
+  void operator()(V v) {
+    if (first) {
+      std::cout &lt;&lt; "\n  " &lt;&lt; v;
+      first = false;
+    }
+    else {
+      std::cout &lt;&lt; prefix_ &lt;&lt; v;
+    }
+  }
+private:
+  bool first = true;
+  std::string prefix_ = ", ";
+};
+
+template&lt;typename V&gt;
+class SumOp {
+public:
+  void operator()(V v) {
+    sum_ += v;
+  }
+  V sum() { return sum_; }
+private:
+  V sum_;
+};
+
+template&lt;typename C&gt;
+bool contains(C c, typename C::value_type v) {
+  typename C::iterator iter = 
+    std::find(c.begin(), c.end(), v);
+  return iter != c.end();
+}
+
+template&lt;typename C&gt;
+void show(C&amp; c) {
+  std::cout &lt;&lt; "  ";
+  for_each(
+    c.begin(), c.end(), 
+    ShowOp&lt;typename C::value_type&gt;()
+  );
+}
+
+template&lt;typename T&gt;
+using Vec = std::vector&lt;T&gt;;
+
+template&lt;typename T&gt;
+using Lst = std::list&lt;T&gt;;
+
+template&lt;typename T&gt;
+using vecIterator = 
+  typename std::vector&lt;T&gt;::iterator;
+
+template&lt;typename O&gt;
+struct Null {};
+<span class="notice">
+  /*----------------------------------------- 
+  This is an important part 
+  - defines Range-like construct
+  -----------------------------------------*/
+</span>
+template&lt;
+  typename C, 
+  template&lt;typename&gt; class Op = Null
+&gt;
+struct Collection {
+  Collection(
+    C&amp; c, 
+    Op&lt;typename C::value_type&gt; op_ = 
+      Null&lt;
+    typename C::value_type&gt;()
+  ) : op(op_) 
+{
+    first = c.begin();
+    last = c.end();
+  }
+  typename C::iterator first;
+  typename C::iterator last;
+  Op&lt;typename C::value_type&gt; op;
+};
+<span class="notice">
+  /*----------------------------------------- 
+  This is another important part 
+  - defines foreach taking a Collection
+  -----------------------------------------*/
+</span>
+template&lt;
+  typename C, 
+  template&lt;typename&gt; class Op
+&gt;
+typename Op&lt;typename C::value_type&gt; 
+foreach(
+  Collection&lt;C, Op&gt; rng, 
+  Op&lt;typename C::value_type&gt; op
+) 
+{
+  return std::for_each(rng.first, rng.last, op);
+}
+
+template&lt;
+  typename C, 
+  template&lt;typename&gt; class Op
+&gt;
+typename Op&lt;typename C::value_type&gt; 
+foreach(
+  Collection&lt;C&gt; rng, 
+  Op&lt;typename C::value_type&gt; op
+) 
+{
+  return std::for_each(rng.first, rng.last, op);
+}
+
+template&lt;
+  typename C, 
+  template&lt;typename&gt; class Op
+&gt;
+typename Op&lt;typename C::value_type&gt; 
+foreach(Collection&lt;C, Op&gt; rng) {
+  return std::for_each(
+    rng.first, rng.last, rng.op
+  );
+}
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Using Code:</defn-head>
+              <defn-code>
+int main() {
+
+  displayDemo("-- traditional algo use --");
+  Vec&lt;int&gt; vecInt{ 1, 2, 3, 4, 5 };
+  std::for_each(
+    vecInt.begin(), vecInt.end(), 
+    ShowOp&lt;int&gt;()
+  );
+
+  displayDemo("\n  -- using generic synonyms --");
+
+  Vec&lt;std::string&gt; vecStr{ 
+    "Joe", "Sally", "Ashok", "Ming", "Hasim" 
+  };
+
+  Collection&lt;Vec&lt;std::string&gt;, ShowOp&gt; 
+  rFriends(vecStr, ShowOp&lt;std::string&gt;());
+
+  /*-- std algorithm with synonym arguments*/
+
+  std::for_each(
+    rFriends.first, rFriends.last, rFriends.op
+  );
+
+  /*------------------------------------------- 
+    prettified using Collection with 
+    embedded operation 
+  -------------------------------------------*/
+
+  foreach(rFriends);
+  
+  /*-------------------------------------------
+    prettified using Collection and 
+    separate operation 
+  -------------------------------------------*/
+
+  ShowOp&lt;std::string&gt; showCout;
+  foreach(rFriends, showCout);
+  putline();
+
+  Collection&lt;Vec&lt;int&gt;, SumOp&gt; 
+  vecIntColl(vecInt, SumOp&lt;int&gt;());
+  SumOp&lt;int&gt; ret = 
+    foreach(vecIntColl, SumOp&lt;int&gt;());
+  show(vecInt);
+  std::cout &lt;&lt; "\n  sum = " 
+            &lt;&lt; ret.sum();
+<span class="notice">
+  /*-------------------------------------------
+    More tests
+  -------------------------------------------*/
+</span>
+  displayDemo("\n  -- more tests --");
+  putline();
+  Vec&lt;double&gt; vecDbl{ 1.0, -1.0, 0.5 };
+  Collection&lt;
+    Vec&lt;double&gt;, SumOp&gt; 
+    vecDblColl(vecDbl, SumOp&lt;double&gt;());
+  
+  Collection&lt;Vec&lt;double&gt;&gt; 
+  vecDblColl2(vecDbl);
+
+  SumOp&lt;double&gt; retd = 
+    foreach(vecDblColl2, SumOp&lt;double&gt;());
+  double sumd = 
+    foreach(
+      vecDblColl2, SumOp&lt;double&gt;()
+    ).sum();
+  show(vecDbl);
+  std::cout &lt;&lt; "\n  sumd = " 
+            &lt;&lt; retd.sum();
+
+  std::list&lt;int&gt; listInt{ 1, 2, 3, 2, 1 };
+  Collection&lt;Lst&lt;int&gt;&gt; 
+  listIntColl(listInt);
+  foreach(listIntColl, ShowOp&lt;int&gt;());
+  int sumi = 
+    foreach(
+      listIntColl, SumOp&lt;int&gt;()
+    ).sum();
+  std::cout &lt;&lt; "\n  sum of list = " 
+            &lt;&lt; sumi;
+
+  putline(2);
+}
+              </defn-code>
+              <defn-head class="defnBorderTop">Output:</defn-head>
+              <defn-code>
+  -- traditional algo use --
+  1, 2, 3, 4, 5
+
+  -- using generic synonyms --
+  Joe, Sally, Ashok, Ming, Hasim
+  Joe, Sally, Ashok, Ming, Hasim
+  Joe, Sally, Ashok, Ming, Hasim
+
+  1, 2, 3, 4, 5
+  sum = 15
+
+  -- more tests --
+
+  1, -1, 0.5
+  sumd = 0.5
+  1, 2, 3, 2, 1
+  sum of list = 9
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </t-b>
+      </details>
+    </t-b>
 
     <a id="eplilog"></a>
     <hr class="spread" />
     <num-cont>
       <num-item1>8B.6</num-item1><num-item4>Epilogue:</num-item4>
     </num-cont>
+    <t-b>
+      The Standard Template Library (STL) is a very nice collection of containers and algorithms, bound
+      together with iterators. We&apos;ve shown, in Chapter2 - Data, that complex data structures can be
+      &quot;snapped together&quot; very easily using the existing STL containers.
+    </t-b>
+    <t-b>
+      The algorithms, with a bit of juice from template metaprogramming, can make your code much more
+      declarative - readable and easy to reason about. The std::range facilities coming in C++20 will
+      provide a lot of the benefit we&apos;ve shown using Collections, so we will be able to just use 
+      the std::libraries.
+    </t-b>
+    <t-b>
+      It takes quite a lot of mental energy to wrap your mind around the processes for template metaprogramming.
+      Using TMP you can write very general code.  There is some real benefit even if you don&apos;t do
+      much more than use an occasional <c-s>if&nbsp;constexpr&nbsp;(pred)&nbsp;{&nbsp;...&nbsp;}</c-s> 
+      in your template code.
+    </t-b>
     <a id="refs"></a>
     <hr class="spread" />
     <num-cont>
