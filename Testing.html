@@ -16,6 +16,8 @@
   <script src="js/ScriptsTemplate.js"></script>
   <script src="js/ScriptsKeyboard.js"></script>
   <script src="js/ScriptsMenuCppRepo.js"></script>
+  <script src="js/ScriptsWebComponents.js"></script>
+  <link rel="stylesheet" href="css/StylesWebComponents.css" />
   <link rel="stylesheet" href="css/StylesTemplate.css" />
   <link rel="stylesheet" href="css/StylesDefault.css" />
   <link rel="stylesheet" href="css/StylesMenu.css" />
@@ -97,12 +99,145 @@
   </header>
 
   <hr class="spread" />
-  <indent-blocks>
+  <indent-blocks class="bb-55">
     <h3>Concept:</h3>
-    <h3>Design:</h3>
     <t-b>
       When a code project contains more than one or two packages adequate testing is likely to require
-      a sequence of test cases.
+      a sequence of test cases. There are four kinds of tests needed for code in this repository:
+    </t-b>  
+    <t-b class="indent">
+      <ol class="tight">
+        <li>
+          <span class="notice">Construction Tests:</span>
+          <div>
+            These tests are implemented as an integral part of the implementation of a package&apos;s
+            code<sup>1</sup>. We add a few lines of code or a small function, then add a test to ensure that the
+            new code functions as expected.  If we need more than one simple test to verify the new code, then
+            we aren&apos;t testing often enough.  If the test fails, we know where to find the problem - in
+            the last few lines of code.  The test code may be part of the package&apos;s main function or may
+            reside in a separate test package.
+          </div>
+        </li>
+        <li>
+          <span class="notice">Unit Tests:</span>
+          <div>
+            The intent of unit testing is to attempt to ensure that tested code meets all its obligations
+            in a robust manner.  That entails testing every path through the code and testing boundary conditions,
+            e.g., beginning and end of the computational range, all cases that it may need to execute, and success or
+            failure when executing operations that may fail, like opening streams or connecting a socket.
+            Unit tests are labor intensive, and we may elect to unit test only those packages on which many other
+            packages depend.
+          </div>
+        </li>
+        <li>
+          <span class="notice">Regression Tests:</span>
+          <div>
+            Regression tests are tests typically conducted over a library or large subsystem during their
+            implementation.  Each regression test contains a set of test cases that are executed individually
+            usually in a predetermined sequence.  It is very common to use a test harness to aggregate all the
+            tests and apply them to the library or subsystem whenever there is significant change.  The idea is
+            to discover problems early that are due to changes in dependencies or the platform on which
+            the code executes.
+          </div>
+        </li>
+        <li>
+          <span class="notice">Performance Tests:</span>
+          <div>
+            Performance testing attempts to construct tests that:
+            <ul class="tight">
+              <li>
+                Compare two processing streams satisfying the same obligations, to see which
+                has higher throughput, lower latency, or other performance metrics.
+              </li>
+              <li>
+                Attempt to make testing overhead a negligible part of the complete test process,
+                by pulling as much overhead as possible into initial and final activities that
+                are not included in measured outputs.
+              </li>
+              <li>
+                Run many times to amortize any remaining startup and shutdown, and average over
+                environmental effects that may have nothing to do with the comparison, but
+                happen to ocur during testing.
+              </li>
+            </ul>
+            Often, a single iteration of a test may run fast enough that it is not possible to accurately
+            measure the time consumed, so running many iterations is also a way of improving measurement
+            accuracy.
+          </div>
+        </li>
+      </ol>
+    </t-b>
+    <t-b>
+      For construction tests, we provide simple tests that are quick to write and don&apos;t require
+      a lot of analysis to build.  For unit, regression, and performance tests we need to be more careful. These tests should
+      satisfy three properties:
+      <ol>
+        <li>
+          <span class="notice">Tests should be repeatable</span> with the same results every time.
+          <div>
+            That implies that each test has a &quot;setup&quot; process that guarentees the testing
+            environment is in a fixed state at the beginning of testing. We may choose to do that with
+            an initialize function or may use a test class for each test that sets up the
+            environment in its constructor.
+          </div>
+        </li>
+        <li>
+          <span class="notice">Test normal and abnormal conditions</span> as completely as practical.
+          <div>
+            We do that by planning each test, defining input data to provide both expected and
+            possible but unexpected conditions. It helps to define functions:
+            <ul class="tight">
+              <li>
+                <span class="notice">Requires(pred)</span>
+                <div>
+                  defines condtions that are expected
+                  to hold before an operation begins.
+                </div>
+              </li>
+              <li>
+                <span class="notice">Ensures(pedicate)</span>
+                <div>
+                  defines condtions that are expected to hold after an operation.
+                </div>
+              </li>
+              <li>
+                <span class="notice">Assert(predicate)</span>
+                <div>
+                  defines conditions that should be true at specific places in an operation.
+                </div>
+              </li>
+            </ul>
+          </div>
+          where predicate is a boolean valued operation on the test environment and/or code
+          state.
+        </li>
+        <li>
+          <span class="notice">Visualize operation results.</span>
+          <div>
+            Evaluating all the conditions above often results in a lot of raw data about the
+            environment and code states.  We need a way to selectively display that to a test
+            developer. That means we need a logging facility that can write to the console, to
+            test data files, or both.  We want to be able to select the levels of display, so
+            we get very little output when the tests are running successfully, but with a lot
+            more detail when operations fail or are not as expected.
+          </div>
+        </li>
+      </ol>
+    </t-b>
+    <t-b>
+      For these thorough tests it is common to write a brief test specification which clearly defines
+      the expected test results, initial setup, and any additional instructions for test developers
+      that may be needed (ideally none).
+    </t-b>
+    <t-b>
+      When unit or regression tests are concluded, a test report, generated by the logging
+      facility, is saved in the appropriate code repository. This should have a summary of
+      what passed and what failed, along with whatever data was logged during the final tests.
+    </t-b>
+    <h3>Design:</h3>
+    This repository contains code that intends to implement this concept, as described above. 
+    The code structure is summarized in the blocks, below.
+    <t-b>
     </t-b>
     <t-b class="indent bb-full">
       <defn-outerBlock>
@@ -135,16 +270,61 @@
             The test harness found in this repository consists of
             <ol class="tight">
               <li>
-                An Executor that executes each test wrapped in a
+                An <c-s class="notice">TestExecutor</c-s> that executes each test case wrapped in a
                 try-catch block. It provides a means of annunciatiing
                 the test results with date annotations.
               </li>
               <li>
-                A Test Executive that contains a collection of
+                A <c-s class="notice">TestExecutive</c-s> that contains a collection of
                 test cases and has methods for binding tests to
                 tested code and invoking each test in the Executor.
               </li>
             </ol>
+            The purpose of the Test Executor is to write only one try-catch block
+            and only one results annunciator, rather than repeating that in each
+            test.
+          </defn-body>
+        </defn-block>
+      </defn-outerBlock>
+    </t-b>
+    <t-b>
+      Below that design abstraction are three more, almost trivial classes.  Here&apos;s how they
+      all interact.
+    </t-b>
+    <t-b class="indent bb-full">
+      <defn-outerBlock>
+        <defn-block style="width:50%;">
+          <defn-head>Class Structure</defn-head>
+          <defn-body>
+            The single-user test harness has four classes:
+            <t-b class="indent">
+              <ol class="tight">
+                <li>
+                  <c-s class="notice">TestExecutive</c-s> runs test sequences. Each <c-s>Test</c-s>
+                  of the sequence is registered with the executive. When started it iterates over its 
+                  <c-s>TestItems</c-s>, and for each passes the test to an instance of <c-s>TestExecutor</c-s>. 
+                </li>
+                <li>
+                  <c-s class="notice">TestItems</c-s> is a collection of <c-s>TestItem</c-s> instances.
+                </li>
+                <li>
+                  <c-s class="notice">TestItem</c-s> is a structure holding a test and a test name.
+                </li>
+                <li>
+                  <c-s class="notice">Test</c-s> is a callable object that when executed returns a bool value, true for passed, and
+                  false for failed.
+                </li>
+              </ol>
+            </t-b>
+          </defn-body>
+        </defn-block>
+        <defn-block style="border:none;">
+          <defn-body style="padding:0px; border:none;">
+            <photosizer-block src="Pictures/Testing.jpg" width="400" class="photoSizerBlock right" style="margin-top:0;">
+              <span style="font-family:'Comic Sans MS, Tahoma';">
+                Fig 1. Test Harness Classes
+              </span>
+            </photosizer-block>
           </defn-body>
         </defn-block>
       </defn-outerBlock>
