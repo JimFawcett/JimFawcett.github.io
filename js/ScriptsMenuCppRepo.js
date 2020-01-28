@@ -31,6 +31,7 @@ function initializeMenu() {
         <div class='darkItem maxWidth'>&nbsp;Utilities</div>\
         <a href='CppUtilities.html'>CppUtilities</a>\
         <a href='FileUtilities.html'>FileUtilities</a>\
+        <a href='Testing.html'>Testing</a>\
         <a href='Logger.html'>Logger</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
