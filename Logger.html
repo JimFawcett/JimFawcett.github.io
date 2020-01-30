@@ -98,7 +98,7 @@
               Planned design changes
             </status-itemLeft>
             <status-itemRight>
-              Review design, small change likely
+              None at this time
             </status-itemRight>
           </status-grid>
         </details>
@@ -121,12 +121,28 @@
         There are two logger classes in this design:
         <ol class="tight">
           <li>
-            <c-s class="notice">TestLogger&lt;T&gt;:</c-s><br />
-            Logs type <c-s>T</c-s> messages to one or more <c-s>std::ostream</c-s> instances, perhaps <c-s>std::cout</c-s> 
-            and a file stream. Provides the ability to time-stamp any message, usually done only for the first message.
+            <c-s class="notice">TestLogger&lt;Level&gt;:</c-s><br />
+            <t-b style="margin-top:5px;">
+              Logs string messages to one or more <c-s>std::ostream</c-s> instances, perhaps <c-s>std::cout</c-s>
+              and a file stream. Provides the ability to time-stamp any message, usually done only for the first message.
+            </t-b>
+            <t-b>
+              Level determines whether a post is sent to its streams. Each logger has a level:
+              <indent-block>
+                <ul class="tight">
+                  <li>Level::debug</li>
+                  <li>Level::demo</li>
+                  <li>Level::results</li>
+                  <li>Level::all</li>
+                </ul>
+              </indent-block>
+              That is compared to a global invariant <c-s>Level logLevel</c-s> to determine if post is sent.
+              Applications set legLevel to determine what is posted during a program execution.
+              <c-s>logLevel = Level::all</c-s> posts everything.
+            </t-b>
           </li>
           <li>
-            <c-s class="notice">QTestLogger&lt;T&gt;:</c-s><br />
+            <c-s class="notice">QTestLogger&lt;Level&gt;:</c-s><br />
             Adds queued writing to the streams. A logging application simply drops a log message into the 
             write queue and returns immediately. The intent is to minimize performance issues with logging,
             as that is done on a child thread while the main thread continues with its test processing.
@@ -146,21 +162,21 @@
         </span>
       </photosizer-block>
       <t-b>
-        <c-s>TestLogger&lt;T&gt;</c-s> supports adding multiple std::ostream references to support concurrent logging to
-        both the console and a log file, or anything else that supports a std::ostream interface. The <c-s>T</c-s>
-        parameterization supports sending any type that has a <c-s>dynamic_cast&lt;std::string&gt;</c-s> for
+        <c-s>TestLogger&lt;Level&gt;</c-s> supports adding multiple std::ostream references for concurrent logging to
+        both the console and a log file, or anything else that supports a std::ostream interface. Logger 
+        <c-s>post</c-s> calls accept any type that has a <c-s>dynamic_cast&lt;std::string&gt;</c-s> for
         logging.  It&apos;s expected that a test application may want to define a message class to hold
         application specific information for logging.
       </t-b>
       <t-b>
-        This logger facility provides an <c-s>ITestLogger&lt;T&gt;</c-s> interface and singleton object factory.  That is important because
+        This logger facility provides an <c-s>ITestLogger&lt;Level&gt;</c-s> interface and singleton object factory.  That is important because
         a lot of the code in these repositories use, or will use, logging.  Since these clients bind to the
         interface they won&apos;t be affected by changes that we decide to make to the logger (see below).
       </t-b>
       <t-b>
-        <c-s>QTestLogger&lt;T&gt;</c-s> inherits from both <c-s>TestLogger&lt;T&gt;</c-s> and <c-s>IQTestLogger&lt;T&gt;</c-s>.
-        Therefore those two classes inherit the common root <c-s>ITestLogger&lt;T&gt;</c-s> using public virtual
-        inheritance to avoid having two copies of the root in <c-s>QTestLogger&lt;T&gt;</c-s>. The purpose of using
+        <c-s>QTestLogger&lt;Level&gt;</c-s> inherits from both <c-s>TestLogger&lt;Level&gt;</c-s> and <c-s>IQTestLogger&lt;Level&gt;</c-s>.
+        Therefore those two classes inherit the common root <c-s>ITestLogger&lt;Level&gt;</c-s> using public virtual
+        inheritance to avoid having two copies of the root in <c-s>QTestLogger&lt;Level&gt;</c-s>. The purpose of using
         this structure is to allow clients of either logger to access all their facilities through an interface pointer
         or reference (examples of both can be found in the demonstration code).
       </t-b>
