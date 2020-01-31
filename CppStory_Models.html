@@ -73,7 +73,7 @@
   <header>
     <hgroup id="pagetitle">
       <h1 id="title">Chapter 1 - C++ Models</h1>
-      <h3 id="subtitle">Compilation, exectution, memory storage, classes, templates</h3>
+      <h3 id="subtitle">Structure, compilation, exectution, memory storage, classes, templates</h3>
     </hgroup>
   </header>
 
@@ -107,6 +107,58 @@
 
   <hr class="spread" />
   <indent-blocks class="bb-55">
+    <t-b class="defnBorder">
+      data model, execution model, 
+    </t-b>
+    <a id="struct"></a>
+    <h3>Code Structure:</h3>
+    <indent-blocks>
+      <t-b>
+        <details>
+          <summary class="labelStyle lightItem">Code Structure Details</summary>
+          <t->
+            <defn-outerBlock>
+            <photosizer-block src="Pictures/CppModel_CodeFiles.JPG" width="700" class="photoSizerBlock right" style="margin-top:0;">
+              <span style="
+                display: inline-block;
+                font-weight: bold;
+                font-family: 'Comic Sans MS, Tahoma';
+                background-color: #ddd;
+                width: 100%;
+                padding: 5px 0px;
+              ">
+                Figure 1. C++ File Inclusion Model
+              </span>
+            </photosizer-block>
+            <photosizer-block src="Pictures/CppModel_CodePkgs.JPG" width="400" class="photoSizerBlock right" style="margin-top:0;">
+              <span style="
+                display: inline-block;
+                font-weight: bold;
+                font-family: 'Comic Sans MS, Tahoma';
+                background-color: #ddd;
+                width: 100%;
+                padding: 5px 0px;
+              ">
+                Figure 1. Package Diagram
+              </span>
+            </photosizer-block>
+            <photosizer-block src="Pictures/CppModel_CodeClasses.JPG" width="400" class="photoSizerBlock right" style="margin-top:0;">
+              <span style="
+                display: inline-block;
+                font-weight: bold;
+                font-family: 'Comic Sans MS, Tahoma';
+                background-color: #ddd;
+                width: 100%;
+                padding: 5px 0px;
+              ">
+                Figure 1. C++ Class Diagram
+              </span>
+            </photosizer-block>
+            </defn-outerBlock>
+          </t->
+        </details>
+      </t-b>
+    </indent-blocks>
     <a id="compil"></a>
     <h3>Compilation Model</h3>
     <indent-blocks>
@@ -280,7 +332,7 @@
           </t-b>
           <t-b>
             Each class has a set of methods - functions associated with that specific class - providing
-            operations on its allocated data when invoked. Each has code that is stored
+            operations on its allocated data when invoked. Each class has code that is stored
             in static memory, and potentially many instances holding data usually stored in the stackframe of the function
             where it is declared.
           </t-b>
@@ -289,9 +341,9 @@
             four coordinates: x, y, z, t.
           </t-b>
           <defn-code style="font-size:0.9rem; padding-top:0px;">
-  class X {
+  class Point {
   public:
-    X(const std::string& name = "none", size_t N = 3);
+    Point(const std::string& name = "none");
     std::string& name();
     double& operator[](size_t i);
     double operator[](size_t i) const;
@@ -302,8 +354,8 @@
   };
           </defn-code>
           <t-b>
-            When an instance method is invoked, <c-s>x.fun(param); x&epsilon;X</c-s>, the address of <c-s>x</c-s> is sent to the
-            code for class <c-s>X</c-s> to use if <c-s>fun</c-s> modifies <c-s>x</c-s>&apos;s data.  That address is identified
+            When an instance method is invoked, <c-s>p1.name(param); p1&epsilon;Point</c-s>, the address of <c-s>p1</c-s> is sent to the
+            code for class <c-s>Point</c-s> to use when <c-s>Point::name</c-s> modifies <c-s>p1</c-s>&apos;s data.  That address is identified
             by the reserved word &quot;<c-s>this</c-s>&quot;.  You may occasionally see references to <c-s>this</c-s> in
             methods of the class.  Most use is implicit, but occasionally it must be used explicitly, as in
             assignment operators that return <c-s>*this</c-s>.
@@ -327,19 +379,45 @@
           </div>-->
           <t-b>
             Templates generate functions and classes when an application instantiates them with
-            specific template parameters. The function template shown in the middle panel generates
-            a max function for each set of types, <c-s>T1</c-s> and <c-s>T2</c-s> specified by using
-            code. The using code instantiates it with four sets of parameter types, so the template
-            generates four functions, one for each set.
+            specific template parameters. The class template shown below generates
+            a point class for each type, <c-s>T</c-s> specified by using
+            code. The using code instantiates it with two parameter types, <c-s>int</c-s> and <c-s>double</c-s>, 
+            so the template generates two classes, one for each type.
+          </t-b>
+          <t-b style="margin-bottom:0px;">
+            The example models a point in some space, so it might have
+            three coordinates: x, y, z, e.g., coordinates_[0], coordinates_[1], ...  Template parameterization
+            allows the designer to structure coordinates to fit an application. If the point described a location
+            in a flowing fluid, the coordiates might be the location and flow rate components for each axis.
+            <indent-block class="pad10">
+              <c-s>T --> std::pair&lt;double, double&gt;</c-s>
+            </indent-block>
+            So, coordinates_ would have size 3 with entries for <c-s>{ x, flow_x }</c-s>, 
+            <c-s>{ y, flow_y }</c-s>, <c-s>{ z, flow_z }</c-s>
+          </t-b>
+          <defn-code style="font-size:0.9rem; padding-top:0px;">
+  template&lt;typename T&gt;
+  class Point {
+  public:
+    Point(const std::string& name = "none");
+    std::string& name();
+    T& operator[](size_t i);
+    T operator[](size_t i) const;
+    size_t size() const;
+  private:
+    std::string name_;
+    std::vector&lt;T&gt; coordinates_;
+  };
+          </defn-code>
           </t-b>
           <t-b>
             Should the using code instantiate for additional
-            sets of parameters, that would generate another function for each set.
+            parameter types, that would generate another class for each one.
             Fortunately, that is done by the compiler.  Developers only need to write one template
-            function and perhaps one or two overloads for special cases, as done below.
+            class and perhaps one or two special cases (specialization is discussed in Chapter 7).
           </t-b>
           <defn-outerBlock>
-            <photosizer-block src="Pictures/TemplateModel.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
+            <photosizer-block src="Pictures/TemplateLayout.jpg" width="600" class="photoSizerBlock" style="margin-top:0;">
               <span style="
               display: inline-block;
               font-weight: bold;
@@ -351,6 +429,23 @@
                 Figure 3. Template Code Generation
               </span>
             </photosizer-block>
+            <photosizer-block src="Pictures/TemplateModel.jpg" width="300" class="photoSizerBlock" style="margin-top:0;">
+              <span style="
+              display: inline-block;
+              font-weight: bold;
+              font-family: 'Comic Sans MS, Tahoma';
+              background-color: #ddd;
+              width: 100%;
+              padding: 5px 0px;
+            ">
+                Figure 4. Specializing Generic Template
+              </span>
+            </photosizer-block>
+          </defn-outerBlock>
+          <t-b>
+
+          </t-b>
+          <defn-outerBlock>
             <defn-block>
               <defn-head>Function Template Code</defn-head>
               <defn-code>
