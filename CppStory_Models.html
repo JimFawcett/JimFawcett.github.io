@@ -107,9 +107,15 @@
 
   <hr class="spread" />
   <indent-blocks class="bb-55">
-    <defn-block class="pad10-15" style="border-width:3px;">
-      This chapter is a work in progress 
-    </defn-block>
+    <t-b>
+      Like many modern languages, C++ is a large and ambitious language. The purpose of this chapter is
+      to help you develop effective mental models for important features of the language. We do this with
+      diagrams and associated text, and occasionally small code fragments.
+    </t-b>
+    <t-b>
+      You will find details, with a lot more code, in succeeding chapters where we focus on data, 
+      operations, classes, and templates.
+    </t-b>
     <a id="struct"></a>
     <hr class="spread" />
     <num-cont>
@@ -125,7 +131,14 @@
         <span class="notice">Package</span> boundaries are not enforced by the C++
         language nor by the platform operating system.  They are an abstraction that represents a unit
         of documentation, and are expected to take on a single responsibility. So they are defined by
-        the C++ developer.
+        the C++ developer.  It is common practice for each C++ package to contain a single .cpp
+        implementation file and usually a single .h header file of the same name, e.g., MyPkg.h and
+        MyPkg.cpp.  To that a developer may choose to add an interface file, IMyPkg.h.
+      </t-b>
+      <t-b>
+        Packages for components with no parents may only have a single .cpp file, and we sometimes
+        elect to make an interface file, IPkg.h, a separate package with just that one file.  We do
+        that when more than one other package has a class that implements the interface.
       </t-b>
       <t-b>
         <span class="notice">Files</span> are an operating system construct.  Code files are expected, by the C++ build environment,
@@ -260,6 +273,8 @@
           </div>
         </details>
       </t-b>
+      The next section describes how a collection of packages are built into a library or executable
+      file.
     </indent-blocks>
     <div class="clear"></div>
     <a id="compil"></a>
@@ -269,8 +284,14 @@
     </num-cont>
     <indent-blocks>
       <t-b>
+        The C++ tool-chain consists of a preprocessor, compiler, and linker. Each .cpp file and its
+        included .h header files form a translation unit.  The build system handles one translation 
+        unit at a time and does not carry over information from one translation to the next.  It is 
+        the job of the linker to bind various translations into an executable or library.
+      </t-b>
+      <t-b>
         <details>
-          <summary class="labelStyle lightItem">Compilation Model</summary>
+          <summary class="labelStyle lightItem">Compilation Model Details</summary>
           <div style="width:calc(100vw - 6rem);">
             <photosizer-block src="Pictures/CompilationModel.JPG" width="600" class="photoSizerBlock right" style="margin-top:0;">
               <span style="
@@ -313,6 +334,13 @@
           </t-b>
         </details>
       </t-b>
+      <t-b>
+        When the linker has successfully completed creating an executable, the executable can be started
+        using 
+        services of the operating system loader. The loader loads the executable image into memory and
+        loads any dynamic-link libraries on which the executable may depend.  In that case it binds the 
+        executable&apos;s calls to an appropriate entry in the library.
+      </t-b>
     </indent-blocks>
     <div class="clear"></div>
     <a id="execute"></a>
@@ -321,6 +349,11 @@
       <num-item1>1.3</num-item1><num-item4>Program Execution Model:</num-item4>
     </num-cont>
     <indent-blocks>
+      <t-b>
+        C++ source code compiles to native code that is loaded into memory, is initialized, and
+        begins to directly execute machine language instructions. You can view the program&apos;s assembled
+        code by choosing an option to generate a file containing assembler output.
+      </t-b>
       <t-b>
         <details>
           <summary class="labelStyle lightItem">Program Execution</summary>
@@ -363,6 +396,11 @@
           </t-b>
         </details>
       </t-b>
+      <t-b>
+        The C++ programming language gives developers freedom to choose where in memory fundamental data
+        and user defined objects reside.  The consequences of those choices determine lifetimes of the data
+        and objects. This is addressed in the next section.
+      </t-b>
     </indent-blocks>
     <div class="clear"></div>
     <a id="memory"></a>
@@ -371,6 +409,12 @@
       <num-item1>1.4</num-item1><num-item4>Memory Model:</num-item4>
     </num-cont>
     <indent-blocks>
+      <t-b>
+        A C++ program runs in an environment with tiered memory: static memory allocated by the compiler
+        holds code and global data. Stack memory is allocated by the developer&apos;s use of scopes, and
+        heap memory is allocated to the process when it starts and heap storage of program artifacts is
+        managed by the language implemented memory manager, part of the C++ infrastructure.
+      </t-b>
       <t-b>
         <details>
           <summary class="labelStyle lightItem">Memory Model</summary>
@@ -411,6 +455,11 @@
           </t-b>
         </details>
       </t-b>
+      <t-b>
+        Most classes manage data - their state - by using the static qualifier to place data in static memory,
+        creating scopes in stack memory defined by brace pairs, <c-s>{</c-s> and <c-s>}</c-s>, and 
+        making heap allocations with the keywords <c-s>new</c-s> and <c-s>delete</c-s>.
+      </t-b>
     </indent-blocks>
     <div class="clear"></div>
     <a id="class"></a>
@@ -421,7 +470,7 @@
     <t-b>
       Classes and class relationships are the building blocks for object-oriented design.  The results
       are a collection of objects - instances of classes - that cooperate to conduct operations
-      required of their program. We structure the designs using:
+      required of their program. We structure designs using:
       inheritance, composition, aggregation, using, and friend class relationships.
     </t-b>
     <indent-blocks>
@@ -485,6 +534,17 @@
           </t-b>
         </details>
       </t-b>
+      <t-b>
+        C++ is a strictly typed language.  Every data artifact is required to have a type, either fundamental -
+        defined by the language - or user-defined.  Templates allow a component to define a function or
+        class in terms of one or more unspecified parameters. Those are compiled, checking syntax for all
+        those parts that don&apos;t depend on the unspecified parameters.
+      </t-b>
+      <t-b>
+        So type checking for those unspecified parts is deferred until application code that defines the parameters
+        is compiled. This design is very useful, allowing construction of libraries that can support
+        operations on many different types of data.
+      </t-b>
     </indent-blocks>
     <div class="clear"></div>
     <a id="templ"></a>
@@ -493,6 +553,11 @@
       <num-item1>1.6</num-item1><num-item4>Templates:</num-item4>
     </num-cont>
     <indent-blocks>
+      <t-b>
+        A template is a code generator that creates type specific artifacts from parameterized patterns.
+        Function templates generate concrete functions and class templates generate concrete classes when
+        supplied, in application code, with types.
+      </t-b>
       <t-b>
         <details>
           <summary class="labelStyle lightItem">Templates</summary>
@@ -505,16 +570,27 @@
             code. The using code instantiates it with two parameter types, <c-s>int</c-s> and <c-s>double</c-s>, 
             so the template generates two classes, one for each type.
           </t-b>
+          <t-b style="width:calc(100vw - 6rem);">
+            <photosizer-block src="Pictures/TemplateLayout.jpg" width="600" class="photoSizerBlock right" style="margin-top:0;">
+              <span style="
+            display: inline-block;
+            font-weight: bold;
+            font-family: 'Comic Sans MS, Tahoma';
+            background-color: #ddd;
+            width: 100%;
+            padding: 5px 0px;
+          ">
+                Figure 3. Template Code Generation
+              </span>
+            </photosizer-block>
+          </t-b>
           <t-b style="margin-bottom:0px;">
-            The example models a point in some space, so it might have
-            three coordinates: x, y, z, e.g., coordinates_[0], coordinates_[1], ...  Template parameterization
-            allows the designer to structure coordinates to fit an application. If the point described a location
-            in a flowing fluid, the coordiates might be the location and flow rate components for each axis.
-            <indent-block class="pad10">
-              <c-s>T --> std::pair&lt;double, double&gt;</c-s>
-            </indent-block>
-            So, coordinates_ would have size 3 with entries for <c-s>{ x, flow_x }</c-s>, 
-            <c-s>{ y, flow_y }</c-s>, <c-s>{ z, flow_z }</c-s>
+            The example, below, models a point in some space, so it might have
+            three coordinates: x, y, z, e.g., coordinates_[0], coordinates_[1], coordinates_[2].  
+          </t-b>
+          <t-b>
+            The diagram in Figure 3. assumes that <c-s>Point&lt;T&gt;</c-s> has been instantiated 
+            for <c-s>int</c-s> and for <c-s>double</c-s>.
           </t-b>
           <defn-code style="font-size:0.9rem; padding-top:0px;">
   template&lt;typename T&gt;
@@ -530,27 +606,19 @@
     std::vector&lt;T&gt; coordinates_;
   };
           </defn-code>
-          </t-b>
           <t-b>
-            Should the using code instantiate for additional
-            parameter types, that would generate another class for each one.
-            Fortunately, that is done by the compiler.  Developers only need to write one template
-            class and perhaps one or two special cases (specialization is discussed in Chapter 7).
+            Template parameterization
+            allows the designer to structure coordinates to fit an application. If the point described a location
+            in a flowing fluid, the coordiates might be the location and flow rate components for each axis.
+            <indent-block class="pad10">
+              <c-s>T --> std::pair&lt;double, double&gt;</c-s>
+            </indent-block>
+            So, coordinates_ would have size 3 with entries for <c-s>{ x, flow_x }</c-s>, 
+            <c-s>{ y, flow_y }</c-s>, <c-s>{ z, flow_z }</c-s>
           </t-b>
-          <defn-outerBlock>
-            <photosizer-block src="Pictures/TemplateLayout.jpg" width="600" class="photoSizerBlock" style="margin-top:0;">
-              <span style="
-              display: inline-block;
-              font-weight: bold;
-              font-family: 'Comic Sans MS, Tahoma';
-              background-color: #ddd;
-              width: 100%;
-              padding: 5px 0px;
-            ">
-                Figure 3. Template Code Generation
-              </span>
-            </photosizer-block>
-            <photosizer-block src="Pictures/TemplateModel.jpg" width="300" class="photoSizerBlock" style="margin-top:0;">
+          <div class="clear"></div>
+          <t-b style="width:calc(100vw - 6rem);">
+            <photosizer-block src="Pictures/TemplateModel.jpg" width="300" class="photoSizerBlock right" style="margin-top:0;">
               <span style="
               display: inline-block;
               font-weight: bold;
@@ -562,96 +630,36 @@
                 Figure 4. Specializing Generic Template
               </span>
             </photosizer-block>
-          </defn-outerBlock>
-          <t-b>
-
           </t-b>
-          <defn-outerBlock>
-            <defn-block>
-              <defn-head>Function Template Code</defn-head>
-              <defn-code>
-template&lt;typename T1, typename T2&gt;
-auto max(T1 t1, T2 t2) {
-  displayDemo("--- using generic template ---");
-  return t1 &gt; t2 ? t1 : t2;
-}
-
-/*-- template function overload --*/
-
-using pChar = const char*;
-auto max(pChar s1, pChar s2) {
-  displayDemo(
-    "--- using overload for const char* ---"
-  );
-  return ((strcmp(s1, s2) &gt; 0) ? s1 : s2);
-}
-              </defn-code>
-              <defn-head class="defnBorderTop">Using Code</defn-head>
-              <defn-code>
---- using generic template ---
-max(4,2) returns 4
---- using generic template ---
-max(3.5, 2L) returns 3.5
---- using generic template ---
-max(3.5, 4L) returns 4
---- using overload for const char* ---
-max("aardvark", "zebra") returns zebra
---- using generic template ---
-max(std::string("a string"), "b string")
-  returns "b string"
-class std::basic_string&lt;
-  char,struct std::char_traits&lt;char&gt;, 
-  class std::allocator&lt;char&gt; 
-&gt;
-              </defn-code>
-            </defn-block>
-            <defn-block>
-              <defn-head>Class Template Code Demo</defn-head>
-              <defn-code>
-  template&lt;typename T&gt;
-  class Demo {
-  public:
-    void value(T t);
-    T value();
-  private:
-    T t_;
-  };
-
-  template&lt;typename T&gt;
-  void Demo&lt;T&gt;::value(T t) {
-    t_ = t;
-  }
-
-  template&lt;typename T&gt;
-  T Demo&lt;T&gt;::value() {
-    return t_;
-  }
-}
-              </defn-code>
-              <defn-head class="defnBorderTop">Using Code</defn-head>
-              <defn-code>
-#include &lt;iostream&gt;
-#include &lt;string&gt;
-#include "../Display/Display.h"
-#include "Demo.h"
-
-int main() {
-
-  displayTitle(
-    "Demonstrating Template Syntax"
-  );
-
-  Demo&lt;std::string&gt; sd;
-  sd.value("hello world");
-  std::cout &lt;&lt; "\n  " 
-            &lt;&lt; sd.value();
-  putline(2);
-}
-              </defn-code>
-            </defn-block>
-          </defn-outerBlock>
+          <t-b>
+            Should using code instantiate a template for additional
+            parameter types, that would generate another class for each one.
+            Fortunately, that is done by the compiler.  Developers only need to write one template
+            class and perhaps one or two special cases.
+          </t-b>
+          <t-b>
+            A class template can be specialized or a function template overloaded to handle special cases.
+            It is not uncommon for a template design to work well for several application types, but fail 
+            to operate as desired for special cases.
+          </t-b>
+          <t-b>
+            Specialization is possible because templates generate code when an application, using the template
+            for specified types, is compiled. When we specialize a class template, we define not only the
+            generic class, but also a type specific class for the special case.  The language guarantees that,
+            if a specialization matches a specified type, the specialization will be compiled.  If the type
+            doesn&apos;t match any specialization (there can be more than one) then the generic template
+            will be compiled using that type.
+          </t-b>
+          <t-b>
+            The same process happens for function templates, except that the special cases are overloads of
+            the template function and overload resolution is used instead of template type deduction.
+          </t-b>
+          <t-b>
+            We will discuss class template specialization and function template overloading in Chapter #7.
+          </t-b>
         </details>
       </t-b>
+      This concludes our discussion of C++ models.  You will find details on each of them in succeeding chapters.
     </indent-blocks>
     <div class="clear"></div>
     <a id="epilog"></a>
@@ -659,11 +667,31 @@ int main() {
     <num-cont>
       <num-item1>1.6</num-item1><num-item4>Epilogue:</num-item4>
     </num-cont>
+    <t-b>
+      This chapter has explored important models used to help you understand how to develope C++ code.
+      The succeeding chapters turn these models into concrete designs and code. 
+    </t-b>
+    <t-b>
+      Chapter #2 surveys
+      the language and provides many code examples to help you get started. Later chapters look in detail
+      at classes, class relationships, and templates. 
+    </t-b>
+    <t-b>
+      Finally, there are two chapters that discuss C++ standard libraries.  There will be more libraries 
+      covered before too long.
+    </t-b>
     <a id="refs"></a>
     <hr class="spread" />
     <num-cont>
       <num-item1>1.7</num-item1><num-item4>References:</num-item4>
     </num-cont>
+    <t-b class="indent">
+      <a href="https://en.cppreference.com/w/cpp/keyword">C++ keywords - cppreference.com</a><br />
+      <a href="https://en.cppreference.com/w/cpp/language/basic_concepts">Basic Concepts - cppreference.com</a><br />
+      <a href="https://isocpp.org/faq">Frequently Asked Questions - isocpp.org</a><br />
+      <a href="Resources/SurvivalGuide.pdf">C++ Survival Guide</a><br />
+      <a href="DesignNote-CvsCpp.html">Comparison of C++ with C</a>
+    </t-b>
   </indent-blocks>
   <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
 
