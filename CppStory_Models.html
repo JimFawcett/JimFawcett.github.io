@@ -72,7 +72,7 @@
 
   <header>
     <hgroup id="pagetitle">
-      <h1 id="title">Chapter 1 - C++ Models</h1>
+      <h1 id="title">Chapter #1 - C++ Models</h1>
       <h3 id="subtitle">Structure, compilation, exectution, memory storage, classes, templates</h3>
     </hgroup>
   </header>
@@ -308,8 +308,22 @@
           </div>
           <t-b>
             C++ compiles each *.cpp file independently, and does not save type information when compiling more than one.
-            Each *.cpp file and all of its included *.h files are called a compilation unit.
-            <spacer-15></spacer-15>
+            Each *.cpp file and all of its included *.h files are called a translation unit. 
+          </t-b>
+          <t-b>
+            The C++ language is designed
+            to support one-pass compilation.  That means that an entity: function, struct, or class must be defined before
+            its first use in compiler scan order. This is called the definition first rule:
+          </t-b>
+          <defn-block class="indent" style="width:25rem;">
+            <defn-head>Definition First Rule:</defn-head>
+            <defn-body>
+              Instances of structs or classes can be declared only after the struct or class has been declared.
+              The compiler can&apos;t lay out code for the instance until it knows how much stack space it will
+              occupy. That is determined by the struct or class declaration.
+            </defn-body>
+          </defn-block>
+          <t-b>
             The operation of a C++ Compiler is shown in Figure 1.  Its first action is to build an intermediate source
             code file with a preprocessor by replacing each #include statement in source code with the entire code of
             the included file.  Included files are really included in that source text.
@@ -547,6 +561,150 @@
       </t-b>
     </indent-blocks>
     <div class="clear"></div>
+    <a id="objmodel"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>1.6</num-item1><num-item4>Object Model:</num-item4>
+    </num-cont>
+    <t-b>
+      The C++ object model is concerned with managment of object resources and the kinds of operations
+      that are supported for instances of its type.
+    </t-b>
+    <indent-blocks>
+      <t-b>
+        <details>
+          <summary class="labelStyle lightItem">Object Model Details</summary>
+          <t-b>
+            All C++ objects support construction and destruction semantics. When an object is declared
+            in some scope its constructor ensures that its state is initialized with no support needed
+            from the using code except to provide parameters, if needed, to the constructor.
+          </t-b>
+          <num-cont>
+            <num-item1>1.6.1</num-item1><num-item4>Scope-based Resource Management:</num-item4>
+          </num-cont>
+          <t-b>
+            When the thread of execution leaves the scope where an object has been constructed its
+            destructor will be invoked, releasing object resources deterministically, with no support
+            needed from its using code.  This inherent resource management is often referred to as
+            Resource Acquisition Is Initialization (RAII).
+          </t-b>
+          <defn-block class="indent" style="width:35rem;">
+            <defn-head>Scope-based Resource Management a.k.a. RAII:</defn-head>
+            <defn-body>
+              The C++ language guarantees that, when the thread of execution leaves a scope, all the
+              objects created within that scope will be destroyed by calling their destructors, releasing
+              any resources that have allocated to each object.
+            </defn-body>
+          </defn-block>
+          <num-cont>
+            <num-item1>1.6.2</num-item1><num-item4>Memory Layout:</num-item4>
+          </num-cont>
+          <t-b>
+            The C++ object model is also concerned with how compound objects are layed out in memory. Structs
+            and Classes support five relationships that bind objects together to build composite objects:
+            inheritance, composition, aggregation, using, and friend-ship.
+          </t-b>
+          <div style="width:calc(100vw - 12rem);">
+            <photosizer-block src="Pictures/ObjectRelationships.JPG" width="500" class="photoSizerBlock right" style="margin-top:0;">
+              <span style="
+                display: inline-block;
+                font-weight: bold;
+                font-family: 'Comic Sans MS, Tahoma';
+                background-color: #ddd;
+                width: 100%;
+                padding: 5px 0px;
+              ">
+                Figure 4. C++ Composite Object Model
+              </span>
+            </photosizer-block>
+          </div>
+          <t-b>
+            The class diagram shown at the top of Figure 4 illustrates relationships between six entities:
+            <ol class="tight">
+              <li>
+                D, a composite object which inherits a base class B and uses an object, U, created by
+                some other entity.
+              </li>
+              <li>
+                B, the base class, composes an instance of class C.
+              </li>
+              <li>
+                C, the composed class.
+              </li>
+              <li>
+                U, the used class.
+              </li>
+              <li>
+                friend, an entity: struct or class or method, or function, that is granted, by D,
+                access to its private data.
+              </li>
+              <li>
+                Client, an entity that aggregates an instance of D.  That means that Client created
+                its instance of D sometime during its lifetime.
+              </li>
+            </ol>
+          </t-b>
+          <t-b>
+            The object diagram, at the bottom of Figure 4., illustrates the layout of each of these
+            entities in memory. That&apos;s shown in two dimensions for clarity, but the layout is 
+            actually a one-dimensional region of memory.
+          </t-b>
+          <t-b>
+            When B is constructed its composed member C is built within the memory footprint of B.
+            That means that the C instance is constructed as part of the construction of B.
+          </t-b>
+          <t-b>
+            Similarly, an instance of D contains, within its memory footprint, an instance of B.  Again,
+            that requires B to be constructed as part of the construction process for D.
+          </t-b>
+          <t-b>
+            Instances of U, friend, and client are not owned by D and their memory layout is outside
+            that of the compound instance of D.  That means that their construction processes are
+            independent of that of D. Of course, if client creates an instance of D it must be 
+            constructed before D.
+          </t-b>
+          <num-cont>
+            <num-item1>1.6.3</num-item1><num-item4>Value Types:</num-item4>
+          </num-cont>
+          <t-b>
+            C++ has been designed, from the ground up, to support value types, that is, types whose
+            <span class="notice">instances</span> can be assigned and copied.
+          </t-b>
+          <defn-block class="indent" style="width:35rem;">
+            <defn-head>Value Types:</defn-head>
+            <defn-body>
+              <t-b>
+                Instances of value types can be copied and assigned. When a value type is copied, the
+                destination instance is constructed and acquires the same state values as the source 
+                of the copy, but
+                remains an independent instance.  Should one of the instances have its state modified
+                that does not affect the other.
+              </t-b>
+              <t-b>
+                Assignment is a similar operation. The only difference is that the destination object
+                already exists; the assignment gave it the same state values as the source of the
+                assignment.
+              </t-b>
+            </defn-body>
+          </defn-block>
+          <t-b>
+            C++ supports value types by allowing a class or struct designer to provide a copy
+            constructor and copy assignment operator overload members to manage the change of state
+          </t-b>
+          <t-b>
+            If a class has base classes (if any) and data members with correct copy and assignment 
+            semantics, then the compiler will generate correct copy operations by memberwise copy
+            construction and copy assignment for both the object and its bases.
+          </t-b>
+          <t-b>
+            If that is not the case, then the designer supplies the constructor and operator overload
+            to handle the transfer of state correctly.
+          </t-b>
+        </details>
+      </t-b>
+    </indent-blocks>
+    <div class="clear"></div>
+
     <a id="templ"></a>
     <hr class="spread" />
     <num-cont>

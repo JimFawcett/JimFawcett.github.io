@@ -17,7 +17,7 @@ function keyAction(keyEvent) {
   if (key === 'T')
     window.scrollTo(0, 0);
   if (key === 'B')
-    window.scrollTo(0, 10000);
+    window.scrollTo(0, 100000);
   if (key === 'U')
     window.scrollBy(0, -200);
   if (key === 'D')
