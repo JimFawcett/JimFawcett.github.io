@@ -25,6 +25,7 @@ function initializeMenu() {
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
+    <a href='Videos.html' class='menuItem'>Videos</a>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Blogs &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
@@ -82,26 +83,6 @@ function initializeMenu() {
         <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
         <a href='SummerReading.html'>Summer Reading</a>\
         <a href='Interviews.html'>Job Interviews</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
-      </div>\
-    </div>\
-    <div class='dropdown menuItem'>\
-      <button class='dropbutton'>P&L &#9662;</button>\
-      <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;OS&nbsp;Platforms&nbsp;&nbsp;</div>\
-        <a href='PlatformWindows.html'>Windows</a>\
-        <a href='PlatformLinux.html'>Linux</a>\
-        <div class='darkItem maxWidth'>&nbsp;Languages</div>\
-        <a href='LangCpp.html'>C++</a>\
-        <a href='LangCSharp.html'>C#</a>\
-        <a href='LangPowerShell'>PowerShell</a>\
-        <a class='disable' href='#'>HTML</a>\
-        <a class='disable' href='#'>CSS</a>\
-        <a class='disable' href='#'>JavaScript</a>\
-        <a class='disable' href='#'>Java</a>\
-        <a class='disable' href='#'>Rust</a>\
-        <a class='disable' href='#'>Go</a>\
-        <a class='disable' href='#'>Python</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
