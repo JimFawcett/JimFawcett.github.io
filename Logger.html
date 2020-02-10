@@ -116,6 +116,20 @@
       <spacer-15></spacer-15>
     </indent-blocks>
     <h3>Design:</h3>
+      <div style="width:calc(100vw - 6rem);">
+        <photosizer-block src="Pictures/TestLogger.jpg" width="500" class="photoSizerBlock right" style="margin-top:0;">
+          <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS, Tahoma';
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;
+        ">
+            Fig 1. Test Logger Classes
+          </span>
+        </photosizer-block>
+      </div>
     <indent-blocks>
       <t-b>
         There are two logger classes in this design:
@@ -149,20 +163,7 @@
           </li>
         </ol>
       </t-b>
-      <div style="width:calc(100vw - 6rem);">
-        <photosizer-block src="Pictures/TestLogger.jpg" width="500" class="photoSizerBlock right" style="margin-top:0;">
-          <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;
-        ">
-            Fig 1. Test Logger Classes
-          </span>
-        </photosizer-block>
-      </div>      <t-b>
+      <t-b>
         <c-s>TestLogger&lt;Level&gt;</c-s> supports adding multiple std::ostream references for concurrent logging to
         both the console and a log file, or anything else that supports a std::ostream interface. Logger 
         <c-s>post</c-s> calls accept any type that has a <c-s>dynamic_cast&lt;std::string&gt;</c-s> for
@@ -183,6 +184,52 @@
       </t-b>
     </indent-blocks>
     <div class="clear"></div>
+    <h3>Operation:</h3>
+    <t-b class="indent">
+      <ol class="tight">
+        <li>
+          Set <c-s>logLevel = Level::all  // [Level::debug, Level::demo, Level::results, Level::all]</c-s>
+        </li>
+        <li>
+          Create a logger with factory:
+          <indent-block style="padding:5px 0px;">
+            <c-s>auto pDemoLogger = createLogger&lt;Level::demo&gt;();</c-s>
+          </indent-block>
+        </li>
+        <li>
+          Add streams:
+          <indent-block style="padding:5px 0px;">
+            <c-s>pDemoLogger->addStream(&std::cout);</c-s><br />
+            <c-s>std::ofstream strm2;</c-s><br />
+            <c-s>if(openFile("test.log",strm2)</c-s><br />
+            <c-s>&nbsp;&nbsp;&nbsp;pDemoLogger->addStream(&strm2)</c-s>
+          </indent-block>
+        </li>
+        <li>
+          Write log messages:
+          <indent-block style="padding:5px 0px;">
+            <c-s>pDemoLogger->postDated("logging demo");</c-s><br />
+            <c-s>pDemoLogger->post("first msg").post("second msg");</c-s>
+          </indent-block>
+        </li>
+        <li>
+          End logging:
+          <indent-block style="padding:5px 0px;">
+            <c-s>pDemoLogger->clear();</c-s>
+          </indent-block>
+          That closes file. You don&apos;t need to call <c-s>delete</c-s> on <c-s>pDemoLogger</c-s>.
+          That is a <c-s>std::unique_ptr&lt;ITestLogger&gt;</c-s> and will release the heap-based logger 
+          when it goes out of scope.
+        </li>
+      </ol>
+      <t-b>
+        The QTestLogger operations are the same except that QTestLogger provides a <c-s>wait</c-s>
+        method, needed when you also use std::cout or other streams for output, so all outputs appear in
+        the order they are written.  Without calling <c-s>wait</c-s> output written after a post
+        may be emitted before the post, which is written by a child thread.  <c-s>wait</c-s> simply waits
+        until the logger write queue is empty.
+      </t-b>
+    </t-b>
     <h3>Build:</h3>
     <t-b>
       All of the logging functionalities are completely defined in their header files, so test developers only 
@@ -193,7 +240,8 @@
     </t-b>
     <h3>Status:</h3>
     <t-b>
-      Installed.  No plans for changes at this time.  I haven&apos;t used this logger design on a large
+      Installed.  Plan to add <c-s>postTimed</c-s> method for <c-s>QTestLogger</c-s>.  I haven&apos;t used this logger 
+      design on a large
       project, so there may be some design tweaks when I start doing that.
     </t-b>
   </div>  <spacer-15></spacer-15>
