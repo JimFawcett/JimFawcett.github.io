@@ -30,10 +30,7 @@ function initializeMenu() {
       <button class='dropbutton'>Utils &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Utilities</div>\
-        <a href='CppUtilities.html'>CppUtilities</a>\
-        <a href='FileUtilities.html'>FileUtilities</a>\
-        <a href='Testing.html'>Testing</a>\
-        <a href='Logger.html'>Logger</a>\
+        <a href='Javascript:;'>None yet</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
@@ -41,13 +38,7 @@ function initializeMenu() {
       <button class='dropbutton'>Tools &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Tools</div>\
-        <a href='TextFinder.html'>TextFinder</a>\
-        <a href='Duplicates.html'>Duplicates</a>\
-        <a href='FileDates.html'>FileDates</a>\
-        <a href='FileSizes.html'>FileSizes</a>\
-        <a href='FindFiles.html'>FindFiles</a>\
-        <a href='CodeWebifier.html'>CodeWebifier</a>\
-        <a href='PrettyPrint.html'>PrettyPrint</a>\
+        <a href='Javascript:;'>None yet</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
@@ -55,15 +46,7 @@ function initializeMenu() {
       <button class='dropbutton'>Cmps &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Components</div>\
-        <a href='CppBlockingQueue.html'>CppBlockingQueue</a>\
-        <a href='FileManager.html'>File Manager</a>\
-        <a href='CppProperties.html'>CppProperties</a>\
-        <a href='ThreadPool.html'>ThreadPool</a>\
-        <a href='CppNoSqlDb.html'>CppNoSqlDb</a>\
-        <a href='Process.html'>Process</a>\
-        <a href='CppConcurrentFileAccess.html'>CppConcurrentFileAccess</a>\
-        <a href='CppLexicalScanner.html'>CppLexicalScanner</a>\
-        <a href='RetryWrapper.html'>RetryWrapper</a>\
+        <a href='Javascript:;'>None yet</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
@@ -71,12 +54,7 @@ function initializeMenu() {
       <button class='dropbutton'>Libs &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Libraries</div>\
-        <a href='FileSystem.html'>FileSystem-Windows</a>\
-        <a class='disable' href='FileSystem.html'>FileSystem-Linux</a>\
-        <a href='Sockets.html'>Sockets-Windows</a>\
-        <a class='disable' href='Sockets.html'>Sockets-Linux</a>\
-        <a href='XmlDocument.html'>XmlDocument</a>\
-        <a href='CppGraph.html'>CppGraph</a>\
+        <a href='RustBasicDemos.html'>display lib</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
@@ -84,10 +62,7 @@ function initializeMenu() {
       <button class='dropbutton'>Prjs &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Projects</div>\
-        <a href='CppParser.html'>CppParser</a>\
-        <a href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a>\
-        <a href='CppCommWithFileXfer.html'>CppCommWithFileXfer</a>\
-        <a href='CppHttpClientServer.html'>CppHttpClientServer</a>\
+        <a href='Javascript:;'>None yet</a>\
         <div style='padding:0px 10px; margin:0px; font-size:smaller;'>&nbsp;</div>\
       </div>\
     </div>\
@@ -95,18 +70,7 @@ function initializeMenu() {
       <button class='dropbutton'>Dems &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Demonstrations</div>\
-        <a href='CppBasicDemos.html'>C++&nbsp;Basic&nbsp;Demos</a>\
-        <a href='STR.html'>STR&nbsp;Value&nbsp;Type</a>\
-        <a href='CompoundObjects.html'>CompoundObjects</a>\
-        <a href='ObjectFactories.html'>ObjectFactories</a>\
-        <a href='TemplateTechniques.html'>TemplateTechniques</a>\
-        <a href='STL-Containers.html'>STL-Containers</a>\
-        <a href='IOStreams.html'>IOStreams</a>\
-        <a href='CppThreads.html'>CppThreads</a>\
-        <a href='ProcsAndThreads.html'>ProcsAndThreads</a>\
-        <a href='Interop.html'>Interop</a>\
-        <a href='CppStoryRepo.html'>C++ Story</a>\
-        <a class='lightItem' href='CppExamples.html'>More&nbsp;Examples</a>\
+        <a href='RustBasicDemos.html'>Rust&nbsp;Basic&nbsp;Demos</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
