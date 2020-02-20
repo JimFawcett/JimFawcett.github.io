@@ -77,8 +77,8 @@
    </toc-b>
 
   <bb-55 class="indent">
-  <a id="prologue"></a>
-  <hr class="spread" />
+    <a id="prologue"></a>
+    <hr class="spread" />
     <num-cont>
       <num-item1>1.0</num-item1><num-item4>Prologue:</num-item4>
     </num-cont>
@@ -88,16 +88,6 @@
     <num-cont>
       <num-item1>1.1</num-item1><num-item4>Code Structure:</num-item4>
     </num-cont>
-    <t-b>
-      Rust code structure is based on <n-s>crates</n-s>. A <n-s>crate</n-s> for an executable is a folder containing a 
-      file <n-s>Cargo.toml</n-s> and a subdirectory named <n-s>src</n-s>.  Inside <n-s>src</n-s> is a file 
-      called <n-s>main.rs</n-s>.
-    </t-b>
-    <t-b>
-      All of this is built with a Rust tool called <n-s>Cargo</n-s>.  <n-s>Cargo</n-s> is a package manager,
-      that can build, run, and clean a Rust <n-s>crate</n-s> as well as create a new <n-s>crate</n-s>
-      and download crates from <a href="https://Crates.io">https://crates.io</a>.
-    </t-b>
     <div style="width:calc(100vw - 6rem);">
       <photosizer-block src="Pictures/Crate.JPG" width="700" class="photoSizerBlock right" style="margin-top:0;">
         <span style="
@@ -108,12 +98,181 @@
           width: 100%;
           padding: 5px 0px;
         ">
-          Figure 1. Crate directories in VS Code
+          Figure 1. Package directories in VS Code
         </span>
       </photosizer-block>
     </div>
     <t-b>
-      Figure 1. shows a newly created <n-s>crate</n-s>.  The process is simple.
+      Rust code structure is based on <n-s>crates</n-s> and <n-s>packages</n-s>:
+      <indent-block class="pad10">
+        <ul class="tight">
+          <li>
+            <strong>package:</strong>
+            <div class="pad10">
+              A package is a directory containing a <n-s>cargo.toml</n-s> file and a <n-s>scr</n-s> folder
+              containing a collection of source files. Packages are built with cargo:
+              <indent-block class="pad10">
+                <c-s>cargo init [--bin | --lib] [package_name]</c-s><br />
+                Default option is --bin and default package_name is the current directory name.
+              </indent-block>
+              The <c-s>cargo build</c-s> command creates a Target subdirectory, if it doesn&apos;t
+              already exist, and runs rustc to create an executable or library in <c-s>Target/debug</c-s>.
+            </div>
+          </li>
+          <li>
+            <strong>crate:</strong>
+            <div class="pad10">
+              A crate is a Rust source file in a package src subdirectory named main.rs (binary), *.rs, or lib.rs (library).
+              The main.rs file is expected to have a <c-s>fn main() {...}</c-s>.
+            </div>
+          </li>
+        </ul>
+      </indent-block>
+    </t-b>
+    <t-b>
+      A <c-s>main.rs</c-s> may load a crate <c-s>helper.rs</c-s> from its own src directory with the 
+      declaration <c-s>mod helper</c-s> and then use public functions from helper.
+    </t-b>
+    <t-b>
+      The package for <c-s>main.rs</c-s> may also import a library <c-s>helper_lib</c-s> by including 
+      the path to helper_lib in its
+      <c-s>Cargo.toml</c-s> file&apos;s <c-s>[dependencies]</c-s> section.
+      <indent-block class="pad10">
+        <c-s>
+          [dependencies]<br />
+          helper_lib = { path = "../helper_lib"}
+        </c-s>
+      </indent-block>
+    </t-b>
+    <t-b>
+      The main.rs file may then simply use <c-s>helper_lib::some_function()</c-s> or declare
+      <c-s>use helper_lib::{ some_function }</c-s> at the top and then use some_function() in its 
+      subsequent code.
+    </t-b>
+    <t-b>
+      <details>
+        <summary class="labelStyle darkItem">Structure Demo</summary>
+        <t-b>
+          The <c-s>main</c-s> function in <c-s>demo/src/main.rs</c-s> uses code from 
+          <c-s>demo/src/helper.rs</c-s> and <c-s>demo_lib/src/lib.rs</c-s>. This shows how to
+          factor code into maintainable pieces.
+        </t-b>
+        <defn-outerBlock>
+          <defn-block>
+            <defn-head>demo/src/main.rs</defn-head>
+            <defn-code>
+mod helper;  // declares helper module
+             // since there is no code block
+             // helper.rs must be in local src and 
+             // provide code for this module
+
+use helper::{ say };
+
+use demo_lib::{ libsay };  // only needed to qualify use of libsay
+
+fn main() {
+    helper::say();
+    say();
+    demo_lib::libsay();
+    libsay();
+    print!("\n  Hello, world!\n\n");
+}
+            </defn-code>
+            <defn-head class="defnBorderTop">demo/src/helper.rs</defn-head>
+            <defn-code>
+pub fn say() {
+    print!("\n  hello from helper");
+}
+
+// Including a main function is not a good idea
+// but doesn't seem to do any harm, even if pub.
+#[allow(dead_code)]
+fn main() {
+    print!("\n  hello world");
+}
+            </defn-code>
+            <defn-head class="defnBorderTop">demo/Cargo.toml</defn-head>
+            <defn-code>
+[package]
+name = "demo"
+version = "0.1.0"
+authors = ["James W. Fawcett &lt;jfawcett@twcny.rr.com&gt;"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+demo_lib = { path = "../demo_lib" }
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>demo_lib/src/lib.rs</defn-head>
+            <defn-code>
+pub fn libsay() {
+    print!("\n  hello from demo_lib");
+}
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        assert_eq!(2 + 2, 4);
+    }
+}
+            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+cargo -q run
+
+  hello from helper
+  hello from helper
+  hello from demo_lib
+  hello from demo_lib
+  Hello, world!
+
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+      </details>
+    </t-b>
+    <t-b style="margin-bottom:0px;">
+      There is more to Rust <n-s>Code Structure</n-s>, e.g.:
+    </t-b>
+    <indent-block class="pad10">
+      <ul class="tight">
+        <li>
+          <strong>Structs and Traits:</strong>
+          <indent-block class="pad10">
+            Roughly equivalent to C++ classes and interfaces.
+          </indent-block>
+        </li>
+        <li>
+          <strong>Enums and Matching:</strong>
+          <indent-block class="pad10">
+            Enums have much more functionality in Rust than in other languages.
+          </indent-block>
+        </li>
+        <li>
+          <strong>Modules:</strong>
+          <indent-block class="pad10">
+            Modules provide a way to factor code into smaller simpler parts in the same package.
+          </indent-block>
+        </li>
+      </ul>
+    </indent-block>
+    Some of this we will discuss in <num-item1>1.4</num-item1><num-item4>User-Defined Types</num-item4>.
+    The rest in <n-s>Chapter&nbsp;2&nbsp;-&nbsp;Data</n-s> and <n-s>chapter&nbsp;3&nbsp;-&nbsp;Operations</n-s>.
+    <a id="build"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>1.2</num-item1><num-item4>Build Process:</num-item4>
+    </num-cont>
+    <t-b>
+      All of this is built with a Rust tool called <n-s>Cargo</n-s>.  <n-s>Cargo</n-s> is a package manager,
+      that can build, run, and clean a Rust <n-s>Package</n-s> as well as create a new <n-s>Package</n-s>
+      and download crates from <a href="https://Crates.io">https://crates.io</a>.
+    </t-b>
+    <t-b>
+      Figure 1. shows a newly created <n-s>Package</n-s>.  The process is simple.
       <indent-block class="pad10">
         <ol class="tight">
           <li>
@@ -141,6 +300,22 @@
         </ol>
       </indent-block>
       <t-b>
+        Using <a href="https://code.visualstudio.com/download">Visual Studio Code</a> makes this a fairly
+        painless process.  If, using the command window, you navigate to the temp directory and type
+        <c-s>code .</c-s>, assuming you&apos;ve installed VS Code, it will open showing the temp
+        directory and its files an subdirectories, e.g., <c-s>Cargo.toml</c-s> and <c-s>temp/src</c-s>.
+      </t-b>
+      <t-b>
+        You can open a teminal in VS Code, e.g., <n-s>top menu > Terminal > New Terminal</n-s>.  I usually move the terminal
+        to the right side.  You can do that with <n-s>top menu > View > Appearance > Move Panel Right</n-s>.
+      </t-b>
+      <t-b>
+        Now, you can edit the package files, save, then, in the <n-s>terminal</n-s> type <c-s>cargo check</c-s>
+        to test the build without running, and <c-s>cargo run</c-s> to build and run.  You will see the output
+        in the terminal.  When you are done you can <c-s>cargo clean</c-s> to remove the target items including
+        the <c-s>target</c-s> folder itself.
+      </t-b>
+      <t-b>
         A typical Rust program consists of a binary crate (one with a main.rs) and perhaps several
         library crates that implement all the functionality used by main.
       </t-b>
@@ -156,7 +331,7 @@
       </t-b>
     </t-b>
     <num-cont>
-      <num-item1>1.1.1</num-item1><num-item4>Display Library</num-item4>
+      <num-item1>1.2.1</num-item1><num-item4>Display Library</num-item4>
     </num-cont>
     <t-b>
       This display library provides a set of display functions to help generate demonstration and
@@ -448,20 +623,17 @@ pub fn putlinen(n: usize) {
       </t-b>
     </details>
     </indent-blocks>
-    <num-cont>
-      <num-item1>1.1.2</num-item1><num-item4>Structs and Traits:</num-item4>
-    </num-cont>
-    <num-cont>
-      <num-item1>1.1.3</num-item1><num-item4>Enums and Matching:</num-item4>
-    </num-cont>
-    <num-cont>
-      <num-item1>1.1.4</num-item1><num-item4>Modules:</num-item4>
-    </num-cont>
-    <a id="build"></a>
-    <hr class="spread" />
-    <num-cont>
-      <num-item1>1.2</num-item1><num-item4>Build Process:</num-item4>
-    </num-cont>
+    <t-b>
+      Configuring packages and building them are traditionally done with <n-s>Cargo</n-s>.  Cargo is a 
+      package manager, build manager (in some ways like a make file), checker, runner, and cleaner.
+    </t-b>
+    <t-b>
+      One of the first things a developer new to Rust needs to learn is the naming conventions that 
+      Cargo depends upon to do its business. It looks for directories named <n-s>src</n-s> to find
+      code to build, its dependencies, described in <n-s>Cargo.toml</n-s>, have to be library packages
+      that come from a local path or from <a href="https://crates.io">crates.io</a>, and it expects
+      that modules are loaded from the local <n-s>src</n-s> directory.
+    </t-b>
     <a id="ownership"></a>
     <hr class="spread" />
     <num-cont>
