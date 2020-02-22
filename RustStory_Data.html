@@ -70,21 +70,174 @@
        <a href="RustStory_References.html">References</a><br />
      </up-b>
      <rt-b id="sects">
-       <a href="#top">Top</a>, <a href="#refs">References</a>
+       <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#lifecycle">Life Cycle</a>, 
+       <a href="#types">Basic Types</a>, <a href="#libtypes">Lib Types</a>, <a href="#epilogue">Epilogue</a>, 
      </rt-b>
    </toc-b>
 
-  <a id="refs"></a>
-  <hr class="spread" />
-  <bb-full class="indent">
-    <h3>Prologue:</h3>
-    <h3>Basic Data Types:</h3>
-    <h3>Initialization:</h3>
-    <h3>std Data Types:</h3>
-    <h3>Ownership:</h3>
-    <h3>Data life cycle:</h3>
-    <h3>Epilogue</h3>
-  </bb-full>
+  <bb-55 class="indent">
+    <a id="prologue"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>2.0</num-item1><num-item4>Prologue</num-item4>
+    </num-cont>
+
+    <a id="lifecycle"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>2.1</num-item1><num-item4>Data and its Life Cycle:</num-item4>
+    </num-cont>
+    <t-b>
+      Rust data comes in two flavors (see <a href="https://cheats.rs/#basic-types">basic-types</a> for details):
+      <indent-block class="pad5">
+        <ol class="tight">
+          <li>
+            <strong>Blittable types:</strong>
+            <div class="pad5">
+              Stored entirely in one contiguous block of stack memory.
+              <indent-block>
+                <ul class="tight">
+                  <li>
+                    Basic Types:
+                    <div>
+                      <c-s>
+                        u8, i8, u16, i16, u32, i32, u64, i64, usize, isize,
+                        f32, f64, bool, char, str
+                      </c-s>
+                    </div>
+                  </li>
+                  <li>
+                    Aggregate Types:
+                    <div>
+                      <c-s>
+                        array, tuple, struct if all their items are blittable
+                      </c-s>
+                    </div>
+                  </li>
+                </ul>
+              </indent-block>
+            </div>
+          </li>
+          <li>
+            <strong>Non-Blittable types:</strong>
+            <div class="pad5">
+              Control block stored in one contiguous block of stack memory with references
+              to data held in the heap.
+              <indent-block>
+                <ul class="tight">
+                  <li>
+                    Std Library Types:
+                    <div>
+                      <c-s>
+                        String, Box, Vec, VecDeque, LinkedList, HashMap, HashSet, 
+                        BTreeMap, BTreeSet, BinaryHeap
+                      </c-s>
+                    </div>
+                  </li>
+                  <li>
+                    Aggregate Types:
+                    <div>
+                      <c-s>
+                        array, tuple, struct if each has at least one non-blittable member
+                      </c-s>
+                    </div>
+                  </li>
+                </ul>
+              </indent-block>
+            </div>
+          </li>
+        </ol>
+      </indent-block>
+    </t-b>
+    <div style="width:calc(100vw - 6rem);">
+      <photosizer-block src="Pictures/StringMove.jpg" width="400" class="photoSizerBlock right" style="margin-top:0;">
+        <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS, Tahoma';
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;
+        ">
+          Figure 1. String Move
+        </span>
+      </photosizer-block>
+    </div>
+    <t-b>
+      Blittable data values are copied:
+      <indent-block class="pad5">
+        <div>
+          <c-s>let x = 3.5;</c-s>
+          <t-b class="indent" style="font-size:0.95rem;">
+            Creates an <c-s>x:f64</c-s> on the stack initialized with the value <c-s>3.5</c-s>. 
+          </t-b>
+        </div>
+      </indent-block>
+      <indent-block class="pad5">
+        <div>
+          <c-s>let y = x;</c-s>
+          <t-b class="indent" style="font-size:0.95rem;">
+            Creates an <c-s>y:f64</c-s> on the stack and copies <c-s>x</c-s>&apos;s value into y.
+            <c-s>x</c-s> is still valid.
+          </t-b>
+        </div>
+      </indent-block>
+    </t-b>
+    <t-b>
+      Non-Blittable data values are moved:
+      <indent-block class="pad5">
+        <div>
+          <c-s>let s = String::from("a string");</c-s>
+          <t-b class="indent" style="font-size:0.95rem;">
+            Creates an <c-s>s:String</c-s> control block on the stack pointing to continguous heap memory 
+            containing the characters &quot;a string&quot;
+          </t-b>
+        </div>
+      </indent-block>
+      <indent-block class="pad5">
+        <div>
+          <c-s>let t = s;</c-s>
+          <t-b class="indent" style="font-size:0.95rem;">
+            Copies the <c-s>s:String</c-s> control block to <c-s>t</c-s> (still pointing to <c-s>s</c-s>&apos;s characters)
+            and marks <c-s>s</c-s> as moved.
+          </t-b>
+        </div>
+      </indent-block>
+    </t-b>
+    <t-b>
+      When <c-s>x</c-s> and <c-s>y</c-s> go out of scope, that is, the thread of execution leaves the scope
+      in which <c-s>x</c-s> and <c-s>y</c-s> are defined, nothing happens other that stack frame is marked as
+      free and may be over-written at any time due to another stack allocation.
+    </t-b>
+    <t-b>
+      When <c-s>s</c-s> and <c-s>t</c-s> go out of scope, the string Drop trait method is called on 
+      <c-s>t</c-s>, deallocating its character memory in the heap. 
+      The Drop trait method is not called on <c-s>s</c-s> since it no longer owns anything on the heap.
+    </t-b>
+    <a id="types"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>2.2</num-item1><num-item4>Basic Data Types:</num-item4>
+    </num-cont>
+
+    <a id="agtypes"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>2.3</num-item1><num-item4>Aggregate Data Types:</num-item4>
+    </num-cont>
+
+    <a id="libtypes"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>2.3</num-item1><num-item4>Std Lib Data Types:</num-item4>
+    </num-cont>
+
+    <a id="Epilogue"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>2.4</num-item1><num-item4>Epilogue:</num-item4>
+    </num-cont>
+  </bb-55>
   <spacer-25></spacer-25>
   <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
 
