@@ -71,8 +71,8 @@
      </up-b>
      <rt-b id="sects">
        <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#structure">Structure</a>, 
-       <a href="#build">Build</a>, <a href="#ownership">Ownership</a>, <a href="#types">User-Defined Types</a>, 
-       <a href="#refs">References</a>
+       <a href="#build">Build</a>, <a href="#ownership">Ownership</a>, <a href="#types">Types</a>, 
+       <a href="#user-defined">User-defined Types</a>, <a href="#refs">References</a>
      </rt-b>
    </toc-b>
 
@@ -83,29 +83,182 @@
       <num-item1>1.0</num-item1><num-item4>Prologue:</num-item4>
     </num-cont>
     <t-b>
-      Rust is an interesting language, similar to C++, but with some unique differences:
+      <details>
+        <summary class="labelStyle lightItem">Hello World in Rust</summary>
+        <t-b>
+          Uses only <n-s>Cargo</n-s>, after installing Rust, and the x64 Native Tools Command Prompt for Visual Studio 2019.
+        </t-b>
+      <defn-outerBlock>
+        <defn-block>
+          <defn-head>Create hello_demo Package with Cargo</defn-head>
+          <defn-code>
+c:\su\temp>
+cargo init hello_demo
+     Created binary (application) package
+
+c:\su\temp>
+cd hello_demo
+
+c:\su\temp\hello_demo>
+dir
+ Volume in drive C is OS
+ Volume Serial Number is 765A-DAD5
+
+ Directory of c:\su\temp\hello_demo
+
+02/23/2020  10:15 AM    &lt;DIR&gt;          .
+02/23/2020  10:15 AM    &lt;DIR&gt;          ..
+02/23/2020  10:15 AM                 8 .gitignore
+02/23/2020  10:15 AM               234 Cargo.toml
+02/23/2020  10:13 AM    &lt;DIR&gt;          src
+               2 File(s)            242 bytes
+               3 Dir(s)  644,435,443,712 bytes free
+
+c:\su\temp\hello_demo>
+dir .\src
+ Volume in drive C is OS
+ Volume Serial Number is 765A-DAD5
+
+ Directory of c:\su\temp\hello_demo\src
+
+02/23/2020  10:13 AM    &lt;DIR&gt;          .
+02/23/2020  10:13 AM    &lt;DIR&gt;          ..
+02/23/2020  10:13 AM                45 main.rs
+               1 File(s)             45 bytes
+               2 Dir(s)  644,435,443,712 bytes free
+          </defn-code>
+        </defn-block>
+        <defn-block>
+          <defn-head>main.rs</defn-head>
+          <defn-code>
+c:\su\temp\hello_demo>
+cd src
+
+c:\su\temp\hello_demo\src>
+type main.rs
+fn main() {
+    println!("Hello, world!");
+}
+          </defn-code>
+          <defn-head class="defnBorderTop">run main.rs</defn-head>
+          <defn-code>
+c:\su\temp\hello_demo\src>
+cd..
+
+c:\su\temp\hello_demo>
+cargo run
+   Compiling hello_demo v0.1.0 (C:\su\temp\hello_demo)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.84s
+     Running `target\debug\hello_demo.exe`
+Hello, world!
+          </defn-code>
+          <defn-head class="defnBorderTop">Cargo.toml</defn-head>
+          <defn-code>
+c:\su\temp\hello_demo>
+type cargo.toml
+[package]
+name = "hello_demo"
+version = "0.1.0"
+authors = ["James W. Fawcett <jfawcett@twcny.rr.com>"]
+edition = "2018"
+
+# See more keys and their definitions at // remainder elided
+
+[dependencies]
+
+          </defn-code>
+        </defn-block>
+      </defn-outerBlock>
+      </details>
+    </t-b>
+    <t-b>
+      Rust is an interesting language, similar to C++, but with some unique differences.
+      <t-b>
+        <defn-block>
+          <defn-head>Rust Principles:</defn-head>
+          <defn-body>
+            <ol class="tight">
+              <li>
+                Memory unsafety <==> <n-s>aliasing + mutation</n-s>
+                <indent-block class="pad5">
+                  <n-s>Compiler</n-s> checked Ownership + Borrowing rules, <n-s>compiler</n-s> checked indexing
+                </indent-block>
+                  Prevent simultaneous aliasing and mutation, indexing out-of-bounds
+              </li>
+              <li>
+                Data races <==> <n-s>aliasing + mutation + no ordering</n-s>
+                <indent-block class="pad5">
+                  Model #1 - Thread communication through messaging transfers ownership of message
+                  <indent-block>
+                    Prevents simultaneous aliasing and mutation
+                  </indent-block>
+                  Model #2 - Guarded locks
+                  <indent-block>
+                    prevent mutation without ordering
+                  </indent-block>
+                </indent-block>
+                These models are <n-s>compiler</n-s> checked.
+              </li>
+            </ol>
+          </defn-body>
+        </defn-block>
+      </t-b>
       <indent-block class="pad10">
         <ol class="tight">
           <li>
-            Rust&apos;s types are, by default, immutable. You have to opt-in to mutability with the
+            Rust&apos;s <n-s>types are, by default, immutable</n-s>. You have to opt-in to mutability with the
             mut keyword:
             <indent-block class="pad5">
               <c-s>let s = mut String::from("a string");</c-s>
             </indent-block>
           </li>
           <li>
-            If a type is blittable, e.g., primitives, arrays, ... it is copyable:
-            <indent-block class="pad5">
-              <c-s>let a1 = [1, 2, 3];<br />let a2 = a1;&nbsp;&nbsp;&nbsp;// a copy</c-s>
-            </indent-block>
-          </li>
-          <li>
-            If not blittable, e.g., strings, a collection type, ... then it gets moved:
-            <indent-block class="pad5">
-              <c-s>let s1 = "a string".to_string();<br />let s2 = s1;&nbsp;&nbsp;&nbsp;// a move</c-s>
-            </indent-block>
-            In this example, s1 will not be usable after the move. Attempts to use a moved item are
-            <n-s>compile</n-s> errors!
+            <n-s>Ownership</n-s>:&nbsp;&nbsp;memory unsafety using resources <==> aliasing + mutation
+            <div class="pad5">
+              In Rust there is only one owner of a value:
+            </div>
+            <ul class="tight" style="list-style-type:lower-alpha;">
+              <li>
+                If a type is blittable, e.g., primitives, arrays, ... it is copyable:
+                <indent-block class="pad5">
+                  <c-s>let a1 = [1, 2, 3];<br />let a2 = a1;&nbsp;&nbsp;&nbsp;// a copy</c-s>
+                </indent-block>
+              </li>
+              <li>
+                If not blittable, e.g., strings, a collection type, ... then it gets moved (transfers ownership):
+                <indent-block class="pad5">
+                  <c-s>let s1 = "a string".to_string();<br />
+                  let s2 = s1;&nbsp;&nbsp;&nbsp;// a move<br />
+                  let s3 = s2.clone();&nbsp;&nbsp;&nbsp;// an explicit copy</c-s>
+                </indent-block>
+                In this example, s1 will not be usable after the move. Attempts to use a moved item are
+                <n-s>compile</n-s> errors! S3 owns a <n-s>copy</n-s> of s2&apos;s resource.
+              </li>
+              <li>
+                References support <n-s>borrowing</n-s>:
+                <indent-block class="pad5">
+                  <c-s>let mut s = String::from("another string);</c-s><br />
+                  <c-s>let &mut rs = s;</c-s>
+                </indent-block>
+              </li>
+              <li>
+                References must satisfy <n-s>compiler-checked</n-s> rules:
+                <div>
+                  <ul class="tight">
+                    <li>
+                      Only one reference is allowed if mutable
+                    </li>
+                    <li>
+                      Any number of references are allowed if non-mutable
+                    </li>
+                    <li>
+                      Owner must not mutate while references are active.
+                      References become inactive when they go out of scope.
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
           </li>
           <li>
             All resource management is scope based.  When an item, holding resources, goes out of scope,
@@ -124,6 +277,9 @@
             with collections, threads, tcp socket wrappers, file system library, ...
           </li>
           <li>
+            It is relatively simple in Rust to interface to C code.
+          </li>
+          <li>
             It has a very useful tool, <n-s>Cargo</n-s> which is a package manager, builder, and
             verifier, and will execute code, all with a simple command syntax.
           </li>
@@ -133,6 +289,16 @@
             fast. Compiler error messages are <n-s>usually</n-s> clear, simple, and provide advice for fixing
             the error.  If the error is grievous enough, the messages can get confusing, even complaining
             about correct code.
+          </li>
+          <li>
+            As of now, there is no debugger as part of the Rust tool chain. That isn&apos;t as big an issue
+            as you might think.  <del>Many</del> most errors are compile-time and the compiler helps with those. 
+            Since Rust eliminates many errors by construction, logging works for the small remainder.
+          </li>
+          <li>
+            Rust code layout is more flexible than that of C++, where definitions must come before use.
+            In Rust, an identifier may be used at any place in the code provided only that it has been
+            defined somewhere in the translation unit (similar to Java and C#).
           </li>
           <li>
             Rust does not implement function overloading.
@@ -165,6 +331,97 @@
         I expect to write a lot of Rust code, but I think C++ will continue to be my favorite language for
         most of the things I do.
       </t-b>
+      <t-b>
+        Important references for this chapter:
+        <s-halfEm></s-halfEm>
+        <table>
+          <tr>
+            <th class="darkItem">Link</th><th class="darkItem">Description</th>
+          </tr>
+          <tr>
+            <td class="lightItem"><a href="https://doc.rust-lang.org/std/index.html">Rust std</a></td>
+            <td class="lightItem">
+              Very clear documentation for the Rust std facilities, e.g., types, modules, macros, and
+              keywords.
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem"><a href="https://cheats.rs/">Rust&nbsp;Cheat&nbsp;Sheet</a></td>
+            <td class="lightItem">
+              Very broad reference to the Rust language, its libraries, and idioms.
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem"><a href="https://docs.google.com/presentation/d/1q-c7UAyrUlM-eZyTo1pd8SZ0qwA_wYxmPZVOQkoDmH4/edit#slide=id.p">Rust Containers</a></td>
+            <td class="lightItem">
+              Container diagrams
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem"><a href="https://hacks.mozilla.org/2015/05/diving-into-rust-for-the-first-time/">Diving into Rust</a></td>
+            <td class="lightItem">
+              Contains an excellent video you <n-s>should</n-s> watch. Discusses <n-s>ownership</n-s>, with
+              copies and moves.  Also discusses thread models.
+            </td>
+          </tr>
+          <!--<tr>
+            <td class="lightItem"><a href="https://wiki.mozilla.org/Matrix">Matrix open discussion platform</a></td>
+            <td class="lightItem">
+              
+            </td>
+          </tr>-->
+        </table>
+      </t-b>
+      <t-b>
+        <details>
+          <summary class="labelStyle lightItem">Places to visit later</summary>
+          <table>
+          <tr>
+            <td class="darkItem">Places to visit later</td>
+            <td class="darkItem">
+              Description
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem"><a href="https://deterministic.space/elegant-apis-in-rust.html">Elegant APIs in Rust</a></td>
+            <td class="lightItem">
+              Things to consider when writing Rust functions and packages
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem"><a href="https://rustacean.net/">Rustaceans</a></td>
+            <td class="lightItem">
+              Open Source images
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem"><a href="https://blog.rust-lang.org/">Rust Blog</a></td>
+            <td class="lightItem">
+              Open Source images
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem"><a href="https://raphlinus.github.io/">Ralph Levien's blog</a></td>
+            <td class="lightItem">
+              Developer and Philosopher
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem"><a href="https://raphlinus.github.io/rust/2020/01/18/soundness-pledge.html">Soundness Pledge</a></td>
+            <td class="lightItem">
+              Commentary about Rust programming goals and ideals - how not to subvert safety goals.
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem"><a href="https://words.steveklabnik.com/a-sad-day-for-rust">Sad day for Rust</a></td>
+            <td class="lightItem">
+              Commentary about some issues with Rust community.
+            </td>
+          </tr>
+          </table>
+        </details>
+      </t-b>
+      <s-halfEm></s-halfEm>
     </t-b>
   <a id="structure"></a>
   <hr class="spread" />
@@ -226,6 +483,18 @@
           helper_lib = { path = "../helper_lib"}
         </c-s>
       </indent-block>
+    </t-b>
+    <t-b>
+      If the Cargo.toml file contains an identifier without a path in its [dependencies] section then
+      Cargo looks for a library in <a href="https://crates.io">https://Crates.io</a>.
+      <indent-block class="pad10">
+        <c-s>
+          [dependencies]<br />
+          serde
+        </c-s>
+      </indent-block>
+      The <a href="https://crates.io/crates/serde">serde crate</a> provides serialization and deserialization 
+      of Rust types.
     </t-b>
     <t-b>
       The main.rs file may then simply use <c-s>helper_lib::some_function()</c-s> or declare
@@ -948,11 +1217,21 @@ e = MS("Computer Engineering")
       of that help for the S struct, in the dropdown, where we tell the compiler that a literal string is 
       static, e.g., it has the lifetime of the program.  The syntax is: <c-s>s:&'static str</c-s> where 
       the <c-s>&apos;static</c-s> says that the literal string has the same lifetime as the program.
+      <a id="user-defined"></a>
     </t-b>
+    <num-cont>
+      <num-item1>1.4.1</num-item1><num-item4>User-Defined Types:</num-item4>
+    </num-cont>
     <t-b>
-      Rust does not have classes or inheritance.  It does, however, have structs and traits.  A trait is
-      similar to an interface or abstract class.  Here&apos;s an example, used in the details dropdown, 
-      below:
+      <t-b>
+        Rust does not have classes or inheritance.  It does, however, have structs and traits.  A trait is
+        similar to an interface or abstract class.  Structs have public and private members and can implement
+        traits as well as other functions.
+      </t-b>
+      <t-b>
+        Here&apos;s an example, used in the details dropdown,
+        below:
+      </t-b>
       <t-b>
         <defn-block>
           <defn-head>Salutation Trait</defn-head>
@@ -1117,6 +1396,20 @@ pub fn run() {
       </tr>
       <tr>
         <td class="lightItem">
+          <a href="https://cheats.rs/">Rust cheat sheet</a>
+        </td>
+        <td class="lightItem">
+          Quite extensive list of cheats and helpers.
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem"><a href="https://docs.google.com/presentation/d/1q-c7UAyrUlM-eZyTo1pd8SZ0qwA_wYxmPZVOQkoDmH4/edit#slide=id.p">Rust Containers</a></td>
+        <td class="lightItem">
+          Container diagrams
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
           <a href="https://www.twelve21.io/getting-started-with-rust-on-windows-and-visual-studio-code/">
             Getting Started with Rust on Windows and Visual Studio Code
           </a>
@@ -1132,14 +1425,6 @@ pub fn run() {
         </td>
         <td class="lightItem">
           Links to download and documentation
-        </td>
-      </tr>
-      <tr>
-        <td class="lightItem">
-          <a href="https://cheats.rs/">rust cheat sheet</a>
-        </td>
-        <td class="lightItem">
-          Quite extensive list of cheats and helpers.
         </td>
       </tr>
       <tr>
