@@ -108,9 +108,9 @@ function initializeMenu() {
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Ordered&nbsp;Content</div>\
         <a href='Stories.html'>What is a Story?</a>\
-        <a href='StoryTeller_LocalStorage.html'>Load Story List</a>\
         <a href='CppStory_Prologue.html'>C++ Story</a>\
-        <a href='RustStory_Prologue.html'>Learning Rust Story</a>\
+        <a href='RustStory_Prologue.html'>Rust Story</a>\
+        <a href='StoryTeller_LocalStorage.html'>Load Story List</a>\
         <a href='StoryTellerDesign.html'>StoryTeller Design</a>\
         <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
