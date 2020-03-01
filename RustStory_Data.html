@@ -150,7 +150,7 @@
                     Aggregate Types:
                     <div>
                       <c-s>
-                        array, tuple, struct if all their items are blittable
+                        array, tuple, struct <n-s style="font-size:1rem;">if all their items are blittable</n-s>
                       </c-s>
                     </div>
                   </li>
@@ -178,7 +178,7 @@
                     Aggregate Types:
                     <div>
                       <c-s>
-                        array, tuple, struct if each has at least one non-blittable member
+                        array, tuple, struct <n-s style="font-size:1rem;">if each has at least one non-blittable member</n-s>
                       </c-s>
                     </div>
                   </li>
@@ -516,7 +516,7 @@ fn separator() {
 }
 
 fn main() {
-  // code elided
+  // code elided - see panel above
 }
                 </defn-code>
               </defn-block>
@@ -597,33 +597,26 @@ cargo -q run
         <defn-block>
           <defn-head>References are borrows</defn-head>
           <defn-code>
-let mut demo = String::from("a demo String");
-putln(&amp;"let demo = String::from(\"a demo String\");");
-log(&amp;demo);
-let rdemo = &amp;mut demo;
-putln(&amp;"let rdemo = &amp;mut demo;");
-putln(&amp;"redemo.push_str(\" more stuff\")");
-rdemo.push_str(" more stuff");
-/////////////////////////////////////////////////////////
-// Owner can&apos;t mutate while borrow is active
-//-------------------------------------------------------
-// compile fails - owner can't mutate until borrow ends
-// demo.push_str(" still more stuff");
-// This is borrow because log takes a ref and that's
-// what rdemo is.
-log(rdemo);  
-/////////////////////////////////////////////////////////
-// borrow ends when function returns
-//-------------------------------------------------------
-putln(&amp;"demo.push_str(\" still more stuff\"");
-demo.push_str(" still more stuff");
-log(&amp;demo);
+/* attempt to mutate after borrow */
+
+let mut s = String::from("s is owner");
+slog(&amp;s);
+{
+    let rs = &amp;s;  // borrow s
+    // statement below fails to compile
+    // owner can't mutate after borrow 
+    // s += " with stuff";
+    slog(&amp;rs);
+}  // borrow ends here
+s += " with stuff";
+slog(&amp;s);
           </defn-code>
         </defn-block>
       </div>
     </t-b>
     <t-b>
-      Examples for all of the aggregate types, showing code and output:
+      Examples for all of the aggregate types, showing code and output from
+      RustBasicDemos: data_types:
     </t-b>
     <t-b>
       <div>
@@ -634,93 +627,181 @@ log(&amp;demo);
               <defn-block>
                 <defn-head>Aggregate Types code from main</defn-head>
                 <defn-code>
-    /* Rust arrays: [1,2,3] */
+// code elided
 
-    separator();
-    let demo = [1, 2, 3];
-    putln(&amp;"let demo = [1, 2, 3];");
-    log(&amp;demo);
+/* Rust arrays: [1,2,3] */
 
-    separator();
-    let demo = [(1.5, 2.3), (3.1, 3.9)];
-    putln(&amp;"let demo = [(1.5, 2.3), (3.1, 3.9)];");
-    log(&amp;demo);
+separator();
+let demo = [1, 2, 3];
+putln(&amp;"let demo = [1, 2, 3];");
+log(&amp;demo);
 
-    /* Rust tuples: (1,'z',3.5) */
+separator();
+let demo = [(1.5, 2.3), (3.1, 3.9)];
+putln(&amp;"let demo = [(1.5, 2.3), (3.1, 3.9)];");
+log(&amp;demo);
+
+/* Rust tuples: (1,'z',3.5) */
     
-    separator();
-    let demo = (1, 2.5, (1,'a'), [1,2,3]);
-    putln(&amp;"let demo = (1, 2.5, (1,'a'), [1,2,3]);");
-    log(&amp;demo);
+separator();
+let demo = (1, 2.5, (1,'a'), [1,2,3]);
+putln(&amp;"let demo = (1, 2.5, (1,'a'), [1,2,3]);");
+log(&amp;demo);
 
-    /* Rust Strings: String::from("a string") */
+/* Rust Strings: String::from("a string") */
     
-    separator();
-    let demo = String::from("a demo String");
-    putln(&amp;"let demo = String::from(\"a demo String\");");
-    log(&amp;demo);
+separator();
+let demo = String::from("a demo String");
+putln(
+  &amp;"let demo = String::from(\"a demo String\");"
+);
+log(&amp;demo);
 
-    /* Rust references:  */
+/* Rust references:  */
     
-    separator();
-    let mut demo = String::from("a demo String");
-    putln(&amp;"let demo = String::from(\"a demo String\");");
-    log(&amp;demo);
-    let rdemo = &amp;mut demo;
-    putln(&amp;"let rdemo = &amp;mut demo;");
-    putln(&amp;"redemo.push_str(\" more stuff\")");
-    rdemo.push_str(" more stuff");
-    // compile fails - owner can't mutate until borrow ends
-    // demo.push_str(" still more stuff");
-    // This is borrow because log takes a ref and that's
-    // what rdemo is.
-    log(rdemo);  // borrow ends when function returns
-    putln(&amp;"demo.push_str(\" still more stuff\"");
-    demo.push_str(" still more stuff");
-    log(&amp;demo);
+separator();
+let mut demo = String::from("a demo String");
+putln(
+  &amp;"let demo = String::from(\"a demo String\");"
+);
+log(&amp;demo);
+let rdemo = &amp;mut demo;
+putln(&amp;"let rdemo = &amp;mut demo;");
+putln(&amp;"redemo.push_str(\" more stuff\")");
+rdemo.push_str(" more stuff");
+// compile fails - this is attemp to make second
+// mutable borrow because push_str takes &amp;self
+// demo.push_str(" still more stuff");
+log(rdemo);
+putln(&amp;"demo.push_str(\" still more stuff\"");
+// this call succeeds only because rdemo 
+// is not used below call
+demo.push_str(" still more stuff");
+log(&amp;demo);
+// log(rdemo);  // if this call is uncommented 
+                // both calls above fail
+putline();
 
-    /* Rust structs: struct Point { x:f64, y:f64, z:f64, t:} */
-    
-    separator();
-    #[derive(Debug)]
-    struct Point { x:f64, y:f64, z:f64, name:String, }
-    let demo = 
-      Point { x:1.5, y:2.5, z:3.7, name:String::from("Peter") };
-    putln(
-      &amp;"struct Point { x:f64, y:f64, z:f64, name:String, }"
-    );
-    putln(&amp;"let demo = 
-      Point { 
-        x:1.5, y:2.5, z:3.7, 
-        name:String::from(\"Peter\") 
-      };
-    ");
-    log(&amp;demo);
+/* attempt to mutate after borrow */
 
-    /* Rust enums: enum POS { bs, ms, phd } */
+let mut s = String::from("s is owner");
+slog(&amp;s);
+{
+    let rs = &amp;s;  // borrow s
+    // statement below fails to compile
+    // owner can't mutate after borrow 
+    // s += " with stuff";
+    slog(&amp;rs);
+}  // borrow ends here
+s += " with stuff";
+slog(&amp;s);
+putline();
     
-    separator();
-    #[derive(Debug)]
-    #[allow(dead_code)]
-    enum POS { BS(String), MS(String), PhD(String), };
-    let demo = 
-      POS::MS(String::from("Computer Engineering"));
-    putln(
-      &amp;"enum POS { 
-              BS(String), MS(String), PhD(String), 
-      };"
-    );
-    putln(
-      &amp;"let demo = 
-        POS::MS(String::from(\"Computer Engineering\"));
-      ");
-    log(&amp;demo);
+/*-------------------------------------------
+  Rust structs: 
+    struct Point { x:f64, y:f64, z:f64, t:} 
+*/
+    
+separator();
+#[derive(Debug)]
+struct Point { 
+  x:f64, y:f64, z:f64, name:String, 
+}
+let demo = Point { 
+  x:1.5, y:2.5, z:3.7, 
+  name:String::from("Peter") 
+};
+putln(
+  &amp;"struct Point { 
+    x:f64, y:f64, z:f64, name:String, 
+  }"
+);
+putln(
+  &amp;"let demo = Point { 
+    x:1.5, y:2.5, z:3.7, 
+    name:String::from(\"Peter\") };"
+);
+log(&amp;demo);
+
+/* Rust enums: enum POS { bs, ms, phd } */
+    
+separator();
+#[derive(Debug)]
+#[allow(dead_code)]
+enum POS { 
+  BS(String), MS(String), PhD(String), 
+};
+let demo = POS::MS(
+  String::from("Computer Engineering")
+);
+putln(
+  &amp;"enum POS { 
+    BS(String), MS(String), PhD(String), 
+  };"
+);
+putln(
+  &amp;"let demo = 
+    POS::MS(
+      String::from(\"Computer Engineering\")
+    );"
+);
+log(&amp;demo);
+
+// code elided
 
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Output for Aggegate Types</defn-head>
                 <defn-code>
+C:\github\JimFawcett\RustBasicDemos\data_types>
+cargo -q run
+
+  exploring basic types
+ -----------------------
+  let demo :i8 = 3;
+  TypeId: i8, size: 1
+  value:  3
+ ---------------------------------
+  let demo = 5;
+  TypeId: i32, size: 4
+  value:  5
+ ---------------------------------
+  let demo :usize = 7;
+  TypeId: usize, size: 4
+  value:  7
+ ---------------------------------
+  let demo = 3.5;
+  TypeId: f64, size: 8
+  value:  3.5
+ ---------------------------------
+  let demo :f32 = -3.5;
+  TypeId: f32, size: 4
+  value:  -3.5
+ ---------------------------------
+  let demo = 'a';
+  TypeId: char, size: 4
+  value:  'a'
+ ---------------------------------
+  let demo :char = 'Z';
+  TypeId: char, size: 4
+  value:  'Z'
+ ---------------------------------
+  let demo = true;
+  TypeId: bool, size: 1
+  value:  true
+ ---------------------------------
+  let demo :bool = false
+  TypeId: bool, size: 1
+  value:  false
+ ---------------------------------
+  let demo = ();
+  TypeId: (), size: 0
+  value:  ()
+ ---------------------------------
+  let demo :() = ();
+  TypeId: (), size: 0
+  value:  ()
  ---------------------------------
   let demo = [1, 2, 3];
   TypeId: [i32; 3], size: 12
@@ -731,7 +812,9 @@ log(&amp;demo);
   value:  [(1.5, 2.3), (3.1, 3.9)]
  ---------------------------------
   let demo = (1, 2.5, (1,'a'), [1,2,3]);
-  TypeId: (i32, f64, (i32, char), [i32; 3]), size: 32
+  TypeId: 
+    (i32, f64, (i32, char), [i32; 3]), 
+    size: 32
   value:  (1, 2.5, (1, 'a'), [1, 2, 3])
  ---------------------------------
   let demo = String::from("a demo String");
@@ -745,36 +828,41 @@ log(&amp;demo);
   redemo.push_str(" more stuff")
   TypeId: alloc::string::String, size: 12
   value:  String (24): a demo String more stuff
-  demo.push_str(" still more stuff")
+  demo.push_str(" still more stuff"
   TypeId: alloc::string::String, size: 12
   value:  String (41): 
     a demo String more stuff still more stuff
+
+  TypeId: alloc::string::String, size: 12
+  value:  "s is owner"
+  TypeId: &alloc::string::String, size: 4
+  value:  "s is owner"
+  TypeId: alloc::string::String, size: 12
+  value:  "s is owner with stuff"
+
  ---------------------------------
   struct Point { 
     x:f64, y:f64, z:f64, name:String, 
   }
-  let demo = 
-    Point { 
-      x:1.5, y:2.5, z:3.7, 
-      name:String::from("Peter") 
-    };
-  TypeId: 
-    data_types::main::Point, size: 40
-  value:  
-    Point { 
-      x: 1.5, y: 2.5, z: 3.7, 
-      name: "Peter" 
-    }
+  let demo = Point { 
+    x:1.5, y:2.5, z:3.7, 
+    name:String::from("Peter") 
+  };
+  TypeId: data_types::main::Point, size: 40
+  value:  Point { 
+    x: 1.5, y: 2.5, z: 3.7, name: "Peter" 
+  }
  ---------------------------------
   enum POS { 
     BS(String), MS(String), PhD(String), 
   };
   let demo = 
-    POS::MS(
-      String::from("Computer Engineering")
-    );
+    POS::MS(String::from(
+              "Computer Engineering")
+           );
   TypeId: data_types::main::POS, size: 16
   value:  MS("Computer Engineering")
+
                 </defn-code>
               </defn-block>
             </defn-outerBlock>
@@ -816,19 +904,433 @@ log(&amp;demo);
       has the Clone trait.
     </t-b>
 
+    <a id="slices"></a>
+    <num-cont>
+      <num-item1>2.3.1</num-item1><num-item4>Slices of Aggregate Types:</num-item4>
+    </num-cont>
+    <t-b>
+      A slice is a non-owning view into an aggregate data structure that may or may not be
+      viewing the complete data structure.  Consider an array:
+      <indent-block class="pad5">
+        <c-s>let arr = [1, 2, 3, 4, 5, 6];</c-s>
+        <ul class="tight">
+          <li>
+            <c-s>let slc1 = &arr[..];    // view the entire array</c-s>
+          </li>
+          <li>
+            <c-s>let slc2 = &arr[0..6];  // same as slc1</c-s>
+          </li>
+          <li>
+            <c-s>let slc3 = &arr[..3];   // views elements [1, 2, 3]</c-s>
+          </li>
+          <li>
+            <c-s>let slc4 = &arr[1..];   // views elements [2, 3, 4, 5, 6]</c-s>
+          </li>
+          <li>
+            <c-s>let slc5 = &arr[1..4];  // views elements [2, 3, 4]</c-s>
+          </li>
+        </ul>
+      </indent-block>
+    </t-b>
+    <t-b>
+      It only makes sense to take slices of array-like things, e.g., arrays, vectors, and strings.
+      Also, string slices only make sense if all the string characters are ASCII.  We will discuss
+      this further in the next section.
+    </t-b>
     <a id="strings"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>2.3</num-item1><num-item4>String Types:</num-item4>
+      <num-item1>2.4</num-item1><num-item4>String Types:</num-item4>
     </num-cont>
-    <t-b>
     <t-b>
       Rust provides two native string types: String and str, and two types intended for use with
       C language bindings: OsString and CString.  We will focus here on String and str.
     </t-b>
-    The str type is part of the core Rust language and String is provided in the std library.  Both
-    contain sequences of utf-8 characters.  The size of utf-8 characters ranges from 1 to 4 bytes.
-    But String is implemented using Vec&lt;u8&gt;
+    <t-b>
+      The str type is part of the core Rust language and String is provided in the std library.  Both
+      contain sequences of utf-8 characters.  The size of utf-8 characters ranges from 1 to 4 bytes.
+      But String is implemented using Vec&lt;u8&gt;, so indexing into the Vec only yields a byte which
+      will be a whole character if ASCII, but only part of a character otherwise.  That means that you
+      can&apos;t index Strings. 
+    </t-b>
+    <a id="string"></a>
+    <num-cont>
+      <num-item1>2.4.1</num-item1><num-item4>String</num-item4>
+    </num-cont>
+    <t-b>
+      You retrieve the ith utf-8 char from a String, s, using: 
+      <indent-block class="pad5">
+        <c-s>s.chars().nth(i).unwrap()</c-s>. 
+      </indent-block>
+      <c-s>chars()</c-s> is a String iterator that knows how to find utf-8 character boundaries.
+      <c-s>nth(i)</c-s> calls <c-s>next</c-s> on the iterator <c-s>i</c-s> times.  That returns
+      a <c-s>std::option</c-s> that contains either <c-s>Some(ch)</c-s> or <c-s>None</c-s>. If the
+      indexing succeeded that returns <c-s>Some(ch)</c-s> and we can use ch directly. Note that this
+      is an order N process because we walk down the string looking for character boundaries.
+    </t-b>
+    <t-b>
+      Using <c-s>unwrap()</c-s> attempts to use the character directly.  If indexing failed that would
+      result in a panic. In cases where a panic is not appropriate (flight navigation system for the
+      Boeing 797) we use matching to react to the option.  We will discuss option processing in the
+      next chapter, Operations.
+    </t-b>
+    <t-b>
+      The method described above works for all utf-8 character sets.  However, for languages that use
+      diacritics, the diacritics get encoded in a separate char even though a speaker of the language 
+      would say that those are part of an adjacent character in that language (Hindi for example).
+      the chars() iterator is not smart enough to handle that situation.
+    </t-b>
+    <t-b>
+      Here&apos;s a reference: 
+      <a href="https://doc.rust-lang.org/1.25.0/book/second-edition/ch08-02-strings.html">
+         ch08-02-strings in the Rust Book
+      </a>
+    </t-b>
+    <t-b>
+      Note that Strings are not blittable, so rebinding a string to a new name transfers ownership, 
+      and taking a borrow reference suspends the owner&apos;s ability to mutate until the borrow ends.
+    </t-b>
+    <a id="str"></a>
+    <num-cont>
+      <num-item1>2.4.2</num-item1><num-item4>str</num-item4>
+    </num-cont>
+    <t-b>
+      The str type represents litteral strings like &quot;a literal string&quot;. These are implemented
+      with contiguous blocks of stack memory, and so are blittable.  You almost always encounter literal
+      strings as references, &s.
+    </t-b>
+    <t-b>
+      strs can be converted to String instances in several ways.  Here&apos;s two:
+      <indent-block class="pad5">
+        <ol class="tight">
+          <li>
+            <c-s>let s = String::from("a literal string");</c-s>
+          </li>
+          <li>
+            <c-s>let s = "a literal string".to_string();</c-s>
+          </li>
+        </ol>
+      </indent-block>
+      And we can create an str by taking a slice of a String or a literal string:
+      <indent-block class="pad5">
+        <ol class="tight">
+          <li>
+            <c-s>let s1 = "Hello world";  // slice of the whole literal</c-s>
+          </li>
+          <li>
+            <c-s>let s2 = &s[1..3];  // second through 4th bytes of s</c-s>
+          </li>
+        </ol>
+      </indent-block>
+      Both <c-s>s1</c-s> and <c-s>s2</c-s> have type <c-s>&str</c-s>, a reference to a literal string.
+    </t-b>
+    <t-b>
+      Taking a complete slice always works, but, since Rust chars are utf-8 with sizes that range from
+      1 byte (ASCII characters) to 4 bytes for math symbols and emojis, a partial slice like s2 may not
+      have a correct representation of the second through 4th characters of s.
+    </t-b>
+    <a id="str_exmpl"></a>
+    <num-cont>
+      <num-item1>2.4.3</num-item1><num-item4>String Examples:</num-item4>
+    </num-cont>
+    <t-b>
+      The String type has methods:
+      <indent-block class="pad5">
+        <ul class="tight">
+          <li>
+            <c-s>let s = String::new();</c-s><br />
+            Creates new empty String instance
+          </li>
+          <li>
+            <c-s>let s = String::from("a literal");</c-s><br />
+            Creates instance from literal
+          </li>
+          <li>
+            <c-s>let t = s.replace("abc","xyz");</c-s><br />
+            <c-s>t</c-s> is a copy of <c-s>s</c-s> with every instance of <c-s>"abc"</c-s> 
+            replaced with <c-s>"xyz"</c-s>
+          </li>
+          <li>
+            <c-s>s.len();</c-s><br />
+            returns length of <c-s>s</c-s> in bytes, not chars
+          </li>
+          <li>
+            <c-s>let slice = s.as_str();</c-s><br />
+            returns slice of entire String <c-s>s</c-s> contents
+          </li>
+          <li>
+            <c-s>s.push('a');</c-s><br />
+            append char <c-s>'a'</c-s> to end of <c-s>s</c-s>.
+          </li>
+          <li>
+            <c-s>s.push_str("abc");</c-s><br />
+            appends <c-s>"abc"</c-s> to the end of <c-s>s</c-s>
+          </li>
+          <li>
+            <c-s>let st = s.trim();</c-s><br />
+            returns string with leading and trailing whitespace removed.
+          </li>
+          <li>
+            <c-s>let iter = s.split_whitespace();</c-s><br />
+            returns iterator over whitespace separated tokens
+          </li>
+          <li>
+            <c-s>let iter = s.split('\n');</c-s><br />
+            returns iterator over lines
+          </li>
+          <li>
+            <c-s>let iter = s.chars();</c-s><br />
+            returns an iterator over the utf-8 chars of <c-s>s</c-s>
+          </li>
+        </ul>
+      </indent-block>
+    </t-b>
+    <t-b>
+      Here&apos;s an example showing many of these methods in action.
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle darkItem">String Examples:</summary>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>string-probes::main.rs</defn-head>
+              <defn-code>
+#[allow(unused_imports)]
+use display::{
+  log, slog, show, show_type, show_value,
+  putline, putlinen, main_title, sub_title
+};
+
+/*-----------------------------------------------------------
+Note:
+Strings hold utf8 characters, which vary in size, so you
+you can't directly index String instances.
+*/
+#[allow(dead_code)]
+pub fn at(s:&amp;String, i:usize) -&gt; char {
+  s.chars().nth(i).unwrap()
+}
+/*-----------------------------------------------------------
+note:
+- order n, as str chars are utf8, e.g., from 1 to 5 bytes
+-----------------------------------------------------------*/
+
+fn main() {
+
+  main_title("string_probes");
+  putline();
+
+  /*-- char --*/
+
+  let v:Vec&lt;char&gt; = vec!['R', 'u', 's', 't'];
+  log(&amp;v);
+  log(&amp;'R');
+  putline();
+
+  let ch:u8 = 'a' as u8;
+  log(&amp;ch);
+  show("char is ", &amp;(ch as char));
+  putline();
+
+  /*-- String --*/
+
+  let s:String = String::from("Rust");
+  log(&amp;s);
+  let i:usize = 2;
+  let ch = at(&amp;s, i);
+  print!("\n  in string \"{}\", char at {} is {}", &amp;s, i, ch);
+  show("length in bytes of s = {:?}", &amp;s.len());
+  putline();
+
+  let s1 = s.clone();
+  let v:Vec&lt;u8&gt; = Vec::from(s1);
+  slog(&amp;v[0]);
+  show("vec from string",&amp;v);
+  putline();
+
+  /*-- str --*/
+
+  let s_slice = &amp;s[..];   // slice containing all chars of s
+  slog(&amp;s_slice);
+  show("s_slice = ", &amp;s_slice);
+  putline();
+
+  let s_slice2 = s.as_str();
+  slog(&amp;s_slice2);
+  putline();
+
+  /*-- create string and mutate --*/
+
+  let mut s = String::new();
+  s.push('a');
+  s.push(' ');
+  s.push_str("test string");
+  log(&amp;s);
+  putline();
+
+  let t = s.replace("string","Rust String");
+  slog(&amp;t);
+  putline();
+
+  for tok in s.split_whitespace() {
+    print!("\n  {}", tok);
+  }
+  putline();
+
+  //-----------------------
+  // this works too
+  // let iter = s.split_whitespace();
+  // for tok in iter {
+  //   print!("\n  {}", tok);
+  // }
+  // putline();
+
+  /*-----------------------------------------------------
+  Another, order n, way to index string:
+  - chars returns iterator over utf8 chars in string slice
+  - nth(i) calls next on iterator until it gets to i
+  - nth(i) returns std::option::Option&lt;char&gt;:
+  - that contains Some(ch) or None if operation failed
+  */
+  let result = s.chars().nth(0);
+  match result {
+    Some(r) =&gt; show("s.chars().nth(0) = ", &amp;r),
+    None =&gt; print!("\n  couldn't extract char"),
+  }
+  show("s = ", &amp;s);
+  let result = s.chars().nth(2);
+  match result {
+    Some(r) =&gt; show("s.chars().nth(2) = ", &amp;r),
+    None =&gt; print!("\n  couldn't extract char"),
+  }
+  show("s = ", &amp;s);
+  putline();
+
+  {
+    /*-------------------------------------------------
+    Caution here:
+    - slice is returning array of bytes, not utf8 chars
+    - this works only because we use all ASCII chars
+    */
+    /*-- slices are non-owning views and are borrows of s --*/
+    let slice_all = &amp;s;
+    slog(&amp;slice_all);
+    show("slice_all = ", &amp;slice_all);
+    putline();
+
+    let third = &amp;s[2..3];       // string slice with one char
+    slog(&amp;third);
+    show("third = ",&amp;third);
+    putline();
+
+    /*-- this works for utf-8 encoding --*/
+    let ch = third.chars().nth(0);  //
+    log(&amp;ch);
+    match ch {
+      Some(x) =&gt; { log(&amp;x); show("match ch = ", &amp;x); },
+      None =&gt; print!("\n can't return ch"),
+    }
+
+    ///////////////////////////////////////////////////
+    // compile fails
+    // - can't modify owner while borrows are active
+    //------------------------------------------------
+    // s.push('Z');
+    // slog(&amp;slice_all);
+
+  }   // borrow ends here
+
+  s.push('Z');  // ok, borrow no longer active
+
+  putline();
+  sub_title("That's all Folks!");
+  putlinen(2);
+}
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Output</defn-head>
+              <defn-code>
+C:\github\JimFawcett\RustBasicDemos\string_probes>
+cargo -q run
+
+string_probes
+===============
+
+TypeId: alloc::vec::Vec<char>
+, size: 12
+value:  ['R', 'u', 's', 't']
+TypeId: char, size: 4
+value:  'R'
+
+TypeId: u8, size: 1
+value:  97
+char is 'a'
+
+TypeId: alloc::string::String, size: 12
+value:  String (4): Rust
+in string "Rust", char at 2 is s
+length in bytes of s = {:?}4
+
+TypeId: u8, size: 1
+value:  82
+vec from string[82, 117, 115, 116]
+
+TypeId: &str, size: 8
+value:  "Rust"
+s_slice = "Rust"
+
+TypeId: &str, size: 8
+value:  "Rust"
+
+TypeId: alloc::string::String, size: 12
+value:  String (13): a test string
+
+TypeId: alloc::string::String, size: 12
+value:  "a test Rust String"
+
+a
+test
+string
+
+s.chars().nth(0) = 'a'
+s = "a test string"
+s.chars().nth(2) = 't'
+s = "a test string"
+
+TypeId: &alloc::string::String, size: 4
+value:  "a test string"
+slice_all = "a test string"
+
+TypeId: &str, size: 8
+value:  "t"
+third = "t"
+
+TypeId: core::option::Option<char>
+  , size: 4
+  value:  Some('t')
+  TypeId: char, size: 4
+  value:  't'
+  match ch = 't'
+
+  That's all Folks!
+  -------------------
+
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </div>
+    </t-b>
+    <t-b>
+      The fact that Rust Strings hold utf-8 characters is good news and bad news.  The good news is
+      they can represent virtually anything a console can emit, e.g., ASCII chars, math symbols,
+      arabic fonts, european diacritics, and emojis.
+    </t-b>
+    <t-b>
+      The bad news is that you can&apos;t index a Rust String in constant time; and converting to
+      other data structures can get messy.
     </t-b>
     <a id="libtypes"></a>
     <hr class="spread" />
@@ -903,8 +1405,9 @@ log(&amp;demo);
       <num-item1>2.5</num-item1><num-item4>Epilogue:</num-item4>
     </num-cont>
     <t-b>
-      There is one significant omission in this chapter.  We have not discussed slices, which are
-      non-owning views into other aggregate types. This will be rectified in the next chapter, Operations.
+      This chapter has been all about storing and presenting data in scalar, aggregate, and structured forms.
+      In the next chapter we will be looking at ways to operate on this data with functions, operators, and
+      lambdas.
     </t-b>
     <a id="refs"></a>
     <hr class="spread" />
