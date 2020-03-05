@@ -869,24 +869,28 @@ display = { path = "../display" }
             </defn-code>
             <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
-
 C:\github\JimFawcett\RustBasicDemos\display_test>
 cargo -q run
 
- test types
-------------
- TypeId: alloc::string::String, size: 12
- value:  String (8): a string
- TypeId: i8, size: 1
- value:  100
- TypeId: alloc::vec::Vec&lt;i32&gt;, size: 12
- value:  [-1, 0, 1]
- TypeId: test_display::main::Test, size: 1
- value:  Test1
- TypeId: test_display::main::Test, size: 1
- value:  Test2
- TypeId: test_display::Point, size: 24
- value:  Point { x: 1.0, y: 1.5, z: 2.0 }
+  test types
+ ============
+  TypeId: alloc::string::String, size: 12
+  value:  "a string"
+  TypeId: alloc::string::String, size: 12
+  value: "a string"
+  TypeId: i8, size: 1
+  value:  100
+  TypeId: alloc::vec::Vec<i32>, size: 12
+  value:  [-1, 0, 1]
+  TypeId: test_display::main::Test, size: 1
+  value:  Test1
+  TypeId: test_display::main::Test, size: 1
+  value:  Test2
+  TypeId: test_display::Point, size: 24
+  value:  Point { x: 1.0, y: 1.5, z: 2.0 }
+
+  That's all folks!
+ -------------------
 
             </defn-code>
           </defn-block>
@@ -894,7 +898,7 @@ cargo -q run
             <defn-head>display_test::main.rs</defn-head>
             <defn-code>
 /////////////////////////////////////////////////////////////
-// test_display::main.rs - test display library            //
+// display_test::main.rs - test display library            //
 //                                                         //
 // Jim Fawcett, https://JimFawcett.github.io, 14 Feb 2020  //
 /////////////////////////////////////////////////////////////
@@ -908,35 +912,43 @@ cargo -q run
   library just like any other application.
 */
 
-use display::{ putline, title, log, putlinen };
+#[allow(unused_imports)]
+use display::{ 
+  putline, main_title, sub_title, 
+  log, show_type, show_value, putlinen 
+};
 
 #[derive(Debug)]
 struct Point {
-  x: f64,
-  y: f64,
-  z: f64,
+    x: f64,
+    y: f64,
+    z: f64,
 }
+/* Need more tests for added functions */
 
 fn main() {
-  putline();
-  title("test types".to_string());
-  let mut str = String::new();
-  str.push_str("a string");
-  log(&amp;str);
-  let an_i8: i8 = 100;
-  log(&amp;an_i8);
-  let mut vi : Vec&lt;i32&gt; = Vec::new();
-  vi.push(-1);
-  vi.push(0);
-  vi.push(1);
-  log(&amp;vi);
-  #[derive(Debug)]
-  enum Test { Test1, Test2, };
-  log(&amp;Test::Test1);
-  log(&amp;Test::Test2);
-  let point = Point { x:1.0, y:1.5, z:2.0 };
-  log(&amp;point);
-  putlinen(1);
+    main_title("test types");
+    let mut str = String::new();
+    str.push_str("a string");
+    log(&amp;str);
+    show_type(&amp;str);
+    show_value(&amp;str);
+    let an_i8: i8 = 100;
+    log(&amp;an_i8);
+    let mut vi : Vec&lt;i32&gt; = Vec::new();
+    vi.push(-1);
+    vi.push(0);
+    vi.push(1);
+    log(&amp;vi);
+    #[derive(Debug)]
+    enum Test { Test1, Test2, };
+    log(&amp;Test::Test1);
+    log(&amp;Test::Test2);
+    let point = Point { x:1.0, y:1.5, z:2.0 };
+    log(&amp;point);
+    putline();
+    sub_title("That's all folks!");
+    putlinen(2);
 }
             </defn-code>
           </defn-block>
@@ -960,7 +972,7 @@ fn main() {
 [package]
 name = "display"
 version = "0.1.0"
-authors = ["James W. Fawcett &lt;jfawcett@twcny.rr.com&gt;"]
+authors = ["James W. Fawcett"]
 edition = "2018"
 
 [dependencies]
@@ -998,7 +1010,7 @@ test result: ok.
             <defn-head>display::lib.rs</defn-head>
             <defn-code>
 /////////////////////////////////////////////////////////////
-// display::main.rs - Demonstrate display types            //
+// display::lib.rs - Demonstrate display types             //
 //                                                         //
 // Jim Fawcett, https://JimFawcett.github.io, 14 Feb 2020  //
 /////////////////////////////////////////////////////////////
@@ -1012,96 +1024,84 @@ use std::any::Any;
 use std::any::type_name;
 use std::mem::size_of;
 
-/*---------------------------------------------------------
+/*-----------------------------------------------------------
+   Display message and value on console
+*/
+pub fn show&lt;T: Debug&gt;(msg:&amp;str, t:&amp;T) {
+    print!("\n  {}{:?}", msg, t);
+}
+/*-----------------------------------------------------------
+   show value on console
+   - expects T to implement Debug
+   - see #[define(Debug)] attributes, above 
+*/
+pub fn show_value&lt;T: Debug&gt;(value: &amp;T) {
+    print!("\n  value: {:?}", value);
+}
+/*----------------------------------------------------------- 
    show type name on console
    - expects T to implement Debug
    - see #[define(Debug)] attributes, above 
 */
-pub fn show_type&lt;T: Any + Debug&gt;(_value: &amp;T) {
+pub fn show_type&lt;T: Debug&gt;(_value: &amp;T) {
     let name = type_name::&lt;T&gt;();
     print!(
       "\n  TypeId: {}, size: {}", name, size_of::&lt;T&gt;()
     );
 }
-
-/*---------------------------------------------------------
-   log type name and value to console
+  /*-----------------------------------------------------------
+   show type name and value on console
    - expects T to implement Debug
    - see #[define(Debug)] attributes, above 
 */
-pub fn log&lt;T: Any + Debug&gt;(value: &amp;T) {
-    let value_any = value as &amp;dyn Any;
+pub fn log&lt;T: Debug&gt;(value: &amp;T) {
     let name = type_name::&lt;T&gt;();
     print!(
       "\n  TypeId: {}, size: {}", name, size_of::&lt;T&gt;()
     );
-
-    // Try to convert our value to a `String`. If successful, 
-    // we want to output the String`'s length as well as its 
-    // value. If not, it's a different type: just print it 
-    // out unadorned.
-
-    match value_any.downcast_ref::&lt;String&gt;() {
-        Some(as_string) =&gt; {
-            print!(
-              "\n  value:  String ({}): {}", 
-              as_string.len(), as_string
-            );
-        }
-        None =&gt; {
-            print!("\n  value:  {:?}", value);
-        }
-    }
-}
-
-/*---------------------------------------------------------
-   Display underlined title on console
+    print!("\n  value:  {:?}", value);
+  }
+/*-------------------------------------------------------------
+   Display underlined main title on console
 */
-pub fn title(msg: String) {
+pub fn main_title(msg: &amp;str) {
     print!("\n  {}", msg);
-    let s = std::iter::repeat('-').take(msg.len() + 2)
-            .collect::&lt;String&gt;();
+    let s = std::iter::repeat('=')
+              .take(msg.len() + 2)
+              .collect::&lt;String&gt;();
     print!("\n {}", s);
 }
+/*-------------------------------------------------------------
+   Display underlined sub title on console
+*/
+pub fn sub_title(msg: &amp;str) {
+    print!("\n  {}", msg);
+    let s = std::iter::repeat('-')
+              .take(msg.len() + 2)
+              .collect::&lt;String&gt;();
+    print!("\n {}", s);
+}
+/*-----------------------------------------------------------
+   show line with len hyphens
+*/
+pub fn separator(len:u8) {
+    let mut s = String::new();
+    for _i in 1..len+2 { s.push('-');}
+    print!("\n {}",s);
+}
+
 /*-- push a single newline to console --*/
 
 pub fn putline() {
-    println!("\n");
+    print!("\n");
 }
 /*-- pust n newlines to console --*/
 
 pub fn putlinen(n: usize) {
-    let s = std::iter::repeat('\n').take(n)
-            .collect::&lt;String&gt;();
-    println!("{}", s);
-}
-
-///////////////////////////////////////////////////////////////
-// display::main.rs tests - Demonstrate display types        //
-//                                                           //
-// Jim Fawcett, https://JimFawcett.github.io, 14 Feb 2020    //
-///////////////////////////////////////////////////////////////
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[derive(Debug)]
-    struct Point {
-        x: f64,
-        y: f64,
-        z: f64,
-    }
-    #[test]
-    /*
-       Library doesn't write to console, so all this tests is
-       no panic occurred.  See test_display for useful tests.
-    */
-    fn test_types() {
-
-        // test code elided
-
-    }
+    let s = std::iter::repeat('\n')
+              .take(n)
+              .collect::&lt;String&gt;();
+    print!("{}", s);
 }
             </defn-code>
           </defn-block>
