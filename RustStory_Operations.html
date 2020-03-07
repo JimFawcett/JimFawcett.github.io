@@ -90,14 +90,615 @@
       <num-item1>3.1</num-item1><num-item4>Functions:</num-item4>
     </num-cont>
     <t-b>
+      The syntax for Rust functions looks like this:
+    </t-b>
+    <t-b>
+      <indent-block>
+        <defn-outerBlock>
+          <defn-block>
+            <defn-head>Pass by Value</defn-head>
+            <defn-code>
+/*-----------------------------------------------
+   Pass by value moves the argument into the
+   function's stack frame, so invalid after call
+*/
+fn pass_by_value_str(s:String) {  // move
+  show_type(&s);   // def in display::lib.rs
+  show_value(&s);  // def in display::lib.rs
+}
 
+            </defn-code>
+            <defn-head class="defnBorderTop">Pass by Reference</defn-head>
+            <defn-code>
+/*-----------------------------------------------
+   Pass by ref borrows the argument. Borrow
+   moved into the function's stack frame.  
+   Borrow ends at end of function call, so 
+   param is valid after call
+*/
+fn pass_by_ref_str(rs:&String) {  // borrow
+  show_type(&rs);   // def in display::lib.rs
+  show_value(&rs);  // def in display::lib.rs
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code:</defn-head>
+            <defn-code>
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("Pass string by value");
+  let mut s = "xyz".to_string();
+  let s1 = s.clone();
+  pass_by_value_str(s1);  // moves s1
+  ////////////////////////////////////////////////
+  // next statement fails to compile - s1 moved
+  // pass_by_value(s1);
+            </defn-code>
+            <defn-head class="defnBorderTop">Using Code:</defn-head>
+            <defn-code>
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("Pass string by reference");
+  pass_by_ref_str(&s);
+  s.push('a');
+  pass_by_ref(&s);  // borrows s
+  s.push('b');
+  show("\n  after pushing a and b, s = ",&s);
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+      </indent-block>
+    </t-b>
+    <t-b>
+      They look similar to JavaScript functions with added type specifications.  However, their use is
+      more complicated due to Rust&apos;s rules for mutation and borrowing.  The rules affect:
+      <indent-block class="pad5">
+        <ol class="tight">
+          <li>
+            How you supply function arguments, e.g., the type signatures used.
+          </li>
+          <li>
+            What you are allowed to do inside a function body.
+          </li>
+          <li>
+            What signatures you use for return types.
+          </li>
+        </ol>
+      </indent-block>
+      The bad news is this can get complicated.  The good news is the Rust compiler&apos;s borrow
+      checker does a great job telling you about problems and how to fix them.
+    </t-b>
+    <t-b>
+      In the details dropdown, below, you will find simple demo examples of supplying arguments to
+      functions, returning values and references, and processing input data in function bodies.
+    </t-b>
+    <t-b>
+      There are examples of type specific functions and generic functions. Most are simple demos,
+      only valuable for the usage examples provided.  There are, however, a few functions with
+      lasting value.  One example shows how to gracefully accept either String or str instances.
+    </t-b>
+    <t-b>
+      Another provides a facility to run test functions and report their results.  This
+      &quot;Executor&quot; uses the std::panic library to simulate a try-catch block. That is,
+      if a tested function panics, the stack unwind process is intercepted and a simple
+      error message is displayed.  So, a tested function&apos;s panic is not an Executor panic.
+      It is simply an event to report.
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle lightItem">RustBasicDemos::function_probes</summary>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Demo Functions:</defn-head>
+              <defn-code>
+// function_probes
+
+#[allow(unused_imports)]
+use display::*;
+use std::fmt::Debug;
+/////////////////////////////////////////////////
+// Demo functions
+
+/*-----------------------------------------------
+   Accepts String by value
+*/
+fn show_str1(s:String) {
+  print!("{}",&amp;s);
+}
+/*-----------------------------------------------
+   Accepts String by reference
+*/
+fn show_str2(s:&amp;String) {
+  print!("{}",&amp;s);
+}
+/*-----------------------------------------------
+   Accepts str by reference
+*/
+fn show_str3(s:&amp;str) {
+  print!("{}",&amp;s);
+}
+/*-----------------------------------------------
+   Returns String
+*/
+fn return_str1() -&gt; String {
+  let s = "test string 1".to_string();
+  s  // moves s
+}
+/*-----------------------------------------------
+   Returns string reference
+   - it only makes sense to return a reference
+     to a passed in ref or a static ref
+   - compiler should prevent anything else
+*/
+fn return_str2() -&gt; &amp;'static str {
+  let s = "test string 2";
+  s
+}
+/*-----------------------------------------------
+   Returns string reference
+   - it only makes sense to return a reference
+     to a passed in ref or a static ref
+   - compiler should prevent anything else
+*/
+fn return_str3(s:&amp;mut String) -&gt; &amp;mut String {
+  s.push('Z');
+  s
+}
+/*-----------------------------------------------
+   Pass by value moves the argument into the
+   function's stack frame, so invalid after call
+*/
+fn pass_by_value_str(s:String) {  // move
+  show_type(&amp;s);
+  show_value(&amp;s);
+}
+/*-----------------------------------------------
+   Pass by ref borrows the argument into the
+   function's stack frame.  Borrow ends at end
+   of function stack frame, so param is valid 
+   after call
+*/
+fn pass_by_ref_str(rs:&amp;String) {  // borrow
+  show_type(&amp;rs);
+  show_value(&amp;rs);
+}
+/*-----------------------------------------------
+   Pass by value moves the argument into the
+   function's stack frame, so invalid after call
+*/
+fn pass_by_value&lt;T&gt;(t:T) where T:Debug {
+  show_type(&amp;t);
+  show_value(&amp;t);
+}
+/*-----------------------------------------------
+   Pass by ref borrows the argument into the
+   function's stack frame.  Borrow ends at end
+   of function stack frame, so param is valid 
+   after call
+*/
+fn pass_by_ref&lt;T&gt;(rt:&amp;T) where T:Debug {
+  show_type(&amp;rt);
+  show_value(&amp;rt);
+}
+/*-----------------------------------------------
+   Pass by ref borrows the argument into the
+   function's stack frame.  Borrow ends at end
+   of function stack frame, so param is valid 
+   after call
+*/
+fn lifetime(rs:&amp;String) -&gt; String {
+  show("\n  rs = ",rs); 
+  show_type(rs);
+  // replace doesn't attempt to mutate rs
+  let s = rs.replace("z","a");
+  show("\n  s = ",&amp;s);  
+  show_type(&amp;s);
+  shows("\n  returning string s by value (a move)");
+  // let put = |st|{ print!("{}", st); };
+  // put("\n  returning s by value"); 
+  s  // return by value moves string to destination
+}
+// /*-----------------------------------------------
+//    Pass by ref borrows the argument into the
+//    function's stack frame.  Borrow ends at end
+//    of function stack frame, so param is valid 
+//    after call. Function returns a reference!
+// */
+fn lifetime2&lt;'a, T&gt;(rt:&amp;'a T) -&gt; &amp; 'a T where T:Debug {
+  // Lifetime annotation, 'a, enables borrow checker
+  // to ensures that T lives at least as long as rt, 
+  // its reference.
+  show_type(&amp;rt);
+  show_value(&amp;rt);
+  rt  // the only time it makes sense to return
+      // a reference is when returning a possibly
+      // modified input reference
+}
+
+/////////////////////////////////////////////////
+// Useful functions
+
+/*-----------------------------------------------
+   Accepts either String or str
+*/
+fn shows&lt;S: Into&lt;String&gt;&gt;(s:S) {
+  print!("{}",s.into());
+}
+/*---------------------------------------------------------
+   Higher order function
+*/
+use std::panic;  // catch_unwind panic
+
+fn tester(f:fn() -&gt; bool, name:&amp;str) -&gt; bool {
+  let rslt = panic::catch_unwind(|| { f() });  
+  // line above simulates try-catch
+  match rslt {
+    Ok(true) =&gt; print!("\n  {} passed", name),
+    Ok(false) =&gt; 
+      { print!("\n  {} failed", name); return false; },
+    Err(_) =&gt; 
+      { print!("\n  {} paniced", name); return false; }
+  }
+  return true;
+}
+
+/* hide panic notification */
+fn set_my_hook() {
+  panic::set_hook(Box::new(|_|{ print!(" ");}));
+}
+
+fn always_fails() -&gt; bool {
+  false
+}
+
+fn always_succeeds() -&gt; bool {
+  true
+}
+
+#[allow(unreachable_code)]
+fn always_panics() -&gt; bool {
+  panic!("always panics");
+  return false;
+}
+
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Using Code:</defn-head>
+              <defn-code>
+fn main() {
+    
+  main_title("demo Rust functions");
+   
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("show_str1(s:String)");  // a move
+  show_str1("\n  first test".to_string());
+
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("show_str2(s:&amp;String)");  // a borrow
+  show_str2(&amp;"\n  second test".to_string());
+
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("show_str3(s:&amp;str)");  // a borrow
+  show_str3("\n  third test");
+
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("return_str1() -&gt; String");
+  let mut s = return_str1();
+  s.push_str(" with more stuff");
+  let mut s1 = "\n  ".to_string();
+  s1.push_str(&amp;s);
+  shows(s1);
+  
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("return_str2() -&gt; &amp;'static str");
+  let s = return_str2();
+  let mut st = s.to_string();
+  st.push_str(" with more stuff");
+  let mut s1 = "\n  ".to_string();
+  s1.push_str(&amp;st);
+  shows(s1);
+  
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("return_str3(mut s:&amp;mut String) -&gt; &amp;mut String");
+  let mut s = String::from("test string 4");
+  let rs = return_str3(&amp;mut s);
+  rs.push_str(" with more stuff");
+  let mut s1 = "\n  ".to_string();
+  s1.push_str(&amp;rs);
+  shows(s1);
+  
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("Pass string by value");
+  let mut s = "xyz".to_string();
+  let s1 = s.clone();
+  pass_by_value_str(s1);  // moves s1
+  ////////////////////////////////////////////////
+  // next statement fails to compile - s1 moved
+  // pass_by_value(s1);
+
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("Pass string by reference");
+  pass_by_ref_str(&amp;s);
+  s.push('a');
+  pass_by_ref(&amp;s);  // borrows s
+  s.push('b');
+  show("\n  after pushing a and b, s = ",&amp;s);
+
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("Pass by value");
+  let mut s = "xyz".to_string();
+  let s1 = s.clone();
+  pass_by_value(s1);
+  ////////////////////////////////////////////////
+  // next statement fails to compile - s1 moved
+  // pass_by_value(s1);
+
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("Pass by reference");
+  pass_by_ref(&amp;s);
+  s.push('a');
+  pass_by_ref(&amp;s);
+
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("lifetime");
+  let mut s = "xyz".to_string();
+  show("\n  s = ",&amp;s);
+  shows("\n  calling lifetime");
+  separator(30);
+  let r = &amp;mut lifetime(&amp;mut s);
+  separator(30);
+  shows("\n  returned from lifetime");
+  show("\n  s = ",&amp;s);
+  show("\n  r = ",&amp;r);
+  show_type(&amp;r);
+  r.push('b');
+  show("\n  after pushing b, r = ",&amp;r);
+  s.push('b');
+  show("\n  after pushing b, s = ",&amp;s);
+
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("lifetime2");
+  let mut s = "xyz".to_string();
+  show("\n  s = ",&amp;s);
+  let r = &amp;mut lifetime2(&amp;mut s);
+  show_type(&amp;r);
+  show("\n  r = ",&amp;r);
+
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("Function pointer");
+  let fun = pass_by_ref;
+  let mut s = "xyz".to_string();
+  fun(&amp;s);
+  s.push('a');
+  fun(&amp;s);
+
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("lambdas");
+  let l = |s:&amp;str|{ show_type(&amp;s); show_value(&amp;s); };
+  l("xyz");
+  let s = String::from("abc");
+  l(&amp;s);
+
+  /*-------------------------------------------*/
+  separator(48);
+  sub_title("higher_order_function");
+  set_my_hook();
+
+  let rstl = tester(always_fails, "always_fails");
+  print!("\t\tresult = {}", rstl);
+  let rstl = tester(always_succeeds, "always_passes");
+  print!("\t\tresult = {}", rstl);
+  let rstl = tester(always_panics, "always_panics");
+  print!("\t\tresult = {}\n", rstl);
+
+  /* show that we intercepted panic and continued */
+  use std::io::{Write};
+  let one_second = std::time::Duration::from_millis(1000);
+  for i in 0..5 { 
+    print!("\n  tick {}\t", 5 - i); 
+    std::io::stdout().flush().unwrap();
+    std::thread::sleep(one_second);
+  };
+  print!("\n\n  BOOM!\t");
+  putlinen(2);
+}
+              </defn-code>
+              <defn-head class="defnBorderTop">Output:</defn-head>
+              <defn-code>
+  demo param passing
+ ====================
+ -------------------------------------------------
+  show_str1(s:String)
+ ---------------------
+  first test
+ -------------------------------------------------
+  show_str2(s:&String)
+ ----------------------
+  second test
+ -------------------------------------------------
+  show_str3(s:&str)
+ -------------------
+  third test
+ -------------------------------------------------
+  return_str1() -> String
+ -------------------------
+  test string 1 with more stuff
+ -------------------------------------------------
+  return_str2() -> &'static str
+ -------------------------------
+  test string 2 with more stuff
+ -------------------------------------------------
+  return_str3(mut s:&mut String) -> &mut String   
+ -----------------------------------------------  
+  test string 4Z with more stuff
+ -------------------------------------------------
+  Pass string by value
+ ----------------------
+  TypeId: alloc::string::String, size: 12
+  value: "xyz"
+ -------------------------------------------------
+  Pass string by reference
+ --------------------------
+  TypeId: &alloc::string::String, size: 4
+  value: "xyz"
+  TypeId: &alloc::string::String, size: 4
+  value: "xyza"
+  after pushing a and b, s = "xyzab"
+ -------------------------------------------------
+  Pass by value
+ ---------------
+  TypeId: alloc::string::String, size: 12
+  value: "xyz"
+ -------------------------------------------------
+  Pass by reference
+ -------------------
+  TypeId: &alloc::string::String, size: 4
+  value: "xyz"
+  TypeId: &alloc::string::String, size: 4
+  value: "xyza"
+ -------------------------------------------------
+  lifetime
+ ----------
+  s = "xyz"
+  calling lifetime
+ -------------------------------
+  rs = "xyz"
+  TypeId: alloc::string::String, size: 12
+  s = "xya"
+  TypeId: alloc::string::String, size: 12
+  returning string s by value (a move)
+ -------------------------------
+  returned from lifetime
+  s = "xyz"
+  r = "xya"
+  TypeId: &mut alloc::string::String, size: 4
+  after pushing b, r = "xyab"
+  after pushing b, s = "xyzb"
+ -------------------------------------------------
+  lifetime2
+ -----------
+  s = "xyz"
+  TypeId: &alloc::string::String, size: 4
+  value: "xyz"
+  TypeId: &mut &alloc::string::String, size: 4
+  r = "xyz"
+ -------------------------------------------------
+  Function pointer
+ ------------------
+  TypeId: &alloc::string::String, size: 4
+  value: "xyz"
+  TypeId: &alloc::string::String, size: 4
+  value: "xyza"
+ -------------------------------------------------
+  lambdas
+ ---------
+  TypeId: &str, size: 8
+  value: "xyz"
+  TypeId: &str, size: 8
+  value: "abc"
+ -------------------------------------------------
+  higher_order_function
+ -----------------------
+  always_fails failed           result = false
+  always_passes passed          result = true
+  always_panics paniced         result = false
+
+  tick 5
+  tick 4
+  tick 3
+  tick 2
+  tick 1
+
+  BOOM!
+
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </div>
+    </t-b>
+    <t-b class="mbz">
+      Idiomatic Rust seems to often use functions in places where a C++ developer would be likely
+      to use a class method.  Rust does support methods bound to structs, which we will explore
+      below.
     </t-b>
 
     <a id="funptr"></a>
+    <s-halfEm></s-halfEm>
+    <num-cont>
+      <num-item1>3.1.1</num-item1><num-item4>Function Pointers:</num-item4>
+    </num-cont>
+    <t-b>
+      Function pointers are simply names of functions.  We can use them without using unsafe blocks.
+      In the example, below, fun is a function pointer that invokes pass_by_ref.
+    </t-b>
+    <t-b>
+      <defn-block class="indent">
+        <defn-head>Function Pointer Example</defn-head>
+        <defn-code>
+/*-----------------------------------------------
+   Pass by ref borrows the argument by placing
+   reference to instance in caller&apos;s scope in
+   function's stack frame.  Borrow ends at end
+   of function stack frame, so param is valid 
+   after call
+*/
+fn pass_by_ref&lt;T&gt;(rt:&amp;T) where T:Debug {
+  show_type(&amp;rt);
+  show_value(&amp;rt);
+}
+
+let fun = pass_by_ref;  // define funptr
+let mut s = "xyz".to_string();
+fun(&amp;s);
+s.push('a');
+fun(&amp;s);
+
+        </defn-code>
+      </defn-block>
+    </t-b>
+    <t-b style="margin-bottom:0px;">
+      We use function pointers as aliases that provide domain specific names for library functions
+      or provide short names for longer generic function names.
+    </t-b>
+
+    <a id="funerr"></a>
+    <s-halfEm></s-halfEm>
+    <num-cont>
+      <num-item1>3.1.2</num-item1><num-item4>Function Error Handling:</num-item4>
+    </num-cont>
+    <t-b></t-b>
+
+    <a id="iters"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>3.2</num-item1><num-item4>Function Pointers:</num-item4>
+      <num-item1>3.2</num-item1><num-item4>Iterators:</num-item4>
     </num-cont>
+    <t-b></t-b>
+
+    <a id="iterops"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>3.2</num-item1><num-item4>Operations with Iterators:</num-item4>
+    </num-cont>
+    <t-b></t-b>
 
     <a id="methods"></a>
     <hr class="spread" />
@@ -122,6 +723,73 @@
     <num-cont>
       <num-item1>3.6</num-item1><num-item4>References:</num-item4>
     </num-cont>
+    
+        <table style="width:calc(100vw - 12rem);">
+      <tr>
+        <th class="darkItem">Reference Link</th>
+        <th class="darkItem">Description</th>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://hermanradtke.com/2015/05/06/creating-a-rust-function-that-accepts-string-or-str.html">
+            Functions that accept both String and str
+          </a>
+        </td>
+        <td class="lightItem">
+          Creating a Rust function that accepts String or &str - Herman Radtke
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://hermanradtke.com/2015/05/29/creating-a-rust-function-that-returns-string-or-str.html">
+            Functions that return either String or str
+          </a>
+        </td>
+        <td class="lightItem">
+          Creating a Rust function that returns a &str or String - Herman Radtke
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://hermanradtke.com/2015/01/14/getters-functions-in-rust.html">
+            Avoiding borrow problems with Getter functions
+          </a>
+        </td>
+        <td class="lightItem">
+          Getter Functions In Rust - Herman Radtke
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://hermanradtke.com/2016/09/12/rust-using-and_then-and-map-combinators-on-result-type.html">
+            and_then,&nbsp;map&nbsp;combinators
+          </a>
+        </td>
+        <td class="lightItem">
+          Using option and result effectively - Herman Radtke
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://hermanradtke.com/2015/06/22/effectively-using-iterators-in-rust.html">
+            Iter, IntoIter, Map/Reduce
+          </a>
+        </td>
+        <td class="lightItem">
+          Effectively Using Iterators in Rust - Herman Radtke
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://hermanradtke.com/2015/06/09/strategies-for-solving-cannot-move-out-of-borrowing-errors-in-rust.html">
+            Ending borrow
+          </a>
+        </td>
+        <td class="lightItem">
+          Strategies for solving 'cannot move out of' borrowing errors in Rust - Herman Radtke
+        </td>
+      </tr>
+    </table>
 
   </bb-55>
   <spacer-25></spacer-25>
