@@ -51,7 +51,7 @@
   <header>
     <hgroup id="pagetitle">
       <h1 id="title">Chapter 1. - Rust Models</h1>
-      <h3 id="subtitle">Code Structure, Builds, Ownership, User-Defined Types and Traits</h3>
+      <h3 id="subtitle">Code Structure, Builds, Ownership, User-Defined Types and Traits, Generics</h3>
     </hgroup>
   </header>
 
@@ -67,12 +67,14 @@
        <a href="RustStory_Data.html">Data</a><br />
        <a href="RustStory_Operations.html">Operations</a><br />
        <a href="RustStory_Structures.html">Structs</a><br />
+       <a href="RustStory_Libraries.html">Libraries</a><br />
        <a href="RustStory_References.html">References</a><br />
      </up-b>
      <rt-b id="sects">
        <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#structure">Structure</a>, 
        <a href="#build">Build</a>, <a href="#ownership">Ownership</a>, <a href="#types">Types</a>, 
-       <a href="#user-defined">User-defined Types</a>, <a href="#refs">References</a>
+       <a href="#user-defined">User-defined Types</a>, <a href="#generics">Generics</a>, 
+       <a href="#refs">References</a>
      </rt-b>
    </toc-b>
 
@@ -835,7 +837,7 @@ cargo -q run
             Displays type and size of input, followed by its value.
           </li>
           <li>
-            <n-s>title(msg: String)</n-s> - 
+            <n-s>main_title(msg: String)</n-s> and <n-s>sub_title(msg: String</n-s> - 
             Displays msg followed by an underline.
           </li>
           <li>
@@ -843,6 +845,9 @@ cargo -q run
           </li>
           <li>
             <n-s>putlinen(n: usize)</n-s> - Emits n newlines.
+          </li>
+          <li>
+            ...
           </li>
         </ol>
       </indent-block>
@@ -1487,10 +1492,216 @@ pub fn run() {
       Types and Traits are what make Rust unique and interesting.  We will see more details for each
       of these in the coming chapters.
     </t-b>
+
+    <a id="generics"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>1.5</num-item1><num-item4>Generics:</num-item4>
+    </num-cont>
+    <t-b>
+      Rust supports generics for functions and structs:
+    </t-b>
+    <t-b>
+      <div>
+        <defn-outerBlock>
+          <defn-block>
+            <defn-head>Generic Function:</defn-head>
+            <defn-code>
+fn demo_ref&lt;T&gt;(t:&amp;T) where T:Debug  {
+  show_type(t);
+  show_value(t);
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Generic Struct:</defn-head>
+            <defn-code>
+#[derive(Debug)]
+struct Point&lt;T&gt; { x:T, y:T, z:T, }
+
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+      </div>
+    </t-b>
+    <t-b>
+      Rust generics are similar to C# and Java Generics.  They don&apos;t support specialization to
+      broaded the number of types accepted, like C++.  They do define constraints to narrow the number
+      of types that compile, like C# and Java. In the function example, above, we&apos;ve used a constraint
+      to allow only those types with a Debug trait to compile.
+    </t-b>
+    <t-b>
+      In the details dropdown, below, we&apos;ve added a another example for both functions and structs, and
+      shown using code and output as well.
+    </t-b>
+    <t-b>
+      <indent-blocks>
+        <details>
+          <summary class="labelStyle darkItem">Generics Examples:</summary>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Generic Functions</defn-head>
+              <defn-code>
+/*-----------------------------------------
+No-copy arguments will be moved
+*/
+fn demo&lt;T:Debug&gt;(t:T) {
+  show_type(&amp;t);
+  show_value(&amp;t);
+}
+
+/*-----------------------------------------
+refs so arguments will not be moved
+*/
+fn demo_ref&lt;T&gt;(t:&amp;T) where T:Debug  {
+  show_type(t);
+  show_value(t);
+}
+
+</defn-code>
+<defn-head class="defnBorderTop">Using Code:</defn-head>
+<defn-code>
+let mut s = String::from("this is a test");
+
+sub_title("demo_ref");
+demo_ref(&amp;s);
+let pi = 3.1415927;
+demo_ref(&amp;pi);
+s.push('Z');
+putline();
+
+sub_title("demo");
+demo(s);
+demo(pi);
+// statement below won't compile - s moved
+// s.push('Z');
+putline();
+
+</defn-code>
+<defn-head class="defnBorderTop">Output:</defn-head>
+<defn-code>
+ demo_ref
+----------
+TypeId: alloc::string::String, size: 12
+value: "this is a test"
+TypeId: f64, size: 8
+value: 3.1415927
+
+demo
+------
+TypeId: alloc::string::String, size: 12
+value: "this is a testZ"
+TypeId: f64, size: 8
+value: 3.1415927
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Generic Structs</defn-head>
+              <defn-code>
+#[derive(Debug)]
+struct Point&lt;T&gt; { x:T, y:T, z:T, }
+
+// Copy trait works because blittable, provided
+// that T is blittable
+#[derive(Debug, Copy, Clone)]
+struct BetterPoint&lt;T&gt; { x:T, y:T, z:T, }
+
+              </defn-code>
+              <defn-head class="defnBorderTop">Using Code:</defn-head>
+              <defn-code>
+sub_title("demo_ref and demo with struct");
+let mut pt = Point { x:1.0, y:-1.5, z:2.3 };
+demo_ref(&amp;pt);
+pt.x = 3.2;
+demo(pt);
+// statement below won't compile - pt moved for demo
+// pt.x = 3.2;
+putline();
+
+sub_title("demo_ref and demo with copy-able struct");
+let mut bpt = BetterPoint { x:1.0, y:-1.5, z:2.3 };
+demo_ref(&amp;bpt);
+bpt.x = 3.2;
+demo(bpt);
+// statement ok - pt copied for demo
+bpt.x = 3.2;
+putline();
+
+sub_title("demo_ref and demo with copy-able struct");
+let mut bpt = BetterPoint { x:"one", y:"two", z:"three" };
+demo_ref(&amp;bpt);
+bpt.x = "1";
+demo(bpt);
+// statement ok - pt copied for demo
+bpt.x = "one";
+putline();
+
+sub_title("demo_ref and demo with non copy-able struct");
+let mut bpt = BetterPoint {
+  x:"one".to_string(),
+  y:"two".to_string(),
+  z:"three".to_string()
+};
+demo_ref(&amp;bpt);
+bpt.x = "four".to_string();
+demo(bpt);
+// statement won't compile - pt not blittable
+// bpt.x = "one".to_string();
+
+putlinen(2);
+              </defn-code>
+              <defn-head class="defnBorderTop">Output:</defn-head>
+              <defn-code>
+ demo_ref and demo with struct
+-------------------------------
+TypeId: generics_probes::Point<f64>
+, size: 24
+value: Point { x: 1.0, y: -1.5, z: 2.3 }
+TypeId: generics_probes::Point<f64>
+, size: 24
+value: Point { x: 3.2, y: -1.5, z: 2.3 }
+
+ demo_ref and demo with copy-able struct
+-----------------------------------------
+TypeId: generics_probes::BetterPoint<f64>
+, size: 24
+value: BetterPoint { x: 1.0, y: -1.5, z: 2.3 }
+TypeId: generics_probes::BetterPoint<f64>
+, size: 24
+value: BetterPoint { x: 3.2, y: -1.5, z: 2.3 }
+
+ demo_ref and demo with copy-able struct
+-----------------------------------------
+TypeId: generics_probes::BetterPoint<&str>
+, size: 24
+value: BetterPoint { x: "one", y: "two", z: "three" }
+TypeId: generics_probes::BetterPoint<&str>
+, size: 24
+value: BetterPoint { x: "1", y: "two", z: "three" }
+
+ demo_ref and demo with non copy-able struct
+---------------------------------------------
+TypeId: generics_probes::BetterPoint<alloc::string::String>
+, size: 36
+value: BetterPoint { x: "one", y: "two", z: "three" }
+TypeId: generics_probes::BetterPoint<alloc::string::String>
+  , size: 36
+value: BetterPoint { x: "four", y: "two", z: "three" }
+
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </indent-blocks>
+    </t-b>
+    <t-b>
+      This chapter has focused on the main features and models of Rust.  You will find more details in
+      succeeding chapters.
+    </t-b>
     <a id="refs"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>1.4</num-item1><num-item4>References:</num-item4>
+      <num-item1>1.6</num-item1><num-item4>References:</num-item4>
     </num-cont>
     <table style="width:calc(100vw - 12rem);">
       <tr>
@@ -1579,6 +1790,26 @@ pub fn run() {
         <td class="lightItem">
           Tutorials for most of the Rust parts with code examples.
         </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://deterministic.space/">Blog - Pascal's Scribbles</a>
+        </td>
+        <td class="lightItem">
+          Pascal Hertleif - Rust contributor
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://deterministic.space/">Blog - Deterministic Space</a>
+        </td>
+        <td class="lightItem">
+          Michael Gattozzi - Rust contributor
+        </td>
+      </tr>
+      <tr>
+        <td class="darkItem" style="line-height:0.5em;">&nbsp;</td>
+        <td class="darkItem" style="line-height:0.5em;">&nbsp;</td>
       </tr>
       <!--<tr>
         <td class="lightItem">
