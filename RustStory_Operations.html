@@ -198,7 +198,10 @@ fn pass_by_ref_str(rs:&String) {  // borrow
           <tr>
             <td class="lightItem defn-code">
 /*-----------------------------------------------
-   Accepts String by value
+   Accepts String by value, moves argument s
+   - s invalid after invocation
+   - could use s.clone() as argument to
+     avoid invalidating s
 */
 fn show_str1(s:String) {  // move
   print!("{}",&amp;s);
@@ -215,7 +218,8 @@ first test
           <tr>
             <td class="lightItem defn-code">
 /*-----------------------------------------------
-   Accepts String by reference
+   Accepts String by reference, borrows argument s
+   - won&apos;t accept string literal
 */
 fn show_str2(s:&amp;String) {  // borrow
   print!("{}",&amp;s);
@@ -233,6 +237,8 @@ fn show_str2(s:&amp;String) {  // borrow
             <td class="lightItem defn-code">
 /*-----------------------------------------------
    Accepts str by reference
+   - won&apos;t accept String instance st
+   - will accept &st
 */
 fn show_str3(s:&amp;str) {  // borrow
   print!("{}",&amp;s);
@@ -249,7 +255,8 @@ fn show_str3(s:&amp;str) {  // borrow
           <tr>
             <td class="lightItem defn-code">
 /*-----------------------------------------------
-   Returns String
+   Returns String, moves internally created String
+   to caller&apos;s scope
 */
 fn return_str1() -&gt; String {
   let s = "test string 1".to_string();
@@ -271,7 +278,7 @@ fn return_str1() -&gt; String {
           <tr>
             <td class="lightItem defn-code">
 /*-----------------------------------------------
-   Returns string reference
+   Returns str reference
    - it only makes sense to return a reference
      to a passed in ref or a static ref
    - compiler should prevent anything else
@@ -297,7 +304,7 @@ fn return_str2() -&gt; &amp;'static str {
           <tr>
             <td class="lightItem defn-code">
 /*-----------------------------------------------
-   Returns string reference
+   Returns String reference
    - it only makes sense to return a reference
      to a passed in ref or a static ref
    - compiler should prevent anything else
@@ -327,8 +334,8 @@ fn return_str3(s:&amp;mut String) -&gt; &amp;mut String {
    function's stack frame, so invalid after call
 */
 fn pass_by_value_str(s:String) {  // move
-  show_type(&amp;s);
-  show_value(&amp;s);
+  show_type(&amp;s);   // defined in display lib
+  show_value(&amp;s);  // defined in display lib
 }
             </td>
             <td class="lightItem defn-code">
@@ -354,8 +361,8 @@ fn pass_by_value_str(s:String) {  // move
    after call
 */
 fn pass_by_ref_str(rs:&amp;String) {  // borrow
-  show_type(&amp;rs);
-  show_value(&amp;rs);
+  show_type(&amp;rs);   // defined in display lib
+  show_value(&amp;rs);  // defined in display lib
 }
             </td>
             <td class="lightItem defn-code">
@@ -377,7 +384,7 @@ fn pass_by_ref_str(rs:&amp;String) {  // borrow
           <tr>
             <td class="lightItem defn-code">
 /*-----------------------------------------------
-   Pass by value moves the argument into the
+   Generic pass by value moves argument into the
    function's stack frame, so invalid after call
 */
 fn pass_by_value&lt;T&gt;(t:T) where T:Debug {
@@ -402,7 +409,7 @@ fn pass_by_value&lt;T&gt;(t:T) where T:Debug {
           <tr>
             <td class="lightItem defn-code">
 /*-----------------------------------------------
-   Pass by ref borrows the argument into the
+   Generic pass by ref borrows argument into the
    function's stack frame.  Borrow ends at end
    of function stack frame, so param is valid 
    after call
@@ -428,10 +435,9 @@ fn pass_by_ref&lt;T&gt;(rt:&amp;T) where T:Debug {
           <tr>
             <td class="lightItem defn-code">
 /*-----------------------------------------------
-   Pass by ref borrows the argument into the
-   function's stack frame.  Borrow ends at end
-   of function stack frame, so param is valid 
-   after call
+   
+   Illustrates lifetime 
+   - type specific so no annotation needed
 */
 fn lifetime(rs:&amp;String) -&gt; String {
   show("\n  rs = ",rs); 
@@ -441,8 +447,6 @@ fn lifetime(rs:&amp;String) -&gt; String {
   show("\n  s = ",&amp;s);  
   show_type(&amp;s);
   shows("\n  returning string s by value (a move)");
-  // let put = |st|{ print!("{}", st); };
-  // put("\n  returning s by value"); 
   s  // return by value moves string to destination
 }
             </td>
@@ -484,10 +488,9 @@ fn lifetime(rs:&amp;String) -&gt; String {
           <tr>
             <td class="lightItem defn-code">
 /*-----------------------------------------------
-   Pass by ref borrows the argument into the
-   function's stack frame.  Borrow ends at end
-   of function stack frame, so param is valid 
-   after call. Function returns a reference!
+   Illustrates lifetime for generic.
+   - Borrow checker needs help to analyze lifetime
+     of T
 */
 fn lifetime2&lt;'a, T&gt;(rt:&amp;'a T) -&gt; &amp; 'a T where T:Debug {
   // Lifetime annotation, 'a, enables borrow checker
@@ -516,6 +519,11 @@ fn lifetime2&lt;'a, T&gt;(rt:&amp;'a T) -&gt; &amp; 'a T where T:Debug {
   TypeId: &mut &alloc::string::String, size: 4
   r = "xyz"
             </td>
+          </tr>
+          <tr>
+            <th class="darkItem">Useful functions</th>
+            <th class="darkItem"></th>
+            <th class="darkItem"></th>
           </tr>
           <tr>
             <td class="lightItem defn-code">
@@ -559,6 +567,11 @@ fn shows&lt;S: Into&lt;String&gt;&gt;(s:S) {
           <tr>
             <td class="lightItem defn-code">
   lambda defined in using code
+
+  // Illustrates both lambda and fun ptr
+  let put = |st|{ print!("{}", st); };
+  put("\n  returning s by value"); 
+
             </td>
             <td class="lightItem defn-code">
   sub_title("lambdas");
@@ -583,12 +596,14 @@ fn shows&lt;S: Into&lt;String&gt;&gt;(s:S) {
             <td class="lightItem defn-code">
 /*-----------------------------------------------
    Higher order function
+   - tester accepts test functions and executes them
+   - traps test function panic and continues
 */
 use std::panic;  // catch_unwind panic
 
 fn tester(f:fn() -&gt; bool, name:&amp;str) -&gt; bool {
   let rslt = panic::catch_unwind(|| { f() });  
-  // line above simulates try-catch
+  // line above simulates execution in try-catch
   match rslt {
     Ok(true) =&gt; print!("\n  {} passed", name),
     Ok(false) =&gt; 
@@ -602,6 +617,8 @@ fn tester(f:fn() -&gt; bool, name:&amp;str) -&gt; bool {
 /* hide panic notification */
 fn set_my_hook() {
   panic::set_hook(Box::new(|_|{ print!(" ");}));
+  // Box needed to give lambda lifetime beyond 
+  // this call, e.g., stores in heap
 }
 
 fn always_fails() -&gt; bool {
@@ -667,455 +684,6 @@ fn always_panics() -&gt; bool {
       </div>
       </details>
     </t-b>
-    <!--<t-b>
-      <div>
-        <details>
-          <summary class="labelStyle darkItem">RustBasicDemos::function_probes</summary>
-          <defn-outerBlock>
-            <defn-block>
-              <defn-head>Demo Functions:</defn-head>
-              <defn-code>
-// function_probes
-
-#[allow(unused_imports)]
-use display::*;
-use std::fmt::Debug;
-/////////////////////////////////////////////////
-// Demo functions
-
-/*-----------------------------------------------
-   Accepts String by value
-*/
-fn show_str1(s:String) {
-  print!("{}",&amp;s);
-}
-/*-----------------------------------------------
-   Accepts String by reference
-*/
-fn show_str2(s:&amp;String) {
-  print!("{}",&amp;s);
-}
-/*-----------------------------------------------
-   Accepts str by reference
-*/
-fn show_str3(s:&amp;str) {
-  print!("{}",&amp;s);
-}
-/*-----------------------------------------------
-   Returns String
-*/
-fn return_str1() -&gt; String {
-  let s = "test string 1".to_string();
-  s  // moves s
-}
-/*-----------------------------------------------
-   Returns string reference
-   - it only makes sense to return a reference
-     to a passed in ref or a static ref
-   - compiler should prevent anything else
-*/
-fn return_str2() -&gt; &amp;'static str {
-  let s = "test string 2";
-  s
-}
-/*-----------------------------------------------
-   Returns string reference
-   - it only makes sense to return a reference
-     to a passed in ref or a static ref
-   - compiler should prevent anything else
-*/
-fn return_str3(s:&amp;mut String) -&gt; &amp;mut String {
-  s.push('Z');
-  s
-}
-/*-----------------------------------------------
-   Pass by value moves the argument into the
-   function's stack frame, so invalid after call
-*/
-fn pass_by_value_str(s:String) {  // move
-  show_type(&amp;s);
-  show_value(&amp;s);
-}
-/*-----------------------------------------------
-   Pass by ref borrows the argument into the
-   function's stack frame.  Borrow ends at end
-   of function stack frame, so param is valid 
-   after call
-*/
-fn pass_by_ref_str(rs:&amp;String) {  // borrow
-  show_type(&amp;rs);
-  show_value(&amp;rs);
-}
-/*-----------------------------------------------
-   Pass by value moves the argument into the
-   function's stack frame, so invalid after call
-*/
-fn pass_by_value&lt;T&gt;(t:T) where T:Debug {
-  show_type(&amp;t);
-  show_value(&amp;t);
-}
-/*-----------------------------------------------
-   Pass by ref borrows the argument into the
-   function's stack frame.  Borrow ends at end
-   of function stack frame, so param is valid 
-   after call
-*/
-fn pass_by_ref&lt;T&gt;(rt:&amp;T) where T:Debug {
-  show_type(&amp;rt);
-  show_value(&amp;rt);
-}
-/*-----------------------------------------------
-   Pass by ref borrows the argument into the
-   function's stack frame.  Borrow ends at end
-   of function stack frame, so param is valid 
-   after call
-*/
-fn lifetime(rs:&amp;String) -&gt; String {
-  show("\n  rs = ",rs); 
-  show_type(rs);
-  // replace doesn't attempt to mutate rs
-  let s = rs.replace("z","a");
-  show("\n  s = ",&amp;s);  
-  show_type(&amp;s);
-  shows("\n  returning string s by value (a move)");
-  // let put = |st|{ print!("{}", st); };
-  // put("\n  returning s by value"); 
-  s  // return by value moves string to destination
-}
-// /*-----------------------------------------------
-//    Pass by ref borrows the argument into the
-//    function's stack frame.  Borrow ends at end
-//    of function stack frame, so param is valid 
-//    after call. Function returns a reference!
-// */
-fn lifetime2&lt;'a, T&gt;(rt:&amp;'a T) -&gt; &amp; 'a T where T:Debug {
-  // Lifetime annotation, 'a, enables borrow checker
-  // to ensures that T lives at least as long as rt, 
-  // its reference.
-  show_type(&amp;rt);
-  show_value(&amp;rt);
-  rt  // the only time it makes sense to return
-      // a reference is when returning a possibly
-      // modified input reference
-}
-
-/////////////////////////////////////////////////
-// Useful functions
-
-/*-----------------------------------------------
-   Accepts either String or str
-*/
-fn shows&lt;S: Into&lt;String&gt;&gt;(s:S) {
-  print!("{}",s.into());
-}
-/*---------------------------------------------------------
-   Higher order function
-*/
-use std::panic;  // catch_unwind panic
-
-fn tester(f:fn() -&gt; bool, name:&amp;str) -&gt; bool {
-  let rslt = panic::catch_unwind(|| { f() });  
-  // line above simulates try-catch
-  match rslt {
-    Ok(true) =&gt; print!("\n  {} passed", name),
-    Ok(false) =&gt; 
-      { print!("\n  {} failed", name); return false; },
-    Err(_) =&gt; 
-      { print!("\n  {} paniced", name); return false; }
-  }
-  return true;
-}
-
-/* hide panic notification */
-fn set_my_hook() {
-  panic::set_hook(Box::new(|_|{ print!(" ");}));
-}
-
-fn always_fails() -&gt; bool {
-  false
-}
-
-fn always_succeeds() -&gt; bool {
-  true
-}
-
-#[allow(unreachable_code)]
-fn always_panics() -&gt; bool {
-  panic!("always panics");
-  return false;
-}
-
-              </defn-code>
-            </defn-block>
-            <defn-block>
-              <defn-head>Using Code:</defn-head>
-              <defn-code>
-fn main() {
-    
-  main_title("demo Rust functions");
-   
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("show_str1(s:String)");  // a move
-  show_str1("\n  first test".to_string());
-
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("show_str2(s:&amp;String)");  // a borrow
-  show_str2(&amp;"\n  second test".to_string());
-
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("show_str3(s:&amp;str)");  // a borrow
-  show_str3("\n  third test");
-
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("return_str1() -&gt; String");
-  let mut s = return_str1();
-  s.push_str(" with more stuff");
-  let mut s1 = "\n  ".to_string();
-  s1.push_str(&amp;s);
-  shows(s1);
-  
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("return_str2() -&gt; &amp;'static str");
-  let s = return_str2();
-  let mut st = s.to_string();
-  st.push_str(" with more stuff");
-  let mut s1 = "\n  ".to_string();
-  s1.push_str(&amp;st);
-  shows(s1);
-  
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("return_str3(mut s:&amp;mut String) -&gt; &amp;mut String");
-  let mut s = String::from("test string 4");
-  let rs = return_str3(&amp;mut s);
-  rs.push_str(" with more stuff");
-  let mut s1 = "\n  ".to_string();
-  s1.push_str(&amp;rs);
-  shows(s1);
-  
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("Pass string by value");
-  let mut s = "xyz".to_string();
-  let s1 = s.clone();
-  pass_by_value_str(s1);  // moves s1
-  ////////////////////////////////////////////////
-  // next statement fails to compile - s1 moved
-  // pass_by_value(s1);
-
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("Pass string by reference");
-  pass_by_ref_str(&amp;s);
-  s.push('a');
-  pass_by_ref(&amp;s);  // borrows s
-  s.push('b');
-  show("\n  after pushing a and b, s = ",&amp;s);
-
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("Pass by value");
-  let mut s = "xyz".to_string();
-  let s1 = s.clone();
-  pass_by_value(s1);
-  ////////////////////////////////////////////////
-  // next statement fails to compile - s1 moved
-  // pass_by_value(s1);
-
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("Pass by reference");
-  pass_by_ref(&amp;s);
-  s.push('a');
-  pass_by_ref(&amp;s);
-
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("lifetime");
-  let mut s = "xyz".to_string();
-  show("\n  s = ",&amp;s);
-  shows("\n  calling lifetime");
-  separator(30);
-  let r = &amp;mut lifetime(&amp;mut s);
-  separator(30);
-  shows("\n  returned from lifetime");
-  show("\n  s = ",&amp;s);
-  show("\n  r = ",&amp;r);
-  show_type(&amp;r);
-  r.push('b');
-  show("\n  after pushing b, r = ",&amp;r);
-  s.push('b');
-  show("\n  after pushing b, s = ",&amp;s);
-
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("lifetime2");
-  let mut s = "xyz".to_string();
-  show("\n  s = ",&amp;s);
-  let r = &amp;mut lifetime2(&amp;mut s);
-  show_type(&amp;r);
-  show("\n  r = ",&amp;r);
-
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("Function pointer");
-  let fun = pass_by_ref;
-  let mut s = "xyz".to_string();
-  fun(&amp;s);
-  s.push('a');
-  fun(&amp;s);
-
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("lambdas");
-  let l = |s:&amp;str|{ show_type(&amp;s); show_value(&amp;s); };
-  l("xyz");
-  let s = String::from("abc");
-  l(&amp;s);
-
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("higher_order_function");
-  set_my_hook();
-
-  let rstl = tester(always_fails, "always_fails");
-  print!("\t\tresult = {}", rstl);
-  let rstl = tester(always_succeeds, "always_passes");
-  print!("\t\tresult = {}", rstl);
-  let rstl = tester(always_panics, "always_panics");
-  print!("\t\tresult = {}\n", rstl);
-
-  /* show that we intercepted panic and continued */
-  use std::io::{Write};
-  let one_second = std::time::Duration::from_millis(1000);
-  for i in 0..5 { 
-    print!("\n  tick {}\t", 5 - i); 
-    std::io::stdout().flush().unwrap();
-    std::thread::sleep(one_second);
-  };
-  print!("\n\n  BOOM!\t");
-  putlinen(2);
-}
-              </defn-code>
-              <defn-head class="defnBorderTop">Output:</defn-head>
-              <defn-code>
-  demo param passing
- ====================
- -------------------------------------------------
-  show_str1(s:String)
- ---------------------
-  first test
- -------------------------------------------------
-  show_str2(s:&String)
- ----------------------
-  second test
- -------------------------------------------------
-  show_str3(s:&str)
- -------------------
-  third test
- -------------------------------------------------
-  return_str1() -> String
- -------------------------
-  test string 1 with more stuff
- -------------------------------------------------
-  return_str2() -> &'static str
- -------------------------------
-  test string 2 with more stuff
- -------------------------------------------------
-  return_str3(mut s:&mut String) -> &mut String   
- -----------------------------------------------  
-  test string 4Z with more stuff
- -------------------------------------------------
-  Pass string by value
- ----------------------
-  TypeId: alloc::string::String, size: 12
-  value: "xyz"
- -------------------------------------------------
-  Pass string by reference
- --------------------------
-  TypeId: &alloc::string::String, size: 4
-  value: "xyz"
-  TypeId: &alloc::string::String, size: 4
-  value: "xyza"
-  after pushing a and b, s = "xyzab"
- -------------------------------------------------
-  Pass by value
- ---------------
-  TypeId: alloc::string::String, size: 12
-  value: "xyz"
- -------------------------------------------------
-  Pass by reference
- -------------------
-  TypeId: &alloc::string::String, size: 4
-  value: "xyz"
-  TypeId: &alloc::string::String, size: 4
-  value: "xyza"
- -------------------------------------------------
-  lifetime
- ----------
-  s = "xyz"
-  calling lifetime
- -------------------------------
-  rs = "xyz"
-  TypeId: alloc::string::String, size: 12
-  s = "xya"
-  TypeId: alloc::string::String, size: 12
-  returning string s by value (a move)
- -------------------------------
-  returned from lifetime
-  s = "xyz"
-  r = "xya"
-  TypeId: &mut alloc::string::String, size: 4
-  after pushing b, r = "xyab"
-  after pushing b, s = "xyzb"
- -------------------------------------------------
-  lifetime2
- -----------
-  s = "xyz"
-  TypeId: &alloc::string::String, size: 4
-  value: "xyz"
-  TypeId: &mut &alloc::string::String, size: 4
-  r = "xyz"
- -------------------------------------------------
-  Function pointer
- ------------------
-  TypeId: &alloc::string::String, size: 4
-  value: "xyz"
-  TypeId: &alloc::string::String, size: 4
-  value: "xyza"
- -------------------------------------------------
-  lambdas
- ---------
-  TypeId: &str, size: 8
-  value: "xyz"
-  TypeId: &str, size: 8
-  value: "abc"
- -------------------------------------------------
-  higher_order_function
- -----------------------
-  always_fails failed           result = false
-  always_passes passed          result = true
-  always_panics paniced         result = false
-
-  tick 5
-  tick 4
-  tick 3
-  tick 2
-  tick 1
-
-  BOOM!
-
-              </defn-code>
-            </defn-block>
-          </defn-outerBlock>
-        </details>
-      </div>
-    </t-b>-->
     <t-b class="mbz">
       Idiomatic Rust seems to often use functions in places where a C++ developer would be likely
       to use a class method.  Rust does support methods bound to structs, which we will explore
@@ -1128,7 +696,11 @@ fn main() {
       <num-item1>3.1.1</num-item1><num-item4>Function Pointers:</num-item4>
     </num-cont>
     <t-b>
-      Function pointers are simply names of functions.  We can use them without using unsafe blocks.
+      Function pointers are instances of the type std::fn that point to code, not data.
+      Plain function pointers can only point to safe functions or closures that don&apos;t
+      capture an environment.
+    </t-b>
+    <t-b>
       In the example, below, fun is a function pointer that invokes pass_by_ref.
     </t-b>
     <t-b>
@@ -1136,11 +708,8 @@ fn main() {
         <defn-head>Function Pointer Example</defn-head>
         <defn-code>
 /*-----------------------------------------------
-   Pass by ref borrows the argument by placing
-   reference to instance in caller&apos;s scope in
-   function's stack frame.  Borrow ends at end
-   of function stack frame, so param is valid 
-   after call
+   pass_by_ref is a plain function that calls plain 
+   functions in RustBasicDemos::display library.
 */
 fn pass_by_ref&lt;T&gt;(rt:&amp;T) where T:Debug {
   show_type(&amp;rt);
@@ -1161,12 +730,273 @@ fun(&amp;s);
       or provide short names for longer generic function names.
     </t-b>
 
+    <a id="lambdas"></a>
+    <s-halfEm></s-halfEm>
+    <num-cont>
+      <num-item1>3.1.2</num-item1><num-item4>Closures:</num-item4>
+    </num-cont>
+    <t-b>
+      Closures, also called lambda expressions or lambdas, are anonymous functions that implement 
+      one of these traits:
+      <indent-block class="pad5">
+        <ol class="tight">
+          <li>
+            FnOnce is implemented automatically by closures that may consume (move and use) 
+            captured variables.
+          </li>
+          <li>
+            Fn is automatically implemented by closures which take only immutable references to
+            captured data or don&apos;t capture anything.  FnOnce and FnMut are super traits so
+            closures that implement Fn can be used where FnOnce or FnMut are expected.
+          </li>
+          <li>
+            <n-s>FnMut</n-s> is implemented automatically by closures which take mutable references
+            to captured variables. FnOnce is a super trait so closures that implement FnMut can
+            be used where FnOnce is expected.
+          </li>
+        </ol>
+      </indent-block>
+    </t-b>
+    <t-b class="mbz">
+      <indent-block class="pad5">
+        <defn-block>
+          <defn-head>Closure syntax:</defn-head>
+          <defn-code>
+  let x:i32 = 3;  // immutable capture, below
+  let cl = |val:i32| { 
+    print!("\n  val = {}, x = {}, val + x = {}", val, x, val + x) 
+  };
+  cl(7);
+          </defn-code>
+          <defn-head class="defnBorderTop">Output:</defn-head>
+          <defn-code>
+  val = 7, x = 3, val + x = 10
+          </defn-code>
+        </defn-block>
+      </indent-block>
+      <t-b class="mbz">
+        Closures are used where small special purpose functions are needed, but then discarded.
+        Typically used for filters.
+      </t-b>
+      <t-b>
+        Here are some examples:
+      </t-b>
+      <t-b>
+        <div>
+          <details>
+            <summary class="labelStyle darkItem">Closure Examples:</summary>
+            <defn-outerBlock>
+              <defn-block>
+                <defn-head>Helper Functions</defn-head>
+                <defn-code>
+/*-----------------------------------------------
+  Function consume accepts predicate closure
+  - executes closure and returns its value
+  - accepts function pointers too
+*/
+fn consume&lt;F: FnOnce() -&gt; bool&gt;(cl:F) -&gt; bool 
+where F: FnOnce() -&gt; bool {
+  cl()
+}
+/*-----------------------------------------------
+  Function answer accepts bool and displays value
+*/
+fn answer(ans:bool) {
+    if ans == true {
+        print!("\n  answer is true");
+    }
+    else {
+        print!("\n  answer is false");
+    }
+}
+/*-----------------------------------------------
+  pure predicate functions
+*/
+fn always_true() -&gt; bool { true }
+fn always_false() -&gt; bool { false }
+
+                </defn-code>
+                <defn-head class="defnBorderTop">Output:</defn-head>
+                <defn-code>
+   -- demo closures --
+ =======================
+  val = 7, x = 3, val + x = 10
+
+  count = 1, sum = 3
+  count = 2, sum = 3
+  count = 3, sum = 3
+
+  answer is true
+  answer is false
+  answer is true
+  answer is false
+
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>main</defn-head>
+                <defn-code>
+/*-----------------------------------------------
+  Demonstrate executor and closures
+*/
+fn main() {
+
+    main_title(" -- demo closures -- ");
+
+    /*-- immutable closure --------------------*/
+
+    let x:i32 = 3;  // immutable capture, below
+    let cl = |val:i32| { 
+      print!(
+        "\n  val = {}, x = {}, val + x = {}",
+        val, x, val + x
+      ) 
+    };
+    cl(7);
+    let put = putline;  // declaring funptr
+    put();
+
+    /*-- mutable closure ----------------------*/
+
+    let mut count = 0;
+    let mut counter = |offset:i32| {  // mut closure
+        count = count + 1;
+        print!("\n  count = {}, sum = {}", 
+          count, 
+          count + offset
+        )
+    };
+    counter(2);
+    counter(1);
+    counter(0);
+    putline();
+
+    /*-- invariant closure --------------------*/
+
+    let clst = ||{ true };  // invariant closure
+    let clsf = ||{ false }; // invariant closure
+
+    let mut ans = consume(clst);
+    answer(ans);
+    ans = consume(clsf);
+    answer(ans);
+    ans = consume(always_true);
+    answer(ans);
+    ans = consume(always_false);
+    answer(ans);
+    putlinen(2); 
+}
+                </defn-code>
+              </defn-block>
+            </defn-outerBlock>
+          </details>
+        </div>
+      </t-b>
+    </t-b>
+    <t-b class="mbz">
+      These examples present closures with immutable capture, mutable capture, and no capture.  Also
+      included is an example of a function that accepts either closures or function pointers.
+    </t-b>
+
     <a id="funerr"></a>
     <s-halfEm></s-halfEm>
     <num-cont>
-      <num-item1>3.1.2</num-item1><num-item4>Function Error Handling:</num-item4>
+      <num-item1>3.1.3</num-item1><num-item4>Function Error Handling:</num-item4>
     </num-cont>
-    <t-b></t-b>
+    <t-b>
+      Rust functions with operations that may fail, e.g., opening a file, should return one of two
+      kinds of result wrappers:
+      <indent-block class="pad5">
+        <ol class="tight">
+          <li>
+            <n-s>Option&lt;T&gt;</n-s> is an enumeration that contains either Some(result:T) or None. Option&lt;T&gt;
+            has methods:
+            <indent-block class="pad5">
+              <ul class="tight">
+                <li>
+                  is_some() -> bool
+                </li>
+                <li>
+                  is_none() -> bool
+                </li>
+                <li>
+                  contains&lt;U&gt;(x:&U) -> bool
+                </li>
+                <li>
+                  expect(msg: &str) -> T<br />
+                  Unwraps option returning content of Some or panics with msg
+                </li>
+                <li>
+                  unwrap() -> T<br />
+                  Returns value of Some or panics
+                </li>
+                <li>
+                  map&lt;U, F&gt;(f:F) -> Option&lt;U&gt; where F: FnOnce(T) -> U<br />
+                  Applies f to value of Some.
+                </li>
+                <li>
+                  iter() -> Iter&lt;T&gt;<br />
+                  Returns iterator over value of Some if available
+                </li>
+                <li>
+                  filter&lt;P&gt;(predicate: P) -> Option&lt;T&gt; where P: FnOnce(&amp;T) -> bool<br />
+                  Returns None if no value else calls predicate with unwrapped value and returns.
+                </li>
+                <li>
+                  Many more functions: <a href="https://doc.rust-lang.org/std/option/enum.Option.html">std::Option</a>.
+                </li>
+              </ul>
+            </indent-block>
+          </li>
+          <li>
+            <n-s>enum Result&lt;T, E&gt;</n-s> is an enumeration that contains either Ok(result) or Err(err).
+            Result&lt;T, E&gt; has methods:
+            <indent-block class="pad5">
+              <ul class="tight">
+                <li>
+                  is_ok() -> bool
+                </li>
+                <li>
+                  is_err() -> bool
+                </li>
+                <li>
+                  ok() -> Option&lt;T&gt;
+                </li>
+                <li>
+                  err() -> Option&lt;E&gt;
+                </li>
+                <li>
+                  unwrap() -> T, will return result if available or panic
+                </li>
+                <li>
+                  unwrap_or_else&lt;F&gt;(op:F) -> T where F: FnOnce(E) -> T<br />
+                  Returns result if available, else calls op(err)
+                </li>
+                <li>
+                  expect(msg: &str) -> T, unwraps result if available else panics with msg
+                </li>
+                <li>
+                  map&lt;U, F&gt;(op: F) -> Result&lt;U, E&gt; where F: FnOnce(T) -> U<br />
+                  op is a lambda that replaces t:T with a computed value
+                </li>
+                <li>
+                  iter() -> Iter&lt;T&gt;<br />
+                  Returns iterator over Some value if it exists.
+                </li>
+                <li>
+                  Many more functions: <a href="https://doc.rust-lang.org/std/result/enum.Result.html">std::Result</a>.
+                </li>
+              </ul>
+            </indent-block>
+          </li>
+        </ol>
+      </indent-block>
+      The difference between these is that Result can pass information about the error back
+      to the caller. Returning Option signals that failure to return a result is not an error.
+    </t-b>
+    <t-b>
+
+    </t-b>
 
     <a id="iters"></a>
     <hr class="spread" />
@@ -1194,11 +1024,60 @@ fun(&amp;s);
       <num-item1>3.3.1</num-item1><num-item4>Traits:</num-item4>
     </num-cont>
 
-    <a id="lambdas"></a>
+    <!--<a id="lambdas"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>3.4</num-item1><num-item4>Lambdas:</num-item4>
+      <num-item1>3.4</num-item1><num-item4>Closures:</num-item4>
     </num-cont>
+    <t-b>
+      Closures, also called lambda expressions or lambdas, are anonymous functions that implement 
+      one of these traits:
+      <indent-block class="pad5">
+        <ol class="tight">
+          <li>
+            FnOnce is implemented automatically by closures that may consume (move and use) 
+            captured variables.
+          </li>
+          <li>
+            Fn is automatically implemented by closures which take only immutable references to
+            captured data or don&apos;t capture anything.  FnOnce and FnMut are super traits so
+            closures that implement Fn can be used where FnOnce or FnMut are expected.
+          </li>
+          <li>
+            <n-s>FnMut</n-s> is implemented automatically by closures which take mutable references
+            to captured variables. FnOnce is a super trait so closures that implement FnMut can
+            be used where FnOnce is expected.
+          </li>
+        </ol>
+      </indent-block>
+    </t-b>
+    <t-b>
+      <indent-block class="pad5">
+        <defn-block>
+          <defn-head>Closure syntax:</defn-head>
+          <defn-code>
+  let x:i32 = 3;  // immutable capture, below
+  let cl = |val:i32| { 
+    print!("\n  val = {}, x = {}, val + x = {}", val, x, val + x) 
+  };
+  cl(7);
+          </defn-code>
+          <defn-head class="defnBorderTop">Output:</defn-head>
+          <defn-code>
+  val = 7, x = 3, val + x = 10
+          </defn-code>
+        </defn-block>
+      </indent-block>
+      <t-b>
+        Closures are used where small special purpose functions are needed, but then discarded.
+        Typically used for filters.
+      </t-b>
+    </t-b>
+    <a id="epilogue"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>3.5</num-item1><num-item4>Epilogue:</num-item4>
+    </num-cont>-->
 
     <a id="epilogue"></a>
     <hr class="spread" />
