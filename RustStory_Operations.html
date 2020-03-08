@@ -186,9 +186,491 @@ fn pass_by_ref_str(rs:&String) {  // borrow
       It is simply an event to report.
     </t-b>
     <t-b>
+      <details>
+        <summary class="labelStyle darkItem">Function Code Examples:</summary>
+      <div tabindex="1" style="width:calc(100vw - 6rem); overflow-x:auto;">
+        <table>
+          <tr>
+            <th class="darkItem">Function Code</th>
+            <th class="darkItem">Using Code</th>
+            <th class="darkItem">Output</th>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+/*-----------------------------------------------
+   Accepts String by value
+*/
+fn show_str1(s:String) {  // move
+  print!("{}",&amp;s);
+}
+            </td>
+            <td class="lightItem defn-code">
+show_str1("\n  first test".to_string());
+
+            </td>
+            <td class="lightItem defn-code">
+first test
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+/*-----------------------------------------------
+   Accepts String by reference
+*/
+fn show_str2(s:&amp;String) {  // borrow
+  print!("{}",&amp;s);
+}
+            </td>
+            <td class="lightItem defn-code">
+  show_str2(&amp;"\n  second test".to_string());
+
+            </td>
+            <td class="lightItem defn-code">
+  second test
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+/*-----------------------------------------------
+   Accepts str by reference
+*/
+fn show_str3(s:&amp;str) {  // borrow
+  print!("{}",&amp;s);
+}
+            </td>
+            <td class="lightItem defn-code">
+  show_str3("\n  third test");
+
+            </td>
+            <td class="lightItem defn-code">
+  third test
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+/*-----------------------------------------------
+   Returns String
+*/
+fn return_str1() -&gt; String {
+  let s = "test string 1".to_string();
+  s  // moves s
+}
+            </td>
+            <td class="lightItem defn-code">
+  let mut s = return_str1();
+  s.push_str(" with more stuff");
+  let mut s1 = "\n  ".to_string();
+  s1.push_str(&amp;s);
+  shows(s1);
+  
+            </td>
+            <td class="lightItem defn-code">
+  test string 1 with more stuff
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+/*-----------------------------------------------
+   Returns string reference
+   - it only makes sense to return a reference
+     to a passed in ref or a static ref
+   - compiler should prevent anything else
+*/
+fn return_str2() -&gt; &amp;'static str {
+  let s = "test string 2";
+  s
+}
+            </td>
+            <td class="lightItem defn-code">
+  let s = return_str2();
+  let mut st = s.to_string();
+  st.push_str(" with more stuff");
+  let mut s1 = "\n  ".to_string();
+  s1.push_str(&amp;st);
+  shows(s1);
+  
+            </td>
+            <td class="lightItem defn-code">
+  test string 2 with more stuff
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+/*-----------------------------------------------
+   Returns string reference
+   - it only makes sense to return a reference
+     to a passed in ref or a static ref
+   - compiler should prevent anything else
+*/
+fn return_str3(s:&amp;mut String) -&gt; &amp;mut String {
+  s.push('Z');
+  s
+}
+            </td>
+            <td class="lightItem defn-code">
+  let mut s = String::from("test string 4");
+  let rs = return_str3(&amp;mut s);
+  rs.push_str(" with more stuff");
+  let mut s1 = "\n  ".to_string();
+  s1.push_str(&amp;rs);
+  shows(s1);
+  
+            </td>
+            <td class="lightItem defn-code">
+  test string 4Z with more stuff
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+/*-----------------------------------------------
+   Pass by value moves the argument into the
+   function's stack frame, so invalid after call
+*/
+fn pass_by_value_str(s:String) {  // move
+  show_type(&amp;s);
+  show_value(&amp;s);
+}
+            </td>
+            <td class="lightItem defn-code">
+  let mut s = "xyz".to_string();
+  let s1 = s.clone();
+  pass_by_value_str(s1);  // moves s1
+  ////////////////////////////////////////////////
+  // next statement fails to compile - s1 moved
+  // pass_by_value(s1);
+
+            </td>
+            <td class="lightItem defn-code">
+  TypeId: alloc::string::String, size: 12
+  value: "xyz"
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+/*-----------------------------------------------
+   Pass by ref borrows the argument into the
+   function's stack frame.  Borrow ends at end
+   of function stack frame, so param is valid 
+   after call
+*/
+fn pass_by_ref_str(rs:&amp;String) {  // borrow
+  show_type(&amp;rs);
+  show_value(&amp;rs);
+}
+            </td>
+            <td class="lightItem defn-code">
+  pass_by_ref_str(&amp;s);
+  s.push('a');
+  pass_by_ref(&amp;s);  // borrows s
+  s.push('b');
+  show("\n  after pushing a and b, s = ",&amp;s);
+
+            </td>
+            <td class="lightItem defn-code">
+  TypeId: &alloc::string::String, size: 4
+  value: "xyz"
+  TypeId: &alloc::string::String, size: 4
+  value: "xyza"
+  after pushing a and b, s = "xyzab"
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+/*-----------------------------------------------
+   Pass by value moves the argument into the
+   function's stack frame, so invalid after call
+*/
+fn pass_by_value&lt;T&gt;(t:T) where T:Debug {
+  show_type(&amp;t);
+  show_value(&amp;t);
+}
+            </td>
+            <td class="lightItem defn-code">
+  let mut s = "xyz".to_string();
+  let s1 = s.clone();
+  pass_by_value(s1);
+  ////////////////////////////////////////////////
+  // next statement fails to compile - s1 moved
+  // pass_by_value(s1);
+
+            </td>
+            <td class="lightItem defn-code">
+  TypeId: alloc::string::String, size: 12
+  value: "xyz"
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+/*-----------------------------------------------
+   Pass by ref borrows the argument into the
+   function's stack frame.  Borrow ends at end
+   of function stack frame, so param is valid 
+   after call
+*/
+fn pass_by_ref&lt;T&gt;(rt:&amp;T) where T:Debug {
+  show_type(&amp;rt);
+  show_value(&amp;rt);
+}
+            </td>
+            <td class="lightItem defn-code">
+  pass_by_ref(&amp;s);
+  s.push('a');
+  pass_by_ref(&amp;s);
+
+            </td>
+            <td class="lightItem defn-code">
+  TypeId: &alloc::string::String, size: 4
+  value: "xyz"
+  TypeId: &alloc::string::String, size: 4
+  value: "xyza"
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+/*-----------------------------------------------
+   Pass by ref borrows the argument into the
+   function's stack frame.  Borrow ends at end
+   of function stack frame, so param is valid 
+   after call
+*/
+fn lifetime(rs:&amp;String) -&gt; String {
+  show("\n  rs = ",rs); 
+  show_type(rs);
+  // replace doesn't attempt to mutate rs
+  let s = rs.replace("z","a");
+  show("\n  s = ",&amp;s);  
+  show_type(&amp;s);
+  shows("\n  returning string s by value (a move)");
+  // let put = |st|{ print!("{}", st); };
+  // put("\n  returning s by value"); 
+  s  // return by value moves string to destination
+}
+            </td>
+            <td class="lightItem defn-code">
+  let mut s = "xyz".to_string();
+  show("\n  s = ",&amp;s);
+  shows("\n  calling lifetime");
+  separator(30);
+  let r = &amp;mut lifetime(&amp;mut s);
+  separator(30);
+  shows("\n  returned from lifetime");
+  show("\n  s = ",&amp;s);
+  show("\n  r = ",&amp;r);
+  show_type(&amp;r);
+  r.push('b');
+  show("\n  after pushing b, r = ",&amp;r);
+  s.push('b');
+  show("\n  after pushing b, s = ",&amp;s);
+
+            </td>
+            <td class="lightItem defn-code">
+  s = "xyz"
+  calling lifetime
+ -------------------------------
+  rs = "xyz"
+  TypeId: alloc::string::String, size: 12
+  s = "xya"
+  TypeId: alloc::string::String, size: 12
+  returning string s by value (a move)
+ -------------------------------
+  returned from lifetime
+  s = "xyz"
+  r = "xya"
+  TypeId: &mut alloc::string::String, size: 4
+  after pushing b, r = "xyab"
+  after pushing b, s = "xyzb"
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+/*-----------------------------------------------
+   Pass by ref borrows the argument into the
+   function's stack frame.  Borrow ends at end
+   of function stack frame, so param is valid 
+   after call. Function returns a reference!
+*/
+fn lifetime2&lt;'a, T&gt;(rt:&amp;'a T) -&gt; &amp; 'a T where T:Debug {
+  // Lifetime annotation, 'a, enables borrow checker
+  // to ensures that T lives at least as long as rt, 
+  // its reference.
+  show_type(&amp;rt);
+  show_value(&amp;rt);
+  rt  // the only time it makes sense to return
+      // a reference is when returning a possibly
+      // modified input reference
+}
+
+            </td>
+            <td class="lightItem defn-code">
+  let mut s = "xyz".to_string();
+  show("\n  s = ",&amp;s);
+  let r = &amp;mut lifetime2(&amp;mut s);
+  show_type(&amp;r);
+  show("\n  r = ",&amp;r);
+
+            </td>
+            <td class="lightItem defn-code">
+  s = "xyz"
+  TypeId: &alloc::string::String, size: 4
+  value: "xyz"
+  TypeId: &mut &alloc::string::String, size: 4
+  r = "xyz"
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+/*-----------------------------------------------
+   Accepts either String or str
+*/
+fn shows&lt;S: Into&lt;String&gt;&gt;(s:S) {
+  print!("{}",s.into());
+}
+            </td>
+            <td class="lightItem defn-code">
+  sub_title("shows&lt;S: Into&lt;String&gt;&gt;(s:S)");
+  shows("This accepts either String or str");
+            </td>
+            <td class="lightItem defn-code">
+  shows&lt;S: Into&lt;String&gt;&gt;(s:S)
+ -----------------------------
+  This accepts either String or str
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+  function pointer defined in using code
+            </td>
+            <td class="lightItem defn-code">
+  sub_title("Function pointer");
+  let fun = pass_by_ref;   // define fun ptr
+  let mut s = "xyz".to_string();
+  fun(&amp;s);
+  s.push('a');
+  fun(&amp;s);
+            <td class="lightItem defn-code">
+  Function pointer
+ ------------------
+  TypeId: &alloc::string::String, size: 4
+  value: "xyz"
+  TypeId: &alloc::string::String, size: 4
+  value: "xyza"
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+  lambda defined in using code
+            </td>
+            <td class="lightItem defn-code">
+  sub_title("lambdas");
+  let l = |s:&amp;str| { 
+    show_type(&amp;s); show_value(&amp;s); 
+  };
+  l("xyz");
+  let s = String::from("abc");
+  l(&amp;s);
+
+            </td>
+            <td class="lightItem defn-code">
+  lambdas
+ ---------
+  TypeId: &str, size: 8
+  value: "xyz"
+  TypeId: &str, size: 8
+  value: "abc"
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem defn-code">
+/*-----------------------------------------------
+   Higher order function
+*/
+use std::panic;  // catch_unwind panic
+
+fn tester(f:fn() -&gt; bool, name:&amp;str) -&gt; bool {
+  let rslt = panic::catch_unwind(|| { f() });  
+  // line above simulates try-catch
+  match rslt {
+    Ok(true) =&gt; print!("\n  {} passed", name),
+    Ok(false) =&gt; 
+      { print!("\n  {} failed", name); return false; },
+    Err(_) =&gt; 
+      { print!("\n  {} paniced", name); return false; }
+  }
+  return true;
+}
+
+/* hide panic notification */
+fn set_my_hook() {
+  panic::set_hook(Box::new(|_|{ print!(" ");}));
+}
+
+fn always_fails() -&gt; bool {
+  false
+}
+
+fn always_succeeds() -&gt; bool {
+  true
+}
+
+#[allow(unreachable_code)]
+fn always_panics() -&gt; bool {
+  panic!("always panics");
+  return false;
+}
+
+            </td>
+            <td class="lightItem defn-code">
+  sub_title("higher_order_function");
+  set_my_hook();
+
+  let rstl = 
+    tester(always_fails, "always_fails");
+  print!("\t\tresult = {}", rstl);
+  let rstl = 
+    tester(always_succeeds, "always_passes");
+  print!("\t\tresult = {}", rstl);
+  let rstl = 
+    tester(always_panics, "always_panics");
+  print!("\t\tresult = {}\n", rstl);
+
+  /* show intercepted panic and continued */
+  use std::io::{Write};
+  let one_second = 
+    std::time::Duration::from_millis(1000);
+  for i in 0..5 { 
+    print!("\n  tick {}\t", 5 - i); 
+    std::io::stdout().flush().unwrap();
+    std::thread::sleep(one_second);
+  };
+  print!("\n\n  BOOM!\t");
+  putlinen(2);
+}
+            </td>
+            <td class="lightItem defn-code">
+  higher_order_function
+ -----------------------
+  always_fails failed     result = false
+  always_passes passed    result = true
+  always_panics paniced   result = false
+
+  tick 5
+  tick 4
+  tick 3
+  tick 2
+  tick 1
+
+  BOOM!
+
+            </td>
+          </tr>
+        </table>
+      </div>
+      </details>
+    </t-b>
+    <!--<t-b>
       <div>
         <details>
-          <summary class="labelStyle lightItem">RustBasicDemos::function_probes</summary>
+          <summary class="labelStyle darkItem">RustBasicDemos::function_probes</summary>
           <defn-outerBlock>
             <defn-block>
               <defn-head>Demo Functions:</defn-head>
@@ -633,7 +1115,7 @@ fn main() {
           </defn-outerBlock>
         </details>
       </div>
-    </t-b>
+    </t-b>-->
     <t-b class="mbz">
       Idiomatic Rust seems to often use functions in places where a C++ developer would be likely
       to use a class method.  Rust does support methods bound to structs, which we will explore
@@ -696,7 +1178,7 @@ fun(&amp;s);
     <a id="iterops"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>3.2</num-item1><num-item4>Operations with Iterators:</num-item4>
+      <num-item1>3.2.1</num-item1><num-item4>Operations with Iterators:</num-item4>
     </num-cont>
     <t-b></t-b>
 
@@ -704,6 +1186,12 @@ fun(&amp;s);
     <hr class="spread" />
     <num-cont>
       <num-item1>3.3</num-item1><num-item4>Structs and Methods:</num-item4>
+    </num-cont>
+
+    <a id="traits"></a>
+    <s-halfEm></s-halfEm>
+    <num-cont>
+      <num-item1>3.3.1</num-item1><num-item4>Traits:</num-item4>
     </num-cont>
 
     <a id="lambdas"></a>
