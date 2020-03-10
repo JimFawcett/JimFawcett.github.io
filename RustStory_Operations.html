@@ -435,7 +435,6 @@ fn pass_by_ref&lt;T&gt;(rt:&amp;T) where T:Debug {
           <tr>
             <td class="lightItem defn-code">
 /*-----------------------------------------------
-   
    Illustrates lifetime 
    - type specific so no annotation needed
 */
@@ -492,7 +491,7 @@ fn lifetime(rs:&amp;String) -&gt; String {
    - Borrow checker needs help to analyze lifetime
      of T
 */
-fn lifetime2&lt;'a, T&gt;(rt:&amp;'a T) -&gt; &amp; 'a T where T:Debug {
+fn lifetime2&lt;'a, T&gt;(rt:&amp;'a T) -&gt; &amp;'a T where T:Debug {
   // Lifetime annotation, 'a, enables borrow checker
   // to ensures that T lives at least as long as rt, 
   // its reference.
@@ -992,11 +991,126 @@ fn main() {
           </li>
         </ol>
       </indent-block>
-      The difference between these is that Result can pass information about the error back
-      to the caller. Returning Option signals that failure to return a result is not an error.
+      <t-b style="margin-top:0px;">
+        The difference between these is that Result can pass information about the error back
+        to the caller. Returning Option signals that failure to return a result is not an error.
+      </t-b>
     </t-b>
     <t-b>
+      <indent-blocks>
+        <details>
+          <summary class="labelStyle darkItem">Result and Option Syntax Examples:</summary>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Functions returning Result or Option</defn-head>
+              <defn-code>
+use display::{*};
 
+fn demo_result&lt;'a&gt;(p: bool) -&gt; Result&lt;&amp;'a str, &amp;'a str&gt; {
+    print!("\n  value of input predicate is {}", p);
+    if p {
+        return Ok("it's ok");
+    } 
+    else {
+        return Err("not ok");
+    }
+}
+
+fn demo_option&lt;'a&gt;(p:bool) -&gt; Option&lt;&amp;'a str&gt; {
+    print!("\n  value of input predicate is {}", p);
+    if p {
+        return Some("something just for you!");
+    }
+    else {
+        return None;
+    }
+}
+              </defn-code>
+              <defn-head class="defnBorderTop">Output:</defn-head>
+              <defn-code>
+    -- demo Result --
+ -----------------------
+-- using match
+  value of input predicate is true
+    result is it's ok
+  value of input predicate is false
+    result is not ok
+
+-- using expect
+  value of input predicate is true
+    result is it's ok
+
+    -- demo Option --
+ -----------------------
+--using match
+  value of input predicate is true
+    something just for you!
+  value of input predicate is false
+    sorry, nothing here
+
+--using unwrap
+  value of input predicate is true
+    something just for you!
+
+  That's all folks!
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Using code:</defn-head>
+              <defn-code>
+  use display::{*};
+
+  sub_title("  -- demo Result --  ");
+  shows("\n-- using match");
+
+  let r = demo_result(true);
+  match r {
+      Ok(rslt) =&gt; print!("\n  result is {}", rslt),
+      Err(rslt) =&gt; print!("\n  result is {}", rslt)
+  }
+  let r = demo_result(false);
+  match r {
+      Ok(rslt) =&gt; print!("\n  result is {}", rslt),
+      Err(rslt) =&gt; print!("\n  result is {}", rslt)
+  }
+  shows("\n\n-- using expect");
+
+  let r = demo_result(true)
+    .expect("predicate was false");
+  print!("\n    result is {}", r);
+  /////////////////////////////////////////////
+  // uncomment to see panic
+  // let _r = demo_result(false)
+  //   .expect("predicate was false");
+  putline();
+
+  sub_title("  -- demo Option --  ");
+  shows("\n--using match");
+
+  let r = demo_option(true);
+  match r {
+      Some(rslt) =&gt; print!("\n    {}", rslt),
+      None =&gt; print!("\n    sorry, nothing here")
+  }
+  let r = demo_option(false);
+  match r {
+      Some(rslt) =&gt; print!("\n    {}", rslt),
+      None =&gt; print!("\n    sorry, nothing here")
+  }
+  shows("\n\n--using unwrap");
+
+  let r = demo_option(true).unwrap();
+  print!("\n    {}", r);
+  /////////////////////////////////////////////
+  // uncomment to see panic
+  // let _r = demo_option(false).unwrap();
+
+  print!("\n\n  That's all folks!\n\n");
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </indent-blocks>
     </t-b>
 
     <a id="iters"></a>
