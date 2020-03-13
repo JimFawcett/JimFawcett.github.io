@@ -1120,7 +1120,7 @@ fn demo_option&lt;'a&gt;(p:bool) -&gt; Option&lt;&amp;'a str&gt; {
       </indent-blocks>
     </t-b>
     <t-b>
-      Let&apos;s follow up with a practical example, handling file open errors:
+      Let&apos;s follow up with a practical example, handling file open errors, being careful to avoid panics:
     </t-b>
     <t-b>
       <div>
@@ -1130,18 +1130,13 @@ fn demo_option&lt;'a&gt;(p:bool) -&gt; Option&lt;&amp;'a str&gt; {
             <defn-block>
               <defn-head>File Open Code</defn-head>
               <defn-code>
+use std::io::prelude::*;
+use std::fs::File;
+use display::{*};
+
 #[allow(dead_code)]
-fn open_file_for_write(file_name:&amp;str) -&gt;Result&lt;File&gt; {
-    use std::fs::OpenOptions;
-    let rfile = OpenOptions::new()
-               .write(true)
-               .create(true)
-               .append(true)
-               .open(file_name);
-    rfile
-}
-#[allow(dead_code)]
-fn open_file_for_read(file_name:&amp;str) -&gt;Result&lt;File&gt; {
+fn open_file_for_read(file_name:&amp;str) 
+     -&gt;Result&lt;File, std::io::Error&gt; {
     use std::fs::OpenOptions;
     let rfile = OpenOptions::new()
                .read(true)
@@ -1150,115 +1145,49 @@ fn open_file_for_read(file_name:&amp;str) -&gt;Result&lt;File&gt; {
 }
 
 #[allow(dead_code)]
-fn write_string_to_file(mut f:File, s:&amp;str) -&gt; Result&lt;usize&gt; {
-    f.write(s.as_bytes())
-}
-
-#[allow(dead_code)]
-fn read_file_to_string(mut f:File) -&gt; Result&lt;String&gt; {
+use std::io::{Error, ErrorKind};
+fn read_file_to_string(mut f:File) 
+     -&gt; Result&lt;String, std::io::Error&gt; {
   let mut contents = String::new();
-  let _bytes = f.read_to_string(&amp;mut contents);
-  Ok(contents)
+  let bytes_rslt = f.read_to_string(&amp;mut contents);
+  if bytes_rslt.is_ok() {
+    Ok(contents)
+  }
+  else {
+      Err(Error::new(ErrorKind::Other, "read error"))
+  }
 }
-
-#[allow(dead_code)]
-fn checked_write_string_to_file(mut f:File, s:&amp;str) -&gt; bool {
-    let rslt = f.write(s.as_bytes());
-    let success = test_file_op(&amp;rslt);
-
-    if success {
-      //print!("\n  write succeeded");
-      return true;
-    }
-    else {
-        print!("\n  Error: {}", rslt.err().unwrap());
-        return false;
-    }
-}
-
-#[allow(dead_code)]
-fn test_file_op&lt;T&gt;(r:&amp;Result&lt;T&gt;) -&gt; bool {
-     match &amp;r {
-        Err(why) =&gt; { print!("\n  {}", why);  return false },
-        Ok(_) =&gt; return true
-    };
-}
-
               </defn-code>
             </defn-block>
             <defn-block>
               <defn-head>Using Code</defn-head>
               <defn-code>
-    let file_name = "first_test.txt";
-    let file_text = "Howdy folks!";
-    
-    /*-- first write --*/
-    let f = open_file_for_write(file_name);
-    let success = test_file_op(&f);
-
-    if success {
-        print!("\n  successfully opened file \"{}\" for write", file_name);
-        let rslt = write_string_to_file(f.unwrap(), file_text);  // unwrap won&apos;t panic
-        if test_file_op(&rslt) {
-            print!("\n  wrote \"{}\" to \"{}\"", file_text, file_name);
-        }
-        else {
-            print!("\n  {}", rslt.err().unwrap());  // doesn&apos;t panic
-        }
+    /*-----------------------------------------------------
+       - Choose name of a file in the error_probes crate
+         root directory to show successful operation.  
+       - Choose one that does not exist to show failure 
+         operation.
+    */
+    let file:File;
+    let file_name = "foobar.txt";
+    let rslt = open_file_for_read(file_name);
+    if rslt.is_ok() {
+      print!("\n  file {:?} opened successfully", file_name);
+      file = rslt.unwrap();
+      let s = read_file_to_string(file);
+      if s.is_ok() {
+          print!("\n  contents: \"{}\"", s.unwrap());
+      }
     }
     else {
-        print!("\n  {}", f.err().unwrap());  // won&apos;t panic
+        print!("\n  failed to open file {:?}", file_name);
     }
-    putline();
 
-    /*-- second write --*/
-    let f = open_file_for_write(file_name);
-    let success = test_file_op(&f);
-
-    let file_text = "some other text";
-    if success {
-        print!("\n  successfully opened file \"{}\" for write", file_name);
-        let ok = checked_write_string_to_file(f.unwrap(), file_text);
-        if ok {
-            print!("\n  checked_write of {:?} succeeded", file_text);
-        }
-        else {
-            print!("\n  checked_write failed");
-        }
-    }
-    else {
-        print!("\n  {}", f.err().unwrap());
-    }
-    putline();
-
-    /*-- first open for read --*/
-    let rslt = open_file_for_read(&file_name);
-    let ok = test_file_op(&rslt);
-    match ok {
-        true => print!("\n  open_file_for_read succeeded"),
-        false => print!("\n  open_file_for_read failed"),
-    };
-    if ok {
-        let s = read_file_to_string(rslt.unwrap()).unwrap();
-        print!("\n  Read string {:?} from file {:?}", s, file_name);
-    }
-    else {
-        print!("\n  read_file_to_string failed:\n    {:?}",rslt.err().unwrap());
-    }
               </defn-code>
               <defn-head class="defnBorderTop">Output:</defn-head>
               <defn-code>
-C:\github\JimFawcett\RustBasicDemos\file_io
-  wrote "Howdy folks!" to "first_test.txt"
-
-  successfully opened file "first_test.txt" for write
-  checked_write of "some other text" succeeded
-
-  open_file_for_read succeeded
-  Read string "some other textHowdy folks!some other textHowdy folks!
-
-  // additional output elided
-                
+  file "foobar.txt" opened successfully
+  contents: "This is foobar.txt"
               </defn-code>
             </defn-block>
           </defn-outerBlock>
@@ -1441,6 +1370,16 @@ C:\github\JimFawcett\RustBasicDemos\file_io
         </td>
         <td class="lightItem">
           Strategies for solving 'cannot move out of' borrowing errors in Rust - Herman Radtke
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://www.linuxjournal.com/content/getting-started-rust-working-files-and-doing-file-io">
+            Working with Files and Doing File I/O
+          </a>
+        </td>
+        <td class="lightItem">
+          Linux Journal - Mihalis Tsoukalos, June 20, 2019
         </td>
       </tr>
     </table>
