@@ -1219,14 +1219,240 @@ fn read_file_to_string(mut f:File)
     <num-cont>
       <num-item1>3.2</num-item1><num-item4>Iterators:</num-item4>
     </num-cont>
-    <t-b></t-b>
+    <t-b>
+      Rust collections like Vec, String, and Map provide 
+      <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">iterators</a> 
+      used to step over and operate on
+      elements from the collection. 
+      <indent-block class="pad5">
+        <defn-block>
+          <defn-head>Iterating over Vec of integers</defn-head>
+          <defn-code>
+let v = vec![1, -1, 2, -2, 3, -3];
+print!("\n  ");
+let it = v.iter();
+for val in it {
+    print!("{} ", val);
+}
+          </defn-code>
+          <defn-head class="defnBorderTop">Output:</defn-head>
+          <defn-code>
+1 -1 2 -2 3 -3
+          </defn-code>
+        </defn-block>
+      </indent-block>
+      You can also provide iterators for your own custom types by defining
+      an Iterator trait for the type.  The only requirement is that it provide a method next() that
+      returns an option with Some(item) or None, where item is the next element in the collection:
+      <indent-block class="pad5">
+        <c-s>fn next(&mut self) -> Option&lt;Self::Item&gt;</c-s>
+      </indent-block>
+      You can manually step through a collection by calling next() on an iterator instance, 
+      <c-s>it.next()</c-s>
+      which returns <span style="white-space:nowrap";>Option&lt;T&gt;(item).</span>
+    </t-b>
 
     <a id="iterops"></a>
-    <hr class="spread" />
     <num-cont>
       <num-item1>3.2.1</num-item1><num-item4>Operations with Iterators:</num-item4>
     </num-cont>
-    <t-b></t-b>
+    <t-b>
+      The standard iterators provide a <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">set of adapters</a>, 
+      including:
+      <indent-block class="pad5">
+        <ol class="tight">
+          <li>
+            <strong>map</strong>: <c-s>fn map&lt;B,F&gt;(self, f:F) -> Map&lt;self, F&gt;</c-s> where
+            <c-s>F: FnMut(Self::Item) -> B</c-s><br />
+            <div>
+              Here, the map function takes a closure <c-s>f:F</c-s> that accepts an instance of the associated type
+              <c-s>Item</c-s>
+              and returns some computed value of type <c-s>B</c-s>.  The associated type <c-s>Item</c-s> is the type
+              of elements of the collection.
+            </div>
+          </li>
+          <li>
+            <strong>filter</strong>: <c-s>fn filter&lt;P&gt;(self, predicate: P) -> Filter&lt;Self, P&gt;</c-s>
+            where <c-s>P: FnMut(&Self::Item) -> bool</c-s>
+            <div>
+              Filter function takes a predicate closure <c-s>P</c-s> that determines whether an element of the
+              collection is sent to the output.
+            </div>
+          </li>
+          <li>
+            <strong>collection</strong>: <c-s>fn collect&lt;B&gt;(self) -> B</c-s> 
+            where <c-s>B: FromIterator&lt;Self::Item&gt;</c-s>
+            <div>
+              Turns an iterable collection into a different collection.
+            </div>
+          </li>
+        </ol>
+      </indent-block>
+    </t-b>
+    <t-b>
+      Here&apos;s a set of examples:
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle darkItem">Iterator Examples:</summary>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Helper functions</defn-head>
+              <defn-code>
+use display::{*};
+
+#[allow(dead_code)]
+fn show_prefix(p:&amp;str) {
+    print!("{}", p);
+}
+#[allow(dead_code)]
+/*-- note: Iterator has an associated type, Item --*/
+fn show_csl&lt;T&gt;(mut t:T) 
+   where T:Iterator, T::Item:std::fmt::Debug, {
+     print!("{:?}", t.next().unwrap());  // no leading comma
+     for val in t {
+         print!(", {:?}", val);          // leading comma
+   }
+}
+#[allow(dead_code)]
+/*-- note: Iterator has an associated type, Item --*/
+fn display_csl&lt;T&gt;(mut t:T) 
+   where T:Iterator, T::Item:std::fmt::Display, {
+     print!("{}", t.next().unwrap());  // no leading comma
+     for val in t {
+         print!(", {}", val);          // leading comma
+   }
+}
+#[allow(dead_code)]
+fn show_pcsl&lt;T&gt;(t:T) 
+   where T:Iterator, T::Item:std::fmt::Debug,  {
+     show_prefix("\n  ");
+     show_csl(t);
+}
+#[allow(dead_code)]
+fn display_pcsl&lt;T&gt;(t:T) 
+   where T:Iterator, T::Item:std::fmt::Display,  {
+     show_prefix("\n  ");
+     display_csl(t);
+}
+              </defn-code>
+              <defn-head class="defnBorderTop">Output:</defn-head>
+              <defn-code>
+  Demonstrating Iterators
+ =========================
+
+-- demo iter over vec of ints --
+  1 -1 2 -2 3 -3
+-- demo comma separated display --
+  1, -1, 2, -2, 3, -3
+
+-- demo iter over instance of map type --
+  ("two", 2) ("zero", 0) ("one", 1) ("three", 3)   
+
+-- demo iter over array of floats --
+  1 2.2 3.3 4.4 5.5
+-- demo comma separated display --
+  1.0, 2.2, 3.3, 4.4, 5.5
+
+-- demo iter over array of strs --
+  "one", "two", "three", "four"
+-- demo using Display trait instead of Debug --    
+  one, two, three, four
+
+-- demo map function modifying items --
+  "onez" "twoz" "threez" "fourz"
+
+-- demo collect items into Vec --
+  ["onez", "twoz", "threez", "fourz"]
+
+  That's all Folks!
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Iteration Code</defn-head>
+              <defn-code>
+  main_title("Demonstrating Iterators");
+  putline();
+    
+  shows("\n-- demo iter over vec of ints --");
+  let v = vec![1, -1, 2, -2, 3, -3];
+  print!("\n  ");
+  let it = v.iter();
+  for val in it {
+      print!("{} ", val);
+  }
+  shows("\n-- demo comma separated display --");
+  show_pcsl(v.iter());
+  putline();
+
+  shows("\n-- demo iter over instance of map type --");
+  show_prefix("\n  ");
+  use std::collections::HashMap;
+  let mut map:HashMap&lt;&amp;str, i32&gt; = HashMap::new();
+  map.entry("zero").or_insert(0);
+  map.entry("one").or_insert(1);
+  map.entry("two").or_insert(2);
+  map.entry("three").or_insert(3);
+  let it_map = map.iter();
+  for val in it_map {
+      print!("{:?} ", val);
+  }
+  putline();
+
+  shows("\n-- demo iter over array of floats --");
+  let a = [1.0, 2.2, 3.3, 4.4, 5.5];
+  print!("\n  ");
+  let ita = a.iter();
+  for val in ita {
+      print!("{} ", val);
+  }
+  shows("\n-- demo comma separated display --");
+  let iter = a.iter();
+  show_pcsl(iter);
+  putline();
+
+  shows("\n-- demo iter over array of strs --");
+  let mut s = [ "one", "two", "three", "four" ];
+  show_pcsl(s.iter());
+  shows(
+    "\n-- demo using Display trait instead of Debug --"
+  );
+  display_pcsl(s.iter());
+  putline();
+
+  shows("\n-- demo map function modifying items --");
+  show_prefix("\n  ");
+    
+  let iter = s.iter_mut().map(|item| { 
+      let mut mod_item:String = item.to_string();
+      mod_item.push('z');
+      mod_item   // returning String, not str
+  });
+
+  for val in iter {
+      print!("{:?} ",val);
+  }
+  putline();
+
+  shows("\n-- demo collect items into Vec --");
+  let iter = s.iter_mut().map(|item| { 
+      let mut mod_item:String = item.to_string();
+      mod_item.push('z');
+      mod_item   // returning String, not str
+  });
+  let v:Vec::&lt;String&gt; = iter.collect();
+  print!("\n  {:?}", v);
+  putline();
+
+  println!("\n  That's all Folks!\n");
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </div>
+    </t-b>
+
 
     <a id="methods"></a>
     <hr class="spread" />
