@@ -71,8 +71,10 @@
        <a href="RustStory_References.html">References</a><br />
      </up-b>
      <rt-b id="sects">
-       <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#functions">Functions</a>, 
-       <a href="#funptr">Function Ptrs</a>, <a href="#methods">Methods</a>, <a href="#lambdas">Lambdas</a>, 
+       <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#functions">Functions</a>,
+       <a href="#funptr">Function Ptrs</a>, <a href="#closures">Closures</a>, <a href="#errors">Errors</a>, 
+       <a href="#iters">Iters</a>, <a href="#methods">Methods and Traits</a>, 
+       <a href="#enums">Matching</a>, 
        <a href="#epilogue">Epilogue</a>, <a href="#refs">References</a>
      </rt-b>
    </toc-b>
@@ -729,7 +731,7 @@ fun(&amp;s);
       or provide short names for longer generic function names.
     </t-b>
 
-    <a id="lambdas"></a>
+    <a id="closures"></a>
     <s-halfEm></s-halfEm>
     <num-cont>
       <num-item1>3.1.2</num-item1><num-item4>Closures:</num-item4>
@@ -898,14 +900,37 @@ fn main() {
       them.
     </t-b>
 
-    <a id="funerr"></a>
+    <a id="errors"></a>
     <s-halfEm></s-halfEm>
     <num-cont>
       <num-item1>3.1.3</num-item1><num-item4>Function Error Handling:</num-item4>
     </num-cont>
     <t-b>
       Rust functions with operations that may fail, e.g., opening a file, should return one of two
-      kinds of result wrappers:
+      kinds of result wrappers, std::Result&lt;T,E&gt; or std::Option&lt;T&gt;.  These are both
+      enumerations:
+      <indent-block class="pad5">
+        <defn-outerBlock>
+          <defn-block>
+            <defn-head>Result:</defn-head>
+            <defn-code>
+enum Result&lt;T, E&gt; {
+  Ok(T),
+  Err(E),
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Option:</defn-head>
+            <defn-code>
+enum Option&lt;T&gt; {
+  Some(T),
+  None,
+}
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+      </indent-block>
       <indent-block class="pad5">
         <ol class="tight">
           <li>
@@ -1462,73 +1487,663 @@ fn display_pcsl&lt;T&gt;(t:T)
     <num-cont>
       <num-item1>3.3</num-item1><num-item4>Structs and Methods:</num-item4>
     </num-cont>
-
-    <a id="traits"></a>
-    <s-halfEm></s-halfEm>
-    <num-cont>
-      <num-item1>3.3.1</num-item1><num-item4>Traits:</num-item4>
-    </num-cont>
-
-    <!--<a id="lambdas"></a>
-    <hr class="spread" />
-    <num-cont>
-      <num-item1>3.4</num-item1><num-item4>Closures:</num-item4>
-    </num-cont>
     <t-b>
-      Closures, also called lambda expressions or lambdas, are anonymous functions that implement 
-      one of these traits:
+      Rust structs, like enums, come in three forms:
       <indent-block class="pad5">
         <ol class="tight">
           <li>
-            FnOnce is implemented automatically by closures that may consume (move and use) 
-            captured variables.
+            <n-s>StructExprStruct</n-s>
+            <div class="pad5">
+              <defn-code style="font-size:1.05em;">struct Person1 {
+    name:String, occup:String, id:u32,
+}</defn-code>
+            </div>
           </li>
           <li>
-            Fn is automatically implemented by closures which take only immutable references to
-            captured data or don&apos;t capture anything.  FnOnce and FnMut are super traits so
-            closures that implement Fn can be used where FnOnce or FnMut are expected.
+            <n-s>StructExprTuple</n-s>
+            <div class="pad5">
+              <defn-code style="font-size:1.05em;">struct Person2 (
+    String, String, u32
+);</defn-code>
+            </div>
           </li>
           <li>
-            <n-s>FnMut</n-s> is implemented automatically by closures which take mutable references
-            to captured variables. FnOnce is a super trait so closures that implement FnMut can
-            be used where FnOnce is expected.
+            <n-s>StructExprUnit</n-s>
+            <div class="pad5">
+              <defn-code style="font-size:1.05em;">struct Person3;</defn-code>
+            </div>
           </li>
         </ol>
       </indent-block>
     </t-b>
     <t-b>
-      <indent-block class="pad5">
+      Struct methods are analogous to class methods in C++. They are implemented in an &quot;impl&quot;
+      block decorated with the struct type name, like this:
+    </t-b>
+    <t-b>
+      <div>
         <defn-block>
-          <defn-head>Closure syntax:</defn-head>
+          <defn-head>Method implementation</defn-head>
           <defn-code>
-  let x:i32 = 3;  // immutable capture, below
-  let cl = |val:i32| { 
-    print!("\n  val = {}, x = {}, val + x = {}", val, x, val + x) 
-  };
-  cl(7);
-          </defn-code>
-          <defn-head class="defnBorderTop">Output:</defn-head>
-          <defn-code>
-  val = 7, x = 3, val + x = 10
+struct Person1 {
+    name:String, occup:String, id:u32,
+}
+impl Person1 {
+    fn show(&self) {
+        print!("\n  Person1: {:?}", &self);
+    }
+}
           </defn-code>
         </defn-block>
-      </indent-block>
-      <t-b>
-        Closures are used where small special purpose functions are needed, but then discarded.
-        Typically used for filters.
-      </t-b>
+      </div>
     </t-b>
-    <a id="epilogue"></a>
+    <t-b>
+      Here, the method <c-s>Person1::show</c-s> is simply delegating its responsibility to the
+      <c-s>print!</c-s> macro. The <c-s>self:Self</c-s> plays the same role as the <c-s>this</c-s>
+      pointer in C++.
+    </t-b>
+    <t-b>
+      The examples below illustrate both method implementation and the implementation of traits, which we
+      discuss in the next subsection.
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle darkItem">Method Implementation Examples:</summary>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Method implementations:</defn-head>
+              <defn-code>
+#[allow(unused_imports)]
+use display::{*};
+use std::fmt;
+
+/*-- basic demo --*/
+#[derive(Debug)]
+struct Person1 {
+    name:String, occup:String, id:u32,
+}
+#[allow(dead_code)]
+impl Person1 {
+    fn show(&self) {
+        print!("\n  Person1: {:?}", &self);
+    }
+}
+#[derive(Debug)]
+struct Person2 (
+    String, String, u32
+);
+#[allow(dead_code)]
+impl Person2 {
+    fn show(&self) {
+        print!("\n  Person2: {:?}", &self);
+    }
+}
+#[derive(Debug)]
+struct Person3;
+#[allow(dead_code)]
+impl Person3 {
+    fn show(&self) {
+        print!("\n  Person3");
+    }
+}
+
+/*-- enums used for Demo1 and Demo2 --*/
+#[derive(Debug, PartialEq, Copy, Clone)]
+#[allow(dead_code)]
+pub enum Level { Basic, Intermediate, Advanced }
+#[derive(Debug, PartialEq, Copy, Clone)]
+#[allow(dead_code)]
+pub enum Topic { Rust, Cpp, Design, }
+
+/*-- Struct Demo1 has private data --*/
+#[derive(Debug)]
+pub struct Demo1 {
+    name: String,
+    level: Level,
+    topic: Topic,
+}
+/*-- implement methods for Demo1 --*/
+#[allow(dead_code)]
+impl Demo1 {
+    pub fn new() -> Self {  // set default values
+        Self {
+            name:String::from(""),
+            level: Level::Basic,
+            topic: Topic::Rust,
+        }
+    }
+    pub fn set_name(&mut self, s:&str) { 
+        self.name = s.to_string(); 
+    }
+    pub fn get_name(&self) -> &String {
+        &self.name
+    }
+    pub fn set_level(&mut self, l:Level) {
+        self.level = l;
+    }
+    pub fn get_level(&self) -> &Level {
+        &self.level
+    }
+    pub fn set_topic(&mut self, t:Topic) {
+        self.topic = t;
+    }
+    pub fn get_topic(&self) -> &Topic {
+        &self.topic
+    }
+}
+
+/*-- struct Demo2 has public data --*/
+#[derive(Debug)]
+pub struct Demo2 {
+    pub name: String,
+    pub level: Level,
+    pub topic: Topic,
+}
+/*-- implement Display trait for Demo2 --*/
+#[allow(dead_code)]
+impl fmt::Display for Demo2 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) ->
+         fmt::Result {
+           write!(
+             f, 
+             "Demo2 {
+               { name: \"{}\", 
+                 level: {:?}, 
+                 topic: {:?} 
+                }
+             }", 
+          self.name, self.level, self.topic)
+    }
+}
+/*-- implement Default trait for Demo2 --*/
+impl Default for Demo2 {
+    fn default() -> Self {
+        Self {
+            name: String::from(""),
+            level: Level::Basic,
+            topic: Topic::Rust,
+        }
+    }
+}
+/*-- implement init method for Demo2 --*/
+impl Demo2 {
+    pub fn init(self) -> Demo2 {
+      Demo2 {
+        name: self.name,
+        level: self.level,
+        topic: self.topic,
+      }
+    }
+}
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Using Code:</defn-head>
+              <defn-code>
+sub_title("Demonstrating Basic Structs");
+let p1 = Person1 { 
+    name:"Jim".to_string(), 
+    occup:"dev".to_string(), 
+    id:42 
+};
+p1.show();
+let p2 = Person2 { 
+    0:"Jim".to_string(),
+    1:"dev".to_string(),
+    2:42
+};
+p2.show();
+let p3 = Person3;
+p3.show();
+putline();
+    
+sub_title("Demonstrating Demo1 Struct");
+let mut demo1 = Demo1::new();
+demo1.set_name("Demo1 probe");
+print!("\n  {:?}", demo1);
+print!(
+  "\n  Demo1 level = {:?}", 
+  demo1.get_level()
+);
+putline();
+
+sub_title("Demonstrating Demo2 Struct");
+let mut demo2 = Demo2 {
+    name: String::from("Jim's Demo2"),
+    ..Default::default()
+}.init();
+
+print!(
+  "\n  Using Debug format\n    {:?}", 
+  demo2
+);
+print!(
+  "\n  setting level to Intermediate:"
+);
+demo2.level = Level::Intermediate;
+print!(
+  "\n  Using Display format\n    {}", 
+  demo2
+);
+putline();    
+
+println!("\n\n  That's all Folks!\n");
+              </defn-code>
+              <defn-head class="defnBorderTop">Output:</defn-head>
+              <defn-code>
+  Demonstrating Basic Structs
+ -----------------------------
+  Person1: Person1 { 
+    name: "Jim", 
+    occup: "dev",
+    id: 42 
+  }
+  Person2: Person2("Jim", "dev", 42)
+  Person3
+
+  Demonstrating Demo1 Struct
+ ----------------------------
+  Demo1 { 
+    name: "Demo1 probe", 
+    level: Basic, 
+    topic: Rust 
+  }
+  Demo1 level = Basic
+
+  Demonstrating Demo2 Struct
+ ----------------------------
+  Using Debug format
+    Demo2 { 
+      name: "Jim\'s Demo2", 
+      level: Basic, 
+      topic: Rust 
+    }
+  setting level to Intermediate:
+  Using Display format
+    Demo2 { 
+      name: "Jim's Demo2", 
+      level: Intermediate, 
+      topic: Rust 
+    }        
+
+  That's all Folks!
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </div>
+    </t-b>
+    <t-b class="mbz">
+      Note that a struct may have any finite number of impl blocks.
+    </t-b>
+    <a id="traits"></a>
+    <s-halfEm></s-halfEm>
+    <num-cont>
+      <num-item1>3.3.1</num-item1><num-item4>Traits:</num-item4>
+    </num-cont>
+    <t-b>
+      &quot;Traits are the abstract mechanism for adding 
+      functionality to types and establishing relationships between them.&quot; 
+      <span style="white-space:nowrap;">- Steve Donovan, 
+      <a href="https://stevedonovan.github.io/rustifications/2018/09/08/common-rust-traits.html">Rustifications</a></span>.  
+    </t-b>
+    <t-b>
+      Traits have two uses:
+      <indent-block class="pad5">
+        <ol class="tight">
+          <li>
+            They act like interfaces, defining a contract for use, e.g.:
+            <div class="pad5">
+              <defn-code style="font-size:1.0em;">trait Speaker {
+    fn salutation(&self) -> String;
+}</defn-code>
+            </div>
+            <div class="pad5">
+              <details>
+                <summary class="labelStyle darkItem">Interfaces Example:</summary>
+              <defn-outerBlock>
+                <defn-block>
+                  <defn-head>Implementing Code:</defn-head>
+                  <defn-code>
+trait Speaker {
+    fn salutation(&self) -> String;
+}
+///////////////////////////////////////////////////////////
+// The following structs act like classes that implement
+// a Speaker interface
+
+#[derive(Debug,Copy,Clone)]
+pub struct Presenter;
+impl Speaker for Presenter {
+    fn salutation(&self) -> String {
+      "Hello, today we will discuss ...".to_string()
+    }
+} 
+
+#[derive(Debug)]
+pub struct Friend {
+    pub name : String,
+}
+impl Speaker for Friend {
+    fn salutation(&self) -> String {
+      let mut s = String::from(
+        "Hi good buddy, its me, "
+      );
+      let nm = self.name.as_str();
+      s.push_str(nm);
+      return s;
+    }
+}
+impl Friend {
+    pub fn new(name : String) -> Self {
+        Self {
+            name,
+        }  // no semicolon so self
+    }      // is returned
+}
+
+#[derive(Debug,Copy,Clone)]
+pub struct TeamLead;
+impl Speaker for TeamLead {
+    fn salutation(&self) -> String {
+      "Hi, I have a task for you 
+       ...".to_string()
+    }
+} 
+                  </defn-code>
+                </defn-block>
+                <defn-block>
+                  <defn-head>Using Code:</defn-head>
+                  <defn-code>
+let presenter : Presenter = Presenter;
+let joe : Friend = Friend::new("Joe".to_string());
+let sue : Friend = Friend::new("Sue".to_string());
+let team_lead : TeamLead = TeamLead;
+
+let mut v :Vec<&dyn Speaker> = Vec::new();
+v.push(&presenter);
+v.push(&joe);
+v.push(&sue);
+v.push(&team_lead);
+
+for speaker in v.iter() {
+    print!("\n  {:?}",speaker.salutation());
+}
+                  </defn-code>
+                  <defn-head class="defnBorderTop">Output:</defn-head>
+                  <defn-code>
+-- demo polymorphic struct instances --
+
+"Hello, today we will discuss ..."
+"Hi good buddy, its me, Joe"
+"Hi good buddy, its me, Sue"
+"Hi, I have a task for you ..."
+
+                  </defn-code>
+                </defn-block>
+              </defn-outerBlock>
+              </details>
+            </div>
+          </li>
+          <li>
+            They act as generic constraints, enforcing compile failure if a generic argument does not
+            satisfy a required trait, e.g.:
+            <div class="pad5">
+              <defn-code style="font-size:1.0em;">fn demo_ref&lt;T&gt;(t:&T) where T:Debug  {
+    show_type(t);
+    show_value(t);
+}</defn-code>
+            </div>
+          </li>
+        </ol>
+      </indent-block>
+    </t-b>
+    <t-b>
+      There are a number of commonly used traits defined in the std library:
+      <indent-block class="pad5">
+        <ul class="tight">
+          <li>
+            <n-s>Debug</n-s> and <n-s>Display</n-s> for displaying values on the console and in
+            formatted strings.
+          </li>
+          <li>
+            <n-s>Copy</n-s> can only be implemented by blitable types.  If you implement <n-s>Copy</n-s>
+            then you must also implement <n-s>Clone</n-s>.  However, you can implement <n-s>Clone</n-s>
+            for types that are not blittable. Many of the Rust containers implement <n-s>Clone</n-s>.
+          </li>
+          <li>
+            <n-s>ToString</n-s> for values convertable to strings.
+          </li>
+          <li>
+            <n-s>Default</n-s> used to set default values.
+          </li>
+          <li>
+            <n-s>From</n-s> and <n-s>Into</n-s> for conversions. If you implement <n-s>From</n-s>
+            then <n-s>Into</n-s> is implemented by the compiler.
+          </li>
+          <li>
+            The std library implements <n-s>FromStr</n-s> for numeric types.
+          </li>
+        </ul>
+      </indent-block>
+      Many of these traits can be implemented by derivation, e.g., <c-s>#[derive(Debug, Clone, ...)]</c-s>.
+      The Interfaces Examples, above, has examples of this use.
+    </t-b>
+    <t-b>
+      You will find more useful traits discussed in the Steve Donovan citation in the quote at the top 
+      of this section.
+    </t-b>
+
+    <a id="enums"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>3.5</num-item1><num-item4>Epilogue:</num-item4>
-    </num-cont>-->
+      <num-item1>3.4</num-item1><num-item4>Enumerations and Matching:</num-item4>
+    </num-cont>
+    <t-b>
+      We saw, in the previous chapter, how enumerations are defined.  Here, we are concerned with common
+      uses, especially with matching.  Here&apos;s the matching syntax:
+    </t-b>
+    <t-b>
+      <div>
+        <defn-outerBlock>
+          <defn-block>
+            <defn-head>Explicit match syntax</defn-head>
+            <defn-code>
+let value = Name::Jack;
+match value {
+  Name::John => print!("\n  I am John"),
+  Name::Jim  => print!("\n  I am Jim"),
+  Name::Jack => print!("\n  I am Jack")
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>if else match syntax</defn-head>
+            <defn-code>
+let value = Name::Jack;
+if let Name::Jim = value {
+  print!("\n  I am Jim");
+}
+else {
+  print!("\n  I am not Jim");
+}
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+      </div>
+    </t-b>
+    <t-b>
+      The second &quot;=&quot; token in the <n-s>if else syntax</n-s> block is not an assignment.  It is a match operator.
+    </t-b>
+    <t-b>
+      Some of the enumeration syntax for <n-s>matching</n-s> and <n-s>if let</n-s> can be verbose.
+      Here&apos;s examples that show how to use the enumeration types:
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle darkItem">Enumeration and Matching Examples:</summary>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Enumeration Code</defn-head>
+              <defn-code>
+use display::{*};
+use std::fmt::{Debug};
+
+#[allow(dead_code)]
+#[derive(Debug)]
+enum Name { John, Jim=42, Jack }
+
+#[allow(dead_code)]
+#[derive(Debug)]
+enum NameTuple { 
+    John(String, u32), 
+    Jim(String, u32), 
+    Jack(String, u32) 
+}
+
+#[allow(dead_code)]
+#[derive(Debug)]
+enum NameStruct {
+    John { occup:String, id:u32 },
+    Jim  { occup:String, id:u32 },
+    Jack { occup:String, id:u32 }
+}
+fn main() {
+
+    main_title("Demonstrating enum_probes");
+    print!("\n  - enumerations, match, if let");
+    putline();
+
+    /*-- enum discriminant with explicit matching --*/
+
+    sub_title("  -- enum discriminant --  ");
+    let test = Name::Jim;
+    match test {
+        Name::John =&gt; {
+            let john_discriminant = Name::John as u32;
+            print!(
+            "\n  I am John. my discriminant is {:?}", 
+            john_discriminant
+        )},
+        Name::Jim =&gt; {
+            let jim_discriminant = Name::Jim as u32;
+            print!(
+            "\n  I am Jim. my discriminant is {:?}", 
+            jim_discriminant
+        )},
+        Name::Jack =&gt; {
+            let jack_discriminant = Name::Jack as u32;
+            print!(
+            "\n  I am Jack. my discriminant is {:?}", 
+            jack_discriminant
+        )},
+    }
+    putline();
+
+    let test1 = Name::John;
+    let test2 = Name::Jim;
+    let test3 = Name::Jack;
+
+    if let Name::Jack = test1 {
+        print!("\n  I am John");
+    }
+    else {
+        print!("\n  I am not John");
+    }
+    if let Name::Jack = test2 {
+        print!("\n  I am Jim");
+    }
+    else {
+        print!("\n  I am not Jim");
+    }
+    if let Name::Jack = test3 {
+        print!("\n  I am Jack");
+    }
+    else {
+        print!("\n  I am not Jack");
+    }
+    putline();
+
+    /*-- enum tuple with if let matching --*/
+
+    sub_title("  -- enum tuple --  ");
+    let value = NameTuple::John("pilot".to_string(), 52);
+    if let NameTuple::John(occup, id) = value {
+        print!(
+            "
+  my name is John
+  occupupation is {}
+  id is {}", occup, id
+        );
+    }
+    putline();
+
+    /*-- enum struct  with match and all else --*/
+
+    sub_title("  -- enum struct --  ");
+    let value = NameStruct::Jack { 
+      occup:"plumber".to_string(), id:32 
+    };
+    match value {
+        NameStruct::Jack {occup, id} =&gt; 
+          print!("\n Jack - occup: {}, id: {}", occup, id),
+        _ =&gt; print!("\n  not Jack")
+    }
+    putline();
+
+    println!("\n\nThat's all Folks!\n");
+}
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Output:</defn-head>
+              <defn-code>
+  Demonstrating enum_probes
+ ===========================
+  - enumerations, match, if let
+
+    -- enum discriminant --
+ -----------------------------
+  I am Jim. my discriminant is 42
+
+  I am not John
+  I am not Jim
+  I am Jack
+
+    -- enum tuple --
+ ----------------------
+  my name is John
+  occupupation is pilot
+  id is 52
+
+    -- enum struct --
+ -----------------------
+ Jack - occup: plumber, id: 32
+
+
+That's all Folks!
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </div>
+    </t-b>
+    <t-b>
+      Both forms of matching are widely used in Rust code.  If you work some code examples until you
+      are comfortable with these operations, you will find it much easier to understand the Rust literature.
+    </t-b>
 
     <a id="epilogue"></a>
     <hr class="spread" />
     <num-cont>
       <num-item1>3.5</num-item1><num-item4>Epilogue:</num-item4>
     </num-cont>
+    <t-b>
+      Rust has a rich set of operations that make it very expressive, once you become familiar with their
+      idomatic use. They do make the learning process interesting (The good news is ..., the bad news is ...).
+    </t-b>
 
     <a id="refs"></a>
     <hr class="spread" />
@@ -1540,6 +2155,14 @@ fn display_pcsl&lt;T&gt;(t:T)
       <tr>
         <th class="darkItem">Reference Link</th>
         <th class="darkItem">Description</th>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://doc.rust-lang.org/reference/index.html">Rust Reference</a>
+        </td>
+        <td class="lightItem">
+          Rust Reference is the official language definition - surprisingly readable.
+        </td>
       </tr>
       <tr>
         <td class="lightItem">
@@ -1579,6 +2202,16 @@ fn display_pcsl&lt;T&gt;(t:T)
         </td>
         <td class="lightItem">
           Using option and result effectively - Herman Radtke
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://stevedonovan.github.io/rustifications/2018/09/08/common-rust-traits.html">
+            Common Traits
+          </a>
+        </td>
+        <td class="lightItem">
+          Clear descriptions of many of the common Rust traits
         </td>
       </tr>
       <tr>
