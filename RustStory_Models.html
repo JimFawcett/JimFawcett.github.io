@@ -181,7 +181,7 @@ edition = "2018"
           <defn-body>
             <ol class="tight">
               <li>
-                Memory unsafety <==> <n-s>aliasing + mutation</n-s>, <n-s>out-of-bounds indexing</n-s>
+                <n-b>Memory unsafety <==> <n-s>aliasing + mutation</n-s> or <n-s>out-of-bounds indexing</n-s></n-b>
                 <div>
                   Rust provides memory safety by:
                   <indent-block class="pad5">
@@ -192,7 +192,8 @@ edition = "2018"
                 </div>
               </li>
               <li>
-                Data races <==> <n-s>aliasing + mutation + no ordering</n-s>
+                <n-b>Data races <==> <n-s>aliasing + mutation + no ordering</n-s></n-b>
+                Rust provides race safety using two concurrency models:
                 <indent-block class="pad5">
                   Model #1 - Thread communication through messaging transfers ownership of message
                   <indent-block>
@@ -225,7 +226,7 @@ edition = "2018"
             </div>
             <ul class="tight" style="list-style-type:lower-alpha;">
               <li>
-                If a type is blittable, e.g., primitives, arrays, ... it is copyable:
+                If a type is blittable<sup>1</sup>, e.g., primitives, arrays, ... it is copyable:
                 <indent-block class="pad5">
                   <c-s>let a1 = [1, 2, 3];<br />let a2 = a1;&nbsp;&nbsp;&nbsp;// a copy</c-s>
                 </indent-block>
@@ -235,10 +236,11 @@ edition = "2018"
                 <indent-block class="pad5">
                   <c-s>let s1 = "a string".to_string();<br />
                   let s2 = s1;&nbsp;&nbsp;&nbsp;// a move<br />
-                  let s3 = s2.clone();&nbsp;&nbsp;&nbsp;// an explicit copy</c-s>
+                  let s3 = s2.clone();&nbsp;&nbsp;&nbsp;// an explicit copy so no move</c-s>
                 </indent-block>
                 In this example, s1 will not be usable after the move. Attempts to use a moved item are
-                <n-s>compile</n-s> errors! S3 owns a <n-s>copy</n-s> of s2&apos;s resource.
+                <n-s>compile</n-s> errors! S3 owns a <n-s>copy</n-s> of s2&apos;s resource, so s2 is usable
+                after the clone operation.
               </li>
               <li>
                 References support <n-s>borrowing</n-s>:
@@ -252,19 +254,30 @@ edition = "2018"
                 <div>
                   <ul class="tight">
                     <li>
-                      Only one reference is allowed if mutable
+                      Only one mutable reference is allowed
                     </li>
                     <li>
-                      Any number of references are allowed if non-mutable
+                      Any number of un-mutable references are allowed
                     </li>
                     <li>
                       Owner must not mutate while references are active.
-                      References become inactive when they go out of scope.
+                      References become inactive when they go out of scope or are dropped<sup>2</sup>.
                     </li>
                   </ul>
                 </div>
               </li>
             </ul>
+            <hr class="spreadup" />
+            <div class="footnote">
+              <ol class="tight">
+                <li>
+                  Data that can be copied with a block transfer, e.g., using memcpy.
+                </li>
+                <li>
+                  let x = String::from("will be dropped"); drop(x);
+                </li>
+              </ol>
+            </div>
           </li>
           <li>
             All <n-s>resource management is scope based</n-s>.  When an item, holding resources, goes out of scope,
@@ -620,7 +633,7 @@ edition = "2018"
       <indent-block class="pad10">
         <c-s>
           [dependencies]<br />
-          serde
+          serde = "1.0.104"
         </c-s>
       </indent-block>
       The <a href="https://crates.io/crates/serde">serde crate</a> provides serialization and deserialization 
@@ -736,7 +749,7 @@ cargo -q run
         <li>
           <strong>Modules:</strong>
           <indent-block class="pad10">
-            Modules provide a way to factor code into smaller simpler parts in the same package.
+            Modules provide a way to factor code into smaller simpler parts in the same crate.
           </indent-block>
         </li>
       </ul>
@@ -1196,12 +1209,12 @@ t = String named s with more stuff
         </defn-outerBlock>
       </indent-block>    </t-b>
     <t-b>
-      Rust has references, which bind to, but don't own their &quot;borrowed&quot; values:
+      Rust has references, which bind to, and borrow but don't own their &quot;borrowed&quot; values:
       <indent-block class="pad5">
         <c-s>let r = &amp;x;</c-s>
       </indent-block>
       A Rust program many have any number of non-mutating references to a given value.  However, it
-      may only have at most one mutating reference, and in that case, no other references.
+      may have at most one mutating reference, and in that case, no other references.
       <indent-block class="pad5">
         <c-s>let r = &amp;mut x;</c-s>
       </indent-block>
@@ -1215,6 +1228,8 @@ t = String named s with more stuff
           <defn-block>
             <defn-head>Example reference:</defn-head>
             <defn-code>
+let i = 3;        // i32 so copyable
+let mut j = i;    // copy of i
 let r = &mut j;   // r borrows j, e.g., reference, no copy
 *r += 2;          // j is mutated
 print!("\n  i = {}, j = {}", i, j);
@@ -1275,7 +1290,7 @@ i = 3, j = 5
     <t-b>
       <t-b>
         <details>
-          <summary class="labelStyle lightItem">Type Declarations:</summary>
+          <summary class="labelStyle darkItem">Type Declarations:</summary>
           <defn-outerBlock>
             <defn-block>
               <defn-head>Declaring Code:</defn-head>
@@ -1654,7 +1669,7 @@ let mut bpt = BetterPoint {
 demo_ref(&amp;bpt);
 bpt.x = "four".to_string();
 demo(bpt);
-// statement won't compile - pt not blittable
+// won't compile - bpt not blittable so it was moved
 // bpt.x = "one".to_string();
 
 putlinen(2);
