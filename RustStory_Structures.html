@@ -2,7 +2,7 @@
 <html id="top">
 <head>
   <!--
-   - CppStory_Prologue.html
+   - RustStory_Structures.html
    - ver 1.0 - 10 June 2019
    - Jim Fawcett, Emeritus Teaching Professor, Syracuse University
   -->
@@ -51,7 +51,7 @@
   <header>
     <hgroup id="pagetitle">
       <h1 id="title">Chapter 4. - Rust Structures</h1>
-      <h3 id="subtitle">enums, structs, traits, attributes</h3>
+      <h3 id="subtitle">Example libraries, tests, and documentation</h3>
     </hgroup>
   </header>
 
@@ -71,9 +71,10 @@
        <a href="RustStory_References.html">References</a><br />
      </up-b>
      <rt-b id="sects">
-       <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#enums">Enums</a>, 
-       <a href="#structs">Structs</a>, <a href="#methods">Methods</a>, <a href="#attributes">Attributes</a>, 
-       <a href="#traits">Traits</a>, <a href="#epilogue">Epilogue</a>, <a href="#refs">References</a>
+       <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#logger">Logger</a>, 
+       <a href="#cmdlnproc">CmdLnProc</a>, <a href="#dirnav">DirNav</a>, <a href="#unittest">UnitTest</a>, 
+       <a href="#examples">Examples</a>, <a href="#docs">Documentation</a>, 
+       <a href="#epilogue">Epilogue</a>, <a href="#refs">References</a>
      </rt-b>
    </toc-b>
 
@@ -83,47 +84,549 @@
     <num-cont>
       <num-item1>3.0</num-item1><num-item4>Prologue:</num-item4>
     </num-cont>
-
-    <a id="enums"></a>
+    <t-b>
+      Previous chapters have provided a lot of technical details about the Rust programming language.  In this chapter we will bring all that
+      together by presenting a few libraries: Logger, CmdLineParser, and DirNavigator.
+    </t-b>
+    <t-b>
+      For the first Logger library we will explore library structure, its implementation, testing, and documentation.  The Rust tool cargo,
+      in concert with the rustc compiler, provide an excellent environment for building libraries and applications, with detailed testing and
+      documentation.
+    </t-b>
+    <t-b>
+      This chapter is a good place to start exploring that.
+    </t-b>
+    <a id="logger"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>3.1</num-item1><num-item4>Enums:</num-item4>
+      <num-item1>3.1</num-item1><num-item4>Logger Library:</num-item4>
+    </num-cont>
+    <t-b>
+      The Logger Library provides a light-weight logger, useful for debugging and demonstration.
+      Library development started with <span>specifications</span>:
+      <indent-block class="pad5">
+        <ol class="tight">
+          <li>
+            Support simultaneous writes to console and a file.
+          </li>
+          <li>
+            Provide file open and close operations and enable or disable
+            console output.
+          </li>
+          <li>
+            Write text messages.
+          </li>
+          <li>
+            Optionally prepend a message with a date-time stamp, using local system time.
+          </li>
+        </ol>
+      </indent-block>
+    </t-b>
+    <t-b>
+      Implementation starts with a struct:
+    </t-b>
+    <t-b>
+      <div class="left" style="padding:5px 25px">
+        <defn-block>
+          <defn-head>
+            Logger Struct
+          </defn-head>
+          <defn-code>
+pub struct Logger {
+    fl:Option&lt;File&gt;,
+    console:bool,
+}
+          </defn-code>
+        </defn-block>
+      </div>
+    </t-b>
+    <t-b>
+      Logger has two data members: <c-s>fl</c-s> and <c-s>console</c-s>. <c-s>fl</c-s> is an <c-s>Option</c-s> that either holds a <c-s>File</c-s>
+      instance as <c-s>Some(f:File)</c-s> or <c-s>None</c-s>.  When you create a logger with <c-s>Logger::new()</c-s>, 
+      <c-s>fl</c-s> is <c-s>None</c-s>, so the logger is not attached to a file.
+    </t-b>
+    <t-b>
+      The member <c-s>console</c-s> is a boolean that determines whether a write sends its output to the console.  <c-s>Logger::new()</c-s> sets 
+      <c-s>console</c-s> to <c-s>true</c-s>, so the logger will, by default, write to the console. To do anything useful, we need some functions 
+      that operate on that member data.  Note
+      that the Logger structure is public, but its data members are not, so only Logger methods can alter their state.
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle darkItem">Logger Methods:</summary>
+          <defn-outerblock>
+          <defn-block>
+            <defn-head>Logger Methods:</defn-head>
+            <defn-code>
+#[allow(dead_code)]
+impl Logger {
+    <n-s>/*-- let l = Logger::new() --*/</n-s>
+    pub fn new() -&gt; Self {
+        Self { fl:None, console:true, }
+    }
+    <n-s>/*-- let l = init(f, true) --*/</n-s>
+    pub fn init(f:File, con:bool) -&gt; Self {
+        Self { fl:Some(f), console:con, }
+    }
+    <n-s>/*-- l.console(false) --*/</n-s>
+    pub fn console(&amp;mut self, con:bool) {
+        self.console = con
+    }
+    <n-s>/*-- l.file(f) --*/</n-s>
+    pub fn file(&amp;mut self, f:File) {
+        self.fl = Some(f);
+    }
+    <n-s>/*-- l.opt(fo) --*/</n-s>
+    pub fn opt(&amp;mut self, fo:Option&lt;File&gt;) {
+        self.fl = fo;
+    }
+    <n-s>/*-- l.open("log.txt") --*/</n-s>
+    pub fn open(&amp;mut self, s:&amp;str) {
+        use std::fs::OpenOptions;
+        self.fl = OpenOptions::new()
+                .write(true)
+                .create(true)
+                .append(true)
+                .open(s).ok();
+    }
+    <n-s>/*-- l.ts_write("test1 log") --*/</n-s>
+    pub fn ts_write(&amp;mut self, s:&amp;str) -&gt; &amp;mut Self {
+        
+        let now: DateTime&lt;Local&gt; = Local::now();
+        /* format DateTime string */
+        let mut now_str = format!("\n  {}", now.to_rfc2822());    
+        /* remove trailing -0400 */
+        now_str.truncate(now_str.len() - 6);
+
+        Logger::write(self, &amp;now_str);
+        Logger::write(self, s);
+        self
+    }
+    <n-s>/*-- l.write("\n  first item").write("\n  second item") --*/</n-s>
+    pub fn write(&amp;mut self, s:&amp;str) -&gt; &amp;mut Self {
+        if let Some(ref mut f) = self.fl {
+            let _n = f.write(s.as_bytes());
+        }
+        if self.console {
+            print!("{}", s);
+        }
+        self
+    }
+    <n-s>/*-- l.close() --*/</n-s>
+    pub fn close(&amp;mut self) {
+        self.fl = None;
+    }
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Explanations:</defn-head>
+            <defn-body style="width:25em;">
+              <t-b>
+                Methods are defined in one or more impl blocks.
+                Each block contains method definitions, as you see in the right panel.
+              </t-b>
+              <t-b>
+                The type Self is the type of the Structure, e.g., Logger. The variable self is a reference
+                to the instance on which the method was called.
+              </t-b>
+              <t-b>
+                The method new() returns an instance of the type Self, e.g., the logger we are creating with
+                this method. It only has one line: <c-s>Self { fl:None, console:true, }</c-s>. Since there
+                is no semicolon following the closing brace in this line, this is an expression, and any scope has the value
+                of its last expression, so we are returning <c-s>Logger { fl:None, console:true }</c-s>.
+              </t-b>
+              <t-b>
+                Many of the methods are relatively simple, but the <c-s>write</c-s> method has some peculiar code, e.g.:
+                <indent-block class="pad5">
+                  <c-s>if let Some(ref&nbsp;&nbsp;mut&nbsp;&nbsp;f) = self.fl { ... }</c-s>
+                </indent-block>
+                The &quot;=&quot; operator is not an assignment.  It is a matching operator. The term &quot;<c-s>Some(ref&nbsp;&nbsp;mut&nbsp;&nbsp;f)</c-s>
+                is the <c-s>Option&lt;T&gt;::Some(t:T)&gt;</c-s> holding a mutable reference to a File instance.  So, we are matching
+                <c-s>self.fl</c-s> with a pattern that requires the <c-s>Some</c-s> option rather than <c-s>None</c-s>.
+                If the match is satisfied, e.g., the logger has a file reference, then we write to the file.
+              </t-b>
+              <t-b>
+                The remainder of the function
+                is a test to see if the user elected to use the console, and if so, writes to the console.  So, if both conditions match, the
+                logger writes to both the console and the log file.
+              </t-b>
+              <t-b>
+                The <c-s>ts_write</c-s> method uses code from the DateTime crate to generate the local system date and time, format it, and then write
+                using the <c-s>write</c-s> method. It then repeats with its string argument.
+              </t-b>
+            </defn-body>
+          </defn-block>
+          </defn-outerblock>
+        </details>
+      </div>
+    </t-b>
+    <t-b>
+      Logger has nine methods: 
+      <div class="pad5 indent">
+        <c-s>new()</c-s>, <c-s>init(f:File, con:bool)</c-s>,
+        <c-s>console(con:bool)</c-s>, <c-s>file(f:file)</c-s>, <c-s>opt(f:Option&lt;File&gt;)</c-s>,
+        <c-s>open(file_name:&str)</c-s>, <c-s>ts_write(s:&str)</c-s>, <c-s>write(s:&str)</c-s>,
+        and <c-s>close()</c-s>
+      </div>
+      <c-s>new</c-s> and <c-s>init</c-s> are creational methods, <c-s>console</c-s>, <c-s>file</c-s>, and <c-s>opt</c-s> mutate the logger state,
+      <c-s>open</c-s> and <c-s>close</c-s> manage the state of logger&apos;s file member, and <c-s>write</c-s> and <c-s>ts_write</c-s> handle 
+      logger&apos;s main business, writing to the console and/or file.
+    </t-b>
+    <t-b>
+      Both <c-s>write</c-s> and <c-s>ts_write</c-s> return <c-s>&mut Self</c-s>, so they can be chained, e.g.,
+      <c-s>l.write("first).write(", second");</c-s>
+    </t-b>
+    <div class="clear"></div>
+
+    <a id="unittest"></a>
+    <s-halfEm></s-halfEm>
+    <num-cont>
+      <num-item1>3.2.1</num-item1><num-item4>Unit Tests:</num-item4>
+    </num-cont>
+    <t-b>
+      when cargo creates a library project with <c-s>cargo new --lib</c-s>, it creates a src directory containing a <c-s>lib.rs</c-s> 
+      file.  At the end of the file you will find a #[cfg(test)] directive that defines one or more tests to run.
+    </t-b>
+    <t-b>
+      Each test starts with a #[test] directive containing a single test function.  The test function is expected to have one or more
+      assertions.  The test passes if all assertions are satisfied, otherwise it fails.
+    </t-b>
+    <t-b>
+      The details dropdown, below, lists all of the unit tests for the Logger library. 
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle darkItem">Logger Unit Tests:</summary>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Unit Test Code:</defn-head>
+              <defn-code>
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_open_file() {
+        let stest = "test_open.txt";
+        let mut l = Logger::new();
+        l.open(stest);
+        open_file(stest, OpenMode::Truncate);
+        assert_eq!(file_exists(stest),true);
+        remove_file(stest);
+        assert_eq!(file_exists(stest),false);
+    }
+    #[test]
+    fn test_file_contains() {
+        let stest = "test_contains.txt";
+        let mut l = Logger::new();
+        l.open(stest);
+        assert_eq!(l.fl.is_some(), true);
+        l.write("test contents with a short string");
+        l.close();
+        assert_eq!(file_exists(stest), true);
+        assert_eq!(file_contains(stest, "a short"), true);
+        remove_file(stest);
+        assert_eq!(file_exists(stest),false);
+    }
+    #[test]
+    fn test_remove_file() {
+        let stest = "test_remove";
+        open_file(stest, OpenMode::Truncate);
+        remove_file(stest);
+        assert_eq!(file_exists(stest),false);
+    }
+    #[test]
+    fn test_file_exists() {
+        assert_eq!(file_exists("foobar.fee"),false);
+    }
+    #[test]
+    fn test_new() {
+        let stest = "test_new";
+        let mut l = Logger::new();
+        l.open(stest);
+        assert_eq!(file_exists(stest), true);
+        remove_file(stest);
+        assert_eq!(file_exists(stest), false);
+    }
+    #[test]
+    fn test_init() {
+        let stest = "test_new";
+        let opt = open_file(stest, OpenMode::Append);
+        let mut l = Logger::init(opt.unwrap(), false);
+        l.open(stest);
+        assert_eq!(file_exists(stest), true);
+        remove_file(stest);
+        assert_eq!(file_exists(stest), false);
+    }
+    #[test]
+    fn test_console() {
+        let mut l = Logger::new();
+        assert_eq!(l.console == true, true);
+        l.console(false);
+        assert_eq!(l.console == false, true);
+    }
+    #[test]
+    fn test_file() {
+        let mut l = Logger::new();
+        let stest = "test_file";
+        l.file(open_file(stest, OpenMode::Append).unwrap());
+        assert_eq!(file_exists(stest), true);
+        remove_file(stest);
+        assert_eq!(file_exists(stest), false);
+    }
+    #[test]
+    fn test_opt() {
+        let mut l = Logger::new();
+        let stest = "test_file";
+        let file_opt = open_file(stest, OpenMode::Append);
+        l.opt(file_opt);
+        assert_eq!(file_exists(stest), true);
+        remove_file(stest);
+        assert_eq!(file_exists(stest), false);
+    }
+    #[test]
+    fn test_open() {
+        let mut l = Logger::new();
+        let stest = "test_open";
+        l.open(stest);
+        assert_eq!(file_exists(stest), true);
+        remove_file(stest);
+        assert_eq!(file_exists(stest), false);
+    }
+    #[test]
+    fn test_write() {
+        let mut l = Logger::new();
+        let stest = "test_write";
+        l.open(stest);
+        let stxt = "abc 012 xyz 789";
+        l.write(stxt);
+        assert_eq!(file_contains(stest, stxt), true);
+        remove_file(stest);
+        assert_eq!(file_exists(stest), false);
+    }
+    #[test]
+    fn test_ts_write() {
+        let mut l = Logger::new();
+        let stest = "test_ts_write";
+        l.open(stest);
+        let sdt = "2020";  // change if year != 2020
+        let stxt = "abc 012 xyz 789";
+        l.ts_write(stxt);
+        assert_eq!(file_contains(stest,sdt), true);
+        assert_eq!(file_contains(stest, stxt), true);
+        remove_file(stest);
+        assert_eq!(file_exists(stest), false);
+    }
+    #[test]
+    fn test_close() {
+        let mut l = Logger::new();
+        let stest = "test_close.txt";
+        l.open(stest);
+        assert_eq!(l.fl.is_some(), true);
+        l.close();
+        assert_eq!(l.fl.is_none(), true);
+        remove_file(stest);
+        assert_eq!(file_exists(stest), false);
+    }
+}
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Output:</defn-head>
+              <defn-code>
+>cargo test
+
+   // compiler output elided
+
+running 13 tests
+test tests::test_console ... ok
+test tests::test_close ... ok
+test tests::test_file ... ok
+test tests::test_file_exists ... ok
+test tests::test_file_contains ... ok
+test tests::test_init ... ok
+test tests::test_new ... ok
+test tests::test_open ... ok
+test tests::test_open_file ... ok
+test tests::test_remove_file ... ok
+test tests::test_opt ... ok
+test tests::test_write ... ok
+test tests::test_ts_write ... ok
+
+test result: ok. 
+  13 passed; 0 failed; 
+   0 ignored; 0 measured; 0 filtered out        
+
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </div>
+    </t-b>
+    <t-b>
+      Since cargo sets up the unit test configuration code for each library crate that it creates, 
+      it is quite easy to write unit tests as we write functions.  When development is finished we
+      have a robust test sequence that can be run any time maintenance changes are made to the library.
+    </t-b>
+
+    <a id="examples"></a>
+    <s-halfEm></s-halfEm>
+    <num-cont>
+      <num-item1>3.2.2</num-item1><num-item4>Examples:</num-item4>
+    </num-cont>
+    <t-b>
+      If you create an examples directory as a sibling of src, then you can put code there with a main function that
+      exercises your library, perhaps to demonstrate its operations for new users.  If you do that then
+      <indent-block class="pad5">
+        <c-s>cargo run --example test1</c-s>
+      </indent-block>
+        will trigger cargo to attempt to build a binary crate from
+        test1.rs and run its executable.
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle darkItem">Examples:</summary>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Examples/test1.rs</defn-head>
+              <defn-code>
+extern crate logger;
+
+use logger::{*};
+use display::{*};
+use std::fs::File;
+
+fn main() {
+
+    main_title("Demonstrating Logger");
+    putline();
+    let file_name = "log.txt";
+
+    if file_exists(file_name) {
+        remove_file(file_name);
+        print!("\n  deleted previous log file");
+    }
+    else {
+        print!("\n  failed to delete previous log file");
+    }
+
+    sub_title("writing to \"Log.txt\"");
+
+    let f:Option&lt;File&gt; = open_file(file_name, OpenMode::Append);
+
+    let mut log = Logger::new();
+    log.console(true);
+    log.opt(f);
+    log.ts_write("\n  starting log");
+    log.write("\n  first entry").write(", second entry");
+    log.write(", third entry");
+    log.close();
+    log.console(false);
+    /*-- won't write, won't panic --*/
+    log.write("\n  after close");
+    /*-- reopens logger with named file --*/
+    log.open("log.txt");
+    log.console(true);
+    log.ts_write("\n  reopening log");
+    log.write("\n  after reopen");
+    log.close();
+    
+    let test_string = "first entry";
+    let b = file_contains(file_name, test_string);
+    if b {
+        print!("\n  found {} in {}", test_string, file_name);
+    }
+    else {
+        print!("\n did not find {} in {}", test_string, file_name);
+    }
+    println!("\n\n  That's all Folks!\n");
+}
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Output:</defn-head>
+              <defn-code>
+>cargo run --example test1
+
+    // compiler output elided
+
+  Demonstrating Logger
+ ======================
+
+  deleted previous log file
+  writing to "Log.txt"
+ ----------------------
+  Wed, 18 Mar 2020 14:37:40
+  starting log
+  first entry, second entry, third entry
+  Wed, 18 Mar 2020 14:37:40
+  reopening log
+  after reopen
+  contents = 
+  Wed, 18 Mar 2020 14:37:40
+  starting log
+  first entry, second entry, third entry
+  Wed, 18 Mar 2020 14:37:40
+  reopening log
+  after reopen
+  found first entry in log.txt
+
+  That's all Folks!
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </div>
+    </t-b>
+    <t-b>
+      You can have any number of example files in the examples directory, each with a main function that demonstrates some
+      particular aspect of your library. You can also supply examples suitable for developer&apos;s with different levels
+      of expertise with Rust.
+    </t-b>
+
+    <a id="cmdlnproc"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>3.2</num-item1><num-item4>CmdLine Processor Library:</num-item4>
     </num-cont>
 
-    <a id="structs"></a>
+    <a id="dirnav"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>3.2</num-item1><num-item4>Structs:</num-item4>
+      <num-item1>3.3</num-item1><num-item4>Directory Navigator Library:</num-item4>
     </num-cont>
 
-    <a id="methods"></a>
+    <a id="unittest"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>3.3</num-item1><num-item4>Methods:</num-item4>
+      <num-item1>3.4</num-item1><num-item4>Unit Tests:</num-item4>
     </num-cont>
 
-    <a id="attributes"></a>
+    <a id="examples"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>3.4</num-item1><num-item4>Attributes:</num-item4>
+      <num-item1>3.5</num-item1><num-item4>Library Demo Examples:</num-item4>
     </num-cont>
 
-    <a id="traits"></a>
+    <a id="docs"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>3.5</num-item1><num-item4>Traits:</num-item4>
+      <num-item1>3.6</num-item1><num-item4>Library Documentation:</num-item4>
     </num-cont>
 
     <a id="epilogue"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>3.6</num-item1><num-item4>Epilogue:</num-item4>
+      <num-item1>3.7</num-item1><num-item4>Epilogue:</num-item4>
     </num-cont>
 
     <a id="refs"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>3.7</num-item1><num-item4>References:</num-item4>
+      <num-item1>3.8</num-item1><num-item4>References:</num-item4>
     </num-cont>
 
   </bb-55>
