@@ -152,6 +152,18 @@ pub struct Logger {
       that the Logger structure is public, but its data members are not, so only Logger methods can alter their state.
     </t-b>
     <t-b>
+      Logger has nine methods: 
+      <div class="pad5 indent">
+        <c-s>new()</c-s>, <c-s>init(f:File, con:bool)</c-s>,
+        <c-s>console(con:bool)</c-s>, <c-s>file(f:file)</c-s>, <c-s>opt(f:Option&lt;File&gt;)</c-s>,
+        <c-s>open(file_name:&str)</c-s>, <c-s>ts_write(s:&str)</c-s>, <c-s>write(s:&str)</c-s>,
+        and <c-s>close()</c-s>
+      </div>
+      <c-s>new</c-s> and <c-s>init</c-s> are creational methods, <c-s>console</c-s>, <c-s>file</c-s>, and <c-s>opt</c-s> mutate the logger state,
+      <c-s>open</c-s> and <c-s>close</c-s> manage the state of logger&apos;s file member, and <c-s>write</c-s> and <c-s>ts_write</c-s> handle 
+      logger&apos;s main business, writing to the console and/or file.
+    </t-b>
+    <t-b>
       <div>
         <details>
           <summary class="labelStyle darkItem">Logger Methods:</summary>
@@ -161,63 +173,135 @@ pub struct Logger {
             <defn-code>
 #[allow(dead_code)]
 impl Logger {
-    <n-s>/*-- let l = Logger::new() --*/</n-s>
+    /*-- create default logger --*/
     pub fn new() -&gt; Self {
         Self { fl:None, console:true, }
     }
-    <n-s>/*-- let l = init(f, true) --*/</n-s>
+    /*-- create initialized logger --*/
     pub fn init(f:File, con:bool) -&gt; Self {
         Self { fl:Some(f), console:con, }
     }
-    <n-s>/*-- l.console(false) --*/</n-s>
+    /*-- enable | disable writing to console --*/
     pub fn console(&amp;mut self, con:bool) {
         self.console = con
     }
-    <n-s>/*-- l.file(f) --*/</n-s>
+    /*-- attach file --*/
     pub fn file(&amp;mut self, f:File) {
         self.fl = Some(f);
     }
-    <n-s>/*-- l.opt(fo) --*/</n-s>
-    pub fn opt(&amp;mut self, fo:Option&lt;File&gt;) {
-        self.fl = fo;
+    /*-- attach Option&lt;File&gt; --*/
+    pub fn opt(&amp;mut self, f:Option&lt;File&gt;) {
+        self.fl = f;
     }
-    <n-s>/*-- l.open("log.txt") --*/</n-s>
-    pub fn open(&amp;mut self, s:&amp;str) {
+    /*-- attempt to open logger file --*/
+    pub fn open(&amp;mut self, s:&amp;str) -&gt; bool {
         use std::fs::OpenOptions;
         self.fl = OpenOptions::new()
                 .write(true)
                 .create(true)
                 .append(true)
                 .open(s).ok();
+        if self.fl.is_some() {
+            return true;
+        }
+        false
     }
-    <n-s>/*-- l.ts_write("test1 log") --*/</n-s>
-    pub fn ts_write(&amp;mut self, s:&amp;str) -&gt; &amp;mut Self {
+    /*-- write log entry with date-time stamp */
+    /*-- can be chained                       */
+    pub fn ts_write(&amp;mut self, s:&amp;str) 
+          -&gt; &amp;mut Self {
         
         let now: DateTime&lt;Local&gt; = Local::now();
         /* format DateTime string */
-        let mut now_str = format!("\n  {}", now.to_rfc2822());    
+        let mut now_str = 
+          format!("\n  {}", now.to_rfc2822());
         /* remove trailing -0400 */
         now_str.truncate(now_str.len() - 6);
 
-        Logger::write(self, &amp;now_str);
-        Logger::write(self, s);
-        self
+        let _ = Logger::write(self, &amp;now_str);
+        let rslt = Logger::write(self, s);
+        rslt
     }
-    <n-s>/*-- l.write("\n  first item").write("\n  second item") --*/</n-s>
-    pub fn write(&amp;mut self, s:&amp;str) -&gt; &amp;mut Self {
-        if let Some(ref mut f) = self.fl {
-            let _n = f.write(s.as_bytes());
-        }
+    /*-- write log entry, can be chained --*/
+    pub fn write(&amp;mut self, s:&amp;str) 
+          -&gt; &amp;mut Self {
         if self.console {
             print!("{}", s);
         }
+        if let Some(ref mut f) = self.fl {
+            let rslt = f.write(s.as_bytes());
+            match rslt {
+                Ok(_) =&gt; {},
+                Err(_) =&gt; 
+                  print!("\n  file write failed\n"),
+            }
+        }
         self
     }
-    <n-s>/*-- l.close() --*/</n-s>
+    /*-- close log file */
     pub fn close(&amp;mut self) {
         self.fl = None;
     }
 }
+#[derive(PartialEq)]
+#[allow(dead_code)]
+pub enum OpenMode { Truncate, Append }
+#[allow(dead_code)]
+/*-----------------------------------------
+  Helper functions
+*/
+/*-- attempt to open file by name --*/
+pub fn open_file(s:&amp;str, mode:OpenMode) 
+      -&gt; Option&lt;File&gt; {
+    let fl:Option&lt;File&gt;;
+    use std::fs::OpenOptions;
+    if mode == OpenMode::Truncate {
+        fl = OpenOptions::new()
+             .write(true)
+             .truncate(true)
+             .open(s).ok();
+    }
+    else {
+        fl = OpenOptions::new()
+             .write(true)
+             .create(true)
+             .append(true)
+             .open(s).ok();
+    }
+    fl
+}
+/*-- attempt to remove file by name --*/
+pub fn remove_file(s:&amp;str) -&gt; bool {
+    let rslt = std::fs::remove_file(s);
+    rslt.is_ok()
+}
+/*-- does file contain a string? --*/
+pub fn file_contains(fl:&amp;str, ts:&amp;str) 
+      -&gt; bool {
+    let contents = std::fs::read_to_string(fl);
+    let mut s = "".to_string();
+    if contents.is_ok() {
+        s = contents.unwrap();
+    }
+    s.contains(ts)
+}
+/*-- display contents of named file --*/
+pub fn file_contents(fl:&amp;str) {
+    let contents = std::fs::read_to_string(fl);
+     if contents.is_ok() {
+        let s = contents.unwrap();
+        print!("{}", s);
+     }
+     else {
+         print!("\n  no contents");
+     }
+}
+/*-- does file exist? --*/
+pub fn file_exists(s:&amp;str) -&gt; bool {
+    let path = Path::new(s);
+    return path.exists();
+}
+
             </defn-code>
           </defn-block>
           <defn-block>
@@ -243,7 +327,7 @@ impl Logger {
                   <c-s>if let Some(ref&nbsp;&nbsp;mut&nbsp;&nbsp;f) = self.fl { ... }</c-s>
                 </indent-block>
                 The &quot;=&quot; operator is not an assignment.  It is a matching operator. The term &quot;<c-s>Some(ref&nbsp;&nbsp;mut&nbsp;&nbsp;f)</c-s>
-                is the <c-s>Option&lt;T&gt;::Some(t:T)&gt;</c-s> holding a mutable reference to a File instance.  So, we are matching
+                is the <c-s>Option&lt;T&gt;::Some(t:T)</c-s> holding a mutable reference to a File instance.  So, we are matching
                 <c-s>self.fl</c-s> with a pattern that requires the <c-s>Some</c-s> option rather than <c-s>None</c-s>.
                 If the match is satisfied, e.g., the logger has a file reference, then we write to the file.
               </t-b>
@@ -262,19 +346,7 @@ impl Logger {
         </details>
       </div>
     </t-b>
-    <t-b>
-      Logger has nine methods: 
-      <div class="pad5 indent">
-        <c-s>new()</c-s>, <c-s>init(f:File, con:bool)</c-s>,
-        <c-s>console(con:bool)</c-s>, <c-s>file(f:file)</c-s>, <c-s>opt(f:Option&lt;File&gt;)</c-s>,
-        <c-s>open(file_name:&str)</c-s>, <c-s>ts_write(s:&str)</c-s>, <c-s>write(s:&str)</c-s>,
-        and <c-s>close()</c-s>
-      </div>
-      <c-s>new</c-s> and <c-s>init</c-s> are creational methods, <c-s>console</c-s>, <c-s>file</c-s>, and <c-s>opt</c-s> mutate the logger state,
-      <c-s>open</c-s> and <c-s>close</c-s> manage the state of logger&apos;s file member, and <c-s>write</c-s> and <c-s>ts_write</c-s> handle 
-      logger&apos;s main business, writing to the console and/or file.
-    </t-b>
-    <t-b>
+    <t-b class="mbz">
       Both <c-s>write</c-s> and <c-s>ts_write</c-s> return <c-s>&mut Self</c-s>, so they can be chained, e.g.,
       <c-s>l.write("first).write(", second");</c-s>
     </t-b>
@@ -292,6 +364,12 @@ impl Logger {
     <t-b>
       Each test starts with a #[test] directive containing a single test function.  The test function is expected to have one or more
       assertions.  The test passes if all assertions are satisfied, otherwise it fails.
+    </t-b>
+    <t-b>
+      You run unit tests with the cargo command:
+      <indent-block class="pad5">
+        <c-s>cargo test</c-s>
+      </indent-block>
     </t-b>
     <t-b>
       The details dropdown, below, lists all of the unit tests for the Logger library. 
@@ -401,7 +479,7 @@ mod tests {
         let stest = "test_write";
         l.open(stest);
         let stxt = "abc 012 xyz 789";
-        l.write(stxt);
+        let _ = l.write(stxt);
         assert_eq!(file_contains(stest, stxt), true);
         remove_file(stest);
         assert_eq!(file_exists(stest), false);
@@ -413,7 +491,7 @@ mod tests {
         l.open(stest);
         let sdt = "2020";  // change if year != 2020
         let stxt = "abc 012 xyz 789";
-        l.ts_write(stxt);
+        let _ = l.ts_write(stxt);
         assert_eq!(file_contains(stest,sdt), true);
         assert_eq!(file_contains(stest, stxt), true);
         remove_file(stest);
@@ -436,29 +514,32 @@ mod tests {
             <defn-block>
               <defn-head>Output:</defn-head>
               <defn-code>
->cargo test
+C:\github\JimFawcett\RustBasicDemos\logger>
+cargo test
 
    // compiler output elided
 
 running 13 tests
 test tests::test_console ... ok
-test tests::test_close ... ok
-test tests::test_file ... ok
 test tests::test_file_exists ... ok
-test tests::test_file_contains ... ok
-test tests::test_init ... ok
 test tests::test_new ... ok
+test tests::test_file ... ok
+test tests::test_close ... ok
 test tests::test_open ... ok
-test tests::test_open_file ... ok
 test tests::test_remove_file ... ok
+test tests::test_file_contains ... ok
+test tests::test_open_file ... ok
 test tests::test_opt ... ok
+test tests::test_init ... ok
 test tests::test_write ... ok
 test tests::test_ts_write ... ok
 
 test result: ok. 
-  13 passed; 0 failed; 
-   0 ignored; 0 measured; 0 filtered out        
-
+13 passed; 
+0 failed; 
+0 ignored; 
+0 measured; 
+0 filtered out    
               </defn-code>
             </defn-block>
           </defn-outerBlock>
@@ -493,57 +574,31 @@ test result: ok.
             <defn-block>
               <defn-head>Examples/test1.rs</defn-head>
               <defn-code>
-extern crate logger;
+  Demonstrating Logger
+ ======================
 
-use logger::{*};
-use display::{*};
-use std::fs::File;
+  deleted previous log file
+  writing to "Log.txt"
+ ----------------------
+  Thu, 19 Mar 2020 18:18:59
+  starting log
+  first entry, second entry, third entry
 
-fn main() {
+  contents of log.txt
+ ---------------------
+  Thu, 19 Mar 2020 18:18:59
+  starting log
+  first entry, second entry, third entry
 
-    main_title("Demonstrating Logger");
-    putline();
-    let file_name = "log.txt";
+  closing then reopening log
+ ----------------------------
+  Thu, 19 Mar 2020 18:18:59
+  reopening log
+  after reopen
+  found "first entry" in "log.txt"
 
-    if file_exists(file_name) {
-        remove_file(file_name);
-        print!("\n  deleted previous log file");
-    }
-    else {
-        print!("\n  failed to delete previous log file");
-    }
+  That's all Folks!
 
-    sub_title("writing to \"Log.txt\"");
-
-    let f:Option&lt;File&gt; = open_file(file_name, OpenMode::Append);
-
-    let mut log = Logger::new();
-    log.console(true);
-    log.opt(f);
-    log.ts_write("\n  starting log");
-    log.write("\n  first entry").write(", second entry");
-    log.write(", third entry");
-    log.close();
-    log.console(false);
-    /*-- won't write, won't panic --*/
-    log.write("\n  after close");
-    /*-- reopens logger with named file --*/
-    log.open("log.txt");
-    log.console(true);
-    log.ts_write("\n  reopening log");
-    log.write("\n  after reopen");
-    log.close();
-    
-    let test_string = "first entry";
-    let b = file_contains(file_name, test_string);
-    if b {
-        print!("\n  found {} in {}", test_string, file_name);
-    }
-    else {
-        print!("\n did not find {} in {}", test_string, file_name);
-    }
-    println!("\n\n  That's all Folks!\n");
-}
               </defn-code>
             </defn-block>
             <defn-block>
