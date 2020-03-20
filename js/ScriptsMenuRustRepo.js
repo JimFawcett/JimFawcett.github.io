@@ -38,7 +38,7 @@ function initializeMenu() {
       <button class='dropbutton'>Tools &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Tools</div>\
-        <a href='Javascript:;'>None yet</a>\
+        <a href='RustLogger.html'>RustLogger</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
