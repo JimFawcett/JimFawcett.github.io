@@ -1248,8 +1248,8 @@ pub fn putlinen(n: usize) {
                 If the crate root file is a library, <c-s>lib.rs</c-s>, the command &quot;<c-s>cargo test</c-s>&quot; will
                 run any tests configured at the end of the library.  When cargo builds a library it creates a
                 single configured test at the end of the library that simply asserts that <c-s>2 + 2 == 4</c-s>,
-                to show you how to build tests.  Tests succeed if and only if they do not assert, so you uses
-                assertions to check test invariants and operation cases.
+                to show you how to build tests.  Tests succeed if and only if they do not assert, so you use
+                assertions to check test invariants and operation results.
               </t-b>
               <t-b>
                 When running tests, an assertion failure does not cause a panic shutdown.  Instead, the test
@@ -1288,13 +1288,13 @@ pub fn putlinen(n: usize) {
     <t-b>
       Ownership is one of the most important features of the Rust programming language.  Rust fully
       supports value types, and manages to do that without help from the application designer.  There
-      are no copy and move constructors, assignment operators, and destructors to write.
+      are no copy and move constructors, assignment operators, or destructors to write.
     </t-b>
     <t-b>
       Every name is bound to a value on the stack.  The value may have additional structure on the 
       heap which it manages without prompting by the designer. The String type and std::collections
       types are examples.  When the value goes out of scope, 
-      it drops any heap resources it may own.
+      it drops (deallocates) any heap resources it may own.
     </t-b>
     <t-b>
       When a new name binds to a declared value:
@@ -1357,13 +1357,13 @@ t = String named s with more stuff
     </t-b>
     <t-b>
       When a value has been borrowed by a reference, e.g., <c-s>r</c-s> mutably borrowing 
-      <c-s>x</c-s>&apos;s value, the original owner, <c-s>x</c-s>, may not mutate the value, because
+      <c-s>x</c-s>&apos;s value, the original owner, <c-s>x</c-s>, can not mutate the value, because
       <c-s>r</c-s> has borrowed the ability to mutate.  That restriction continues until the reference, <c-s>r</c-s> 
       goes out of scope or is dropped with a call to <c-s>drop(r)</c-s>.
     </t-b>
     <t-b>
       When a non-mutable reference to a value is declared, that creates a view of the value which should not
-      change until the reference is dropped, so, again, the original owner may not mutate its value until
+      change until the reference is dropped, so, again, the original owner can not mutate its value until
       all references have been dropped or go out of scope. Note that dropping a reference does not drop the
       referred value since the reference does not own the value.
     </t-b>
@@ -1455,7 +1455,7 @@ let f:f64 = 3.4;
 let a:[f32; 5] = [1.0, 1.5, 2.0, 1.5, 1.0];
 let t:(i32, f64, String) = (1, 2.0, "three".to_string());
 #[derive(Debug)]
-struct S{i:i32, s:&'static str, };
+struct S<'a>{i:i32, s:&'a str, };
 let s:S = S{i:15, s:"a literal string" };
 #[derive(Debug)]
 enum E {BS(String), MS(String), PhD(String),};
@@ -1516,9 +1516,14 @@ e = MS("Computer Engineering")
     <t-b>
       Occasionally the Rust compiler needs help defining life time of references.  It wants to
       ensure that a reference does not outlive the value to which it is bound. You can see an example
-      of that help for the S struct, in the dropdown, where we tell the compiler that a literal string is 
-      static, e.g., it has the lifetime of the program.  The syntax is: <c-s>s:&'static str</c-s> where 
-      the <c-s>&apos;static</c-s> says that the literal string has the same lifetime as the program.
+      of that help for the S struct, in the dropdown, where we tell the compiler that a literal string
+      member must have the lifetime of the struct.  The member declaration syntax is: 
+      <c-s>s:&amp;&apos;a str</c-s> where 
+      the <c-s>&apos;a</c-s> says that the literal string has the same lifetime as the struct.
+      <indent-block class="pad5">
+        <c-s>struct S&lt;&apos;a&gt;{i:i32, s:&amp;&apos;a str, };</c-s>
+      </indent-block>
+      Where the notation <c-s>S&lt;&apos;a&gt;</c-s> identifies &quot;a&quot; as the lifetime of S.
       <a id="user-defined"></a>
     </t-b>
     <num-cont>
@@ -1670,10 +1675,227 @@ pub fn run() {
       types used as function arguments and struct data members. 
     </t-b>
 
+    <a id="objmodel"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>1.6</num-item1><num-item4>Rust Object Model:</num-item4>
+    </num-cont>
+    <t-b>
+      Rust does not have classes but structs are used in a way very similar to the way classes are used in C++.
+      Structs have:
+      <indent-block class="pad5">
+        <ul class="tight">
+          <li>
+            <strong>Composed members:</strong>
+            <div>
+              May be instances of language or user defined types.
+            </div>
+          </li>
+          <li>
+            <strong>Aggregated members:</strong> using the <n-s>Box&lt;T&gt;</n-s> construct
+            <div>
+              Box&lt;T&gt; is composed, but points to an instance of T in the native heap. 
+              Box&lt;T&gt; acts like the std::unique_ptr&lt;T&gt; in C++.  That is, it provides
+              a reference to data on the heap, but deallocates that data when it goes out of scope.
+            </div>
+          </li>
+          <li>
+            <strong>Methods:</strong>, both <n-s>static</n-s> and <n-s>non-static</n-s>
+            <div>
+              A non-static method is declared with a first argument of &amp;self, analogous to the
+              &quot;this&quot; pointer in C++. When invoked the compiler generates code to pass
+              a reference to the invoking instance so the user does not supply that argument.
+              Static methods do not have the &amp;self argument, and so are unable to access member
+              data.
+            </div>
+          </li>
+          <li>
+            <strong>Traits:</strong> implemented by the struct
+            <div>
+              Traits declare method signatures that must be defined for types that implement them.
+              A trait may provide default method implementations but often does not. Traits are used
+              like Java or C# interfaces and also provide type constraints for generic functions and
+              types.
+            </div>
+          </li>
+          <li>
+            <strong>Access control:</strong> using the <n-s>pub</n-s> keyword
+            <div>
+              A typical struct will be declared public with <n-s>pub</n-s>.  Some of its methods will
+              also be declared public, but we usually don&apos;t make the struct&apos;s member data public.
+            </div>
+          </li>
+        </ul>
+      </indent-block>
+    </t-b>
+    <t-b>
+      It is interesting to note that traits can be applied to existing types, including those provided by
+      the language, to add new methods for the type, much like C# extension methods, but easier to use.
+    </t-b>
+    <t-b>
+      Here is an example of a user defined type:
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle darkItem">User Defined Type with Traits:</summary>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Type Definition:</defn-head>
+              <defn-code>
+/////////////////////////////////////////////////
+// probe_traits.rs - demo user defined type 
+
+use std::fmt::{Debug};
+use display::{*};
+/*-----------------------------------------------
+   Note that all trait functions are public
+*/
+
+/*-----------------------------------------------
+   Show trait needs Super trait Debug 
+   - provides default method implementation
+*/
+trait Show : Debug {
+    fn show(&amp;self) {
+        print!("\n  {:?}", &amp;self);
+    }
+}
+/*-----------------------------------------------
+   Stucts that use Size must implement fn size
+   - no default impl provided
+*/
+trait Size {
+    fn size(&amp;self) -&gt; usize;
+}
+
+#[derive(Debug)]
+pub struct Test { // public type 
+    x:i32, y:f64, // private data
+}
+/*-----------------------------------------------
+   Implementing traits
+*/
+impl Show for Test {}  // using default impl
+impl Size for Test {   // must provide impl
+    fn size(&amp;self) -&gt; usize {
+        use std::mem;
+        mem::size_of::&lt;Test&gt;()
+    }
+}
+/*-----------------------------------------------
+   Implementing methods
+*/
+impl Test {
+    pub fn new() -&gt; Self {
+        Self {
+            x:42,
+            y:1.5,
+        }
+    }
+    pub fn get_x(&amp;self) -&gt; i32 {
+        self.x
+    }
+    pub fn set_x(&amp;mut self, v:i32) {
+        self.x = v;
+    }
+    pub fn get_y(&amp;self) -&gt; f64 {
+        self.y
+    }
+    pub fn set_y(&amp;mut self, v:f64) {
+        self.y = v;
+    }
+}
+
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Using Code:</defn-head>
+              <defn-code>
+pub fn run () {
+    main_title("Demonstrating probe_traits");
+    putline();
+
+    sub_title("using Show trait");
+    let mut t = Test::new();
+    t.show();
+    putline();
+
+    sub_title("using getters and setters");
+    t.set_x(3);
+    t.set_y(-3.5);
+    print!("\n  x = {}, y = {}", t.get_x(), t.get_y());
+    putline();
+
+    sub_title("using Size trait");
+    print!("\n  size = Test instance t = {}", t.size());
+
+    /*-------------------------------------------
+       Implementing Size for built in types!
+    */
+    impl Size for i32 {
+        fn size(&amp;self) -&gt; usize {
+            std::mem::size_of::&lt;i32&gt;() as usize
+        }
+    }
+    impl Size for f64 {
+        fn size(&amp;self) -&gt; usize {
+            std::mem::size_of::&lt;f64&gt;() as usize
+        }
+    }
+
+    let sx = t.x.size();
+    let sy = t.y.size();
+    print!("\n  size of x = {}, size of y = {}", sx, sy);
+    print!("\n  remaining 4 bytes is size of pointer to trait vtable");
+    putline();
+}
+              </defn-code>
+              <defn-head class="defnBorderTop">Output:</defn-head>
+              <defn-code>
+  Demonstrating probe_traits
+ ============================
+
+  using Show trait
+ ------------------
+  Test { x: 42, y: 1.5 }
+
+  using getters and setters
+ ---------------------------
+  x = 3, y = -3.5
+
+  using Size trait
+ ------------------
+  size = Test instance t = 16
+  size of x = 4, size of y = 8
+  remaining 4 bytes is size of pointer to trait vtable
+
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </div>
+    </t-b>
+    <div style="width:calc(100vw - 9rem);">
+      <photosizer-block src="Pictures/RustVtbl.jpg" width="600" class="photoSizerBlock right" style="margin-top:0;">
+        <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS, Tahoma';
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;
+        ">
+          Figure 3. Trait Method Dispatching
+        </span>
+      </photosizer-block>
+    </div>
+
+    <div class="clear"></div>
     <a id="generics"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>1.6</num-item1><num-item4>Generics:</num-item4>
+      <num-item1>1.7</num-item1><num-item4>Generics:</num-item4>
     </num-cont>
     <t-b>
       Rust supports generics for functions and structs:
