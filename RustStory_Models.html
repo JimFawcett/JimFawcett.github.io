@@ -27,6 +27,12 @@
     summary {
       padding: 3px 0px 5px 0px;
     }
+    #github .fw_norm {
+      font-weight:normal;
+    }
+    #github th.darkItem, td.lightItem {
+      padding:5px 15px;
+    }
   </style>
 </head>
 <body id="github" onload="initializeMenu()">
@@ -71,11 +77,11 @@
        <a href="RustStory_References.html">References</a><br />
      </up-b>
      <rt-b id="sects">
-       <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#structure">Structure</a>, 
-       <a href="#build">Build</a>, <a href="#execution">Execution</a>, 
-       <a href="#ownership">Ownership</a>, <a href="#types">Types</a>, 
-       <a href="#user-defined">User-defined Types</a>, <a href="#generics">Generics</a>, 
-       <a href="#epilogue">Epilogue</a>, <a href="#exercises">Exercises</a>, <a href="#refs">References</a>
+       <a href="#top">Top</a>, <a href="#prologue">Prolg</a>, <a href="#structure">CodeStr</a>, 
+       <a href="#build">Bld</a>, <a href="#execution">Exec</a>, 
+       <a href="#ownership">Ownrshp</a>, <a href="#types">Types</a>, <a href="#objmodel">ObjMod</a>
+       <a href="#userdeftypes">UserDefTyps</a>, <a href="#generics">Genrcs</a>, 
+       <a href="#epilogue">Epilg</a>, <a href="#exercises">Exers</a>, <a href="#refs">Refs</a>
      </rt-b>
    </toc-b>
 
@@ -1406,7 +1412,7 @@ i = 3, j = 5
     <a id="types"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>1.5</num-item1><num-item4>Rust Types and User-Defined Types and Traits:</num-item4>
+      <num-item1>1.5</num-item1><num-item4>Rust Types</num-item4>
     </num-cont>
     <t-b>
       Rust&apos;s <n-s><a href="https://doc.rust-lang.org/beta/std/index.html#primitives">type system</a></n-s> has:
@@ -1526,8 +1532,487 @@ e = MS("Computer Engineering")
       Where the notation <c-s>S&lt;&apos;a&gt;</c-s> identifies &quot;a&quot; as the lifetime of S.
       <a id="user-defined"></a>
     </t-b>
-    <num-cont>
+    <!--<num-cont>
       <num-item1>1.5.1</num-item1><num-item4>User-Defined Types:</num-item4>
+    </num-cont>
+    <t-b>
+      <t-b>
+        Rust does not have classes or inheritance.  It does, however, have structs and traits.  A trait is
+        similar to an interface or abstract class.  Structs have public and private members and can implement
+        traits as well as other functions.
+      </t-b>
+      <t-b>
+        Here&apos;s an example, used in the details dropdown,
+        below:
+      </t-b>
+      <t-b>
+        <defn-block>
+          <defn-head>Salutation Trait</defn-head>
+          <defn-code>
+trait Speaker {
+    fn salutation(&self) -> String;
+}
+          </defn-code>
+        </defn-block>
+      </t-b>
+      <t-b>
+        The trait declares a salutation function that structs implement, like this:
+      </t-b>
+      <t-b>
+        <defn-block>
+          <defn-head>
+            Implementing Saluation Trait
+          </defn-head>
+          <defn-code>
+pub struct Presenter;
+impl Speaker for Presenter {
+    fn salutation(&self) -> String {
+      "Hello, today we will discuss ...".to_string()
+    }
+} 
+          </defn-code>
+        </defn-block>
+      </t-b>
+    </t-b>
+    <t->
+      The code in the User-Defined Type dropdown illustrates how this can be used to implement
+      polymorphic operations, e.g., function dispatching based on the type of value  bound to a reference,
+      not on the type of the reference.
+    </t->
+    <t-b>
+      That works because each trait has a virtual function pointer table used for function dispatching.
+    </t-b>
+    <t-b>
+      <t-b>
+        <details>
+          <summary class="labelStyle darkItem">Example User-Defined Type:</summary>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Declaring Code:</defn-head>
+              <defn-code>
+///////////////////////////////////////////////////////////
+// user-defined traits act like interfaces
+
+trait Speaker {
+    fn salutation(&self) -> String;
+}
+
+///////////////////////////////////////////////////////////
+// The following structs act like classes that implement
+// a Speaker interface
+
+#[derive(Debug,Copy,Clone)]
+pub struct Presenter;
+impl Speaker for Presenter {
+    fn salutation(&self) -> String {
+      "Hello, today we will discuss ...".to_string()
+    }
+} 
+
+#[derive(Debug)]
+pub struct Friend {
+    pub name : String,
+}
+impl Speaker for Friend {
+    fn salutation(&self) -> String {
+      let mut s = String::from("Hi good buddy, its me, ");
+      let nm = self.name.as_str();
+      s.push_str(nm);
+      return s;
+    }
+}
+impl Friend {
+    #[allow(dead_code)]
+    pub fn new(name : String) -> Self {
+        Self {
+            name,
+        }  // note: no semicolon so Self is returned
+    }
+}
+#[derive(Debug,Copy,Clone)]
+pub struct TeamLead;
+impl Speaker for TeamLead {
+    fn salutation(&self) -> String {
+      "Hi, I have a task for you ...".to_string()
+    }
+} 
+
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Using Code:</defn-head>
+              <defn-code>
+#[allow(dead_code)]
+pub fn run() {
+    
+    print!("\n\n  {}","-- demo polymorphic struct instances --\n");
+    let presenter : Presenter = Presenter;
+    let joe : Friend = Friend::new("Joe".to_string());
+    let sue : Friend = Friend::new("Sue".to_string());
+    let team_lead : TeamLead = TeamLead;
+
+    let mut v :Vec<&dyn Speaker> = Vec::new();
+    v.push(&presenter);
+    v.push(&joe);
+    v.push(&sue);
+    v.push(&team_lead);
+
+    for speaker in v.iter() {
+        print!("\n  {:?}",speaker.salutation());
+    }
+}
+              </defn-code>
+              <defn-head class="defnBorderTop">Output:</defn-head>
+              <defn-code>
+-- demo polymorphic struct instances --
+
+"Hello, today we will discuss ..."
+"Hi good buddy, its me, Joe"
+"Hi good buddy, its me, Sue"
+"Hi, I have a task for you ..."
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </t-b>
+    </t-b>
+    <t-b>
+      In the next section we discuss Rust generics.  They provide a way of deferring definition of specific
+      types used as function arguments and struct data members. 
+    </t-b>-->
+
+    <a id="objmodel"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>1.6</num-item1><num-item4>Rust Object Model:</num-item4>
+    </num-cont>
+    <t-b>
+      Rust does not have classes but structs are used in a way very similar to the way classes are used in C++.
+      Structs have:
+      <indent-block class="pad5">
+        <ul class="tight">
+          <li>
+            <strong>Composed members:</strong>
+            <div>
+              May be instances of language or user defined types.
+            </div>
+          </li>
+          <li>
+            <strong>Aggregated members:</strong> using the <n-s>Box&lt;T&gt;</n-s> construct
+            <div>
+              Box&lt;T&gt; is composed, but points to an instance of T in the native heap. 
+              Box&lt;T&gt; acts like the std::unique_ptr&lt;T&gt; in C++.  That is, it provides
+              a reference to data on the heap, but deallocates that data when it goes out of scope.
+            </div>
+          </li>
+          <li>
+            <strong>Methods:</strong>, both <n-s>static</n-s> and <n-s>non-static</n-s>
+            <div>
+              A non-static method is declared with a first argument of &amp;self, analogous to the
+              &quot;this&quot; pointer in C++. When invoked the compiler generates code to pass
+              a reference to the invoking instance so the user does not supply that argument.
+              Static methods do not have the &amp;self argument, and so are unable to access member
+              data.
+            </div>
+          </li>
+          <li>
+            <strong>Traits:</strong> implemented by the struct
+            <div>
+              Traits declare method signatures that must be defined for types that implement them.
+              A trait may provide default method implementations but often does not. Traits are used
+              like Java or C# interfaces and also provide type constraints for generic functions and
+              types.
+            </div>
+          </li>
+          <li>
+            <strong>Access control:</strong> using the <n-s>pub</n-s> keyword
+            <div>
+              A typical struct will be declared public with <n-s>pub</n-s>.  Some of its methods will
+              also be declared public, but we usually don&apos;t make the struct&apos;s member data public.
+            </div>
+          </li>
+        </ul>
+      </indent-block>
+    </t-b>
+    <t-b>
+      It is interesting to note that traits can be applied to existing types, including those provided by
+      the language, to add new methods for the type, much like C# extension methods, but easier to use.
+    </t-b>
+    <t-b>
+      Here is an example of a user defined type:
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle darkItem">User Defined Type with Traits:</summary>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Type Definition:</defn-head>
+              <defn-code>
+/////////////////////////////////////////////////
+// probe_traits.rs - demo user defined traits
+
+use std::fmt::{Debug};
+use display::{*};
+/*-----------------------------------------------
+   Note that all trait functions are public
+*/
+
+/*-----------------------------------------------
+   Show trait needs Super trait Debug 
+   - provides default method implementation
+*/
+trait Show : Debug {
+    fn show(&amp;self) {
+        print!("\n  {:?}", &amp;self);
+    }
+}
+/*-----------------------------------------------
+   Stucts that use Size must implement fn size
+   - no default impl provided
+*/
+trait Size {
+    fn size(&amp;self) -&gt; usize;
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct Test { // public type 
+    x:i32, y:f64, // private data
+}
+/*-----------------------------------------------
+   Implementing traits
+*/
+impl Show for Test {}  // using default impl
+impl Size for Test {   // must provide impl
+    fn size(&amp;self) -&gt; usize {
+        use std::mem;
+        mem::size_of::&lt;Test&gt;()
+    }
+}
+/*-----------------------------------------------
+   Implementing methods
+*/
+impl Test {
+    pub fn new() -&gt; Self {
+        Self {
+            x:42,
+            y:1.5,
+        }
+    }
+    pub fn get_x(&amp;self) -&gt; i32 {
+        self.x
+    }
+    pub fn set_x(&amp;mut self, v:i32) {
+        self.x = v;
+    }
+    pub fn get_y(&amp;self) -&gt; f64 {
+        self.y
+    }
+    pub fn set_y(&amp;mut self, v:f64) {
+        self.y = v;
+    }
+}
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Using Code:</defn-head>
+              <defn-code>
+pub fn run () {
+    main_title("Demonstrating probe_traits");
+    putline();
+
+    sub_title("using Show trait");
+    let mut t = Test::new();
+    t.show();
+    putline();
+
+    sub_title("using getters and setters");
+    t.set_x(3);
+    t.set_y(-3.5);
+    print!("\n  x = {}, y = {}", t.get_x(), t.get_y());
+    putline();
+
+    sub_title("using Size trait");
+    print!("\n  size = Test instance t = {}", t.size());
+
+    /*-------------------------------------------
+       Implementing Size for built in types!
+    */
+    impl Size for i32 {
+        fn size(&self) -> usize {
+            std::mem::size_of::<i32>() as usize
+        }
+    }
+    impl Size for f64 {
+        fn size(&self) -> usize {
+            std::mem::size_of::<f64>() as usize
+        }
+    }
+
+    let sx = t.x.size();
+    let sy = t.y.size();
+    print!("\n  size of x = {}, size of y = {}", sx, sy);
+    print!(
+      "\n  4 bytes is size of pointer to trait vtable"
+    );
+    putline();
+
+    sub_title("exploring struct layout with safe pointers");
+    let mut t = Test::new();
+    t.show();
+    shows("\n  Note: Test implements traits:");
+    shows("\n        Show, Size, Debug, Copy, Clone");
+    shows(
+      "\n        Missing 4 bytes is ptr to traits vtable.\n"
+    );
+    let rt = &t as *const Test;
+    let rx = &t.x as *const i32;
+    let ry = &mut t.y as *mut f64;
+    let st = std::mem::size_of::<Test>();
+    let sx = std::mem::size_of::<i32>();
+    let sy = std::mem::size_of::<f64>();
+    print!("\n  address of t   = {:?}", rt as i32);
+    print!("\n  address of t.x = {:?}", rx as i32);
+    print!("\n  address of t.y = {:?}", ry as i32);
+    print!("\n  size of t      = {:?}", st);
+    print!("\n  size of x      = {:?}", sx);
+    print!("\n  size of y      = {:?}", sy);
+    print!(
+      "\n  address of t + st = {:?}", rt as i32 + st as i32
+    );
+    putline();
+}              </defn-code>
+              <defn-head class="defnBorderTop">Output:</defn-head>
+              <defn-code>
+  Demonstrating probe_traits
+ ============================
+
+  using Show trait
+ ------------------
+  Test { x: 42, y: 1.5 }
+
+  using getters and setters
+ ---------------------------
+  x = 3, y = -3.5
+
+  using Size trait
+ ------------------
+  size = Test instance t = 16
+  size of x = 4, size of y = 8
+  4 bytes is size of pointer to trait vtable
+
+  exploring struct layout with safe pointers
+ --------------------------------------------
+  Test { x: 42, y: 1.5 }
+  Note: Test implements traits:
+        Show, Size, Debug, Copy, Clone
+        Missing 4 bytes is ptr to traits vtable.
+
+  address of t   = 8190584
+  address of t.x = 8190592
+  address of t.y = 8190584
+  size of t      = 16
+  size of x      = 4
+  size of y      = 8
+  address of t + st = 8190600
+
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </div>
+    </t-b>
+    <div style="width:calc(100vw - 9rem);">
+      <photosizer-block src="Pictures/RustVtbl.jpg" width="600" class="photoSizerBlock right" style="margin-top:0;">
+        <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS, Tahoma';
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;
+        ">
+          Figure 3. Trait Method Dispatching
+        </span>
+      </photosizer-block>
+    </div>
+    <t-b>
+      Any type with a trait has an associated virtual function pointer table (Vtbl), as shown in Figure 3.
+      If you looked at the &quot;User Defined Type with Traits&quot; details dropdown, above, you saw that the layout
+      of a struct can be analyzed using safe pointers<sup>1</sup>.  The results of that analysis are shown in 
+      Table 1., below.
+    </t-b>
+    <t-b>
+      <div>
+        <table>
+          <tr>
+            <th colspan="3" class="darkItem fw_norm">
+              Table 1. Test Struct Memory Layout
+            </th>
+          </tr>
+          <tr>
+            <th class="darkItem fw_norm">Component</th>
+            <th class="darkItem fw_norm">Address</th>
+            <th class="darkItem fw_norm">Size - bytes</th>
+          </tr>
+          <tr>
+            <th class="lightItem fw_norm" style="text-align:right;">Test Struct</th>
+            <th class="lightItem fw_norm">8190584</th>
+            <th class="lightItem fw_norm" style="text-align:right;">16</th>
+          </tr>
+          <tr>
+            <th class="lightItem fw_norm" style="text-align:right;">y:f64</th>
+            <th class="lightItem fw_norm">8190584</th>
+            <th class="lightItem fw_norm" style="text-align:right;">8</th>
+          </tr>
+          <tr>
+            <th class="lightItem fw_norm" style="text-align:right;">x:i32</th>
+            <th class="lightItem fw_norm">8190592</th>
+            <th class="lightItem fw_norm" style="text-align:right;">4</th>
+          </tr>
+          <tr>
+            <th class="lightItem fw_norm" style="text-align:right;">ptr to Vtbl</th>
+            <th class="lightItem fw_norm">8190596</th>
+            <th class="lightItem fw_norm" style="text-align:right;">4</th>
+          </tr>
+        </table>
+      </div>
+    </t-b>
+    <t-b>
+      We see from the table that each field associated with a struct lies within the memory footprint of 
+      the struct, and if the
+      struct has any traits<sup>2</sup> there will be an embedded pointer to a Vtbl as well.
+      There is only one Vtbl for each type, so the pointer address value is invariant.
+    </t-b>
+    <t-b>
+      Because of this layout strategy, a copy<sup>3</sup>, is simply a memcopy of the entire struct
+      to the destination. For structs that contain no-copy (non-blittable) fields, only moves are
+      allowed, but they work the same way, doing a mem-copy to the destination.  The only difference
+      is that for copies the source remains valid, while for moves, the source becomes invalid.
+    </t-b>
+    <t-b>
+      <hr class="spreadup" />
+      <ol class="footnote">
+        <li>
+          You can create pointers and display their addresses in safe code, which is what we have
+          done for this analysis.  You can only dereference pointers in unsafe blocks, but we did
+          not need to do that.
+        </li>
+        <li>
+          Almost every struct has traits, at least Debug, and if copyable, Copy and Clone. Adding
+          custom traits can be very useful, as shown in this and the next example.
+        </li>
+        <li>
+          Stucts with all blittable fields can implement the Copy trait.  Those with non-blittable
+          fields cannot.
+        </li>
+      </ol>
+    </t-b>
+    <div class="clear"></div>
+    <a id="userdeftypes"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>1.7</num-item1><num-item4>User-Defined Types:</num-item4>
     </num-cont>
     <t-b>
       <t-b>
@@ -1675,227 +2160,10 @@ pub fn run() {
       types used as function arguments and struct data members. 
     </t-b>
 
-    <a id="objmodel"></a>
-    <hr class="spread" />
-    <num-cont>
-      <num-item1>1.6</num-item1><num-item4>Rust Object Model:</num-item4>
-    </num-cont>
-    <t-b>
-      Rust does not have classes but structs are used in a way very similar to the way classes are used in C++.
-      Structs have:
-      <indent-block class="pad5">
-        <ul class="tight">
-          <li>
-            <strong>Composed members:</strong>
-            <div>
-              May be instances of language or user defined types.
-            </div>
-          </li>
-          <li>
-            <strong>Aggregated members:</strong> using the <n-s>Box&lt;T&gt;</n-s> construct
-            <div>
-              Box&lt;T&gt; is composed, but points to an instance of T in the native heap. 
-              Box&lt;T&gt; acts like the std::unique_ptr&lt;T&gt; in C++.  That is, it provides
-              a reference to data on the heap, but deallocates that data when it goes out of scope.
-            </div>
-          </li>
-          <li>
-            <strong>Methods:</strong>, both <n-s>static</n-s> and <n-s>non-static</n-s>
-            <div>
-              A non-static method is declared with a first argument of &amp;self, analogous to the
-              &quot;this&quot; pointer in C++. When invoked the compiler generates code to pass
-              a reference to the invoking instance so the user does not supply that argument.
-              Static methods do not have the &amp;self argument, and so are unable to access member
-              data.
-            </div>
-          </li>
-          <li>
-            <strong>Traits:</strong> implemented by the struct
-            <div>
-              Traits declare method signatures that must be defined for types that implement them.
-              A trait may provide default method implementations but often does not. Traits are used
-              like Java or C# interfaces and also provide type constraints for generic functions and
-              types.
-            </div>
-          </li>
-          <li>
-            <strong>Access control:</strong> using the <n-s>pub</n-s> keyword
-            <div>
-              A typical struct will be declared public with <n-s>pub</n-s>.  Some of its methods will
-              also be declared public, but we usually don&apos;t make the struct&apos;s member data public.
-            </div>
-          </li>
-        </ul>
-      </indent-block>
-    </t-b>
-    <t-b>
-      It is interesting to note that traits can be applied to existing types, including those provided by
-      the language, to add new methods for the type, much like C# extension methods, but easier to use.
-    </t-b>
-    <t-b>
-      Here is an example of a user defined type:
-    </t-b>
-    <t-b>
-      <div>
-        <details>
-          <summary class="labelStyle darkItem">User Defined Type with Traits:</summary>
-          <defn-outerBlock>
-            <defn-block>
-              <defn-head>Type Definition:</defn-head>
-              <defn-code>
-/////////////////////////////////////////////////
-// probe_traits.rs - demo user defined type 
-
-use std::fmt::{Debug};
-use display::{*};
-/*-----------------------------------------------
-   Note that all trait functions are public
-*/
-
-/*-----------------------------------------------
-   Show trait needs Super trait Debug 
-   - provides default method implementation
-*/
-trait Show : Debug {
-    fn show(&amp;self) {
-        print!("\n  {:?}", &amp;self);
-    }
-}
-/*-----------------------------------------------
-   Stucts that use Size must implement fn size
-   - no default impl provided
-*/
-trait Size {
-    fn size(&amp;self) -&gt; usize;
-}
-
-#[derive(Debug)]
-pub struct Test { // public type 
-    x:i32, y:f64, // private data
-}
-/*-----------------------------------------------
-   Implementing traits
-*/
-impl Show for Test {}  // using default impl
-impl Size for Test {   // must provide impl
-    fn size(&amp;self) -&gt; usize {
-        use std::mem;
-        mem::size_of::&lt;Test&gt;()
-    }
-}
-/*-----------------------------------------------
-   Implementing methods
-*/
-impl Test {
-    pub fn new() -&gt; Self {
-        Self {
-            x:42,
-            y:1.5,
-        }
-    }
-    pub fn get_x(&amp;self) -&gt; i32 {
-        self.x
-    }
-    pub fn set_x(&amp;mut self, v:i32) {
-        self.x = v;
-    }
-    pub fn get_y(&amp;self) -&gt; f64 {
-        self.y
-    }
-    pub fn set_y(&amp;mut self, v:f64) {
-        self.y = v;
-    }
-}
-
-              </defn-code>
-            </defn-block>
-            <defn-block>
-              <defn-head>Using Code:</defn-head>
-              <defn-code>
-pub fn run () {
-    main_title("Demonstrating probe_traits");
-    putline();
-
-    sub_title("using Show trait");
-    let mut t = Test::new();
-    t.show();
-    putline();
-
-    sub_title("using getters and setters");
-    t.set_x(3);
-    t.set_y(-3.5);
-    print!("\n  x = {}, y = {}", t.get_x(), t.get_y());
-    putline();
-
-    sub_title("using Size trait");
-    print!("\n  size = Test instance t = {}", t.size());
-
-    /*-------------------------------------------
-       Implementing Size for built in types!
-    */
-    impl Size for i32 {
-        fn size(&amp;self) -&gt; usize {
-            std::mem::size_of::&lt;i32&gt;() as usize
-        }
-    }
-    impl Size for f64 {
-        fn size(&amp;self) -&gt; usize {
-            std::mem::size_of::&lt;f64&gt;() as usize
-        }
-    }
-
-    let sx = t.x.size();
-    let sy = t.y.size();
-    print!("\n  size of x = {}, size of y = {}", sx, sy);
-    print!("\n  remaining 4 bytes is size of pointer to trait vtable");
-    putline();
-}
-              </defn-code>
-              <defn-head class="defnBorderTop">Output:</defn-head>
-              <defn-code>
-  Demonstrating probe_traits
- ============================
-
-  using Show trait
- ------------------
-  Test { x: 42, y: 1.5 }
-
-  using getters and setters
- ---------------------------
-  x = 3, y = -3.5
-
-  using Size trait
- ------------------
-  size = Test instance t = 16
-  size of x = 4, size of y = 8
-  remaining 4 bytes is size of pointer to trait vtable
-
-              </defn-code>
-            </defn-block>
-          </defn-outerBlock>
-        </details>
-      </div>
-    </t-b>
-    <div style="width:calc(100vw - 9rem);">
-      <photosizer-block src="Pictures/RustVtbl.jpg" width="600" class="photoSizerBlock right" style="margin-top:0;">
-        <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;
-        ">
-          Figure 3. Trait Method Dispatching
-        </span>
-      </photosizer-block>
-    </div>
-
-    <div class="clear"></div>
     <a id="generics"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>1.7</num-item1><num-item4>Generics:</num-item4>
+      <num-item1>1.8</num-item1><num-item4>Generics:</num-item4>
     </num-cont>
     <t-b>
       Rust supports generics for functions and structs:
@@ -2100,7 +2368,7 @@ value: BetterPoint { x: "four", y: "two", z: "three" }
     <a id="epilogue"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>1.7</num-item1><num-item4>Epilogue:</num-item4>
+      <num-item1>1.9</num-item1><num-item4>Epilogue:</num-item4>
     </num-cont>
     <t-b>
       The models we&apos;ve covered here: Code Structure, Build Process, Ownership, and User-Defined
@@ -2117,7 +2385,7 @@ value: BetterPoint { x: "four", y: "two", z: "three" }
     <a id="exercises"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>1.8</num-item1><num-item4>Exercises:</num-item4>
+      <num-item1>1.10</num-item1><num-item4>Exercises:</num-item4>
     </num-cont>
     <t-b class="indent" style="margin-bottom:2em;">
       <ol class="tight">
@@ -2139,10 +2407,11 @@ value: BetterPoint { x: "four", y: "two", z: "three" }
         </li>
       </ol>
     </t-b>
+
     <a id="refs"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>1.9</num-item1><num-item4>References:</num-item4>
+      <num-item1>1.11</num-item1><num-item4>References:</num-item4>
     </num-cont>
     <table style="width:calc(100vw - 12rem);">
       <tr>
