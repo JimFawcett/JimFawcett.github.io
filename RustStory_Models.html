@@ -593,45 +593,71 @@ edition = "2018"
         </span>
       </photosizer-block>
     </div>
-    <t-b>
+    <t-b class="mbz">
       Rust code structure is based on <n-s>crates</n-s> and <n-s>packages</n-s>:
-      <indent-block class="pad10">
-        <ul class="tight">
+      <indent-block class="pad10 mbz">
+        <ul class="tight mbz">
           <li>
-            <strong>crate:</strong>
+            <strong>Package:</strong>
             <div class="pad10">
-              A crate is a directory containing a <n-s>cargo.toml</n-s> file and a <n-s>scr</n-s> folder
-              containing a collection of source files. Crates are built with cargo:
+              A Package is a directory containing a <c-s>cargo.toml</c-s> file and a <c-s>/scr</c-s> folder
+              containing a collection of source files. Packages are built with cargo:
               <indent-block class="pad10">
-                <c-s>cargo init [--bin | --lib] [crate_name]</c-s><br />
-                Default option is --bin and default crate_name is the current directory name.
+                <c-s>cargo init [--bin | --lib] [package_name]</c-s><br />
+                Default option is --bin and default package_name is the current directory name.
               </indent-block>
               The <c-s>cargo build</c-s> command creates a Target subdirectory, if it doesn&apos;t
               already exist, and runs rustc to create an executable or library in <c-s>Target/debug</c-s>.
             </div>
           </li>
           <li>
-            <strong>Package:</strong>
-            <div class="pad10">
-              A package is one or more linked crates that focus on a specific functionality.  Links
-              are described in the Cargo.toml [dependencies] section.
+            <strong>Crate:</strong>
+            <div class="pad10 mbz">
+              The source form of a crate has:
+              <indent-block class="pad5">
+                <ol class="tight mbz">
+                  <li>
+                    A crate root file with the name main.rs or lib.rs, residing in the /src folder.  
+                    main.rs has a main function. lib.rs has a test configuration section with one or more tests.
+                  </li>
+                  <li>
+                    Zero or more supporting source files, *.rs, in <c-s>/src</c-s>, called modules, that are imported into the
+                    crate root with the keyword mod followed by the module name without extension.
+                    Each module may import other lower-level module files that reside in <c-s>/src</c-s>.
+                  </li>
+                  <li>
+                    The crate may depend on other libraries in some local folder, in crates.io, or in a github
+                    repository. These are all identified in the <c-s>[dependencies]</c-s> section of the 
+                    <c-s>cargo.toml</c-s> file.
+                  </li>
+                  <li>
+                    Crates compile into a single file.  A binary crate has a main.rs root and compiles to
+                    a single executable file, [package_name].exe on windows.  A library crate has a lib.rs root
+                    and compiles to a
+                    single library file, lib[package_name].rlib.
+                  </li>
+                </ol>
+              </indent-block>
             </div>
           </li>
         </ul>
       </indent-block>
     </t-b>
-    <t-b>
-      A <c-s>main.rs</c-s> may load a crate <c-s>helper.rs</c-s> from its own src directory with the 
-      declaration <c-s>mod helper</c-s> and then use public functions from helper.
+    <t-b class="mtz">
+      All this is illustrated in the &quot;Structure Demo&quot;, below.
+    </t-b>
+    <t-b class="mtz">
+      The Structure Demo <c-s>main.rs</c-s> loads a module, <c-s>helper.rs</c-s>, from its own src directory with the 
+      declaration <c-s>mod helper</c-s> and then declares use of a public function, say, from helper.
     </t-b>
     <t-b>
-      The package for <c-s>main.rs</c-s> may also import a library <c-s>helper_lib</c-s> by including 
-      the path to helper_lib in its
+      The package for <c-s>main.rs</c-s> also imports a library <c-s>demo_lib</c-s> by including 
+      the path to demo_lib in its
       <c-s>Cargo.toml</c-s> file&apos;s <c-s>[dependencies]</c-s> section.
       <indent-block class="pad10">
         <c-s>
           [dependencies]<br />
-          helper_lib = { path = "../helper_lib"}
+          demo_lib = { path = "../demo_lib"}
         </c-s>
       </indent-block>
     </t-b>
@@ -641,6 +667,7 @@ edition = "2018"
       <indent-block class="pad10">
         <c-s>
           [dependencies]<br />
+          demo_lib = { path = "../demo_lib"}
           serde = "1.0.104"
         </c-s>
       </indent-block>
@@ -648,9 +675,16 @@ edition = "2018"
       of Rust types.
     </t-b>
     <t-b>
-      The main.rs file may then simply use <c-s>helper_lib::some_function()</c-s> or declare
-      <c-s>use helper_lib::{ some_function }</c-s> at the top and then use some_function() in its 
+      The main.rs file may then simply use <c-s>demo_lib::say()</c-s> or declare
+      <c-s>use helper_lib::{ say }</c-s> at the top and then use say() in its 
       subsequent code.
+    </t-b>
+    <t-b>
+      <defn-block>
+        <defn-body>
+          This Structure Demo illustrates how to build a binary crate root, helper module, and a demo library.
+        </defn-body>
+      </defn-block>
     </t-b>
     <t-b>
       <details>
@@ -754,12 +788,6 @@ cargo -q run
             Enums have much more functionality in Rust than in other languages.
           </indent-block>
         </li>
-        <li>
-          <strong>Modules:</strong>
-          <indent-block class="pad10">
-            Modules provide a way to factor code into smaller simpler parts in the same crate.
-          </indent-block>
-        </li>
       </ul>
     </indent-block>
     <t-b style="margin-top:0px;">
@@ -804,7 +832,7 @@ cargo -q run
         Using <a href="https://code.visualstudio.com/download">Visual Studio Code</a> makes this a fairly
         painless process.  If, using the command window, you navigate to the temp directory and type
         <c-s>code .</c-s>, assuming you&apos;ve installed VS Code, it will open showing the temp
-        directory and its files an subdirectories, e.g., <c-s>Cargo.toml</c-s> and <c-s>temp/src</c-s>.
+        directory and its files and subdirectories, e.g., <c-s>Cargo.toml</c-s> and <c-s>temp/src</c-s>.
       </t-b>
       <t-b>
         You can open a teminal in VS Code, e.g., <n-s>top menu > Terminal > New Terminal</n-s>.  I usually move the terminal
@@ -864,77 +892,36 @@ cargo -q run
           </li>
         </ol>
       </indent-block>
-      The code in <n-s>display_test</n-s> shows how it imports the library, <n-s>display</n-s>.
-      Look at the dependencies in <n-s>display_test::Cargo.toml</n-s> and at the <c-s>use display</c-s>
-      declaration near the top of the code in <n-s>display_test::main.rs</n-s>
     </t-b>
-    <indent-blocks>
+  <t-b>
+    The code in <n-s>display library</n-s> shows the structure of a lib crate. Note how the library
+    imports Rust std library facilities with a series of use std::xxxx statements. These
+    do essentially the same thing that #include &lt;xxxx&gt; declarations do in C++.
+  </t-b>
+  <indent-blocks>
     <details>
-      <summary class="labelStyle, darkItem">display_test</summary>
+      <summary class="labelStyle, darkItem">display library</summary>
       <t-b>
         <defn-outerBlock>
           <defn-block>
-            <defn-head>display_test::Cargo.toml</defn-head>
+            <defn-head>display::Cargo.toml</defn-head>
             <defn-code>
 [package]
-name = "test_display"
-version = "0.1.0"
+name = "display"
+version = "0.1.1"
 authors = ["James W. Fawcett <jfawcett@twcny.rr.com>"]
 edition = "2018"
 
+[lib]
+doctest = false
+
 [dependencies]
-display = { path = "../display" }
-            </defn-code>
-            <defn-head class="defnBorderTop">Output:</defn-head>
-            <defn-code>
-C:\github\JimFawcett\RustBasicDemos\display_test>
-cargo -q run
-
-  test types
- ============
-  TypeId: alloc::string::String, size: 12
-  value:  "a string"
-  TypeId: alloc::string::String, size: 12
-  value: "a string"
-  TypeId: i8, size: 1
-  value:  100
-  TypeId: alloc::vec::Vec<i32>, size: 12
-  value:  [-1, 0, 1]
-  TypeId: test_display::main::Test, size: 1
-  value:  Test1
-  TypeId: test_display::main::Test, size: 1
-  value:  Test2
-  TypeId: test_display::Point, size: 24
-  value:  Point { x: 1.0, y: 1.5, z: 2.0 }
-
-  That's all folks!
- -------------------
 
             </defn-code>
-          </defn-block>
-          <defn-block>
-            <defn-head>display_test::main.rs</defn-head>
+            <defn-head class="defnBorderTop">examples/demo_display.rs</defn-head>
             <defn-code>
-/////////////////////////////////////////////////////////////
-// display_test::main.rs - test display library            //
-//                                                         //
-// Jim Fawcett, https://JimFawcett.github.io, 14 Feb 2020  //
-/////////////////////////////////////////////////////////////
-/*
-  Usually you test a library using the library's built in
-  test functions.  But those cannot write to the console
-  because they are a compiled part of the library which
-  has no console.
-
-  So I've constructed this separate main that uses the
-  library just like any other application.
-*/
-
-#[allow(unused_imports)]
-use display::{ 
-  putline, main_title, sub_title, 
-  log, show_type, show_value, putlinen 
-};
+extern crate display;
+use display::{*};
 
 #[derive(Debug)]
 struct Point {
@@ -942,15 +929,18 @@ struct Point {
     y: f64,
     z: f64,
 }
-/* Need more tests for added functions */
 
-fn main() {
-    main_title("test types");
+fn test_displays() {
+    main_title("demo display");
+    sub_title("--  shows  --");
+    shows("\n  showing type and value:");
+    putline();
+    sub_title("--  show_type and show_value  --");
     let mut str = String::new();
     str.push_str("a string");
-    log(&amp;str);
-    show_type(&amp;str);
     show_value(&amp;str);
+    putline();
+    sub_title("--  log  --");
     let an_i8: i8 = 100;
     log(&amp;an_i8);
     let mut vi : Vec&lt;i32&gt; = Vec::new();
@@ -965,73 +955,60 @@ fn main() {
     let point = Point { x:1.0, y:1.5, z:2.0 };
     log(&amp;point);
     putline();
-    sub_title("That's all folks!");
-    putlinen(2);
+    sub_title("--  show --");
+    show("\n  this is a Point structure\n  ", &amp;point);
+    putline();
+    sub_title("that's all folks!");
+    putline();
 }
-            </defn-code>
-          </defn-block>
-        </defn-outerBlock>
-      </t-b>
-    </details>
-  </indent-blocks>
-  <t-b>
-    The code in <n-s>display</n-s> shows the structure of a lib crate. Note how the library
-    imports Rust std library facilities with a series of use std::xxxx statements. These
-    do essentially the same thing that #include &lt;xxxx&gt; declarations do in C++.
-  </t-b>
-  <indent-blocks>
-    <details>
-      <summary class="labelStyle, darkItem">display library</summary>
-      <t-b>
-        <defn-outerBlock>
-          <defn-block>
-            <defn-head>display::Cargo.toml</defn-head>
-            <defn-code>
-[package]
-name = "display"
-version = "0.1.0"
-authors = ["James W. Fawcett"]
-edition = "2018"
 
-[dependencies]
-
+fn main() {
+    test_displays();
+}
             </defn-code>
             <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
-C:\github\JimFawcett\RustBasicDemos\display>
-cargo test
-Compiling display v0.1.0
-(C:\github\JimFawcett\RustBasicDemos\display)
-Finished test [unoptimized + debuginfo]
-target(s) in 0.63s
-Running target\debug\deps
-\display-7c39a3f9b415f17e.exe
+  demo display
+ ==============
+  --  shows  --
+ ---------------
+  showing type and value:
 
-running 1 test
-test tests::test_types ... ok
+  --  show_type and show_value  --
+ ----------------------------------
+  value: "a string"
 
-test result: ok.
-1 passed; 0 failed; 0 ignored; 0 measured;
-0 filtered out
+  --  log  --
+ -------------
+  TypeId: i8, size: 1
+  value:  100
+  TypeId: alloc::vec::Vec<i32>, size: 12
+  value:  [-1, 0, 1]
+  TypeId: demo_display::test_displays::Test, size: 1
+  value:  Test1
+  TypeId: demo_display::test_displays::Test, size: 1
+  value:  Test2
+  TypeId: demo_display::Point, size: 24
+  value:  Point { x: 1.0, y: 1.5, z: 2.0 }
 
-Doc-tests display
+  --  show --
+ -------------
+  this is a Point structure
+  Point { x: 1.0, y: 1.5, z: 2.0 }
 
-running 0 tests
-
-test result: ok.
-0 passed; 0 failed; 0 ignored; 0 measured;
-0 filtered out
+  that's all folks!
+ -------------------
 
             </defn-code>
           </defn-block>
           <defn-block>
             <defn-head>display::lib.rs</defn-head>
             <defn-code>
-/////////////////////////////////////////////////////////////
-// display::lib.rs - Demonstrate display types             //
-//                                                         //
-// Jim Fawcett, https://JimFawcett.github.io, 14 Feb 2020  //
-/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
+// lib.rs - Demonstrate display types          //
+//                                             //
+// Jim Fawcett, https://JimFawcett.github.io   //
+/////////////////////////////////////////////////
 /*
    log and do_work are derived from:
    https://doc.rust-lang.org/beta/std/any/index.html
@@ -1042,64 +1019,103 @@ use std::any::Any;
 use std::any::type_name;
 use std::mem::size_of;
 
-/*-----------------------------------------------------------
-   Display message and value on console
+/*-----------------------------------------------
+   Accepts either String or str
+   - no automatic newline
 */
-pub fn show&lt;T: Debug&gt;(msg:&amp;str, t:&amp;T) {
-    print!("\n  {}{:?}", msg, t);
+pub fn shows&lt;S: Into&lt;String&gt;&gt;(s:S) {
+    print!("{}",s.into());
 }
-/*-----------------------------------------------------------
-   show value on console
+/*-----------------------------------------------
+   Display message and value
+   - no automatic newline
+*/
+pub fn show&lt;T: Debug&gt;(
+    msg:&amp;str, t:&amp;T
+    ) {
+    print!("{}{:?}", msg, t);
+}
+pub fn str_show&lt;T: Debug&gt;(
+      msg:&amp;str, t:&amp;T
+    ) -&gt; String {
+        format!("{}{:?}", msg, t)
+}
+/*-----------------------------------------------
+   show value
    - expects T to implement Debug
-   - see #[define(Debug)] attributes, above 
 */
 pub fn show_value&lt;T: Debug&gt;(value: &amp;T) {
     print!("\n  value: {:?}", value);
 }
-/*----------------------------------------------------------- 
-   show type name on console
-   - expects T to implement Debug
-   - see #[define(Debug)] attributes, above 
+pub fn str_show_value&lt;T: Debug&gt;(value: &amp;T)
+         -&gt; String {
+    format!("\n  value: {:?}", value)
+}
+/*-----------------------------------------------
+   show type name
 */
-pub fn show_type&lt;T: Debug&gt;(_value: &amp;T) {
-    let name = type_name::&lt;T&gt;();
+pub fn show_type&lt;T&gt;(_value: &amp;T) {
+    let name = std::any::type_name::&lt;T&gt;();
     print!(
-      "\n  TypeId: {}, size: {}", name, size_of::&lt;T&gt;()
+      "\n  TypeId: {}, size: {}", 
+      name, size_of::&lt;T&gt;()
     );
 }
-  /*-----------------------------------------------------------
-   show type name and value on console
+pub fn str_show_type&lt;T&gt;(_value: &amp;T)
+          -&gt; String {
+    let name = std::any::type_name::&lt;T&gt;();
+    format!(
+      "\n  TypeId: {}, size: {}", 
+      name, size_of::&lt;T&gt;()
+    )
+}
+  /*---------------------------------------------
+   show type name and value
    - expects T to implement Debug
    - see #[define(Debug)] attributes, above 
 */
 pub fn log&lt;T: Debug&gt;(value: &amp;T) {
     let name = type_name::&lt;T&gt;();
     print!(
-      "\n  TypeId: {}, size: {}", name, size_of::&lt;T&gt;()
+      "\n  TypeId: {}, size: {}", 
+      name, size_of::&lt;T&gt;()
     );
     print!("\n  value:  {:?}", value);
   }
-/*-------------------------------------------------------------
+  pub fn str_log&lt;T: Debug&gt;(value: &amp;T)
+           -&gt; String {
+    let name = type_name::&lt;T&gt;();
+    let mut st = format!(
+      "\n  TypeId: {}, size: {}", 
+      name, size_of::&lt;T&gt;()
+    );
+    let st1 = 
+      format!("\n  value:  {:?}", value);
+    st.push_str(&amp;st1);
+    st.clone()
+  }
+  
+/*-----------------------------------------------
    Display underlined main title on console
 */
 pub fn main_title(msg: &amp;str) {
     print!("\n  {}", msg);
     let s = std::iter::repeat('=')
-              .take(msg.len() + 2)
-              .collect::&lt;String&gt;();
+          .take(msg.len() + 2)
+          .collect::&lt;String&gt;();
     print!("\n {}", s);
 }
-/*-------------------------------------------------------------
+/*-----------------------------------------------
    Display underlined sub title on console
 */
 pub fn sub_title(msg: &amp;str) {
     print!("\n  {}", msg);
     let s = std::iter::repeat('-')
-              .take(msg.len() + 2)
-              .collect::&lt;String&gt;();
+           .take(msg.len() + 2)
+           .collect::&lt;String&gt;();
     print!("\n {}", s);
 }
-/*-----------------------------------------------------------
+/*-----------------------------------------------
    show line with len hyphens
 */
 pub fn separator(len:u8) {
@@ -1107,24 +1123,117 @@ pub fn separator(len:u8) {
     for _i in 1..len+2 { s.push('-');}
     print!("\n {}",s);
 }
-
-/*-- push a single newline to console --*/
-
+/*-----------------------------------------------
+   push a single newline to console
+*/
 pub fn putline() {
     print!("\n");
 }
-/*-- pust n newlines to console --*/
-
+/*-----------------------------------------------
+   pust n newlines to console
+*/
 pub fn putlinen(n: usize) {
     let s = std::iter::repeat('\n')
-              .take(n)
-              .collect::&lt;String&gt;();
+            .take(n).collect::&lt;String&gt;();
     print!("{}", s);
 }
+
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>lib.rs tests</defn-head>
+            <defn-code>
+/////////////////////////////////////////////////
+// display::main.rs tests - Demo display types //
+//                                             //
+// Jim Fawcett, https://JimFawcett.github.io   //
+/////////////////////////////////////////////////
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[derive(Debug)]
+    struct Point {
+        x: f64,
+        y: f64,
+        z: f64,
+    }
+    #[test]
+    fn test_show_type() {
+        let mut str = String::new();
+        str.push_str("a string");
+        assert_eq!(
+          str_show_type(&amp;str).contains("TypeId:"), 
+          true
+        );
+    }
+    #[test]
+    fn test_show_value() {
+        let mut str = String::new();
+        str.push_str("a string");
+        assert_eq!(
+          str_show_value(&amp;str).contains("value:"),
+          true
+        );
+    }
+    #[test]
+    fn test_log() {
+        let an_i8: i8 = 100;
+        assert_eq!(
+          str_log(&amp;an_i8).contains("100"),
+          true
+        );
+        let mut vi : Vec&lt;i32&gt; = Vec::new();
+        vi.push(-1);
+        vi.push(0);
+        vi.push(1);
+        assert_eq!(
+          str_log(&amp;vi).contains("1]"),
+          true
+        );
+        #[derive(Debug)]
+        enum Test { Test1, Test2, };
+        log(&amp;Test::Test1);
+        log(&amp;Test::Test2);
+        let point = Point { x:1.0, y:1.5, z:2.0 };
+        log(&amp;point);
+        assert_eq!(
+          str_log(&amp;point).contains("2.0 }"),
+          true
+        );
+        sub_title("that's all folks!");
+    }
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>lib.rs test output</defn-head>
+            <defn-code>
+C:\github\JimFawcett\RustBasicDemos\display>
+cargo test
+    Finished test [unoptimized + debuginfo] 
+      target(s) in 0.02s
+    Running target\debug\deps
+      \display-26eaf9b270500dad.exe   
+
+running 3 tests
+test tests::test_show_type ... ok
+test tests::test_log ... ok
+test tests::test_show_value ... ok
+
+test result: ok. 
+  3 passed; 
+  0 failed; 
+  0 ignored; 
+  0 measured; 
+  0 filtered out
+
             </defn-code>
           </defn-block>
         </defn-outerBlock>
       </t-b>
+      <s-halfEm></s-halfEm>
     </details>
     </indent-blocks>
     <t-b>
