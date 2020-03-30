@@ -54,7 +54,7 @@ function initializeMenu() {
       <button class='dropbutton'>Libs &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Libraries</div>\
-        <a href='RustBasicDemos.html'>display lib</a>\
+        <a href='RustDisplayLib.html'>Display Lib</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
@@ -71,6 +71,7 @@ function initializeMenu() {
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Demonstrations</div>\
         <a href='RustBasicDemos.html'>Rust&nbsp;Basic&nbsp;Demos</a>\
+        <a href='RustStoryRepo.html'>Rust&nbsp;Story&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
