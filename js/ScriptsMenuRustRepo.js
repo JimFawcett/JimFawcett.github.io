@@ -71,6 +71,7 @@ function initializeMenu() {
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Demonstrations</div>\
         <a href='RustBasicDemos.html'>Rust&nbsp;Basic&nbsp;Demos</a>\
+        <a href='RustModels.html'>Rust&nbsp;Models&nbsp;</a>\
         <a href='RustStoryRepo.html'>Rust&nbsp;Story&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
