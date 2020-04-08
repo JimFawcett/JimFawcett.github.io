@@ -105,6 +105,7 @@ function initializeMenu() {
         <a href='CppThreads.html'>CppThreads</a>\
         <a href='ProcsAndThreads.html'>ProcsAndThreads</a>\
         <a href='Interop.html'>Interop</a>\
+        <a href='CppModelsRepo.html'>C++ Models</a>\
         <a href='CppStoryRepo.html'>C++ Story</a>\
         <a class='lightItem' href='CppExamples.html'>More&nbsp;Examples</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
