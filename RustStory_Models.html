@@ -181,14 +181,48 @@ edition = "2018"
       </details>
     </t-b>
     <t-b>
-      Rust is an interesting language, similar to C++, but with some unique differences.
+      Rust is an interesting language, similar to C++, but with some unique differences.  To  understand those, let&apos;s 
+      start with a couple of definitions:
+    <t-b>
+      <div class="pad5">
+        <defn-block>
+          <defn-head>Type Safety</defn-head>
+          <defn-body>
+            <ul class="tight">
+              <li>
+                A program is well defined if no execution can exhibit undefined behavior.
+              </li>
+              <li>
+                A language is type safe if its type system ensures that every program is well defined.
+              </li>
+            </ul>
+            <s-halfEm></s-halfEm>
+          </defn-body>
+        </defn-block>
+        <s-halfEm></s-halfEm>
+      </div>
+      A non-type safe language may introduce undefined behavior with:
+      <indent-block class="pad5">
+        <ul class="tight">
+          <li>mutation of data with active aliases</li>
+          <li>memory access after buffer overflow</li>
+          <li>integer overflow</li>
+          <li>use after free</li>
+          <li>double free</li>
+          <li>race conditions</li>
+        </ul>
+      </indent-block>
+    </t-b>
+    <t-b>
+      Rust&apos;s type system was designed to prevent these behaviors.
+    </t-b>
+    <t-b>
       <t-b>
         <defn-block>
           <defn-head>Rust Principles:</defn-head>
           <defn-body>
             <ol class="tight">
               <li>
-                <n-b>Memory unsafety <==> <n-s>aliasing + mutation</n-s> or <n-s>out-of-bounds indexing</n-s></n-b>
                 <div>
                   Rust provides memory safety by:
                   <indent-block class="pad5">
@@ -199,14 +233,20 @@ edition = "2018"
                 </div>
               </li>
               <li>
-                <n-b>Data races <==> <n-s>aliasing + mutation + no ordering</n-s></n-b>
-                Rust provides race safety using two concurrency models:
+                In debug builds signed and unsigned intergers are checked for overflow.
+              </li>
+              <li>
+                All access to heap resources occurs through Box&lt;T&gt;, a smart pointer
+                that releases resources when it goes out of scope.
+              </li>
+              <li>
+                Rust provides data race safety using two concurrency models:
                 <indent-block class="pad5">
-                  Model #1 - Thread communication through messaging transfers ownership of message
+                  Model #1 - Thread communication through messaging passing that transfers ownership of messages
                   <indent-block>
                     Prevents simultaneous aliasing and mutation
                   </indent-block>
-                  Model #2 - Guarded locks
+                  Model #2 - Guarded locks bound to mutated data
                   <indent-block>
                     prevent mutation without ordering
                   </indent-block>
@@ -227,7 +267,7 @@ edition = "2018"
             </indent-block>
           </li>
           <li>
-            <n-s>Ownership</n-s>:&nbsp;&nbsp;memory unsafety using resources <==> aliasing + mutation
+            <n-s>Ownership</n-s>:
             <div class="pad5">
               In Rust there is only one owner of a value:
             </div>
@@ -313,8 +353,8 @@ edition = "2018"
           <li>
             The Rust <n-s>compiler analyzes code deeply</n-s> and refuses to build code that has memory and
             reference problems.  Because of the structure of its types and its caching strategies, this 
-            analysis is suprisingly
-            fast. Compiler error messages are <n-s>usually</n-s> clear, simple, and provide advice for fixing
+            analysis is faster than you might expect.
+            Compiler error messages are <n-s>usually</n-s> clear, simple, and provide advice for fixing
             the error.  If the error is grievous enough, the messages can get confusing, even complaining
             about correct code.
           </li>
@@ -416,7 +456,7 @@ edition = "2018"
         </indent-block>
       </t-b>
       <t-b>
-        This isn&apos;t as one-sided as it seems.  Rust has two back doors that could reintroduce 
+        This isn&apos;t as one-sided as it seems.  Rust has two back doors that could re-introduce 
         vulnerabilities:
         <indent-block>
           <ol class="tight">
@@ -427,10 +467,11 @@ edition = "2018"
               a library designer to build what is needed.
             </li>
             <li>
-              Rust provides an <n-s><strong>interface to C code</strong></n-s> through libc.  This can be used to bind to
+              Rust provides an <n-s><strong>interface to C code</strong></n-s> through its std::ffi 
+              (foreign function interface) crate.  This can be used to bind to
               existing code resources written in C or C++.  The Rust interface can only talk
-              directly to C code for reasons of code layout, but that code can call into C++
-              code.  That imports any vulnerabilities suffered by the foreign code.
+              directly to C style code, but that code can call into C++ code that uses more advanced
+              features.  That imports any vulnerabilities suffered by the foreign code.
             </li>
           </ol>
         </indent-block>
@@ -777,29 +818,6 @@ cargo -q run
         </defn-outerBlock>
       </details>
     </t-b>
-    <t-b style="margin-bottom:0px;">
-      There is more to Rust <n-s>Code Structure</n-s>, e.g.:
-    </t-b>
-    <indent-block class="pad10">
-      <ul class="tight">
-        <li>
-          <strong>Structs and Traits:</strong>
-          <indent-block class="pad10">
-            Roughly equivalent to C++ classes and interfaces.
-          </indent-block>
-        </li>
-        <li>
-          <strong>Enums and Matching:</strong>
-          <indent-block class="pad10">
-            Enums have much more functionality in Rust than in other languages.
-          </indent-block>
-        </li>
-      </ul>
-    </indent-block>
-    <t-b style="margin-top:0px;">
-      Some of this we will discuss in <num-item1>1.4</num-item1><num-item4>User-Defined Types</num-item4>.
-      The rest in <n-s>Chapter&nbsp;2&nbsp;-&nbsp;Data</n-s> and <n-s>chapter&nbsp;3&nbsp;-&nbsp;Operations</n-s>.
-    </t-b>
     <t-b>
       Most Rust code starts with a package structure built with the Rust tool <n-s>Cargo</n-s>.  
       <n-s>Cargo</n-s> is a package manager,
@@ -876,22 +894,22 @@ cargo -q run
       <indent-block class="pad10">
         <ol class="tight">
           <li>
-            <n-s>show_type&lt;T&gt;(_value: &amp;T)</n-s> - 
+            <n-ss>show_type&lt;T&gt;(_value: &amp;T)</n-ss> - 
             Displays type and size of input
           </li>
           <li>
-            <n-s>log&lt;T&gt;(value: &amp;T)</n-s> - 
+            <n-ss>log&lt;T&gt;(value: &amp;T)</n-ss> - 
             Displays type and size of input, followed by its value.
           </li>
           <li>
-            <n-s>main_title(msg: String)</n-s> and <n-s>sub_title(msg: String</n-s> - 
+            <n-ss>main_title(msg: String)</n-ss> and <n-s>sub_title(msg: String</n-s> - 
             Displays msg followed by an underline.
           </li>
           <li>
-            <n-s>putline()</n-s> - Emits a newline.
+            <n-ss>putline()</n-ss> - Emits a newline.
           </li>
           <li>
-            <n-s>putlinen(n: usize)</n-s> - Emits n newlines.
+            <n-ss>putlinen(n: usize)</n-ss> - Emits n newlines.
           </li>
           <li>
             ...
@@ -1518,8 +1536,27 @@ i = 3, j = 5
       </indent-block>
     </t-b>
     <t-b>
-      You can find code that demonstrates all these ideas in 
-      <a href="RustBasicDemos.html">RustBasicDemos::rust_probes::ownership.rs</a>.
+      You will find a more detailed presentation of Rust&apos;s ownership model by following links in the table, below.
+    </t-b>
+    <t-b>
+      <table>
+        <tr>
+          <th class="darkItem">Ownership Details</th>
+          <th class="darkItem"></th>
+        </tr>
+        <tr>
+          <td class="lightItem">
+            <a href="Resources/RustModels.pdf#page=18">RustModels.pdf</a>
+          </td>
+          <td class="lightItem">
+            Discussion of RwLock ownership, Copies, Moves, Clones, reference borrowing, mutability
+          </td>
+        </tr>
+        <tr>
+          <td class="lightItem"><a href="RustBasicDemos.html">RustBasicDemos.html</a></td>
+          <td class="lightItem">Large collection of demos, many for ownership</td>
+        </tr>
+      </table>
     </t-b>
     <t-b>
       The next section focuses on user-defined structuring of code and data.
