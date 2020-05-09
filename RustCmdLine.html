@@ -59,7 +59,13 @@
           <summary class="lightItem quickStatus">Quick Status</summary>
           <status-grid style="padding:5px 10px;" class="lightItem border">
             <status-itemLeft>
-              Beta
+              Version
+            </status-itemLeft>
+            <status-itemRight>
+              1.0.0
+            </status-itemRight>
+            <status-itemLeft>
+              Code status
             </status-itemLeft>
             <status-itemRight>
               No known defects
@@ -122,20 +128,6 @@
           </span>
         </photosizer-block>
       </div>
-      <!--<div style="width:calc(100vw - 6rem);">
-        <photosizer-block src="Pictures/RustDirNavOutput.JPG" width="500" class="photoSizerBlock right clear" style="margin-top:0;">
-          <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;
-        ">
-            Fig 1. Directory Navigator Output
-          </span>
-        </photosizer-block>
-      </div>-->
     <h3>Concept:</h3>
     <indent-blocks>
       RustCmdLine is a facility for parsing command line arguments.  Here&apos;s a sample:
@@ -151,6 +143,8 @@
         /r "abc"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- regular expression</c-s>
       </div>
       <spacer-15></spacer-15>
+      The intent is that a program creates an instance of CmdLineParser, uses that to parse its command line, then
+      passes it to any code that needs to know about an option.
     </indent-blocks>
     <h3>Design:</h3>
     <indent-blocks>
@@ -159,19 +153,122 @@
         a vector of pattern strings (file extensions), a HashMap of option char and value, e.g., {P, "."},
         and a help string.  It provides methods for initiating the parse, returning pattern strings,
         returning options, and returning the path.
+      </t-b>
+      <t-b>
+        CmdLineParser implements the following methods and functions:
+        <div class="indent">
+          <ol class="tight">
+            <li>
+              <strong><c-s>new() -> Self</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Create new <c-s>CmdLineParser</c-s> which has an options hashmap, patterns vector, and help string.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>parse(&self)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Builds internal options hashmap and patterns vector.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>path(&self) -> String</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Return value of relative root path, held in options map.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>abs_path(&self) -> String</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Return value of absolute root path, from canonicalized relative path.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>set_path(&mut self, p:&str)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Replaces value of root path, held in options map.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>set_regex(&mut self, re:&str)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Replaces value of regex string, held in options map.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>get_regex(&mut self) -> &str</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Retrieves value of regex string, held in options map.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>default_options(&mut self)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Sets values of some of the options in options map.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>contains_option(&self, opt:char) -> bool</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                returns true if options map contains key opt, else returns false.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>add_option(&mut self, opt:char, val:&str)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Inserts option in options hashmap, adding key if it does not exist, else overriding previous value.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>value(&self, opt:char) -> &str</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Inserts option in options hashmap, adding key if it does not exist, else overriding previous value.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>add_pattern(&mut self, patt:&str) -> &mut self</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Inserts patt into patterns vector.  Method can be chained.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>patterns(&self) -> &CmdLinePatterns</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Returns reference to vector of patterns.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>options(&self) -> &Options</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Returns reference to hashmap of options.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>help(&self) -> &str</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Returns default help string.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>replace_help(&mut self, hs:&str)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Replace internal help string.
+              </div>
+            </li>
+          </ol>
+        </div>      </t-b>
     </indent-blocks>
     <div class="clears"></div>
     <h3>Operation:</h3>
-    <t-b class="indent">
+    <t-b>
       See Test1.rs in examples folder for typical usage.
     </t-b>
     <h3>Build:</h3>
-    <t-b class="indent">
+    <t-b>
       Download and, in a command prompt, <c-s>cargo build</c-s> or <c-s>cargo run</c-s>.
     </t-b>
     <h3>Status:</h3>
-    <t-b class="indent">
-      This is a &quot;beta&quot; version.  
+    <t-b>
+      This is version 1.0.0.  
     </t-b>
   </div>
   <spacer-15 class="clear"></spacer-15>

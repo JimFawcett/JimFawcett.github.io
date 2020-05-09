@@ -59,28 +59,34 @@
           <summary class="lightItem quickStatus">Quick Status</summary>
           <status-grid style="padding:5px 10px;" class="lightItem border position:relative; z-index:1000;">
             <status-itemLeft>
-              No code yet
+              Version
             </status-itemLeft>
             <status-itemRight>
-              NA
+              1.1.0
+            </status-itemRight>
+            <status-itemLeft>
+              Code status
+            </status-itemLeft>
+            <status-itemRight>
+              No known defects
             </status-itemRight>
             <status-itemLeft>
               Demonstration code
             </status-itemLeft>
             <status-itemRight>
-              no
+              NA
             </status-itemRight>
             <status-itemLeft>
               Documentation
             </status-itemLeft>
             <status-itemRight>
-              no
+              yes
             </status-itemRight>
             <status-itemLeft>
               Test cases
             </status-itemLeft>
             <status-itemRight>
-              coming soon
+              NA
             </status-itemRight>
             <status-itemLeft>
               Static library
@@ -98,7 +104,7 @@
               Planned design changes
             </status-itemLeft>
             <status-itemRight>
-              Many
+              None for now
             </status-itemRight>
           </status-grid>
         </details>
@@ -122,8 +128,8 @@
           </span>
         </photosizer-block>
       </div>
-      <!--<div style="width:calc(100vw - 6rem);">
-        <photosizer-block src="Pictures/RustDirNavOutput.JPG" width="500" class="photoSizerBlock right clear" style="margin-top:0;">
+      <div style="width:calc(100vw - 6rem);">
+        <photosizer-block src="Pictures/RustTextFinderOutput.JPG" width="600" class="photoSizerBlock right clear" style="margin-top:0;">
           <span style="
           display: inline-block;
           font-weight: bold;
@@ -132,35 +138,108 @@
           width: 100%;
           padding: 5px 0px;
         ">
-            Fig 1. Directory Navigator Output
+            Fig 2. TextFinder Output
           </span>
         </photosizer-block>
-      </div>-->
+      </div>
     <h3>Concept:</h3>
     <indent-blocks>
       <t-b>
         RustTextFinder is a tool for locating files containing text that matches a specified regular expression.  
-        It uses the facilities of RustDirNav and RustCmdLine libraries.
+        It uses the facilities of RustDirNav and RustCmdLine libraries, and std::fs and regex crates.
       </t-b>
       <t-b>
-        It uses facilities of std::fs, std::thread, and crate regex.
+        It can be used to:
+        <div class="indent">
+          <ol class="tight">
+            <li>
+              Find all files in a directory subtree with text that matches a specified regular expression.
+            </li>
+            <li>
+              Find all files that have specified extensions (patterns).
+            </li>
+            <li>
+              List all directories and their files in some directory subtree.
+            </li>
+          </ol>
+        </div>
+        It processes many hundreds of files and directories in a few seconds.
       </t-b>
-      <spacer-15></spacer-15>
     </indent-blocks>
     <h3>Design:</h3>
     <indent-blocks>
-      <t-b>This repository is currently empty, awaiting code presently under construction.</t-b>
+      <t-b>TextFinder implements the following methods and functions:</t-b>
+      <div class="indent">
+        <ol class="tight">
+            <li>
+              <strong><c-s>new() -> TextFinder</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Create new <c-s>TextFinder</c-s> which holds a regex string.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>find(&self, file_path: &str) -> bool</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                returns true if file content matches internal regex string.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>regex(&mut self, re:&str)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Replace current regex string with re.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>get_regex(&self) -> &str</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Retrieve regex string.
+              </div>
+            </li>
+        </ol>
+      </div>
+      <t-b>
+        RustTextFinder uses the services TextFinder, described above, and RustDirNav::DirNav&lt;App&gt;, where App must implement the trait 
+        RustDirNav::DirEvent.  For this application, DirNav is declared with the user-defined type TfAppl for its App parameter.
+      </t-b>
+      <t-b>
+        TfAppl holds an instance of TextFinder, a curr_dir string, and predicates hide and recurse.  When DirNav&lt;TfAppl&gt;
+        encounters a file or directory it calls the DirEvent functions do_dir(&mut self, d:&str) and do_file(&mut self, f:&str).
+      </t-b>
+      <t-b>
+        TfAppl defines those functions to build output displays based on its command line parameters, as shown in Fig 2.
+      </t-b>
     </indent-blocks>
     <div class="clears"></div>
     <h3>Operation:</h3>
-    <t-b class="indent">
+    <t-b>
+      When RustTextFinder is started, it:
+      <div class="indent">
+        <ol class="tight">
+          <li>
+            creates an instance of CmdLineParser parser
+          </li>
+          <li>
+            uses that to evaluate the program&apos;s option parameters.
+          </li>
+          <li>
+            It then creates an instance of DirNav&lt;TfAppl&gt; dn, supplying it with the starting path, file patterns,
+            and recursion predicate, all extracted from parser.
+          </li>
+          <li>
+            calls dn.visit, starting at parser.abs_path(), converted
+            to a std::Path.
+          </li>
+        </ol>
+      </div>
+      The results are shown in Fig 2.
     </t-b>
     <h3>Build:</h3>
-    <t-b class="indent">
+    <t-b>
       Download and, in a command prompt, <c-s>cargo build</c-s> or <c-s>cargo run</c-s>.
     </t-b>
     <h3>Status:</h3>
-    <t-b class="indent">
+    <t-b>
+      Version 1.0.0
     </t-b>
   </div>
   <spacer-15 class="clear"></spacer-15>
