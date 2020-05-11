@@ -743,8 +743,527 @@ authors = ["James W. Fawcett <jfawcett@twcny.rr.com>
     <a id="cmdlnproc"></a>
     <hr class="spread clear" />
     <num-cont>
-      <num-item1>3.2</num-item1><num-item4>CmdLine Processor Library:</num-item4>
+      <num-item1>3.2</num-item1><num-item4>CmdLine Parser Library:</num-item4>
     </num-cont>
+    <indent-blocks>
+      RustCmdLine is a facility for parsing command line arguments.  Here&apos;s a sample:
+      <div class="indent pad5">
+        <c-s>/P "." /p "rs,txt" /s /H /r "abc"</c-s>
+      </div>
+      where:
+      <div class="indent pad5">
+        <c-s>/P "."&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- path<br />
+        /p "rs,txt" - file patterns<br />
+        /s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- recurse through directory tree rooted at path<br />
+        /H&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- hide directories that don&apos;t contain target files<br />
+        /r "abc"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- regular expression</c-s>
+      </div>
+      <spacer-15></spacer-15>
+      The intent is that a program creates an instance of CmdLineParser, uses that to parse its command line, then
+      passes it to any code that needs to know about a pattern or an option.
+    </indent-blocks>
+    <h3>Design:</h3>
+    <indent-blocks>
+      <t-b>
+        This library contains a single user-defined type: CmdLineParser.
+        <s-5px></s-5px>
+        <t-b class="left">
+          <div style="padding-right:1em;">
+            <defn-block>
+              <defn-head style="margin-top:0px;">CmdLineParser Struct</defn-head>
+              <defn-code>
+pub struct CmdLineParse {
+  opt_map : Options,
+  patterns : CmdLinePatterns,
+  help_str : String,
+}
+              </defn-code>
+            </defn-block>
+          </div>
+        </t-b>
+        <t-b>
+          The opt_map field is a HashMap&lt;K, V&gt; of key-value pairs, where each key is a command line
+          option; that is, a character from the command line that is preceeded by a '/' character.
+          If an option, o, is succeeded by a non-option string, that becomes the value. If there is no value,
+          then the opt_map contains &quot;true&quot; for the value of the key o.
+        </t-b>
+        <t-b>
+          The field, patterns, is a vector of Strings where each string is expected to be a file extension,
+          e.g., rs.  Note that using *.rs will not work as expected for applications like RustTextFinder.
+        </t-b>
+        <t-b>
+          It is expected that applications using CmdLineParser will process only files with the specified
+          extensions.  If none are supplied, then the application processes all files it encounters.
+        </t-b>
+        <t-b>
+          The field, help_str, is a String containing information to supply to the user in response to an
+          option /h.  In this library, the string contains the defaults, cited above, but an application
+          can change the string with <c-s>replace_help(hs&str)</c-s>.
+        </t-b>
+      </t-b>
+      <div class="clear"></div>
+      <num-cont>
+        <num-item1>3.2.1</num-item1><num-item4>CmdLine Parser Methods:</num-item4>
+      </num-cont>
+      <t-b>
+        CmdLineParser implements the following methods and functions:
+        <div class="indent">
+          <ol class="tight">
+            <li>
+              <strong><c-s>new() -> Self</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Create new <c-s>CmdLineParser</c-s> which has an options hashmap, patterns vector, and help string.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>parse(&self)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Builds internal options hashmap and patterns vector.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>path(&self) -> String</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Return value of relative root path, held in options map.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>abs_path(&self) -> String</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Return value of absolute root path, from canonicalized relative path.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>set_path(&mut self, p:&str)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Replaces value of root path, held in options map.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>set_regex(&mut self, re:&str)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Replaces value of regex string, held in options map.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>get_regex(&mut self) -> &str</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Retrieves value of regex string, held in options map.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>default_options(&mut self)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Sets values of some of the options in options map.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>contains_option(&self, opt:char) -> bool</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                returns true if options map contains key opt, else returns false.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>add_option(&mut self, opt:char, val:&str)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Inserts option in options hashmap, adding key if it does not exist, else overriding previous value.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>value(&self, opt:char) -> &str</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Inserts option in options hashmap, adding key if it does not exist, else overriding previous value.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>add_pattern(&mut self, patt:&str) -> &mut self</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Inserts patt into patterns vector.  Method can be chained.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>patterns(&self) -> &CmdLinePatterns</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Returns reference to vector of patterns.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>options(&self) -> &Options</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Returns reference to hashmap of options.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>help(&self) -> &str</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Returns default help string.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>replace_help(&mut self, hs:&str)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Replace internal help string.
+              </div>
+            </li>
+          </ol>
+        </div>
+      </t-b>
+      <t-b>
+        Code for CmdLineParser library and a demonstration program are provided in the dropdown, below.
+      </t-b>
+      <t-b>
+        <div>
+          <details>
+            <summary class="labelStyle darkItem">CmdLineParser Implementation</summary>
+            <defn-outerBlock>
+              <defn-block>
+                <defn-head>CmdLineParser lib.rs</defn-head>
+                <defn-code>
+/////////////////////////////////////////////////////////////
+// rust_cmd_line::lib.rs                                   //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 19 Apr 2020  //
+/////////////////////////////////////////////////////////////
+
+use std::env::{args};
+use std::collections::HashMap;
+use std::fs::*;
+
+/////////////////////////////////////////////////////////////
+// sample command line with options
+//-----------------------------------------------------------
+// /P "." /p "rs,txt" /s [true] /r "abc" /h [true] /H [true]
+//
+// P - path in either absolute or relative form
+// p - pattern, a file extension indicating file to process
+// s - recurse directory tree rooted at P
+// r - regular expression
+// H - hide directories that don't contain any target files
+// h - help: display this message
+// custom option:
+// /x [v] - x is application specific option which may
+//          have value, v
+// Note:
+// Any attribute that has no value on command line will
+// have value "true" in option map
+/////////////////////////////////////////////////////////////
+// CmdLineParse methods
+//-----------------------------------------------------------
+// new() -&gt; CmdLineParse
+// parse(&amp;self)
+// contains_option(&amp;self, opt: char) -&gt; bool
+// value(&amp;self, char opt) -&gt; &amp;str
+// options(&amp;self) -&gt; &amp;HashMap&lt;char, String&gt;
+// - defaults are created with default_options():
+//   - /P "."    - root search path is current directory
+//   - /s "true" - recurse
+//   - /r "."    - match all text
+//   - /H "true" - hide unused directories
+//   - no patterns are equivalent to all files
+// path(&amp;self) -&gt; String
+// abs_path(&amp;self) -&gt; String
+// set_path(&amp;self, p:&amp;str)
+// patterns(&amp;self) -&gt; &amp;Vec&lt;String&gt;
+// add_pattern(&amp;mut self, p:&amp;str) -&gt; &amp;mut self
+// set_regex(&amp;mut self, re:&amp;str)
+// get_regex(&amp;self) -&gt; &amp;str
+// help(&amp;self) -&gt; String
+// replace_help(&amp;mut self, &amp;str) -&gt; String
+
+/// display command line arguments
+pub fn show_cmd_line() {
+    print!("\n  {:?}\n  ", args().next());
+    for arg in args().skip(1) {
+        print!("{:?} ", arg)
+    }
+}
+
+pub type Options = HashMap&lt;char, String&gt;;
+pub type CmdLinePatterns = Vec&lt;String&gt;;
+
+/// Parses command line into options and patterns
+#[derive(Debug, Default)]
+pub struct CmdLineParse {
+    opt_map : Options,
+    patterns : CmdLinePatterns,
+    help_str : String,
+}
+impl CmdLineParse {
+    /// create new instance of parser
+    pub fn new() -&gt; Self {
+        let help = CmdLineParse::help_txt();
+        Self {
+            opt_map: Options::default(),
+            patterns: CmdLinePatterns::new(),
+            help_str: help,
+        }
+    }
+    /// returns string with command line arguments example
+    fn help_txt() -&gt; String {
+        let mut str =
+        "\n  Help:\n  Options: /P . /p \"rs,txt\"".to_string();  
+        str.push_str(" /s /r \"abc\" /H /h"); 
+        str
+    }
+    /// does the command line argument start with '/'
+    fn is_opt(&amp;self, s:&amp;str) -&gt; bool {
+        let bytes = s.as_bytes();
+        bytes[0] as char == '/'
+    }
+    /// returns path string with default value "."
+    pub fn path(&amp;self) -&gt; String {
+        if self.contains_option('P') {
+            self.opt_map[&amp;'P'].clone()
+        }
+        else {
+            ".".to_string()
+        }
+    }
+
+    /// replace Win path separator "\\" with Linux "/"
+    /// - use only with absolute paths for Windows 
+    fn replace_sep(path: &amp;str) -&gt; String {
+        let mut rtn = path.to_string();
+        if rtn.contains("\\") {
+            rtn = rtn.replace("\\", "/");
+            rtn = rtn.chars().skip(4).collect();
+        }
+        rtn
+    }
+    /// convert relative to absolute path
+    pub fn abs_path(&amp;self) -&gt; String {
+        let abs = std::path::PathBuf::from(self.path());
+        let rslt = canonicalize(&amp;abs);
+        match rslt {
+            Ok(path_buf) =&gt; {
+                // print!("\n--path_buf = {:?}",path_buf);
+                let ap = path_buf.to_string_lossy().to_string();
+                let ap = CmdLineParse::replace_sep(&amp;ap);
+                // print!("\n--abs_path = {:?}",ap);
+                ap
+            }
+            Err(error) =&gt; error.to_string()
+        }
+    }
+    /// set new root path
+    pub fn set_path(&amp;mut self, p:&amp;str) {
+        self.opt_map.insert('P', p.to_string());
+    }
+    /// set new regex string for matching
+    pub fn set_regex(&amp;mut self, re:&amp;str) {
+        self.opt_map.insert('r', re.to_string());
+    }
+    /// return current regex string
+    pub fn get_regex(&amp;self) -&gt; &amp;str {
+        let re_opt = self.opt_map.get(&amp;'r');
+        match re_opt {
+            Some(value) =&gt; value,
+            None =&gt; ".",
+        }
+    }
+    /// commonly used default options
+    pub fn default_options(&amp;mut self) {
+        self.opt_map.insert('P', ".".to_string());
+        self.opt_map.insert('s', "true".to_string());  
+        self.opt_map.insert('r', ".".to_string());     
+        self.opt_map.insert('H', "true".to_string());  
+    }
+    /// does options contain opt char? 
+    pub fn contains_option(&amp;self, opt:char) -&gt; bool {
+        self.opt_map.contains_key(&amp;opt)
+    }
+    /// insert {o,v} if o key doesn't exist, else overwrite v
+    pub fn add_option(&amp;mut self, o:char, v:&amp;str) {
+        self.opt_map.insert(o, v.to_string());
+    }
+    /// return option value
+    pub fn value(&amp;self, opt:char) -&gt; &amp;str {
+        &amp;self.opt_map[&amp;opt]
+    }
+    /// add file ext (with no "*.")
+    pub fn add_pattern(&amp;mut self, p:&amp;str)
+           -&gt; &amp;mut Self {
+        let s = String::from(p);
+        if !self.patterns.contains(&amp;s) {
+            self.patterns.push(s);
+        }
+        self
+    }
+    /// returns non-mutable reference to patterns
+    pub fn patterns(&amp;self) -&gt; &amp;CmdLinePatterns {
+        &amp;self.patterns
+    }
+    /// returns non-mutable reference to options
+    pub fn options(&amp; self) -&gt; &amp;Options {
+        &amp;self.opt_map
+    }
+    /// return help string
+    pub fn help(&amp;self) -&gt; &amp;str {
+        &amp;self.help_str
+    }
+    /// replace help string
+    pub fn replace_help(&amp;mut self, s:&amp;str) {
+        self.help_str = s.to_string();
+    }
+    /// parse command line arguments, provided by env()
+    pub fn parse(&amp;mut self) {
+    
+        let cl_args:Vec&lt;String&gt; = args().collect();
+        let end = cl_args.len();
+        for i in 1..end {
+            if self.is_opt(&amp;cl_args[i]) {
+                let bytes = cl_args[i].as_bytes();
+                let key = bytes[1] as char;
+                if i &lt; end - 1 {
+                    if !self.is_opt(&amp;cl_args[i+1]) {
+                        self.opt_map.insert(
+                            key,cl_args[i+1].to_string()
+                        );
+                    }
+                    else {
+                        self.opt_map.insert(
+                            key, "true".to_string()
+                        );
+                    }
+                }
+                else {
+                    self.opt_map.insert(
+                        key, "true".to_string()
+                    );
+                }
+            }
+        }
+        /*-- build patterns --*/
+        if self.contains_option('p') {
+            let pat_str = self.value('p').to_string();
+            let split_iter = pat_str.split(',');
+            for patt in split_iter {
+                self.add_pattern(patt);
+            }
+        }
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn cl_args() {
+        let _mock_args = vec!["/P", ".", "/p", "rs,txt", "/s"];
+        print!("\n  cl args: ");
+        for arg in args() {
+            print!("{:?} ", arg);
+        }
+        let mut parser = CmdLineParse::new();
+        parser.parse();
+        for arg in args() {
+            let bytes = arg.as_bytes();
+            if '/' == (bytes[0] as char) {
+                assert!(
+                    parser.opt_map.contains_key(
+                        &amp;(bytes[1] as char)
+                  )
+                );
+            }
+        }
+    }
+}
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Example program</defn-head>
+                <defn-code>
+/////////////////////////////////////////////////////////////
+// rust_cmd_line::test1.rs                                 //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 19 Apr 2020  //
+/////////////////////////////////////////////////////////////
+
+use rust_cmd_line::*;
+
+fn main() {
+
+    print!("\n  Command line arguments:");
+    show_cmd_line();
+
+    let mut parser = CmdLineParse::new();
+    // let mut parser = CmdLineParse::default();
+    parser.default_options();
+    print!("\n  {}\n",parser.help());
+    parser.parse();
+    print!("\n  path     = {:?}", parser.path());
+    print!("\n  abspath  = {:?}", parser.abs_path());
+    let new_path = "C:/github/foo";
+    parser.set_path(new_path);
+    print!("\n  setting path to {:?}", new_path);
+    print!("\n  path     = {:?}", parser.path());
+    parser.add_pattern("rs");
+    parser.add_pattern("rs");  // is not repeated
+    parser.add_pattern("exe");
+    let patts = parser.patterns();
+    print!("\n  patts    = {:?}", patts);
+    print!("\n  regex    = {:?}", parser.get_regex());
+    let opts = parser.options();
+    print!("\n  opts     = {:#?}", opts);
+    print!("\n\n  adding option {{x,false}}");
+    parser.add_option('x', "false");
+    let opts = parser.options();
+    print!("\n  opts     = {:#?}", opts);
+    print!("\n\n  adding option {{x,true}}");
+    parser.add_option('x', "true");
+    let opts = parser.options();
+    print!("\n  opts     = {:#?}", opts);
+
+    print!("\n\n  That's all Folks!\n\n")
+}
+                </defn-code>
+                <defn-head class="defnBorderTop">Output:</defn-head>
+                <defn-code>
+  Command line arguments:
+  
+  Help:
+  Options: /P . /p "rs,txt" /s /r "abc" /H /h
+
+  path     = "."
+  abspath  = "C:/github/JimFawcett/RustCmdLine"
+  setting path to "C:/github/foo"
+  path     = "C:/github/foo"
+  patts    = ["rs", "exe"]
+  regex    = "."
+  opts     = {
+    'r': ".",
+    'H': "true",
+    's': "true",
+    'P': "C:/github/foo",
+}
+
+  adding option {x,false}
+  opts     = {
+    'x': "false",
+    'r': ".",
+    'H': "true",
+    's': "true",
+    'P': "C:/github/foo",
+}
+
+  adding option {x,true}
+  opts     = {
+    'x': "true",
+    'r': ".",
+    'H': "true",
+    's': "true",
+    'P': "C:/github/foo",
+}
+
+  That's all Folks!
+                </defn-code>
+              </defn-block>
+            </defn-outerBlock>
+          </details>
+        </div>
+      </t-b>
+      The CmdLineParser library is used in the <a href="RustTextFinder.html">RustTextFinder</a> application.
+      I expect to use it for many more tools.
+    </indent-blocks>
 
     <a id="dirnav"></a>
     <hr class="spread" />
