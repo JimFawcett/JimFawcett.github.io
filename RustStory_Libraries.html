@@ -84,19 +84,240 @@
     <num-cont>
       <num-item1>3.0</num-item1><num-item4>Prologue:</num-item4>
     </num-cont>
-
+    <under-construction class="indent">
+      This page is under construction
+    </under-construction>
     <a id="std"></a>
     <hr class="spread" />
     <num-cont>
       <num-item1>3.1</num-item1><num-item4>std:</num-item4>
     </num-cont>
-
+    <t-b>
+      Rust has a well endowed collection of <strong><a href="https://doc.rust-lang.org/beta/std/">std libraries</a></strong> in the
+      std namespace.  You don&apos;t have to declare a use std::*, as the std::prelude::* is automatically applied.
+    </t-b>
+    <t-b>
+      All of the libraries discussed below are part of std.
+    </t-b>
     <a id="collections"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>3.2</num-item1><num-item4>collections:</num-item4>
+      <num-item1>3.2</num-item1><num-item4>std::collections:</num-item4>
     </num-cont>
-
+    The std namespace has a set of <a href="https://doc.rust-lang.org/std/collections/index.html">std::collections</a> 
+    similar to other languages:
+    <div class="" style="width:calc(100vw - 15em); padding:15px;">
+      <table>
+        <tr>
+          <th class="darkItem">Collection</th><th class="darkItem">Description</th>
+        </tr>
+        <tr>
+          <td class="lightItem">Vec&lt;T&gt;</td>
+          <td class="lightItem">
+            Sequence container:<br />
+            A self expanding indexable array of items of type T, occupying a contiguous block of memory.
+            Constant time access to indexed item, linear time insertion and removal.
+          </td>
+        </tr>
+        <tr>
+          <td class="lightItem">VecDeque&lt;T&gt;</td>
+          <td class="lightItem">
+            Sequence container:<br />
+            A self expanding indexable array of items of type T, with constant-time access, insertion,
+            and removal on either end.
+          </td>
+        </tr>
+        <tr>
+          <td class="lightItem">LinkedList&lt;T&gt;</td>
+          <td class="lightItem">
+            Sequence container:<br />
+            A doubly linked list of items of type T, with linear-time traversal.
+          </td>
+        </tr>
+        <tr>
+          <td class="lightItem">HashMap&lt;K, V&gt;</td>
+          <td class="lightItem">
+            Associative container:<br />
+            A hashed container with almost constant time access.  Elements are randomly ordered
+            (if the hash function works well for T)
+          </td>
+        </tr>
+        <tr>
+          <td class="lightItem">BTreeMap&lt;K,&nbsp;V&gt;</td>
+          <td class="lightItem">
+            Associative container:<br />
+            A balanced binary tree container with log n time access.  Elements are sorted.
+          </td>
+        </tr>
+        <tr>
+          <td class="lightItem">HashSet&lt;K&gt;</td>
+          <td class="lightItem">
+            Set container:<br />
+            A hashed container with almost constant time access.  Elements are randomly ordered
+            (if the hash function works well for T)
+          </td>
+        </tr>
+        <tr>
+          <td class="lightItem">BTreeSet&lt;K&gt;</td>
+          <td class="lightItem">
+            Set container:<br />
+            A balanced binary tree container with log n time access.  Elements are sorted.
+          </td>
+        </tr>
+        <tr>
+          <td class="lightItem">BinaryHeap&lt;T&gt;</td>
+          <td class="lightItem">
+            Priority queue:<br />
+            Largest element is accessed in constant time.
+          </td>
+        </tr>
+      </table>
+    </div>
+    <num-cont><num-item1>3.2.1</num-item1><num-item4>Iterators:</num-item4></num-cont>
+    <t-b>
+      Iterators support iterating through all the collections.  They come in three flavors:
+      iter, iter_mut, and into_iter.  Note that into_iter is a consuming iterator, moving items
+      from source to destination.
+    </t-b>
+    <t-b>
+      Iterators provide a set of adapter methods for performing common operations on containers.
+      Here&apos;s a partial list - see 
+      <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">Trait&nbsp;std::iter::Iterator</a>
+      for more details:
+      <div style="padding:5px 25px;">
+        <ol class="tight">
+          <li>
+            <c-s>fn <strong>next</strong>(&mut self) -> Option&lt;Self::Item&gt;</c-s><br />
+            <s-5px></s-5px>
+            Advances and returns value.
+          </li>
+          <li>
+            <c-s>fn map&lt;B, F&gt;(self, f:F) -> Map&lt;Self, F&gt;</c-s><br />
+            <c-s> where F: FnMut(Self::Item) -> B</c-s><br />
+            <s-5px></s-5px>
+            Takes a closure and creates an iterator that applies the closure to each item.
+          </li>
+          <li>
+            <c-s>fn filter&lt;P&gt;(self, predicate:P) -> Filter&lt;Self, P&gt;</c-s><br />
+            <c-s>where P: FnMust(&Self::Item) -> bool</c-s><br />
+            <s-5px></s-5px>
+            Creates an iterator that determines if an item should be included.
+          </li>
+          <li>
+            <c-s>fn take(self, n:usize) -> Take&lt;Self&gt;</c-s>
+          </li>
+          <li>
+            <c-s>
+              fn take_while&lt;P&gt;(self, predicate: P) -> TakeWhile&lt;Self, P&gt;<br />
+              where P: FnMut(&Self::Item) -> bool
+            </c-s>
+          </li>
+          <li>
+            <c-s>
+              fn fold&lt;B, F&gt;(self, init:B, f:F) -> B<br />
+              where FnMut(B, Self::Item) -> B
+            </c-s>
+          </li>
+          <li>
+            <c-s>fn skip(self, n:usize) -> Skip&lt;Self&gt;</c-s>
+          </li>
+          <li>
+            <c-s>
+              fn collect&lt;B&gt;(self) -> B<br />
+              where B: FromIterator&lt;Self::Item&gt;
+            </c-s>
+          </li>
+          <li>
+            <c-s>step_by(self, step:usize) -> StepBy&lt;Self&gt;<br /></c-s>
+            <s-5px></s-5px>
+            Skips step items on each iteration
+          </li>
+          <li>
+            <c-s>nth(&mut self, n:usize) -> Option&lt;Self::item&gt;<br /></c-s>
+            <s-5px></s-5px>
+            Returns nth item, counting from zero
+          </li>
+          <li>
+            <c-s>last(self) -> Option&lt;Self::item&gt;<br /></c-s>
+            <s-5px></s-5px>
+            Consumes iterator, returning last item
+          </li>
+          <li>
+            <c-s>
+              fn find&lt;P&gt;(&mut self, predicate: P) -> Option&lt;Self::Item&gt;<br />
+              where FnMut(&Self::Item) -> bool
+            </c-s> 
+          </li>
+          <li>
+            <c-s>
+              fn position&lt;P&gt;(&mut self, predicate: P) -> Option&lt;usize&gt;<br />
+              where P: FnMut(Self::Item) -> bool
+            </c-s>
+          </li>
+          <li>
+            <c-s>
+              fn for_each&lt;F&gt;(self, f:F)<br />
+              where F: FnMut(Self::Item)<br />
+            </c-s>
+            <s-5px></s-5px>
+            Calls a closure on each element of an iterator.
+          </li>
+          <li>
+            <c-s>fn enumerate(self) -> Enumerate&lt;Self&gt;<br /></c-s>
+            <s-5px></s-5px>
+            Creates an iterator returns a pair with current iteration count and next value.
+          </li>
+          <li>
+            <c-s>fn by_ref(&mut self) -> &mut Self</c-s>
+          </li>
+          <li>
+            <c-s>
+              fn all&lt;F&gt;(&mut self, f:F) -> bool<br />
+              where F: FnMut(Self::Item) -> bool
+            </c-s>
+          </li>
+          <li>
+            <c-s>
+              fn any&lt;F&gt;(&mut self, f:F) -> bool<br />
+              where F: FnMut(Self::Item) -> bool
+            </c-s>
+          </li>
+          <li>
+            <c-s>fn count(self) -> usize<br /></c-s>
+            <s-5px></s-5px>
+            Consumes iterator, counting number of iterations
+          </li>
+          <li>
+            <c-s>
+              fn chain&lt;U&gt;(self, other: U) -> Chain&lt;Self, &lt;U as IntoIterator&gt;::IntoIter&gt;<br />
+              where U: IntoIterator&lt;Self::Item&gt;
+            </c-s>
+          </li>
+          <li>
+            <c-s>
+              fn zip&lt;U&gt;(self, other: U) -> Zip&lt;Self, &lt;U as IntoIterator&gt;::IntoIter&gt;<br />
+              where U: IntoIterator
+            </c-s>
+          </li>
+          <li>
+            <c-s>
+              fn sum&lt;S&gt;(self) -> S<br />
+              where S: Sum&lt;Self::Item&gt;
+            </c-s>
+          </li>
+          <li>
+            <c-s>
+              fn product&lt;P&gt;(self) -> P<br />
+              where P: Product&lt;Self::Item&gt;
+            </c-s>
+          </li>
+        </ol>
+      </div>
+    </t-b>
+    <t-b>
+      Similar to the C++ std::algorithms, these provide a readable declarative interface for code doing
+      compound operations on collection items.
+    </t-b>
     <a id="fs"></a>
     <hr class="spread" />
     <num-cont>
@@ -145,6 +366,140 @@
     <num-cont>
       <num-item1>3.7</num-item1><num-item4>References:</num-item4>
     </num-cont>
+        <table style="width:calc(100vw - 12rem);">
+      <tr>
+        <th class="darkItem">Reference Link</th>
+        <th class="darkItem">Description</th>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://stevedonovan.github.io/rust-gentle-intro/readme.html">A Gentle Introduction To Rust</a>
+        </td>
+        <td class="lightItem">
+          First thing to read.
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://doc.rust-lang.org/book/">The Rust Book</a>
+        </td>
+        <td class="lightItem">
+          Rust docs - walkthrough of syntax
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://doc.rust-lang.org/reference/">The Rust Reference Book</a>
+        </td>
+        <td class="lightItem">
+          Rust&apos;s approximation of a language standard. Clear and well written, with a glossary at the end.
+          Its <a href="https://github.com/rust-lang/reference">github site</a> shows that changes are still being
+          actively incorporated.
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://cheats.rs/">Rust cheat sheet</a>
+        </td>
+        <td class="lightItem">
+          Quite extensive list of cheats and helpers.
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem"><a href="https://docs.google.com/presentation/d/1q-c7UAyrUlM-eZyTo1pd8SZ0qwA_wYxmPZVOQkoDmH4/edit#slide=id.p">Rust Containers</a></td>
+        <td class="lightItem">
+          Container diagrams
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem"><a href="https://stackoverflow.com/questions/27683266/how-do-you-do-interprocess-communication-ipc-in-rust">Rust IPC</a></td>
+        <td class="lightItem">
+          Stackoverflow re Rust IPC
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem"><a href="https://stackoverflow.com/questions/31192956/whats-the-de-facto-way-of-reading-and-writing-files-in-rust-1-x">Rust file io</a></td>
+        <td class="lightItem">
+          Stackoverflow re Rust file io
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem"><a href="https://stackoverflow.com/questions/27840394/how-can-a-rust-program-access-metadata-from-its-cargo-package">Rust metadata</a></td>
+        <td class="lightItem">
+          Stackoverflow re reading metadata from cargo.toml
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem"><a href="https://riptutorial.com/ebook/rust">RIP Tutorial on Rust</a></td>
+        <td class="lightItem">
+          Comprehensive coverage from RIP, the stackoverflow archive
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem"><a href="https://riptutorial.com/ebook/rust">Learning Rust ebook</a></td>
+        <td class="lightItem">
+          Comprehensive coverage from RIP, stackoverflow archive
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem"><a href="https://riptutorial.com/rust/awesome-learning/book">Rust - Awesome Book</a></td>
+        <td class="lightItem">
+          lots of interesting discussions from RIP, the Stackoverflow Archive
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem"><a href="https://docs.rs/regex/1.3.7/regex/">std::regex</a></td>
+        <td class="lightItem">
+          std docs on Regex
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://docs.rs/dtolnay/0.0.8/dtolnay/macro._02__reference_types.html">
+            Shared&nbsp;reference&nbsp;&amp;T&nbsp;and&nbsp;exclusive&nbsp;reference&nbsp;&amp;mut&nbsp;T
+          </a>
+        </td>
+        <td class="lightItem">
+          More accurate description than immutable reference and mutable reference
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://deterministic.space/">Blog - Pascal's Scribbles</a>
+        </td>
+        <td class="lightItem">
+          Pascal Hertleif - Rust contributor
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://blog.mgattozzi.dev/">Blog - Barely Functional</a>
+        </td>
+        <td class="lightItem">
+          Michael Gattozzi - Rust contributor
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://blog.mgattozzi.dev/rust-wasm/">Rust and the case for WebAssembly in 2018</a>
+        </td>
+        <td class="lightItem">
+          Michael Gattozzi - Rust contributor
+        </td>
+      </tr>
+      <tr>
+        <td class="lightItem">
+          <a href="https://www.snoyman.com/blog/2020/05/no-mutable-parameters-in-rust">Blog - S.Noyberg</a>
+        </td>
+        <td class="lightItem">
+          Examples of aysnc/await, tokio, lifetime, ...
+        </td>
+      </tr>
+      <tr>
+        <td class="darkItem" style="line-height:0.5em;">&nbsp;</td>
+        <td class="darkItem" style="line-height:0.5em;">&nbsp;</td>
+      </tr>
+    </table>
 
   </bb-55>
   <spacer-25></spacer-25>
