@@ -105,6 +105,24 @@
       <num-item1>3.2</num-item1><num-item4>std::convert:</num-item4>
     </num-cont>
     <t-b>
+      Traits for conversions are provided in <a href="https://doc.rust-lang.org/std/convert/index.html">std::convert</a>.
+      The traits provided in this module provide ways to convert from one type to another.  Each trait serves a different
+      purpose:
+      <div class="indent">
+        <ul class="tight">
+          <li>
+            AsRef trait provides cheap reference-to-reference conversions.
+          </li>
+          <li>
+            AsMut trait provides cheap mutable-to-mutable conversions.
+          </li>
+          <li>
+            From trait provides consuming value-to-value conversions.
+          </li>
+        </ul>
+      </div>
+    </t-b>
+    <t-b>
       <div class="indent">
         <ol class="tight pad10">
           <li>
@@ -183,6 +201,38 @@
             </div>
           </li>
           <li>
+            AsMut:
+            <defn-code style="font-size:1.0em;">pub trait AsMut&lt;T&gt; where T: ?Sized,
+{
+  fn as_mut(&mut self) -> &mut T;
+}
+            </defn-code>
+            <div>
+              <details>
+                <summary class="labelStyle lightItem">Partial List of Implementors</summary>
+                <div>
+                  <ul class="tight">
+                    <li>
+                      <c-s>String::as_mut() -> &mut str</c-s>
+                    </li>
+                    <li>
+                      <c-s>[T]::as_mut() -> &mut [T]</c-s>
+                    </li>
+                    <li>
+                      <c-s>Vec&lt;T&gt;::as_mut() -> &mut [T]</c-s>
+                    </li>
+                    <li>
+                      <c-s>Vec&lt;T&gt;::as_mut() -> &mut Vec&lt;T&gt;</c-s>
+                    </li>
+                    <li>
+                      <c-s>Box&lt;T: ?Sized&gt;::as_mut() -> &mut T</c-s>
+                    </li>
+                  </ul>
+                </div>
+              </details>
+            </div>
+          </li>
+          <li>
             From:
             <defn-code style="font-size:1.0em;">pub trait From&lt;T&gt; {
   fn from(T) -> Self
@@ -242,43 +292,43 @@
                       VecDeque&lt;T&gt;::from(Vec&lt;T&gt;)
                     </li>
                     <li>
-                      Error::from(kind: ErrorKind)
-                    </li>
-                    <li>
-                      Box&lt;[u8]&gt;::from(Box&gt;str&gt;)
-                    </li>
-                    <li>
-                      Arc&lt;OsStr&gt;::from(OsString)
-                    </li>
-                    <li>
-                      Stdio::from(File)
-                    </li>
-                    <li>
-                      Arc&lt;Path&gt;::From(PathBuf)
-                    </li>
-                    <li>
-                      Stdio::from(ChildStdin)
-                    </li>
-                    <li>
-                      Stdio::from(ChildStdout)
-                    </li>
-                    <li>
-                      Arc&lt;String&gt;::from(String)
-                    </li>
-                    <li>
-                      Box&lt;str&gt;::from(&str)
-                    </li>
-                    <li>
                       BinaryHeap&lt;T&gt;::from(Vec&lt;T&gt;)
-                    </li>
-                    <li>
-                      Arc&lt;T&gt;::from(T)
                     </li>
                     <li>
                       Mutex&lt;T&gt;::from(T)
                     </li>
                     <li>
                       RWLock&lt;T&gt;::from(T)
+                    </li>
+                    <li>
+                      Box&lt;[u8]&gt;::from(Box&gt;str&gt;)
+                    </li>
+                    <li>
+                      Box&lt;str&gt;::from(&str)
+                    </li>
+                    <li>
+                      Arc&lt;OsStr&gt;::from(OsString)
+                    </li>
+                    <li>
+                      Arc&lt;Path&gt;::From(PathBuf)
+                    </li>
+                    <li>
+                      Arc&lt;String&gt;::from(String)
+                    </li>
+                    <li>
+                      Arc&lt;T&gt;::from(T)
+                    </li>
+                    <li>
+                      Error::from(kind: ErrorKind)
+                    </li>
+                    <li>
+                      Stdio::from(File)
+                    </li>
+                    <li>
+                      Stdio::from(ChildStdin)
+                    </li>
+                    <li>
+                      Stdio::from(ChildStdout)
                     </li>
                   </ul>
                 </div>
@@ -291,7 +341,7 @@
     <a id="collections"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>3.2</num-item1><num-item4>std::collections:</num-item4>
+      <num-item1>3.3</num-item1><num-item4>std::collections:</num-item4>
     </num-cont>
     The std namespace has a set of <a href="https://doc.rust-lang.org/std/collections/index.html">std::collections</a> 
     similar to other languages:
@@ -362,7 +412,7 @@
         </tr>
       </table>
     </div>
-    <num-cont><num-item1>3.2.1</num-item1><num-item4>Iterators:</num-item4></num-cont>
+    <num-cont><num-item1>3.3.1</num-item1><num-item4>Iterators:</num-item4></num-cont>
     <t-b>
       Iterators support iterating through all the collections.  They come in three flavors:
       iter, iter_mut, and into_iter.  Note that into_iter is a consuming iterator, moving items
@@ -373,155 +423,680 @@
       Here&apos;s a partial list - see 
       <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">Trait&nbsp;std::iter::Iterator</a>
       for more details:
-      <div style="padding:5px 25px;">
-        <ol class="tight">
-          <li>
-            <c-s>fn <strong>next</strong>(&mut self) -> Option&lt;Self::Item&gt;</c-s><br />
-            <s-5px></s-5px>
-            Advances and returns value.
-          </li>
-          <li>
-            <c-s>fn map&lt;B, F&gt;(self, f:F) -> Map&lt;Self, F&gt;</c-s><br />
-            <c-s> where F: FnMut(Self::Item) -> B</c-s><br />
-            <s-5px></s-5px>
-            Takes a closure and creates an iterator that applies the closure to each item.
-          </li>
-          <li>
-            <c-s>fn filter&lt;P&gt;(self, predicate:P) -> Filter&lt;Self, P&gt;</c-s><br />
-            <c-s>where P: FnMust(&Self::Item) -> bool</c-s><br />
-            <s-5px></s-5px>
-            Creates an iterator that determines if an item should be included.
-          </li>
-          <li>
-            <c-s>fn take(self, n:usize) -> Take&lt;Self&gt;</c-s>
-          </li>
-          <li>
-            <c-s>
-              fn take_while&lt;P&gt;(self, predicate: P) -> TakeWhile&lt;Self, P&gt;<br />
-              where P: FnMut(&Self::Item) -> bool
-            </c-s>
-          </li>
-          <li>
-            <c-s>
-              fn fold&lt;B, F&gt;(self, init:B, f:F) -> B<br />
-              where FnMut(B, Self::Item) -> B
-            </c-s>
-          </li>
-          <li>
-            <c-s>fn skip(self, n:usize) -> Skip&lt;Self&gt;</c-s>
-          </li>
-          <li>
-            <c-s>
-              fn collect&lt;B&gt;(self) -> B<br />
-              where B: FromIterator&lt;Self::Item&gt;
-            </c-s>
-          </li>
-          <li>
-            <c-s>step_by(self, step:usize) -> StepBy&lt;Self&gt;<br /></c-s>
-            <s-5px></s-5px>
-            Skips step items on each iteration
-          </li>
-          <li>
-            <c-s>nth(&mut self, n:usize) -> Option&lt;Self::item&gt;<br /></c-s>
-            <s-5px></s-5px>
-            Returns nth item, counting from zero
-          </li>
-          <li>
-            <c-s>last(self) -> Option&lt;Self::item&gt;<br /></c-s>
-            <s-5px></s-5px>
-            Consumes iterator, returning last item
-          </li>
-          <li>
-            <c-s>
-              fn find&lt;P&gt;(&mut self, predicate: P) -> Option&lt;Self::Item&gt;<br />
-              where FnMut(&Self::Item) -> bool
-            </c-s> 
-          </li>
-          <li>
-            <c-s>
-              fn position&lt;P&gt;(&mut self, predicate: P) -> Option&lt;usize&gt;<br />
-              where P: FnMut(Self::Item) -> bool
-            </c-s>
-          </li>
-          <li>
-            <c-s>
-              fn for_each&lt;F&gt;(self, f:F)<br />
-              where F: FnMut(Self::Item)<br />
-            </c-s>
-            <s-5px></s-5px>
-            Calls a closure on each element of an iterator.
-          </li>
-          <li>
-            <c-s>fn enumerate(self) -> Enumerate&lt;Self&gt;<br /></c-s>
-            <s-5px></s-5px>
-            Creates an iterator returns a pair with current iteration count and next value.
-          </li>
-          <li>
-            <c-s>fn by_ref(&mut self) -> &mut Self</c-s>
-          </li>
-          <li>
-            <c-s>
-              fn all&lt;F&gt;(&mut self, f:F) -> bool<br />
-              where F: FnMut(Self::Item) -> bool
-            </c-s>
-          </li>
-          <li>
-            <c-s>
-              fn any&lt;F&gt;(&mut self, f:F) -> bool<br />
-              where F: FnMut(Self::Item) -> bool
-            </c-s>
-          </li>
-          <li>
-            <c-s>fn count(self) -> usize<br /></c-s>
-            <s-5px></s-5px>
-            Consumes iterator, counting number of iterations
-          </li>
-          <li>
-            <c-s>
-              fn chain&lt;U&gt;(self, other: U) -> Chain&lt;Self, &lt;U as IntoIterator&gt;::IntoIter&gt;<br />
-              where U: IntoIterator&lt;Self::Item&gt;
-            </c-s>
-          </li>
-          <li>
-            <c-s>
-              fn zip&lt;U&gt;(self, other: U) -> Zip&lt;Self, &lt;U as IntoIterator&gt;::IntoIter&gt;<br />
-              where U: IntoIterator
-            </c-s>
-          </li>
-          <li>
-            <c-s>
-              fn sum&lt;S&gt;(self) -> S<br />
-              where S: Sum&lt;Self::Item&gt;
-            </c-s>
-          </li>
-          <li>
-            <c-s>
-              fn product&lt;P&gt;(self) -> P<br />
-              where P: Product&lt;Self::Item&gt;
-            </c-s>
-          </li>
-        </ol>
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle lightItem">Partial List of Iterator Adapters</summary>
+          <s-halfEm></s-halfEm>
+          <div class="indent">
+            <ol class="tight">
+              <li>
+                <c-s>fn <strong>next</strong>(&mut self) -> Option&lt;Self::Item&gt;</c-s><br />
+                <s-5px></s-5px>
+                Advances and returns value.
+              </li>
+              <li>
+                <c-s>fn map&lt;B, F&gt;(self, f:F) -> Map&lt;Self, F&gt;</c-s><br />
+                <c-s> where F: FnMut(Self::Item) -> B</c-s><br />
+                <s-5px></s-5px>
+                Takes a closure and creates an iterator that applies the closure to each item.
+              </li>
+              <li>
+                <c-s>fn filter&lt;P&gt;(self, predicate:P) -> Filter&lt;Self, P&gt;</c-s><br />
+                <c-s>where P: FnMust(&Self::Item) -> bool</c-s><br />
+                <s-5px></s-5px>
+                Creates an iterator that determines if an item should be included.
+              </li>
+              <li>
+                <c-s>fn take(self, n:usize) -> Take&lt;Self&gt;</c-s>
+              </li>
+              <li>
+                <c-s>
+                  fn take_while&lt;P&gt;(self, predicate: P) -> TakeWhile&lt;Self, P&gt;<br />
+                  where P: FnMut(&Self::Item) -> bool
+                </c-s>
+              </li>
+              <li>
+                <c-s>
+                  fn fold&lt;B, F&gt;(self, init:B, f:F) -> B<br />
+                  where FnMut(B, Self::Item) -> B
+                </c-s>
+              </li>
+              <li>
+                <c-s>fn skip(self, n:usize) -> Skip&lt;Self&gt;</c-s>
+              </li>
+              <li>
+                <c-s>
+                  fn collect&lt;B&gt;(self) -> B<br />
+                  where B: FromIterator&lt;Self::Item&gt;
+                </c-s>
+              </li>
+              <li>
+                <c-s>step_by(self, step:usize) -> StepBy&lt;Self&gt;<br /></c-s>
+                <s-5px></s-5px>
+                Skips step items on each iteration
+              </li>
+              <li>
+                <c-s>nth(&mut self, n:usize) -> Option&lt;Self::item&gt;<br /></c-s>
+                <s-5px></s-5px>
+                Returns nth item, counting from zero
+              </li>
+              <li>
+                <c-s>last(self) -> Option&lt;Self::item&gt;<br /></c-s>
+                <s-5px></s-5px>
+                Consumes iterator, returning last item
+              </li>
+              <li>
+                <c-s>
+                  fn find&lt;P&gt;(&mut self, predicate: P) -> Option&lt;Self::Item&gt;<br />
+                  where FnMut(&Self::Item) -> bool
+                </c-s> 
+              </li>
+              <li>
+                <c-s>
+                  fn position&lt;P&gt;(&mut self, predicate: P) -> Option&lt;usize&gt;<br />
+                  where P: FnMut(Self::Item) -> bool
+                </c-s>
+              </li>
+              <li>
+                <c-s>
+                  fn for_each&lt;F&gt;(self, f:F)<br />
+                  where F: FnMut(Self::Item)<br />
+                </c-s>
+                <s-5px></s-5px>
+                Calls a closure on each element of an iterator.
+              </li>
+              <li>
+                <c-s>fn enumerate(self) -> Enumerate&lt;Self&gt;<br /></c-s>
+                <s-5px></s-5px>
+                Creates an iterator returns a pair with current iteration count and next value.
+              </li>
+              <li>
+                <c-s>fn by_ref(&mut self) -> &mut Self</c-s>
+              </li>
+              <li>
+                <c-s>
+                  fn all&lt;F&gt;(&mut self, f:F) -> bool<br />
+                  where F: FnMut(Self::Item) -> bool
+                </c-s>
+              </li>
+              <li>
+                <c-s>
+                  fn any&lt;F&gt;(&mut self, f:F) -> bool<br />
+                  where F: FnMut(Self::Item) -> bool
+                </c-s>
+              </li>
+              <li>
+                <c-s>fn count(self) -> usize<br /></c-s>
+                <s-5px></s-5px>
+                Consumes iterator, counting number of iterations
+              </li>
+              <li>
+                <c-s>
+                  fn chain&lt;U&gt;(self, other: U) -> Chain&lt;Self, &lt;U as IntoIterator&gt;::IntoIter&gt;<br />
+                  where U: IntoIterator&lt;Self::Item&gt;
+                </c-s>
+              </li>
+              <li>
+                <c-s>
+                  fn zip&lt;U&gt;(self, other: U) -> Zip&lt;Self, &lt;U as IntoIterator&gt;::IntoIter&gt;<br />
+                  where U: IntoIterator
+                </c-s>
+              </li>
+              <li>
+                <c-s>
+                  fn sum&lt;S&gt;(self) -> S<br />
+                  where S: Sum&lt;Self::Item&gt;
+                </c-s>
+              </li>
+              <li>
+                <c-s>
+                  fn product&lt;P&gt;(self) -> P<br />
+                  where P: Product&lt;Self::Item&gt;
+                </c-s>
+              </li>
+            </ol>
+          </div>
+        </details>
       </div>
     </t-b>
     <t-b>
       Similar to the C++ std::algorithms, these provide a readable declarative interface for code doing
       compound operations on collection items.
     </t-b>
+    <a id="io"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>3.4</num-item1><num-item4>std::io</num-item4>
+    </num-cont>
+    <t-b>
+      <strong>Traits:</strong>
+    </t-b>
+    <t-b>
+      Traits are contracts with function signatures that implementors are required to provide.  For example,
+      every implementor of the Read trait is obligated to provide <c-s>read</c-s> and all the other methods
+      from that trait.  The BufReader and Stdin structs both implement Read.
+    </t-b>
+    <t-b>
+      In the dropdown, below, you will find the most important methods for the Read, BufRead, Seek, and Write
+      traits.
+    </t-b>
+    <t-b>
+      <div class="">
+        <details>
+          <summary class="labelStyle lightItem">Partial List of Traits</summary>
+          <div class="indent">
+            <s-halfEm></s-halfEm>
+        <ol class="tight">
+          <li>
+          <defn-code style="font-size:1.0em; margin-left:-15px;">pub trait Read {
+  fn read(&mut self, buf: &mut [u8]) -> Result&lt;usize&gt;
+  fn read_exact(&mut self, buf: &mut [u8]) -> Result&lt;()&gt;
+  fn read_to_end(&mut self, buf: &mut Vec&lt;u8&gt;) -> Result&lt;usize&gt;
+  fn read_to_string(&mut self, buf: &mut String) -> Result&lt;usize&gt;
+  fn by_ref(&mut self) -> &mut Self, where Self: Sized,
+  fn bytes(self) -> Bytes&lt;Self&gt;, where Self: Sized,
+  ...
+}
+            </defn-code>
+          </li>
+          <li>
+          <defn-code style="font-size:1.0em; margin-left:-15px;">pub trait BufRead {
+  fn fill_buf(&mut self) -> Result&lt;&[u8]&gt;
+  fn consume(&mut self, amt: usize)
+  fn read_until(&mut self, byte: u8, buf: &mut Vec&lt;u8&gt;) -> Result&lt;usize&gt;
+  fn read_line(&mut self, buf: &mut String) -> Result&lt;usize&gt;
+  fn lines(self) -> Lines&lt;Self&gt; // an iterator
+  ...
+}
+            </defn-code>
+          </li>
+          <li>
+          <defn-code style="font-size:1.0em; margin-left:-15px;">pub trait Write {
+  fn write_all(&mut self, buf: &[u8]) -> Result&lt;()&gt;
+  fn write(&mut self, buf: &[u8]) -> Result&lt;usize&gt;
+  fn write_fmt(&mut self, fmt: Arguments) -> Result&lt;()&gt;
+  fn by_ref(&mut self) -> &mut Self, where Self: Sized,
+  fn flush(&mut self) -> Result&lt;()&gt;,
+  ...
+}
+            </defn-code>
+          </li>
+          <li>
+          <defn-code style="font-size:1.0em; margin-left:-15px;">pub trait Seek {
+  fn seek(&mut self, pos: SeekFrom) -> Result&lt;u64&gt;
+  fn stream_len(&mut self) -> Result&lt;u64&gt;
+  ...
+}
+            </defn-code>
+          </li>
+        </ol>
+            </div>
+          </details>
+      </div>
+    </t-b>
+    <t-b>
+      <strong>Structs:</strong>
+    </t-b>
+    <t-b>
+      Structs are used to build library and user-defined types.  Here, you will find definitions for
+      BufReader, BufWriter, Error, LineWriter, Stdin, and Stdout types.
+    </t-b>
+    <t-b>
+      Two other structs, Bytes and Lines, are iterator types that provide access to the io state. You will find
+      definitions for all of these in the dropdown, below.
+    </t-b>
+    <t-b>
+      <div class="">
+        <details>
+          <summary class="labelStyle lightItem">Partial List of Structs</summary>
+          <div class="indent">
+          <s-halfEm></s-halfEm>
+        <ol class="tight">
+          <li>
+            BufReader
+            <div class="indent">
+              <ul class="tight">
+                <li>
+                  Implements Traits <c-s>BufRead, Debug, Read, Seek, ...</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn new(inner: R) -> BufReader&lt;R&gt; where R: Read</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn get_ref(&self) -> &R</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn get_mut(&self) -> &mut R</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn buffer(&self) -> &[u8]</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn into_inner(self) -> R</c-s>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            BufWriter
+            <div class="indent">
+              <ul class="tight">
+                <li>
+                  Implements Traits <c-s>Debug, Drop, Seek, Write ...</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn new(inner: W) -> BufWriter&lt;W&gt; where W: Write</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn get_ref(&self) -> &W</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn get_mut(&self) -> &mut W</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn buffer(&self) -> &[u8]</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn into_inner(self) -> Result&lt;W, IntoInnerError&lt;BufWriter&lt;W&gt;&gt;&gt;</c-s>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            Bytes
+            <div class="indent">
+              <ul class="tight">
+                <li>
+                  Implements Traits <c-s>Debug, Iterator ...</c-s>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            Error
+            <div class="indent">
+              <ul class="tight">
+                <li>
+                  Implements Traits <c-s>Debug, Display, Error, From&lt;ErrorKind&gt;, ...</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn new&lt;E&gt;(kind: ErrorKind, error: E) -> Error</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn get_ref(&self) -> Option&lt;&(dyn Error + Send + Sync + 'static')&gt;</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn get_mut(&mut self) -> Option&lt;&mut (dyn Error + Send + Sync + 'static')&gt;</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn into_inner(self) -> Option&lt;Box&lt;dyn Error + Send + Sync&gt;&gt;</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn kind(&self) -> ErrorKind</c-s>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            LineWriter
+            <div class="indent">
+              <ul class="tight">
+                <li>
+                  Implements Traits <c-s>Debug, Write ...</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn new(inner: W) -> LineWriter&lt;W&gt; where W: Write</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn get_ref(&self) -> &W</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn get_mut(&self) -> &mut W</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn into_inner(self) -> Result&lt;W, IntoInnerError&lt;LineWriter&lt;W&gt;&gt;&gt;</c-s>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            Lines
+            <div class="indent">
+              <ul class="tight">
+                <li>
+                  Implements Traits <c-s>Debug, Iterator ...</c-s>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            Stdin
+            <div class="indent">
+              <ul class="tight">
+                <li>
+                  Implements Traits <c-s>Debug, Read ...</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn lock(&self) -> StdinLock</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn read_line(&self, buf: &mut String) -> Result&lt;usize&gt;</c-s>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            Stdout
+            <div class="indent">
+              <ul class="tight">
+                <li>
+                  Implements Traits <c-s>Debug, Write ...</c-s>
+                </li>
+                <li>
+                  <c-s>pub fn lock(&self) -> StdoutLock</c-s>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ol>
+            </div>
+          </details>
+      </div>
+    </t-b>
+    <t-b>
+      <strong>Functions:</strong>
+    </t-b>
+    <t-b>
+      Here you will find a short list of functions that are occasionally useful for programs dealing with io.
+    </t-b>
+    <t-b>
+      <div class="">
+        <details>
+          <summary class="labelStyle lightItem">Partial List of Functions</summary>
+          <s-halfEm></s-halfEm>
+          <div class="indent">
+        <ol class="tight">
+          <li>
+            <c-s>pub fn copy&lt;R: ?Sized, W: ?Sized&gt;(reader: &mut R, writer: &mut W) -> Result&lt;u64&gt;</c-s>
+          </li>
+          <li>
+            <c-s>pub fn stderr() -> Stderr</c-s>
+          </li>
+          <li>
+            <c-s>pub fn stdin() -> Stdin</c-s>
+          </li>
+          <li>
+            <c-s>pub fn stdout() -> Stdout</c-s>
+          </li>
+        </ol>
+            </div>
+          </details>
+      </div>
+    </t-b>
+    <t-b>
+      <strong>Types:</strong>
+    </t-b>
+    <t-b>
+      <div class="indent"><c-s>type Result&lt;T&gt; = Result&lt;T, Error&gt;</c-s></div>
+    </t-b>
+
     <a id="fs"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>3.3</num-item1><num-item4>std::fs</num-item4>
+      <num-item1>3.5</num-item1><num-item4>std::fs</num-item4>
     </num-cont>
-    Working with files and directories is well supported in Rust with the 
-    <a href="https://doc.rust-lang.org/std/fs/index.html">std::fs</a> library.
     <t-b>
-      <div class="indent">
-        <ol class="tight">
-          <li>
-            fn create_dir&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;()&gt;
-          </li>
-        </ol>
+      Working with files and directories is well supported in Rust with the
+      <a href="https://doc.rust-lang.org/std/fs/index.html">std::fs</a> library.
+    </t-b>
+    <t-b>
+      <strong>Structs:</strong>
+    </t-b>
+    <t-b>
+      The most important std::fs types are listed here - DirBuilder, DirEntry, File, FileType, Metadata,
+      OpenOptions, Permissions, and ReadDir:
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle lightItem">List of Structs</summary>
+          <s-halfEm></s-halfEm>
+          <div class="indent">
+            <ol class="tight">
+              <li>
+                <c-s>DirBuilder</c-s>
+                <ul class="tight">
+                  <li>
+                    Implements Traits <c-s>Debug, ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn new() -> DirBuilder</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn recursive(&mut self, recursive: bool) -> &mut Self</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn create&lt;P: AsRef&lt;Path&gt;&gt;(&mut self, path: P) -> Result&lt;()&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn recursive(&mut self, recursive: bool) -> &mut Self</c-s>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <c-s>DirEntry</c-s>
+                <ul class="tight">
+                  <li>
+                    Implements Traits <c-s>Debug, ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn path(&self) -> PathBuf</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn metadata(&mut self) -> Result&lt;Metadata&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn file_type(&mut self) -> Result&lt;FileType&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn file_name(&mut self) -> OsString</c-s>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <c-s>File</c-s>
+                <ul class="tight">
+                  <li>
+                    Implements Traits <c-s>Debug, Read, Seek, Write, ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn open&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;File&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn create&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;File&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn set_len(&mut self, size: u64) -> Result&lt;()&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn metadata(&mut self) -> Result&lt;Metadata&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn set_permissions(&mut self, perm: Permissions) -> Result&lt;()&gt;</c-s>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <c-s>FileType</c-s>
+                <ul class="tight">
+                  <li>
+                    Implements Traits <c-s>Clone, Copy, Debug, ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn is_dir(&mut self) -> bool</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn is_file(&mut self) -> bool</c-s>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <c-s>Metadata</c-s>
+                <ul class="tight">
+                  <li>
+                    Implements Traits <c-s>Clone, Debug, ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn file_type(&mut self) -> FileType</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn is_dir(&mut self) -> bool</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn is_file(&mut self) -> bool</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn len(&mut self) -> u64</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn permissions(&mut self) -> Permissions</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn modified(&mut self) -> Result&lt;SystemTime&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn accessed(&mut self) -> Result&lt;SystemTime&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn created(&mut self) -> Result&lt;SystemTime&gt;</c-s>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <c-s>OpenOptions</c-s>
+                <ul class="tight">
+                  <li>
+                    Implements Traits <c-s>Clone, Debug, ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn new() -> OpenOptions</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn read(&mut self, read: bool) -> &mut OpenOptions</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn write(&mut self, write: bool) -> &mut OpenOptions</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn append(&mut self, append: bool) -> &mut OpenOptions</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn truncate(&mut self, truncate: bool) -> &mut OpenOptions</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn create(&mut self, create: bool) -> &mut OpenOptions</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn create_new(&mut self, create_new: bool) -> &mut OpenOptions</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn open&lt;P: AsRef&lt;Path&gt;&gt;(&self, path: P) -> Result&lt;File&gt;</c-s>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <c-s>Permissions</c-s>
+                <ul class="tight">
+                  <li>
+                    Implements Traits <c-s>Clone, Debug, Eq, PartialEq, ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn readonly(&self) -> bool</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn set_readonly(&mut self, readonly: bool)</c-s>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <c-s>ReadDir</c-s>
+                <ul class="tight">
+                  <li>
+                    Implements Traits <c-s>Debug, Iterator, ...</c-s>
+                  </li>
+                </ul>
+                <div class="indent">
+                  <t-b style="margin-top:5px; margin-bottom:5px;">
+                    Iterator over entries in a directory, returned from the read_dir(p: Path)
+                    function.
+                  </t-b>
+                  <t-b style="margin-top:5px; margin-bottom:5px;">
+                    Yields instances of io::Result&lt;DirEntry&gt;
+                  </t-b>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </details>
       </div>
+    </t-b>
+    <t-b>
+      <strong>Functions:</strong>
+    </t-b>
+    <t-b>
+      Quite often, you may only need some of the functions, listed here, for a program&apos;s file and directory
+      management needs.
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle lightItem">Partial List of IO Functions</summary>
+          <s-halfEm></s-halfEm>
+          <div class="indent">
+            <ol class="tight">
+              <li>
+                <c-s>fn canonicalize&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;PathBuf&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn create_dir&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;()&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn read_dir&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;ReadDir&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn remove_dir&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;()&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn metadata&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;Metadata&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn read&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;Vec&lt;u8&gt;&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn read_dir&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;ReadDir&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn read_to_string&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;String&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn write&lt;P: AsRef&lt;Path&gt;&gt;, C: AsRef&lt;[u8]&gt;&gt;(path: P, contents: C) -> Result&lt;()&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn remove_file&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;()&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn rename&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;()&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn set_permissions&lt;P: AsRef&lt;Path&gt;&gt;(path: P, perm: Permissions) -> Result&lt;()&gt;</c-s>
+              </li>
+            </ol>
+          </div>
+        </details>
+      </div>
+
     </t-b>
     <a id="net"></a>
     <hr class="spread" />
