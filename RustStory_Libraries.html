@@ -824,6 +824,9 @@ fn main() {
       <num-item1>3.4</num-item1><num-item4>std::io</num-item4>
     </num-cont>
     <t-b>
+      Reference: <a href="https://doc.rust-lang.org/std/io/index.html">std::io</a>
+    </t-b>
+    <t-b>
       <strong>Traits:</strong>
     </t-b>
     <t-b>
@@ -1426,14 +1429,543 @@ fn main() -&gt; std::io::Result&lt;()&gt; {
           </div>
         </details>
       </div>
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle darkItem">Example:&nbsp;&nbsp;std::fs::echo</summary>
+          <s-halfEm></s-halfEm>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>fs_echo::main.rs</defn-head>
+              <defn-code>
+/////////////////////////////////////////////////////////////
+// fs_echo::main.rs - demonstrate file operations          //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 15 May 2020  //
+/////////////////////////////////////////////////////////////
 
+use std::fs::*;
+use std::io::*;
+
+/*-----------------------------------------------------------
+   Note:
+   The try operator ? has been used in several places in 
+   both using_File and using_OpenOptions to avoid a lot
+   of explicit error handling.
+
+   The try operator bubbles errors up to the caller, so
+   if there are several places where errors may occur, 
+   they can all be handled in one place by the caller.
+
+   What is surprising, but useful, is that the Result&lt;T,E&gt;
+   types are not all the same.  In some results the type T
+   is File, or (), or usize.  However, the error types are
+   all io::Error, and that is what ? returns to the caller,
+   so it just works!
+
+   If there are no errors, ? simply unwraps the result to 
+   be used, and everything is significantly simpler.
+*/
+#[allow(non_snake_case)]
+fn using_File(file_name:&amp;str, msg:&amp;str)
+     -&gt; std::io::Result&lt;()&gt; {
+    let mut wfile = File::create(file_name)?;
+    print!(
+        "\n  writing message {:?} to file {:?}", 
+        msg, file_name
+    );
+    wfile.write_all(msg.as_bytes())?;
+    let mut rfile = File::open(file_name)?;
+    let mut rcv_msg = String::new();
+    let _ = rfile.read_to_string(&amp;mut rcv_msg);
+    print!(
+        "\n  message {:?} read from {:?}", 
+        rcv_msg, file_name
+    );
+    Ok(())
+}
+fn open_file_for_write(path:&amp;str)
+     -&gt; std::io::Result&lt;File&gt; {
+    let wfile = OpenOptions::new()
+                .create(true)
+                .write(true)
+                .truncate(true)
+                .open(path)?;
+    Ok(wfile)
+}
+fn open_file_for_read(path:&amp;str)
+       -&gt; std::io::Result&lt;File&gt; {
+    let rfile = OpenOptions::new()
+                .read(true)
+                .open(path)?;
+    Ok(rfile)
+}
+#[allow(non_snake_case)]
+fn using_OpenOptions(file_name:&amp;str, msg:&amp;str)
+    -&gt; std::io::Result&lt;()&gt; {
+    let mut wfile = open_file_for_write(file_name)?;
+    print!(
+        "\n  writing message {:?} to file {:?}", 
+        msg, file_name
+    );
+    wfile.write_all(msg.as_bytes())?;
+
+    let mut rfile = open_file_for_read(file_name)?;
+    let mut rcv_msg = String::new();
+    let _ = rfile.read_to_string(&amp;mut rcv_msg);
+    print!(
+        "\n  message {:?} read from {:?}", 
+        rcv_msg, file_name
+    );
+    Ok(())
+}
+fn main() -&gt; std::io::Result&lt;()&gt; {
+    let putline = || print!("\n");
+
+    let file_name = "test.txt";
+    let msg = "msg from writer";
+    print!("\n  std::fs echo demonstration");
+    print!("\n ============================");
+    putline();
+
+    print!("\n  demo using File structure");
+    print!("\n ---------------------------");
+    using_File(file_name, msg)?;
+    putline();
+
+    print!("\n  demo using OpenOptions structure");
+    print!("\n ----------------------------------");
+    using_OpenOptions(file_name, msg)?;
+
+    println!("\n\n  That's all Folks!\n");
+    Ok(())
+}
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Output:</defn-head>
+              <defn-code>
+std::fs echo demonstration
+============================
+
+demo using File structure
+---------------------------
+writing message "msg from writer" to file "test.txt"
+message "msg from writer" read from "test.txt"
+
+demo using OpenOptions structure
+----------------------------------
+writing message "msg from writer" to file "test.txt"
+message "msg from writer" read from "test.txt"
+
+That's all Folks!
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </div>
+    </t-b>
+    <t-b>
+      The code for this example can be bound <a href="RustLibraryDemos.html">here</a>.
     </t-b>
     <a id="net"></a>
     <hr class="spread" />
     <num-cont>
       <num-item1>3.4</num-item1><num-item4>net:</num-item4>
     </num-cont>
+    <t-b>
+      Reference: <a href="https://doc.rust-lang.org/std/net/index.html">std::net</a> library.
+    </t-b>
+    <t-b>
+      <strong>Structs:</strong>
+    </t-b>
+    <t-b>
+      The std::net types are listed here - TcpListener, Incoming, TcpStream, UdpSocket,
+      Ipv4Addr, Ipv6Addr, SocketAddrV4, SocketAddrV6, AddrParseError:
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle lightItem">List of Structs</summary>
+          <s-halfEm></s-halfEm>
+          <div class="indent">
+            <ol class="tight">
+              <li>
+                <c-s>TcpListener</c-s>
+                <ul class="tight">
+                  <li>
+                    Traits: <c-s>Debug, ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn bind&lt;A: ToSocketAddrs&gt;(addr: A) -> Result&lt;TcpListener&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn accept(&self) -> Result&lt;(TcpStrea,. SpcletAddr)&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn inoming(&self) -> Incoming</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn take_error(&self) -> Result&lt;Option&lt;Error&gt;&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn set_nonblocking(&self, nonblocking: bool) -> Result&lt;()&gt;</c-s>
+                  </li>
+                  <li>...</li>
+                </ul>
+              </li>
+              <li>
+                <c-s>TcpStream</c-s>
+                <ul class="tight">
+                  <li>
+                    Traits: <c-s>Read, Write, Debug, ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn connect&lt;A: ToSoketAddrs&gt;(addr: A) -> Result&lt;TcpStream&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn shutdown(&self, how: Shutdown) -> Result&lt;()&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn peek(&mut self, buf: &mut [u8]) -> Result&lt;usize&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn take_error(&self) -> Result&lt;Option&lt;Error&gt;&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn set_nonblocking(&self, nonblocking: bool) -> Result&lt;()&gt;</c-s>
+                  </li>
+                  <li>...</li>
+                </ul>
+              </li>
+              <li>
+                <c-s>UdpSocket</c-s>
+                <ul class="tight">
+                  <li>
+                    Traits: <c-s>Debug, ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn bind&lt;A: ToSocketAddrs&gt;(addr: A) -> Result&lt;TcpListener&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn recv_from(&self, buf: &mut [u8]) -> Result&lt;(usize, SocketAddr)&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn peek_from(&self, buf: &mut [u8]) -> Result&lt;(usize, SocketAddr)&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn send_to&lt;A: ToSocketAddrs&gt;(&self, buf: &[u8], addr: A) -> Result&lt;usize&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn set_broadcast(&self, broadcast: bool) -> Result&lt;()&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn broadcast(&mut self) -> Result&lt;bool&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn take_error(&self) -> Result&lt;Option&lt;Error&gt;&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn connect&lt;A: ToSocketAddrs&gt;(&self, addr: A) -> Result&lt;()&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn send(&self, buf: &mut [u8]) -> Result&lt;usize&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn recv(&self, buf: &mut [u8]) -> Result&lt;usize&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn peek(&self, buf: &mut [u8]) -> Result&lt;usize&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn set_nonblocking(&self, nonblocking: bool) -> Result&lt;()&gt;</c-s>
+                  </li>
+                  <li>...</li>
+                </ul>
+              </li>
+              <li>
+                <c-s>Ipv4Addr</c-s>
+                <ul class="tight">
+                  <li>
+                    Implements Traits <c-s>Debug, Display, copy, clone, Eq, PartialEq, From ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub const fn new(a: u8, b: u8, c: u8, d: u8) -> IpvrAddr</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub const LOCALHOST: Self</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub const UNSPECIFIED: Self</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub const BROADCAST: Self</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn octets(&self) -> [u8; 4]</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn is_unspecified(&self) -> bool</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn is_loopback(&self) -> bool</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn is_private(&self) -> bool</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn is_multicast(&self) -> bool</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn is_broadcast(&self) -> bool</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn to_ipv6_compatible(&self) -> Ipv6Addr</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn to_ipv6_mapped(&self) -> Ipv6Addr</c-s>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <c-s>Ipv6Addr</c-s>
+                <ul class="tight">
+                  <li>
+                    Implements Traits <c-s>Debug, Display, copy, clone, Eq, PartialEq, From ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub const fn new(a: u16, b: u16, c: u16, d: u16, e: u16, f: u16, g: u16, h: u16) -> IpvrAddr</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub const LOCALHOST: Self</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub const UNSPECIFIED: Self</c-s>
+                  </li>
+                  <!--<li>
+                    <c-s>pub const BROADCAST: Self</c-s>
+                  </li>-->
+                  <li>
+                    <c-s>pub fn segments(&self) -> [u16; 8]</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn octets(&self) -> [u8; 16]</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn is_unspecified(&self) -> bool</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn is_loopback(&self) -> bool</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn is_multicast(&self) -> bool</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn to_ipv4(&self) -> Ipv4Addr</c-s>
+                  </li>
+                  <li>...</li>
+                </ul>
+              </li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </t-b>
+    <t-b>
+      <strong>Functions:</strong>
+    </t-b>
+    <t-b>
+      Quite often, you may only need some of the functions, listed here, for a program&apos;s file and directory
+      management needs.
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle lightItem">Partial List of IO Functions</summary>
+          <s-halfEm></s-halfEm>
+          <div class="indent">
+            <ol class="tight">
+              <li>
+                <c-s>fn canonicalize&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;PathBuf&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn create_dir&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;()&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn read_dir&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;ReadDir&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn remove_dir&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;()&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn metadata&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;Metadata&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn read&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;Vec&lt;u8&gt;&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn read_dir&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;ReadDir&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn read_to_string&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;String&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn write&lt;P: AsRef&lt;Path&gt;&gt;, C: AsRef&lt;[u8]&gt;&gt;(path: P, contents: C) -> Result&lt;()&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn remove_file&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;()&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn rename&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -> Result&lt;()&gt;</c-s>
+              </li>
+              <li>
+                <c-s>fn set_permissions&lt;P: AsRef&lt;Path&gt;&gt;(path: P, perm: Permissions) -> Result&lt;()&gt;</c-s>
+              </li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle darkItem">Example:&nbsp;&nbsp;std::fs::echo</summary>
+          <s-halfEm></s-halfEm>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>fs_echo::main.rs</defn-head>
+              <defn-code>
+/////////////////////////////////////////////////////////////
+// fs_echo::main.rs - demonstrate file operations          //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 15 May 2020  //
+/////////////////////////////////////////////////////////////
 
+use std::fs::*;
+use std::io::*;
+
+/*-----------------------------------------------------------
+   Note:
+   The try operator ? has been used in several places in 
+   both using_File and using_OpenOptions to avoid a lot
+   of explicit error handling.
+
+   The try operator bubbles errors up to the caller, so
+   if there are several places where errors may occur, 
+   they can all be handled in one place by the caller.
+
+   What is surprising, but useful, is that the Result&lt;T,E&gt;
+   types are not all the same.  In some results the type T
+   is File, or (), or usize.  However, the error types are
+   all io::Error, and that is what ? returns to the caller,
+   so it just works!
+
+   If there are no errors, ? simply unwraps the result to 
+   be used, and everything is significantly simpler.
+*/
+#[allow(non_snake_case)]
+fn using_File(file_name:&amp;str, msg:&amp;str)
+     -&gt; std::io::Result&lt;()&gt; {
+    let mut wfile = File::create(file_name)?;
+    print!(
+        "\n  writing message {:?} to file {:?}", 
+        msg, file_name
+    );
+    wfile.write_all(msg.as_bytes())?;
+    let mut rfile = File::open(file_name)?;
+    let mut rcv_msg = String::new();
+    let _ = rfile.read_to_string(&amp;mut rcv_msg);
+    print!(
+        "\n  message {:?} read from {:?}", 
+        rcv_msg, file_name
+    );
+    Ok(())
+}
+fn open_file_for_write(path:&amp;str)
+     -&gt; std::io::Result&lt;File&gt; {
+    let wfile = OpenOptions::new()
+                .create(true)
+                .write(true)
+                .truncate(true)
+                .open(path)?;
+    Ok(wfile)
+}
+fn open_file_for_read(path:&amp;str)
+       -&gt; std::io::Result&lt;File&gt; {
+    let rfile = OpenOptions::new()
+                .read(true)
+                .open(path)?;
+    Ok(rfile)
+}
+#[allow(non_snake_case)]
+fn using_OpenOptions(file_name:&amp;str, msg:&amp;str)
+    -&gt; std::io::Result&lt;()&gt; {
+    let mut wfile = open_file_for_write(file_name)?;
+    print!(
+        "\n  writing message {:?} to file {:?}", 
+        msg, file_name
+    );
+    wfile.write_all(msg.as_bytes())?;
+
+    let mut rfile = open_file_for_read(file_name)?;
+    let mut rcv_msg = String::new();
+    let _ = rfile.read_to_string(&amp;mut rcv_msg);
+    print!(
+        "\n  message {:?} read from {:?}", 
+        rcv_msg, file_name
+    );
+    Ok(())
+}
+fn main() -&gt; std::io::Result&lt;()&gt; {
+    let putline = || print!("\n");
+
+    let file_name = "test.txt";
+    let msg = "msg from writer";
+    print!("\n  std::fs echo demonstration");
+    print!("\n ============================");
+    putline();
+
+    print!("\n  demo using File structure");
+    print!("\n ---------------------------");
+    using_File(file_name, msg)?;
+    putline();
+
+    print!("\n  demo using OpenOptions structure");
+    print!("\n ----------------------------------");
+    using_OpenOptions(file_name, msg)?;
+
+    println!("\n\n  That's all Folks!\n");
+    Ok(())
+}
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Output:</defn-head>
+              <defn-code>
+std::fs echo demonstration
+============================
+
+demo using File structure
+---------------------------
+writing message "msg from writer" to file "test.txt"
+message "msg from writer" read from "test.txt"
+
+demo using OpenOptions structure
+----------------------------------
+writing message "msg from writer" to file "test.txt"
+message "msg from writer" read from "test.txt"
+
+That's all Folks!
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </div>
+    </t-b>
+    <t-b>
+      The code for this example can be bound <a href="RustLibraryDemos.html">here</a>.
+    </t-b>
     <a id="error"></a>
     <hr class="spread" />
     <num-cont>
