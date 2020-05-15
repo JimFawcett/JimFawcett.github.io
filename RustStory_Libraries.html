@@ -111,13 +111,13 @@
       <div class="indent">
         <ul class="tight">
           <li>
-            AsRef trait provides cheap reference-to-reference conversions.
+            AsRef trait provides cheap (re-interprets) reference-to-reference conversions.
           </li>
           <li>
-            AsMut trait provides cheap mutable-to-mutable conversions.
+            AsMut trait provides cheap (re-interprets) mutable-to-mutable conversions.
           </li>
           <li>
-            From trait provides consuming value-to-value conversions.
+            From trait provides consuming (move) value-to-value conversions.
           </li>
         </ul>
       </div>
@@ -127,7 +127,7 @@
         <ol class="tight pad10">
           <li>
             AsRef:
-            <defn-code style="font-size:1.0em;">trait std::convert::AsRef {
+            <defn-code style="font-size:1.0em;">pub trait AsRef&lt;T&gt; where T: ?Sized, {
   fn as_ref(&self) -> &T
 }
             </defn-code>
@@ -527,13 +527,74 @@ fn main() {
     </t-b>
     <num-cont><num-item1>3.3.1</num-item1><num-item4>Iterators:</num-item4></num-cont>
     <t-b>
-      Iterators support iterating through all the collections.  They come in three flavors:
-      iter, iter_mut, and into_iter.  Note that into_iter is a consuming iterator, moving items
-      from source to destination.
+      Reference: <a href="https://doc.rust-lang.org/std/iter/index.html">std::iter</a>
+    </t-b>
+    <t-b>
+      Iterators support iterating through collections.  They come in three flavors:
+      <div class="indent pad5">
+        <ul class="tight">
+          <li>
+            iter(), which iterates over &T
+          </li>
+          <li>
+            iter_mut(), which iterates over &mut T
+          </li>
+          <li>
+            into_iter(), which iterates over T
+          </li>
+        </ul>
+      </div>
+      Note that into_iter is a consuming iterator, moving items from source to destination.
+    </t-b>
+    <t-b>
+      Iterators are lazy: they don&apos;t do anything until consumed, e.g.:
+    </t-b>
+    <t-b>
+      <div>
+        <defn-code style="font-size:1.0em;">coll.iter().for_each(|x| { /* do something with x */ });
+    <t-s>or</t-s>
+for x in &coll { /* do something else with x */ };
+        </defn-code>
+      </div>
+    </t-b>
+    <t-b>
+      <strong>Traits:</strong>
+    </t-b>
+    <t-b>
+      <div class="indent">
+        <ol class="tight">
+          <li>
+            <defn-code style="font-size:1.0em; margin-left:-15px;">trait Iterator {
+    type Item;
+    fn next(&mut self) -> Option&lt;Self::Item&gt;
+    fn count(self) -> usize
+    fn last(self) -> Option&lt;Self::Item&gt;
+    fn nth(&mut self, n: usize) -> Option&lt;Self::Item&gt;
+    fn step_by(self, step: usize) -> StepBy&lt;Self&gt;
+    fn map&lt;B, F&gt;(self, f: F) -> Map&lt;Self, F&gt;
+       where F: FnMut(Self::Item) -> B
+    fn for_each&lt;F&gt;(self, f: F)
+       where F: FnMut(Self::Item)
+    fn filter&lt;P&gt;(self, predicate: P) -> Filter&lt;Self, P&gt;
+       where P: FnMut(&Self::Item) -> bool
+    ...
+}
+            </defn-code>
+          </li>
+          <li>
+            <defn-code style="font-size:1.0em; margin-left:-15px;">trait IntoIterator {
+    type Item;
+    type IntoIter: Iterator
+    fn into_iter(self) -> Self::IntoIter
+}
+            </defn-code>
+          </li>
+        </ol>
+      </div>
     </t-b>
     <t-b>
       Iterators provide a set of adapter methods for performing common operations on containers.
-      Here&apos;s a partial list - see 
+      Here&apos;s a longer partial list - see 
       <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">Trait&nbsp;std::iter::Iterator</a>
       for more details:
     </t-b>

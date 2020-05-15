@@ -77,6 +77,7 @@ function initializeMenu() {
         <a href='RustBasicDemos.html'>Rust&nbsp;Basic&nbsp;Demos</a>\
         <a href='RustErrorHandling.html'>Rust&nbsp;Error&nbsp;Handling&nbsp;</a>\
         <a href='RustModels.html'>Rust&nbsp;Models&nbsp;</a>\
+        <a href='RustLibraryDemos.html'>Rust&nbsp;Librarys&nbsp;Demos&nbsp;</a>\
         <a href='RustStoryRepo.html'>Rust&nbsp;Story&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
