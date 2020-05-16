@@ -56,10 +56,10 @@
   </header>
 
    <toc-b id="toc">
-     <div style="display:flex; flex-direction:row">
-       <a href="Javascript:;" onclick="storyMenu.chaps()" style="color:darkred;">Chaps</a>&nbsp;
-       <a href="Javascript:;" onclick="storyMenu.sects()" style="color:darkred;">Sects</a>&nbsp;
-       <a href="Javascript:;" onclick="storyMenu.closeTOC()" style="color:darkred;">close</a>&nbsp;
+     <div style="display:flex; flex-direction:row;">
+       <a href="Javascript:;" onclick="storyMenu.chaps()" style="color:#fefefa;">Chaps</a>&nbsp;
+       <a href="Javascript:;" onclick="storyMenu.sects()" style="color:#fefefa;">Sects</a>&nbsp;
+       <a href="Javascript:;" onclick="storyMenu.closeTOC()" style="color:#fefefa;">close</a>&nbsp;
      </div>
      <up-b id="chaps" onmouseout="storyMenu.chaps()">
        <a href="RustStory_Prologue.html">Prologue</a><br />
@@ -1572,7 +1572,7 @@ That's all Folks!
     <a id="net"></a>
     <hr class="spread" />
     <num-cont>
-      <num-item1>3.4</num-item1><num-item4>net:</num-item4>
+      <num-item1>3.6</num-item1><num-item4>net:</num-item4>
     </num-cont>
     <t-b>
       Reference: <a href="https://doc.rust-lang.org/std/net/index.html">std::net</a> library.
@@ -1875,108 +1875,105 @@ That's all Folks!
           <s-halfEm></s-halfEm>
           <defn-outerBlock>
             <defn-block>
-              <defn-head>fs_echo::main.rs</defn-head>
+              <defn-head>net_echo::main.rs</defn-head>
               <defn-code>
 /////////////////////////////////////////////////////////////
-// fs_echo::main.rs - demonstrate file operations          //
+// net_echo::main.rs - demonstrate Tcp communication       //
 //                                                         //
-// Jim Fawcett, https://JimFawcett.github.io, 15 May 2020  //
+// Jim Fawcett, https://JimFawcett.github.io, 16 May 2020  //
 /////////////////////////////////////////////////////////////
+/*
+   This demo uses TcpListener and TcpStream which use 
+   sockets internally.  So, like sockets, they are byte
+   oriented.
 
-use std::fs::*;
-use std::io::*;
+   In order to send messages, the application needs a 
+   protocol for defining when to stop reading bytes.
+   For this, newlines are used as message terminators,
+   which works well for this demonstration.
 
-/*-----------------------------------------------------------
-   Note:
-   The try operator ? has been used in several places in 
-   both using_File and using_OpenOptions to avoid a lot
-   of explicit error handling.
-
-   The try operator bubbles errors up to the caller, so
-   if there are several places where errors may occur, 
-   they can all be handled in one place by the caller.
-
-   What is surprising, but useful, is that the Result&lt;T,E&gt;
-   types are not all the same.  In some results the type T
-   is File, or (), or usize.  However, the error types are
-   all io::Error, and that is what ? returns to the caller,
-   so it just works!
-
-   If there are no errors, ? simply unwraps the result to 
-   be used, and everything is significantly simpler.
+   An application will probably need something more
+   flexible like HTTP style messages.
 */
-#[allow(non_snake_case)]
-fn using_File(file_name:&amp;str, msg:&amp;str)
-     -&gt; std::io::Result&lt;()&gt; {
-    let mut wfile = File::create(file_name)?;
-    print!(
-        "\n  writing message {:?} to file {:?}", 
-        msg, file_name
-    );
-    wfile.write_all(msg.as_bytes())?;
-    let mut rfile = File::open(file_name)?;
-    let mut rcv_msg = String::new();
-    let _ = rfile.read_to_string(&amp;mut rcv_msg);
-    print!(
-        "\n  message {:?} read from {:?}", 
-        rcv_msg, file_name
-    );
-    Ok(())
-}
-fn open_file_for_write(path:&amp;str)
-     -&gt; std::io::Result&lt;File&gt; {
-    let wfile = OpenOptions::new()
-                .create(true)
-                .write(true)
-                .truncate(true)
-                .open(path)?;
-    Ok(wfile)
-}
-fn open_file_for_read(path:&amp;str)
-       -&gt; std::io::Result&lt;File&gt; {
-    let rfile = OpenOptions::new()
-                .read(true)
-                .open(path)?;
-    Ok(rfile)
-}
-#[allow(non_snake_case)]
-fn using_OpenOptions(file_name:&amp;str, msg:&amp;str)
-    -&gt; std::io::Result&lt;()&gt; {
-    let mut wfile = open_file_for_write(file_name)?;
-    print!(
-        "\n  writing message {:?} to file {:?}", 
-        msg, file_name
-    );
-    wfile.write_all(msg.as_bytes())?;
+use std::io::prelude::*;
+use std::net::{TcpStream, TcpListener, Shutdown::Both};
+use std::thread;
+use std::str;
+use std::io::{BufReader};
 
-    let mut rfile = open_file_for_read(file_name)?;
+/*-- demo handler receives one msg and replys --*/
+fn handle_client(mut stream: &amp;TcpStream)
+       -&gt; std::io::Result&lt;()&gt; {
+    print!("\n  entered client handler");
+    let mut reader = 
+        BufReader::new(stream.try_clone()?);
     let mut rcv_msg = String::new();
-    let _ = rfile.read_to_string(&amp;mut rcv_msg);
-    print!(
-        "\n  message {:?} read from {:?}", 
-        rcv_msg, file_name
-    );
+    reader.read_line(&amp;mut rcv_msg)?;
+    rcv_msg.pop();  // remove '\n' sentinal
+    print!("\n  client handler received: ");
+    print!("{:?}",rcv_msg);
+    let _ = std::io::stdout().flush();
+
+    rcv_msg.push_str(" recieved!\n");
+    let _ = std::io::stdout().flush();
+    stream.write_all(&amp;rcv_msg.as_bytes())?;
+    stream.shutdown(Both)?;
     Ok(())
 }
+/*-- demo listener accepts only one connection --*/
+fn start_listener(end_point :&amp;str)
+        -&gt; std::io::Result&lt;()&gt; {
+    print!(
+        "\n  starting listener on {:?}", end_point
+    );
+    let _ = std::io::stdout().flush();
+    let tcpl = TcpListener::bind(end_point)?;
+    for stream in tcpl.incoming() {
+        print!("\n  listener accepted connection");
+        let _ = handle_client(&amp;stream?)?;
+        /*-- Here, just accept one connection --*/
+        break;
+    }
+    Ok(())
+}
+/*-- demonstration --*/
 fn main() -&gt; std::io::Result&lt;()&gt; {
-    let putline = || print!("\n");
 
-    let file_name = "test.txt";
-    let msg = "msg from writer";
-    print!("\n  std::fs echo demonstration");
-    print!("\n ============================");
-    putline();
+    print!("\n  net_echo demonstration");
+    print!("\n ========================");
 
-    print!("\n  demo using File structure");
-    print!("\n ---------------------------");
-    using_File(file_name, msg)?;
-    putline();
+    let rcvr_endpoint = "127.0.0.1:8080";
+    let mut msg = "msg from connector".to_string();
 
-    print!("\n  demo using OpenOptions structure");
-    print!("\n ----------------------------------");
-    using_OpenOptions(file_name, msg)?;
+    /*-- run listener on child thread --*/
+    let handle = thread::spawn( 
+        move || { 
+            let _ = start_listener(rcvr_endpoint); 
+        }
+    );
 
-    println!("\n\n  That's all Folks!\n");
+    /*-- send message --*/
+    print!("\n  connecting to {:?}", rcvr_endpoint);
+    let mut stream = 
+        TcpStream::connect(rcvr_endpoint)?;
+    print!("\n  sending message {:?}", msg);
+    msg.push('\n');  // message end sentinal
+    stream.write_all(&amp;msg.as_bytes())?;
+
+    /*-- read reply message --*/
+    let mut reader = 
+        BufReader::new(stream.try_clone()?);
+    let mut rcv_msg = String::new();
+    reader.read_line(&amp;mut rcv_msg)?;
+    rcv_msg.pop();  // remove '\n' sentinal
+    print!(
+        "\n  connector received reply {:?}", rcv_msg
+    );
+    let _ = std::io::stdout().flush();
+
+    let _ = handle.join();  // wait for shutdown
+
+    println!("\n\n  That's all Folks!\n\n");
     Ok(())
 }
               </defn-code>
@@ -1984,20 +1981,18 @@ fn main() -&gt; std::io::Result&lt;()&gt; {
             <defn-block>
               <defn-head>Output:</defn-head>
               <defn-code>
-std::fs echo demonstration
-============================
+  net_echo demonstration
+ ========================
+  connecting to "127.0.0.1:8080"
+  starting listener on "127.0.0.1:8080"
+  sending message "msg from connector"
+  listener accepted connection
+  entered client handler
+  client handler received: "msg from connector"
+  connector received reply 
+                "msg from connector recieved!"
 
-demo using File structure
----------------------------
-writing message "msg from writer" to file "test.txt"
-message "msg from writer" read from "test.txt"
-
-demo using OpenOptions structure
-----------------------------------
-writing message "msg from writer" to file "test.txt"
-message "msg from writer" read from "test.txt"
-
-That's all Folks!
+  That's all Folks!
               </defn-code>
             </defn-block>
           </defn-outerBlock>
@@ -2005,7 +2000,344 @@ That's all Folks!
       </div>
     </t-b>
     <t-b>
-      The code for this example can be bound <a href="RustLibraryDemos.html">here</a>.
+      The code for this example can be found <a href="RustLibraryDemos.html">here</a>.
+    </t-b>
+
+    <a id="thread"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>3.7</num-item1><num-item4>thread:</num-item4>
+    </num-cont>
+    <t-b>
+      Reference: <a href="https://doc.rust-lang.org/std/thread/index.html">std::thread</a> library.
+    </t-b>
+    <t-b>
+      Thread related Traits:
+      <div class="indent">
+        <ol class="tight">
+          <li>
+          <defn-code style="font-size:1.0em; margin-left:-15px;">trait Send { }
+// marker trait
+// - types that can be transferred across thread boundaries
+          </defn-code>
+          </li>
+          <li>
+          <defn-code style="font-size:1.0em; margin-left:-15px;">trait Sync { }
+// marker trait
+// - types for which it is safe to share references between threads
+          </defn-code>
+          </li>
+        </ol>
+      </div>
+    </t-b>
+    <t-b>
+      <strong>Structs:</strong>
+    </t-b>
+    <t-b>
+      The std::thread types are: Thread, Builder, ThreadId, JoinHandle, LocalKey, AcessError  
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle lightItem">List of Structs</summary>
+          <s-halfEm></s-halfEm>
+          <div class="indent">
+            <ol class="tight">
+              <li>
+                <c-s>Thread</c-s>
+                <ul class="tight">
+                  <li>
+                    Traits: <c-s>Debug, Clone, Send, Sync, ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn id(&self) -> ThreadId</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn name(&self) -> Option&lt;&amp;str&gt;</c-s>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <c-s>ThreadId</c-s>
+                <ul class="tight">
+                  <li>
+                    Traits: <c-s>Debug, Copy, Clone, Eq, PartialEq, Send, Sync, ...</c-s>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <c-s>Builder</c-s>
+                <ul class="tight">
+                  <li>
+                    Traits: <c-s>Debug, Send, Sync, ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn new() -> Builder</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn name(self, name: String) -> Builder</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn stack_size(self, size: usize) -> Builder</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn spawn&lt;F, T&gt;(self, f: F) -> Result&lt;JoinHandle&lt;T&gt;&gt;</c-s><br />
+                    <c-s>where F: FnOnce() -> T, F: Send + 'static', T: Send + 'static'</c-s>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <c-s>JoinHandle</c-s>
+                <ul class="tight">
+                  <li>
+                    Traits: <c-s>Debug, Send, Sync, ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn thread(&self) -> &Thread</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn join(self) -> Result&lt;T&gt;</c-s>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <c-s>LocalKey</c-s>
+                <ul class="tight">
+                  <li>
+                    Traits: <c-s>Debug, Send, Sync, ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn with&lt;F, R&gt;(&'static self, f: F) -> R</c-s>
+                    <c-s>where F: FnOnce(&T) -> R</c-s>
+                  </li>
+                  <li>...</li>
+                </ul>
+              </li>
+              <li>
+                <c-s>AccessError</c-s>
+                <ul class="tight">
+                  <li>
+                    Traits: <c-s>Debug, Display, Clone, Copy, Eq, PartialEq, Error, Send, Sync, ...</c-s>
+                  </li>
+                </ul>
+              </li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </t-b>
+    <t-b>
+      Thread functions are: spawn, current, sleep, yield_now, ...
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle lightItem">List of Functions</summary>
+          <s-halfEm></s-halfEm>
+          <div class="indent">
+            <ol class="tight">
+              <li>
+                <c-s>pub fn spawn&lt;F, T&gt;(f: F) -> JoinHandle&lt;T&gt;</c-s>
+                <c-s>where F: FnOnce() -> T, F: Send + 'static, T: Send + 'static</c-s>
+              </li>
+              <li>
+                <c-s>pub fn current() -> Thread</c-s>
+              </li>
+              <li>
+                <c-s>pub fn sleep(dur: std::time::Duration)</c-s>
+              </li>
+              <li>
+                <c-s>pub fn yield_now()</c-s>
+              </li>
+              <li>
+                <c-s>...</c-s>
+              </li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </t-b>
+    <t-b>
+      Types:
+      <div class="indent">
+        <c-s>type Result&lt;T&gt; = Result&ltT, Box&lt;dyn Any + Send + 'static&gt;&gt;</c-s>
+      </div>
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle darkItem">Example:&nbsp;&nbsp;std::thread::Shared</summary>
+          <s-halfEm></s-halfEm>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>std::thread::shared</defn-head>
+              <defn-code>
+/////////////////////////////////////////////////////////////
+// thread_shared::main.rs - shared string demo             //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 10 May 2020  //
+/////////////////////////////////////////////////////////////
+
+#![allow(dead_code)]
+
+use std::thread;
+use std::sync::{Arc, Mutex};
+use std::time::Duration;
+
+fn db_show&lt;T:std::fmt::Debug&gt;(t:T, msg:&amp;str, p:bool) {
+    print!("\n  --{}", msg);
+    if p {
+        let name = std::any::type_name::&lt;T&gt;();
+        print!(
+            "\n  --TypeId: {},
+            \n  --size: {}", 
+            name, std::mem::size_of::&lt;T&gt;()
+        );
+    }
+    print!("\n  --{:?}", t);
+} 
+fn thread_id() -&gt; thread::ThreadId {
+    thread::current().id()
+}
+fn thread_id_value(id:thread::ThreadId) -&gt; char {
+    let sid = format!("{:?}", id);
+    sid.chars().nth(9).unwrap()
+}
+fn test2() -&gt; std::io::Result&lt;()&gt; {
+    print!("\n  Two child threads sharing string");
+    print!("\n ==================================");
+
+    let thrd1_id = thread_id_value(thread::current().id());
+    print!("\n  main thread id      = {:?}", thrd1_id);
+    let dur = Duration::from_millis(2);  // sleep time
+    let mut s = String::new();            // shared string
+    s.push(thrd1_id);  // main thread gets first edit
+
+    let data = Arc::new(Mutex::new(s));   
+    // thread safe shared wrapper
+    
+    /*-------------------------------------------------------
+        Modify String s on child thread #1
+    */
+    let shared1 = Arc::clone(&amp;data);
+    // clones pointer to data ref
+    let _handle1 = thread::spawn(move || { 
+        // shared1 clone moved without moving data
+        let sid:String = format!("{:?}",thread::current().id());
+        // sid = "ThreadId(2)"
+        if let Some(sid) = sid.chars().nth(9) {
+            // ThreadId(2) =&gt; 2
+            for _i in 0..15 {
+                {
+                    if let Ok(mut temp) = shared1.lock() {
+                        temp.push(sid);  // append thread id
+                    }
+                }  // unlocked here
+                thread::sleep(dur);
+            }
+        }
+    });
+    
+    /*-------------------------------------------------------
+        Modify String s on child thread #2
+    */
+    let shared2 = Arc::clone(&amp;data);
+    // db_show(&amp;shared2, "shared2", false);
+    let _handle2 = thread::spawn(move || { 
+        let sid:String = format!("{:?}",thread::current().id());
+        if let Some(sid) = sid.chars().nth(9) {
+            for _i in 0..15 {
+                {
+                    if let Ok(mut temp) = shared2.lock() {
+                        temp.push(sid);
+                    }
+                }
+                thread::sleep(dur);
+            }
+        }
+    });
+    /*-------------------------------------------------------
+        main thread displaying child threads ids and then
+        joining them, e.g., block until threads complete
+    */
+    let thrd2_id = thread_id_value(_handle1.thread().id());
+    print!("\n  1st child thread id = {:?}", thrd2_id);
+    let _ = _handle1.join();
+    let thrd3_id = thread_id_value(_handle2.thread().id());
+    print!("\n  2nd child thread id = {:?}", thrd3_id);
+    let _ = _handle2.join();
+
+    /*-------------------------------------------------------
+        extract mutex from arc
+        - commented line is simple but may panic
+        - code used here manages error without panic
+    */
+    // let out = Arc::try_unwrap(data).expect("lock still owned");
+    let rslt = Arc::try_unwrap(data);
+    let out :Mutex&lt;String&gt;;
+    match rslt {
+        Ok(mtx) =&gt; out = mtx,
+        Err(_) =&gt; {
+            let error = std::io::Error::new(
+                std::io::ErrorKind::Other, 
+                "Arc access error"
+            );
+            return Err(error);
+        },
+    }
+    /*-------------------------------------------------------
+        extract string from mutex
+        - commented line is simple but may panic
+        - code used here manages error without panic
+    */
+    //let mut shared = out.into_inner().expect("can't lock mutex");
+    let mut shared: String;
+    let rslt = out.into_inner();
+    match rslt {
+        Ok(s) =&gt; shared = s,
+        Err(_) =&gt; {
+            let error = std::io::Error::new(
+                std::io::ErrorKind::Other, 
+                "Mutex access error"
+            );
+            return Err(error);
+        } 
+    }
+    shared.push(thrd1_id);  // main thread has last edit
+
+    /*-- display result of string modifications --*/
+    print!("\n  final shared string value = {:?}",shared);
+    Ok(())
+}
+fn main() -&gt; std::io::Result&lt;()&gt; {
+
+    test2()?;
+
+    println!("\n\n  That's all Folks!\n\n");
+    Ok(())
+}
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Output:</defn-head>
+              <defn-code>
+  Two child threads sharing string
+ ==================================
+  main thread id      = '1'
+  1st child thread id = '2'
+  2nd child thread id = '3'
+  final shared string value = 
+      "12323322332233223323232323223231"   
+
+  That's all Folks!
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </div>
+    </t-b>
+    <t-b>
+      The code for this example can be found in <a href="RustLibraryDemos.html">RustLibraryDemos</a>.
     </t-b>
     <a id="error"></a>
     <hr class="spread" />
@@ -2017,12 +2349,6 @@ That's all Folks!
     <hr class="spread" />
     <num-cont>
       <num-item1>3.6</num-item1><num-item4>time:</num-item4>
-    </num-cont>
-
-    <a id="thread"></a>
-    <hr class="spread" />
-    <num-cont>
-      <num-item1>3.7</num-item1><num-item4>thread:</num-item4>
     </num-cont>
 
     <a id="process"></a>
