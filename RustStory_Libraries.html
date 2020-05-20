@@ -27,6 +27,21 @@
     summary {
       padding: 3px 0px 5px 0px;
     }
+    h-s2em {
+      display: inline-block;
+      margin-left: 2em;
+      color:#999;
+    }
+    h-s4em {
+      display: inline-block;
+      margin-left: 4em;
+      color:#999;
+    }
+    h-s8em {
+      display: inline-block;
+      margin-left: 8em;
+      color: #999;
+    }
   </style>
 </head>
 <body id="github" onload="initializeMenu()">
@@ -92,6 +107,13 @@
       and type definitions.  The structure and function pages have examples for almost everything presented.
     </t-b>
     <t-b>
+      <div style="font-size:1em; border:2px solid darkred; padding: 0.5em 1.5em; margin:0em 1.0em;">
+        Source code is provided for all the std libraries.
+        simply go <a href="https://doc.rust-lang.org/beta/std/">here</a>, 
+        browse around and click any of the [src] tabs.
+      </div>
+    </t-b>
+    <t-b>
       Once you are passed the stage of constantly being surprised by ownership rules, you will find the libraries easy to
       use and rich in functionality.
     </t-b>
@@ -101,11 +123,12 @@
       <num-item1>3.1</num-item1><num-item4>std:</num-item4>
     </num-cont>
     <t-b>
-      Rust has a well endowed collection of <strong><a href="https://doc.rust-lang.org/beta/std/">std libraries</a></strong> in the
+      Rust has a well endowed collection of more than sixty <strong><a href="https://doc.rust-lang.org/beta/std/">std libraries</a></strong> in the
       std namespace.  You don&apos;t have to declare a use std::*, as the std::prelude::* is automatically applied.
     </t-b>
     <t-b>
-      All of the libraries discussed below are part of std.
+      All of the libraries discussed below are part of std.  There are many more - included here are libraries
+      I expect you will use most often.
     </t-b>
     <a id="convert"></a>
     <hr class="spread" />
@@ -2355,7 +2378,7 @@ fn main() -&gt; std::io::Result&lt;()&gt; {
     </num-cont>
     <t-b>
       <under-construction>
-        Under construction
+        Under construction - example code needed
       </under-construction>
     </t-b>
     <t-b>
@@ -2689,7 +2712,7 @@ edition = "2018"
     </num-cont>
     <t-b>
       <under-construction>
-        Under Construction
+        Under Construction - example code needed
       </under-construction>
     </t-b>
     <t-b>
@@ -2699,7 +2722,7 @@ edition = "2018"
       <strong>Structs:</strong>
     </t-b>
     <t-b>
-      The std::thread types are: Command, Child, ChildStdin, ChildStdout, ChildStderr, Output, Stdio, ExitCode  
+      The std::mpsc types are: Receiver, Sender, SyncSender, IntoIter, Iter, TryIter, RecvError, and SendError
     </t-b>
     <t-b>
       <div>
@@ -2709,141 +2732,126 @@ edition = "2018"
           <div class="indent">
             <ol class="tight">
               <li>
-                <c-s>Command</c-s>
+                <c-s>Receiver</c-s>
                 <ul class="tight">
                   <li>
-                    Traits: <c-s>Debug, ...</c-s>
+                    retrieves messages from a channel
                   </li>
                   <li>
-                    <c-s>pub fn new&lt;S: AsRef&lt;OsStr&gt;&gt;(program: S) -> Command</c-s>
+                    can only be owned by one thread
                   </li>
                   <li>
-                    <c-s>pub fn arg&lt;S: AsRef&lt;OsStr&gt;&gt;(&mut self, arg: S) -> &mut Command</c-s>
+                    Traits: <c-s>Debug, IntoIterator, Drop, Send, !Sync, ...</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn args&lt;I, S&gt;(&mut self, args: I) -> &mut Command</c-s><br />
-                    <c-s>where I: IntoIterator&lt;Item = S&gt;, S: AsRef&lt;OsStr&gt;,</c-s>
+                    <c-s>pub fn try_recv(&self) -> Result&lt;T, TryRecvError&gt;<h-s4em>non-blocking</h-s4em></c-s>
                   </li>
                   <li>
-                    <c-s>pub fn env&lt;K, V&gt;(&mut self, key: K, val: V) -> &mut Command</c-s><br />
-                    <c-s>where K: AsRef&lt;OsStr&gt;, V: AsRef&lt;OsStr&gt;,</c-s>
+                    <c-s>pub fn recv(&self) -> Result&lt;T, RecvError&gt;<h-s4em>blocks on no data</h-s4em></c-s>
                   </li>
                   <li>
-                    <c-s>pub fn envs&lt;I, K, V&gt;(&mut self, vars: I) -> &mut Command</c-s><br />
-                    <c-s>where I: IntoIterator&lt;Item = (K, V)&gt;, K: AsRef&lt;OsStr&gt;, V: AsRef&lt;OsStr&gt;,</c-s>
+                    <c-s>pub fn recv_timeout(&self, timeout: Duration) -> Result&lt;T, RecvTimeoutError&gt;</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn env_remove&lt;K: AsRef&lt;OsStr&gt;&gt;(&mut self, key: K) -> &mut Command</c-s>
+                    <c-s>pub fn iter(&self) -> Iter&lt;T&gt;</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn env_clear(&mut self) -> &mut Command</c-s>
-                  </li>
-                  <li>
-                    <c-s>pub fn current_dir&lt;P: AsRef&lt;Path&gt;&gt;(&mut self, dir: P) -> &mut Command</c-s>
-                  </li>
-                  <li>
-                    <c-s>pub fn stdin&lt;T: Into&lt;Stdio&gt;&gt;(&mut self, cfg: T) -> &mut Command</c-s>
-                  </li>
-                  <li>
-                    <c-s>pub fn stdout&lt;T: Into&lt;Stdio&gt;&gt;(&mut self, cfg: T) -> &mut Command</c-s>
-                  </li>
-                  <li>
-                    <c-s>pub fn stderr&lt;T: Into&lt;Stdio&gt;&gt;(&mut self, cfg: T) -> &mut Command</c-s>
-                  </li>
-                  <li>
-                    <c-s>pub fn spawn(&mut self) -> Result&lt;Child&gt;</c-s>
-                  </li>
-                  <li>
-                    <c-s>pub fn output(&mut self) -> Result&lt;Output&gt;</c-s>
-                  </li>
-                  <li>
-                    <c-s>pub fn status(&mut self) -> Result&lt;ExitStatus&gt;</c-s>
+                    <c-s>pub fn try_iter(&self) -> TryIter&lt;T&gt;</c-s>
                   </li>
                 </ul>
               </li>
               <li>
-                <c-s>Child</c-s>
+                <c-s>Sender</c-s>
                 <ul class="tight">
+                  <li>sends messages to a a channel, non-blocking</li>
                   <li>
-                    Traits: <c-s>Debug, ...</c-s>
+                    can only be owned by one thread, but can be cloned
                   </li>
                   <li>
-                    <c-s>pub fn kill(&mut self) -> Result&lt;()&gt;</c-s>
+                    Traits: <c-s>Debug, Clone, Send, !Sync, Drop, ...</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn id(&mut self) -> u32</c-s>
-                  </li>
-                  <li>
-                    <c-s>pub fn wait(&mut self) -> Result&lt;ExitStatus&gt;</c-s>
-                  </li>
-                  <li>...</li>
-                </ul>
-              </li>
-              <li>
-                <c-s>ChildStdin</c-s>
-                <ul class="tight">
-                  <li>
-                    Traits: <c-s>Debug, From, Write, ...</c-s>
+                    <c-s>pub fn send(&self, t: T) -> Result&lt;(), SendError&gt;</c-s>
                   </li>
                 </ul>
               </li>
               <li>
-                <c-s>ChildStdout</c-s>
+                <c-s>SyncSender</c-s>
                 <ul class="tight">
                   <li>
-                    Traits: <c-s>Debug, From, Read, ...</c-s>
+                    sends messages to a channel, blocks if there is not enough space in internal buffer
+                  </li>
+                  <li>
+                    Traits: <c-s>Debug, Clone, Send, Drop, ...</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn send(&self, t: T) -> Result&lt;(), SendError&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn try_send(&self, t: T) -> Result&lt;(), TrySendError&gt;</c-s>
                   </li>
                 </ul>
               </li>
               <li>
-                <c-s>ChildStderr</c-s>
+                <c-s>IntoIter</c-s>
                 <ul class="tight">
                   <li>
-                    Traits: <c-s>Debug, From, Read, ...</c-s>
+                    blocks when next is called, waiting for a new message
+                  </li>
+                  <li>
+                    Traits: <c-s>Debug, Iterator, ...</c-s>
                   </li>
                 </ul>
               </li>
               <li>
-                <c-s>Stdio</c-s>
+                <c-s>Iter</c-s>
                 <ul class="tight">
                   <li>
-                    Traits: <c-s>Debug, From, ...</c-s>
+                    blocks when next is called, waiting for a new message
                   </li>
                   <li>
-                    <c-s>pub fn piped() -> Stdio</c-s>
-                  </li>
-                  <li>
-                    <c-s>pub fn inherit() -> Stdio</c-s>
-                  </li>
-                  <li>
-                    <c-s>pub fn null() -> Stdio</c-s>
+                    Traits: <c-s>Debug, Iterator, ...</c-s>
                   </li>
                 </ul>
               </li>
               <li>
-                <c-s>Output</c-s>
+                <c-s>TryIter</c-s>
                 <ul class="tight">
                   <li>
-                    Traits: <c-s>Debug, Clone, Eq, PartialEq, ...</c-s>
+                    attempts to yield all pending values for a Receiver
+                  </li>
+                  <li>
+                    Traits: <c-s>Debug, Iterator, ...</c-s>
                   </li>
                 </ul>
               </li>
               <li>
-                <c-s>ExitStatus</c-s>
+                <c-s>SendError</c-s>
                 <ul class="tight">
                   <li>
-                    Traits: <c-s>Debug, Display, Copy, Clone, Eq, PartialEq, ...</c-s>
+                    sends only fail if receiving end is disconnected.  
                   </li>
                   <li>
-                    <c-s>pub fn success(&self) -> bool</c-s>
+                    error contains un-sent message as payload
                   </li>
                   <li>
-                    <c-s>pub fn code(&self) -> Option&lt;i32&gt;</c-s>
+                    Traits: <c-s>Debug, Display, Clone, Copy, Eq, PartialEq, ...</c-s>
                   </li>
                 </ul>
               </li>
               <li>
-                ...
+                <c-s>ReceiveError</c-s>
+                <ul class="tight">
+                  <li>
+                    receives only fail if sending end is disconnected.  
+                  </li>
+                  <li>
+                    error contains un-sent message as payload
+                  </li>
+                  <li>
+                    Traits: <c-s>Debug, Display, Clone, Copy, Eq, PartialEq, ...</c-s>
+                  </li>
+                </ul>
               </li>
             </ol>
           </div>
@@ -2851,7 +2859,7 @@ edition = "2018"
       </div>
     </t-b>
     <t-b>
-      Process functions are: abort, exit, id
+      mpsc functions are: channel and sync_channel
     </t-b>
     <t-b>
       <div>
@@ -2861,13 +2869,10 @@ edition = "2018"
           <div class="indent">
             <ol class="tight">
               <li>
-                <c-s>pub fn abort() -> !</c-s>
+                <c-s>pub fn channel&lt;T&gt;() -> (Sender&lt;T&gt;, Receiver&lt;T&gt;)</c-s>
               </li>
               <li>
-                <c-s>pub fn exit(code: i32) -> !</c-s>
-              </li>
-              <li>
-                <c-s>pub fn id() -> u32</c-s>
+                <c-s>pub fn sync_channel&lt;T&gt;(bound: usize) -> (SyncSender&lt;T&gt;, Receiver&lt;T&gt;)</c-s>
               </li>
             </ol>
           </div>
@@ -2875,12 +2880,39 @@ edition = "2018"
       </div>
     </t-b>
     <t-b>
-      The example below spawns a child process and collects its output for display when the child exits.
+      std::mpsc enums are: RecvTimeoutError, TryRecvError, and TrySendError
     </t-b>
     <t-b>
       <div>
         <details>
-          <summary class="labelStyle darkItem">Example:&nbsp;&nbsp;process_demo</summary>
+          <summary class="labelStyle lightItem">List of Enumerations</summary>
+          <s-halfEm></s-halfEm>
+          <div class="indent">
+            <ol class="tight">
+              <li>
+                Traits: Debug, Display, Clone, Copy, Error, Eq, PartialEq, .... 
+              </li>
+              <li>
+                <c-s>pub enum RecvTimeoutError { Timeout, Disconnected, }</c-s>
+              </li>
+              <li>
+                <c-s>pub enum TryRecvError { Empty, Disconnected, }</c-s>
+              </li>
+              <li>
+                <c-s>pub enum TrySendError&lt;T&gt;{ Full(T), Disconnected(T), }</c-s>
+              </li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </t-b>
+    <t-b>
+      The example below constructs a channel and sends messages between threads.
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle darkItem">Example:&nbsp;&nbsp;channel_demo</summary>
           <s-halfEm></s-halfEm>
           <defn-outerBlock>
             <defn-block>
@@ -2957,14 +2989,13 @@ edition = "2018"
       The code for this example can be found in <a href="RustLibraryDemos.html">RustLibraryDemos</a>.
     </t-b>
 
-
     <a id="time"></a>
     <hr class="spread" />
     <num-cont>
       <num-item1>3.10</num-item1><num-item4>process:</num-item4>
     </num-cont>
     <t-b>
-      Reference: <a href="https://doc.rust-lang.org/std/process/index.html">std::process</a> library.
+      Reference: <a href="https://doc.rust-lang.org/std/time/index.html">std::process</a> library.
     </t-b>
     <t-b>
       <strong>Structs:</strong>
@@ -3228,7 +3259,6 @@ edition = "2018"
       The code for this example can be found in <a href="RustLibraryDemos.html">RustLibraryDemos</a>.
     </t-b>
 
-
     <a id="time"></a>
     <hr class="spread" />
     <num-cont>
@@ -3236,7 +3266,7 @@ edition = "2018"
     </num-cont>
     <t-b>
       <under-construction>
-        Under Construction
+        Under Construction - example code needed
       </under-construction>
     </t-b>
     <t-b>
@@ -3246,7 +3276,7 @@ edition = "2018"
       <strong>Structs:</strong>
     </t-b>
     <t-b>
-      The std::thread types are: Command, Child, ChildStdin, ChildStdout, ChildStderr, Output, Stdio, ExitCode  
+      The std::time types are: Duration, Instant, SystemTime, SystemTimeError
     </t-b>
     <t-b>
       <div>
@@ -3256,141 +3286,105 @@ edition = "2018"
           <div class="indent">
             <ol class="tight">
               <li>
-                <c-s>Command</c-s>
+                <c-s>Duration</c-s>
                 <ul class="tight">
                   <li>
-                    Traits: <c-s>Debug, ...</c-s>
+                    Traits: <c-s>Debug, Default, Clone, Copy, ...</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn new&lt;S: AsRef&lt;OsStr&gt;&gt;(program: S) -> Command</c-s>
+                    <c-s>pub fn new(secs: u64, nanos: u32) -> Duration</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn arg&lt;S: AsRef&lt;OsStr&gt;&gt;(&mut self, arg: S) -> &mut Command</c-s>
+                    <c-s>pub fn from_secs(secs: u64) -> Duration</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn args&lt;I, S&gt;(&mut self, args: I) -> &mut Command</c-s><br />
-                    <c-s>where I: IntoIterator&lt;Item = S&gt;, S: AsRef&lt;OsStr&gt;,</c-s>
+                    <c-s>pub fn from_millis(millis: u64) -> Duration</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn env&lt;K, V&gt;(&mut self, key: K, val: V) -> &mut Command</c-s><br />
-                    <c-s>where K: AsRef&lt;OsStr&gt;, V: AsRef&lt;OsStr&gt;,</c-s>
+                    <c-s>pub fn from_micros(micros: u64) -> Duration</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn envs&lt;I, K, V&gt;(&mut self, vars: I) -> &mut Command</c-s><br />
-                    <c-s>where I: IntoIterator&lt;Item = (K, V)&gt;, K: AsRef&lt;OsStr&gt;, V: AsRef&lt;OsStr&gt;,</c-s>
+                    <c-s>pub fn from_nanos(nanos: u64) -> Duration</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn env_remove&lt;K: AsRef&lt;OsStr&gt;&gt;(&mut self, key: K) -> &mut Command</c-s>
+                    <c-s>pub fn as_secs(&self) -> u64</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn env_clear(&mut self) -> &mut Command</c-s>
+                    <c-s>pub fn as_millis(&self) -> u128</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn current_dir&lt;P: AsRef&lt;Path&gt;&gt;(&mut self, dir: P) -> &mut Command</c-s>
+                    <c-s>pub fn as_micros(&self) -> u128</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn stdin&lt;T: Into&lt;Stdio&gt;&gt;(&mut self, cfg: T) -> &mut Command</c-s>
+                    <c-s>pub fn as_nanos(&self) -> u128</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn stdout&lt;T: Into&lt;Stdio&gt;&gt;(&mut self, cfg: T) -> &mut Command</c-s>
+                    <c-s>pub fn checked_add(self, rhs: Duration) -> Option&lt;Duration&gt;</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn stderr&lt;T: Into&lt;Stdio&gt;&gt;(&mut self, cfg: T) -> &mut Command</c-s>
+                    <c-s>pub fn checked_sub(self, rhs: Duration) -> Option&lt;Duration&gt;</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn spawn(&mut self) -> Result&lt;Child&gt;</c-s>
+                    <c-s>pub fn checked_mul(self, rhs: u32) -> Option&lt;Duration&gt;</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn output(&mut self) -> Result&lt;Output&gt;</c-s>
+                    <c-s>pub fn checked_div(self, rhs: u32) -> Option&lt;Duration&gt;</c-s>
                   </li>
-                  <li>
-                    <c-s>pub fn status(&mut self) -> Result&lt;ExitStatus&gt;</c-s>
-                  </li>
+                  <li>s...</li>
                 </ul>
               </li>
               <li>
-                <c-s>Child</c-s>
+                <c-s>Instant</c-s>
                 <ul class="tight">
                   <li>
-                    Traits: <c-s>Debug, ...</c-s>
+                    Traits: <c-s>Debug, Clone, Copy, ...</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn kill(&mut self) -> Result&lt;()&gt;</c-s>
+                    <c-s>pub fn now() -> Instant</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn id(&mut self) -> u32</c-s>
+                    <c-s>pub fn duration_since(&mut self, earlier: Instant) -> Duration</c-s>
                   </li>
                   <li>
-                    <c-s>pub fn wait(&mut self) -> Result&lt;ExitStatus&gt;</c-s>
+                    <c-s>pub fn checked_duration_since(&mut self, earlier: Instant) -> Option&lt;Duration&gt;</c-s>
+                  </li>
+                  <li>
+                    <c-s>pub fn elapsed(&mut self) -> Duration</c-s>
                   </li>
                   <li>...</li>
                 </ul>
               </li>
               <li>
-                <c-s>ChildStdin</c-s>
+                <c-s>SystemTime</c-s>
                 <ul class="tight">
                   <li>
-                    Traits: <c-s>Debug, From, Write, ...</c-s>
+                    Traits: <c-s>Debug, Clone, Copy, Eq, PartialEq, ...</c-s>
                   </li>
+                  <li>
+                    pub const UNIX_EPOCH: SystemTime
+                  </li>
+                  <li>
+                    pub fn now() -> SystemTime
+                  </li>
+                  <li>
+                    pub fn duration_since(&self, earlier: SystemTime) -> Result&lt;Duration, SystemTimeError&gt;
+                  </li>
+                  <li>
+                    pub fn elapsed(&self) -> Result&lt;Duration, SystemTimeError&gt;
+                  </li>
+                  <li>...</li>
                 </ul>
               </li>
               <li>
-                <c-s>ChildStdout</c-s>
+                <c-s>SystemTimeError</c-s>
                 <ul class="tight">
                   <li>
-                    Traits: <c-s>Debug, From, Read, ...</c-s>
+                    Traits: <c-s>Debug, Display, Clone, Error, ...</c-s>
+                  </li>
+                  <li>
+                    pub fn duration(&self) -> Duration
                   </li>
                 </ul>
-              </li>
-              <li>
-                <c-s>ChildStderr</c-s>
-                <ul class="tight">
-                  <li>
-                    Traits: <c-s>Debug, From, Read, ...</c-s>
-                  </li>
-                </ul>
-              </li>
-              <li>
-                <c-s>Stdio</c-s>
-                <ul class="tight">
-                  <li>
-                    Traits: <c-s>Debug, From, ...</c-s>
-                  </li>
-                  <li>
-                    <c-s>pub fn piped() -> Stdio</c-s>
-                  </li>
-                  <li>
-                    <c-s>pub fn inherit() -> Stdio</c-s>
-                  </li>
-                  <li>
-                    <c-s>pub fn null() -> Stdio</c-s>
-                  </li>
-                </ul>
-              </li>
-              <li>
-                <c-s>Output</c-s>
-                <ul class="tight">
-                  <li>
-                    Traits: <c-s>Debug, Clone, Eq, PartialEq, ...</c-s>
-                  </li>
-                </ul>
-              </li>
-              <li>
-                <c-s>ExitStatus</c-s>
-                <ul class="tight">
-                  <li>
-                    Traits: <c-s>Debug, Display, Copy, Clone, Eq, PartialEq, ...</c-s>
-                  </li>
-                  <li>
-                    <c-s>pub fn success(&self) -> bool</c-s>
-                  </li>
-                  <li>
-                    <c-s>pub fn code(&self) -> Option&lt;i32&gt;</c-s>
-                  </li>
-                </ul>
-              </li>
-              <li>
-                ...
               </li>
             </ol>
           </div>
@@ -3398,36 +3392,12 @@ edition = "2018"
       </div>
     </t-b>
     <t-b>
-      Process functions are: abort, exit, id
+      The example below may eventually do something interesting.
     </t-b>
     <t-b>
       <div>
         <details>
-          <summary class="labelStyle lightItem">List of Functions</summary>
-          <s-halfEm></s-halfEm>
-          <div class="indent">
-            <ol class="tight">
-              <li>
-                <c-s>pub fn abort() -> !</c-s>
-              </li>
-              <li>
-                <c-s>pub fn exit(code: i32) -> !</c-s>
-              </li>
-              <li>
-                <c-s>pub fn id() -> u32</c-s>
-              </li>
-            </ol>
-          </div>
-        </details>
-      </div>
-    </t-b>
-    <t-b>
-      The example below spawns a child process and collects its output for display when the child exits.
-    </t-b>
-    <t-b>
-      <div>
-        <details>
-          <summary class="labelStyle darkItem">Example:&nbsp;&nbsp;process_demo</summary>
+          <summary class="labelStyle darkItem">Example:&nbsp;&nbsp;time_demo</summary>
           <s-halfEm></s-halfEm>
           <defn-outerBlock>
             <defn-block>
@@ -3504,12 +3474,40 @@ edition = "2018"
       The code for this example can be found in <a href="RustLibraryDemos.html">RustLibraryDemos</a>.
     </t-b>
 
+
     <a id="epilogue"></a>
     <hr class="spread" />
     <num-cont>
       <num-item1>3.12</num-item1><num-item4>Epilogue:</num-item4>
     </num-cont>
-
+    <t-b>
+      Augmenting the standard Rust libraries, there are a large number of open-source crates on
+      <a href="https://crates.io">https://crates.io</a>.  Many are developed by member of the Rust
+      development team.  There are also a lot of resources available on github.  
+      Here are a few interesting selections:
+      <div class="indent pad10">
+        <ol class="tight">
+          <li>
+            <a href="https://crates.io/crates/hyper">hyper</a>, an HTTP client and server api
+          </li>
+          <li>
+            <a href="https://crates.io/crates/tokio">tokio</a>, a runtime for asynchronous applications.
+          </li>
+          <li>
+            <a href="https://crates.io/crates/serde">serde</a>, framework for serializing and deserializing 
+            Rust data structures.
+          </li>
+          <li>
+            <a href="https://github.com/rust-unofficial/awesome-rust">awesome-rust</a>, a large list
+            of rust resources, mostly on github.
+          </li>
+        </ol>
+      </div>
+    </t-b>
+    <t-b>
+      I&apos;ve been impressed with Rust&apos;s clever ideas, professional implementation, and ease of use of the
+      Rust tool chain.  Cheers!
+    </t-b>
     <a id="refs"></a>
     <hr class="spread" />
     <num-cont>
