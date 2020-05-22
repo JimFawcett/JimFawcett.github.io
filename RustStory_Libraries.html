@@ -130,6 +130,11 @@
       All of the libraries discussed below are part of std.  There are many more - included here are libraries
       I expect you will use most often.
     </t-b>
+    <t-b>
+      The materials below summarize some of the Rust Library documentation, and give small examples of library use. Note that
+      the Rust documentation has examples for almost everything.  The examples here are often a little larger, and
+      dig into things that interested me as I learned some of the library content.
+    </t-b>
     <a id="convert"></a>
     <hr class="spread" />
     <num-cont>
@@ -2377,11 +2382,6 @@ fn main() -&gt; std::io::Result&lt;()&gt; {
       <num-item1>3.8</num-item1><num-item4>sync:</num-item4>
     </num-cont>
     <t-b>
-      <under-construction>
-        Under construction - example code needed
-      </under-construction>
-    </t-b>
-    <t-b>
       Reference: <a href="https://doc.rust-lang.org/std/sync/index.html">std::sync</a> library.
     </t-b>
     <t-b>
@@ -2632,67 +2632,164 @@ fn main() -&gt; std::io::Result&lt;()&gt; {
           <s-halfEm></s-halfEm>
           <defn-outerBlock>
             <defn-block>
-              <defn-head>std::thread::shared</defn-head>
+              <defn-head>Example:&nbsp;&nbsp;std::sync - Blocking Queue</defn-head>
               <defn-code>
 /////////////////////////////////////////////////////////////
-// process_demo::main.rs - start child process             //
+// sync_demo::main.rs - BlockingQueue                      //
 //                                                         //
-// Jim Fawcett, https://JimFawcett.github.io, 16 May 2020  //
+// Jim Fawcett, https://JimFawcett.github.io, 19 May 2020  //
 /////////////////////////////////////////////////////////////
+/*
+   This is a prototype for a blocking queue.  There is
+   another alternative, based on Rust channels which are,
+   essentially blocking queues.
 
-#![allow(unused_imports)]
-use std::process::*;
+   I will build a prototype from channels, and then make
+   a decision about which to use for a final design.
+*/
+#![allow(clippy::mutex_atomic)]
 use std::io::*;
+use std::{time};
+use std::sync::atomic::*;
+
+fn demo()  {
+
+    use std::sync::{Arc, Mutex, Condvar};
+    use std::thread;
+    use std::collections::*;
+    
+    /*---------------------------------------------
+        shared queue and condition variable 
+        - condition variable makes thread wait for
+          queue to have at least one entry
+        - It is the reason queue blocks dequeuer
+          when empty.
+        - Arcs are thread-safe pointers, so both
+          shared1 and its clone, shared2, refer to 
+          the same locks and queue.
+    */
+    let shared1 = Arc::new((
+        Mutex::new(VecDeque::&lt;String&gt;::new()), 
+        Condvar::new(),
+    ));
+    let shared2 = shared1.clone();
+    
+    /*---------------------------------------------
+        Atomic used to poll for active thread
+    */
+    let thread_started = Arc::new(AtomicBool::new(false));
+    let checker = thread_started.clone();
+
+    /*---------------------------------------------
+        Start child thread
+        - Dequeues messages sent by main thread.
+    */
+    let handle = thread::spawn(move|| {
+
+        print!("\n  thread started");
+        thread_started.store(true, Ordering::SeqCst);
+        let _time_delay = time::Duration::from_millis(55);
+        let (lq, cvar) = &amp;*shared2;
+        loop {
+            //thread::sleep(_time_delay);
+            let item: String;
+            {
+                /*-- acquire lock --*/
+                let mut q = lq.lock().unwrap();
+                
+                /*-- block on empty queue --*/
+                while q.len() == 0 {  // may get spurious returns
+                    q = cvar.wait(q).unwrap();
+                }
+                /*-- dequeue and display message --*/
+                item = q.pop_front().unwrap();
+            }   // lock released
+            
+            print!("\n  dequeued {:?} on child thread", item);
+            let _ = std::io::stdout().flush();
+            
+            /*-- client shuts down dequeuer with quit msg --*/
+            if item == "quit" {
+                break;
+            }
+        }
+    
+        print!("\n  thread finishing");
+    });
+
+    /*---------------------------------------------
+        Main thread thread enqueues messages
+        for child thread.
+    */
+    /*-- wait for child thread to start ---------*/
+    let _time_delay = time::Duration::from_micros(10);
+
+    while !checker.load(Ordering::SeqCst) {
+        thread::sleep(_time_delay);
+    }
+    /*-- start sending messages --*/
+    let (lq, cvar) = &amp;*shared1;
+    let mut not_processed = 0;
+
+    let max = 5;
+    for i in 0..max {
+        let mut value:String;
+        if i &lt; max-1 {
+          value = String::from("msg #");
+          value.push_str(&amp;i.to_string());
+        }
+        else {
+            value = "quit".to_string();
+        }
+        print!("\n  enqueue  {:?} on main thread", &amp;value);
+        {
+            let mut q = lq.lock().unwrap();
+            q.push_back(value);
+            not_processed = q.len();
+        }
+        cvar.notify_one();    
+    }
+    /*---------------------------------------------
+        Make sure all queued items are processed:
+        - Needed because notifies that are issued
+          before thread starts are dropped.
+    */
+    for _i in 0..not_processed {
+        cvar.notify_one();
+    }
+
+    print!("\n  waiting for child thread to finish");
+    let _ = handle.join();
+}
 
 fn main() {
 
-    let putline = || print!("\n");
+    print!("\n  Blocking queue shared between threads");
+    print!("\n =======================================");
 
-    print!("\n  spawning child process");
-    print!("\n ========================\n");
-    putline();
-
-    let output = if cfg!(target_os = "windows") {
-        Command::new("cmd.exe")
-                .args(&amp;[
-                    "/C", "type",
-                    "cargo.toml"
-                ])
-                .output()
-                .expect("failed to execute process")
-    }
-    else {
-        Command::new("sh")
-                 .arg("-C")
-                 .arg("echo.hello")
-                 .output()
-                 .expect("failed to execute process")
-    };
-
-    std::io::stdout().write_all(
-                          &amp;output.stdout
-                      ).unwrap();
-
-    println!("\n\n  That's all Folks!\n\n");
+    demo();
+    print!("\n\n  That's all Folks!\n");
 }
               </defn-code>
             </defn-block>
             <defn-block>
               <defn-head>Output:</defn-head>
               <defn-code>
-  spawning child process
- ========================
-
-[package]
-name = "process_demo"
-version = "0.1.0"
-authors = ["James W. Fawcett <jfawcett@twcny.rr.com>"]
-edition = "2018"
-
-# See more keys and their definitions at 
-# https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
+  Blocking queue shared between threads
+ ======================================= 
+  thread started
+  enqueue  "msg #0" on main thread
+  dequeued "msg #0" on child thread
+  enqueue  "msg #1" on main thread
+  enqueue  "msg #2" on main thread
+  enqueue  "msg #3" on main thread
+  enqueue  "quit" on main thread
+  waiting for child thread to finish
+  dequeued "msg #1" on child thread
+  dequeued "msg #2" on child thread
+  dequeued "msg #3" on child thread
+  dequeued "quit" on child thread
+  thread finishing
 
   That's all Folks!
               </defn-code>
@@ -2710,11 +2807,6 @@ edition = "2018"
     <num-cont>
       <num-item1>3.9</num-item1><num-item4>mpsc:</num-item4>
     </num-cont>
-    <t-b>
-      <under-construction>
-        Under Construction - example code needed
-      </under-construction>
-    </t-b>
     <t-b>
       Reference: <a href="https://doc.rust-lang.org/std/mpsc/index.html">std::mpsc</a> library.
     </t-b>
@@ -2916,69 +3008,100 @@ edition = "2018"
           <s-halfEm></s-halfEm>
           <defn-outerBlock>
             <defn-block>
-              <defn-head>std::thread::shared</defn-head>
+              <defn-head>std::mpsc - mpsc_demo::main.rs</defn-head>
               <defn-code>
 /////////////////////////////////////////////////////////////
-// process_demo::main.rs - start child process             //
+// mpsc_demo::main.rs - msg passing uses blocking queue    //
 //                                                         //
-// Jim Fawcett, https://JimFawcett.github.io, 16 May 2020  //
+// Jim Fawcett, https://JimFawcett.github.io, 22 May 2020  //
 /////////////////////////////////////////////////////////////
 
-#![allow(unused_imports)]
-use std::process::*;
-use std::io::*;
+use std::sync::mpsc;
+use std::thread;
+use std::time::Duration;
 
-fn main() {
-
-    let putline = || print!("\n");
-
-    print!("\n  spawning child process");
-    print!("\n ========================\n");
-    putline();
-
-    let output = if cfg!(target_os = "windows") {
-        Command::new("cmd.exe")
-                .args(&amp;[
-                    "/C", "type",
-                    "cargo.toml"
-                ])
-                .output()
-                .expect("failed to execute process")
+fn send_proc(s:&amp;str, tx : &amp;mpsc::Sender&lt;String&gt;) {
+    let max = 5;
+    for i in 0..max {
+        let msg = format!("msg #{} from {}", i.to_string(), s);
+        print!("\n  sending  {:?}", msg);
+        tx.send(msg).unwrap();
+        thread::yield_now();   // others ready to run?
     }
-    else {
-        Command::new("sh")
-                 .arg("-C")
-                 .arg("echo.hello")
-                 .output()
-                 .expect("failed to execute process")
-    };
+}
+fn recv_proc(rx: &amp;mpsc::Receiver&lt;String&gt;) {
+    for msg in rx {
+        print!("\n  received {:?}", msg);
+        if msg == "quit" {
+            break;
+        }
+    }
+}
+fn demo() {
+    /*-- setup channel --*/
+    let (tx, rx) = mpsc::channel::&lt;String&gt;();
+    let tx2 = mpsc::Sender::clone(&amp;tx);
+    let tx_quit = mpsc::Sender::clone(&amp;tx);
 
-    std::io::stdout().write_all(
-                          &amp;output.stdout
-                      ).unwrap();
+    /*-- receive thread --*/
+    let rcv_handle = thread::spawn(
+        move || { recv_proc(&amp;rx); 
+    });
 
-    println!("\n\n  That's all Folks!\n\n");
+    /*-- wait for receive thread to start --*/
+    thread::sleep(Duration::from_millis(50));
+
+    /*-- send threads --*/
+    let toms_handle = thread::spawn(
+        move || { send_proc("Tom", &amp;tx); 
+    });
+    let jerrys_handle = thread::spawn(
+        move || { send_proc("Jerry", &amp;tx2); 
+    });
+    let _ = toms_handle.join();
+    let _ = jerrys_handle.join();
+
+    /*-- Tom and Jerry are finished so it's safe to stop receiver --*/
+    let _ = tx_quit.send("quit".to_string());
+    let _ = rcv_handle.join();
+}
+fn main() {
+    print!("\n  Message passing demo");
+    print!("\n ======================");
+
+    demo();
+    print!("\n\n That's all Folks!\n");
 }
               </defn-code>
             </defn-block>
             <defn-block>
               <defn-head>Output:</defn-head>
               <defn-code>
-  spawning child process
- ========================
+  Message passing demo
+ ======================
+  sending  "msg #0 from Tom"
+  sending  "msg #0 from Jerry"
+  sending  "msg #1 from Jerry"
+  sending  "msg #2 from Jerry"
+  sending  "msg #3 from Jerry"
+  received "msg #0 from Tom"
+  received "msg #0 from Jerry"
+  sending  "msg #4 from Jerry"
+  sending  "msg #1 from Tom"
+  sending  "msg #2 from Tom"
+  received "msg #1 from Jerry"
+  received "msg #2 from Jerry"
+  received "msg #3 from Jerry"
+  received "msg #4 from Jerry"
+  received "msg #1 from Tom"
+  received "msg #2 from Tom"
+  sending  "msg #3 from Tom"
+  sending  "msg #4 from Tom"
+  received "msg #3 from Tom"
+  received "msg #4 from Tom"
+  received "quit"
 
-[package]
-name = "process_demo"
-version = "0.1.0"
-authors = ["James W. Fawcett <jfawcett@twcny.rr.com>"]
-edition = "2018"
-
-# See more keys and their definitions at 
-# https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-
-  That's all Folks!
+ That's all Folks!
               </defn-code>
             </defn-block>
           </defn-outerBlock>
@@ -3265,11 +3388,6 @@ edition = "2018"
       <num-item1>3.11</num-item1><num-item4>time:</num-item4>
     </num-cont>
     <t-b>
-      <under-construction>
-        Under Construction - example code needed
-      </under-construction>
-    </t-b>
-    <t-b>
       Reference: <a href="https://doc.rust-lang.org/std/time/index.html">std::time</a> library.
     </t-b>
     <t-b>
@@ -3401,67 +3519,105 @@ edition = "2018"
           <s-halfEm></s-halfEm>
           <defn-outerBlock>
             <defn-block>
-              <defn-head>std::thread::shared</defn-head>
+              <defn-head>std::time time_demo</defn-head>
               <defn-code>
 /////////////////////////////////////////////////////////////
-// process_demo::main.rs - start child process             //
+// time_demo::main.rs - demonstration of std::time         //
 //                                                         //
-// Jim Fawcett, https://JimFawcett.github.io, 16 May 2020  //
+// Jim Fawcett, https://JimFawcett.github.io, 22 May 2020  //
 /////////////////////////////////////////////////////////////
 
-#![allow(unused_imports)]
-use std::process::*;
-use std::io::*;
+use std::time;
+use std::thread;
+use std::convert::TryFrom;
 
+/*-- how accurate is thread sleep ? --*/
+fn sleep_proc(ms: u64) {
+   let dur = time::Duration::from_millis(ms); 
+   thread::sleep(dur);
+}
+/*-- nonsense calculation to waste time --*/
+fn calc_proc(count: u64) {
+    let mut _value: f64 = 42.0;
+    let mut mult:i32 = 42; 
+    let rslt = i32::try_from(count);
+    match rslt {
+        Ok(counter) =&gt; {
+            for i in 0..counter {
+                mult = mult + i;
+                let mult = (mult + i) % 33;
+                let _value = _value + mult as f64;
+            }       
+        },
+        Err(_) =&gt; print!("\n  can't compute this number")
+    }
+}
+/*-- writing to console is slow --*/
+fn print_proc(count: u64) {
+    print!("\n  ");
+    for _num in 0..count {
+        for _out in 0..25 {
+            print!(". ");
+        }
+        print!("\n  ");
+    }
+}
+/*-- stop watch timer --*/
+fn measure_time&lt;F: FnOnce(u64) -&gt; ()&gt;(f: F, arg: u64) -&gt; time::Duration {
+    let start = time::Instant::now();
+    f(arg);
+    start.elapsed()
+}
+/*-- demo time durations --*/
 fn main() {
+    print!("\n  Demonstrate std::time");
+    print!("\n =======================");
 
     let putline = || print!("\n");
 
-    print!("\n  spawning child process");
-    print!("\n ========================\n");
+    putline();
+    let mut duration = measure_time(sleep_proc, 3);
+    print!("\n  thread::sleep for 3 ms actually took {:?}", duration);
     putline();
 
-    let output = if cfg!(target_os = "windows") {
-        Command::new("cmd.exe")
-                .args(&amp;[
-                    "/C", "type",
-                    "cargo.toml"
-                ])
-                .output()
-                .expect("failed to execute process")
-    }
-    else {
-        Command::new("sh")
-                 .arg("-C")
-                 .arg("echo.hello")
-                 .output()
-                 .expect("failed to execute process")
-    };
+    duration = measure_time(calc_proc, 1500);
+    print!("\n  time to perform nonsense calc was {:?}", duration);
+    putline();
 
-    std::io::stdout().write_all(
-                          &amp;output.stdout
-                      ).unwrap();
+    duration = measure_time(print_proc, 15);
+    print!("\n  time to print array of dots was {:?}", duration);
 
-    println!("\n\n  That's all Folks!\n\n");
+    println!("\n\n  That's all Folks!\n");
 }
               </defn-code>
             </defn-block>
             <defn-block>
               <defn-head>Output:</defn-head>
               <defn-code>
-  spawning child process
- ========================
+  Demonstrate std::time
+ =======================
 
-[package]
-name = "process_demo"
-version = "0.1.0"
-authors = ["James W. Fawcett <jfawcett@twcny.rr.com>"]
-edition = "2018"
+  thread::sleep for 3 ms actually took 3.6934ms
 
-# See more keys and their definitions at 
-# https://doc.rust-lang.org/cargo/reference/manifest.html
+  time to perform nonsense calc was 62µs
 
-[dependencies]
+  . . . . . . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . . . . . . .
+  . . . . . . . . . . . . . . . . . . . . . . . . .
+
+  time to print array of dots was 11.503ms
 
   That's all Folks!
               </defn-code>
@@ -3491,7 +3647,17 @@ edition = "2018"
             <a href="https://crates.io/crates/hyper">hyper</a>, an HTTP client and server api
           </li>
           <li>
-            <a href="https://crates.io/crates/tokio">tokio</a>, a runtime for asynchronous applications.
+            <a href="https://github.com/http-rs">http-rs</a>, HTTP client, server, and parts.
+          </li>
+          <li>
+            <a href="https://async.rs/">async-std</a>, an implementation of the async-await pattern and
+            updates of some of the std libraries to incorporate it, e.g., fs, io, net, process, sync, ...
+            It provides new libraries future, stream, and task.  Here&apos;s a nice 
+            <a href="https://www.philipdaniels.com/blog/2019/async-std-demo1/">set of examples</a> of its
+            use.
+          </li>
+          <li>
+            <a href="https://crates.io/crates/tokio">tokio</a>, a widely used runtime for asynchronous applications.
           </li>
           <li>
             <a href="https://crates.io/crates/serde">serde</a>, framework for serializing and deserializing 
