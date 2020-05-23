@@ -629,6 +629,7 @@ for x in &coll { /* do something else with x */ };
     fn count(self) -> usize
     fn last(self) -> Option&lt;Self::Item&gt;
     fn nth(&mut self, n: usize) -> Option&lt;Self::Item&gt;
+    fn skip(self, n: usize) -> Skip&lt;Self&gt;
     fn step_by(self, step: usize) -> StepBy&lt;Self&gt;
     fn map&lt;B, F&gt;(self, f: F) -> Map&lt;Self, F&gt;
        where F: FnMut(Self::Item) -> B
@@ -2646,29 +2647,33 @@ fn main() -&gt; std::io::Result&lt;()&gt; {
       <s-halfEm></s-halfEm>
     </t-b>
     <t-b>
-      The example below builds a blocking queue and demonstrates sending messages.
+      The example below builds a loosely coupled set of parts, using <c-s>Arc</c-s>,<c-s> Mutex</c-s>, and 
+      <c-s>Condvar</c-s>, that act like a blocking queue
+      and demonstrate sending messages.  Focus here
+      on the use of synchronization constructs to avoid data races (the code won&apos;t compile 
+      if you don&apos;t use them).
     </t-b>
     <t-b>
       <div>
         <details>
-          <summary class="labelStyle darkItem">Example:&nbsp;&nbsp;sync_demo - Blocking Queue</summary>
+          <summary class="labelStyle darkItem">Example:&nbsp;&nbsp;sync_demo</summary>
           <s-halfEm></s-halfEm>
           <defn-outerBlock>
             <defn-block>
-              <defn-head>Example:&nbsp;&nbsp;std::sync - Blocking Queue</defn-head>
+              <defn-head>Example:&nbsp;&nbsp;std::sync - Blocking Queue Parts</defn-head>
               <defn-code>
 /////////////////////////////////////////////////////////////
-// sync_demo::main.rs - BlockingQueue                      //
+// sync_demo::main.rs - BlockingQueue Prototype            //
 //                                                         //
 // Jim Fawcett, https://JimFawcett.github.io, 19 May 2020  //
 /////////////////////////////////////////////////////////////
 /*
-   This is a prototype for a blocking queue.  There is
-   another alternative, based on Rust channels which are,
-   essentially blocking queues.
+   This is a prototype for a blocking queue, essentially some
+   pieces that act like a blocking queue, but not yet put
+   into an abstraction for that.
 
-   I will build a prototype from channels, and then make
-   a decision about which to use for a final design.
+   In the next demo we build a nice abstraction for this
+   behavior.
 */
 #![allow(clippy::mutex_atomic)]
 use std::io::*;
@@ -2822,7 +2827,159 @@ fn main() {
       </div>
     </t-b>
     <t-b>
-      The code for this example can be found in <a href="RustLibraryDemos.html">RustLibraryDemos</a>.
+      Next, we use these ideas to provide a good BlockingQueue abstraction, without using unsafe code, that
+      has essentially the same behavior.
+    </t-b>
+    <t-b>
+      <div>
+        <details>
+          <summary class="labelStyle darkItem">Example:&nbsp;&nbsp;Blocking Queue</summary>
+          <s-halfEm></s-halfEm>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>blocking_queue::main.rs</defn-head>
+              <defn-code>
+/////////////////////////////////////////////////////////////
+// sync_demo::main.rs - BlockingQueue                      //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 19 May 2020  //
+/////////////////////////////////////////////////////////////
+/*
+   This is a BlockingQueue abstraction.  To be shared between
+   threads without using unsafe code, any abstraction must
+   be composed only of Mutexes and Condvars or a struct or
+   tuple with only those members.
+
+   So, the blocking queue must hold its native queue in a 
+   Mutex, as shown below.
+   
+   There is another alternative, based on Rust channels, which 
+   are essentially blocking queues.
+
+   In another demo I will build a prototype from channels, and 
+   then discuss the advantages and disadvantages of each.
+*/
+use std::io::*;
+use std::sync::*;
+use std::collections::*;
+use std::thread;
+
+#[derive(Debug)]
+struct BlockingQueue&lt;T&gt; {
+    q: Mutex&lt;VecDeque&lt;T&gt;&gt;,
+    cv: Condvar,
+}
+impl&lt;T&gt; BlockingQueue&lt;T&gt; {
+    fn new() -&gt; Self {
+        Self {
+            q: Mutex::new(VecDeque::new()),
+            cv: Condvar::new(),
+        }
+    }
+    fn en_q(&amp;self, t:T) {
+        let mut lq = self.q.lock().unwrap();
+        lq.push_back(t);
+        self.cv.notify_one();
+    }
+    fn de_q(&amp;self) -&gt; T {
+        let mut lq = self.q.lock().unwrap();
+        while lq.len() == 0 {
+            lq = self.cv.wait(lq).unwrap();
+        }
+        lq.pop_front().unwrap()
+    }
+    fn len(&amp;self) -&gt; usize {
+        self.q.lock().unwrap().len()
+    }
+}
+
+/*-- simple test of BlockingQueue --*/
+fn test() {
+
+    let share = Arc::new(BlockingQueue::&lt;String&gt;::new());
+    let share1 = Arc::clone(&amp;share);
+    let share2 = Arc::clone(&amp;share);
+
+    let flush = || { let _ = std::io::stdout().flush(); };
+
+    /*-- child thread dequeues messages --*/
+    let handle = thread::spawn(move || {
+        print!("\n  child thread started");
+        flush();
+        loop {
+            let t = share1.de_q();
+            print!("\n  dequeued {} on child thread", t);
+            flush();
+            if &amp;t == "quit" {
+                break;
+            }
+        }
+        print!("\n  thread shutting down");
+        flush();
+    });
+
+    /*-- main thread enqueues messages --*/
+    for i in 0..5 {
+        let msg = format!("msg #{}", i.to_string());
+        print!("\n  enqueued {:?} on main thread", msg);
+        flush();
+        share2.en_q(msg);
+    }
+    /*-- shut down child thread --*/
+    print!("\n  enqueued {:?} on main thread", "quit");
+    flush();
+    share2.en_q("quit".to_string());
+
+    /*-- child thread must complete before exiting --*/
+    print!("\n  waiting for child thread to stop");
+    flush();
+    let _ = handle.join();
+
+    print!("\n  queue length = {}", share2.len());
+}
+
+fn main() {
+
+    print!("\n  Demonstrate queue shared between threads");
+    print!("\n ==========================================");
+
+    //demo();
+    test();
+    print!("\n\n  That's all Folks!\n");
+}              
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Output:</defn-head>
+              <defn-code>
+  Demonstrate queue shared between threads
+ ==========================================
+  enqueued "msg #0" on main thread
+  child thread started
+  dequeued msg #0 on child thread
+  enqueued "msg #1" on main thread
+  enqueued "msg #2" on main thread
+  dequeued msg #1 on child thread
+  dequeued msg #2 on child thread
+  enqueued "msg #3" on main thread
+  enqueued "msg #4" on main thread
+  enqueued "quit" on main thread
+  waiting for child thread to stop
+  dequeued msg #3 on child thread
+  dequeued msg #4 on child thread
+  dequeued quit on child thread
+  thread shutting down
+  queue length = 0
+
+  That's all Folks!
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+      </div>
+    </t-b>
+    <t-b>
+      The code for these examples can be found in <a href="RustLibraryDemos.html">RustLibraryDemos</a>.
     </t-b>
 
     <a id="mpsc"></a>
