@@ -113,6 +113,8 @@ function initializeMenu() {
         <a href='Stories.html'>What is a Story?</a>\
         <a href='CppStory_Prologue.html'>C++ Story</a>\
         <a href='RustStory_Prologue.html'>Rust Story</a>\
+        <a href='RustStory_CodeIndex.html'>Rust Code Index</a>\
+        <a href='Resources/ConsumingRust.pdf'>Rust&nbsp;bite&nbsp;by&nbsp;byte&nbsp;</a>\
         <a href='StoryTeller_LocalStorage.html'>Load Story List</a>\
         <a href='StoryTellerDesign.html'>StoryTeller Design</a>\
         <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
