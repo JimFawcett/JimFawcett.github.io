@@ -47,7 +47,7 @@ function initializeMenu() {
       <button class='dropbutton'>Cmps &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Components</div>\
-        <a href='Javascript:;'>None yet</a>\
+        <a href='RustBlockingQueue.html'>BlockingQueue&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
