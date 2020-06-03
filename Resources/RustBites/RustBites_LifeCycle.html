@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="keywords" content="Rust, Introduction" />
+    <meta name="Author" content="Jim Fawcett" />
+    <meta name="Author" content="James Fawcett" />
+    <title>RustBites LifeCycle</title>
+    <link rel="stylesheet" href="css/BiteStyles.css" />
+    <script src="js/BiteScripts.js"></script>
+    <!-- <style>
+      table, th, td { 
+        border: 1px solid #363636; 
+        border-collapse: collapse;
+      }
+      th, td {
+        padding:3px;
+      }
+    </style> -->
+  </head>
+  <body id="github" onload="initBites()">
+      <div class="top-banner">
+          <!-- <span id="hlft"><a href="RustBites_Intro.html">Intro</a></span> -->
+          <span id="hctr">Consuming Rust Bite by Byte</span>
+          <!-- <span id="hrgt"><a href="RustBites_UDB.html">UDB</a></span> -->
+      </div>
+
+      <toc-b id="toc">
+        <div style="display:flex; flex-direction:row">
+          <a href="Javascript:;" onclick="storyMenu.chaps()" style="color:#fefefa;">Bites</a>&nbsp;
+          <a href="Javascript:;" onclick="storyMenu.sects()" style="color:#fefefa;">Sects</a>&nbsp;
+          <a href="../../RustBiteByByte.html" style="color:#fefefa;">Repo</a>&nbsp;
+          <a href="Javascript:;" onclick="storyMenu.toggleTOC()" style="color:#fefefa;">Esc</a>&nbsp;
+          <a href="Javascript:;" onclick="storyMenu.closeTOC()" style="color:#fefefa;">Close</a>&nbsp;
+        </div>
+        <!-- <up-b id="chaps" onmouseout="storyMenu.chaps()"> -->
+        <up-b id="chaps">
+          <a href="RustBites_Intro.html">Intro</a><br />
+          <a href="RustBites_Data.html">Data</a><br />
+          <a href="RustBites_LifeCycle.html">LifeCycle</a><br />
+          <a href="RustBites_UDB.html">UndefBhvr</a><br />
+          <a href="RustBites_Ownrs.html">Ownershp</a><br />
+          <a href="RustBites_Intmut.html">InterMutat</a><br />
+          <a href="RustBites_Functs.html">Functions</a><br />
+          <a href="RustBites_ErrHnd.html">ErrHand</a><br />
+          <a href="RustBites_Structs.html">Structs</a><br />
+          <a href="RustBites_Traits.html">Traits</a><br />
+          <a href="RustBites_Generics.html">Generics</a><br />
+          <a href="RustBites_LifeTime.html">LifeTime</a><br />
+          <a href="RustBites_Abstract.html">Abstract</a><br />
+          <a href="RustBites_Collects.html">Collects</a><br />
+          <a href="RustBites_Iterator.html">Iterator</a><br />
+          <a href="RustBites_Threads.html">Threads</a><br />
+          <a href="RustBites_Synchron.html">Synchronz</a><br />
+          <a href="RustBites_Channels.html">Channels</a><br />
+          <a href="RustBites_AsyncAwt.html">AsyncAwt</a><br />
+          <a href="RustBites_Macros.html">Macros</a><br />
+          <a href="Javascript.;#"></a><br />
+        </up-b>
+        <rt-b id="sects">
+          <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#starting">Starting</a>, 
+          <a href="#contents">Contents</a>, <a href="#refs">References</a>
+        </rt-b>
+      </toc-b>
+      <div id="hlp" style="display:none;">
+        <table>
+          <tr>
+            <td style="padding-right:5px;">Esc</td>
+            <td>toggle menus</td>
+          </tr>
+          <tr>
+            <td>C</td>
+            <td>close menus</td>
+          </tr>
+          <tr>
+            <td>R</td><td>Refresh</td>
+          </tr>
+          <tr>
+            <td>T</td><td>scroll to top</td>
+          </tr>
+          <tr>
+            <td>B</td><td>scroll to bottom</td>
+          </tr>
+          <tr>
+            <td>H</td><td>Help</td>
+          </tr>
+        </table>
+      </div>
+   
+      <bb-55>
+        <h1>Rust Bite - LifeCycle</h1>
+        <hr />
+
+        <t-b>
+          In this LifeCycle Bite our goal is to understand the processes a Rust object goes through
+          during its life time.  The first part of the code we will look at focuses on creating a 
+          test type that helps demonstrate what happens as an object is created, used, moved, and
+          goes out of scope.
+        </t-b>
+        <t-b>
+          We haven&apos;t discussed creation of user-defined types yet - we won&apos;t until Rust Bite - Structs.
+          So some of this code won&apos;t be completely obvious.  But that&apos;s O.K., you will get
+          the main ideas, and can come back later for details.
+        </t-b>
+        <t-b>
+          In the Test Code dropdown we declare a TestLifeCycle type:
+          <div class="indent pad5">
+            <c-s>struct TestLifeCycle { count: u32, }</c-s>
+          </div>
+          We want instances of this type to announce their creation, cloning, and destruction.  That 
+          is effected with the functions:
+          <s-halfEm></s-halfEm>
+          <div class="indent pad5">
+            <table>
+              <tr>
+                <td>- &nbsp;</td><td><c-s>new() -> TestLifeCycle&nbsp;&nbsp;</c-s></td>
+                <td>default constructor provides object with default state</td>
+              </tr>
+              <tr>
+                <td>- &nbsp;</td><td><c-s>new(cnt:&nbsp;u32)&nbsp;->&nbsp;TestLifeCycle&nbsp;&nbsp;</c-s></td>
+                <td>parameterized constructdor provides object with program supplied state</td>
+              </tr>
+              <tr>
+                <td>- &nbsp;</td><td><c-s>clone(&self)&nbsp;->&nbsp;TestLifeCycle&nbsp;&nbsp;</c-s></td>
+                <td>clone function, e.g., copy constructor makes a new object that is a copy of cloner</td>
+              </tr>
+              <tr>
+                <td>- &nbsp;</td><td><c-s>drop(&mut self)&nbsp;&nbsp;</c-s></td>
+                <td>drop function, e.g., destructor, releases resources held by object when it goes out of scope</td>
+              </tr>
+              <tr>
+                <td>- &nbsp;</td><td><c-s>value(&self) -> u32&nbsp;&nbsp;</c-s></td><td>value getter returns object&apos;s state</td>
+              </tr>
+            </table>
+          </div>
+        </t-b>
+        <t-b>
+          The code, in the left panel in this dropdown, implements these functions for TestLifeCycle, and the code
+          in the right panel exercises tests on instances of this type.
+        </t-b>
+      </bb-55>
+
+      <details>
+        <summary class="darkItem">Test Code&nbsp;&nbsp;</summary>
+        <table>
+          <tr>
+            <td><img src="CodeSamples/life_cycle/TestLifeCycleCode.jpg" style="width:40em;"></td>
+            <td><img src="CodeSamples/life_cycle/main.jpg" style="width:30em;"></td>
+          </tr>
+        </table>
+      </details>
+      <bb-55>
+        <t-b>
+          All of the remaining codes are various demonstration tests and their outputs, to show you what happens
+          during the lifecycle of an object in Rust.
+        </t-b>
+        <t-b>
+          Demonstrate Creation and Drop is a short test that shows that a Move type, like <c-s>TestLifeCycle</c-s>, can be dropped before it
+          leaves its scope of definition by calling std::ops::Drop::drop.  The output shows the drop.
+          If you comment out the drop call you will see the drop annunciation after the &quot;leaving demo_drop scope&quot;
+          printout. 
+        </t-b>
+        <t-b>
+          Drop, like a C++ destructor, returns any resources that the type holds when it goes out of scope.  
+          <c-s>TestLifeCycle</c-s> doesn&apos;t hold
+          any resources on the heap, but became a Move type because it implements the Drop trait, as if it did
+          hold resources that needed to be released. The Drop trait is Rust&apos;s mechanism for distinguishing a 
+          Move type from a Copy type.
+        </t-b>
+      </bb-55>
+      <details>
+        <summary class="darkItem">Demonstrate Creation and Drop&nbsp;&nbsp;</summary>
+        <table>
+          <tr>
+            <td><img src="CodeSamples/life_cycle/demo_drop.jpg" style="width:40em;"></td>
+            <td><img src="CodeSamples/life_cycle/demo_drop_output.jpg" style="width:25em;"></td>
+          </tr>
+        </table>
+      </details>
+      <bb-55>
+        <t-b>
+          Demonstrate Order of Destruction shows that objects are dropped (destroyed) in the reverse order of
+          their creation.  Things are done that way in case there are dependencies between objects - not the case 
+          here.  The demonstration also shows what happens when we rebind a type, as we did for the _third 
+          object.
+        </t-b>
+        <t-b>
+          Rust calls this &quot;shadowing&quot;. A shadowed object is not accessible after its identifier 
+          is bound to a new instance.  However, as this demonstration shows, the object isn&apos;t dropped when it 
+          is shadowed, but waits until the thread of execution leaves the scope where it was defined.
+        </t-b>
+        </bb-55>
+      <details>
+        <summary class="darkItem">Demonstrate Order of Destruction&nbsp;&nbsp;</summary>
+        <table>
+          <tr>
+            <td><img src="CodeSamples/life_cycle/order_of_destruction.jpg" style="width:40em;"></td>
+            <td><img src="CodeSamples/life_cycle/order_of_destruction_output.jpg" style="width:25em;"></td>
+          </tr>
+        </table>
+      </details>
+      <bb-55>
+        <t-b>
+          Collection Creation and Drop uses a <c-s>Vec&lt;TestLifeCycle&gt;</c-s> to collect several <c-s>TestLifeCycle</c-s>
+          objects and show how they are created and destroyed.  What this shows is that dropping is a recursive
+          activity.  When the vector is dropped each of its elements is dropped.  It also shows how a parameterized 
+          constructor can provide unique state for each instance.
+        </t-b>
+        <t-b>
+          Note that, if we don't explicitly call drop on an instance of a Move type, it will be implicitly dropped when it 
+          goes out of scope.
+        </t-b>
+        </bb-55>
+      <details>
+        <summary class="darkItem">Demonstrate Collecton Creation and Drop&nbsp;&nbsp;</summary>
+        <table>
+          <tr>
+            <td><img src="CodeSamples/life_cycle/demo_collection_drop.jpg" style="width:40em;"></td>
+            <td><img src="CodeSamples/life_cycle/demo_collection_drop_output.jpg" style="width:25em;"></td>
+          </tr>
+        </table>
+      </details>
+      <bb-55>
+        <t-b>
+          The Move demo illustrates a move operation:
+          <div class="indent pad5">
+            <c-s>let tlc1 = TestLifeCycle::param_new(42);</c-s><br />
+            <c-s>let tlc2 = tlc1; &nbsp;// move here</c-s>
+          </div>
+          There are two important things to note from the output.  First, the move did not result in 
+          an immediate drop.  That didn&apos;t happen until <c-s>tlc2</c-s> went out of scope.
+          The second, related, thing to notice is that only one drop occurs.  That&apos;s because <c-s>tlc1</c-s>&apos;s 
+          resources were moved to <c-s>tlc2</c-s>, so no drop was needed for <c-s>tlc1</c-s>. This validates Figure 1, from 
+          <a href="RustBites_Data.html">RustBites Data</a>.
+
+        </t-b>
+      </bb-55>
+      <details>
+        <summary class="darkItem">Demonstrate Move&nbsp;&nbsp;</summary>
+        <table>
+          <tr>
+            <td><img src="CodeSamples/life_cycle/demo_move.jpg" style="width:40em;"></td>
+            <td><img src="CodeSamples/life_cycle/demo_move_output.jpg" style="width:35em;"></td>
+          </tr>
+        </table>
+      </details>
+      <bb-55>
+        <t-b>
+          There are two major observation we need to make that are not shown in any of the code:  
+        </t-b>
+        <under-construction>
+          Copy types are not dropped.  They have no resources to drop.
+        </under-construction>
+        <t-b>  
+          Endowing a copy type with a drop turns it into a Move type, as we saw with the
+          <c-s>TestLifeCycle</c-s> type.  Without the Drop implementation <c-s>TestLifeCycle</c-s> would be a Copy 
+          type.
+        </t-b>
+        <under-construction>
+          If you create a type that holds a Move type component that makes it a Move type.  
+        </under-construction>          
+        <t-b>
+          For example, if we 
+          had given <c-s>TestLifeCycle </c-s> a String member, perhaps a name, that would have turned it into 
+          a Move type even without the Drop implementation.  The compiler would have dropped it simply by dropping 
+          each of its Move elements, like a name <c-s>String</c-s> for <c-s>TestLifeCycle</c-s> if it had one. 
+          This is similar to C++ member-wise destruction in compiler generated destructors.
+        </t-b>
+      </bb-55>
+    <div style="height: 5em;"></div>
+  </body>
+</html>

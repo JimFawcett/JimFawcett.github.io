@@ -63,16 +63,27 @@ storyMenu.sects = function () {
   }
 };
 
-storyMenu.closeTOC = function () {
-    // let chaps = document.getElementById("chaps");
-    // chaps.style.display = "none";
-    // let sects = document.getElementById("sects");
-    // sects.style.display = "none";
-    let toc = document.getElementById("toc");
-    toc.style.display = "none";
+storyMenu.toggleTOC = function () {
+  storyMenu.chaps();
+  storyMenu.sects();
+  // let chaps = document.getElementById("chaps");
+  // chaps.style.display = "none";
+  // let sects = document.getElementById("sects");
+  // sects.style.display = "none";
+  // let toc = document.getElementById("toc");
+  // toc.style.display = "none";
 };
 
-  // listen for keyboard events:
+storyMenu.closeTOC = function () {
+  // let chaps = document.getElementById("chaps");
+  // chaps.style.display = "none";
+  // let sects = document.getElementById("sects");
+  // sects.style.display = "none";
+  let toc = document.getElementById("toc");
+  toc.style.display = "none";
+};
+
+// listen for keyboard events:
   // - key actions are defined in ScriptsKeyboard.js
 
   document.addEventListener('keydown', (event) => { keyAction(event); }, false);
