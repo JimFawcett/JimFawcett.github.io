@@ -1,0 +1,45 @@
+<pre>
+/*-- only one writer in function scope --*/
+fn mutate_and_show(t:&amp;mut String) {
+    t.clear();
+    t.push_str("new value");
+    print!("\n  t in function = {:?}", t);
+}
+
+fn main() {
+    /*-- multiple readers: O.K. --*/
+    let s = String::from("immutable string");
+    let t = &amp;s;
+    print!("\n  s = {:?}", s);
+    print!("\n  t = {:?}", t);
+
+    /*-- one writer: O.K. --*/
+    let mut u = String::from("mutable string");
+    u.push_str(" u");
+    print!("\n  u = {:?}", u);
+
+    /*----------------------------------------------------- 
+       attempting to add reader v with active writer u
+       not O.K. 
+    */
+    // let v = &amp;u;
+    // u.push_str("modfied by u");
+    // print!("\n  v = {:?}", v);
+   
+    /*-- mutable v borrows u's ability to write, O.K. --*/
+    let v = &amp;mut u;
+    v.push_str(" referenced by v");
+    print!("\n  v = {:?}", v);
+
+    /*-- attempting to use second writer, not O.K. --*/
+    // u.push_str(" and modifed again by u");
+    // print!("\n  u = {:?}", u);
+
+    /*-----------------------------------------------------
+       can mutate u in function since ref v is not accessible 
+    */
+    mutate_and_show(&amp;mut u);
+
+    println!("\n\n  That's all Folks!\n\n");
+}
+</pre>
