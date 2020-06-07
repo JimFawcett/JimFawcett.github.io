@@ -667,8 +667,221 @@ TestLifeCycle instance 42 dropped
        </div>
 
        <h2><a id="refcell"></a>RefCell&lt;T&gt;</h2>
-       <h2><a id="ref"></a>Ref&lt;T&gt;</h2>
-       <h2><a id="refmut"></a>RefMut&lt;T&gt;</h2>
+       <bb-55>
+         <t-b>
+            RefCell&lt;T&gt; is used to defer borrow checking until run-time.  We declare it
+            as an immutable type, but are allowed to borrow a mutable reference.  If we 
+            already have an active borrow, the program will  panic, because the ownership
+            rules have been violated.
+         </t-b>
+         <t-b>
+           The point of all this is that there are certain conditions under which correct code
+           will not compile because the compiler&apos;s static analysis can&apos;t guarantee 
+           that ownership rules haven&apos;t been violated.
+           A common place where this occurs is in mult-threaded code.  We will see some 
+           examples when we look at the <a href="RustBites_Threads.html">Threads</a> Bite.
+         </t-b>
+         <t-b>
+           When we borrow from a RefCell&lt;T&gt; we get a Ref&lt;T&gt; or a RefMut&lt;T&gt;,
+           depending on the type of borrow.  These types are essentially transparent because
+           they support automatic dereferencing to the RefCell&lt;T&gt; inner value.
+         </t-b>
+       </bb-55>
+       <div class="indent pad5">
+         <defn-block>
+           <defn-head>RefCell, Ref, and RefMut</defn-head>
+           <defn-code>
+RefCell holds a mutable memory location with dynamically
+checked borrow rules.
 
+let sp = std::cell::RefCell::new(T::new());
+let r1 = sp.borrow()     // returns a Ref<T>
+                          // panics if r1 was mutably borrowed
+                          // access inner with sp.borrow()
+                          //   due to auto dereferencing
+let r2 = sp.borrow_mut() // returns a RefMut<T>
+                          // panics if r2 was already borrowed
+                          // access inner with sp.borrow_mut()
+                          //   due to auto dereferencing
+drop(r1) dropps inner t
+           </defn-code>
+         </defn-block>
+       </div>
+       <bb-55>
+         <t-b>
+           The example, below, illustrates the basic mechanics for using RefCell&lt;T&gt; and the
+           wrappers Ref&lt;T&gt; and RefMut&lt;T&gt;.  It doens&apos;t give you much insight into 
+           how they are used in practice.  That will have to wait until we get to 
+           <a href="RustBites_Threads.html">Threads</a>.  There we will see that Mutex&lt;T&gt; and 
+           RwLock&lt;T&gt; need RefCell to implement their functionality.
+         </t-b>
+       </bb-55>
+       <div>
+         <details>
+           <summary class="darkItem">Example: RefCell&lt;T&gt;</summary>
+           <s-halfEm></s-halfEm>
+           <defn-outerBlock>
+             <defn-block>
+               <defn-head>show_refcell::main.rs</defn-head>
+               <defn-code>
+/////////////////////////////////////////////////////////////
+// show_refcell::main.rs - demo RefCell<T> smart pointer   //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 06 Jun 2020  //
+/////////////////////////////////////////////////////////////
+
+#![allow(clippy::print_literal)]
+#![allow(unused_imports)]
+
+use core::fmt::{ Debug };
+use std::cell::{ RefCell, Ref, RefMut };
+use std::any::type_name;
+
+/*-- same as print!("\n  sp = {:?}", sp) --*/
+fn show<T:Debug>(name:&str, t:&T) {
+    print!("\n  {} = {:?}", name, t);
+}
+
+fn show_type<'a, T:Debug>(_t:T) -> &'a str where T:Debug {
+    type_name::<T>()
+}
+
+struct SpaceAtEnd;
+impl Drop for SpaceAtEnd {
+    fn drop(&mut self) {
+        print!("\n\n");
+    }
+}
+
+fn main() {
+    /*-------------------------------------------------------
+        Note: 
+        This program will panic if both Blk #1 and Blk #2
+        are uncommented.  That's because the borrowing
+        rules are violated.
+
+        If one is commented out - it doesn't matter which 
+        one - the program completes successfully.
+
+        This illustrates that RefCell defers borrow checking
+        to run-time.
+    */
+
+    let putline = || print!("\n");
+    let _cosmetic = SpaceAtEnd;
+
+    let tlc = test_type::TestLifeCycle::new();
+
+    print!("\n  -- create RefCell pointer to tlc --");
+    /*-- note sp is statically immutable --*/
+    let sp = RefCell::new(tlc);
+    show("sp", &sp);
+    putline();
+
+    // Blk #1
+    // print!("\n  -- borrow inner TLC from RefCell --");
+    // let b = sp.borrow();
+    // show("b ", &b);
+    // let v = b.get_value();
+    // show("v ", &v);
+    // putline();
+
+    // Blk #2
+    print!("\n  -- attempt to mutably borrow inner TLC from RefCell --");
+    /*-------------------------------------------------------
+        - Even though sp is immutable, we can get a mutable
+          reference, b2.
+        - RefCell defers borrow checking to runtime. 
+        - This succeeds only if there are no other current borrows.
+          You can see that by uncommenting the code in blk #1
+    */
+    let mut b2 = sp.borrow_mut();   // returns RefMut<T>
+    show("b2", &b2);
+    b2.set_value(42);               // automatically dereferenced
+    show("b2", &b2);
+    let v = b2.get_value();         // here too
+    show("v ", &v);
+    putline();
+
+    print!("\n  -- exploring borrowed type --");
+    type TLC = test_type::TestLifeCycle;
+    let sp2 = RefCell::new(TLC::new());
+    let r:Ref<TLC> = sp2.borrow();
+    show("r:Ref<TLC>", &show_type(r));
+    putline();
+
+    print!("\n  -- exploring automatic dereferencing of Ref<T> --");
+    /*-- r was moved in show_type(r) so get another --*/
+    let r = sp2.borrow();
+    let tlc = &*r;
+    show("r:Ref<T>", &r);
+    show("tlc", &tlc);
+    putline();
+
+    print!("\n  -- exploring mutably borrowed type --");
+    let sp2 = RefCell::new(TLC::new());
+    let r:RefMut<TLC> = sp2.borrow_mut();
+    show("r:RefMut<TLC>", &show_type(r));
+    putline();
+
+    print!("\n  -- exploring automatic dereferencing of RefMut<T> --");
+    /*-- r was moved in show_type(r) so get another --*/
+    let r = sp2.borrow_mut();
+    let tlc = &*r;
+    show("r:RefMut<T>", &r);
+    show("tlc", &tlc);
+
+    println!("\n\n  That's all Folks!");
+
+}
+               </defn-code>
+             </defn-block>
+             <defn-block>
+               <defn-head>Output:</defn-head>
+               <defn-code>
+creating instance 0 of TestLifeCycle
+-- create RefCell pointer to tlc --
+sp = RefCell { value: TestLifeCycle { count: 0 } }
+
+-- attempt to mutably borrow inner TLC from RefCell --
+b2 = TestLifeCycle { count: 0 }
+b2 = TestLifeCycle { count: 42 }
+v  = 42
+
+-- exploring borrowed type --
+creating instance 0 of TestLifeCycle
+r:Ref<TLC> = "core::cell::Ref<test_type::TestLifeCycle>"
+
+-- exploring automatic dereferencing of Ref<T> --
+r:Ref<T> = TestLifeCycle { count: 0 }
+tlc = TestLifeCycle { count: 0 }
+
+-- exploring mutably borrowed type --
+creating instance 0 of TestLifeCycle
+r:RefMut<TLC> = "core::cell::RefMut<test_type::TestLifeCycle>"
+
+-- exploring automatic dereferencing of RefMut<T> --
+r:RefMut<T> = TestLifeCycle { count: 0 }
+tlc = TestLifeCycle { count: 0 }
+
+That's all Folks!
+
+TestLifeCycle instance 0 dropped
+TestLifeCycle instance 0 dropped
+TestLifeCycle instance 42 dropped
+              </defn-code>
+             </defn-block>
+           </defn-outerBlock>
+         </details>
+       </div>
+       <bb-55>
+         <t-b>
+           If you look through the Rust documentation you will find other applications of 
+           RefCell&lt;T&gt; for building 
+           <a href="https://doc.rust-lang.org/book/ch15-05-interior-mutability.html">Mock Objects</a> for
+           testing and for initializing objects that have an immutable interface.
+         </t-b>
+       </bb-55>
+    <div style="height:5rem;"></div>
   </body>
 </html>
