@@ -39,25 +39,21 @@ fn main() {
 
     let _cosmetic = SpaceAtEnd;
 
-    /*-- create Box pointing to TLC on heap --*/
     print!("\n  -- create Box pointer to TLC on heap --");
     let sp = Box::new(TLC::new());
     show("sp", &sp);
     putline();
 
-    /*-- extract data from boxed TLC --*/
     print!("\n  -- access member of TLC using Box --");
     let v = sp.get_value();
     show("v ", &v);
     putline();
 
-    /*-- clone Boxed item --*/
     print!("\n  -- clone Box pointer to TLC on heap --");
     let mut spc = sp.clone();
     show("spc", &spc);
     putline();
 
-    /*-- mutate Boxed value --*/
     print!("\n  -- mutate TLC through Box --");
     spc.set_value(42);
     show("spc", &spc);
@@ -65,7 +61,6 @@ fn main() {
     show("sp", &sp);
     putline();
 
-    /*-- make mut reference to Box --*/
     print!("\n  -- create reference to Box pointer --");
     let rspc = &mut spc;
     rspc.set_value(21);
@@ -73,7 +68,6 @@ fn main() {
     show("spc", &spc);      // holds new value too
     putline();
 
-    /*-- move TLC from Box back to stack with deref --*/
     print!("\n  -- move contents of Box back to stack with deref --");
     let tlc = *sp;  // move
     show("tlc", &tlc);

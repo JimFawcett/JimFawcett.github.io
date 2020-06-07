@@ -140,25 +140,21 @@ fn main() {
 
     type TLC = test_type::TestLifeCycle;
 
-    /*-- create Box pointing to TLC on heap --*/
     print!("\n  -- create Box pointer to TLC on heap --");
     let sp = Box::new(TLC::new());
     show("sp", &amp;sp);
     putline();
 
-    /*-- extract data from boxed TLC --*/
     print!("\n  -- access member of TLC using Box --");
     let v = sp.get_value();
     show("v ", &amp;v);
     putline();
 
-    /*-- clone Boxed item --*/
     print!("\n  -- clone Box pointer to TLC on heap --");
     let mut spc = sp.clone();
     show("spc", &amp;spc);
     putline();
 
-    /*-- mutate Boxed value --*/
     print!("\n  -- mutate TLC through Box --");
     spc.set_value(42);
     show("spc", &amp;spc);
@@ -166,7 +162,6 @@ fn main() {
     show("sp", &amp;sp);
     putline();
 
-    /*-- make mut reference to Box --*/
     print!("\n  -- create reference to Box pointer --");
     let rspc = &amp;mut spc;
     rspc.set_value(21);
@@ -174,7 +169,6 @@ fn main() {
     show("spc", &amp;spc);      // holds new value too
     putline();
 
-    /*-- move TLC from Box back to stack with deref --*/
     print!("\n  -- move contents of Box back to stack with deref --");
     let tlc = *sp;  // move
     show("tlc", &amp;tlc);
@@ -226,6 +220,240 @@ TestLifeCycle instance 21 dropped
        </div>
     
        <h2><a id="rc"></a>Rc&lt;T&gt;</h2>
+       <bb-55>
+        <t-b>
+          std::rc::Rc&lt;T&gt; is a reference counted pointer to an initialized value on the stack.
+          Rc manages multiple references by dropping its inner value only when the last Rc pointer
+          is dropped, e.g., there are no dangling references.
+         </t-b>
+         <t-b>
+         </bb-55>
+         <div class="indent pad5">
+           <defn-block>
+             <defn-head>Rc - reference counted pointer</defn-head>
+             <defn-code>
+  let tlc = test_type::TestLifeCycle;
+  let mut rc1 = Rc::new(tlc)
+  /*------------------------------------------------*/
+    std::rc::Rc is a reference counted pointer.
+    - Rc::new(value) creates a pointer to value. 
+    - Rc::clone creates a new pointer to the same
+      source inner value, adding 1 to ref count.
+    - Rc::drop decrements the ref count, dropping
+      the inner value on zero.
+    - Note, it does no harm to drop a stack value
+      as long as there is no attempt to use after.
+  /*------------------------------------------------*/
+  let rc2 = rc1.clone();
+  let rc3 = Rc::clone(&rc2);
+  let opt = Rc::get_mut(&rc1);
+  where opt: Option&lt;Some(&mut tlc)&gt;
+  /*------------------------------------------------*/
+     get_mut returns an Option because the Rust
+     ownership rules allow only one active mutable
+     reference.
+     If there is already an active mutable reference
+     the option contains the enumeration value None.
+     Otherwise it contains Some(&mut inner_value).
+  /*------------------------------------------------*/
+             </defn-code>
+           </defn-block>
+         </div>
+       </t-b>
+       <bb-55>
+        <t-b>
+          Example code for Rc is shown below.  Note that most of the code complexity results from processing an Option, returned
+          by Rc::get_mut(&mut inner_value).  That&apos;s the way the cookie crumbles.
+        </t-b>
+        </bb-55>
+       <div>
+         <details>
+           <summary class="darkItem">Example: Rc&lt;T&gt;</summary>
+           <s-halfEm></s-halfEm>
+           <defn-outerBlock>
+             <defn-block>
+               <defn-head>show_rc::main.rs</defn-head>
+               <defn-code>
+/////////////////////////////////////////////////////////////
+// show_rc::main.rs - demo Rc&lt;T&gt; ref counted ptr           //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 06 Jun 2020  //
+/////////////////////////////////////////////////////////////
+
+use core::fmt::{ Debug };
+use std::rc::Rc;
+
+/*-- same as print!("\n  sp = {:?}", sp) --*/
+#[allow(clippy::print_literal)]
+fn show&lt;T:Debug&gt;(name:&amp;str, t:&amp;T) {
+    print!("\n  {} = {:?}", name, t);
+}
+
+struct SpaceAtEnd;
+impl Drop for SpaceAtEnd {
+    fn drop(&amp;mut self) {
+        print!("\n\n");
+    }
+}
+
+fn main() {
+
+    let putline = || print!("\n");
+    let _cosmetic = SpaceAtEnd;
+
+    print!("\n  -- create instance of TestLifeCycle in stack --");
+    let tlc = test_type::TestLifeCycle::new();
+    putline();
+
+    print!("\n  -- create Rc ptr to value in stack --");
+    let mut rc1 = Rc::new(tlc);
+    show("rc1", &amp;rc1);
+    show("Rc strong count", &amp;Rc::strong_count(&amp;rc1));
+    putline();
+
+    print!("\n  -- attempt to mutate inst through Rc ptr --");
+    let opt_mut_rc1 = Rc::get_mut(&amp;mut rc1);
+    match opt_mut_rc1 {
+        Some(val) =&gt; {
+            /*-- make mutable reference --*/
+            let mut_rc1 = &amp;mut *val;
+            mut_rc1.set_value(42);
+            show("rc1", &amp;rc1);
+        },
+        None =&gt; { 
+            print!(
+                "\n  can't have multiple mutable references"
+            );
+        }
+    }
+    putline();
+
+    print!("\n  -- create new Rc ptr to inst in stack --");
+    let mut rc2 = rc1.clone();
+    show("rc2", &amp;rc2);
+    show("Rc strong count", &amp;Rc::strong_count(&amp;rc2));
+    putline();
+
+    print!("\n  -- attempt to mutate inst through Rc ptr --");
+    let opt_mut_rc2 = Rc::get_mut(&amp;mut rc2);
+    match opt_mut_rc2 {
+        Some(val) =&gt; {
+            /*-- make mutable reference --*/
+            let mut_rc2 = &amp;mut *val;
+            mut_rc2.set_value(21);
+            show("rc2", &amp;rc2);
+        },
+        None =&gt; { 
+            print!(
+                "\n  can't have multiple mutable references"
+            );
+        }
+    }
+    putline();
+
+    /*-- alternate clone syntax --*/
+    print!("\n  -- create another new Rc ptr to inst in stack --");
+    let mut rc3 = Rc::clone(&amp;rc1); 
+    show("rc3", &amp;rc3);
+    show("Rc strong count", &amp;Rc::strong_count(&amp;rc1));
+    putline();
+
+    /*-- alternate matching syntax --*/
+    print!("\n  -- attempt to mutate inst through Rc ptr --");
+    let opt_mut_rc3 = Rc::get_mut(&amp;mut rc3);
+    if let Some(val) = opt_mut_rc3 {
+        /*-- make mutable reference --*/
+        let mut_rc3 = &amp;mut *val;
+        mut_rc3.set_value(21);
+        show("rc3", &amp;rc2);
+    }
+    else {
+        print!(
+            "\n  can't have multiple mutable references"
+        );
+    }
+    putline();
+
+    // print!("\n  dropping rc1");
+    // drop(rc1);
+    // print!("\n  dropping rc2");
+    // drop(rc2);
+    // print!("\n  dropping rc3");
+    // drop(rc3);
+    // putline();    
+
+    /*-------------------------------------------------------
+        Help with Option processing, used above: 
+        -----------------------------------------------------
+        The code below illustrates destructuring an option
+        with both if let and match constructs.
+        These will be discussed again in the Error Handling
+        Bite.
+    */
+    let maybe_cake = Some("this code is a piece of cake! :-)");
+    let not_cake = std::option::Option::&lt;&amp;str&gt;::None;
+    if let Some(cake) = maybe_cake {    // cake is a defined identifier
+        print!("\n  {}", cake);         // due to if let destructuring
+    }
+    
+    let maybe_cake: Option&lt;&amp;str&gt; = not_cake;
+    match maybe_cake {
+        Some(cake) =&gt; print!("\n  {}", cake),
+                                        // now, cake is defined by
+                                        // match destructuring
+        None =&gt; print!("\n  this code is not a piece of cake!! :-(")
+    }
+
+    println!("\n\n  That's all Folks!");
+}
+                                </defn-code>
+             </defn-block>
+             <defn-block>
+               <defn-head>Output:</defn-head>
+               <defn-code>
+cargo run -q
+
+-- create instance of TestLifeCycle in stack --
+creating instance 0 of TestLifeCycle
+
+-- create Rc ptr to value in stack --
+rc1 = TestLifeCycle { count: 0 }
+Rc strong count = 1
+
+-- attempt to mutate inst through Rc ptr --
+rc1 = TestLifeCycle { count: 42 }
+
+-- create new Rc ptr to inst in stack --
+rc2 = TestLifeCycle { count: 42 }
+Rc strong count = 2
+
+-- attempt to mutate inst through Rc ptr --
+can't have multiple mutable references
+
+-- create another new Rc ptr to inst in stack --
+rc3 = TestLifeCycle { count: 42 }
+Rc strong count = 3
+
+-- attempt to mutate inst through Rc ptr --
+can't have multiple mutable references
+
+this code is a piece of cake! :-)
+this code is not a piece of cake!! :-(
+
+That's all Folks!
+
+TestLifeCycle instance 42 dropped
+               </defn-code>
+             </defn-block>
+           </defn-outerBlock>
+         </details>
+         <bb-55>
+           <t-b>
+             Rc is used most often with <a href="RustBites_Intmut.html">Interior Mutability</a>.  You will see
+             its use in examples for that Bite. 
+           </t-b>
+         </bb-55>
+       </div>
        <h2><a id="arc"></a>Arc&lt;T&gt;</h2>
        <h2><a id="refcell"></a>RefCell&lt;T&gt;</h2>
        <h2><a id="ref"></a>Ref&lt;T&gt;</h2>
