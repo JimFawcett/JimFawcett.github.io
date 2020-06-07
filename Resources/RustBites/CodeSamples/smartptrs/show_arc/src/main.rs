@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////
-// show_rc::main.rs - demo Rc<T> ref counted ptr           //
+// show_arc::main.rs - demo Arc<T> ref counted ptr         //
 //                                                         //
 // Jim Fawcett, https://JimFawcett.github.io, 06 Jun 2020  //
 /////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@
    where opt: Option<Some(&mut tlc)>
 */
 use core::fmt::{ Debug };
-use std::rc::Rc;
+use std::sync::Arc;
 
 /*-- same as print!("\n  sp = {:?}", sp) --*/
 #[allow(clippy::print_literal)]
@@ -47,21 +47,21 @@ fn main() {
     let tlc = test_type::TestLifeCycle::new();
     putline();
 
-    print!("\n  -- create Rc ptr to value in stack --");
-    let mut rc1 = Rc::new(tlc);
-    show("rc1", &rc1);
-    show("Rc strong count", &Rc::strong_count(&rc1));
-    show("rc1 inner value", &rc1.get_value());
+    print!("\n  -- create Arc ptr to value in stack --");
+    let mut arc1 = Arc::new(tlc);
+    show("arc1", &arc1);
+    show("Arc strong count", &Arc::strong_count(&arc1));
+    show("arc1 inner value", &arc1.get_value());
     putline();
 
-    print!("\n  -- attempt to mutate inst through Rc ptr --");
-    let opt_mut_rc1 = Rc::get_mut(&mut rc1);
-    match opt_mut_rc1 {
+    print!("\n  -- attempt to mutate inst through Arc ptr --");
+    let opt_mut_arc1 = Arc::get_mut(&mut arc1);
+    match opt_mut_arc1 {
         Some(val) => {
             /*-- make mutable reference --*/
-            let mut_rc1 = &mut *val;
-            mut_rc1.set_value(42);
-            show("rc1", &rc1);
+            let mut_arc1 = &mut *val;
+            mut_arc1.set_value(42);
+            show("arc1", &arc1);
         },
         None => { 
             print!(
@@ -71,20 +71,20 @@ fn main() {
     }
     putline();
 
-    print!("\n  -- create new Rc ptr to inst in stack --");
-    let mut rc2 = rc1.clone();
-    show("rc2", &rc2);
-    show("Rc strong count", &Rc::strong_count(&rc2));
+    print!("\n  -- create new Arc ptr to inst in stack --");
+    let mut arc2 = arc1.clone();
+    show("arc2", &arc2);
+    show("Arc strong count", &Arc::strong_count(&arc2));
     putline();
 
-    print!("\n  -- attempt to mutate inst through Rc ptr --");
-    let opt_mut_rc2 = Rc::get_mut(&mut rc2);
-    match opt_mut_rc2 {
+    print!("\n  -- attempt to mutate inst through Arc ptr --");
+    let opt_mut_arc2 = Arc::get_mut(&mut arc2);
+    match opt_mut_arc2 {
         Some(val) => {
             /*-- make mutable reference --*/
-            let mut_rc2 = &mut *val;
-            mut_rc2.set_value(21);
-            show("rc2", &rc2);
+            let mut_arc2 = &mut *val;
+            mut_arc2.set_value(21);
+            show("arc2", &arc2);
         },
         None => { 
             print!(
@@ -95,20 +95,20 @@ fn main() {
     putline();
 
     /*-- alternate clone syntax --*/
-    print!("\n  -- create another new Rc ptr to inst in stack --");
-    let mut rc3 = Rc::clone(&rc1); 
-    show("rc3", &rc3);
-    show("Rc strong count", &Rc::strong_count(&rc1));
+    print!("\n  -- create another new Arc ptr to inst in stack --");
+    let mut arc3 = Arc::clone(&arc1); 
+    show("arc3", &arc3);
+    show("Arc strong count", &Arc::strong_count(&arc1));
     putline();
 
     /*-- alternate matching syntax --*/
-    print!("\n  -- attempt to mutate inst through Rc ptr --");
-    let opt_mut_rc3 = Rc::get_mut(&mut rc3);
-    if let Some(val) = opt_mut_rc3 {
+    print!("\n  -- attempt to mutate inst through Arc ptr --");
+    let opt_mut_arc3 = Arc::get_mut(&mut arc3);
+    if let Some(val) = opt_mut_arc3 {
         /*-- make mutable reference --*/
-        let mut_rc3 = &mut *val;
-        mut_rc3.set_value(21);
-        show("rc3", &rc2);
+        let mut_arc3 = &mut *val;
+        mut_arc3.set_value(21);
+        show("arc3", &arc2);
     }
     else {
         print!(
@@ -124,28 +124,6 @@ fn main() {
     // print!("\n  dropping rc3");
     // drop(rc3);
     // putline();    
-
-    /*-------------------------------------------------------
-       Help with Option processing, used above: 
-       -----------------------------------------------------
-       The code below illustrates destructuring an option
-       with both if let and match constructs.
-       These will be discussed again in the Error Handling
-       Bite.
-    */
-    let maybe_cake = Some("this code is a piece of cake! :-)");
-    let not_cake = std::option::Option::<&str>::None;
-    if let Some(cake) = maybe_cake {    // cake is a defined identifier
-        print!("\n  {}", cake);         // due to if let destructuring
-    }
-    
-    let maybe_cake: Option<&str> = not_cake;
-    match maybe_cake {
-        Some(cake) => print!("\n  {}", cake),
-                                        // now, cake is defined by
-                                        // match destructuring
-        None => print!("\n  this code is not a piece of cake!! :-(")
-    }
 
     println!("\n\n  That's all Folks!");
 }

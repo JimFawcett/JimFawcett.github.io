@@ -96,7 +96,7 @@
            <defn-code>
 let sp = Box::new(T::new());
 /*--------------------------------------------*/
-    sp has the interface of both Box and T
+    Box automatically derefernces to a T
     so you can call T methods on sp
 /*--------------------------------------------*/
 let vl = sp.getter();    // T method
@@ -239,6 +239,8 @@ TestLifeCycle instance 21 dropped
     - Rc::new(value) creates a pointer to value. 
     - Rc::clone creates a new pointer to the same
       source inner value, adding 1 to ref count.
+    - Rc automatically dereferences to a T, so you
+      can call T methods on an Rc&lt;T&gt;.
     - Rc::drop decrements the ref count, dropping
       the inner value on zero.
     - Note, it does no harm to drop a stack value
@@ -309,6 +311,7 @@ fn main() {
     let mut rc1 = Rc::new(tlc);
     show("rc1", &amp;rc1);
     show("Rc strong count", &amp;Rc::strong_count(&amp;rc1));
+    show("rc1 inner value", &rc1.get_value());
     putline();
 
     print!("\n  -- attempt to mutate inst through Rc ptr --");
@@ -419,6 +422,7 @@ creating instance 0 of TestLifeCycle
 -- create Rc ptr to value in stack --
 rc1 = TestLifeCycle { count: 0 }
 Rc strong count = 1
+rc1 inner value = 0
 
 -- attempt to mutate inst through Rc ptr --
 rc1 = TestLifeCycle { count: 42 }
@@ -455,6 +459,213 @@ TestLifeCycle instance 42 dropped
          </bb-55>
        </div>
        <h2><a id="arc"></a>Arc&lt;T&gt;</h2>
+       <bb-55>
+        <t-b>
+          std::sync::Arc&lt;T&gt; is a thread-safe reference counted pointer to an initialized value on the stack.
+          Arc manages multiple references by dropping its inner value only when the last Rc pointer
+          is dropped, e.g., there are no dangling references. Arc is a thread-safe version of Rc.
+         </t-b>
+         <t-b>
+         </bb-55>
+         <div class="indent pad5">
+           <defn-block>
+             <defn-head>Arc - atomic reference counted pointer</defn-head>
+             <defn-code>
+let tlc = test_type::TestLifeCycle;
+let mut arc1 = Arc::new(tlc)
+/*------------------------------------------------*/
+  std::sync::Arc is a thread-safe reference counted 
+  pointer, very like Rc, but using atomic ref count.
+  - Arc::new(value) creates a pointer to value. 
+  - Arc::clone creates a new pointer to the same
+    source inner value, adding 1 to ref count.
+  - Arc::drop decrements the ref count, dropping
+    the inner value on zero.
+  - Note, it does no harm to drop a stack value
+    as long as there is no attempt to use after.
+  - 
+/*------------------------------------------------*/
+let arc2 = arc1.clone();
+let arc3 = Arc::clone(&amp;arc2);
+let opt = Arc::get_mut(&amp;arc1);
+where opt: Option&lt;Some(&amp;mut tlc)&gt;
+          </defn-code>
+           </defn-block>
+         </div>
+       </t-b>
+       <bb-55>
+        <t-b>
+          Example code for Arc is shown below.  Note that most of the code complexity results from processing an Option, returned
+          by Arc::get_mut(&mut inner_value).  That&apos;s still the way cookies crumble.
+        </t-b>
+        </bb-55>
+       <div>
+         <details>
+           <summary class="darkItem">Example: Arc&lt;T&gt;</summary>
+           <s-halfEm></s-halfEm>
+           <defn-outerBlock>
+             <defn-block>
+               <defn-head>show_arc::main.rs</defn-head>
+               <defn-code>
+/////////////////////////////////////////////////////////////
+// show_arc::main.rs - demo Arc&lt;T&gt; ref counted ptr         //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 06 Jun 2020  //
+/////////////////////////////////////////////////////////////
+
+use core::fmt::{ Debug };
+use std::sync::Arc;
+
+/*-- same as print!("\n  sp = {:?}", sp) --*/
+#[allow(clippy::print_literal)]
+fn show&lt;T:Debug&gt;(name:&amp;str, t:&amp;T) {
+    print!("\n  {} = {:?}", name, t);
+}
+
+struct SpaceAtEnd;
+impl Drop for SpaceAtEnd {
+    fn drop(&amp;mut self) {
+        print!("\n\n");
+    }
+}
+
+fn main() {
+
+    let putline = || print!("\n");
+    let _cosmetic = SpaceAtEnd;
+
+    print!("\n  -- create instance of TestLifeCycle in stack --");
+    let tlc = test_type::TestLifeCycle::new();
+    putline();
+
+    print!("\n  -- create Arc ptr to value in stack --");
+    let mut arc1 = Arc::new(tlc);
+    show("arc1", &amp;arc1);
+    show("Arc strong count", &amp;Arc::strong_count(&amp;arc1));
+    show("arc1 inner value", &amp;arc1.get_value());
+    putline();
+
+    print!("\n  -- attempt to mutate inst through Arc ptr --");
+    let opt_mut_arc1 = Arc::get_mut(&amp;mut arc1);
+    match opt_mut_arc1 {
+        Some(val) =&gt; {
+            /*-- make mutable reference --*/
+            let mut_arc1 = &amp;mut *val;
+            mut_arc1.set_value(42);
+            show("arc1", &amp;arc1);
+        },
+        None =&gt; { 
+            print!(
+                "\n  can't have multiple mutable references"
+            );
+        }
+    }
+    putline();
+
+    print!("\n  -- create new Arc ptr to inst in stack --");
+    let mut arc2 = arc1.clone();
+    show("arc2", &amp;arc2);
+    show("Arc strong count", &amp;Arc::strong_count(&amp;arc2));
+    putline();
+
+    print!("\n  -- attempt to mutate inst through Arc ptr --");
+    let opt_mut_arc2 = Arc::get_mut(&amp;mut arc2);
+    match opt_mut_arc2 {
+        Some(val) =&gt; {
+            /*-- make mutable reference --*/
+            let mut_arc2 = &amp;mut *val;
+            mut_arc2.set_value(21);
+            show("arc2", &amp;arc2);
+        },
+        None =&gt; { 
+            print!(
+                "\n  can't have multiple mutable references"
+            );
+        }
+    }
+    putline();
+
+    /*-- alternate clone syntax --*/
+    print!("\n  -- create another new Arc ptr to inst in stack --");
+    let mut arc3 = Arc::clone(&amp;arc1); 
+    show("arc3", &amp;arc3);
+    show("Arc strong count", &amp;Arc::strong_count(&amp;arc1));
+    putline();
+
+    /*-- alternate matching syntax --*/
+    print!("\n  -- attempt to mutate inst through Arc ptr --");
+    let opt_mut_arc3 = Arc::get_mut(&amp;mut arc3);
+    if let Some(val) = opt_mut_arc3 {
+        /*-- make mutable reference --*/
+        let mut_arc3 = &amp;mut *val;
+        mut_arc3.set_value(21);
+        show("arc3", &amp;arc2);
+    }
+    else {
+        print!(
+            "\n  can't have multiple mutable references"
+        );
+    }
+    putline();
+
+    // print!("\n  dropping rc1");
+    // drop(rc1);
+    // print!("\n  dropping rc2");
+    // drop(rc2);
+    // print!("\n  dropping rc3");
+    // drop(rc3);
+    // putline();    
+
+    println!("\n\n  That's all Folks!");
+}
+                </defn-code>
+             </defn-block>
+             <defn-block>
+               <defn-head>Output:</defn-head>
+               <defn-code>
+cargo run -q
+
+-- create instance of TestLifeCycle in stack --
+creating instance 0 of TestLifeCycle
+
+-- create Arc ptr to value in stack --
+arc1 = TestLifeCycle { count: 0 }
+Arc strong count = 1
+arc1 inner value = 0
+
+-- attempt to mutate inst through Arc ptr --
+arc1 = TestLifeCycle { count: 42 }
+
+-- create new Arc ptr to inst in stack --
+arc2 = TestLifeCycle { count: 42 }
+Arc strong count = 2
+
+-- attempt to mutate inst through Arc ptr --
+can't have multiple mutable references
+
+-- create another new Arc ptr to inst in stack --        
+arc3 = TestLifeCycle { count: 42 }
+Arc strong count = 3
+
+-- attempt to mutate inst through Arc ptr --
+can't have multiple mutable references
+
+
+That's all Folks!
+
+TestLifeCycle instance 42 dropped
+             </defn-code>
+             </defn-block>
+           </defn-outerBlock>
+         </details>
+         <bb-55>
+           <t-b>
+             Rc is used most often with <a href="RustBites_Intmut.html">Interior Mutability</a>.  You will see
+             its use in examples for that Bite. 
+           </t-b>
+         </bb-55>
+       </div>
+
        <h2><a id="refcell"></a>RefCell&lt;T&gt;</h2>
        <h2><a id="ref"></a>Ref&lt;T&gt;</h2>
        <h2><a id="refmut"></a>RefMut&lt;T&gt;</h2>
