@@ -33,6 +33,7 @@
         <a href="RustBites_LifeCycle.html">LifeCycle</a><br />
         <a href="RustBites_UDB.html">UndefBhvr</a><br />
         <a href="RustBites_Ownrs.html">Ownershp</a><br />
+        <a href="RustBites_SmrtPtrs.html">SmartPtrs</a><br />
         <a href="RustBites_Intmut.html">InterMutat</a><br />
         <a href="RustBites_Functs.html">Functions</a><br />
         <a href="RustBites_ErrHnd.html">ErrHand</a><br />
@@ -82,13 +83,15 @@
       <h1>Rust Bite - Ownership</h1>
       <hr />
       <t-b>
-        Rust ownership policy is descrived by a set of rules that apply to read and write operations on data.  These
-        rules are responsible for almost all of Rust's memory safety.  
+        Rust ownership policy is a set of rules that apply to read, write, allocation, and disposal operations on data.  
+        These rules, with occasional help from <a href="RustBites_Intmut.html">Interior Mutablity</a> are responsible 
+        Rust's memory safety.  
       </t-b>
       <t-b>
-        <a href="RustBites_Intmut.html">Interior Mutability</a> shares the responsibility for situations
+        Interior Mutability shares responsibility for situations
         where the compiler&apos;s static analysis is insufficient to prove that some code is indeed 
-        correct, especially for threading applications.
+        correct, especially for threading applications.  We will look at that in a subsequent Bite.
+        Now we focus on the results of static analysis by Rust&apos;s compilation tools.
       </t-b>
       <h2>Ownership Rules:</h2>
       <t-b>
@@ -96,6 +99,8 @@
         <under-construction style="padding:0.05em 1em; margin:1em 0em;">
           <ul class="tight">
             <li>There is only one owner for every data item</li>
+            <li>Ownership can be transferred with move operations</li>
+            <li>Ownership can be borrowed by creating references</li>
             <li>Any number of readers may have access to a data value simultaneously</li>
             <li>Writers get exclusive access to a value - no other readers or writers</li>
           </ul>
@@ -140,9 +145,6 @@
                 the owner&apos;s ability to mutate.
               </li>
               <li>
-                Even if the owner is immutable, 
-              </li>
-              <li>
                 References are active from the time they are created (with a let statement)
                 until they go out of scope.
               </li>
@@ -152,35 +154,37 @@
       </t-b>
       <t-b style="margin-bottom:0px;">
         In the dropdown, below, you will find examples of all these rules in action, with violations
-        in comment blocks.  We will discuss the uncommented code in this example.
-        <div class="indent pad5">
-          <ol class="tight">
-            <li>
-              In the first block in main we see two active readers - O.K.
-            </li>
-            <li>
-              In the second block we see one writer - O.K.
-            </li>
-            <li>
-              In the last block, before the function call, we see the reference v borrowing u&apos;s 
-              ability to mutate, so there is only one writer - O.k.
-            </li>
-            <li>
-              In the function we see a reference to u mutating.  This is not a violation because the 
-              reference, &mut String, goes out of scope at the end of the function.
-            </li>
-            <li>
-              The commented blocks will be discussed in the next examples.
-            </li>
-          </ul>
-        </div>
+        in comment blocks.  We will discuss the valid code in this example.
       </t-b>
+      <s-1em></s-1em>
     </bb-55>
       <t-b class="top">
         <details>
           <summary class="darkItem">Examples of Ownership&nbsp;&nbsp;</summary>
-          <s-halfEm></s-halfEm>
-          <defn-outerBlock>
+          <bb-55>
+            <div class="indent pad5">
+              <ol class="tight">
+                <li>
+                  In the first block, Blk #1, in main we see two active readers - O.K.
+                </li>
+                <li>
+                  In the second block, Blk #2, we see one writer - O.K.
+                </li>
+                <li>
+                  In the last uncommented block, before the function call, Blk #3, we see reference v borrowing u&apos;s 
+                  ability to mutate, so there is only one writer - O.K.
+                </li>
+                <li>
+                  In the function we see a reference to u mutating.  This is not a violation because the 
+                  reference, &mut String, goes out of scope at the end of the function.
+                </li>
+                <li>
+                  The commented blocks will be discussed in the next examples.
+                </li>
+              </ol>
+            </div>
+            </bb-55>
+            <defn-outerBlock>
             <defn-block>
               <defn-head>ownership::main.rs</defn-head>
               <defn-code>
@@ -192,12 +196,14 @@ fn mutate_and_show(t:&amp;mut String) {
 }
 
 fn main() {
+    // Blk #1
     /*-- multiple readers: O.K. --*/
     let s = String::from("immutable string");
     let t = &amp;s;
     print!("\n  s = {:?}", s);
     print!("\n  t = {:?}", t);
 
+    // Blk #2
     /*-- one writer: O.K. --*/
     let mut u = String::from("mutable string");
     u.push_str(" u");
@@ -211,6 +217,7 @@ fn main() {
     // u.push_str("modfied by u");
     // print!("\n  v = {:?}", v);
     
+    // Blk #3
     /*-- mutable v borrows u's ability to write, O.K. --*/
     let v = &amp;mut u;
     v.push_str(" referenced by v");
