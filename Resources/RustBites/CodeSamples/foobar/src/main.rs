@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::cell::RefCell;
 //use std::rc::Rc;
 use std::fmt::Debug;
@@ -48,7 +50,29 @@ fn exercise_a() {
     terminus(intermediate(creator("trace: ")));
     println!();
 }
+///////////////////////////////////////////////////////
+// Exercise #2 - shared string
 // ////////////////////////////////////////////////////
+type Shared = std::rc::Rc<std::cell::RefCell<String>>;
+
+fn modifier(r:&Shared, id:&str) {
+    let mut s = r.borrow_mut();
+    s.push_str(id);
+}
+fn exer2() {
+    //use std::cell::RefCell;
+    use std::rc::Rc;
+    let shared = Rc::new(RefCell::new(String::new()));
+    let shr1 = Rc::clone(&shared);
+    let shr2 = Rc::clone(&shared);
+    for _i in 0..4 {
+        modifier(&shr1, "shr1");
+        modifier(&shr2, "shr2");
+    }
+    let s: String = shared.borrow().to_string();
+    print!("\n  shared string = {:?}", &s);
+}
+
 // // Exercise b
     
 // struct Node  { name:&'static str, children:Vec<Rc<Node>> }
@@ -164,9 +188,10 @@ fn exercise_2() {
 
 fn main() {
 
-    exercise_a();
-    exercise_1();
-    exercise_2();
+    exer2();
+    // exercise_a();
+    // exercise_1();
+    // exercise_2();
 
 
     println!("\n\n  That's all Folks!\n\n");
