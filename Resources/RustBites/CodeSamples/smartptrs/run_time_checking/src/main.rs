@@ -26,9 +26,11 @@ fn test_checker1(p: bool) {
     let mut mrs: &mut String = &mut "mrs".to_string();
     if p {
         rs = &s;
+        print!("\n  rs = {:?}", rs);
     }
     else {
         mrs = &mut s;
+        print!("\n  mrs = {:?}", mrs);
     }
     print!("\n  mrs = {:?}", mrs);
     print!("\n  rs = {:?}", rs);
@@ -109,8 +111,8 @@ fn test_checker3(p1: bool, p2: bool, p3:bool) {
 
 fn main() {
 
-    // test_checker1(true);             // succeeds
-    // test_checker1(false);            // succeeds
+    test_checker1(true);             // succeeds
+    test_checker1(false);            // succeeds
     test_checker3(true, true, false);   // succeeds
     test_checker3(true, true, true);    // panics
 

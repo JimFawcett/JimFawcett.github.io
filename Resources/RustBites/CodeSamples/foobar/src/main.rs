@@ -1,5 +1,5 @@
 use std::cell::RefCell;
-use std::rc::Rc;
+//use std::rc::Rc;
 use std::fmt::Debug;
 use std::any::type_name;
 use std::time::*;
@@ -48,16 +48,16 @@ fn exercise_a() {
     terminus(intermediate(creator("trace: ")));
     println!();
 }
-////////////////////////////////////////////////////
-// Exercise b
+// ////////////////////////////////////////////////////
+// // Exercise b
     
-struct Node  { name:&'static str, children:Vec<Rc<Node>> }
+// struct Node  { name:&'static str, children:Vec<Rc<Node>> }
 
-fn exercise_b() {
-  let n1 = Node { name:"n1", children:Vec::new() };
-  let n2 = Node { name:"n2", children:Vec::new(Rc::new(n1)) };
-}
-fn exercise_2() {
+// fn exercise_b() {
+//   let n1 = Node { name:"n1", children:Vec::new() };
+//   let n2 = Node { name:"n2", children:Vec::new(Rc::new(n1)) };
+// }
+fn exercise_1() {
 
     print!("\n  -- exercise #1 --");
 
@@ -79,7 +79,7 @@ fn exercise_2() {
 // This is an exploration of creating and managing arrays.
 // Almost always you should prefer to use std::Vec.
 
-fn exercise_3() {
+fn exercise_2() {
 
     print!("\n  -- exercise #2 --");
     /*-- create static array in stack and swap --*/
