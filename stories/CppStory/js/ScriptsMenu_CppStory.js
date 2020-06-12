@@ -101,18 +101,17 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Stories &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;Ordered&nbsp;Content</div>\
-        <a href='../../Stories.html'>What is a Story?</a>\
-        <a href='../../StoryTeller.html'>Load Story List</a>\
-        <a class='disable' href='#'>C++ Ecosystem</a>\
-        <a class='disable' href='#'>Site Story</a>\
-        <a class='disable' href='#'>Repository&nbsp;Content</a>\
-        <a class='disable' href='#'>Using&nbsp;Visual&nbsp;Studio</a>\
-        <a class='disable' href='#'>Using&nbsp;VS&nbsp;Code</a>\
-        <a class='disable' href='#'>Building&nbsp;Repository&nbsp;Code&nbsp;</a>\
-        <a class='disable' href='#'>Design Examples</a>\
-        <a class='disable' href='#'>Building Complex Systems</a>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Ordered&nbsp;Content</div>\
+        <a href='Stories.html'>What is a Story?</a>\
+        <a href='CppStory_Prologue.html'>C++ Story</a>\
+        <a href='RustBiteByByte.html'>Rust&nbsp;bite&nbsp;by&nbsp;byte&nbsp;</a>\
+        <a href='RustStory_Prologue.html'>Rust Story</a>\
+        <a href='RustStory_CodeIndex.html'>Rust Code Index</a>\
+        <a href='StoryTeller_LocalStorage.html'>Load Story List</a>\
+        <a href='StoryTellerDesign.html'>StoryTeller Design</a>\
+        <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div >\
     </div>\
     <div class='dropdown menuItem'>\
