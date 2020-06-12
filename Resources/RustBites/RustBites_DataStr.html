@@ -8,6 +8,29 @@
     <title>RustBites DataStr</title>
     <link rel="stylesheet" href="css/BiteStyles.css" />
     <script src="js/BiteScripts.js"></script>
+    <style>
+      #github table, td, th { 
+        border:1px solid #333; 
+        border-collapse: collapse;
+      }
+      #github table {
+        margin-top: 0.5em;
+        margin-bottom: 0.75em;
+      }
+      #github th { /* darkItem */
+           background-color: #363636;
+           color: #fef9ee;
+           padding: 3px 10px;
+           border: 1px solid #fef9ee;
+      }
+      #github td { /* lightItem */
+        background-color: #fef9ee;
+        color: #5c2107;
+        padding: 3px 10px;
+        border: 1px solid #5c2107;
+        white-space: nowrap;
+      }
+    </style>
   </head>
   <body id="github" onload="initBites()">
     <div class="top-banner">
@@ -85,38 +108,597 @@
         <h1>Rust Bite - std Data Structures</h1>
         <hr />
         <t-b>
-  
+          This Bite presents primitive data types and data structures from the Rust std libraries.
+          It provides a reference and brief examples, pulling in information from
+          several libraries into one top-level view.
+        </t-b>
+        <t-b>
+          <under-construction>
+            under construction
+          </under-construction>
         </t-b>
         <div>
           <ol class="tight">
             <li>
-              <h2><a id="array"></a>array</h2>
-              <t-b>
-                
-              </t-b>
+              <h2><a id="prologue"></a>Primitives and Aggregates</h2>
+              <ul class="tight">
+                <li>
+                  Scalar primitives are all Copy types:
+                  <table>
+                    <tr>
+                      <th>Type</th><th>Example</th>
+                    </tr>
+                    <tr>
+                      <td>bool, char</td><td>let b:bool = true;</td>
+                    </tr>
+                    <tr>
+                      <td>i8, i16, i32, i64, isize</td><td>let i:i8 = -42;</td>
+                    </tr>
+                    <tr>
+                      <td>u8, u16, u32, u64, usize</td><td>let u:u8 = 42;</td>
+                    </tr>
+                    <tr>
+                      <td>f32, f64</td><td>let f:f64 = 3.1415927;</td>
+                    </tr>
+                  </table>
+                </li>
+                <li>
+                  Aggregate primitives are all Copy types if and only if their elements are Copy:
+                  <table>
+                    <tr>
+                      <th>Type</th><th>Example</th>
+                    </tr>
+                    <tr>
+                      <td>
+                        array: [T;N], 
+                        contiguous sequence of T
+                      </td>
+                      <td>
+                        let a:[i32;4] = [1, 2, 3, 4];
+                        &nbsp;&nbsp;assert_eq!(a[1], 2);<br />
+                        a[1] = -2;
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        slice:
+                        dynamically sized view into contiguous sequence [T]
+                      </td>
+                      <td>let s = &a[1..3]; => [2, 3]</td>
+                    </tr>
+                    <tr>
+                      <td>str: string slice</td><td>let s = "an str";</td>
+                    </tr>
+                  </table>
+                </li>
+                <li>
+                  tuples and structs are Copy if and only if they hold no Move types:
+                  <table>
+                    <tr>
+                      <th>Type</th><th>Example</th>
+                    </tr>
+                    <tr>
+                      <td>tuple: finite heterogeneous sequence (T,U,...)</td>
+                      <td>
+                        let t:(u16, String, f64) = (42, String::from("42"), 3.1415927);
+                        &nbsp;&nbsp;assert_eq!(t.0, 42);
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>struct: named fields</td>
+                      <td>
+                        struct S { a:i8, b:String, c:f64 }<br />
+                        let s = S { a:42, b:String::from("String"), c:3.1415927 };
+                        &nbsp;&nbsp;assert_eq!(s.a, 42);
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>struct: tuple</td>
+                      <td>
+                        struct T(i8, String, f64)<br />
+                        let t:T = (42, String::from("a string"), 3.1415927);
+                        &nbsp;&nbsp;assert_eq!(t.0, 42);
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>struct: unit</td>
+                      <td>
+                        let s = struct S;
+                        &nbsp;&nbsp;s.what().more();
+                        &nbsp;&nbsp;units have no data members, only methods.
+                      </td>
+                    </tr>
+                  </table>
+                </li>
+              </ul>
             </li>
             <li>
-              <h2><a id="tuple"></a>tuple</h2>
+              <h2>Iterators:</h2>
               <t-b>
-                
+                The contiguous data structures, slice, array, and Vec, provide iter()
+                member functions that iterate through the structure, e.g.:
+                <div class="indent pad5">
+                  <c-s>
+                    let iter = [1, 2, 3, 4].iter();<br />
+                    for item in iter {
+                      /* do something with item */
+                    }
+                  </c-s>
+                </div>
+                <div class="indent pad5">
+                  <c-s>
+                    let iter = vec![1, 2, 3, 4, 5].iter();<br />
+                    for item in iter {
+                      /* do something with item */
+                    }
+                  </c-s>
+                </div>
               </t-b>
-            </li>
-            <li>
-              <h2><a id="struct"></a>struct</h2>
               <t-b>
-                
+                Strings have the member function chars() that returns an iterator over
+                its UTF-8 characters:
+                <div class="indent pad5">
+                  <c-s>
+                    let iter = String::from("a string").chars();<br />
+                    for ch in iter {
+                      /* do something with character */
+                    }
+                  </c-s>
+                </div>
+              </t-b>
+              <t-b>
+                Maps have the member function iter() that returns an iterator over
+                its key-value pairs:
+                <div class="indent pad5">
+                  <c-s>
+                    let mut m = std::collections::HashMap::<u8, String>::new();<br />
+                      m.insert(0, String::from("zero"));<br />
+                      m.insert(1, String::from("one"));<br />
+                        ..<br />
+                      let iter = m.iter();<br />
+                      for item in iter { /* do something with item */ }
+                  </c-s>
+                </div>
+              </t-b>
+              <t-b>
+                Iterators have an associated type, Item, and a number of member functions:
+                <table>
+                  <tr>
+                    <th>member function</th><th>operation</th>
+                  </tr>
+                  <tr>
+                    <td>next(&mut self) -> Option&lt;Self::Item&gt;</td>
+                    <td>Return next element in collection</td>
+                  </tr>
+                  <tr>
+                    <td>count(self) -> usize</td>
+                    <td>Consumes iterator, returning number of iterations</td>
+                  </tr>
+                  <tr>
+                    <td>last(self) -> Option&lt;Self::Item&gt;</td>
+                    <td>Consumes iterator, returning last item</td>
+                  </tr>
+                  <tr>
+                    <td>nth(&mut self, n: usize) -> Option&lt;Self::Item&gt;</td>
+                    <td>Consumes all preceding elements and nth which it returns</td>
+                  </tr>
+                  <tr>
+                    <td>step-by(self, step: usize) ->StepBy&lt;Self&gt;</td>
+                    <td>
+                      Creates new iterator starting at same point, but
+                      stepping by given amount at each iteration.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>map&lt;B, F&gt;(self, f: F) -> Map&lt;Self, F&gt;</td>
+                    <td>
+                      Takes a closure and creates an iterator that calls the closure
+                      on each element
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="no-wrap">
+                      filter&lt;P&gt;(self, predicate: P) - > Filter&lt;Self, P&gt;<br />
+                      where P: FnMut(&Self::Item) -> bool
+                    </td>
+                    <td>
+                      Creates an iterator which takes a closure to decide if element
+                      should be included in result
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>skip(self, n: usize) -> Skip&lt;Self&gt;</td>
+                    <td>Creates an iterator that skips the first n elements</td>
+                  </tr>
+                  <tr>
+                    <td>take(self, n:usize) -> Take&lt;Self&gt;</td>
+                    <td>Creates an iterator that returns first n elements</td>
+                  </tr>
+                  <tr>
+                    <td>by_ref(&mut self) -> &mut Self</td>
+                    <td>
+                      Supports using these adapters while retaining ownership
+                      of the original iterator
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>collect&lt;B&gt;(self) -> B</td>
+                    <td>Transforms iterator into collection</td>
+                  </tr>
+                  <tr>
+                    <td>More adapter functions ...</td>
+                    <td><a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">std::iter::Iterator</a></td>
+                  </tr>
+                </table>
+              </t-b>
+              <t-b>
+                <div>
+                  <details>
+                    <summary class="darkItem">Examples: show_coll, show_fold</summary>
+                    <s-halfEm></s-halfEm>
+                    <defn-outerBlock>
+                      <defn-block>
+                        <defn-head>show_coll</defn-head>
+                        <defn-code>
+/*-------------------------------------------------------
+  Display comma separated list of collection items
+  - shows how to build function accepting iterable 
+    collections
+  - returns Option::None if collection is empty
+*/
+fn show_coll&lt;C&gt;(c:&amp;C) -&gt; Option&lt;()&gt; 
+  where C:IntoIterator + Clone + Debug, C::Item: Debug {
+
+    let mut iter = c.clone().into_iter();
+    /*-------------------------------------------
+      returns Option if no next element using 
+      ? try operator
+    */
+    print!("\n  {:?}", iter.next()?);
+    /*-- breaks when no next element --*/
+    for item in iter {
+        print!(", {:?}", &amp;item);
+    }
+    Some(())
+}
+                        </defn-code>
+                      </defn-block>
+                      <defn-block>
+                        <defn-head>show_fold</defn-head>
+                        <defn-code>
+/*-------------------------------------------------
+  Show slice as stack of rows with span elements
+  in row
+  - nice illustration of Iterator methods
+*/
+fn show_fold&lt;T:Debug&gt;(
+       t:&amp;[T], span:usize, width:usize
+   ) {
+    let iter = t.iter();
+    print!("\n  ");
+    let mut count = 0;
+    for bt in iter {
+        count = count + 1;
+        print!("{:wd$?}", bt, wd = width);
+        if count == span {
+            print!("\n  ");
+            count = 0;
+        }
+    }
+    //---------------------------------------------
+    // alternate implementation
+    //---------------------------------------------
+    // let times = 1 + t.len()/span;
+    // for _i in 0..times {
+    //     for bt in iter.clone()
+    //         .skip(_i * span).take(span) {
+    //         print!("{:5?} ", bt);
+    //     }
+    //     if _i &lt; times - 1 {
+    //         print!("\n  ");
+    //     }
+    // }
+}
+                        </defn-code>
+                      </defn-block>
+                    </defn-outerBlock>
+                  </details>
+                </div>
               </t-b>
             </li>
             <li>
               <h2><a id="string"></a>String, str</h2>
               <t-b>
-                
+                The std::string library provides the main Rust string.
+                <div class="indent pad5">
+                  <c-s>let s = String::from("a string");</c-s>
+                </div>
+                The <c-s>"a string"</c-s> is a string slice of type <c-s>&str</c-s>.
+                It is a contiguous collection of UTF-8 characters, compiled into some
+                location in static memory with the code that uses it.
+                <s-halfEm></s-halfEm>
+                Each member of the <c-s>String</c-s> class consists of a control block in the stack 
+                holding a pointer to its string slice in the heap.  See
+                <a href="RustBites_Data.html">RustBites_Data</a> for a diagram of that. 
+              </t-b>
+              <t-b>
+                Strings have member functions:
+                <div style="width:calc(100vw-9em);">
+                  <table style="max-width:calc(100vw-9em);">
+                    <tr>
+                      <th>member function</th><th>description</th>
+                    </tr>
+                    <tr>
+                      <td>new() -> String</td>
+                      <td>Create new empty String</td>
+                    </tr>
+                    <tr>
+                      <td>from(s: &str) -> String</td>
+                      <td>Creates string from string slice</td>
+                    </tr>
+                    <tr>
+                      <td>as_str(&self) -> &str</td>
+                      <td>Returns string slice</td>
+                    </tr>
+                    <tr>
+                      <td>push_str(&mut self, s: &str)</td>
+                      <td>Appends chars from s</td>
+                    </tr>
+                    <tr>
+                      <td>push(&mut self, ch: char)</td>
+                      <td>Appends ch</td>
+                    </tr>
+                    <tr>
+                      <td>remove(&mut self, n: usize) -> char</td>
+                      <td>Removes char at index n</td>
+                    </tr>
+                    <tr>
+                      <td>insert(&mut self, n: usize, ch: char)</td>
+                      <td>inserts ch at location n</td>
+                    </tr>
+                    <tr>
+                      <td>insert_str(&mut self, n: usize, s: &str)</td>
+                      <td>Inserts contents of s at location n</td>
+                    </tr>
+                    <tr>
+                      <td>len(&self) -> usize</td>
+                      <td>
+                        Returns length of string in bytes, not chars!<br />
+                        They are the same only for ASCII characters.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>is_empty(&self) -> bool</td>
+                      <td>Returns true if len() == 0, else false</td>
+                    </tr>
+                    <tr>
+                      <td>clear(&mut self)</td>
+                      <td>Removes all bytes</td>
+                    </tr>
+                    <tr>
+                      <td class="no-wrap">from_utf8(vec: Vec&lt;u8&gt; -> REsult&lt;String, FromUtf8Error&gt;</td>
+                      <td>Converts vector of bytes to String.  Returns error if invalid UTF-8</td>
+                    </tr>
+                    <tr>
+                      <td>into_bytes(self) -> Vec&lt;u8&gt;</td>
+                      <td>Convert to Vec of bytes</td>
+                    </tr>
+                    <tr>
+                      <td>as_bytes(&self) -> &[u8]</td>
+                      <td>Returns byte slice</td>
+                    </tr>
+                    <tr>
+                      <td>is_char_boundary(&self, n: usize) -> bool</td>
+                      <td>Is this byte the start of a new UTF-8 character?</td>
+                    </tr>
+                    <tr>
+                      <td>More methods ...</td>
+                      <td><a href="https://doc.rust-lang.org/std/string/struct.String.html">std::string::String</a></td>
+                    </tr>
+                  </table>
+                  </div>
+              </t-b>
+              <t-b>
+                <div>
+                  <details>
+                    <summary class="darkItem">String Examples:</summary>
+                    <s-halfEm></s-halfEm>
+                    <defn-outerBlock>
+                      <defn-block>
+                        <defn-head>demo_string</defn-head>
+                        <defn-code>
+print!("\n  === demo_string ===");
+let s1 : String = String::from("a test string");
+show_type_value("s1", &s1);
+print!("\n  -- iterating through String characters --");
+let iter = s1.chars();
+print!("\n  ");
+for ch in iter {
+    print!("{} ", ch);
+}
+print!("\n  -- extracting bytes --");
+let s1_bytes = s1.as_bytes();
+print!("\n  bytes are:");
+show_fold(&s1_bytes, 5, 5);
+// This works too, will wrap in []
+// print!("\n  bytes are: {:?}", b"a test string");
+
+print!("\n  -- extracting a slice --");
+let slc = &s1[0..6];
+show_type_value("&s1[0..6]", &slc);
+                        </defn-code>
+                      </defn-block>
+                      <defn-block>
+                        <defn-head>Output:</defn-head>
+                        <defn-code>
+cargo run -q
+
+=== demo_string ===
+value of s1 = "a test string"
+type is: &alloc::string::String
+-- iterating through String characters --
+a   t e s t   s t r i n g
+-- extracting bytes --
+bytes are:
+   97   32  116  101  115
+  116   32  115  116  114
+  105  110  103
+-- extracting a slice --
+value of &s1[0..6] = "a test"
+type is: &&str
+
+That's all Folks!
+                      </defn-code>
+                      </defn-block>
+                    </defn-outerBlock>
+                  </details>
+                </div>
               </t-b>
             </li>
             <li>
               <h2><a id="vec"></a>Vec&lt;T&gt;</h2>
               <t-b>
-                
+                The Vec&lt;T&gt;, found in std::vec::Vec, is an expandable,
+                indexable,  
+                array-like container with elements, t:T, stored in contiguous
+                memory in the heap.  It&apos;s structure is very like that of
+                std::String. 
+              </t-b>
+              <t-b>
+                Vec&lt;T&gt; has member functions:
+                <div style="width:calc(100vw - 12em);">
+                  <table>
+                    <tr>
+                      <th>member functions</th><th>operations</th>
+                    </tr>
+                    <tr>
+                      <td>new() -> Vec&lt;T&gt;</td>
+                      <td>Returns a new empty vector.</td>
+                    </tr>
+                    <tr>
+                      <td>push(&mut self, value: T)</td>
+                      <td>Appends value to vector contents</td>
+                    </tr>
+                    <tr>
+                      <td>pop(&mut self) -> Option&lt;T&gt;</td>
+                      <td>
+                        Removes last element and returns Some(t:T).
+                        If vector is empty returns None.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>insert(&mut self, n: usize, elem: T)</td>
+                      <td>Inserts elem at position n.  Panics if out of bounds.</td>
+                    </tr>
+                    <tr>
+                      <td>remove(&mut self, n: usize) -> T</td>
+                      <td>
+                        Removes and returns element at position n.
+                        Panics if n is out of bounds.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>clear(&mut self)</td>
+                      <td>Removes all elements from vector</td>
+                    </tr>
+                    <tr>
+                      <td>len(&self) -> usize</td>
+                      <td>Returns number of elements in vector</td>
+                    </tr>
+                    <tr>
+                      <td>swap(&mut self, m: usize, n: usize)</td>
+                      <td>
+                        Swaps elements at positions m and n.
+                        Panics if either m or n are out of bounds.
+                      </td>
+                    <tr>
+                      <td>as_slice(&self) -> &[T]</td>
+                      <td>Returns slice containing all elements of vector</td>
+                    </tr>
+                    <tr>
+                      <td class="no-wrap">as_mut_slice(&mut self) -> &mut [T]</td>
+                      <td>Returns mutable slice with all elements of vector</td>
+                    </tr>
+                    </tr>
+                  </table>
+                  </div>
+              </t-b>
+              <t-b>
+                <div>
+                  <details>
+                    <summary class="darkItem">Vec Examples:</summary>
+                    <s-halfEm></s-halfEm>
+                    <defn-outerBlock>
+                      <defn-block>
+                        <defn-head>demo_vec_int</defn-head>
+                        <defn-code>
+print!("\n  === demo_vec_int ===");
+let mut vec = vec![1, 2, 3, 4, 5];
+show_coll(&vec);
+print!("\n  -- assign vectors --");
+vec = vec![5, 4, 3, 2, 1];
+show_coll(&vec);
+print!("\n  -- replace element --");
+vec[1] = -4;
+show_coll(&vec);
+print!("\n  -- pop and push element --");
+let _elem = vec.pop();
+vec.push(42);
+show_coll(&vec);
+print!("\n  -- insert element --");
+vec.insert(1, -42);
+show_coll(&vec);
+print!("\n  -- remove element --");
+vec.remove(2);
+show_coll(&vec);
+print!("\n  -- extract full slice --");
+let array = &vec[..];  // full slice
+show_coll(&array);
+print!("\n  -- extract partial slice --");
+let array = &vec[1..4];  // partial slice
+show_coll(&array);
+print!("\n  -- build from string --");
+let vec = Vec::from("a string");
+show_coll(&vec);
+print!("\n  -- iterate over vector --");
+print!("\n  ");
+for ch in vec {
+    print!("{}", ch as char);
+}
+                    </defn-code>
+                      </defn-block>
+                      <defn-block>
+                        <defn-head>Output:</defn-head>
+                        <defn-code>
+cargo run -q
+
+=== demo_vec_int ===
+1, 2, 3, 4, 5
+-- assign vectors --
+5, 4, 3, 2, 1
+-- replace element --
+5, -4, 3, 2, 1
+-- pop and push element --
+5, -4, 3, 2, 42
+-- insert element --
+5, -42, -4, 3, 2, 42
+-- remove element --
+5, -42, 3, 2, 42
+-- extract full slice --
+5, -42, 3, 2, 42
+-- extract partial slice --
+-42, 3, 2
+-- build from string --
+97, 32, 115, 116, 114, 105, 110, 103
+-- iterate over vector --
+a string
+
+That's all Folks!
+                      </defn-code>
+                      </defn-block>
+                    </defn-outerBlock>
+                  </details>
+                </div>
               </t-b>
             </li>
             <li>
