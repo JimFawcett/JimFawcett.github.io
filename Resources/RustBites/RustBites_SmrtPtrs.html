@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html id="top">
   <head>
     <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
     <meta name="keywords" content="Rust, Introduction" />
@@ -54,8 +54,8 @@
         </up-b>
         <rt-b id="sects">
           <a href="#top">Top</a>, <a href="#box">Box</a>, <a href="#rc">Rc</a>, 
-          <a href="#arc">Arc</a>, <a href="#refcell">RefCell</a>, <a href="#exer">Exer</a>, 
-          <a href="#other">Other</a>
+          <a href="#arc">Arc</a>, <a href="#refcell">RefCell</a>, <a href="#intmut">InterMut</a>, 
+           <a href="#exer">Exer</a>, <a href="#other">Other</a>
         </rt-b>
       </toc-b>
       <div id="hlp" style="display:none;">
@@ -912,6 +912,23 @@ TestLifeCycle instance 42 dropped
            <a href="https://doc.rust-lang.org/book/ch15-05-interior-mutability.html">Mock Objects</a> for
            testing and for initializing objects that have an immutable interface.
          </t-b>
+         <a id="intmut"></a>
+         <s-halfEm></s-halfEm>
+         <h2>Interior Mutability</h2>
+         <t-b>
+          RefCell&lt;T&gt; was designed to support something called &quot;interior mutability&quot;.
+          Its inner element can be mutated throught its member function borrow_mut().  That returns 
+          a reference that appears to the compiler to be immutable, but which supports mutating the 
+          inner element.
+         </t-b>
+         <t-b>
+           That doesn&apos;t escape the Rust ownership rules.  It just defers their application to 
+           run-time. When borrow_mut() is invoked the borrow is recorded and, should another borrow 
+           occur before the first becomes inactive, then a panic results.  The advantage of this is 
+           that the compiler&apos;s borrow checker cannot always tell if a time sequence of borrows 
+           is safe, and so will fail to compile unless we use RefCell&lt;T&gt;.
+         </t-b>
+ 
          <a id="exer"></a>
          <s-halfEm></s-halfEm>
          <h2>Exercises:</h2>
@@ -945,7 +962,9 @@ TestLifeCycle instance 42 dropped
          <s-halfEm></s-halfEm>
          <h2>Other Interesting Problems</h2>
          <t-b>
-
+          In this section we look at several exercises that are a bit more complicated.  I&apos;ve
+          provided solutions for them because of that, but its worth your time to read them as they will 
+          help you understand the intended roles for each of these smart pointers. 
          </t-b>
          <div>
            <ol class="tight">
@@ -1149,8 +1168,8 @@ swapped arr_back = ["0", "2", "third element", "6", "8", "10", "12"]
               </div>
               <t-b class="top">
                 The solution, above, provides a lot of details about using heap memory,
-                working with vectors and with arrays.  You will see all of the issues cited
-                in the Exercise 3 statement handled and with comments to help illustrate 
+                working with vectors and with arrays.  You will see handled all of the issues cited
+                in the Exercise 3 statement with comments to help illustrate 
                 what the code is trying to do.
               </t-b>
             </li>
@@ -1175,9 +1194,7 @@ swapped arr_back = ["0", "2", "third element", "6", "8", "10", "12"]
                 </t-b>
               </div>
               <div class="indent">
-                This problem has several, not very satisfying, simple answers, e.g., modify then share.  
-                The answer I want to show you is a bit more challenging.  I&apos;ve provided that here
-                - as cited above, it uses RefCell to defer borrow checking to run-time. 
+                The answer I want to show you uses RefCell to defer borrow checking to run-time. 
               </div>
               <s-halfEm></s-halfEm>
               <div class="pad5">
