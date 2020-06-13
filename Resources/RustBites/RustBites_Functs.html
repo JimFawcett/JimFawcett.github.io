@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html id="top">
   <head>
     <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
     <meta name="keywords" content="Rust, Introduction" />
@@ -53,8 +53,8 @@
           <a href="Javascript.;#"></a><br />
         </up-b>
         <rt-b id="sects">
-          <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#starting">Starting</a>, 
-          <a href="#contents">Contents</a>, <a href="#refs">References</a>
+          <a href="#top">Top</a>, <a href="#funcs">Functions</a>, <a href="#return_types">Returns</a>, 
+          <a href="#generics">Generics</a>, <a href="#closures">Closures</a>, <a href="#exer">Exercises</a>
         </rt-b>
       </toc-b>
       <div id="hlp" style="display:none;">
@@ -81,8 +81,325 @@
           </tr>
         </table>
        </div>
-   
-      <h2>Rust Bite - Functions</h2>
+   <bb-55>
+    <h1>Rust Bite - Functions</h1>
+    <hr />
+    <t-b class="bottom">
+      Functions and methods are fundamental building blocks for programs in most languages. 
+      Rust is no exception. In this Bite we will focus first on free-standing functions and then look at 
+      methods, which are attached to structs to form objects.
+      <a id="funcs"></a>
+      <s-halfEm></s-halfEm>
+    </t-b>
+    <t-b class="top">
+      <ol class="tight top">
+        <li>
+          <h2>Functions:</h2>
+          <t-b>
+            The Rust syntax for functions is familiar:
+            <div class="indent pad10">
+              <defn-block>
+                <defn-head>Function Syntax - Pass by Value</defn-head>
+                <defn-code class="code-large">
+fn f(t:T, u:U, ...) -> V {
+  /* code that uses t, u, ...
+      and returns an instance of V */
+  }
+                </defn-code>
+              </defn-block>
+            </div>
+            Here, f accepts its arguments by value, so if the caller&apos;s values are Move types like String or Vec,
+            they are moved into the function and become invalid when the function returns.  Copy types are simply copied 
+            and remain valid after the call.
+          </t-b>
+          <t-b>
+            Arguments can also be passed by reference:
+            <div class="indent pad10">
+              <defn-block>
+                <defn-head>Function Syntax - Pass by Reference</defn-head>
+                <defn-code class="code-large">
+fn g(rt:&T, ru:&U, ...) {
+  /* code that uses references rt, ru, ... */
+  }
+                </defn-code>
+              </defn-block>
+            </div>
+            Since, g accepts its arguments by reference, the caller&apos;s values are not moved into the function 
+            and so, do not become invalid when the function returns.  
+          </t-b>
+          <div>
+            <details>
+              <summary class="darkItem">Function Examples:</summary>
+              <s-halfEm></s-halfEm>
+              <defn-outerBlock>
+                <defn-block>
+                  <defn-head>functions_and_methods::main.rs</defn-head>
+                  <defn-code>
+// functions_and_methods::main.rs
 
+fn f(mut s:String, t:String) -&gt; String {
+    s.push(' ');
+    s.push_str(&amp;t);
+    s
+}
+
+fn g(s:&amp;mut String, t:&amp;str) -&gt; String {
+    s.push(' ');
+    s.push_str(t);
+    s.to_string()
+}
+
+fn main() {
+
+    print!("\n  -- passing function arguments by value --");
+    let s1 = String::from("a string");
+    print!("\n  s1 = {:?}", s1);
+    let s2 = String::from("and more");
+    print!("\n  s2 = {:?}", s2);
+    
+    let s3 = f(s1, s2);
+    
+    print!("\n  s3 = {:?}", s3);
+    // print!("\n  s2 = {:?}", s2);
+    print!("\n  can't print s2, it's been moved");
+    // print!("\n  s1 = {:?}", s1);
+    print!("\n  can't print s1, it's been moved");
+    println!();
+
+    print!("\n  -- passing function arguments by value --");
+    let mut s1 = String::from("a refreshed string");
+    let s2 = "and a new more";
+    let s3 = g(&amp;mut s1, s2);
+
+    print!("\n  s3 = {:?}", s3);
+    print!("\n  s2 = {:?}", s2);
+    print!("\n  s1 = {:?}", s1);
+    print!("\n  note: s1 has been changed as a side-effect");
+
+    print!("\n\n  That's all Folks!\n\n");
+}
+                  </defn-code>
+                </defn-block>
+                <defn-block>
+                  <defn-head>Output:</defn-head>
+                  <defn-code>
+cargo run -q
+
+-- passing function arguments by value --
+s1 = "a string"
+s2 = "and more"
+s3 = "a string and more"
+can't print s2, it's been moved
+can't print s1, it's been moved
+
+-- passing function arguments by value --
+s3 = "a refreshed string and a new more"
+s2 = "and a new more"
+s1 = "a refreshed string and a new more"
+note: s1 has been changed as a side-effect
+
+That's all Folks!
+                  </defn-code>
+                </defn-block>
+              </defn-outerBlock>
+            </details>
+          </div>
+          <t-b>
+            It doesn&apos;t make sense to return by 
+            reference for free-standing functions, as the references would be invalid after the return.
+            Of course, g could create an instance of something on the heap, using Box. 
+            But it is as cheap to return 
+            a Box by value as a reference, since the Box is the size of a pointer.
+          </t-b>
+          <t-b>
+            We will see that it does make sense to return references from methods where the references 
+            are bound to member data.  We will look at that in a later section.
+            <a id="return_types"></a>
+            <s-halfEm></s-halfEm>
+          </t-b>
+        </li>
+        <li>
+          <h2>Special Return Types:</h2>
+          <t-b>
+            Rust provides two enumerations to support special needs for function return values.  The first is
+            Option: 
+            <div class="indent pad10">
+              <defn-block>
+                <defn-head>Option Enumeration</defn-head>
+                <defn-code class="code-large">
+enum Option&lt;T&gt; { Some(T), None, }
+                </defn-code>
+              </defn-block>
+            </div>
+            Unlike some other languages, Rust enumeration values can wrap instances of some type. 
+            The Option::Some(T) wraps an instance of the type a function evaluates. But Option supports 
+            the case where the function may have nothing to return.
+          </t-b>
+          <t-b>
+            For example, if the function is passed a collection from which it computes a value to return, 
+            if the collection is empty, the function may have nothing to return, so it can return None, 
+            rather that Some(t:T).
+          </t-b>
+          <t-b>
+            For functions that may encounter an error during processing, Rust provides the enumeration Result:
+            <div class="indent pad10">
+              <defn-block>
+                <defn-head>Result Enumeration</defn-head>
+                <defn-code class="code-large">
+enum Result&lt;T&gt; { Ok(T), Err(E), }
+                </defn-code>
+              </defn-block>
+            </div>
+            Perhaps the function is attempting to open a file.  If that succeeds it may return <c-s>Ok(f: File)</c-s>.
+            If not, it returns <c-s>Err(err: std::io::Error)</c-s>.
+          </t-b>
+          <t-b>
+            Below, find an example that illustrates use of these return types in a practical setting.
+          </t-b>
+          <t-b>
+            <div>
+              <details>
+                <summary class="darkItem">Examples of Return Types:</summary>
+                <defn-outerBlock>
+                  <defn-block>
+                    <defn-head>return_values::main.rs</defn-head>
+                    <defn-code>
+// return_values::main.rs
+
+fn sum(v:&amp;Vec&lt;i32&gt;) -&gt; Option&lt;i32&gt; {
+    if v.is_empty() {
+        return None;
+    }
+    let iter = v.iter();
+    let sum = iter.sum();
+    Some(sum)
+}
+
+use std::fs::File;
+use std::io::prelude::*;
+use std::io::{ Result };
+
+fn open(f:&amp;str) -&gt; Result&lt;File&gt; {
+    File::open(f)
+}
+fn create(f:&amp;str) -&gt; Result&lt;File&gt; {
+    File::create(f)
+}
+
+fn demo_scope_value() {
+  let v1 = { 2 + 3 };
+  assert_eq!(v1, 5);
+  let v2 = { let s = "a string slice"; s };
+  assert_eq!(v2, "a string slice");
+  let v3 = { let _s = "another string"; };
+  assert_eq!(v3, ());
+}
+
+fn main() -&gt; Result&lt;()&gt; {
+
+    demo_scope_value();
+
+    print!("\n  -- demonstrate Option --");
+    let v = Vec::&lt;i32&gt;::new();
+    let opt = sum(&amp;v);
+    if opt.is_none() {
+        print!("\n  no content to sum");
+    } 
+
+    let v = vec![1, 2, 3, 4, 5];
+    let opt = sum(&amp;v);
+    if opt.is_some() {
+        print!("\n  sum of {:?} is {}", v, opt.unwrap());
+    }
+    println!();
+
+    print!("\n  -- demonstrate Result --");
+    let file_name = "new_file.txt";
+    print!("\n  attempting to create {:?}", file_name);
+    let rslt = create(file_name);
+
+    let content = "\n  first line\n  second line";
+    print!("\n  attempting to write {:?}", content);
+    if rslt.is_ok() {
+        let mut fl = rslt?; // unwrap or bubble up error (uobue)
+        fl.write_all(content.as_bytes())?; // uobue
+    }
+    print!("\n  attempting to open {:?}", file_name);
+    let rslt = open(file_name);
+    if rslt.is_ok() {
+        print!("\n  attempting to read contents");
+        let mut f = rslt?; // uobue
+        let mut buf = String::new();
+        f.read_to_string(&amp;mut buf)?; // uobue
+        print!("\n{}", buf);
+    }
+    else {
+        print!("\n  can't read file {:?}", file_name);
+    }
+
+    println!("\n\n  That's all Folks!\n\n");
+    Ok(())
+}
+                    </defn-code>
+                  </defn-block>
+                  <defn-block>
+                    <defn-head>Output:</defn-head>
+                    <defn-code>
+  cargo run -q
+
+  -- demonstrate Option --
+  no content to sum
+  sum of [1, 2, 3, 4, 5] is 15
+
+  -- demonstrate Result --
+  attempting to create "new_file.txt"
+  attempting to write "\n  first line\n  second line"
+  attempting to open "new_file.txt"
+  attempting to read contents
+
+  first line
+  second line
+
+  That's all Folks!
+                    </defn-code>
+                  </defn-block>
+                </defn-outerBlock>
+              </details>
+            </div>
+          </t-b>
+          <t-b>
+            One thing to note about the examples, above: 
+          </t-b>
+          <t-b>
+            If the last construct in a scope is an expression (a statement minus its semicolon), then
+            that is treated as the value of the scope.  If there is no terminating expression, the 
+            value of the scope is (), the unit, signifying no value.  See demo_scope_value() in the 
+            Examples, above, for confirmation.
+          </t-b>
+          <t-b>
+            If a function signature declares some return value and if the function scope ends with an
+            expression, the value of the expression is treated as the return value.  Return statements
+            also work, but ending expressions are idiomatic Rust.
+          </t-b>
+          <t-b>
+            You will observe that all the functions, including main, in the examples, above, use
+            terminal expressions to return results.
+            <a id="generics"></a>
+          </t-b>
+        </li>
+        <li>
+          <h2>Generic Functions:</h2>
+          <a id="closures"></a>
+        </li>
+        <li>
+          <h2>Closures:</h2>
+          <a id="exer"></a>
+        </li>
+        <li>
+          <h2>Exercises:</h2>
+        </li>
+      </ol>
+    </t-b>
+ </bb-55>
   </body>
 </html>
