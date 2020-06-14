@@ -265,9 +265,26 @@ enum Result&lt;T&gt; { Ok(T), Err(E), }
                   <defn-block>
                     <defn-head>return_values::main.rs</defn-head>
                     <defn-code>
-// return_values::main.rs
+/////////////////////////////////////////////////////////////
+// return_values::main.rs - demo Option<T> and Result<T,E> //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 14 Jun 2020  //
+/////////////////////////////////////////////////////////////
 
-fn sum(v:&amp;Vec&lt;i32&gt;) -&gt; Option&lt;i32&gt; {
+#![allow(dead_code)]
+
+/*-- show that scopes evaluate to their last expression --*/
+fn demo_scope_value() {
+    let v1 = { 2 + 3 };
+    assert_eq!(v1, 5);
+    let v2 = { let s = "a string slice"; s };
+    assert_eq!(v2, "a string slice");
+    let v3 = { let _s = "another string"; };
+    assert_eq!(v3, ());
+}
+
+/*-- demo Option<T> with collection --*/
+fn sum(v:&Vec<i32>) -> Option<i32> {
     if v.is_empty() {
         return None;
     }
@@ -276,67 +293,100 @@ fn sum(v:&amp;Vec&lt;i32&gt;) -&gt; Option&lt;i32&gt; {
     Some(sum)
 }
 
+/*-- demonstrate file error handling with Result<T,E> --*/
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::{ Result };
 
-fn open(f:&amp;str) -&gt; Result&lt;File&gt; {
-    File::open(f)
-}
-fn create(f:&amp;str) -&gt; Result&lt;File&gt; {
-    File::create(f)
-}
-
-fn demo_scope_value() {
-  let v1 = { 2 + 3 };
-  assert_eq!(v1, 5);
-  let v2 = { let s = "a string slice"; s };
-  assert_eq!(v2, "a string slice");
-  let v3 = { let _s = "another string"; };
-  assert_eq!(v3, ());
+/*-- unwrap or bubble up error (uobue) --*/
+fn create_test_file(f:&str, cnt:&str) -> Result<File> {
+    print!("\n  attempting to create file {:?}", f);
+    let mut file = File::create(f)?; //uobue
+    print!("\n  attempting to write contents {:?}", cnt);
+    file.write_all(cnt.as_bytes())?; // uobue
+    Ok(file)
 }
 
-fn main() -&gt; Result&lt;()&gt; {
+/*-- unwrap or bubble up error (uobue) --*/
+fn open_file_and_read(f:&str) -> Result<String> {
+    print!("\n  attempting to open file {:?}", f);
+    let mut file = File::open(f)?; //uobue
+    print!("\n  attempting to read contents");
+    let mut buf = String::new();
+    file.read_to_string(&mut buf)?; // uobue
+    Ok(buf)
+}
+
+/*-- run demonstrations --*/
+fn main() -> Result<()> {
 
     demo_scope_value();
 
+  /*-----------------------------------------------------*/
     print!("\n  -- demonstrate Option --");
-    let v = Vec::&lt;i32&gt;::new();
-    let opt = sum(&amp;v);
+    let v = Vec::<i32>::new();
+    let opt = sum(&v);
     if opt.is_none() {
         print!("\n  no content to sum");
     } 
 
     let v = vec![1, 2, 3, 4, 5];
-    let opt = sum(&amp;v);
+    let opt = sum(&v);
     if opt.is_some() {
-        print!("\n  sum of {:?} is {}", v, opt.unwrap());
+        print!(
+          "\n  sum of {:?} is {}", v, opt.unwrap()
+        );
     }
     println!();
 
-    print!("\n  -- demonstrate Result --");
+  /*-------------------------------------------------*/
+    print!("\n  -- demonstrate Result<T,E> --");
     let file_name = "new_file.txt";
-    print!("\n  attempting to create {:?}", file_name);
-    let rslt = create(file_name);
-
     let content = "\n  first line\n  second line";
-    print!("\n  attempting to write {:?}", content);
+
+    print!(
+      "\n  attempting to create file {:?}", file_name
+    );
+    let rslt = File::create(file_name);
     if rslt.is_ok() {
-        let mut fl = rslt?; // unwrap or bubble up error (uobue)
-        fl.write_all(content.as_bytes())?; // uobue
+        print!("\n  open succeeded");
+        let content = "\n  first line\n  second line";
+        print!("\n  attempting to write {:?}", content);
+        let mut fl = rslt.unwrap();
+        let wrslt = fl.write_all(content.as_bytes());
+        if wrslt.is_ok() {
+            print!("\n  write succeeded");
+        }
+        else {
+            print!("\n  write failed");
+        }
     }
     print!("\n  attempting to open {:?}", file_name);
-    let rslt = open(file_name);
+    let rslt = File::open(file_name);
     if rslt.is_ok() {
         print!("\n  attempting to read contents");
-        let mut f = rslt?; // uobue
+        let mut f = rslt.unwrap();
         let mut buf = String::new();
-        f.read_to_string(&amp;mut buf)?; // uobue
-        print!("\n{}", buf);
+        let rrslt = f.read_to_string(&mut buf);
+        if rrslt.is_ok() {
+            print!("\n  contents:{}", buf);
+        }
+        else {
+            print!("\n  can't read file {:?}", file_name);
+        }
     }
-    else {
-        print!("\n  can't read file {:?}", file_name);
-    }
+    println!();
+
+  /*-------------------------------------------------*/
+    print!("\n  -- demonstrate Result<T,E> using ? --");
+    let mut _file = 
+        create_test_file(file_name, content)?; // uobue
+    /*-- write more text using _file --*/
+    _file.write_all(
+        b"\n  third line\n  fourth line"
+    )?; // uobue
+    let text = open_file_and_read(file_name)?; // uobue
+    print!("\n  file contents:{}", text);
 
     println!("\n\n  That's all Folks!\n\n");
     Ok(())
@@ -352,14 +402,29 @@ fn main() -&gt; Result&lt;()&gt; {
   no content to sum
   sum of [1, 2, 3, 4, 5] is 15
 
-  -- demonstrate Result --
-  attempting to create "new_file.txt"
-  attempting to write "\n  first line\n  second line"
+  -- demonstrate Result<T,E> --
+  attempting to create file "new_file.txt"
+  open succeeded
+  attempting to write 
+      "\n  first line\n  second line"
+  write succeeded
   attempting to open "new_file.txt"
   attempting to read contents
-
+  contents:
   first line
   second line
+
+  -- demonstrate Result<T,E> using ? --
+  attempting to create file "new_file.txt"
+  attempting to write contents 
+      "\n  first line\n  second line"
+  attempting to open file "new_file.txt"
+  attempting to read contents
+  file contents:
+  first line
+  second line
+  third line
+  fourth line
 
   That's all Folks!
                     </defn-code>
