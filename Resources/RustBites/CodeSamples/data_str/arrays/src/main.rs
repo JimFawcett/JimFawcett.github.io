@@ -188,10 +188,10 @@ fn demo_map() {
 
 fn main() {
 
-    demo_array_int();
-    // demo_struct();
+    // demo_array_int();
+    demo_struct();
     // demo_string();
-    demo_vec_int();
+    // demo_vec_int();
     // demo_map();
 
     println!("\n\n  That's all Folks!\n\n");
