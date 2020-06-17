@@ -36,11 +36,10 @@ fn show_type<'a, T:Debug>(_t:T) -> &'a str where T:Debug {
    - nice illustration of Iterator methods
 */
 fn show_fold<T:Debug>(t:&[T], span:usize, width:usize) {
-    //let times = 1 + t.len()/span;
-    let iter = t.iter();
+    // let iter = t.iter();
     print!("\n  ");
     let mut count = 0;
-    for bt in iter {
+    for bt in t {
         count = count + 1;
         print!("{:wd$?}", bt, wd = width);
         if count == span {
@@ -48,9 +47,10 @@ fn show_fold<T:Debug>(t:&[T], span:usize, width:usize) {
             count = 0;
         }
     }
+    // let times = 1 + t.len()/span;
     // for _i in 0..times {
-    //     for bt in iter.clone().skip(_i * span).take(span) {
-    //         print!("{:5?} ", bt);
+    //     for bt in t.iter().skip(_i * span).take(span) {
+    //         print!("{:wd$?} ", bt, wd = width);
     //     }
     //     if _i < times - 1 {
     //         print!("\n  ");
@@ -69,6 +69,8 @@ fn demo_array_int() -> Option<()> {
     show_coll(&arr_slice);
     arr[1] = -1;
     show_coll(&&arr)?;
+    let arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+    show_fold(&arr, 5, 4);
     Some(())
 }
 
@@ -186,7 +188,7 @@ fn demo_map() {
 
 fn main() {
 
-    // demo_array_int();
+    demo_array_int();
     // demo_struct();
     // demo_string();
     demo_vec_int();
