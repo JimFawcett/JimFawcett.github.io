@@ -39,9 +39,9 @@ fn show_fold<T:Debug>(t:&[T], span:usize, width:usize) {
     // let iter = t.iter();
     print!("\n  ");
     let mut count = 0;
-    for bt in t {
+    for item in t {
         count = count + 1;
-        print!("{:wd$?}", bt, wd = width);
+        print!("{:wd$?}", item, wd = width);
         if count == span {
             print!("\n  ");
             count = 0;
@@ -49,8 +49,8 @@ fn show_fold<T:Debug>(t:&[T], span:usize, width:usize) {
     }
     // let times = 1 + t.len()/span;
     // for _i in 0..times {
-    //     for bt in t.iter().skip(_i * span).take(span) {
-    //         print!("{:wd$?} ", bt, wd = width);
+    //     for item in t.iter().skip(_i * span).take(span) {
+    //         print!("{:wd$?} ", item, wd = width);
     //     }
     //     if _i < times - 1 {
     //         print!("\n  ");
