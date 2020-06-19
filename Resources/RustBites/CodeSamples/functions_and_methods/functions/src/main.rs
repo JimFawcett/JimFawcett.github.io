@@ -29,7 +29,7 @@ fn main() {
     print!("\n  can't print s1, it's been moved");
     println!();
 
-    print!("\n  -- passing function arguments by value --");
+    print!("\n  -- passing function arguments by reference --");
     let mut s1 = String::from("a refreshed string");
     let s2 = "and a new more";
     let s3 = g(&mut s1, s2);
