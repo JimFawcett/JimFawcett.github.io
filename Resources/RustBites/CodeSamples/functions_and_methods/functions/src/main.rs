@@ -107,7 +107,7 @@ fn main() {
 
     print!("\n  -- defining function inside another function --");
     fn whooaaa() {
-        print!("\n  inside main!");
+        print!("\n  whooaaa - inside main!");
     }
     whooaaa();
 

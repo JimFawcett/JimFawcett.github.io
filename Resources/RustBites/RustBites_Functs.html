@@ -715,8 +715,193 @@ fn demo_struct() {
             </details>
           </div>
           <t-b>
+            In the last dropdown for this section you will find basic and more advanced topics:
+            <div>
+              <ol class="tight">
+                <li>pass and return by value and reference</li>
+                <li>functions that take and return function arguments</li>
+                <li>dynamic dispatch - compared to static dispatch</li>
+                <li>local functions</li>
+              </ol>
+            </div>
+          </t-b>
+          <div>
+            <details>
+              <summary class="darkItem">Examples: Summary of function topics:</summary>
+              <s-halfEm></s-halfEm>
+              <defn-outerBlock>
+                <defn-block>
+                  <defn-head>functions::main.rs</defn-head>
+                  <defn-code>
+/////////////////////////////////////////////////////////////
+// functions_and_methods::main.rs - functions Bite demos   //
+//                                                         //  
+// Jim Fawcett, https://JimFawcett.github.com, 19 Jun 2020 //
+/////////////////////////////////////////////////////////////
+
+// https://stackoverflow.com/questions/36390665
+//       /how-do-you-pass-a-rust-function-as-a-parameter
+// https://joshleeb.com/blog/rust-traits-trait-objects/
+
+/*-----------------------------------------------------
+  pass arguments by value 
+  - passing by value results in Move for non-copy types
+  - we say that the s and t arguments are consumed
+  */
+fn f(mut s:String, t:String) -> String {
+    s.push(' ');
+    s.push_str(&t);
+    s  // value of last expression is returned
+}
+/*-----------------------------------------------------
+  pass arguments by reference
+  - passing s and t does not consume their referends 
+*/
+fn g(s:&mut String, t:&str) -> String {
+    s.push(' ');
+    s.push_str(t);
+    s.to_string()
+}
+/*-----------------------------------------------------
+  h_in_2 accepts function argument via static dispatch
+  - F: Fn ... specifies accepted function signatures
+*/
+fn h_in_1<F: Fn(i32) -> String>(i:i32, f: F) -> String {
+  f(i)
+}
+/*-----------------------------------------------------
+  h_in_2 accepts function argument via dynamic dispatch
+  - Fn ... specifies accepted function signatures
+*/
+fn h_in_2(i:i32, f: &dyn Fn(i32) -> String) -> String {
+  f(i)
+}
+/*-----------------------------------------------------
+  function passed to, and returned from demonstration
+  functions, below
+*/
+fn test_function(i:i32) -> String {
+    i.to_string()
+}
+/*-----------------------------------------------------
+  static dispatch of returned function
+  - uses impl to specify that return satisfies Fn ... 
+*/
+fn h_out_1() -> impl Fn(i32) -> String {
+    &test_function
+}
+/*-----------------------------------------------------
+    dynamic dispatch of returned function 
+    - uses lifetime annotation 'a
+    - &dyn to include vtable
+*/
+fn h_out_2<'a>() -> &'a dyn Fn(i32) -> String {
+    &test_function
+}
+                  </defn-code>
+                </defn-block>
+                <defn-block>
+                  <defn-head>Using Code:</defn-head>
+                  <defn-code>
+  fn main() {
+
+    print!(
+      "\n  -- passing function args by value --"
+    );
+    let s1 = String::from("a string");
+    print!("\n  s1 = {:?}", s1);
+    let s2 = String::from("and more");
+    print!("\n  s2 = {:?}", s2);
+    
+    let s3 = f(s1, s2);
+    
+    print!("\n  s3 = {:?}", s3);
+    // print!("\n  s2 = {:?}", s2);
+    print!("\n  can't print s2, it's been moved");
+    // print!("\n  s1 = {:?}", s1);
+    print!("\n  can't print s1, it's been moved");
+    println!();
+
+    print!(
+      "\n  -- passing function args by reference --"
+    );
+    let mut s1 = String::from("a refreshed string");
+    let s2 = "and a new more";
+    let s3 = g(&mut s1, s2);
+
+    print!("\n  s3 = {:?}", s3);
+    print!("\n  s2 = {:?}", s2);
+    print!("\n  s1 = {:?}", s1);
+    print!(
+      "\n  note - s1 has been changed as side-effect"
+    );
+    println!();
+
+    print!("\n  -- passing function as argument --");
+    /*-- static dispatch --*/
+    let s = h_in_1(42, &test_function);
+    print!("\n  s = {}", s);
+    /*-- dynamic dispatch --*/
+    let s = h_in_2(42, &test_function);
+    print!("\n  s = {}", s);
+    println!();
+
+    print!("\n  -- function returning function --");
+    let s = h_out_1()(42);  // static dispatch
+    print!("\n  s = {}", s);
+    let s = h_out_2()(42);  // dynamic dispatch
+    print!("\n  s = {}", s);
+    println!();
+
+    print!(
+      "\n  -- defining function inside function --"
+    );
+    fn whooaaa() {
+        print!("\n  whooaaa - inside main!");
+    }
+    whooaaa();
+
+    print!("\n\n  That's all Folks!\n\n");
+}
+                  </defn-code>
+                  <defn-head class="defnBorderTop">Output:</defn-head>
+                  <defn-code>
+  cargo run -q
+
+  -- passing function arguments by value --
+  s1 = "a string"
+  s2 = "and more"
+  s3 = "a string and more"
+  can't print s2, it's been moved
+  can't print s1, it's been moved
+
+  -- passing function arguments by reference --       
+  s3 = "a refreshed string and a new more"
+  s2 = "and a new more"
+  s1 = "a refreshed string and a new more"
+  note that s1 has been changed as a side-effect      
+
+  -- passing function as argument --
+  s = 42
+  s = 42
+
+  -- function returning function --
+  s = 42
+  s = 42
+
+  -- defining function inside another function --     
+  whooaaa - inside main!
+
+  That's all Folks!
+                  </defn-code>
+                </defn-block>
+              </defn-outerBlock>
+            </details>
+          </div>
+          <t-b>
             In the next section we discuss closures, sometimes call lambdas.  They work a lot like locally
-            defined functions, although their syntax is quite different.
+            defined functions, although their syntax is quite different, and they can do one thing that 
+            functions can&apos;t.
             <a id="closures"></a>
             <s-halfEm></s-halfEm>
             </t-b>
