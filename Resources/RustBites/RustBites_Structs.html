@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html id="top">
   <head>
     <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
     <meta name="keywords" content="Rust, Introduction" />
@@ -81,8 +81,221 @@
           </tr>
         </table>
        </div>
-   
-      <h2>Rust Bite - Structs</h2>
+   <bb-55>
+    <h1>Rust Bite - Structs</h1>
+    <hr />
+    <t-b>
+      Rust uses structs to represent objects, e.g., an aggregate managing data with a set of 
+      methods.  This is very similar to the way C++ uses classes to define objects.
+    </t-b>
+    <t-b>
+      In the first section we will implement methods for structs, turning them into user-defined 
+      types.  This is a big step forward.  It allows us to structure our programs areound the data 
+      that the program manages, rather than simply using a lot of operation fragments to manage 
+      public data.
+    </t-b>
+    <t-b>
+      Methods allow us to build abstractions that are consistent with our problem domain or 
+      lower-level abstractions that help us organize the solution side.
+    </t-b>
+    <div>
+      <ol>
+        <li>
+          <h2>Methods:</h2>
+          <t-b>
+            First, let&apos;s start with a simple demo that illustrates how to endow a struct 
+            with methods.
+          </t-b>
+          <div>
+            <defn-outerBlock>
+              <defn-block>
+                <defn-head>methods::main.rs</defn-head>
+                <defn-code style="font-size:0.95em;">
+fn demo_basic() {
+
+  print!("\n  -- demo_basic --");
+  
+  #[derive(Debug)]
+  pub struct Demo { value: i32 }
+  impl Demo {
+      pub fn new() -&gt; Demo {
+          Demo {
+              value:0
+          }
+      }
+      pub fn set_value(&amp;mut self, v: i32) {
+          self.value = v;
+      }
+      pub fn get_value(&amp;self) -&gt; i32 {
+          self.value
+      }
+  }
+
+  let mut d = Demo::new();
+  d.set_value(42);
+  print!("\n  d = {:?}", d);
+  print!("\n  d.value = {:?}", d.get_value());
+}
+                </defn-code>
+              </defn-block>
+              <defn-block style="max-width:30%;">
+                <defn-head>Output:</defn-head>
+                <defn-code style="font-size:0.95em;">
+-- demo_basic --
+d = Demo { value: 42 }
+d.value = 42
+              </defn-code>
+              <defn-head class="defnBorderTop">Comments:</defn-head>
+              <defn-body style="font-size:0.95em;">
+                <t-b>
+                  For the struct Demo we are defining an associated function, <c-s>new()</c-s>, 
+                  that is invoked as <c-s>Demo::new()</c-s>.
+                </t-b>
+                <t-b>
+                  We also define two methods, <c-s>set_value(&mut self, v: i32)</c-s>, 
+                  and <c-s>get_value(&self) -> i32</c-s>.
+                </t-b>
+                <t-b>
+                  Methods always pass <c-s>&self</c-s> or <c-s>&mut self</c-s> as the first argument in the definition.
+                  That is not used for invocations, as you see at the bottom of the left panel.
+                </t-b>
+              </defn-body>
+              </defn-block>
+            </defn-outerBlock>
+          </div>
+          <t-b>
+            The example, below, provides a user-defined type, Point&lt;T&gt;, that is closer to what 
+            you will see in production code than the previous example, but uses the same techniques.
+          </t-b>
+          <div>
+            <details>
+              <summary class="darkItem">Method Example - Point&lt;T&gt;:</summary>
+              <s-halfEm></s-halfEm>
+              <defn-outerBlock>
+                <defn-block>
+                  <defn-head>methods.main.rs</defn-head>
+                  <defn-code>
+fn demo_point() {
+
+    print!("\n  -- demo_point --");
+
+    use std::fmt::*;
+
+    #[derive(Debug, Default)]
+    pub struct Point<T> 
+    where T:Default + Debug {
+        x:T, y:T, z:T
+    }
+    impl<T> Point<T> where T:Default + Debug + Clone {
+        pub fn new() -> Point<T> {
+            Point {
+                x:std::default::Default::default(), 
+                y:std::default::Default::default(), 
+                z:std::default::Default::default() 
+            }
+        }
+        pub fn default() -> Point<T> {
+            Point::new()
+        }
+        pub fn get_coordinates(&self) -> [T; 3] {
+            [self.x.clone(), self.y.clone(), self.z.clone()]
+        }
+        pub fn set_coordinates(&mut self, coor: &[T; 3]) {
+            self.x = coor[0].clone();
+            self.y = coor[1].clone();
+            self.z = coor[2].clone();
+        } 
+    }
+    let mut pt = Point::<i32>::new();
+    pt.set_coordinates(&[1, 2, 3]);
+    print!("\n  pt = {:?}", &pt);
+    print!("\n  coordinates are: {:?}", &pt.get_coordinates());
+    pt.set_coordinates(&[3, 2, 1]);
+    print!("\n  pt = {:?}", pt);
+    print!("\n  coordinates are: {:?}", pt.get_coordinates());
+}
+                  </defn-code>
+                </defn-block>
+                <defn-block style="max-width:26%;">
+                  <defn-head>Outputs:</defn-head>
+                  <defn-code>
+-- demo_point --
+pt = Point { x: 1, y: 2, z: 3 }
+coordinates are: [1, 2, 3]
+pt = Point { x: 3, y: 2, z: 1 }
+coordinates are: [3, 2, 1]
+
+That's all Folks!
+                    </defn-code>
+                  <defn-head class="defnBorderTop">Comments:</defn-head>
+                  <defn-body style="font-size:0.9em;">
+                    <ol class="tight">
+                      <li>
+                        Note that Debug and Default are derived traits for Point&lt;T&gt;.
+                      </li>
+                      <li>
+                        impl&lt;T&gt; has a generic parameter to match Point&lt;T&gt;.
+                      </li>
+                      <li>
+                        <c-s>new()</c-s> and <c-s>default()</c-s> are associated functions.
+                      </li>
+                      <li>
+                        <c-s>get_coordinates(&self) -&gt; [T; 3]</c-s> and 
+                        <c-s>set_coordinates(&mut self, coor: &[T; 3])</c-s> are methods.
+                      </li>
+                      <li>
+                        In <c-s>set_coordinates</c-s> we used clones of the array elements to set the 
+                        coordinate values because Rust does not allow moving elements out of 
+                        an array.
+                      </li>
+                      <li>
+                        Using arrays is not the only interface that could work, but it&apos;s 
+                        efficient, and provides a nice example of when and how to pass arrays.
+                      </li>
+                    </ol>
+                  </defn-body>
+                </defn-block>
+              </defn-outerBlock>
+            </details>
+            <t-b>
+              
+              <a id="exer"></a>
+              <s-halfEm></s-halfEm>
+            </t-b>
+          </div>
+        </li>
+        <li>
+          <h2>Traits:</h2>
+        </li>
+        <li>
+          <h2>Static vs. Dynamic Binding</h2>
+        </li>
+        <li>
+          <h2>Graph Example</h2>
+        </li>
+        <li>
+          <h2>Exercises:</h2>
+          <div>
+            <ol class="tight">
+              <li>
+                Develop a user-defined type, Person, with fields for name, age, and 
+                name of occupation. Demonstrate it in operation.
+              </li>
+              <li>
+                Change the storage type, in the Point&lt;T&gt; example above, to a Vec.
+                Run the same demonstrations as the example. 
+              </li>
+              <li>
+                Create a user-defined type representing Teams, using the Person class 
+                you developed in the first exercise.
+              </li>
+            </ol>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </bb-55>
+
 
   </body>
 </html>
