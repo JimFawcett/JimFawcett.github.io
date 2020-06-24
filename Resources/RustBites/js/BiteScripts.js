@@ -43,6 +43,22 @@ initBites = function() {
   //        sects.style.display = "block";
 }
 
+storyMenu.prev = function() {
+  var prv = document.getElementById("prev");
+  prv.click();
+  // if(isDefined(prv)) {
+  //   prv.click();
+  // }
+}
+
+storyMenu.next = function() {
+  var nxt = document.getElementById("next");
+  nxt.click();
+  // if(isDefined(nxt)) {
+  //   nxt.click();
+  // }
+}
+
 storyMenu.chaps = function () {
   var menu = document.getElementById("chaps");
   if (isDefined(menu)) {
@@ -112,6 +128,12 @@ storyMenu.closeTOC = function () {
         else
           menu.style.display = "none";
       }
+    }
+    if (key === 'P') {
+      storyMenu.prev();
+    }
+    if (key === 'N') {
+      storyMenu.next();
     }
     if (key === 'R') {
       location.reload();
