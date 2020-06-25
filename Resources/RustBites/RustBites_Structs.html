@@ -149,7 +149,7 @@ fn demo_basic() {
 }
                 </defn-code>
               </defn-block>
-              <defn-block style="max-width:30%;">
+              <defn-block style="width:25em">
                 <defn-head>Output:</defn-head>
                 <defn-code style="font-size:0.95em;">
 -- demo_basic --
@@ -227,7 +227,7 @@ fn demo_point() {
 }
                   </defn-code>
                 </defn-block>
-                <defn-block style="max-width:26%;">
+                <defn-block style="width:25em;">
                   <defn-head>Outputs:</defn-head>
                   <defn-code>
 -- demo_point --
@@ -270,13 +270,227 @@ That's all Folks!
             </details>
             <t-b>
 
-              <a id="exer"></a>
+              <a id="traits"></a>
               <s-halfEm></s-halfEm>
             </t-b>
           </div>
         </li>
         <li>
           <h2>Traits:</h2>
+          <t-b>
+
+          </t-b>
+          <div>
+            <details>
+              <summary class="darkItem">Example: Point&lt;T&gt; with Time & Display Traits</summary>
+              <s-halfEm></s-halfEm>
+              <defn-outerBlock>
+                <defn-block>
+                  <defn-head>point::lib.rs</defn-head>
+                  <defn-code>
+/////////////////////////////////////////////////////////////
+// point::lib.rs - Demo Traits                             //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 24 Jun 2020  //
+/////////////////////////////////////////////////////////////
+
+use chrono::offset::Local;
+use chrono::DateTime;
+use chrono::{Datelike, Timelike};
+use std::fmt::*;
+
+
+pub trait Time {
+    fn set_time(&amp;mut self, st: DateTime&lt;Local&gt;);
+    fn get_time(&amp;self) -&gt; DateTime&lt;Local&gt;;
+    fn get_time_string(&amp;self) -&gt; String;
+}
+
+#[derive(Debug)]
+pub struct Point&lt;T&gt; 
+where T:Default + Debug {
+    x:T, y:T, z:T, t:DateTime&lt;Local&gt;,
+}
+
+/*-- implement Time trait --*/
+impl&lt;T&gt; Time for Point&lt;T&gt;
+where T:Default + Debug + Clone {
+    fn set_time(&amp;mut self, st: DateTime&lt;Local&gt;) {
+        self.t = st;
+  }
+  fn get_time(&amp;self) -&gt; DateTime&lt;Local&gt; {
+      self.t
+  }
+  fn get_time_string(&amp;self) -&gt; String {
+      let year = self.t.year().to_string();
+      let mon = self.t.month().to_string();
+      let day = self.t.day().to_string();
+      let hour = self.t.hour().to_string();
+      let min = self.t.minute().to_string();
+      let sec = self.t.second().to_string();
+      let dt = format!(
+          "{}::{:0&gt;2}::{:0&gt;2} {:0&gt;2}::{:0&gt;2}::{:0&gt;2}", 
+          year, mon, day, hour, min, sec
+      );
+      dt
+  }
+}
+/*-- implement Display trait --*/
+impl&lt;T&gt; Display for Point&lt;T&gt;
+where T:Default + Debug + Clone {
+    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter)
+       -&gt; std::fmt::Result {
+        write!(
+            f, "{{ {:?}, {:?}, {:?}, {} }}", 
+            &amp;self.x, &amp;self.y, &amp;self.z, 
+            &amp;self.get_time_string()
+        )
+    }
+}
+/*-- implement Point methods --*/
+impl&lt;T&gt; Point&lt;T&gt; where T:Default + Debug + Clone {
+    pub fn new() -&gt; Point&lt;T&gt; {
+        Point {
+            x:std::default::Default::default(), 
+            y:std::default::Default::default(), 
+            z:std::default::Default::default(),
+            t:Local::now()
+        }
+    }
+    pub fn default() -&gt; Point&lt;T&gt; {
+        Point::new()
+    }
+    /*-- return array of three spatial coordinates --*/
+    pub fn get_coordinates(&amp;self) -&gt; [T; 3] {
+        [self.x.clone(), self.y.clone(), self.z.clone()]
+    }
+    /*-- set coordinates from array slice --*/
+    pub fn set_coordinates(&amp;mut self, coor: &amp;[T; 3]) {
+        self.x = coor[0].clone();
+        self.y = coor[1].clone();
+        self.z = coor[2].clone();
+    }
+    /*-- time is returned with Time::get_time() --*/ 
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn construct () {
+        let pt = Point::&lt;i32&gt;::new();
+        assert_eq!(pt.get_coordinates(), [0, 0, 0]);
+    }
+    #[test]
+    fn set_coor() {
+        let mut pt = Point::&lt;i32&gt;::new();
+        pt.set_coordinates(&amp;[1, 2, 3]);
+        assert_eq!(pt.get_coordinates(), [1, 2, 3]);
+    }
+    #[test]
+    fn get_time() {
+        use chrono::{Duration};
+        let two_sec = Duration::seconds(2);
+        let ts_start = Local::now() - two_sec;
+        let pt = Point::&lt;i32&gt;::new();
+        let ts_now = pt.get_time();
+        let ts_stop = Local::now() + two_sec;
+        assert!(ts_start &lt; ts_now);
+        assert!(ts_now &lt; ts_stop);
+    }
+}
+                  </defn-code>
+                </defn-block>
+                <defn-block>
+                  <defn-head>Using Code - point::test1.rs</defn-head>
+                  <defn-code>
+/////////////////////////////////////////////////////////////
+// point::test1.rs - Demo Point&lt;T&gt; with                    //
+//                   Time and Display Traits               //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 24 Jun 2020  //
+/////////////////////////////////////////////////////////////
+
+#![allow(dead_code)]
+use point::{*};
+use point::Time;
+use chrono::{Local, Datelike, Timelike};
+
+fn test_time() {
+    print!("\n  Test Time Evaluation");
+    print!("\n ======================");
+
+    let now = Local::now();
+    let (_is_pm, mut hour) = now.hour12();
+    if _is_pm {
+        hour += 12;
+    }
+    let (_is_common_era, year) = now.year_ce();
+    print!("\n  time is {}", now);
+    print!(
+        "\n  year: {}, month: {:0&gt;2}, day: {:0&gt;2}", 
+        year, now.month(), now.day()
+    );
+    print!(
+        "\n  hour: {:0&gt;2}, min: {:0&gt;2}, sec: {:0&gt;2}", 
+        hour, now.minute(), now.second()
+    );
+    println!();
+}
+fn main() {
+
+    // test_time();
+
+    print!("\n  Demonstrating Point Type");
+    print!("\n ==========================");
+
+    print!(
+      "\n  -- create Point&lt;i32&gt; & display w/ Debug fmt --"
+    );
+    let mut pt = Point::&lt;i32&gt;::new();
+    pt.set_coordinates(&amp;[1, 2, 3]);
+    pt.set_time(Local::now());
+    print!("\n  pt = {:?}", &amp;pt);
+    print!(
+      "\n  -- display coor & time w/ Display format --"
+    );
+    print!(
+      "\n  coordinates are: {:?}", &amp;pt.get_coordinates()
+    );
+    print!(
+      "\n  point time is: {}", &amp;pt.get_time_string()
+    );
+    print!("\n  -- mutate coordinates, display again --");
+    pt.set_coordinates(&amp;[3, 2, 1]);
+    print!("\n  pt = {}", pt);
+    print!(
+      "\n  coordinates are: {:?}", pt.get_coordinates()
+    );
+
+    println!("\n\n  That's all Folks!\n\n");
+}
+                  </defn-code>
+                  <defn-head class="defnBorderTop">Output:</defn-head>
+                  <defn-code>
+Demonstrating Point Type
+==========================
+  -- create Point<i32> and display with Debug format --
+  pt = Point { 
+    x: 1, y: 2, z: 3, t: 2020-06-24T20:30:42.379218-04:00 
+  }
+  -- display coordinates and time with Display format --
+  coordinates are: [1, 2, 3]
+  point time is: 2020::06::24 20::30::42
+  -- mutate coordinates and display again --
+  pt = { 3, 2, 1, 2020::06::24 20::30::42 }
+  coordinates are: [3, 2, 1]
+
+  That's all Folks!
+                  </defn-code>
+                </defn-block>
+              </defn-outerBlock>
+            </details>
+          </div>
         </li>
         <li>
           <h2>Static vs. Dynamic Binding</h2>
