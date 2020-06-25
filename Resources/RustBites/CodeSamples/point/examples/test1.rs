@@ -1,55 +1,64 @@
 /////////////////////////////////////////////////////////////
-// point::test1.rs - Demo Point<T> with                    //
-//                   Time and Display Traits               //
+// point::test1.rs - Demo Point<T> with SpaceTime and      //
+//                   Display Traits                        //
 //                                                         //
 // Jim Fawcett, https://JimFawcett.github.io, 24 Jun 2020  //
 /////////////////////////////////////////////////////////////
 
 #![allow(dead_code)]
 use point::{*};
-use point::Time;
-use chrono::{Local, Datelike, Timelike};
+use point::SpaceTime;
+use chrono::{Local};
+use std::fmt::*;
 
-fn test_time() {
-    print!("\n  Test Time Evaluation");
-    print!("\n ======================");
-
-    let now = Local::now();
-    let (_is_pm, mut hour) = now.hour12();
-    if _is_pm {
-        hour += 12;
-    }
-    let (_is_common_era, year) = now.year_ce();
-    print!("\n  time is {}", now);
-    print!(
-        "\n  year: {}, month: {:0>2}, day: {:0>2}", 
-        year, now.month(), now.day()
-    );
-    print!(
-        "\n  hour: {:0>2}, min: {:0>2}, sec: {:0>2}", 
-        hour, now.minute(), now.second()
-    );
-    println!();
+/*-----------------------------------------------------------
+  function accepting SpaceTime<T> trait object 
+  - Does not depend on a specific type for pt, just the
+    SpaceTime<T> trait - like an interface.
+  - Can't use name. That's not part of trait.
+*/
+fn use_space_time_info<T:Debug>(pt : &dyn SpaceTime<T>) {
+    print!("\n  -- using SpaceTime trait object --");
+    print!("\n  -- display coordinates and time with Display format --");
+    print!("\n  coordinates are: {:?}", &pt.get_coordinates());
+    print!("\n  point time is: {}", &pt.get_time_string());
 }
+/*-----------------------------------------------------------
+  Exercise Point<i32> and Point<f64> funtionality 
+*/
 fn main() {
-
-    // test_time();
 
     print!("\n  Demonstrating Point Type");
     print!("\n ==========================");
 
-    print!("\n  -- create Point<i32> and display with Debug format --");
+    print!("\n  -- create Point<i32> and display with Display format --");
     let mut pt = Point::<i32>::new();
     pt.set_coordinates(&[1, 2, 3]);
     pt.set_time(Local::now());
-    print!("\n  pt = {:?}", &pt);
-    print!("\n  -- display coordinates and time with Display format --");
-    print!("\n  coordinates are: {:?}", &pt.get_coordinates());
-    print!("\n  point time is: {}", &pt.get_time_string());
+    pt.set_name("pt");
+    print!("\n  pt = {}", &pt);
+    println!();
+
+    use_space_time_info(&pt);
+    println!();
+
     print!("\n  -- mutate coordinates and display again --");
     pt.set_coordinates(&[3, 2, 1]);
+    pt.set_name("mutated pt");
     print!("\n  pt = {}", pt);
     print!("\n  coordinates are: {:?}", pt.get_coordinates());
+    println!();
 
-    println!("\n\n  That's all Folks!\n\n");
+    print!("\n  -- display point with Debug format --");
+    print!("\n  pt in Debug format: {:?}", pt);
+    println!();
+
+    print!("\n  -- creating Point<f64> --");
+    let mut ptd = Point::<f64>::new();
+    ptd.set_coordinates(&[0.5, -0.5, 1.75]);
+    ptd.set_name("ptd");
+    print!("\n  ptd = {}", ptd);
+    use_space_time_info(&ptd);
+
+    print!("\n\n  That's all Folks!\n\n");
 }

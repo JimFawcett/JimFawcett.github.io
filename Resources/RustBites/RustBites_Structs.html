@@ -175,7 +175,7 @@ d.value = 42
             </defn-outerBlock>
           </div>
           <t-b>
-            The example, below, provides a user-defined type, Point&lt;T&gt;, that is closer to what 
+            The example below provides a user-defined type, Point&lt;T&gt;, that is closer to what 
             you will see in production code than the previous example, but uses the same techniques.
           </t-b>
           <div>
@@ -269,7 +269,9 @@ That's all Folks!
               </defn-outerBlock>
             </details>
             <t-b>
-
+              User-defined types become really useful when we couple them with traits. The next section
+              extends the Point&lt;T&gt; type with SpaceTime&lt;T&gt; and Display traits and provides 
+              motivation for the use of traits. 
               <a id="traits"></a>
               <s-halfEm></s-halfEm>
             </t-b>
@@ -278,11 +280,50 @@ That's all Folks!
         <li>
           <h2>Traits:</h2>
           <t-b>
-
+            We presented a lot of introductory material for Traits in the
+            <a href="RustBites_Traits.html">Generics and Traits</a> Bite.  If you haven&apos;t
+            looked at that yet, now is a good time to do so.
+          </t-b>
+          <t-b>
+            In the example, below, we extend the Point&lt;T&gt; type with traits SpaceTime&lt;T&gt; 
+            and Display. SpaceTime&lt;T&gt; declares an interface for accessing 3-dimensional space 
+            coordinates and date time information from a Point&lt;T&gt; or any other type that 
+            implements the trait.
+          </t-b>
+          <t-b>
+            Here&apos;s the SpaceTime&lt;T&gt; definition:
+          </t-b>
+          <t-b>
+            <defn-block>
+              <defn-head>
+                SpaceTime&lt;T&gt;
+              </defn-head>
+              <defn-code class="normal">
+  pub trait SpaceTime&lt;T&gt; {
+    fn get_coordinates(&amp;self) -&gt; [T; 3];
+    fn set_coordinates(&amp;mut self, coor: &amp;[T; 3]);
+    fn set_time(&amp;mut self, st: DateTime&lt;Local&gt;);
+    fn get_time(&amp;self) -&gt; DateTime&lt;Local&gt;;
+    fn get_time_string(&amp;self) -&gt; String;
+}
+              </defn-code>
+            </defn-block>
+          </t-b>
+          <t-b>
+            A Point&lt;T&gt; that implements this trait could be used to annotate 
+            data from an astronomical observatory.  A system for such annotation would probably 
+            use several different types of points to mark different types of observables.  The 
+            trait allows any of those point types to make their space and time information 
+            available to mapping and display functions.
+          </t-b>
+          <t-b>
+            That works because the functions accept a SpaceTime&lt;T&gt; trait object rather 
+            than a specific point type.  So traits allow us to build very flexible software 
+            based on use rather than implementation details.
           </t-b>
           <div>
             <details>
-              <summary class="darkItem">Example: Point&lt;T&gt; with Time & Display Traits</summary>
+              <summary class="darkItem">Example: Point&lt;T&gt; with SpaceTime & Display Traits</summary>
               <s-halfEm></s-halfEm>
               <defn-outerBlock>
                 <defn-block>
@@ -293,57 +334,92 @@ That's all Folks!
 //                                                         //
 // Jim Fawcett, https://JimFawcett.github.io, 24 Jun 2020  //
 /////////////////////////////////////////////////////////////
-
+/*
+    Point represents points in 3-dimensional space and time.
+    Example hypothetical applications:
+    - Aircraft flight navigation systems
+    - Airport and Marine port area management systems
+    - Autonomous vehicle control
+    - Drawing applications
+    Point implements a SpaceTime trait.  That allows a 
+    function to use space and time information from any 
+    object that implements the SpaceTime&lt;T&gt;trait.  
+    
+    For example, in an Aircraft, points might be used 
+    as fundamental data structure for capturing instrument 
+    information, navigation computations, and in flight 
+    recording.  
+    
+    Each of these applications might use different internal 
+    data, e.g., ids, other information, ... but a function 
+    that accepts a SpaceTime trait object can extract that 
+    information from any of them.
+*/
 use chrono::offset::Local;
 use chrono::DateTime;
 use chrono::{Datelike, Timelike};
 use std::fmt::*;
 
-
-pub trait Time {
+/*-----------------------------------------------------------
+  declare SpaceTime&lt;T&gt; trait
+  - note that this trait is generic  
+*/
+pub trait SpaceTime&lt;T&gt; {
+    fn get_coordinates(&amp;self) -&gt; [T; 3];
+    fn set_coordinates(&amp;mut self, coor: &amp;[T; 3]);
     fn set_time(&amp;mut self, st: DateTime&lt;Local&gt;);
     fn get_time(&amp;self) -&gt; DateTime&lt;Local&gt;;
     fn get_time_string(&amp;self) -&gt; String;
 }
-
+/*-- define Point&lt;T&gt; type --*/
 #[derive(Debug)]
 pub struct Point&lt;T&gt; 
 where T:Default + Debug {
-    x:T, y:T, z:T, t:DateTime&lt;Local&gt;,
+    x:T, y:T, z:T, t:DateTime&lt;Local&gt;, n:String,
 }
-
 /*-- implement Time trait --*/
-impl&lt;T&gt; Time for Point&lt;T&gt;
+impl&lt;T&gt; SpaceTime&lt;T&gt; for Point&lt;T&gt;
 where T:Default + Debug + Clone {
     fn set_time(&amp;mut self, st: DateTime&lt;Local&gt;) {
         self.t = st;
-  }
-  fn get_time(&amp;self) -&gt; DateTime&lt;Local&gt; {
-      self.t
-  }
-  fn get_time_string(&amp;self) -&gt; String {
-      let year = self.t.year().to_string();
-      let mon = self.t.month().to_string();
-      let day = self.t.day().to_string();
-      let hour = self.t.hour().to_string();
-      let min = self.t.minute().to_string();
-      let sec = self.t.second().to_string();
-      let dt = format!(
-          "{}::{:0&gt;2}::{:0&gt;2} {:0&gt;2}::{:0&gt;2}::{:0&gt;2}", 
-          year, mon, day, hour, min, sec
-      );
-      dt
-  }
+    }
+    fn get_time(&amp;self) -&gt; DateTime&lt;Local&gt; {
+        self.t
+    }
+    fn get_time_string(&amp;self) -&gt; String {
+        let year = self.t.year().to_string();
+        let mon = self.t.month().to_string();
+        let day = self.t.day().to_string();
+        let hour = self.t.hour().to_string();
+        let min = self.t.minute().to_string();
+        let sec = self.t.second().to_string();
+        let dt = format!(
+            "{}::{:0&gt;2}::{:0&gt;2} {:0&gt;2}::{:0&gt;2}::{:0&gt;2}", 
+            year, mon, day, hour, min, sec
+        );
+        dt
+    }
+    /*-- set coordinates from array slice --*/
+    fn set_coordinates(&amp;mut self, coor: &amp;[T; 3]) {
+        self.x = coor[0].clone();
+        self.y = coor[1].clone();
+        self.z = coor[2].clone();
+    }
+    /*-- return array of three spatial coordinates --*/
+    fn get_coordinates(&amp;self) -&gt; [T; 3] {
+        [self.x.clone(), self.y.clone(), self.z.clone()]
+    }
+    /*-- time is returned with Time::get_time() --*/ 
 }
 /*-- implement Display trait --*/
 impl&lt;T&gt; Display for Point&lt;T&gt;
 where T:Default + Debug + Clone {
-    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter)
+    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter) 
        -&gt; std::fmt::Result {
         write!(
-            f, "{{ {:?}, {:?}, {:?}, {} }}", 
+            f, "{{ {:?}, {:?}, {:?}, {}, {:?} }}", 
             &amp;self.x, &amp;self.y, &amp;self.z, 
-            &amp;self.get_time_string()
+            &amp;self.get_time_string(), &amp;self.n
         )
     }
 }
@@ -354,23 +430,19 @@ impl&lt;T&gt; Point&lt;T&gt; where T:Default + Debug + Clone {
             x:std::default::Default::default(), 
             y:std::default::Default::default(), 
             z:std::default::Default::default(),
-            t:Local::now()
+            t:Local::now(),
+            n:String::default()
         }
     }
     pub fn default() -&gt; Point&lt;T&gt; {
         Point::new()
     }
-    /*-- return array of three spatial coordinates --*/
-    pub fn get_coordinates(&amp;self) -&gt; [T; 3] {
-        [self.x.clone(), self.y.clone(), self.z.clone()]
+    pub fn set_name(&amp;mut self, name: &amp;str) {
+        self.n = name.to_string();
     }
-    /*-- set coordinates from array slice --*/
-    pub fn set_coordinates(&amp;mut self, coor: &amp;[T; 3]) {
-        self.x = coor[0].clone();
-        self.y = coor[1].clone();
-        self.z = coor[2].clone();
+    pub fn get_name(&amp;self) -&gt; &amp;str {
+        &amp;self.n
     }
-    /*-- time is returned with Time::get_time() --*/ 
 }
 
 #[cfg(test)]
@@ -405,85 +477,109 @@ mod tests {
                   <defn-head>Using Code - point::test1.rs</defn-head>
                   <defn-code>
 /////////////////////////////////////////////////////////////
-// point::test1.rs - Demo Point&lt;T&gt; with                    //
-//                   Time and Display Traits               //
+// point::test1.rs - Demo Point&lt;T&gt; with SpaceTime and      //
+//                   Display Traits                        //
 //                                                         //
 // Jim Fawcett, https://JimFawcett.github.io, 24 Jun 2020  //
 /////////////////////////////////////////////////////////////
 
 #![allow(dead_code)]
 use point::{*};
-use point::Time;
-use chrono::{Local, Datelike, Timelike};
+use point::SpaceTime;
+use chrono::{Local};
+use std::fmt::*;
 
-fn test_time() {
-    print!("\n  Test Time Evaluation");
-    print!("\n ======================");
-
-    let now = Local::now();
-    let (_is_pm, mut hour) = now.hour12();
-    if _is_pm {
-        hour += 12;
-    }
-    let (_is_common_era, year) = now.year_ce();
-    print!("\n  time is {}", now);
+/*-----------------------------------------------------------
+  function accepting SpaceTime&lt;T&gt; trait object 
+  - Does not depend on a specific type for pt, just the
+    SpaceTime&lt;T&gt; trait - like an interface.
+  - Can't use name. That's not part of trait.
+*/
+fn use_space_time_info&lt;T:Debug&gt;(pt : &amp;dyn SpaceTime&lt;T&gt;) {
+    print!("\n  -- using SpaceTime trait object --");
     print!(
-        "\n  year: {}, month: {:0&gt;2}, day: {:0&gt;2}", 
-        year, now.month(), now.day()
+      "\n  -- display coords & time w/ Display format --"
     );
     print!(
-        "\n  hour: {:0&gt;2}, min: {:0&gt;2}, sec: {:0&gt;2}", 
-        hour, now.minute(), now.second()
+      "\n  coordinates are: {:?}", &amp;pt.get_coordinates()
     );
-    println!();
+    print!("\n  point time is: {}", &amp;pt.get_time_string());
 }
+/*-----------------------------------------------------------
+  Exercise Point&lt;i32&gt; and Point&lt;f64&gt; funtionality
+*/
 fn main() {
-
-    // test_time();
 
     print!("\n  Demonstrating Point Type");
     print!("\n ==========================");
 
     print!(
-      "\n  -- create Point&lt;i32&gt; & display w/ Debug fmt --"
+      "\n  -- create Point&lt;i32&gt; "
+      "& display w/ Display format --"
     );
     let mut pt = Point::&lt;i32&gt;::new();
     pt.set_coordinates(&amp;[1, 2, 3]);
     pt.set_time(Local::now());
-    print!("\n  pt = {:?}", &amp;pt);
+    pt.set_name("pt");
+    print!("\n  pt = {}", &amp;pt);
+    println!();
+
+    use_space_time_info(&amp;pt);
+    println!();
+
     print!(
-      "\n  -- display coor & time w/ Display format --"
+      "\n  -- mutate coordinates & display again --"
     );
-    print!(
-      "\n  coordinates are: {:?}", &amp;pt.get_coordinates()
-    );
-    print!(
-      "\n  point time is: {}", &amp;pt.get_time_string()
-    );
-    print!("\n  -- mutate coordinates, display again --");
     pt.set_coordinates(&amp;[3, 2, 1]);
+    pt.set_name("mutated pt");
     print!("\n  pt = {}", pt);
     print!(
       "\n  coordinates are: {:?}", pt.get_coordinates()
     );
+    println!();
 
-    println!("\n\n  That's all Folks!\n\n");
+    print!("\n  -- display point with Debug format --");
+    print!("\n  pt in Debug format: {:?}", pt);
+    println!();
+
+    print!("\n  -- creating Point&lt;f64&gt; --");
+    let mut ptd = Point::&lt;f64&gt;::new();
+    ptd.set_coordinates(&amp;[0.5, -0.5, 1.75]);
+    ptd.set_name("ptd");
+    print!("\n  ptd = {}", ptd);
+    use_space_time_info(&amp;ptd);
+
+    print!("\n\n  That's all Folks!\n\n");
 }
                   </defn-code>
                   <defn-head class="defnBorderTop">Output:</defn-head>
                   <defn-code>
 Demonstrating Point Type
 ==========================
-  -- create Point<i32> and display with Debug format --
-  pt = Point { 
-    x: 1, y: 2, z: 3, t: 2020-06-24T20:30:42.379218-04:00 
-  }
+  -- create Point<i32> and display with Display format --
+  pt = { 1, 2, 3, 2020::06::25 16::55::36, "pt" }
+
+  -- using SpaceTime trait object --
   -- display coordinates and time with Display format --
   coordinates are: [1, 2, 3]
-  point time is: 2020::06::24 20::30::42
+  point time is: 2020::06::25 16::55::36
+
   -- mutate coordinates and display again --
-  pt = { 3, 2, 1, 2020::06::24 20::30::42 }
+  pt = { 3, 2, 1, 2020::06::25 16::55::36, "mutated pt" }
   coordinates are: [3, 2, 1]
+
+  -- display point with Debug format --
+  pt in Debug format: Point { 
+    x: 3, y: 2, z: 1, 
+    t: 2020-06-25T16:55:36.838484600-04:00, 
+    n: "mutated pt" }
+
+  -- creating Point<f64> --
+  ptd = { 0.5, -0.5, 1.75, 2020::06::25 16::55::36, "ptd" }
+  -- using SpaceTime trait object --
+  -- display coordinates and time with Display format --
+  coordinates are: [0.5, -0.5, 1.75]
+  point time is: 2020::06::25 16::55::36
 
   That's all Folks!
                   </defn-code>

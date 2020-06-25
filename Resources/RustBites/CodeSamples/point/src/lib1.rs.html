@@ -3,55 +3,90 @@
 //                                                         //
 // Jim Fawcett, https://JimFawcett.github.io, 24 Jun 2020  //
 /////////////////////////////////////////////////////////////
-
+/*
+   Point represents points in 3-dimensional space and time.
+   Example hypothetical applications:
+   - Aircraft flight navigation systems
+   - Airport and Marine port area management systems
+   - Autonomous vehicle control
+   - Drawing applications
+   Point implements a SpaceTime trait.  That allows a function
+   to use space and time information from any object that 
+   implements the trait.  
+   
+   For example, in an Aircraft, points might be used as a 
+   fundamental data structure for capturing instrument information, 
+   navigation computations, and in flight recording.  
+   
+   Each of these applications might use different internal data, 
+   e.g., ids, other information, ... but a function that accepts 
+   a SpaceTime trait object can extract that information from any 
+   of them.
+*/
 use chrono::offset::Local;
 use chrono::DateTime;
 use chrono::{Datelike, Timelike};
 use std::fmt::*;
 
-
-pub trait Time {
+/*-----------------------------------------------------------
+  declare SpaceTime&lt;T&gt; trait
+  - note that this trait is generic  
+*/
+pub trait SpaceTime&lt;T&gt; {
+    fn get_coordinates(&amp;self) -&gt; [T; 3];
+    fn set_coordinates(&amp;mut self, coor: &amp;[T; 3]);
     fn set_time(&amp;mut self, st: DateTime&lt;Local&gt;);
     fn get_time(&amp;self) -&gt; DateTime&lt;Local&gt;;
     fn get_time_string(&amp;self) -&gt; String;
 }
-
+/*-- define Point&lt;T&gt; type --*/
 #[derive(Debug)]
 pub struct Point&lt;T&gt; 
 where T:Default + Debug {
-    x:T, y:T, z:T, t:DateTime&lt;Local&gt;,
+    x:T, y:T, z:T, t:DateTime&lt;Local&gt;, n:String,
 }
 /*-- implement Time trait --*/
-impl&lt;T&gt; Time for Point&lt;T&gt;
+impl&lt;T&gt; SpaceTime&lt;T&gt; for Point&lt;T&gt;
 where T:Default + Debug + Clone {
     fn set_time(&amp;mut self, st: DateTime&lt;Local&gt;) {
         self.t = st;
-  }
-  fn get_time(&amp;self) -&gt; DateTime&lt;Local&gt; {
-      self.t
-  }
-  fn get_time_string(&amp;self) -&gt; String {
-      let year = self.t.year().to_string();
-      let mon = self.t.month().to_string();
-      let day = self.t.day().to_string();
-      let hour = self.t.hour().to_string();
-      let min = self.t.minute().to_string();
-      let sec = self.t.second().to_string();
-      let dt = format!(
-          "{}::{:0&gt;2}::{:0&gt;2} {:0&gt;2}::{:0&gt;2}::{:0&gt;2}", 
-          year, mon, day, hour, min, sec
-      );
-      dt
-  }
+    }
+    fn get_time(&amp;self) -&gt; DateTime&lt;Local&gt; {
+        self.t
+    }
+    fn get_time_string(&amp;self) -&gt; String {
+        let year = self.t.year().to_string();
+        let mon = self.t.month().to_string();
+        let day = self.t.day().to_string();
+        let hour = self.t.hour().to_string();
+        let min = self.t.minute().to_string();
+        let sec = self.t.second().to_string();
+        let dt = format!(
+            "{}::{:0&gt;2}::{:0&gt;2} {:0&gt;2}::{:0&gt;2}::{:0&gt;2}", 
+            year, mon, day, hour, min, sec
+        );
+        dt
+    }
+    /*-- set coordinates from array slice --*/
+    fn set_coordinates(&amp;mut self, coor: &amp;[T; 3]) {
+        self.x = coor[0].clone();
+        self.y = coor[1].clone();
+        self.z = coor[2].clone();
+    }
+    /*-- return array of three spatial coordinates --*/
+    fn get_coordinates(&amp;self) -&gt; [T; 3] {
+        [self.x.clone(), self.y.clone(), self.z.clone()]
+    }
+    /*-- time is returned with Time::get_time() --*/ 
 }
 /*-- implement Display trait --*/
 impl&lt;T&gt; Display for Point&lt;T&gt;
 where T:Default + Debug + Clone {
     fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter) -&gt; std::fmt::Result {
         write!(
-            f, "{{ {:?}, {:?}, {:?}, {} }}", 
+            f, "{{ {:?}, {:?}, {:?}, {}, {:?} }}", 
             &amp;self.x, &amp;self.y, &amp;self.z, 
-            &amp;self.get_time_string()
+            &amp;self.get_time_string(), &amp;self.n
         )
     }
 }
@@ -62,23 +97,19 @@ impl&lt;T&gt; Point&lt;T&gt; where T:Default + Debug + Clone {
             x:std::default::Default::default(), 
             y:std::default::Default::default(), 
             z:std::default::Default::default(),
-            t:Local::now()
+            t:Local::now(),
+            n:String::default()
         }
     }
     pub fn default() -&gt; Point&lt;T&gt; {
         Point::new()
     }
-    /*-- return array of three spatial coordinates --*/
-    pub fn get_coordinates(&amp;self) -&gt; [T; 3] {
-        [self.x.clone(), self.y.clone(), self.z.clone()]
+    pub fn set_name(&amp;mut self, name: &amp;str) {
+        self.n = name.to_string();
     }
-    /*-- set coordinates from array slice --*/
-    pub fn set_coordinates(&amp;mut self, coor: &amp;[T; 3]) {
-        self.x = coor[0].clone();
-        self.y = coor[1].clone();
-        self.z = coor[2].clone();
+    pub fn get_name(&amp;self) -&gt; &amp;str {
+        &amp;self.n
     }
-    /*-- time is returned with Time::get_time() --*/ 
 }
 
 #[cfg(test)]
