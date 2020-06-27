@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html id="top">
   <head>
     <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
     <meta name="keywords" content="Rust, Introduction" />
@@ -29,6 +29,14 @@
         padding: 3px 10px;
         border: 1px solid #5c2107;
         white-space: nowrap;
+      }
+      #github table.fixed {
+        table-layout: fixed;
+        width: 100%;
+        max-width: 95%;
+      }
+      td.left {
+        max-width: 30%;
       }
     </style>
   </head>
@@ -744,20 +752,219 @@ That's all Folks!
               <s-1em></s-1em>
             </li>
             <li>
-              <h2>Map&lt;K, V&gt;</h2>
+              <h2>HashMap&lt;K, V&gt;</h2>
               <t-b>
-                
+                The Map&lt;K, V&gt;, found in std::collections::HashMap, is a hash table structure,
+                indexable by key:K, with associated value:V. Each HashMap item, { k:k, v:V } is stored in a 
+                bucket - linked list in the heap - of items which all have the same hash value for k. If the table is not 
+                densely populated the bucket list is short.  So retrieval is nearly constant time, the time 
+                required to evaluate hash(k).
               </t-b>
-              <a id="set"></a>
-              <s-1em></s-1em>
+              <t-b>
+                HashMap&lt;K, V&gt; has member functions:
+                <div style="width:calc(100vw - 12em);">
+                  <table class="fixed">
+                    <tr>
+                      <th style="width:40%;">member functions</th><th>operations</th>
+                    </tr>
+                    <tr>
+                      <td>new() -> HashMap&lt;K, V&gt;</td>
+                      <td style="white-space: normal;">Returns a new empty hash table.</td>
+                    </tr>
+                    <tr>
+                      <td>insert(&mut self, k: K, v: V) -> Option&lt;V&gt;</td>
+                      <td style="white-space: normal;">
+                        Inserts key-value pair into map.  If k already existed the old value is replaced by v and returns the old value,
+                        otherwise the pair is inserted into the hash table and returns None.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>remove(&mut self, k: &Q) -> Option&lt;V&gt;<br />where K: Borrow&lt;Q&gt;, Q: Hash + Eq</td>
+                      <td style="white-space: normal;">
+                        Removes key from map, returning value if key was in map.
+                        If vector is empty returns None.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>clear(&mut self)</td>
+                      <td style="white-space: normal;">Removes all key-value pairs, retains allocated table size</td>
+                    </tr>
+                    <tr>
+                      <td>contains_key&lt;Q: ?Sized&gt;(&self, k: &Q) -> bool</td>
+                      <td style="white-space: normal;">
+                        Returns true if map contains k.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        get_key_value&lt;Q: ?Sized&gt;(&mut self, k: &Q) -> Option&lt;(&K, &V)&gt;<br />
+                        where K: Borrow&lt;Q&gt;, Q: Hash + Eq
+                      </td>
+                      <td>Returns key-value pair for the supplied key.</td>
+                    </tr>
+                    <tr>
+                      <td>get&lt;Q: ?Sized&gt;(&self, k: &Q) -> Option&lt;&V&gt;</td>
+                      <td style="white-space: normal;">Returns reference to the value for k</td>
+                    </tr>
+                    <tr>
+                      <td>is_empty(&self) -> bool</td>
+                      <td style="white-space: normal;">Returns true if map contains no elements</td>
+                    <tr>
+                      <td>iter(&self) -> Iter&lt;K, V&gt;</td>
+                      <td style="white-space: normal;">Returns iterator that visits all elements in arbitrary order</td>
+                    </tr>
+                    <tr>
+                      <td>iter_mut(&mut self) -> IterMut&lt;K, V&gt;</td>
+                      <td style="white-space: normal;">
+                        Returns iterator that visits all elements in arbitrary order, returning mutable references.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>keys(&self) -> Keys&lt;K, V&gt;</td>
+                      <td style="white-space: normal;">Returns an iterator visiting all keys in arbitrary order</td>
+                    </tr>
+                    <tr>
+                      <td>values(&self) -> Values&lt;K, V&gt;</td>
+                      <td style="white-space: normal;">Returns an iterator visiting all values in arbitrary order</td>
+                    </tr>
+                    <tr>
+                      <td>values_mut(&mut self) -> ValuesMut&lt;K, V&gt;</td>
+                      <td style="white-space: normal;">Returns an iterator visiting all values mutably in arbitrary order</td>
+                    </tr>
+                    <tr>
+                      <td>More methods ...</td>
+                      <td style="white-space: normal;"><a href="https://doc.rust-lang.org/beta/std/collections/struct.HashMap.html">HashMap</a></td>
+                    </tr>
+                  </table>
+                  </div>
+              </t-b>
+              <t-b>
+                <div>
+                  <details>
+                    <summary class="darkItem">Map Examples:</summary>
+                    <s-halfEm></s-halfEm>
+                    <defn-outerBlock>
+                      <defn-block>
+                        <defn-head>collections::main.rs -> demo_map</defn-head>
+                        <defn-code>
+#![allow(dead_code)]
+use std::fmt::Debug;
+use std::any::*;
+/*-----------------------------------------------------------
+    Display comma separated list of collection items
+    - shows how to build function accepting iterable 
+      collections
+    - returns Option::None if collection is empty
+*/
+fn show_coll&lt;C&gt;(c:&amp;C) -&gt; Option&lt;()&gt; 
+  where C:IntoIterator + Clone + Debug, C::Item: Debug {
+
+    let mut iter = c.clone().into_iter();
+    /*-------------------------------------------
+      returns Option if no next element using 
+      ? try operator
+    */
+    print!("\n  {:?}", iter.next()?);
+    /*-- breaks when no next element --*/
+    for item in iter {
+        print!(", {:?}", &amp;item);
+    }
+    Some(())
+}
+
+// code elided
+
+fn demo_map() {
+    print!("\n  -- demo_map --");
+    let mut m = std::collections::HashMap::&lt;u8, String&gt;::new();
+    m.insert(0, String::from("zero"));
+    m.insert(1, String::from("one"));
+    m.insert(2, String::from("two"));
+    m.insert(3, String::from("three"));
+
+    print!("\n  Iterating through map:",);
+    let iter = m.iter();
+    print!("\n  {{ ");
+    for item in iter {
+        print!("{:?} ", item);
+    }
+    print!("}}");
+    print!("\n  using show_coll(&amp;m):",);
+    show_coll(&amp;m);
+    print!("\n  displaying keys:",);
+    let v:Vec&lt;&amp;u8&gt; = m.keys().collect();
+    show_coll(&amp;v);
+    print!("\n  displaying values:",);
+    let v:Vec&lt;&amp;String&gt; = m.values().collect();
+    show_coll(&amp;v);
+    print!("\n  removing item with k == 2");
+    m.remove(&amp;2);
+    show_coll(&amp;m);
+    print!("\n  value for k == 3 is {:?}",m[&amp;3]);
+}
+
+fn main() {
+
+    // code elided
+
+    demo_map();
+
+    println!("\n\n  That's all Folks!\n\n");
+}
+                        </defn-code>
+                      </defn-block>
+                      <defn-block>
+                        <defn-head>Output:</defn-head>
+                        <defn-code>
+cargo run -q
+
+  -- demo_map --
+  Iterating through map:
+  { (1, "one") (3, "three") (2, "two") (0, "zero") }
+  using show_coll(&m):
+  (1, "one"), (3, "three"), (2, "two"), (0, "zero")
+  displaying keys:
+  1, 3, 2, 0
+  displaying values:
+  "one", "three", "two", "zero"
+  removing item with k == 2
+  (1, "one"), (3, "three"), (0, "zero")
+  value for k == 3 is "three"
+
+  That's all Folks!
+                      </defn-code>
+                      </defn-block>
+                    </defn-outerBlock>
+                  </details>
+                </div>
+              </t-b>
+              <t-b>
+                Strings, Arrays, Vecs, and HashMaps are the most commonly used Rust containers, but there are other useful collections
+                as well, listed below. 
+                <a id="collect"></a>
+                <s-1em></s-1em>
+                </t-b>
             </li>
             <li>
-              <h2>Set&lt;K&gt;</h2>
+              <h2>Other Collections:</h2>
               <t-b>
-                
+                All documentations for the Rust collections are very well written - clear and accompanied by examples.
               </t-b>
-              <a id="Exer"></a>
-              <s-1em></s-1em>
+              <t-b>
+                <div>
+                  <ul class="tight">
+                    <li><a href="https://doc.rust-lang.org/beta/std/collections/">std::collections</a></li>
+                    <li><a href="https://doc.rust-lang.org/beta/std/collections/struct.VecDeque.html">VecDeque</a></li>
+                    <li><a href="https://doc.rust-lang.org/beta/std/collections/struct.LinkedList.html">LinkedList</a></li>
+                    <li><a href="https://doc.rust-lang.org/beta/std/collections/struct.BTreeMap.html">BTreeMap</a></li>
+                    <li><a href="https://doc.rust-lang.org/beta/std/collections/struct.HashSet.html">HashSet</a></li>
+                    <li><a href="https://doc.rust-lang.org/beta/std/collections/struct.BTreeSet.html">BTreeSet</a></li>
+                    <li><a href="https://doc.rust-lang.org/beta/std/collections/struct.BinaryHeap.html">BinaryHeap</a></li>
+                  </ul>
+                </div>
+                <a id="exer"></a>
+                <s-1em></s-1em>
+                </t-b>
             </li>
             <li>
               <h2>Exercises</h2>

@@ -174,25 +174,34 @@ fn demo_map() {
     m.insert(2, String::from("two"));
     m.insert(3, String::from("three"));
 
+    print!("\n  Iterating through map:",);
     let iter = m.iter();
     print!("\n  {{ ");
     for item in iter {
         print!("{:?} ", item);
     }
     print!("}}");
+    print!("\n  using show_coll(&m):",);
+    show_coll(&m);
+    print!("\n  displaying keys:",);
+    let v:Vec<&u8> = m.keys().collect();
+    show_coll(&v);
+    print!("\n  displaying values:",);
+    let v:Vec<&String> = m.values().collect();
+    show_coll(&v);
+    print!("\n  removing item with k == 2");
+    m.remove(&2);
+    show_coll(&m);
+    print!("\n  value for k == 3 is {:?}",m[&3]);
 }
-
-// fn demo_struct() {
-//     print!("\n  -- demo_struct --");
-// }
 
 fn main() {
 
     // demo_array_int();
-    demo_struct();
+    // demo_struct();
     // demo_string();
     // demo_vec_int();
-    // demo_map();
+     demo_map();
 
     println!("\n\n  That's all Folks!\n\n");
 }
