@@ -189,7 +189,10 @@ function initializeMenu() {
 
   var rvsd = document.getElementsByTagName("info-bar");
   var date = document.lastModified;
-  rvsd[0].innerHTML = "copyright &copy; Jim Fawcett, 2020&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Page Revised: " + date;
+  rvsd[0].innerHTML = "Key Map: <u>N?</u>ext <u>P?</u>rev <u>T</u>op <u>B</u>ottom <u>H</u>elp <u>R</u>efresh" +
+    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
+    "copyright &copy; Jim Fawcett, 2020" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+    "Page Revised: " + date;
   rvsd[0].addEventListener('click', function () { location.reload(); });
 
   // set display mode for navKeys from value in local storage
