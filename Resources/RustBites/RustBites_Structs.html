@@ -58,8 +58,8 @@
             <a href="Javascript.;#"></a><br />
           </up-b>
             <rt-b id="sects">
-          <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#starting">Starting</a>, 
-          <a href="#contents">Contents</a>, <a href="#refs">References</a>
+          <a href="#top">Top</a>, <a href="#methods">Methods</a>, <a href="#traits">Traits</a>, 
+          <a href="#binding">Binding</a>, <a href="#graph">graph</a>, <a href="#exer">Exercises</a>
         </rt-b>
       </toc-b>
       <div id="hlp" style="display:none;">
@@ -108,6 +108,8 @@
     <t-b>
       Methods allow us to build abstractions that are consistent with our problem domain or 
       lower-level abstractions that help us organize the solution side.
+      <a id="methods"></a>
+      <s-halfEm></s-halfEm>
     </t-b>
     <div>
       <ol>
@@ -588,14 +590,268 @@ Demonstrating Point Type
             </details>
           </div>
           <t-b>
-            
+            <a id="binding"></a>
+            <s-halfEm></s-halfEm>
           </t-b>
         </li>
         <li>
           <h2>Static vs. Dynamic Binding</h2>
+          <t-b>
+            Dispatching method arguments statically is just what we have been doing in all of the earlier Bites.
+            Binding of call to compiled method code happens at compile time.
+          </t-b>
+          <t-b>
+            Dynamic dispatching binds method calls to compiled code at run time.  Which object is passed to the
+            function isn't known until run time, so the binding has to happen then.  This binding is effected via 
+            a dyn object that contains two pointers, one to the object being passed, and one to a virtual pointer 
+            table (vtable). 
+          </t-b>
+          <t-b>
+            Each type that implements a trait constructs a vtable during the compilation of the impl trait for type 
+            part of its definition.  That compilation phase knows where the code for each of the type&apos;s Methods
+            is stored and constructs a table with pointers to each of those code blocks, e.g. the vtable.
+          </t-b>
+          <t-b>
+            When a function is specified to accept a trait object - do_draw&apos;s item in the right panel below - it is passed a 
+            reference to a dyn with pointer to the item and another pointer to the item&apos;s type&apos;s vtable.
+          </t-b>
+          <t-b>
+            Here&apos;s what the code looks like:
+          </t-b>
+          <div>
+            <defn-outerBlock>
+              <defn-block>
+                <defn-head>Static Dispatch Function</defn-head>
+                <defn-code>
+struct SomeVisualItem { /* contents elided */ }
+impl SomeVisualItem {
+  fn draw(&self) { /* code elided */ }
+}
+                </defn-code>
+                <defn-head class="defnBorderTop">Invocation</defn-head>
+                <defn-code>
+let svi = SomeVisualItem { /* content elided */ };
+svi.draw();
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Dynamic Dispatch Function</defn-head>
+                <defn-code>
+trait Draw { fn draw(&self); }
+
+struct SomeVisualItem { /* contents elided */ }
+impl Draw for SomeVisualItem {
+  fn draw(&self) { /* code elided */ }
+}
+
+fn do_draw(item: &dyn Draw) {
+  item.draw();
+}
+                </defn-code>
+                <defn-head class="defnBorderTop">Invocation</defn-head>
+                <defn-code>
+let svi = SomeVisualItem { /* content elided */ };
+do_draw(&svi); 
+// works for any type implementing Draw trait
+                </defn-code>
+              </defn-block>
+            </defn-outerBlock>
+          </div>
+          <t-b>
+            The Example code below represents a graphics editor that is drawing on some form of canvas.
+            It defines three graphics shapes that each implement a Draw trait - rectangles, circles, 
+            and textboxes.  An application would 
+            define many additional types, but only three are used here to keep things as simple as 
+            practical.
+          </t-b>
+          <t-b>
+            An editor will construct a draw_list of all the defined graphics objects and, when instructed, 
+            iterate through its list calling a do_draw function using dynamic dispatching.  In this way, 
+            the editor does not need to know anything about the graphics objects other than they implement 
+            the Draw trait.
+          </t-b>
+          <t-b>
+            <div>
+              <details>
+                <summary class="darkItem">Examples: static and dynamic dispatch</summary>
+                <s-halfEm></s-halfEm>
+                <defn-outerBlock>
+                  <defn-block>
+                    <defn-head>dispatch::main.rs</defn-head>
+                    <defn-code>
+///////////////////////////////////////////////////////////////
+// dispatch - demo static and dynamic fn arg dispatching     //
+//                                                           //
+// Jim Fawcett, https://JimFawcett.github.com, 27 Jun 2020   //
+///////////////////////////////////////////////////////////////
+
+#![allow(dead_code)]
+
+trait Draw {
+    fn draw(&amp;self);
+}
+/*-- define Rectangle --*/
+#[derive(Debug)]
+struct Point { x:i32, y:i32 }
+type Corner = Point;
+#[derive(Debug)]
+struct Rect { ll:Corner, ur:Corner }
+impl Draw for Rect {
+    fn draw(&amp;self) {
+        print!("\n  drawing Rect:\n  {:?}", &amp;self);
+    }
+}
+/*-- define Circle --*/
+#[derive(Debug)]
+struct Circle { orig:Point, rad:i32 }
+impl Draw for Circle {
+    fn draw(&amp;self) {
+        print!("\n  drawing Circle:\n  {:?}", &amp;self);
+    }
+}
+/*-- define TextBox --*/
+#[derive(Debug)]
+struct TextBox { region:Rect, text:String }
+impl Draw for TextBox {
+    fn draw(&amp;self) {
+        print!("\n  drawing TextBox:\n  {:?}", &amp;self);
+    }
+}
+/*-- dynamic dispatch of trait objects --*/
+fn do_draw(item:&amp;dyn Draw) {
+    item.draw();
+}
+                    </defn-code>
+                  </defn-block>
+                  <defn-block>
+                    <defn-head>Using Code</defn-head>
+                    <defn-code>
+fn main() {
+
+  print!("\n  -- static dispatch --");
+  let r = Rect { ll:Corner {x:1,y:0}, ur:Corner {x:2,y:5} };
+  r.draw();
+
+  print!("\n  -- dynamic dispatch --");
+  do_draw(&amp;r);
+  
+  print!("\n  -- dynamic dispatch of draw_list --");
+  let mut draw_list = Vec::&lt;&amp;dyn Draw&gt;::new();
+  let r1 = 
+    Rect{ 
+      ll:Corner {x:42, y:-42}, ur:Corner {x:-13, y:14} 
+    };
+  let r2 = 
+    Rect{ 
+      ll:Corner {x:81, y:53}, ur:Corner {x:35, y:36} 
+    };
+  let c1 = Circle{ orig:Point{x:5,y:19}, rad:3 };
+  let t1 = 
+  TextBox{ 
+    region:Rect{
+      ll:Corner{x:20,y:30}, ur:Corner{x:40, y:50}
+    }, 
+    text:"some text".to_string()};
+  draw_list.push(&amp;r1);
+  draw_list.push(&amp;r2);
+  draw_list.push(&amp;c1);
+  draw_list.push(&amp;t1);
+  
+  for item in draw_list {
+      do_draw(item);
+  }
+  print!("\n\n  That's all Folks!\n\n");
+}
+                    </defn-code>
+                    <defn-head class="defnBorderTop">Output:</defn-head>
+                    <defn-code>
+-- static dispatch --
+drawing Rect:
+Rect { ll: Point { x: 1, y: 0 }, ur: Point { x: 2, y: 5 } }
+
+-- dynamic dispatch --
+drawing Rect:
+Rect { ll: Point { x: 1, y: 0 }, ur: Point { x: 2, y: 5 } }
+
+-- dynamic dispatch of draw_list --
+
+drawing Rect:
+Rect { 
+  ll: Point { x: 42, y: -42 }, ur: Point { x: -13, y: 14 } 
+}  
+
+drawing Rect:       
+Rect { 
+  ll: Point { x: 81, y: 53 }, ur: Point { x: 35, y: 36 } 
+}
+
+drawing Circle:
+Circle { orig: Point { x: 5, y: 19 }, rad: 3 }
+
+drawing TextBox:
+TextBox { 
+  region: Rect { 
+    ll: Point { x: 20, y: 30 }, ur: Point { x: 40, y: 50 } 
+  }, 
+  text: "some text" 
+}
+
+That's all Folks!
+                  </defn-code>
+                  </defn-block>
+                </defn-outerBlock>
+              </details>
+            </div>
+          </t-b>
+          <t-b>
+            You have to use a bit of imagination as you look at the dispatching example.  We aren&apos;t drawing on a canvas, 
+            of course.  Just writing out information to the console.  But you see that all of the information necessary 
+            to draw on a canvas is handed to the draw method, via its instance&apos;s state.
+          </t-b>
+          <t-b>
+            So, in a galaxy not to far away, Rust generates 
+            <a href="https://www.hellorust.com/demos/canvas/index.html">webassembly code</a> to use this information to draw on a web brouwser 
+            canvas.
+            <a id="graph"></a>
+            <s-halfEm></s-halfEm>
+          </t-b>
         </li>
         <li>
           <h2>Graph Example</h2>
+          <t-b>
+            A directed graph, consisting of vertices connected with directed edges, is a useful example to illustrate how the 
+            Rust memory model affects our design strategies.
+          </t-b>
+          <t-b>
+            If we try to implement the graph with references - not hard to do in C# for example - we will almost immediately 
+            violate the Rust ownership rules.  Rust demands that a mutable pointer to any data item has exclusive access. But 
+            a directed graph may have several edge references to a vertex and we may wish to mutate the vertice&apos;s state.
+          </t-b>
+          <t-b>
+            It turns out that we can put the vertices in a Vec&lt;Vertex&gt; and access them through Vec indices.  That doesn&apos;t 
+            violate the ownership rules.  Each vertex is owned by the Vec&lt;Vertex&gt; - let&apos;s call it an adjacency list.
+            Access to a vertex through another vertex&apos;s edge is just an index operation with no additional reference 
+            needed.
+          </t-b>
+          <t-b>
+            There are design issues to be worked out, e.g., how to efficiently delete vertices, ... But those are all "business as 
+            usual" problems.
+          </t-b>
+          <t-b>
+            <defn-block style="width:50em;">
+              <defn-body>
+                This is a placeholder for example code.  I will be turning to other things for awhile, so it will take some time 
+                before Rust code appears here.  In the mean time, you can look at a Directed Graph class I built in C++ that uses
+                this strategy.
+                <s-1em></s-1em> 
+                It has an adjacency list of vertices with each vertex holding an edge that is a pair of an edge type E instance and an 
+                index for the vertex it &quot;points&quot; to.  The code is in the 
+                <a href="../../CppGraph.html">CppGraph</a> C++ Repository.
+              </defn-body>
+            </defn-block>
+            <a id="exer"></a>
+            <s-halfEm></s-halfEm>
+          </t-b>
         </li>
         <li>
           <h2>Exercises:</h2>
