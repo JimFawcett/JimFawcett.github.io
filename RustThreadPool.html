@@ -98,7 +98,7 @@
               Planned design changes
             </status-itemLeft>
             <status-itemRight>
-              None at this time
+              add post methods
             </status-itemRight>
           </status-grid>
         </details>
@@ -129,13 +129,18 @@
       <spacer-15></spacer-15>
       This is a nice illustration of how to build a data structure that uses threads for concurrent processing.  I intend to compare
       performance of this facility with message passing some time soon.
+      <s-1em></s-1em>
+      <notice-block style="max-width: 55em;">
+        This is a work in progress.  Thread handling is working, but the pool needs one or more methods
+        to post inputs.  I may also support embedding an output blocking queue to access results for processing
+        pipelines.
+      </notice-block>
     </indent-blocks>
     <h3>Design:</h3>
     <indent-blocks>
       <t-b>
-        There is one struct, ThreadPool&lt;M&gt;, with an associated function and one method in this design:
+        There is one struct, ThreadPool&lt;M&gt;, with an associated function and three methods in this design:
         <indent-block class="pad5">
-          Methods:
           <ol class="tight">
             <li>
               <strong><c-s>new(nt:u8, f:F) -> Self where F: FnOnce() -> () + Send + 'static + Copy</c-s></strong>
@@ -149,6 +154,24 @@
               <strong><c-s>wait(&mut self)</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Waits for all threads to complete.
+              </div>
+            </li>
+            <li class="disable">
+              <strong><c-s>post_work_item&lt;F&gt;(&mut self, f:F) where F:FnOnce() -> + Send + 'static + copy</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Enqueues function object for processing.
+              </div>
+            </li>
+            <li class="disable">
+              <strong><c-s>post_message&lt;Msg&gt;(&mut self, &msg: Msg) where Msg:Debug + Clone</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Enqueues message for processing.
+              </div>
+            </li>
+            <li class="disable">
+              <strong><c-s>get_message&lt;Msg&gt;(&mut self) -> Msg where M:Debug + Clone + Default</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Dequeues result message.
               </div>
             </li>
           </ol>
