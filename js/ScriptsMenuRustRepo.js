@@ -48,6 +48,7 @@ function initializeMenu() {
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Components</div>\
         <a href='RustBlockingQueue.html'>BlockingQueue&nbsp;</a>\
+        <a href='RustThreadPool.html'>ThreadPool&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
