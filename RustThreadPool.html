@@ -131,9 +131,9 @@
       performance of this facility with message passing some time soon.
       <s-1em></s-1em>
       <notice-block style="max-width: 55em;">
-        This is a work in progress.  Thread handling is working, but the pool needs one or more methods
-        to post inputs.  I may also support embedding an output blocking queue to access results for processing
-        pipelines.
+        This is a work in progress.  Thread handling and message posting is working, but the pool needs one or 
+        more methods to post work items (function objects).  I may also support embedding an output blocking queue 
+        to access results for processing pipelines.
       </notice-block>
     </indent-blocks>
     <h3>Design:</h3>
@@ -143,9 +143,10 @@
         <indent-block class="pad5">
           <ol class="tight">
             <li>
-              <strong><c-s>new(nt:u8, f:F) -> Self where F: FnOnce() -> () + Send + 'static + Copy</c-s></strong>
+              <strong><c-s>new&lt;F&gt;(nt:u8, f:F) -> ThreadPool&lt;M&gt;<br />
+                where F: FnOnce(&BlockingQueue&lt;M&gt;) -> () + Send + 'static + Copy</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
-                Create new <c-s>ThreadPool</c-s> which is running nt threads, processing f().  If f is a closure,
+                Create new <c-s>ThreadPool</c-s> which is running nt threads, each processing f().  If f is a closure,
                 then input data can be supplied in its capture.  An example is given in the test1.rs in
                 examples folder.
               </div>
@@ -156,20 +157,22 @@
                 Waits for all threads to complete.
               </div>
             </li>
+            <li>
+              <strong><c-s>post_message(&mut self, msg: M) where M:Debug + Clone</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Enqueues message for processing.<br />
+                Function object passed to new needs to accept and process posted messages.
+              </div>
+            </li>
             <li class="disable">
               <strong><c-s>post_work_item&lt;F&gt;(&mut self, f:F) where F:FnOnce() -> + Send + 'static + copy</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
-                Enqueues function object for processing.
+                Enqueues work item (function object) for processing.<br />
+                Function object passed to new needs to accept and process work items.
               </div>
             </li>
             <li class="disable">
-              <strong><c-s>post_message&lt;Msg&gt;(&mut self, &msg: Msg) where Msg:Debug + Clone</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Enqueues message for processing.
-              </div>
-            </li>
-            <li class="disable">
-              <strong><c-s>get_message&lt;Msg&gt;(&mut self) -> Option&lt;Msg&gt; where M:Debug + Clone + Default</c-s></strong>
+              <strong><c-s>get_message(&mut self) -> Option&lt;M&gt; where M:Debug + Clone + Default</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Dequeues result message. Option is None if there are no messages to dequeue.  Alternate is to simply
                 block on empty, but that may have operational problems.
