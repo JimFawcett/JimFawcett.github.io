@@ -135,8 +135,8 @@ function initializeMenu() {
         <a href='SiteDesign.html'>Site Design</a>\
         <a href='BookDesignCourse.html'>Design Course</a>\
         <a class='border' href='index.html'>L1 Site Home</a>\
-        <a class='border' href='Repositories.html'>L2&nbsp;Repository&nbsp;webpage</a>\
-        <a class='border' href='LangCpp.html'>L2&nbsp;C++&nbsp;webpage</a>\
+        <a class='border' href='RsRepositories.html'>L2&nbsp;Repository&nbsp;webpage</a>\
+        <a class='border' href='RustBiteByByte.html'>L3&nbsp;Rust&nbsp;Bites</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
@@ -189,12 +189,17 @@ function initializeMenu() {
 
   var rvsd = document.getElementsByTagName("info-bar");
   var date = document.lastModified;
-  rvsd[0].innerHTML = "Key Map: <u>N?</u>ext <u>P?</u>rev <u>T</u>op <u>B</u>ottom <u>H</u>elp <u>R</u>efresh" +
+  rvsd[0].innerHTML = 
     "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
-    "copyright &copy; Jim Fawcett, 2020" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-    "Page Revised: " + date;
+    "copyright &copy; Jim Fawcett, 2020" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
+    "Page Revised: " + date + "&nbsp;&nbsp;&nbsp;&nbsp;"
   rvsd[0].addEventListener('click', function () { location.reload(); });
-
+  //rvsd[0].appendChild(nxt);
+  //pKey.style.display = "inline";
+  //rvsd[0].appendChild(prv);
+  //rvsd[0].innerHTML = rvsd[0].innerHTML + "&nbsp;&nbsp;&nbsp;&nbsp;"
+  //rvsd[0].appendChild(prv);
+  //console.log(rvsd[0].innerHTML);
   // set display mode for navKeys from value in local storage
 
   setnavKeys();

@@ -116,23 +116,23 @@ function initializeMenu() {
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
-      <div class='dropdown-content'>\
-        <div class='darkTheme'>&nbsp;About&nbsp;this&nbsp;Site</div>\
-        <a href='../../JimFawcett.html'>Jim Fawcett</a>\
-        <a href='../../Interesting.html'>Interesting&nbsp;things&nbsp;&nbsp;</a>\
-        <a href='../../Help.html'>Help</a>\
-        <a href='../../ToDo.html'>ToDo</a>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;About&nbsp;this&nbsp;Site</div>\
+        <a href='JimFawcett.html'>Jim Fawcett</a>\
+        <a href='Interesting.html'>Interesting&nbsp;things&nbsp;&nbsp;</a>\
+        <a href='Friends.html'>Friends&nbsp;&amp&nbsp;Collaborators&nbsp;&nbsp;</a>\
+        <a href='Help.html'>Help</a>\
+        <a href='SitePlans.html'>Site Plans</a>\
         <a href='#' onclick='togglenavKeys()'>Toggle Nav Keys</a>\
         <a href='#' onclick='toggleSwipeEvents()'>Toggle Swipe Events</a>\
-        <a href='../../SiteDesign.html'>Site Design</a>\
-        <a href='../../BookDesignCourse.html'>Design Course</a>\
-        <a class='border' href='../../index.html'>L1 Site Home</a>\
-        <a class='border' href='../../Repositories.html'>L2&nbsp;Repository&nbsp;webpage</a>\
-        <a class='border' href='../../LangCpp.html'>L2&nbsp;C++&nbsp;webpage</a>\
+        <a href='SiteDesign.html'>Site Design</a>\
+        <a href='BookDesignCourse.html'>Design Course</a>\
+        <a class='border' href='index.html'>L1 Site Home</a>\
+        <a class='border' href='CppRepositories.html'>L2&nbsp;C++&nbsp;Repository&nbsp;webpage</a>\
+        <a class='border' href='CppStory_Prologue.html'>L3&nbsp;C++&nbsp;Story</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
-        <a href='../../SiteMap.html'>Site Map</a>\
-        <a href='../../Menus.html'>Menus</a>\
-        <a href='../../TestFileLoad.html'>TestFileLoad</a>\
+        <a href='SiteMap.html'>Site Map</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\

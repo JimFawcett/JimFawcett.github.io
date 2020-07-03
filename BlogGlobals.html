@@ -18,6 +18,7 @@
   <script src="js/ScriptsKeyboard.js"></script>
   <script src="js/ScriptsMenu.js"></script>
   <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesDefault.css" />
   <link rel="stylesheet" href="css/StylesMenu.css" />
   <link rel="stylesheet" href="css/StylesBrownTheme.css" />
   <style>
@@ -65,13 +66,16 @@
   <!-- page content -->
 
   <h3>Initial Thoughts:</h3>
+  <t-b>
   Global data is often said to be <a href="http://c2.com/cgi/wiki?GlobalVariablesAreBad">&quot;bad&quot;</a>.  By global, we mean that the data is subject
   to some form of non-local sharing.  Throughout this discussion we take &quot;data&quot; to mean an instance of some language or user defined type, including language
   primitives like ints.
-  <p />
+  <t-b>
+  </t-b>
   Most data is shared, otherwise why create it in the first place?  However, the scope of this sharing has deep
   implications for the ease and effectiveness of the code's implementation and maintenance.
-  <p />
+  <t-b>
+  </t-b>
   <h3>Problems with Global Sharing:</h3>
   <ul class="indent">
     <li>
@@ -98,14 +102,20 @@
       not result in problematic behavior, but if it does it will often be very difficult to find and rectify.
     </li>
   </ul>
-  These problems make development, testing, and maintenance of code containing global sharing difficult and often quite unproductive.
+  <t-b>
+    These problems make development, testing, and maintenance of code containing global sharing difficult and often quite unproductive.
+  </t-b>
 
-  <div style="float:right">
-    <img src="Pictures/placement.jpg" width="700" />
+  <div style="width:calc(100vw - 9rem);">
+    <div style="float:right">
+      <img src="Pictures/placement.jpg" width="700" />
+    </div>
   </div>
   <h3>Scopes:</h3>
+  <t-b>
   For purposes of this discussion we will define a package as a single source code file in C# and Java, and, for C and C++, a pair of source code files - header and matching implementation.
-  <p />
+  </t-b>
+  <t-b>
   Access to data in the four major development languages C, C++, Java, and C#, depends on scope.  These languages define, for each package, a tree of nested scopes
   using the symbols &quot;{&quot; and &quot;}&quot;.  Code that resides outside any &quot;{&quot;, &quot;}&quot; block is said to be in the program's
   global scope.  There are two kinds of scope:
@@ -125,11 +135,13 @@
   Namespaces can be defined only at the global level.  That is, they may be sequenced and nested in the global scope, but may not be nested within any
   non-namespace scope.  They serve to qualify program names to avoid conflicts when code is developed by more than one person, and also to provide a
   weak semantic structuring for large bodies of code.
-  <p />
+  </t-b>
+  <t-b>
   In C# and Java, handles to reference types and instances of value types may be declared only as members of a class or struct or locally in a member function.
   C and C++ allow type instances to be declared in global scope, in a namespace scope, and as members of a class or struct or locally in a global or member function.
-
+  </t-b>
   <h3>Data Access:</h3>
+  <t-b>
   Access to data is controlled by the scope in which it resides:
   <ul class="indent">
     <li>
@@ -150,48 +162,60 @@
       The values of static member data of a class or struct are shared by all instances of that type.
     </li>
   </ul>
-
+  </t-b>
   <h3>What do we mean by Global Sharing?</h3>
+  <t-b>
   It's relative. Data defined outside any class, struct, or global function, is global to the program.  Non-static member data is global to the instance of its
   class or struct.  Static member data is global to the set of all instances of its type.
   Data defined inside the scope of a function is global to all code in the function after the point of its declaration.
-  <p />
+  </t-b>
+  <t-b>
   I expect that most developers and language enthusiasts mean program global access when they use the term &quot;global&quot;.  Note that a database provides
   program global sharing of data.  Its use is subject to some of the same problems as raw data, although most database facilities provide safe multi-threaded operation.
-
+  </t-b>
   <h3>So What?</h3>
+  <t-b>
   The difficulties we encounter with shared data depends largely on its scope of definition.  Data defined in a program's global scope is the most likely to
   cause difficulties in development and maintenance, as cited in &quot;Problems with Global Sharing&quot;, above.  As the scope of access is reduced the problems become
   easier to manage; and for local and non-static member data, in small functions and classes, almost non-existent because the entire scope is
   designed and implemented by one person at one time in a page or two of code.
-  <p />
+  </t-b>
+  <t-b>
   Constant data defined in the global scope causes no problems and has semantic value, providing a program-wide name for an invariant.  Global data with a
   single writer has only one specific problem - a value intended for one reader may be overwritten with a value for another reader before the first is read.
-  <p />
+  </t-b>
+  <t-b>
   Using global data with multiple writers and readers should almost always be avoided because its just too hard to understand and manage.
   Java and C# prohibit all use of global data, even the beneficial use of global invariants.
-  <p />
+  </t-b>
+  <t-b>
   Sharing through static member data can be very useful.  Here's an example.
   <div class="indent">
+  <t-b>
     We've decided to communicate between two processes in our application using
     enqueued messages.  There may be several parts of the sending process's code that need to create and post messages.  If they are in different scopes how
     do they all access the queue?
-    <p />
+  </t-b>
+  <t-b>
     It would be hard to make a simple elegant design that passed references to the queue into every scope that needs access.
     If we write a small wrapper class that holds a static instance of the queue and makes it available, the code in any other scope that needs access can
     simply declare an instance of the wrapper class to get to the queue.  If the queue is thread-safe, then the wrapper becomes very easy to use.
-    <p />
+  </t-b>
+  <t-b>
     In C++ we can declare the wrapper as a template type that takes an integral type
     as a template parameter.  That will create seperate types for each value of the parameter and so we can define queues that are shared by different
     categories of users, e.g., those that need acess to an input queue and those that need access to an output queue.
   </div>
+  </t-b>
+
   <h3>Summary:</h3>
+  <t-b>
   Use program global data only for program invariants, e.g., initialized once and read many times. Use static member data to share between instances and
   provide access to a facility, like a queue, across program scopes.  But, be aware of threading issues with static member data.  While virtually all programs
   beyond the &quot;Hello&quot; variety need shared data, we should attempt to minimize and localize its use as much as possible.
-  <p>
-    <img class="photo" src="Pictures/slocum.jpg" alt="Newhouse" style="width:100%;" />
-  </p>
+  </t-b>
+  <div sstyle="width:calc(100vw ng- 9rem);"><img class="photo" src="Pictures/slocum.jpg" alt="Newhouse" style="width:100%;" /></div>
+ 
   <info-bar></info-bar>
 </body>
 </html>

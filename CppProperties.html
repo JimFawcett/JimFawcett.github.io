@@ -18,6 +18,7 @@
   <script src="js/ScriptsMenuCppRepo.js"></script>
   <script src="js/ScriptsSizerComp.js"></script>
   <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesDefault.css" />
   <link rel="stylesheet" href="css/StylesMenu.css" />
   <link rel="stylesheet" href="css/StylesSizerComp.css" />
   <link rel="stylesheet" href="css/StylesBlueTheme.css" />
@@ -119,11 +120,12 @@
   <indent-blocks>
     <h3>Concept:</h3>
     <indent-blocks>
-      Properties are a programming language construct that provide encapsulated instances of the property type
-      with setter and getter methods to access that value. C++ does not provide properties, but this code shows
-      that can be done with templates and some specialization magic.
-      <spacer-15></spacer-15>
-      There are some important reasons for using properties:
+      <t-b>
+        Properties are a programming language construct that provide encapsulated instances of the property type
+        with setter and getter methods to access that value. C++ does not provide properties, but this code shows
+        that can be done with templates and some specialization magic.
+      </t-b>
+      <t-b>There are some important reasons for using properties:</t-b>
       <ul>
         <li>
           Provide thread-safe operations for the encapsulated instances.  Property access methods may take
@@ -138,17 +140,22 @@
           encapsulated instances, e.g., authorization, styling, security checks, ...
         </li>
       </ul>
-      If the Property class provides virtual functions for access, derived classes may simply provide whatever
-      their application needs.
+      <t-b>
+        If the Property class provides virtual functions for access, derived classes may simply provide whatever
+        their application needs.
+      </t-b>
     </indent-blocks>
     <h3>Design:</h3>
     <div id="fig1"></div>
     <indent-blocks>
-      This design of properties uses an inheritance hierarchy, shown in Figure 1., to implement the various
-      design aspects needed for property behaviors, as described in the concept statement, above.
-      <spacer-10></spacer-10>
-      The first base class, <code-span>PropContainer&lt;T&gt;</code-span>, holds the encapsulated instance t &epsilon; T and provides
-      protected virtual methods:<br />
+      <t-b>
+        This design of properties uses an inheritance hierarchy, shown in Figure 1., to implement the various
+        design aspects needed for property behaviors, as described in the concept statement, above.
+      </t-b>
+      <t-b>
+        The first base class, <code-span>PropContainer&lt;T&gt;</code-span>, holds the encapsulated instance t &epsilon; T and provides
+        protected virtual methods:
+      </t-b><br />
       <ul class="tight pad10">
         <li>
           <span class="code">virtual void set(const T&amp; t)</span>
@@ -156,10 +163,12 @@
         <li>
           <span class="code">virtual T&amp; get()</span>
         </li>
-      </ul><br />
-      The purpose of these methods is to manage access to the encapsulated type.
-      The <code-span>PropertyBase&lt;T&gt;</code-span>
-      class inherits those protected methods and uses them to implement the user interface methods:<br />
+      </ul>
+      <t-b>
+        The purpose of these methods is to manage access to the encapsulated type.
+        The <code-span>PropertyBase&lt;T&gt;</code-span>
+        class inherits those protected methods and uses them to implement the user interface methods:
+      </t-b>
       <ul class="tight pad10">
         <li>
           <span class="code">
@@ -176,55 +185,61 @@
           <span class="code">T operator()()</span>
         </li>
       </ul><br />
-      The first three of these methods call
-      <span class="code">void PropContainer&lt;T&gt;::set(const T&amp; t)</span>
-      and the last calls
-      <span class="code">T&amp; PropContainer&lt;T&gt;::get()</span>.
-      Note that the <span class="code">set(const T&amp; t)</span> method copy assigns t to the
-      encapsulated instance, e.g., makes a <strong>copy</strong> so users can&apos;t modify the
-      inner instance through that reference.  Also note that the <span class="code">operator()()</span>
-      method returns a copy of the inner instance, for the same reason.  For large types, those
-      copies will have preformance implications, but are necessary to ensure application defined
-      constraints on operations are enforced and any changes, for thread-safe properties, happen
-      only in a locked critical section.
-      <spacer-10></spacer-10>
-      Since <code-span>Property&lt;T&gt;</code-span> is not a T, it doesn&apos;t have T&apos;s methods.
-      If <code-span>Property&lt;T&gt;</code-span>
-      derived from T, that would provide those methods, but then it would be very difficult
-      (maybe impossible) to enforce application constraints and provide consistent logging and
-      thread safety. So, I elected to take the design route described below.
-      <spacer-10></spacer-10>
+      <t-b>
+        The first three of these methods call
+        <span class="code">void PropContainer&lt;T&gt;::set(const T&amp; t)</span>
+        and the last calls
+        <span class="code">T&amp; PropContainer&lt;T&gt;::get()</span>.
+        Note that the <span class="code">set(const T&amp; t)</span> method copy assigns t to the
+        encapsulated instance, e.g., makes a <strong>copy</strong> so users can&apos;t modify the
+        inner instance through that reference.  Also note that the <span class="code">operator()()</span>
+        method returns a copy of the inner instance, for the same reason.  For large types, those
+        copies will have preformance implications, but are necessary to ensure application defined
+        constraints on operations are enforced and any changes, for thread-safe properties, happen
+        only in a locked critical section.
+      </t-b>
+      <t-b>
+        Since <code-span>Property&lt;T&gt;</code-span> is not a T, it doesn&apos;t have T&apos;s methods.
+        If <code-span>Property&lt;T&gt;</code-span>
+        derived from T, that would provide those methods, but then it would be very difficult
+        (maybe impossible) to enforce application constraints and provide consistent logging and
+        thread safety. So, I elected to take the design route described below.
+      </t-b>
       <div id="fig2"></div>
-      The class <code-span>PropertyOps&lt;T&gt;</code-span> provides methods for frequently occurring types:<br />
+      <t-b>The class <code-span>PropertyOps&lt;T&gt;</code-span> provides methods for frequently occurring types:</t-b>
       <ul class="tight pad10">
         <li>fundamental type operations</li>
         <li>operations for STL sequential containers</li>
         <li>operations for STL associative containers</li>
-      </ul><br />
-      Each of these types require different interfaces, so the <code-span>PropertyOps&lt;T&gt;</code-span> class provides
-      specializations for each of these, based on custom type traits: <code-span>is_fundamental</code-span>,
-      <code-span>is_stl_seq_container</code-span>, and <code-span>is_stl_assoc_container</code-span>.  The selection of those specializations uses some
-      template metaprogramming constructs provided by C++14 and C++17. The Property.h and CustomContTypeTraits.h
-      files provide some notes about that.
-      <spacer-10></spacer-10>
-      Whenever it can, <code-span>PropertyOps&lt;T&gt;</code-span> uses the protected
-      <code-span>PropContainer&lt;T&gt;</code-span> reference-based methods for performance,
-      only using instance copy operations when it must to maintain thread-safety or application constraints.
-      <spacer-10></spacer-10>
-      For types not included in <span class="code">PropertyBase&lt;T&gt;</span>, e.g.,
-      <span class="code">Widget</span>, applications can retreive
-      a copy of the encapsulated type using <span class="code">T PropertyBase&lt;T&gt;::operator()()</span>,
-      use the copy&apos;s methods, and set the modified instance with
-      <span class="code">void PropertyBase&lt;T&gt;::operator()(const T&amp; t)</span> method.
-      That, obviously has performance and convenience issues, but would probably be worthwhile for
-      multi-threaded environments or applications needing specific logging operations.
-      <spacer-10></spacer-10>
-      For frequently used types, a developer may always elect to add another <span class="code">PropertyOps</span>
-      specialization.  That will probably be easier than for STL containers, since those class interfaces
-      are likely to be smaller, simpler, and easier to implement.
-      <spacer-10></spacer-10>
+      </ul>
+      <t-b>
+        Each of these types require different interfaces, so the <code-span>PropertyOps&lt;T&gt;</code-span> class provides
+        specializations for each of these, based on custom type traits: <code-span>is_fundamental</code-span>,
+        <code-span>is_stl_seq_container</code-span>, and <code-span>is_stl_assoc_container</code-span>.  The selection of those specializations uses some
+        template metaprogramming constructs provided by C++14 and C++17. The Property.h and CustomContTypeTraits.h
+        files provide some notes about that.
+      </t-b>
+      <t-b>
+        Whenever it can, <code-span>PropertyOps&lt;T&gt;</code-span> uses the protected
+        <code-span>PropContainer&lt;T&gt;</code-span> reference-based methods for performance,
+        only using instance copy operations when it must to maintain thread-safety or application constraints.
+      </t-b>
+      <t-b>
+        For types not included in <span class="code">PropertyBase&lt;T&gt;</span>, e.g.,
+        <span class="code">Widget</span>, applications can retreive
+        a copy of the encapsulated type using <span class="code">T PropertyBase&lt;T&gt;::operator()()</span>,
+        use the copy&apos;s methods, and set the modified instance with
+        <span class="code">void PropertyBase&lt;T&gt;::operator()(const T&amp; t)</span> method.
+        That, obviously has performance and convenience issues, but would probably be worthwhile for
+        multi-threaded environments or applications needing specific logging operations.
+      </t-b>
+      <t-b>
+        For frequently used types, a developer may always elect to add another <span class="code">PropertyOps</span>
+        specialization.  That will probably be easier than for STL containers, since those class interfaces
+        are likely to be smaller, simpler, and easier to implement.
+      </t-b>
       <div id="fig3"></div>
-      Three classes derive from <code-span>PropertyOps&lt;T&gt;</code-span>:
+      <t-b>Three classes derive from <code-span>PropertyOps&lt;T&gt;</code-span>:</t-b>
       <ul>
         <li>
           <span class="code">Property&lt;T&gt;</span> imposes no constraints and does no locking.
@@ -241,12 +256,14 @@
           <span class="code">T&amp; get()</span> methods.
         </li>
       </ul>
-      The <code-span>Property&lt;T&gt;</code-span> and <span class="code">TS_Property&lt;T&gt;</span> classes
-      have been implemented and are part of this repository.  <code-span>Log_Property&lt;T&gt;</code-span>
-      is planned and should appear soon.
-      <spacer-15></spacer-15>
-      A final observation about this design: note how property operations are factored into
-      single-responsibility classes, e.g.:
+      <t-b>
+        The <code-span>Property&lt;T&gt;</code-span> and <span class="code">TS_Property&lt;T&gt;</span> classes
+        have been implemented and are part of this repository.  <code-span>Log_Property&lt;T&gt;</code-span>
+        is planned and should appear soon.
+        <spacer-15></spacer-15>
+        A final observation about this design: note how property operations are factored into
+        single-responsibility classes, e.g.:
+      </t-b>
       <ul>
         <li>
           <code-span>PropContainer</code-span> provides virtual functions to manage its encapsulated
@@ -267,20 +284,21 @@
           <code-span>PropContainer&lt;T&gt;</code-span> methods to suit the current application.
         </li>
       </ul>
-      <code-span>PropContainer&lt;T&gt;</code-span> sets up the flexibility infrastructure, and
-      <code-span>Property&lt;T&gt;</code-span>,
-      <code-span>TS_Property&lt;T&gt;</code-span>, and
-      <code-span>Log_Property&lt;T&gt;</code-span> use that for their application.
-      The Single-Responsibility Principle is the queen - most important - of all the design principles.
-
+      <t-b>
+        <code-span>PropContainer&lt;T&gt;</code-span> sets up the flexibility infrastructure, and
+        <code-span>Property&lt;T&gt;</code-span>,
+        <code-span>TS_Property&lt;T&gt;</code-span>, and
+        <code-span>Log_Property&lt;T&gt;</code-span> use that for their application.
+        The Single-Responsibility Principle is the queen - most important - of all the design principles.
+      </t-b>
     </indent-blocks>
     <h3>Build:</h3>
-    <indent-blocks>
+    <t-b>
       CppProperties was built with Visual Studio Community Edition - 2019 and tested on Windows&nbsp;10.
       <spacer-25></spacer-25>
-    </indent-blocks>
+    </t-b>
     <h3>Status:</h3>
-    <indent-blocks>
+    <t-b>
       All of the classes except
       <code-Span>Log-Property&lt;T&gt;</code-Span> have been implemented.  The code has not been used
       in any major application yet, so there may be some latent undetected errors.
@@ -291,7 +309,7 @@
       methods.  They need their own <code-span>PropertyOps&lt;T&gt;</code-span> processing.  I have not done that
       yet, so using them will cause compilation failure.  Since you can use the <code-span>std::deque&lt;T&gt;</code-span>
       as a stack or queue, I will not do that for awhile.
-    </indent-blocks>
+    </t-b>
     <spacer-15></spacer-15>
     <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
   </indent-blocks>

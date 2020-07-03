@@ -96,6 +96,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>About &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;About&nbsp;this&nbsp;Site</div>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
         <a href='Interesting.html'>Interesting&nbsp;things&nbsp;&nbsp;</a>\
         <a href='Friends.html'>Friends&nbsp;&amp&nbsp;Collaborators&nbsp;&nbsp;</a>\
@@ -106,8 +107,8 @@ function initializeMenu() {
         <a href='SiteDesign.html'>Site Design</a>\
         <a href='BookDesignCourse.html'>Design Course</a>\
         <a class='border' href='index.html'>L1 Site Home</a>\
-        <a class='border' href='Repositories.html'>L2&nbsp;Repository&nbsp;webpage</a>\
-        <a class='border' href='LangCpp.html'>L2&nbsp;C++&nbsp;webpage</a>\
+        <a class='border' href='CsRepositories.html'>L2&nbsp;C#&nbsp;Repository&nbsp;webpage</a>\
+        <a class='border' href='CppStory_Prologue.html'>L3&nbsp;C++&nbsp;Story</a>\
         <a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a>\
         <a href='SiteMap.html'>Site Map</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
