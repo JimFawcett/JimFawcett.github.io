@@ -65,6 +65,7 @@ function initializeMenu() {
         <a href='Videos.html' class='menuItem'>Videos</a>\
         <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a>\
         <a href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a>\
+        <a href='page_test.html'>Test Page</a>\
         <a href='DesignProcess.html'>Design Process</a>\
         <a href='ProjectsList.html'>Project suggestions</a>\
         <a href='RustStory_CodeIndex.html'>Rust code index</a>\
