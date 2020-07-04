@@ -18,6 +18,7 @@
   <script src="js/ScriptsKeyboard.js"></script>
   <script src="js/ScriptsMenu.js"></script>
   <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesDefault.css" />
   <link rel="stylesheet" href="css/StylesMenu.css" />
   <link rel="stylesheet" href="css/StylesBrownTheme.css" />
   <style>
@@ -64,83 +65,111 @@
 
   <!-- page content -->
   <h3>Initial Thoughts:</h3>
-  C++11 has a lot of useful features, many <a href="http://herbsutter.com/elements-of-modern-c-style/">new to the latest 2011 standard</a>, e.g.,
-  range-based for loop, uniform initialization, type inference with auto, new smart pointers, lambda functions, move constructors and assignments, etc.
-  One of the things that was discussed but not adopted was the addition of file and directory management facilities in the standard C++ library.
-  <p />
-  Projects for CSE687 - Object Oriented Design and CSE775 - Distributed Objects often require us to find, using C++ code, files on specific directory paths
-  that match a specified pattern.  So not having file and directory management libraries means we get to write a lot of low-level code using
-  platform specific APIs or interoperate with code developed in languages that do provide that library support, like C#.
-  While that is not that difficult to do, it would be very convenient to have native C++ libraries that provide such support.
+  <t-b>
+    C++11 has a lot of useful features, many <a href="http://herbsutter.com/elements-of-modern-c-style/">new to the latest 2011 standard</a>, e.g.,
+    range-based for loop, uniform initialization, type inference with auto, new smart pointers, lambda functions, move constructors and assignments, etc.
+    One of the things that was discussed but not adopted was the addition of file and directory management facilities in the standard C++ library.
+  </t-b>
+  
+  <t-b>
+    Projects for CSE687 - Object Oriented Design and CSE775 - Distributed Objects often require us to find, using C++ code, files on specific directory paths
+    that match a specified pattern.  So not having file and directory management libraries means we get to write a lot of low-level code using
+    platform specific APIs or interoperate with code developed in languages that do provide that library support, like C#.
+    While that is not that difficult to do, it would be very convenient to have native C++ libraries that provide such support.
+  </t-b>
 
   <h3>Background:</h3>
-  CSE775 - Distributed Objects is concerned with system programming for both Windows and Linux platforms.  The first assigned project requires
-  development of components using the Microsoft Component Object Model (COM) on Windows and components on Linux that use the same model,
-  e.g., code accessed through interfaces and object factories and that uses reference counting management of object life-time.
-  <p />
-  For the second major project each student selects from a list of <a href="../CSE775/lectures/CSE775Projects.htm">suggestions</a>.  Most of these projects
-  explore some interesting platfrom that will require student research to learn a new, for them, technology. They then propose development of
-  an application, they will develop, that illustrates how the technology works and will be technically interesting for the rest of the class.
-  Many of these projects
-  are expected to create applications that run on both Windows and Linux or that have components that interoperate across these platforms.
+  <t-b>
+    CSE775 - Distributed Objects is concerned with system programming for both Windows and Linux platforms.  The first assigned project requires
+    development of components using the Microsoft Component Object Model (COM) on Windows and components on Linux that use the same model,
+    e.g., code accessed through interfaces and object factories and that uses reference counting management of object life-time.
+  </t-b>
+  
+  <t-b>
+    For the second major project each student selects from a list of <a href="../CSE775/lectures/CSE775Projects.htm">suggestions</a>.  Most of these projects
+    explore some interesting platfrom that will require student research to learn a new, for them, technology. They then propose development of
+    an application, they will develop, that illustrates how the technology works and will be technically interesting for the rest of the class.
+    Many of these projects
+    are expected to create applications that run on both Windows and Linux or that have components that interoperate across these platforms.
+  </t-b>
 
   <h3>Core Idea:</h3>
-  In order to support cross-platform development we have been working on libraries that provide access to system artifacts: files, directories,
-  threads and locks<sup>1</sup>, process management, and socket-based communication. The idea is for the libraries to host the same interfaces on
-  both platforms while using the underlying platform APIs<sup>2</sup>.  That way we can build applications out of code common to both platforms
-  that use these Windows or Linux libraries without change.
-  <p />
-  Building common Graphical User Interfaces (GUI)s provide an interesting challenge which we will discuss in a future Blog page.
+  <t-b>
+    In order to support cross-platform development we have been working on libraries that provide access to system artifacts: files, directories,
+    threads and locks<sup>1</sup>, process management, and socket-based communication. The idea is for the libraries to host the same interfaces on
+    both platforms while using the underlying platform APIs<sup>2</sup>.  That way we can build applications out of code common to both platforms
+    that use these Windows or Linux libraries without change.
+  </t-b>
+  
+  <t-b>Building common Graphical User Interfaces (GUI)s provide an interesting challenge which we will discuss in a future Blog page.</t-b>
 
-  <div class="right clear photo" style="margin: 10px; padding: 10px;">
-    <img name="filesys" width="600" onmouseover="filesys.width='900'" onmouseout="filesys.width='600'" src="Pictures/Blog.FileSystem.png" />
-    <div class="center">Figure 1 - File System Classes</div>
+  <div style="width:calc(100vw - 9rem);">
+    <div class="right clear photo" style="margin: 10px; padding: 10px;">
+      <img name="filesys" width="600" onmouseover="filesys.width='900'" onmouseout="filesys.width='600'" src="Pictures/Blog.FileSystem.png" />
+      <div class="center">Figure 1 - File System Classes</div>
+    </div>
   </div>
 
   <h3>Design:</h3>
-  Here, we focus on our FileSystem library that supports operations on the file systems of either Windows or Linux
-  through the same set of interfaces.
-  <p />
-  The FileSystem library contains four main classes: Directory, Path, FileInfo, and File, with another public helper class Block and
-  private helper class FileSystemSearch.
-  The main classes are modeled after similar classes in the .Net System.IO namespace.
-  <p />
-  Directory is composed of static member functions for manipulating directories and files.  For example, Directory::getFiles(...) returns a std::vector&lt;string&gt;
-  containing the names of files on a specified path that match a specified pattern.
-  <p />
-  Path supports parsing fully qualified file specifications into path, file name, and extension and composing those parts into a file specification.
-  Its function getFullFileSpec(...) supports converting a relative path into an absolute path.
-  <p />
-  The FileInfo class provides facilities for retrieving directory properties about a directory entry, like date of last modification, size, and whether
-  it is a file or directory.  The class also supports comparing properties of two specified files.
-  <p />
-  The File class supports opening, reading lines or blocks of bytes, writing lines or blocks of bytes, and testing FileStream state.
-  <p />
-  Finally, the Block class wraps an array of bytes for read and write operations on instances of the File class.  Blocks are most useful for file transfers with
-  chunking - breaking a file into pieces for transmission over a socket-based channel.
+  <t-b>
+    Here, we focus on our FileSystem library that supports operations on the file systems of either Windows or Linux
+    through the same set of interfaces.
+  </t-b>
+  
+  <t-b>
+    The FileSystem library contains four main classes: Directory, Path, FileInfo, and File, with another public helper class Block and
+    private helper class FileSystemSearch.
+    The main classes are modeled after similar classes in the .Net System.IO namespace.
+  </t-b>
+  
+  <t-b>
+    Directory is composed of static member functions for manipulating directories and files.  For example, Directory::getFiles(...) returns a std::vector&lt;string&gt;
+    containing the names of files on a specified path that match a specified pattern.
+  </t-b>
+  
+  <t-b>
+    Path supports parsing fully qualified file specifications into path, file name, and extension and composing those parts into a file specification.
+    Its function getFullFileSpec(...) supports converting a relative path into an absolute path.
+  </t-b>
+  
+  <t-b>
+    The FileInfo class provides facilities for retrieving directory properties about a directory entry, like date of last modification, size, and whether
+    it is a file or directory.  The class also supports comparing properties of two specified files.
+  </t-b>
+  
+  <t-b>The File class supports opening, reading lines or blocks of bytes, writing lines or blocks of bytes, and testing FileStream state.</t-b>
+  
+  <t-b>
+    Finally, the Block class wraps an array of bytes for read and write operations on instances of the File class.  Blocks are most useful for file transfers with
+    chunking - breaking a file into pieces for transmission over a socket-based channel.
+  </t-b>
 
-  <div class="right clear photo" style="margin: 10px; padding: 10px;">
-    <img name="filesysOut" width="600" onmouseover="filesysOut.width='900'" onmouseout="filesysOut.width='600'" src="Pictures/Blog.FileSystemOutput.png" />
-    <div class="center">Figure 2 - File System Output</div>
+  <div style="width:calc(100vw - 9rem);">
+    <div class="right clear photo" style="margin: 10px; padding: 10px;">
+      <img name="filesysOut" width="600" onmouseover="filesysOut.width='900'" onmouseout="filesysOut.width='600'" src="Pictures/Blog.FileSystemOutput.png" />
+      <div class="center">Figure 2 - File System Output</div>
+    </div>
   </div>
 
   <h3>Typical Output:</h3>
-  Demo output is presented in Figure&nbsp;2, which shows construction test output for some of the main classes.
-  <p />
+  <t-b>Demo output is presented in Figure&nbsp;2, which shows construction test output for some of the main classes.</t-b>
+  
   <h3>Source Code:</h3>
-  This FileSystem library is written in C++ using Visual Studio 2013 and compiles and runs using Visual Studio 2013 as well.
-  You will find the code here:
-  <p />
+  <t-b>
+    This FileSystem library is written in C++ using Visual Studio 2013 and compiles and runs using Visual Studio 2013 as well.
+    You will find the code here:  
   <div class="indent" style="margin: 10px;">
     <a href="../CoreTechnologies/Cpp/code/FileSystem-Windows">FileSystem- Windows library</a>
   </div>
-  <p />
-  This code bears a copyright &copy; that grants all rights to users except the right to publish and requires retention of the copyright notice.
-  <p />
+  </t-b>
+  <t-b>This code bears a copyright &copy; that grants all rights to users except the right to publish and requires retention of the copyright notice.</t-b>
+  
   <h3>Conclusions:</h3>
-  The C++ FileSystem library has proven to be almost as easy to use as its .Net counterpart System.IO.  The library has been used by several classes
-  to support their project work and found to be sufficient for most project needs.
-  </div>
+  <t-b>
+    The C++ FileSystem library has proven to be almost as easy to use as its .Net counterpart System.IO.  The library has been used by several classes
+    to support their project work and found to be sufficient for most project needs.
+  </t-b>
+ 
   <div class="footnote">
     <hr />
     <ol>
@@ -153,9 +182,10 @@
         That is, of course, exactly what the C++ standard library does.  We are simply augmenting the standard library using the same approach.
       </li>
     </ol>
-    <p>
-      <img class="photo" src="Pictures/QuadStrip.jpg" alt="Newhouse" style="width:100%;" />
-    </p>
+  </div>
+    <t-b>
+      <div style="width:calc(100vw - 9rem);"><img class="photo" src="Pictures/QuadStrip.jpg" alt="Newhouse" style="width:100%;" /></div>
+    </t-b>
     <info-bar></info-bar>
 </body>
 </html>

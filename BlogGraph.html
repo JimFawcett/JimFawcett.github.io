@@ -18,6 +18,7 @@
   <script src="js/ScriptsKeyboard.js"></script>
   <script src="js/ScriptsMenu.js"></script>
   <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesDefault.css" />
   <link rel="stylesheet" href="css/StylesMenu.css" />
   <link rel="stylesheet" href="css/StylesBrownTheme.css" />
   <style>
@@ -64,10 +65,11 @@
 
   <!-- page content -->
   <h3>Initial Thoughts:</h3>
-  A graph, of the kind discussed here, is a collection of vertices connected by edges.  We'll be concerned exclusively with directed graphs where each edge
-  has a direction from its parent vertex to some child vertex in the collection.  Directed graphs are particularly useful for describing large sets of relationships.
-  Here are some example graph models:
-  <p />
+  <t-b>
+    A graph, of the kind discussed here, is a collection of vertices connected by edges.  We'll be concerned exclusively with directed graphs where each edge
+    has a direction from its parent vertex to some child vertex in the collection.  Directed graphs are particularly useful for describing large sets of relationships.
+    Here are some example graph models:
+  </t-b>
   <ul class="indent" style="margin-top:0px; padding-top:0px;">
     <li>
       Build dependency relationships between software packages
@@ -82,68 +84,86 @@
       Communication connections, e.g., web hosts and client machines
     </li>
   </ul>
-  Frequently graph models are very large, as in
-  <a href="http://www.caida.org/tools/visualization/walrus/gallery1/">models of the internet developed by &quot;The Cooperative Association for Internet Data Analysis&quot; (CAIDA)</a>.
-  Therefore, we will be particularly interested in means to persist models to and from disk storage, to make storage parsimonius, and design operations to be as efficient as is reasonably practical.
+  <t-b>
+    Frequently graph models are very large, as in
+    <a href="http://www.caida.org/tools/visualization/walrus/gallery1/">models of the internet developed by &quot;The Cooperative Association for Internet Data Analysis&quot; (CAIDA)</a>.
+    Therefore, we will be particularly interested in means to persist models to and from disk storage, to make storage parsimonius, and design operations to be as efficient as is reasonably practical.
+  </t-b>
 
-  <p />
-  <div class="right photo" style="margin:10px; padding:20px; border:1px solid black;">
-    <img src="Pictures/StdAdjList.png" name="AdjList" width="400" onmouseover="AdjList.width='600'" onmouseout="AdjList.width='400'" />
+  <div style="width:calc(100vw - 9rem);">
+    <div class="right photo" style="margin:10px; padding:20px; border:1px solid black;">
+      <img src="Pictures/StdAdjList.png" name="AdjList" width="400" onmouseover="AdjList.width='600'" onmouseout="AdjList.width='400'" />
+    </div>
   </div>
-  <div class="right photo" style="margin:10px; padding:20px; border:1px solid black; clear:both">
-    <img src="Pictures/graphStruct.png" name="GraphStruct" width="400" onmouseover="GraphStruct.width='800'" onmouseout="GraphStruct.width='400'" />
+  <div style="width:calc(100vw - 9rem);">
+    <div class="right photo" style="margin:10px; padding:20px; border:1px solid black; clear:both">
+      <img src="Pictures/graphStruct.png" name="GraphStruct" width="400" onmouseover="GraphStruct.width='800'" onmouseout="GraphStruct.width='400'" />
+    </div>
   </div>
-  <div class="right photo" style="margin:10px; padding:20px; border:1px solid black; clear:both">
-    <img src="Pictures/graph.png" name="classes" width="400" onmouseover="classes.width='600'" onmouseout="classes.width='400'" />
+  <div style="width:calc(100vw - 9rem);">
+    <div class="right photo" style="margin:10px; padding:20px; border:1px solid black; clear:both">
+      <img src="Pictures/graph.png" name="classes" width="400" onmouseover="classes.width='600'" onmouseout="classes.width='400'" />
+    </div>
   </div>
   <h3>A C++ Template-based Graph Facility</h3>
-  Frequently graph structures are discussed in terms of adjacency lists like the example in the first diagram.  Note that the adjacency list holds redundant nodes to
-  represent graph vertices, e.g., there are three nodes that represent vertex 4 in the diagram.
-  <p />
-  We won't want to directly implement this structure, not only because of
-  the unnecessary storage, but also because that opens up the possiblity of two or more representations of a node having different properties and values.  When there are
-  storage redundancies errors like that are relatively easy to make and often very difficult to find.
-  <p />
-  The linked structure shown in the next diagram is preferable.  It has no redundancies - each vertex holds references to child vertices, where both parent and children
-  reside in the same collection.  These references could be implemented with pointers, but we will choose not to do that, and use indexes into the adjacency collection
-  to refer to child vertices.  That makes creation of copies trivial.  In fact, the compiler created member-wise copy constructor and assignment operator will be
-  correct for that design.
+  <t-b>
+    Frequently graph structures are discussed in terms of adjacency lists like the example in the first diagram.  Note that the adjacency list holds redundant nodes to
+    represent graph vertices, e.g., there are three nodes that represent vertex 4 in the diagram.
+  </t-b>
+  <t-b>
+    We won't want to directly implement this structure, not only because of
+    the unnecessary storage, but also because that opens up the possiblity of two or more representations of a node having different properties and values.  When there are
+    storage redundancies errors like that are relatively easy to make and often very difficult to find.
+  </t-b>
+  <t-b>
+    The linked structure shown in the next diagram is preferable.  It has no redundancies - each vertex holds references to child vertices, where both parent and children
+    reside in the same collection.  These references could be implemented with pointers, but we will choose not to do that, and use indexes into the adjacency collection
+    to refer to child vertices.  That makes creation of copies trivial.  In fact, the compiler created member-wise copy constructor and assignment operator will be
+    correct for that design.
+  </t-b>
 
   <h3>Design:</h3>
-  The Graph's logical structure is shown in the third diagram.  The graph class is template-based with parameters V, a vertex type, and E, an edge type.
-  <p />
-  These could simply be strings that label vertices and edges.  In this case a vertex might represent a town on a map with edges that are roads from that town to another.
-  <p />
-  Often, however, we may need a vertex or an edge to hold composite information containing several different values.  In this case we simply define
-  a V class and/or an E class with the appropriate structure to hold that information.
-  <p />
-  The graph holds a collection of vertices in a std::vector&lt;Vertex&lt;V,E&gt;&gt;, named adj for adjacency list.  Each vertex holds an instance of the V type and a collection of edges
-  in a std::vector&lt;Edge&gt;.  An edge is simply a typedef for std::pair&lt;size_t, E&gt;.  The size_t argument is an index into the graph's vertex collection, selecting the edge's
-  target vertex.  The E argument is an instance of the E type, so each edge can hold a unique instance.
-  <p />
-  Simple XmlReader and XmlWriter classes are part of the graphLib archive and are used to create and retrieve graph models from disk storage.
-  These are not Document Object Model (DOM) based, but
-  simply implemented with string manipulation and a scope stack.  You may find these usesful for other applicatations as well.
-  <p />
+  <t-b>The Graph's logical structure is shown in the third diagram.  The graph class is template-based with parameters V, a vertex type, and E, an edge type.</t-b>
+  <t-b>These could simply be strings that label vertices and edges.  In this case a vertex might represent a town on a map with edges that are roads from that town to another.</t-b>
+  <t-b>
+    Often, however, we may need a vertex or an edge to hold composite information containing several different values.  In this case we simply define
+    a V class and/or an E class with the appropriate structure to hold that information.
+  </t-b>
+
+  <t-b>
+    The graph holds a collection of vertices in a std::vector&lt;Vertex&lt;V,E&gt;&gt;, named adj for adjacency list.  Each vertex holds an instance of the V type and a collection of edges
+    in a std::vector&lt;Edge&gt;.  An edge is simply a typedef for std::pair&lt;size_t, E&gt;.  The size_t argument is an index into the graph's vertex collection, selecting the edge's
+    target vertex.  The E argument is an instance of the E type, so each edge can hold a unique instance.
+  </t-b>
+  
+  <t-b>
+    Simple XmlReader and XmlWriter classes are part of the graphLib archive and are used to create and retrieve graph models from disk storage.
+    These are not Document Object Model (DOM) based, but
+    simply implemented with string manipulation and a scope stack.  You may find these usesful for other applicatations as well.
+  </t-b>
 
   <h3>Source Code:</h3>
-  This graph implementation is written in C++ using Visual Studio 2013.  It should port, with little difficulty, to Gnu gcc to run on Linux, for example.
-  <div class="indent" style="margin:10px;"><a href="../Research/Code/DirectedGraph">Directed Graph Library</a></div>
-  This code bears a copyright &copy; that grants all rights to users except the right to publish and requires retention of the copyright notice.
-  <p />
+  <t-b>
+    This graph implementation is written in C++ using Visual Studio 2013.  It should port, with little difficulty, to Gnu gcc to run on Linux, for example.
+    <div class="indent" style="margin:10px;"><a href="../Research/Code/DirectedGraph">Directed Graph Library</a></div>
+    This code bears a copyright &copy; that grants all rights to users except the right to publish and requires retention of the copyright notice.
+  </t-b>
+
   <h3>Contributions</h3>
-  One of my doctoral advisees, Mehmet Kaya developed strong component and topological softing algorithms for this graph class.  He has been using
-  that to help develop new ways of restructuring C++ source code to improve its structure and maintainability.  Here is a Syracuse University
-  <a href="http://surface.syr.edu/eecs_techreports/73/">Technical Report</a> describing that work.  Another advisee, Mubarek Mohammed, is using the
-  graph class to support research on visualization for large software systems.
-  <p />
+  <t-b>
+    One of my doctoral advisees, Mehmet Kaya developed strong component and topological softing algorithms for this graph class.  He has been using
+    that to help develop new ways of restructuring C++ source code to improve its structure and maintainability.  Here is a Syracuse University
+    <a href="http://surface.syr.edu/eecs_techreports/73/">Technical Report</a> describing that work.  Another advisee, Mubarek Mohammed, is using the
+    graph class to support research on visualization for large software systems.
+  </t-b>
   <h3>Conclusions:</h3>
-  This graph class implementation is reasonably simple, fast, and robust.  It supports persisting graph models to XML data files and retrieving back
-  into graph instances.  We have an interest in algorithms, based on this graph facility, that support investigations into the structure and dynamics
-  of large systems.  We will add algorithms we are working with to this package as they mature.
-  <p>
-    <img class="photo" src="Pictures/newhouse2.jpg" alt="Newhouse" style="width:100%;" />
-  </p>
+  <t-b>
+    This graph class implementation is reasonably simple, fast, and robust.  It supports persisting graph models to XML data files and retrieving back
+    into graph instances.  We have an interest in algorithms, based on this graph facility, that support investigations into the structure and dynamics
+    of large systems.  We will add algorithms we are working with to this package as they mature.
+  <t-b>
+    <div style="width:calc(100vw - 9rem);"><img class="photo" src="Pictures/newhouse2.jpg" alt="Newhouse" style="width:100%;" /></div>
+  </t-b>
   <info-bar></info-bar>
 </body>
 </html>

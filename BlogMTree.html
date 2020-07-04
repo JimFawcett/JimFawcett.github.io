@@ -18,6 +18,7 @@
   <script src="js/ScriptsKeyboard.js"></script>
   <script src="js/ScriptsMenu.js"></script>
   <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesDefault.css" />
   <link rel="stylesheet" href="css/StylesMenu.css" />
   <link rel="stylesheet" href="css/StylesBrownTheme.css" />
   <style>
@@ -64,126 +65,150 @@
 
   <!-- page content -->
   <h3>Initial Thoughts:</h3>
-  The Trees we are concerned with here are not balanced binary trees used for quick access to ordered data.
-  They are simple tree structures where each tree node may have zero or more child nodes.  They are often used
-  as in-memory representations of tree structures that occur as artifacts of processing activities, i.e., parse trees
-  resulting from processing markup like XML or HTML.
-  <p />
-  Our interests focus on using M-ary Trees to support code analysis.  We will use instances of a C++ template class MTree&lt;T&gt;, discussed here,
-  to capture the structure of code scopes<sup>1</sup>.  For example, one measure of complexity of a function written in C, C++, Java, or C#
-  is the number of scopes the function uses for branching and looping to carry out its processing activities.  This is
-  closely related to the well-know McCabe Cyclomatic Complexity metric.
+  <t-b>
+    The Trees we are concerned with here are not balanced binary trees used for quick access to ordered data.
+    They are simple tree structures where each tree node may have zero or more child nodes.  They are often used
+    as in-memory representations of tree structures that occur as artifacts of processing activities, i.e., parse trees
+    resulting from processing markup like XML or HTML.
+  </t-b>
+  <t-b>
+    Our interests focus on using M-ary Trees to support code analysis.  We will use instances of a C++ template class MTree&lt;T&gt;, discussed here,
+    to capture the structure of code scopes<sup>1</sup>.  For example, one measure of complexity of a function written in C, C++, Java, or C#
+    is the number of scopes the function uses for branching and looping to carry out its processing activities.  This is
+    closely related to the well-know McCabe Cyclomatic Complexity metric.
+  </t-b>
 
-  <div class="photo" style="float:right">
-    <div align="right" style="margin-right:40px; margin-top:0px;">
-      MTree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <input type="button" value="+" onclick="incrementSize(1);" />&nbsp;
-      <input type="button" value="-" onclick="decrementSize(1);" />
+  <div style="width:calc(100vw - 9rem)">
+    <div class="photo" style="float:right">
+      <div align="right" style="margin-right:40px; margin-top:0px;">
+        MTree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="button" value="+" onclick="incrementSize(1);" />&nbsp;
+        <input type="button" value="-" onclick="decrementSize(1);" />
+      </div>
+      <img id="1" src="Pictures/CodeScopes.PNG" width="475" />
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;Figure 1. - Code Scopes Tree Representation</div>
     </div>
-    <img id="1" src="Pictures/CodeScopes.PNG" width="475" />
-    <div>&nbsp;&nbsp;&nbsp;&nbsp;Figure 1. - Code Scopes Tree Representation</div>
   </div>
 
-  <div class="photo" style="float:right; clear:both;">
-    <div align="right" style="margin-right:40px; margin-top:0px;">
-      MTree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <input type="button" value="+" onclick="incrementSize(2);" />&nbsp;
-      <input type="button" value="-" onclick="decrementSize(2);" />
+  <div style="width:calc(100vw - 9rem)">
+    <div class="photo" style="float:right; clear:both;">
+      <div align="right" style="margin-right:40px; margin-top:0px;">
+        MTree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="button" value="+" onclick="incrementSize(2);" />&nbsp;
+        <input type="button" value="-" onclick="decrementSize(2);" />
+      </div>
+      <img id="2" src="Pictures/WalkMTree.PNG" width="300" />
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;Figure 2. - Code Scopes Fragment</div>
     </div>
-    <img id="2" src="Pictures/WalkMTree.PNG" width="300" />
-    <div>&nbsp;&nbsp;&nbsp;&nbsp;Figure 2. - Code Scopes Fragment</div>
   </div>
 
   <h3>Background:</h3>
-  The Spring 2014 CSE687 - Object Oriented Design class will, in their first project, build a code analyzer that, for each file it processes,
-  finds the size and complexity of all function definitions.  We will use some of that code to build, in Project #2, a code similarity
-  detector.  That would be useful for code refactoring: to find, for later replacement, duplicated code in a set of packages.  The intent
-  is to replace duplicated code with invocations of an extracted function.
-  <p />
-  Eliminating redundancies avoids fixing bugs in multiple places or worse, fixing in only one of several places the bug occurs.
-  Our redundancy analysis seeks to find congruencies within the scope trees
-  of analyzed function definitions.  So we will need a way to capture a representation of the these scope trees - enter the class MTree&lt;T&gt;.
+  <t-b>
+    The Spring 2014 CSE687 - Object Oriented Design class will, in their first project, build a code analyzer that, for each file it processes,
+    finds the size and complexity of all function definitions.  We will use some of that code to build, in Project #2, a code similarity
+    detector.  That would be useful for code refactoring: to find, for later replacement, duplicated code in a set of packages.  The intent
+    is to replace duplicated code with invocations of an extracted function.
+  </t-b>
+  <t-b>
+    Eliminating redundancies avoids fixing bugs in multiple places or worse, fixing in only one of several places the bug occurs.
+    Our redundancy analysis seeks to find congruencies within the scope trees
+    of analyzed function definitions.  So we will need a way to capture a representation of the these scope trees - enter the class MTree&lt;T&gt;.
+  </t-b>
 
   <h3>Core Idea:</h3>
-  A function's scope tree is something like it's DNA.  If two functions have scope subtrees that are identical in structure and the scope nodes
-  have similar line counts the behavior of those parts of the code may not be identical, but their processing is certainly similar.  We've shown
-  in Figures&nbsp;1&nbsp;and&nbsp;2 the code and scope tree of member function MTree&lt;Node&gt;::walk(Node*).
-  <p />
-  Each tree node has been annotated with the line count of the scope it represents.  If we find, in some other function, a tree with similar structure
-  and line counts that becomes a candidate to examine for code duplication.  We won't go into how we measure similarity - its not complicated, but
-  isn't relevant to a discussion of the M-ary Tree.
+  <t-b>
+    A function's scope tree is something like it's DNA.  If two functions have scope subtrees that are identical in structure and the scope nodes
+    have similar line counts the behavior of those parts of the code may not be identical, but their processing is certainly similar.  We've shown
+    in Figures&nbsp;1&nbsp;and&nbsp;2 the code and scope tree of member function MTree&lt;Node&gt;::walk(Node*).
+  </t-b>
+  <t-b>
+    Each tree node has been annotated with the line count of the scope it represents.  If we find, in some other function, a tree with similar structure
+    and line counts that becomes a candidate to examine for code duplication.  We won't go into how we measure similarity - its not complicated, but
+    isn't relevant to a discussion of the M-ary Tree.
+  </t-b>
 
-  <div class="photo" style="float:right; clear:both;">
-    <div align="right" style="margin-right:40px; margin-top:0px;">
-      MTree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <input type="button" value="+" onclick="incrementSize(3);" />&nbsp;
-      <input type="button" value="-" onclick="decrementSize(3);" />
+  <div style="width:calc(100vw - 9rem)">
+    <div class="photo" style="float:right; clear:both;">
+      <div align="right" style="margin-right:40px; margin-top:0px;">
+        MTree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="button" value="+" onclick="incrementSize(3);" />&nbsp;
+        <input type="button" value="-" onclick="decrementSize(3);" />
+      </div>
+      <img id="3" src="Pictures/MTreeClassDiag.PNG" width="475" />
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;Figure 3. - MTree&lt;Node&gt; Package Classes</div>
     </div>
-    <img id="3" src="Pictures/MTreeClassDiag.PNG" width="475" />
-    <div>&nbsp;&nbsp;&nbsp;&nbsp;Figure 3. - MTree&lt;Node&gt; Package Classes</div>
   </div>
 
   <h3>Design:</h3>
-  The MTree&lt;Node&gt; class and helper class, MNode&lt;T&gt;, are relatively simple template classes.  The template parameter Node used by
-  MTree&lt;Node&gt; is expected to take the type MNode&lt;T&gt; where T represents the type of data held by each node.  That may be a library type
-  like a string or some user-defined type that holds composite information.
-  <p />
-  Each instance of MNode&lt;T&gt; holds a vector of pointers to child nodes, created on the native C++ heap.  The class provides methods to
-  add and remove child nodes and mark nodes for traversal.  The MTree&lt;Node&gt; class provides a method to make an instance of its Node parameter
-  the tree root and assumes that the Node addChild method will be used to build out the tree.
-  <p />
-  Client programs interact with an instance of MTree&lt;Node&gt; in two ways.  The using code may define a class derived from the Operation&lt;Node&gt;
-  class that defines what processing should occur when nodes are encountered on a depth first tree traversal.  The class can provide accessor functions
-  to feed the operation, initializing data and collect results at the end of traversal.
-  <p />
-  Clients may also use the methods MTree&lt;Node&gt;::find() and MTree&lt;Node&gt;::finder().  find() simply returns with a pointer to a Node that
-  has a specified value, if it exists, else returns null.  finder() uses an instance of finderOp&lt;Node&gt;, derived from Operation&lt;Node&gt;.
-  This nominally does the same thing, except that finder() has more control over how the search is implemented.
+  <t-b>
+    The MTree&lt;Node&gt; class and helper class, MNode&lt;T&gt;, are relatively simple template classes.  The template parameter Node used by
+    MTree&lt;Node&gt; is expected to take the type MNode&lt;T&gt; where T represents the type of data held by each node.  That may be a library type
+    like a string or some user-defined type that holds composite information.
+  </t-b>
+  <t-b>
+    Each instance of MNode&lt;T&gt; holds a vector of pointers to child nodes, created on the native C++ heap.  The class provides methods to
+    add and remove child nodes and mark nodes for traversal.  The MTree&lt;Node&gt; class provides a method to make an instance of its Node parameter
+    the tree root and assumes that the Node addChild method will be used to build out the tree.
+  </t-b>
+  <t-b>
+    Client programs interact with an instance of MTree&lt;Node&gt; in two ways.  The using code may define a class derived from the Operation&lt;Node&gt;
+    class that defines what processing should occur when nodes are encountered on a depth first tree traversal.  The class can provide accessor functions
+    to feed the operation, initializing data and collect results at the end of traversal.
+  </t-b>
+  <t-b>
+    Clients may also use the methods MTree&lt;Node&gt;::find() and MTree&lt;Node&gt;::finder().  find() simply returns with a pointer to a Node that
+    has a specified value, if it exists, else returns null.  finder() uses an instance of finderOp&lt;Node&gt;, derived from Operation&lt;Node&gt;.
+    This nominally does the same thing, except that finder() has more control over how the search is implemented.
+  </t-b>
 
-  <div class="photo" style="float:right; clear:both;">
-    <div align="right" style="margin-right:40px; margin-top:0px;">
-      MTree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <input type="button" value="+" onclick="incrementSize(4);" />&nbsp;
-      <input type="button" value="-" onclick="decrementSize(4);" />
+  <div style="width:calc(100vw - 9rem)">
+    <div class="photo" style="float:right; clear:both;">
+      <div align="right" style="margin-right:40px; margin-top:0px;">
+        MTree&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="button" value="+" onclick="incrementSize(4);" />&nbsp;
+        <input type="button" value="-" onclick="decrementSize(4);" />
+      </div>
+      <img id="4" src="Pictures/MTreeOutput.PNG" width="475" />
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;Figure 4. - MTree&lt;Node&gt; Output</div>
     </div>
-    <img id="4" src="Pictures/MTreeOutput.PNG" width="475" />
-    <div>&nbsp;&nbsp;&nbsp;&nbsp;Figure 4. - MTree&lt;Node&gt; Output</div>
   </div>
-
-  <!--<div class="right clear" style="margin: 10px; padding: 10px;">
-    <img name="Output" width="500" onmouseover="Output.width='800'" onmouseout="Output.width='500'" src="MTreeOutput.png" />
-    <div class="center">Figure 4 - MTree Output</div>
-  </div>-->
 
   <h3>Typical Output:</h3>
-  Demo output is presented in Figure&nbsp;4, which shows test code traversing the MTree and using find and finder.  Also shown is the removal
-  of an MTree&lt;Node&gt; node, making copies of the tree and assigning to other tree instances.
-  <p />
+  <t-b>
+    Demo output is presented in Figure&nbsp;4, which shows test code traversing the MTree and using find and finder.  Also shown is the removal
+    of an MTree&lt;Node&gt; node, making copies of the tree and assigning to other tree instances.
+  </t-b>
+
   <h3>Source Code:</h3>
-  This M-ary Tree Demo is written in C++ using Visual Studio 2012 and compiles and runs using Visual Studio 2013 as well.
-  You will find the code here:
-  <p />
-  <div class="indent" style="margin: 10px;">
-    <a href="../CoreTechnologies/Cpp/code/MTree">MTree&lt;Node&gt; Demo Code</a>
+  <t-b>
+    This M-ary Tree Demo is written in C++ using Visual Studio 2012 and compiles and runs using Visual Studio 2013 as well.
+    You will find the code here:
+  </t-b>
+
+  <div style="width:calc(100vw - 9rem)">
+    <div class="indent" style="margin: 10px;">
+      <a href="../CoreTechnologies/Cpp/code/MTree">MTree&lt;Node&gt; Demo Code</a>
+    </div>
   </div>
-  <p />
-  This code bears a copyright &copy; that grants all rights to users except the right to publish and requires retention of the copyright notice.
-  <p />
-  <p />
+
+  <t-b>This code bears a copyright &copy; that grants all rights to users except the right to publish and requires retention of the copyright notice.</t-b>
+
   <h3>Conclusions:</h3>
-  The MTree&lt;Node&gt; package demonstrates how you can use C++ to build something close to an Abstract Data Type (ADT).  We haven't made an
-  effort to make this container compatible with the algorithms in the STL.  That wouldn't be too hard to do, but the package isn't widely applicable
-  outside of the way we will be using it, so we chose not to do that.
-  <div class="footnote clear">
+  <t-b>
+    The MTree&lt;Node&gt; package demonstrates how you can use C++ to build something close to an Abstract Data Type (ADT).  We haven't made an
+    effort to make this container compatible with the algorithms in the STL.  That wouldn't be too hard to do, but the package isn't widely applicable
+    outside of the way we will be using it, so we chose not to do that.
+  </t-b>
+  <div class="footnote clear"></div>
     <hr />
     <ol>
       <li>
         The <a href="BlogGlobals.htm">Global Data Blog entry</a> has a fairly complete discussion of code scope structure.
       </li>
     </ol>
-    <p>
-      <img class="photo" src="Pictures/linkStrip.jpg" alt="Newhouse" style="width:100%;" />
-    </p>
+    <t-b>
+      <div style="width:calc(100vw - 9rem);"><img class="photo" src="Pictures/linkStrip.jpg" alt="Newhouse" style="width:100%;" /></div>
+    </t-b>
     <info-bar></info-bar>
 </body>
 </html>
