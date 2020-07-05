@@ -79,7 +79,7 @@ function initializeMenu() {
         <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
         <a href='TechnicalLinks.html'>Technical Links</a>\
         <a href='WebNotes.html'>Web Notes</a>\
-        <a href='Tests.html'>UI Widget Tests</a>\
+        <a href='WebComponentTests.html'>UI Widget Tests</a>\
         <a href='https://encycolorpedia.com/named'>Web Colors</a>\
         <a href='UML.html'>UML Diagrams</a>\
         <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
