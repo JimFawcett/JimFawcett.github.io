@@ -15,8 +15,6 @@ function initializeMenu() {
   var topMenu = document.getElementsByTagName("nav");
   topMenu[0].innerHTML = "<div class='navbar'>\
     <a href='index.html' class='menuItem'>Home</a>\
-    <a id='prevLink' class='nextprev' href='#'>Prev</a>\
-    <a id='nextLink' class='nextprev' href='#'>Next</a>\
     <a href='Repositories.html' class='menuItem' style='margin:0px;'>Repos</a>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Notes &#9662;</button>\
@@ -142,6 +140,8 @@ function initializeMenu() {
         <span>&nbsp;</a>\
       </div>\
     </div>\
+    <a id='prevLink' class='nextprev' href='#'>Prev</a>\
+    <a id='nextLink' class='nextprev' href='#'>Next</a>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\
     <button class='pageScroll' onclick='scrollPageBottom()'>Bottom</button>\
     <button class='menuScroll' onclick='scrollMenuLeft()'>&lt;</button>\
