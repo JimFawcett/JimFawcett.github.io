@@ -108,33 +108,6 @@
   <hr class="spread" />
 
   <div class="bb-55">
-    <h3>Concept:</h3>
-    <t-b>
-      RustComm is a facility for sending messages between a Sender and Receiver.  It uses the std::net::TcpStream and
-      std::net::TcpListener types.
-      <spacer-15></spacer-15>
-      This is a prototype for message-passing communication system. It provides three user defined types: Sender,
-      Receiver, and Message.
-      <t-b class="mtz">
-        <ul class="tight mtz">
-          <li>
-            Uses unbuffered, unqueued full-duplex message sending and receiving
-          </li>
-          <li>
-            Each message has a fixed size header and <c-s>Vec&lt;u8&gt;</c-s> body.
-          </li>
-          <li>
-            For each Sender connection, Receiver processes messages until receiving a message with MessageType::END.
-            Receiver spawns a thread for each client connection and processes messages in an external handle_client function.
-          </li>
-          <li>
-            In this version, handle_client only displays message body to console. It does not send back a reply 
-            message.
-          </li>
-        </ul>
-      </t-b>
-    </t-b>
-    <h3>Design:</h3>
       <div style="width:calc(100vw - 6rem);">
         <photosizer-block src="Pictures/RustCommStructure.jpg" width="400" class="photoSizerBlock right" style="margin-top:0;">
           <span style="
@@ -163,6 +136,60 @@
           </span>
         </photosizer-block>
       </div>
+    <h3>Concept:</h3>
+    <t-b>
+      RustComm is a facility for sending messages between a Sender and Receiver.  It uses the std::net::TcpStream and
+      std::net::TcpListener types.
+      <spacer-15></spacer-15>
+      This is a prototype for message-passing communication system. It provides three user defined types: Sender,
+      Receiver, and Message.
+      <t-b class="mtz">
+        <ul class="tight mtz">
+          <li>
+            Uses unqueued full-duplex buffered message sending and receiving
+          </li>
+          <li>
+            Each message has a fixed size header and <c-s>Vec&lt;u8&gt;</c-s> body.
+          </li>
+          <li>
+            For each Sender connection, Receiver processes messages until receiving a message with MessageType::END.
+            Receiver spawns a thread for each client connection and processes messages in an external handle_client function.
+          </li>
+          <li>
+            In this version, handle_client displays message body on console, then echos back as reply to sender. 
+          </li>
+        </ul>
+      </t-b>
+    </t-b>
+    <h3>Design:</h3>
+      <!--<div style="width:calc(100vw - 6rem);">
+        <photosizer-block src="Pictures/RustCommStructure.jpg" width="400" class="photoSizerBlock right" style="margin-top:0;">
+          <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS, Tahoma';
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;
+        ">
+            Fig 1. RustComm Structure
+          </span>
+        </photosizer-block>
+      </div>
+      <div style="width:calc(100vw - 6rem);">
+        <photosizer-block src="Pictures/RustCommOutput.jpg" width="400" class="photoSizerBlock right clear" style="margin-top:0;">
+          <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS, Tahoma';
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;
+        ">
+            Fig 2. RustComm Output
+          </span>
+        </photosizer-block>
+      </div>-->
     <t-b>
       <t-b>
         There are three user-defined types: Message, Sender, and Receiver, with methods and several functions in this design:
@@ -227,12 +254,22 @@
               </div>
             </li>
           </ol>
-          <t-b><strong>Sender</strong> methods:</t-b>
+          <t-b>
+            <hr />
+            <div class="pad10">
+              Both <c-s>Sender&lt;L&gt;</c-s> and <c-s>Receiver&lt;L&gt;</c-s> are parameterized with <c-s>L</c-s>,
+              a type satisfying a <c-s>Log</c-s> trait.  The package defines two types that implement the trait,
+              <c-s>VerboseLog</c-s> and <c-s>MuteLog</c-s> that allow users to easily turn on and off event display
+              outputs.  Fig 2. uses <c-s>Sender&lt;VerboseLog&gt;</c-s> and <c-s>Receiver&lt;VerboseLog&gt;</c-s>.
+            </div>
+            <hr />
+          </t-b>
+          <t-b><strong>Sender&lt;L&gt;</strong> methods:</t-b>
           <ol class="tight">
             <li>
-              <strong><c-s>new() -> Sender</c-s></strong>
+              <strong><c-s>new() -> Sender&lt;L&gt;</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
-                Create new <c-s>Sender</c-s>.
+                Create new <c-s>Sender&lt;L&gt;</c-s>.
               </div>
             </li>
             <li>
@@ -247,33 +284,10 @@
                 Attempt to send msg to connected Receiver.
               </div>
             </li>
-          </ol>
-          <t-b><strong>Receiver</strong> methods:</t-b>
-          <ol class="tight">
             <li>
-              <strong><c-s>new(addr: &str) -> Receiver</c-s></strong>
+              <strong><c-s>recv_message(&mut self) -> Result&lt;()&gt;</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
-                Create new <c-s>Receiver</c-s> listening on <c-s>addr: &str</c-s>.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>start(&mut self) -> Result&lt;()&gt;</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Start <c-s>Receiver</c-s> loop accepting connections on <c-s>addr: &str</c-s>.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>start_listener(addr: &'static str) -> JoinHanle&lt;()&gt;</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Create dedicated listener thread that creates a Receiver and invokes its 
-                <c-s>start(&mut self)</c-s> method.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>handle_client(stream: &TcpStream) -> Result&lt;()&gt;</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Defines <c-s>Receiver</c-s> processing for each connection.  Terminates on 
-                receiving <c-s>Message</c-s> with <c-s>MessageType::END</c-s>.
+                Attempt to read reply msg from connected Receiver.
               </div>
             </li>
             <li>
@@ -287,6 +301,65 @@
               <div style="padding:3px 10px 5px 10px;">
                 Processes io result and displays appropriate console text.
               </div>
+            </li>
+          </ol>
+          <t-b><strong>Receiver&lt;L&gt;</strong> methods:</t-b>
+          <ol class="tight">
+            <li>
+              <strong><c-s>new(addr: &str) -> Receiver&lt;L&gt;</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Create new <c-s>Receiver&lt;L&gt;</c-s> listening on <c-s>addr: &str</c-s>.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>clone(&self) -> Receiver&lt;L&gt;</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Create copy of <c-s>Receiver&lt;L&gt;</c-s>.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>start(&mut self) -> Result&lt;()&gt;</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Start <c-s>Receiver</c-s> loop accepting connections on <c-s>addr: &str</c-s>.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>stop(&mut self)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Signal <c-s>Receiver&lt;L&gt;</c-s> loop to stop accepting connections.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>start_listener(&mut self) -> JoinHanle&lt;()&gt;</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Create dedicated listener thread that creates a Receiver and invokes its 
+                <c-s>start(&mut self)</c-s> method.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>send_message(stream: &TcpStream, msg: Message) -> Result&lt;()&gt;</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Sends reply message to connected Sender.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>check_io(rslt: &Result&lt;()&gt;)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Processes io result and displays appropriate console text.
+              </div>
+            </li>
+          </ol>
+          <t-b>
+            <strong>Receiver&lt;L&gt;</strong> free method:
+          </t-b>
+          <ol class="tight">
+            <li>
+              <strong><c-s>handle_client&lt;L:Log&gt;(stream: &TcpStream) -> Result&lt;()&gt;</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Defines <c-s>Receiver</c-s> processing for each connection.  Terminates on 
+                receiving <c-s>Message</c-s> with <c-s>MessageType::END</c-s>.
+              </div>
+              Called in <c-s>Receiver&lt;L&gt;::start(&mut self)</c-s>.
             </li>
           </ol>
         </indent-block>
@@ -307,13 +380,23 @@
       <t-b class="mtz">
         <ul class="tight">
           <li>
-            Add reply messages to this demo.
+            Define traits <c-s>Message</c-s>, <c-s>Sender</c-s>, and <c-s>Receiver</c-s>.  Refactor package
+            code into <c-s>Connector&lt;P&gt;</c-s> and <c-s>Listener&lt;P&gt;</c-s>, where P implements
+            all three traits.  The intent is to allow designers to create application specific 
+            processing types, <c-s>P</c-s>, that provide <c-s>Connector</c-s>s and <c-s>Listener</c-s>s send
+            and receive methods that are tailored to an application&apos;s messages and processing.
+          </li>
+          <li>
+            <del>&nbsp;Add reply messages to this demo.&nbsp;</del>
           </li>
           <li>
             Add Sender queue and a threadpool in Receiver
           </li>
           <li>
-            Convert to buffered reads and writes
+            Add file transfer capability
+          </li>
+          <li>
+            <del>&nbsp;Convert to buffered reads and writes&nbsp;</del>
           </li>
           <li>
             Add user-defined Comm type that composes a Sender and a Receiver.
