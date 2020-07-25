@@ -116,6 +116,8 @@ function initializeMenu() {
         <a href='RustBiteByByte.html'>Rust&nbsp;bite&nbsp;by&nbsp;byte&nbsp;</a>\
         <a href='RustStory_Prologue.html'>Rust Story</a>\
         <a href='RustStory_CodeIndex.html'>Rust Code Index</a>\
+        <a href='InfDataLib_1.html'>Inf Data Lib - A.Zaitsev</a>\
+        <a href='MLiPS_1.html'>MLiPS - M.Corley</a>\
         <a href='StoryTeller_LocalStorage.html'>Load Story List</a>\
         <a href='StoryTellerDesign.html'>StoryTeller Design</a>\
         <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
