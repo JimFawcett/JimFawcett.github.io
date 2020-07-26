@@ -58,9 +58,8 @@
             <!-- <a href="RustBites_Intmut.html">InterMutat</a><br /> -->
             <a href="Javascript.;#"></a><br />
           </up-b>
-            <rt-b id="sects">
-          <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#starting">Starting</a>, 
-          <a href="#contents">Contents</a>, <a href="#refs">References</a>
+        <rt-b id="sects">
+          <a href="#top">Top</a>, <a href="#member-thread">member thread</a>, <a href="#date-time">date-time</a>
         </rt-b>
       </toc-b>
       <div id="hlp" style="display:none;">
@@ -102,6 +101,8 @@
       </t-b>
       <t-b>
         I expect to add to this page continuously as I work on Rust-based projects.
+        <a id="member-thread"></a>
+        <s-halfEm></s-halfEm>
       </t-b>
       <h3>1.0 - Struct with method hosting thread</h3>
       <t-b>
@@ -133,6 +134,8 @@
         <a href="https://github.com/JimFawcett/Consuming_Rust_bite_by_byte">
           RustBiteByByte/hacks_and_helps/methods_with_threads
         </a>
+        <a id="start"></a>
+        <s-halfEm></s-halfEm>
       </t-b>
      <h3>1.1 - User-defined Type with thread start() method</h3>
       <t-b>
@@ -208,7 +211,9 @@ t1 result = 10
           </defn-block>
         </defn-outerBlock>
       </div>
-      <t-b>
+      <a id="new"></a>
+      <s-halfEm></s-halfEm>
+    <t-b>
         <h3>1.2 - User-defined Type with thread starting in constructor new()</h3>
       </t-b>
       <t-b>
@@ -295,6 +300,8 @@ t3 result = 10
           </defn-block>
         </defn-OuterBlock>
       </div>
+      <a id="stop"></a>
+      <s-halfEm></s-halfEm>
       <t-b>
         <h3>1.3 - User-defined Type with stop() method</h3>
       </t-b>
@@ -396,12 +403,15 @@ t4 result = 7
       </div>
       <t-b>
 
-      </t-b>
-      <s-halfEm></s-halfEm>
+        <a id="date-time"></a>
+        <s-halfEm></s-halfEm>
+        </t-b>
       <h3>2.0 - Dates and Times</h3>
       <t-b>
         This section presents date and time tools for testing and logging.
-      </t-b>
+        <a id="stopwatch"></a>
+        <s-halfEm></s-halfEm>
+        </t-b>
       <h3>2.1 - StopWatch</h3>
       <t-b>
         StopWatch is a user-defined type that measures time that elapses 
@@ -490,63 +500,180 @@ elapsed time = 26
           </defn-block>
         </defn-outerBlock>
       </div>
-      <h3>2.2 - Timer</h3>
       <t-b>
 
+      <a id="timer"></a>
+      <s-halfEm></s-halfEm>
+      </t-b>
+      <h3>2.2 - Timer emits callback</h3>
+      <t-b>
+        Timer start accepts a time in milliseconds and a closure to run at the end of that time.
       </t-b>
       <div>
         <defn-outerBlock>
           <defn-block>
             <defn-head>Timer</defn-head>
             <defn-code>
-
+/*-----------------------------------------------
+  Timer instance invokes callback after 
+  specified time.
+  - callback runs on Timer thread
+*/
+#[derive(Debug, Clone, Copy)]
+struct Timer {
+    start: Instant,
+    elapsed: Duration,
+}
+impl Timer {
+    pub fn new(time: u64) -&gt; Timer {
+        Timer {
+            start: Instant::now(),
+            elapsed: Duration::new(time, 0),
+        }
+    }
+    pub fn start&lt;F&gt;(&amp;mut self, time: u64, callback:F)
+        -&gt; JoinHandle&lt;()&gt;
+        where F:FnOnce() + Send + 'static {
+        self.start = Instant::now();
+        let handle = thread::spawn(move || {
+            let ttw = Duration::from_millis(time);
+            thread::sleep(ttw);
+            callback();
+        });
+        handle
+    }
+}
+/*-----------------------------------------------
+  Demo Timer, using closure callback
+*/
+fn timer(millisec: u64) -&gt; JoinHandle&lt;()&gt; {
+    let mut tmr = Timer::new(millisec);
+    let cl = move || { 
+        print!(
+          "\n  time's up after {:?} milliseconds", 
+          millisec
+        ) 
+    };
+    tmr.start(millisec, cl)
+}
             </defn-code>
           </defn-block>
           <defn-block>
             <defn-head>Using Code:</defn-head>
             <defn-code>
+  fn main() {
 
+    print!("\n  -- demo Timer --");
+    print!("\n  starting timer(200)");
+    let handle = timer(200);
+    print!(
+      "\n  do some work while waiting for timer"
+    );
+    let _ = handle.join(); 
+    println!();
+}
             </defn-code>
             <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
-              
-            </defn-code>
+-- demo Timer --   
+starting timer(200)
+do some work while waiting for timer
+time's up after 200 milliseconds    
+          </defn-code>
           </defn-block>
         </defn-outerBlock>
       </div>
-      <h3>2.2 - Date-Time Stamps</h3>
       <t-b>
 
+      <a id="stamps"></a>
+      <s-halfEm></s-halfEm>
+      </t-b>
+      <h3>2.3 - Date-Time Stamps</h3>
+      <t-b>
+        Date-time stamps are used for display, often while logging or recording
+        test data.
       </t-b>
       <div>
         <defn-outerBlock>
           <defn-block>
-            <defn-head>Timer</defn-head>
+            <defn-head>Time and Date</defn-head>
             <defn-code>
+/*-----------------------------------------------
+  Date-Time stamp
+*/
+#[allow(unused_imports)]
+use chrono::{DateTime, Local, Datelike, Timelike};
 
+pub fn date_time_stamp() -&gt; String {
+    let now: DateTime&lt;Local&gt; = Local::now();
+    /*---------------------------------------------
+     format DateTime string using chrono formatting 
+    */
+    let mut now_str = format!("{}", now.to_rfc2822());
+    /* remove trailing -0400 */
+    now_str.truncate(now_str.len() - 6);
+    now_str
+}
+
+fn convert_month(m:usize) -&gt; &amp;'static str {
+    let dv = vec![
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+    dv[m]
+}
+
+pub fn date_stamp() -&gt; String {
+    let now: DateTime&lt;Local&gt; = Local::now();
+    /* format date string */
+    let (_is_common_era, year) = now.year_ce();
+    let idx:usize = (now.month() - 1) as usize;
+    let mon = convert_month(idx);
+    let now_str = format!(
+        "{:0&gt;2} {} {}", 
+        now.day(), mon, year
+    );
+    now_str
+}
+
+pub fn time_stamp() -&gt; String {
+    let now: DateTime&lt;Local&gt; = Local::now();
+    /* format time string */ 
+    let now_str = format!(
+        "{:0&gt;2}:{:0&gt;2}:{:0&gt;2}", 
+        now.hour(), now.minute(), now.second()
+    );
+    now_str
+}
             </defn-code>
           </defn-block>
           <defn-block>
             <defn-head>Using Code:</defn-head>
             <defn-code>
-
+  fn main() {
+    
+    print!("\n  -- demo DateTimeStamp --");
+    print!("\n  now is:  {:?}", date_time_stamp());
+    print!("\n  date is: {:?}", date_stamp());
+    print!("\n  time is: {:?}", time_stamp());
+}
             </defn-code>
             <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
-              
-            </defn-code>
+-- demo DateTimeStamp --
+now is:  "Sun, 26 Jul 2020 17:39:51"
+date is: "26 Jul 2020"
+time is: "17:39:51"
+          </defn-code>
           </defn-block>
         </defn-outerBlock>
       </div>
       <t-b>
-
+        <s-1Em></s-1Em>
       </t-b>
       <under-construction>
         <h3>Coming Soon</h3>
         <ol class="tight">
-          <li>
-            timer
-          </li>
           <li>
             string conversions
           </li>
