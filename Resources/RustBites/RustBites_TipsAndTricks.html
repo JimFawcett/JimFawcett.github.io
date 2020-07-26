@@ -116,16 +116,6 @@
             to the Arc&apos;s data calls Arc::clone(&original).  Now, the content will live
             until every reference to it has been dropped. 
           </li>
-          <li>
-            The problem with the incorrect code is that it attempts to take an unshared
-            reference to count.  The correct code simply changes that to take a shared
-            reference by using Arc::clone().
-          </li>
-          <li>
-            Note that, in the correct example code below, local_count is moved into the thread,
-            but that moves a reference to the heap data, not the heap data, so that remains
-            valid.
-          </li>
         </ol>
       </t-b>
       <t-b>
@@ -133,11 +123,27 @@
         handling the Arc correctly. Move errors are often attempting to use a value instead
         of a reference in the thread. 
       </t-b>
+      <t-b>
+        You will find code for all examples below in 
+        <a href="https://github.com/JimFawcett/Consuming_Rust_bite_by_byte">
+          RustBiteByByte/hacks_and_helps/methods_with_threads
+        </a>
+      </t-b>
+     <h3>1.1 - User-defined Type with thread start() method</h3>
+      <t-b>
+        This example is a simple demo that sums a loop index in its thread closure.  This
+        same technique was used in the <a href="../../RustComm.html">RustComm</a> library
+        that does something much more useful; it uses message passing to communicate between 
+        two endpoints using std::net::TcpStream and std::net::TcpListener.
+      </t-b>
       <div>
         <defn-outerBlock>
           <defn-block>
-            <defn-head>methods_with_threads::main.rs</defn-head>
+            <defn-head>Test1 - User-defined type with thread start()</defn-head>
             <defn-code>
+use std::thread::{JoinHandle};
+use std::sync::{Arc, Mutex};
+
 struct Test1 {
     count: Arc&lt;Mutex&lt;i32&gt;&gt;,
 }
@@ -147,65 +153,43 @@ impl Test1 {
             count: Arc::new(Mutex::new(0)),
         }
     }
-    /*-----------------------------------------------------
-      Uncommenting the code, below, causes compile error.
-      The problem is that Rust can't guarantee that the
-      reference to count will remain valid.  The thread 
-      lifetime could exceed the lifetime of Test1 instance.
-    */
-    // fn start2(&amp;mut self) -&gt; JoinHandle&lt;()&gt; {
-    //     std::thread::spawn(move || {
-    //         for i in 0..5 {
-    //             let mut data = self.count.lock().unwrap();
-    //             *data += i;
-    //             print!("\n  {:?}", data);
-    //         }
-    //     })
-    // }
-    /*-----------------------------------------------------
-      The following compiles because local_count uses a
-      shared pointer to the mutex protected value on the
-      heap returned by Arc clone().
-
-      The pointed to value isn't dropped until the last 
-      reference is dropped.
-
-      The incorrect code above didn't use a shared pointer,
-      it attempted to use the member's inner data directly.
-    */
     fn start(&amp;mut self) -&gt; JoinHandle&lt;()&gt; {
-        let local_count = self.count.clone();  // get a shared ptr
+        /* get a shared pointer */
+        let local_count = self.count.clone();
         std::thread::spawn(move || {
             for i in 0..5 {
                 let mut data = local_count.lock().unwrap();
                 *data += i;
                 print!("\n  {:?}", data);
-            }  // mutex is unlocked here
+            }
         })
     }
     fn show_count(&amp;self) {
-        print!("\n\n  t1 result = {:?}",self.count.lock().unwrap());
+        print!(
+          "\n\n  t1 result = {:?}",
+          self.count.lock().unwrap()
+        );
     }
 }
             </defn-code>
           </defn-block>
           <defn-block>
-            <defn-head>Using Code</defn-head>
+            <defn-head>Using Code:</defn-head>
             <defn-code>
-fn main() {
+  fn main() {
 
-  print!("\n  -- demo Test1 --");
-  let mut t1 = Test1::new();
-  let handle = t1.start();
+    print!("\n  -- demo Test1 --");
+    let mut t1 = Test1::new();
+    let handle = t1.start();
 
-  /* do some useful work here */
-  
-  let _ = handle.join();
-  t1.show_count();
-  println!();
+    /* do some useful work here */
+
+    let _ = handle.join();
+    t1.show_count();
+    println!();
 }
-          </defn-code>
-            <defn-head class="defnBorderTop">Output</defn-head>
+            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
 -- demo Test1 --
 0
@@ -214,19 +198,123 @@ fn main() {
 6
 10
 
-t1 result = 10  
+t1 result = 10
           </defn-code>
           </defn-block>
         </defn-outerBlock>
       </div>
       <t-b>
-        You will find variations on the construction above in 
-        <a href="https://github.com/JimFawcett/Consuming_Rust_bite_by_byte">
-          RustBiteByByte/hacks_and_helps/methods_with_threads
-        </a>
+        <h3>1.2 - User-defined Type with thread starting in constructor new()</h3>
       </t-b>
+      <t-b>
+        The code below illustrates how to start a thread in the type&apos;s 
+        constructor, new().  That would be appropriate if an instance&apos;s functionality
+        depended on the thread running.
+      </t-b>
+      <div>
+        <defn-OuterBlock>
+          <defn-block>
+            <defn-head>Test3 - thread starting in new()</defn-head>
+            <defn-code>
+struct Test3 {
+    counter: Arc&lt;Mutex&lt;i32&gt;&gt;,
+}
+impl Test3 {
+    /*-----------------------------------------------------
+      This example uses the same technique as Test1, but
+      moves the thread into new(), the Test3 constructor.  
+      That would be a good idea for any type whose instances 
+      need the running thread to operate as expected. 
+
+      Note that new() now returns a tuple with the newly
+      constructed Test2 instance and the thread handle.
+      Look at main to see how that is used.
+    */
+    fn new() -&gt; (Test3, JoinHandle&lt;()&gt;) {
+
+        /* create mutex guarded i32 in heap memory */
+        let scount = Arc::new(Mutex::new(0));
+        
+        /* create shared reference to that value */
+        let share = Arc::clone(&amp;scount);
+
+        /* scount is moved into thread&apos;s closure */
+        
+        let handle = std::thread::spawn(move || {
+            for i in 0..5 {
+                let mut data = scount.lock().unwrap();
+                *data += i;
+                print!("\n  {:?}", data);
+            }
+        });
+        /* share holds a valid ref to guarded i32 in heap */
+        (
+            Test3 { counter: share, },  
+            handle
+        )
+    }
+    fn show_count(&amp;self) {
+        print!(
+          "\n\n  t3 result = {:?}",
+          self.counter.lock().unwrap()
+        );
+    }
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code:</defn-head>
+            <defn-code>
+fn main() {
+
+  print!("\n  -- demo Test3 --");
+  let (t3, handle) = Test3::new();
+  
+  /* do some useful work here */
+
+  let _ = handle.join();
+  t3.show_count();
+}
+          </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+-- demo Test3 --
+0
+1
+3
+6
+10
+
+t3 result = 10
+            </defn-code>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+      <t-b>
+        <h3>1.3 - User-defined Type with stop() method</h3>
+      </t-b>
+      <div>
+        <defn-OuterBlock>
+          <defn-block>
+            <defn-head>Test4 - graceful thread stop</defn-head>
+            <defn-code>
+
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code:</defn-head>
+            <defn-code>
+
+            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+              
+            </defn-code>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
       <h3>2.0 - Timer</h3>
-      
+
       <under-construction>
         Coming soon
         <ol class="tight">
