@@ -50,6 +50,7 @@ fn min_str2<'a>(s1:&'a str, s2:&'a str) -> &'a str {
     }
     else {
         s2
+        
     }
 }
 
