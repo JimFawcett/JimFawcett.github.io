@@ -77,6 +77,7 @@ function initializeMenu() {
       <button class='dropbutton'>Dems &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Demonstrations</div>\
+        <a href='RustByteRecord.html'>Rust&nbsp;Byte&nbsp;Record&nbsp;</a>\
         <a href='RustBasicDemos.html'>Rust&nbsp;Basic&nbsp;Demos</a>\
         <a href='RustErrorHandling.html'>Rust&nbsp;Error&nbsp;Handling&nbsp;</a>\
         <a href='RustModels.html'>Rust&nbsp;Models&nbsp;</a>\
