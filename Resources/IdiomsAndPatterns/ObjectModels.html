@@ -37,7 +37,7 @@
   </head>
   <body id="github" onload="initBites()">
     <div class="top-banner">
-      <span id="hctr">Idioms and Patterns</span>
+      <span id="hctr">Idioms and Patterns Story</span>
       <div style="position:relative; left:calc(100vw - 15rem);">
         <span class="top-center">Object Models</span>
         <!-- <a class="top-right" href="../../RustBiteByByte.html">RustBiteByByte.html</a> -->
@@ -104,10 +104,44 @@
         This is the first of many pages (coming soon) that explore idioms and patterns implemented in each of these languages.
       </t-b>
       <hr />
+      <h3>Prologue</h3>
+      <t-b>
+        In this story we will look at common idioms and patterns used to build programs and software systems.  Each will
+        be implemented in the three programming languages: C#, C++, and Rust.  We do that to help those with knowledge of
+        one of the languages to start learning the others.  It also will provide a useful cache of techniques to help us
+        remember key implementation strategies.
+      </t-b>
+      <t-b>
+        You will frequently find that each language implements an idiom in different ways, sometimes radically different.  Why is
+        that?  Each of them is built around a different object model that governs how code you write executes in practice.
+      </t-b>
+      <t-b>
+        <ul>
+          <li>
+            C#, like Java, uses a reference model, runs in a virtual machine, and behaves in ways that may be surprising 
+            if you haven&apos;t used it for significant projects.  For example, copy and assignment operate on references,
+            for all non-primitive types, resulting in more than one reference to the same underlying instance.
+          </li>
+          <li>
+            C++ uses a value model, compiles to native code that runs directly on its computer platform, and behaves
+            very like primitive types do, supporting copy and assignment of instances.  This works because the developer 
+            implements overloads of the copy and assignment operators, or, in simple cases, the compile generates them.
+          </li>
+          <li>
+            Rust uses an ownership model, compiles to native code, and behaves in ways that are distinct from either 
+            C# or C++, especially for binding, assignment, and mutation through references.  Rust ownership rules are 
+            strict and enforce memory safety and freedom from data races.  Most important, it does that by construction.
+          </li>
+        </ul>
+      </t-b>
+      <t-b>
+        There are other differences discussed below and in the idiom and pattern implementations in following pages.
+      </t-b>
       <t-b>
         In order to write code effectively, you need to have an initial design and a good mental model of what your program 
-        will do when it executes programming language statements.  Understanding good models helps you understand, with some 
-        precision, what code will do in different contexts.  Without that understanding you don&apos;t know what to write.
+        will do when it executes programming language statements.  That understanding helps you predict, with some 
+        precision, context appropriate sequences of statements to implement your ideas.  Without that understanding 
+        you don&apos;t know what to write.
       </t-b>
       <t-b>
         The two most important models describe how a program uses memory, and how it creates and manipulates objects residing
@@ -116,15 +150,8 @@
         these languages use objects.
       </t-b>
       <t-b>
-        Managed languages like C# and Java use a reference model where assignment and copy don&apos;t assign and copy
-        instances; they assign and copy handles to the same underlying instance.  C++ statements assign and copy instances
-        resulting in a dst instance with the same state values as the src, but src and dst subseqently mutate independently.
-        That is not true of C# and Java.  Rust, on the other hand, copies and assigns values of primitive types, but move
-        values of non-primitives.
-      </t-b>
-        The intent of this page is to help you understand these and other differences in object models for C#, C++, and Rust.
-      <t-b>
-        First, object models depend upon a memory model:
+        The intent of this page is to help you understand differences in object models for C#, C++, and Rust.  We first
+        review a memory model, common to all three of these languages.
       </t-b>
     </bb-55>
     <s-halfEm></s-halfEm>
@@ -171,6 +198,8 @@
               <div class="indent">
                 An Object is a pattern for creating instances.  If the type is defined by the language we usually
                 use the term primitive, e.g., int or double.  Otherwise we use the term object, e.g., struct, vector.
+                These are defined by standard libraries, not the language.  All three languages support the development
+                of new types by developers, e.g., person, order, ...
               </div>
             </t-b>
             An <strong>Object Model</strong> describes:
@@ -409,7 +438,7 @@
             Operations:
           </td>
           <td class="elem topborder">
-            All C# operations are processed by the CLR stack-based virtual machine.  For example, an add operation
+            All <strong>C#</strong> operations are processed by the CLR stack-based virtual machine.  For example, an add operation
             starts by loading the first addend from memory and pushing onto CLR stack.  It then loads the second addend and 
             pushes it on the stack.  Then an add operation runs that pops the two arguments and adds them and pushes
             the result onto the stack.  The operation completes by popping the result and storing in memory.
@@ -424,7 +453,7 @@
             lambda definition in the same parent scope, then that data becomes member(s) of the compiler generated class.
           </td>
           <td class="elem topborder">
-            All C++ operations are processed directly in native code.  For example, an add operation loads both arguments 
+            All <Strong>C++</Strong> operations are processed directly in native code.  For example, an add operation loads both arguments 
             into a register, adds them, and stores the result into the specified location.
             <s-halfEm></s-halfEm>
             C++ operations may be free functions, static functions bound to a class, or member functions with access to 
@@ -440,13 +469,29 @@
             lambda definition in the same parent scope, then that data becomes member(s) of the compiler generated class.
           </td>
           <td class="elem topborder">
-            All Rust operations are processed in native code.
+            All <strong>Rust</strong> operations are processed in native code.
             <s-halfEm></s-halfEm>
             Rust assignment operations and pass by value function calls result, for primitive types, in copy operations. 
             <s-halfEm></s-halfEm>
             For non-primitive types these operations result in moves, e.g., transfers of ownership from the source to the 
             destination.  That is efficient, but invalidates the source.  To avoid invalidation one may assign or 
             pass a clone of the source instance.
+            <s-halfEm></s-halfEm>
+            Rust qualifies its operations with <strong>Ownership Rules</strong>. Every object instance has a unique owner.
+            The owner creates its associted instance.  When the owner goes out of scope the instance&apos;s
+            resources are returned to the process with an implicit drop operation, much like a C++ destructor.
+            <s-halfEm></s-halfEm>
+            An instance has to be qualified with the <c-s>mut</c-s> keyword to be <strong>mutable</strong>.  
+            <s-halfEm></s-halfEm>
+            Reference views of an instance
+            can be created and, if mutable, a reference is allowed to mutate the instance it views.  When references are 
+            active, the owner of the instance is not allowed to mutate its data, until all references become inactive by 
+            going out of scope.  
+            <s-halfEm></s-halfEm>
+            That&apos;s what happens when you pass an argument to a function by reference.  When the call returns, 
+            the reference is no longer active.
+            <s-halfEm></s-halfEm>
+            Rust also supports the definition of lambdas, in a manner very similar to that used by C++.
           </td>
         </tr>
       </table>
