@@ -107,41 +107,39 @@
       <h3>1. Prologue</h3>
       <t-b>
         In this story we look at common idioms and patterns used to build programs and software systems.  Each will
-        be implemented in the three programming languages: C#, C++, and Rust.  We do that to help those with knowledge of
-        one of the languages to start learning the others.  It also will provide a useful cache of techniques to help us
+        be implemented in the three programming languages: C#, C++, and Rust.  That may help developers familiar with one
+        of the languages to start learning the others.  It also provides a useful cache of techniques to help
         remember key implementation strategies.
-      </t-b>
-      <t-b>
-        You will frequently find that each language implements an idiom in different ways, sometimes radically different.  Why is
-        that?  Each of them is built around a different object model that governs how code you write executes in practice.
-      </t-b>
-      <t-b>
-        <ul>
-          <li>
-            C#, like Java, uses a reference model, runs in a virtual machine, and behaves in ways that may be surprising 
-            if you haven&apos;t used it for significant projects.  For example, copy and assignment operate on references,
-            for all non-primitive types, resulting in more than one reference to the same underlying instance.
-          </li>
-          <li>
-            C++ uses a value model, compiles to native code that runs directly on its computer platform, and behaves
-            very like primitive types do, supporting copy and assignment of instances.  This works because the developer 
-            implements overloads of the copy and assignment operators, or, in simple cases, the compile generates them.
-          </li>
-          <li>
-            Rust uses an ownership model, compiles to native code, and behaves in ways that are distinct from either 
-            C# or C++, especially for binding, assignment, and mutation through references.  Rust ownership rules are 
-            strict and enforce memory safety and freedom from data races.  Most important, it does that by construction.
-          </li>
-        </ul>
-      </t-b>
-      <t-b>
-        There are other differences discussed below and in the idiom and pattern implementations in following pages.
       </t-b>
       <t-b>
         In order to write code effectively, you need to have an initial design and a good mental model of what your program 
         will do when it executes programming language statements.  That understanding helps you predict, with some 
         precision, context appropriate sequences of statements to implement your ideas.  Without that understanding 
         you don&apos;t know what to write.
+      </t-b>
+      <t-b>
+        You will frequently find that each language implements an idiom in different ways, sometimes radically different.
+        Each of them is built around a different object model that governs how code you write executes in practice.
+      </t-b>
+      <t-b>
+        <ul>
+          <li>
+            C#, like Java, uses a reference model, runs in a virtual machine, and employs garbage collection to 
+            return process resources when no longer needed.  This model has significant performance implications.
+          </li>
+          <li>
+            C++ uses a value model, compiles to native code that runs directly on its computer platform, and its objects
+            are usually designed to behave as primitive types do, supporting copy and assignment of instances.
+          </li>
+          <li>
+            Rust uses an ownership model, compiles to native code, and behaves in ways that are distinct from either 
+            C# or C++, especially for binding, assignment, and mutation through references.  Rust ownership rules are 
+            strict, enforcing memory safety and freedom from data races.  Most important, it does that by construction.
+          </li>
+        </ul>
+      </t-b>
+      <t-b>
+        There are other differences discussed below and in the idiom and pattern implementations in following pages.
       </t-b>
       <h3>2. Models:</h3>
       <t-b>
@@ -199,21 +197,24 @@
               <div class="indent">
                 An Object is a pattern for creating instances.  If the type is defined by the language we usually
                 use the term primitive, e.g., int or double.  Otherwise we use the term object, e.g., struct, vector.
-                These are defined by standard libraries, not the language.  All three languages support the development
-                of new types by developers, e.g., person, order, ...
+                These are defined by standard libraries and developers, not the language.  All three languages support 
+                development of new types, e.g., person, order, graph, ...
               </div>
             </t-b>
             An <strong>Object Model</strong> describes:
             <ol class="tights">
               <li>
+                <hr class="sep" />
                 <div>Types:</div>
                 <s-halfEm></s-halfEm>
                 <div class="indent">
-                  A type is defined by a memory configuration with specified set of allowed operations.<br />
-                  Examples: integers, floating point numbers, vectors, ...
+                  A type is defined by a memory configuration with specified set of allowed operations.
+                  Examples: integers, floating point numbers, vectors, ...  An object is simply a type that can
+                  be instantiated.
                 </div>
               </li>
               <li>
+                <hr class="sep" />
                 <strongs>Execution environment:</strongs>
                 <s-halfEm></s-halfEm>
                 <div class="indent">
@@ -222,6 +223,7 @@
                 </div>
               </li>
               <li>
+                <hr class="sep" />
                 <strongs>Scope:</strongs>
                 <s-halfEm></s-halfEm>
                 <div class="indent">
@@ -242,6 +244,7 @@
                 </div>
               </li>
               <li>
+                <hr class="sep" />
                 <strongs>Object layout:</strongs>
                 <s-halfEm></s-halfEm>
                 <div class="indent">
@@ -258,24 +261,120 @@
                 </div>
               </li>
               <li>
+                <hr class="sep" />
                 <strongs>Object relationships:</strongs>
                 <s-halfEm></s-halfEm>
                 There are four relationships between objects for all three languages.  C++ offers an infrequently used
                 fifth relationship:
-                <ol class="tight">
+                <ul>
                   <li>
                     <strong>Inheritence:</strong><br />
-                    Base types provide a set of 
+                    Base types declare methods and associated functions.  They may, but often don&apos;t, supply 
+                    implementations.  Base methods may be declared virtual. That causes compilation to layout a
+                    virtual function pointer table used for dispatching methods dynamically, i.e., decide at run-time
+                    which derived class override to invoke.
+                    <s-halfEm></s-halfEm>
+                    Derived classes inherit from a base and are obligated to supply implementations for every 
+                    undefined method declared in the base.
+                    A base class becomes part of the memory footprint of every class that derives from that base.
                   </li>
-                </ol>
+                  <li>
+                    <strong>Composition:</strong><br />
+                    Include in the composing class instance an <strong>instance</strong> of a composed class.  This
+                    supports factoring complex operations into sets of simpler parts.
+                    <s-halfEm></s-halfEm>
+                    The composed instance becomes part of the memory footprint of the composing class; and is
+                    constructed as part of the composer construction.
+                  </li>
+                  <li>
+                    <strong>Aggregation:</strong><br />
+                    Include in the aggregating class a <strong>reference</strong> to an aggregated class. The 
+                    aggregated class instance is created, at run-time, by one of the aggregating class methods.
+                    <s-halfEm></s-halfEm>
+                    An aggregated class instance does not become part of the footprint of the aggregating class,
+                    and is not inherently created as part of the aggregating class construction.
+                  </li>
+                  <li>
+                    <strong>Using:</strong><br />
+                    A reference to a used class is passed as an argument in a using class method.  The used 
+                    class is not created by the user and is not part of the using class footprint.
+                  </li>
+                  <li>
+                    <strong>Friendship:</strong><br />
+                    The C++ language allows a class to grant friendship to a non-class function, or to another class.
+                    Friendship allows the friend access to private data of the granting class. This is primarily used 
+                    to support overloading insertion and extraction operators that are used for, but are not part of 
+                    the granting class.
+                  </li>
+                </ul>
               </li>
               <li>
-                <strongs>Instance management:</strongs>
-                <s-halfEm></s-halfEm>
+                <hr class="sep" />
+                <strongs>Instance management:</strongs><br />
+                Managing instances consists of:
+                <ul>
+                  <li>
+                    <strong>Binding</strong><br />
+                    Binding associates a name with a typed memory location.  C# and C++ allow only one binding of 
+                    a specific name within the same scope.  Rust allows rebinding the same name multiple times.
+                  </li>
+                  <li>
+                    <strong>Assignment</strong><br />
+                    The destination of an assignment aquires the same state as the source.
+                    <t-b class="pad5 indent" style="margin-top:0px; margin-bottom:0px;">
+                      <c-s>dst = src</c-s>
+                    </t-b>
+                    The semantics of assignment are quite different for each of the three languages (see below).
+                  </li>
+                  <li>
+                    <strong>access</strong><br />
+                    The ability of one instance to read the contents of another instance.  Rules for access are
+                    determined by ownership policies, class declarations, and location.  The rules differ significantly 
+                    for the three languages (see below).
+                  </li>
+                  <li>
+                    <strong>mutation</strong><br />
+                    The ability to modify the contents of an accessible instance.  Mutation rules are determined by 
+                    ownership policy, binding syntax, and class declaration.
+                  </li>
+                  <li>
+                    <strong>destruction</strong><br />
+                    Return resources attached to an instance to the program&apos;s process.  Rules for destruction are
+                    determined by the execution environment.  C# uses garbage collection; C++ and Rust use scope-based 
+                    deallocation.
+                  </li>
+                </ul>
               </li>
               <li>
-                <strongs>Operations:</strongs>
-                <s-halfEm></s-halfEm>
+                <hr class="sep" />
+                <strongs>Operations:</strongs><br />
+                Operations are operators, functions, methods, and lambdas.  The biggest differences for the three 
+                languages are which operations can be overloaded. 
+                <ul>
+                  <li>
+                    <strong>operators</strong><br />
+                    Operators are functions that have an alternate symbolic representation, e.g., +, -, =, ...
+                  </li>
+                  <li>
+                    <strong>functions</strong><br />
+                    Functions are named code blocks that accept zero or more parameters and may return a value of some
+                    type.
+                  </li>
+                  <li>
+                    <strong>methods</strong><br />
+                    Methods are functions that are bound to a class and have access to the class&apos;s member data.
+                  </li>
+                  <li>
+                    <strong>associated methods</strong><br />
+                    Associated methods are bound to a class, but do not have access to its member data.
+                  </li>
+                  <li>
+                    <strong>lambdas</strong><br />
+                    Lambdas are anonymous types that can be defined locally within functions and methods.  They 
+                    compile to class instances with a function that contains the lambda code block and member 
+                    data that is captured from the scope in which the lambda was defined.
+                  </li>
+                </ul>
               </li>
             </ol>
           </td>
@@ -398,7 +497,7 @@
           </td>
           <td class="elem topborder">
             C# CLR creates reference type instances on managed heap.  Instances are eventually removed by garbage collection.
-            Creates exceptions and supports event notification.  Provides detailed type information from reflection.
+            CLR creates exceptions and supports event notification.  Provides detailed type information from reflection.
             <s-halfEm></s-halfEm>
             Reference types do not provide value type behavior.  Copy and assignment do not result in independent instances.
             These operations result in multiple references to the same heap-based object.
@@ -454,6 +553,12 @@
             function pointer table.  If the called method is know at compile-time, C#&apos;s compiler will optimize away 
             dynamic dispatching, binding directly to the known method.
             <s-halfEm></s-halfEm>
+            The name of every variable of none-primitive type is a reference.  For example, every declaration of class 
+            member data is a declaration of a reference to an instance of that data, not the instance itself.
+            <s-halfEm></s-halfEm>
+            The assignment operator operator cannot be overloaded in C#.  Assignments are applied to references to class 
+            instances, with the result that the source and destination references refer to the same instance.
+            <s-halfEm></s-halfEm>
             C# supports definition of lambdas within a member function&apos;s code block.  Lambdas are compiled into a
             class with a method that captures the lambda code block, and, if the code block uses data defined prior to the 
             lambda definition in the same parent scope, then that data becomes member(s) of the compiler generated class.
@@ -470,6 +575,11 @@
             is called via a pointer typed as a pointer to a base.  If the base pointer is bound to a derived class instance, 
             the call resolves to the function defined by the class of that instance.
             <s-halfEm></s-halfEm>
+            The name of every non-pointer or non-reference variable is the name of an instance of some type.  C++ supports 
+            overloading the assignment operator to assign the state of a source instance to the state of a 
+            destination instance.  But these instances are independent.  Immediately following assignment they have the 
+            same state, but may then evolve independently.
+            <s-halfEm></s-halfEm>
             C++ also supports the definition of lambdas. A lambda is compiled into a class which overloads the operator(),
             a method that captures the lambda code block, and, if the code block uses data defined prior to the 
             lambda definition in the same parent scope, then that data becomes member(s) of the compiler generated class.
@@ -482,6 +592,8 @@
             For non-primitive types these operations result in moves, e.g., transfers of ownership from the source to the 
             destination.  That is efficient, but invalidates the source.  To avoid invalidation one may assign or 
             pass a clone of the source instance.
+            <s-halfEm></s-halfEm>
+            Rust does not support overloading of any operation, e.g., no overloading of operators, of functions, or of methods.
             <s-halfEm></s-halfEm>
             Rust qualifies its operations with <strong>Ownership Rules</strong>. Every object instance has a unique owner.
             The owner creates its associted instance.  When the owner goes out of scope the instance&apos;s
@@ -501,6 +613,12 @@
           </td>
         </tr>
       </table>
+      <h3>4. Epilogue</h3>
+      <t-b>
+        The following pages provide sequences of code examples for idioms and principles in each of the three languages 
+        cited here, e.g. C#, C++, and Rust.  Object model differences will often be pointed out in comments within the 
+        code blocks.
+      </t-b>
       <s-1em></s-1em>
       <a id="bottom"></a>
   </body>
