@@ -23,7 +23,8 @@ function initializeMenu() {
         <a href='CsRepositories.html'>C#&nbsp;Repositories&nbsp;&nbsp;</a>\
         <a href='RsRepositories.html'>Rust&nbsp;Repositories&nbsp;&nbsp;</a>\
         <a href='JsRepositories.html'>JS&nbsp;Repositories&nbsp;&nbsp;</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
+        <a href='OtherRepositories.html'>Other&nbsp;Repositories&nbsp;&nbsp;</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:smallest;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\

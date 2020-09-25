@@ -27,86 +27,53 @@ function initializeMenu() {
         <div style='padding:0px 10px; margin:0px; font-size:smallest;'>&nbsp;</div>\
       </div>\
     </div>\
-    <a href='Videos.html' class='menuItem'>Videos</a>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Blogs &#9662;</button>\
+      <button class='dropbutton'>Utils &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;Opinions&nbsp;and&nbsp;Ideas&nbsp;</div>\
-        <a href='Blog.html'>First&nbsp;Things</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
-        <a href='BlogDesign.html'>SW&nbsp;Design</a>\
-        <a href='BlogPrinciples.html'>Design&nbsp;Principles</a>\
-        <a href='BlogOOD.html'>OO&nbsp;Design</a>\
-        <a href='BlogObjectModels.html'>Object&nbsp;Models</a>\
-        <a href='BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data&nbsp;&nbsp;</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Engineering&nbsp;SW&nbsp;---</div>\
-        <a href='BlogOCD.html'>Concept&nbsp;Document</a>\
-        <a href='BlogTesting.html'>SW&nbsp;Testing</a>\
-        <a href='SummerReading.html'>Summer&nbsp;Reading</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Software&nbsp;Sys&nbsp;------</div>\
-        <a href='BlogStructure.html'>SW&nbsp;Structure</a>\
-        <a href='BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a>\
-        <a href='BlogActiveObjects.html'>Active&nbsp;Objects</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Reusable&nbsp;Pkgs&nbsp;----</div>\
-        <a href='BlogNoSql.html'>noSQL&nbsp;Database</a>\
-        <a href='BlogParser.html'>Parsing</a>\
-        <a href='BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a>\
-        <a href='BlogMTree.html'>M-ary&nbsp;Trees</a>\
-        <a href='BlogGraph.html'>Directed&nbsp;Graphs</a>\
-        <a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a>\
+        <div class='darkItem maxWidth'>&nbsp;Utilities</div>\
+        <a href='Javascript:;'>None yet</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button id=res class='dropbutton'>Res &#9662;</button>\
+      <button class='dropbutton'>Tools &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
-        <a href='Videos.html' class='menuItem'>Videos</a>\
-        <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a>\
-        <a href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a>\
-        <a href='page_test.html'>Test Page</a>\
-        <a href='DesignProcess.html'>Design Process</a>\
-        <a href='ProjectsList.html'>Project suggestions</a>\
-        <a href='RustStory_CodeIndex.html'>Rust code index</a>\
-        <a href='LangCpp.html'>C++ Language Resources</a>\
-        <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
-        <a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a>\
-        <a href='CppReferences.html'>C++ References</a>\
-        <a href='CppExamples.html'>C++ Example Code</a>\
-        <a href='CppSynopsis.html'>C++ Synopsis</a>\
-        <a href='DesignNote-Cpp11.html'>C++11 Survey</a>\
-        <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
-        <a href='https://dev.to/chrisachard/intro-to-regex-for-web-developers-2fj4'>RegExp&nbsp;for&nbsp;JavaScript</a>\
-        <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
-        <a href='TechnicalLinks.html'>Technical Links</a>\
-        <a href='WebNotes.html'>Web Notes</a>\
-        <a href='WebComponentTests.html'>UI Widget Tests</a>\
-        <a href='https://encycolorpedia.com/named'>Web Colors</a>\
-        <a href='UML.html'>UML Diagrams</a>\
-        <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
-        <a href='https://github.com/joshnh/Git-Commands'>git commands</a>\
-        <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
-        <a href='SummerReading.html'>Summer Reading</a>\
-        <a href='Interviews.html'>Job Interviews</a>\
+        <div class='darkItem maxWidth'>&nbsp;Utilities</div>\
+        <a href='Javascript:;'>None yet</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Nbrhds &#9662;</button>\
+      <button class='dropbutton'>Cmps &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;Site&nbsp;Neighborhoods&nbsp;-&nbsp;related&nbsp;content&nbsp;&nbsp;</div>\
-        <a href='https://JimFawcett.github.io'>JimFawcett-github</a>\
-        <a href='https://ecs.syr.edu/faculty/fawcett'>JimFawcett-SyracuseUniv</a>\
-        <a href='https://mwcorley79.github.io/MikeCorley/'>Mike Corley</a>\
-        <a href='https://csiac.org'>CSIAC</a>\
-        <a href='https://www.fluentcpp.com'>Fluent {C++}</a>\
-        <a href='https://www.boost.org/'>Boost&nbsp;Library&nbsp;(C++)</a>\
-        <a href='https://www.pocoproject.org/'>poco&nbsp;Library&nbsp;(C++ networking)</a>\
-        <a href='https://openframeworks.cc/'>openFrameworks&nbsp;(C++ graphics)</a>\
-        <a href='https://github.com/microsoft'>github.com/Microsoft</a>\
-        <a href='https://www.taniarascia.com/'>taniarascia.com (JavaScript, CSS)</a>\
+        <div class='darkItem maxWidth'>&nbsp;Utilities</div>\
+        <a href='Javascript:;'>None yet</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
-      </div >\
+      </div>\
+    </div>\
+    <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Libs &#9662;</button>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Utilities</div>\
+        <a href='Javascript:;'>None yet</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
+      </div>\
+    </div>\
+    <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Prjs &#9662;</button>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Projects</div>\
+        <a href='Javascript:;'>None yet</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:smaller;'>&nbsp;</div>\
+      </div>\
+    </div>\
+    <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Dems &#9662;</button>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Demonstrations</div>\
+        <a href='IdiomsAndPatterns.html'>Idioms&nbsp;and&nbsp;Patterns&nbsp;</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:smaller;'>&nbsp;</div>\
+      </div>\
     </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Stories &#9662;</button>\
@@ -163,7 +130,7 @@ function initializeMenu() {
   var swKey = document.getElementById("sKey");
   if (nxt === null) {
     document.getElementById("nextLink").style.display = "none";  // button top right menu
-    if(isDefined(nKey))
+    if (isDefined(nKey))
       nKey.style.display = "none";
     if (isDefined(swKey))
       swKey.style.display = "none";
@@ -180,12 +147,12 @@ function initializeMenu() {
   var pKey = document.getElementById("pKey");
   if (prv === null) {
     document.getElementById("prevLink").style.display = "none";  // button top right menu
-    if(isDefined(pKey))
+    if (isDefined(pKey))
       pKey.style.display = "none";
   }
   else {
     document.getElementById("prevLink").href = prv.href;
-    if(isDefined(pKey))
+    if (isDefined(pKey))
       pKey.style.display = "inline";
   }
 
@@ -193,17 +160,9 @@ function initializeMenu() {
 
   var rvsd = document.getElementsByTagName("info-bar");
   var date = document.lastModified;
-  rvsd[0].innerHTML = 
-    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
-    "copyright &copy; Jim Fawcett, 2020" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
-    "Page Revised: " + date + "&nbsp;&nbsp;&nbsp;&nbsp;"
+  rvsd[0].innerHTML = "copyright &copy; Jim Fawcett, 2019&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Page Revised: " + date;
   rvsd[0].addEventListener('click', function () { location.reload(); });
-  //rvsd[0].appendChild(nxt);
-  //pKey.style.display = "inline";
-  //rvsd[0].appendChild(prv);
-  //rvsd[0].innerHTML = rvsd[0].innerHTML + "&nbsp;&nbsp;&nbsp;&nbsp;"
-  //rvsd[0].appendChild(prv);
-  //console.log(rvsd[0].innerHTML);
+
   // set display mode for navKeys from value in local storage
 
   setnavKeys();
@@ -226,53 +185,36 @@ function initializeMenu() {
     elems[i].addEventListener("click", (event) => { toggleVisibility(event); }, false);
   }
   let sKey = document.getElementById('sKey');
-  if (!isDefined(sKey))
-    return;
-  //  if (typeof getSwipeEvents === 'function') {
-  //  if (isDefined(getSwipeEvents))
-  //  
-  if (typeof getSwipeEvents === 'function') {
-    let test = getSwipeEvents();
-    if (test === 'true') {
-      addSwipeListeners();
-      sKey.innerHTML = 'S';
-    }
-    else {
-      sKey.innerHTML = '<del>S</del>';
-    }
+  let test = getSwipeEvents();
+  if (test === 'true') {
+    addSwipeListeners();
+    sKey.innerHTML = 'S';
+  }
+  else {
+    sKey.innerHTML = '<del>S</del>';
   }
 }
 
 //----< load page defined in current page's Prev link >--------------
 
 function loadPrev() {
-  try {
-    document.getElementById("Prev").click();
-  }
-  catch (err) {
-    console.log('exception: ' + err);
-  }
+  document.getElementById("Prev").click();
 }
 //----< load page defined in current page's Next link >--------------
 
 function loadNext() {
-  try {
-    document.getElementById("Next").click();
-  }
-  catch (err) {
-    console.log('exception: ' + err);
-  }
+  document.getElementById("Next").click();
 }
 //----< load page defined in current page's Lect link >--------------
 
-//function loadLect() {
-//  document.getElementById("Lect").click();  // Lect link is near top of first lect page
-//}
-////----< load page defined in current page's Cour link >--------------
+function loadLect() {
+  document.getElementById("Lect").click();  // Lect link is near top of first lect page
+}
+//----< load page defined in current page's Cour link >--------------
 
-//function loadCour() {
-//  document.getElementById("Cour").click();  // Cour link is near top of course page
-//}
+function loadCour() {
+  document.getElementById("Cour").click();  // Cour link is near top of course page
+}
 //----< hide, progressively, menu items on the left >----------------
 /*
 *  This let's user see menu items that overflow on the right
@@ -301,7 +243,7 @@ function scrollMenuRight() {
   for (i = 0; i < items.length; ++i) {
     var cpprp = window.getComputedStyle(items[len - i - 1], null).getPropertyValue("display");
     if (cpprp !== "block") {
-      items[len-i-1].style.display = "block";
+      items[len - i - 1].style.display = "block";
       break;
     }
   }
@@ -334,7 +276,6 @@ function togglenavKeys() {
     }
   }
   catch (err) {
-    console.log('exception: ' + err);
     return;
   }
 }
@@ -343,8 +284,6 @@ function togglenavKeys() {
 function setnavKeys() {
   try {
     var nkc = document.getElementsByTagName("navKeys-Container");
-    if (!isDefined(localStorage))
-      return;
     var navKeyState = window.localStorage.getItem("navKeyState");
     if (navKeyState === null) {
       nkc[0].style.display = "inline";
@@ -434,12 +373,3 @@ function mouseAction(event) {
     }
   }
 }
-//----< close TOC bar >----------------------------------------------
-/*
- *  Developed for CppStory pages
- */
-function closeTOC() {
-  let toc = document.getElementById("toc");
-  toc.style.display = "none";
-}
-
