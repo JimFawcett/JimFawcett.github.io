@@ -98,6 +98,7 @@ function initializeMenu() {
         <a href='https://JimFawcett.github.io'>JimFawcett-github</a>\
         <a href='https://ecs.syr.edu/faculty/fawcett'>JimFawcett-SyracuseUniv</a>\
         <a href='https://mwcorley79.github.io/MikeCorley/'>Mike Corley</a>\
+        <a href='https://github.com/CommProjectComparisons'>CommProjectComparisons-github</a>\
         <a href='https://csiac.org'>CSIAC</a>\
         <a href='https://www.fluentcpp.com'>Fluent {C++}</a>\
         <a href='https://www.boost.org/'>Boost&nbsp;Library&nbsp;(C++)</a>\
