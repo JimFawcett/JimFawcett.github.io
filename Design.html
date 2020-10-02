@@ -1,0 +1,242 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - Resources.html
+   - ver 1.0 - 10 June 2019
+   - Jim Fawcett, Emeritus Teaching Professor, Syracuse University
+  -->
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Projects. Code Samples. Software Links" />
+  <meta name="keywords" content="Repository, Design, Code" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <title>Design</title>
+  <script src="js/ScriptsUtilities.js"></script>
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesDefault.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+  <link rel="stylesheet" href="css/StylesBrownTheme.css" />
+  <style>
+    summary {
+      padding: 3px 0px 5px 0px;
+    }
+
+    #github notes-container {
+      display: grid;
+      grid-template-columns: 0.45fr 1fr;
+      grid-gap: 0px;
+      margin: 10px 10px;
+      padding: 0px;
+    }
+
+    #github note-link {
+      grid-column: 1;
+      margin: 0px;
+      padding: 10px;
+    }
+
+    #github note-text {
+      grid-column: 2;
+      margin: 0px;
+      padding: 10px;
+    }
+
+    #github .headerRow {
+      margin: 0px;
+      padding: 5px 20px;
+    }
+
+    #github .topicRow {
+      margin: 0px;
+      padding: 2px 20px;
+    }
+
+    #github .topicLink {
+      /*border-right: none;*/
+    }
+
+    #github .note {
+      margin: 0px;
+    }
+  </style>
+</head>
+<body id="github" onload="initializeMenu()">
+
+  <navKeys-Container>
+    <nav-Key id="sKey" onclick="toggleSwipeEvents()">S</nav-Key>
+    <nav-Key id="rKey" onclick="location.reload()">R</nav-Key>
+    <nav-Key id="tKey" onclick="scrollPageTop()">T</nav-Key>
+    <nav-Key id="bKey" onclick="scrollPageBottom()">B</nav-Key>
+    <nav-Key id="hKey" onclick="helpWin()">H</nav-Key>
+    <nav-Key id="pKey" onclick="loadPrev()">P</nav-Key>
+    <nav-Key id="nKey" onclick="loadNext()">N</nav-Key>
+  </navKeys-Container>
+
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <!--<a id="Next" href="BlogDesign.htm">N</a>
+  <a id="Prev" href="BlogFileSystem.htm">P</a>-->
+
+  <header>
+    <hgroup id="pagetitle">
+      <h1 id="title">Design</h1>
+    </hgroup>
+  </header>
+
+  <t-b class="mbz" style="padding:5px 25px;">
+    "There are two ways of constructing a software design; one way is to make it so simple that there 
+    are obviously no deficiences, and the other way is to make it so complicated that there are no 
+    obvious deficiencies. The first method is far more difficult."
+    <br />
+    - C.A.R.Hoare
+  </t-b>
+
+  <hr class="spread" />
+  <h3>Prologue:</h3>
+  <indent-block>
+    <t-b>
+      Definitions for design from <a href="https://www.merriam-webster.com/dictionary/design">Merriam-Webster</a>:
+      <ul class="tight pad5">
+        <li>.. scheme in which means to an end are laid down</li>
+        <li>.. outline showing the main features of something to be executed</li>
+        <li>a plan or protocol for carrying out or accomplishing something ..</li>
+      </ul>
+    </t-b>
+    <t-b>
+      Implementing code is a consuming mental task.  We think about the context, semantics, and syntax of each
+      line of code we write.  That doesn&apos;t leave too many mental cycles for building a well structured
+      program that is quick, robust, elegant, and easy to use.
+    </t-b>
+    <t-b>
+      The purpose of design is to think about structure and process strategies before diving into the coding fray.
+      We want our designs to:
+      <ul class="tight pad5">
+        <li>
+          Explain, in brief, unambiguous, and relatively complete fashion, the project goals, structure, 
+          processing concepts, and delivered information.
+        </li>
+        <li>
+          Extract away all of the details of platform and language so that our ideas take precedence.
+        </li>
+        <li>
+          Be small and simple enough that team members will acturally read the document.
+        </li>
+      </ul>
+    </t-b>
+    <t-b>
+      Try to implement the 
+      <a href="https://en.wikipedia.org/wiki/Goldilocks_principle">&quot;Goldilocks principle&quot;</a> - not to much,
+      not to little, just enough to guide your implementation.
+    </t-b>
+    <t-b>
+      I often work on designs early in the morning, coffee cup in hand - scribbling notes and diagrams on
+      sheets of paper, many, at first, get crumpled and thrown away, but soon there&apos;s a small stack of papers,
+      perhaps five or six, convincing me that the project is sensible, do-able, and has a clear starting point.
+    </t-b>
+  </indent-block>
+  <h3>Design of a Software Design Document:</h3>
+  <indent-block>
+    <t-b>
+      A design document <strong>represents</strong> a program design, providing:
+      <ol>
+        <li>
+          A brief specification, if one doesn&apos;t already exist. A one line statement of what the program does,
+          then pre-conditions: the program&apos;s environment and inputs, post-conditions:  
+          a list of the things it must provide.
+        </li>
+        <li>
+          Use: how will users interact with the program: what inputs do they supply, how do they interpret program
+          results - the program is, after all, going to supply information, not raw data?
+        </li>
+        <li>
+          A list of tasks the program must execute, more or less in the order they occur during operation.
+          Each task becomes a candidate for a part in the program&apos;s structure.  Some will be, some may not.
+        </li>
+        <li>
+          A structure consisting of a network of named parts, where each part has a stated responsibility. Parts might
+          be functions, or classes, or packages.
+        </li>
+        <li>
+          One or more diagrams showing the structural relationships, e.g., a call stack diagram, or class diagram,
+          or package diagram, or some combination.
+        </li>
+        <li>
+          A description of the major processing parts.  If you help your friend work on her motorcycle you might
+          describe in words and a diagram how to clean and adjust the bike&apos;s carburetor.  You do the same
+          thing here, perhaps briefly describing a directory tree traversal or messaging process.
+        </li>
+        <li>
+          A description of error handling, which is really part of the processing description.  What errors may
+          occur? How will they be handled?
+        </li>
+        <li>
+          Testing description: test name, description, procedure.
+        </li>
+        <li>
+          Thoughts about future expansions, not implemented, but may be in future versions.  That may lead us
+          in a design direction that we would not otherwise follow.
+        </li>
+        <li>
+          Very brief outline of a prototype developed to verify feasibility of one or more operations.
+        </li>
+      </ol>
+    </t-b>
+    <t-b>
+      What do you mean <strong>small and simple</strong>!  There&apos;s a lot of steps here.  Look&apos;s like
+      Goldilocks slept in today.
+    </t-b>
+    <t-b>
+      Robin Mathew said "Design is where science and art break even". Here is where the art comes in.  Speaking
+      and writing in clear, simple, brief statements. If in doubt, throw it out!  
+    </t-b>
+  </indent-block>
+  <h3>Building a Design:</h3>
+  <indent-block>
+    <t-b>
+      You might scribble on a few pieces of paper, then build your design by writing the design document, thinking 
+      and creating as you go.
+    </t-b>
+    <t-b>
+      One of the best ways to think clearly about some complex topic is to try to write about it.  Expository 
+      writing is very similar to developing code.  You start with an idea, then describe it, bound by the
+      syntax, context and conventions of your topic.  Essentially writing is coding ideas rather than functions
+      and classes.  Same issues of connections, process, and structure.
+    </t-b>
+  </indent-block>
+  <h3>Presenting Designs:</h3>
+  <indent-block>
+    <t-b>
+      Let&apos;s assume you present using slides.  Allow 2 minutes per slide (that is optimistic).  So a ten minute
+      presentation means you will have 5 slides including your opening and closing slides.
+    </t-b>
+    <t-b>
+      Clearly you have to cherry-pick the design document, selecting small pieces of of each design topic as
+      representative of your design.  You may have to eliminate some of the design topics altogether.  Pick those
+      with the most impact for your audience.
+    </t-b>
+    <t-b>
+      Be very careful to stick to the script.  Don&apos;t ramble, use one strong statement per topic with perhaps
+      a very few words of elaboration.
+    </t-b>
+    <t-b>
+      Finally, talk to the audience - don&apos;t read your slides.  The slides are there for your audience and to keep you
+      on track.  Remember, you know more about your presentation topic than the audience - trust me, you do!
+      So don&apos;t be terrified :-)
+    </t-b>
+  </indent-block>
+  <h3>Epilogue:</h3>
+  <indent-block>
+    <t-b>
+      We want to make our programs elegant and simple, make their intents clear, and make them quick and reliable.
+      That is most likely to happen if we think first about design.
+    </t-b>
+  </indent-block>
+  <spacer-15></spacer-15>
+  <info-bar></info-bar>
+</body>
+</html>
