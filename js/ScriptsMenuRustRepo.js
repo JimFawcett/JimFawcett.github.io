@@ -62,6 +62,7 @@ function initializeMenu() {
         <a href='RustDirNav.html'>DirNav</a>\
         <a href='RustComm.html'>Comm Prototype</a>\
         <a href='RustCommWithThreadPool.html'>Comm Prototype with TP&nbsp;</a>\
+        <a href='RustCommExperiments.html'>Comm Experiments&nbsp;</a>\
         <a href='RustStringConversions.html'>String&nbsp;Conv&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
