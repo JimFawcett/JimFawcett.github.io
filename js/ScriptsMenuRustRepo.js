@@ -71,7 +71,8 @@ function initializeMenu() {
       <button class='dropbutton'>Prjs &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Projects</div>\
-        <a href='Javascript:;'>None yet</a>\
+        <a href='BuildOn.html'>BuildOn</a>\
+        <a href='RustCommExperiments.html'>RustComm&nbsp;Exper&nbsp;&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:smaller;'>&nbsp;</div>\
       </div>\
     </div>\
