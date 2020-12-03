@@ -87,6 +87,8 @@ function initializeMenu() {
         <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
         <a href='SummerReading.html'>Summer Reading</a>\
         <a href='Interviews.html'>Job Interviews</a>\
+        <a href='TestGrid.html'>TestGrid - Sized</a>\
+        <a href='TestGrid2.html'>TestGrid - AbsPos</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
