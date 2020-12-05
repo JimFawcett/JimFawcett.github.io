@@ -33,26 +33,31 @@
       /*grid-gap: 0.15em;*/
       width: 100%;
       margin: 1em 0em;
-      border: 0.15em solid #4c2f27;
+      border: 0.10em solid #4c2f27;
       background-color: #4c2f27;
       overflow: auto;
     }
     cpp-content {
-      position:relative;
+      position: relative;
       grid-area: cppcomm;
       width: calc(100%-2em);
-      margin: 0.15em;
-      padding:0.5em;
-      height: 30em;
-      border-right: 0.15em solid #4c2f27;
+      margin: 0.10em;
+      padding: 1.5em;
+      background-color: #fefefa; /* baby powder */
+      color: #4c2f27;
     }
     rust-content {
       position: relative;
       grid-area: rustcomm;
       width: calc(100%-2em);
-      margin: 0.15em;
-      padding: 0.5em;
-      height: 30em;
+      margin: 0.10em;
+      padding: 1.5em;
+      background-color: #fefefa; /* baby powder */
+      color: #4c2f27;
+    }
+    hr.above {
+      margin-top:2.0em;
+      margin-bottom:1.0em;
     }
   </style>
 </head>
@@ -78,7 +83,7 @@
   <header>
     <a class="repoLink" href="https://github.com/JimFawcett/CommCompare">CommCompare code</a>
     <hgroup id="pagetitle">
-      <h1 id="title">CommCommpare&nbsp;&nbsp;Repository</h1>
+      <h1 id="title">CommCompare&nbsp;&nbsp;Repository</h1>
       <h3 id="subtitle">Comparing C++ and Rust Message-passing communicators</h3>
     </hgroup>
 
@@ -135,11 +140,100 @@
     </indent-block>
   </header>
 
-  <hr class="spread" />
-
+  <hr class="above" />
+  <h2>Comparing C++ and Rust</h2>
+  <t-b>
+    My collaborator, Mike Corley, and I are interested in Rust and how it compares with the C++ programming language.
+    To do this in a practical setting, we decided to implement message-passing communicators using socket-based 
+    connections and simple variable-sized messages.  The results of that are what you find in this repository.
+  </t-b>
+  <t-b>
+    Here, we will compare performance, complexity, ease of construction, code size, and safety.  For some of these
+    attributes, like performance, we can be quite specific.  For others, like ease of construction, we will be 
+    satisfied with subjective judgments.
+  </t-b>
+  <t-b>
+    We established several goals for this demonstration:
+    <ol class="tight">
+      <li>
+        The C++ and Rust designs should be as similar as practical within constraints of the two languages.
+        Both use:
+        <ul class="tight">
+          <li>Synchronous, full-duplex sockets for client to server client-handler communication.</li>
+          <li>Threadpools to avoid context thrashing for large numbers of concurrent clients.</li>
+          <li>Simple variable-size messages which may have binary bodies.</li>
+          <li>
+            Server processing simply echos client messages back (client handlers are designed to support
+            significantly more complex server operations.
+          </li>
+        </ul>
+      </li>
+      <li>
+        The C++ code should use modern C++17 constructs supporting safe data handling.  Safe Rust enforces memory
+        and data race safety at compile time.  No unsafe blocks used in any of the Rust code (excluding
+        unsafe blocks used in, and thoroughly vetted for, the standard library).
+      </li>
+      <li>
+        Implementations will use professional care, but no extraordinary efforts will be used to squeeze additional
+        performance or other measured attributes.  This is supposed to reflect good &quot;business as usual&quot; practice.
+      </li>
+    </ol>
+  </t-b>
+  <hr class="above" />
+  <h3>Communicator Comparisons</h3>
+  <t-b>
+    <ol class="tight">
+      <li>
+        <h4>Performance:</h4>
+        <div class="indent pad5">
+          TBD
+        </div>
+      </li>
+      <li>
+        <h4>Size in Source Lines of Code:</h4>
+        <div class="indent pad5">
+          TBD
+        </div>
+      </li>
+      <li>
+        <h4>Complexity:</h4>
+        <div class="indent pad5">
+          TBD
+        </div>
+      </li>
+      <li>
+        <h4>Ease of Construction:</h4>
+        <div class="indent pad5">
+          TBD
+        </div>
+      </li>
+      <li>
+        <h4>Safety:</h4>
+        <div class="indent pad5">
+          TBD
+        </div>
+      </li>
+    </ol>
+  </t-b>
+  <hr class="above" />
+  <h3>Implementations</h3>
+  <!--<t-b>
+    We both are seasoned professional developers.
+    <ul>
+      <li>
+        I&apos;ve used C++ since 1988 when the Zortec compiler was first issued.  My intersts then were for computer-aided
+        design for control systems.  My experience with Rust began when I retired from Syracuse University in 2019.
+        I was particularly attracted to its memory and data race safety.
+      </li>
+      <li>
+        Mike has been developing code in C++, C#, and Java since the beginning of 2000.  He does a lot of prototyping of
+        interesting applications to determine feasibility and aquire funding for advanced development acitivities.
+      </li>
+    </ul>
+  </t-b>-->
   <two-column>
-    <cpp-content class="light">
-      C++
+    <cpp-content>
+      <h3>C++ Communication</h3>
       <div>
         <photosizer-block src="Pictures/MPL.jpg" width="400" class="photoSizerBlock right" style="margin-top:0;">
           <span style="
@@ -156,8 +250,8 @@
       </div>
 
     </cpp-content>
-    <rust-content class="light">
-      Rust
+    <rust-content>
+      <h3>Rust Communication</h3>
       <div>
         <photosizer-block src="Pictures/RustCommConcept.jpg" width="300" class="photoSizerBlock right" style="margin-top:0;">
           <span style="
@@ -172,10 +266,217 @@
           </span>
         </photosizer-block>
       </div>
+      <t-b>
+        RustComm is a facility for sending messages between a Sender and Receiver.  It uses the std::net::TcpStream and
+        std::net::TcpListener types.
+        <spacer-15></spacer-15>
+        This is a prototype for message-passing communication system. It provides three user defined types: <c-s>Connector</c-s>,
+        <c-s>Listener</c-s>, and <c-s>Message</c-s>, with generic parameters <c-s>M</c-s>, <c-s>P</c-s>, and <c-s>L</c-s>, as shown in Fig. 1.  
+        <spacer-15></spacer-15>
+        <c-s>M</c-s> implements the <c-s>Msg</c-s> trait and represents a message to be sent between endpoints. 
+        <c-s>P</c-s> implements the <c-s>Process&lt;M&gt;</c-s> trait that defines message processing, and 
+        <c-s>L</c-s> implements the <c-s>Logger</c-s> trait that supports logging events to the console that can be 
+        turned on or off by the types supplied for <c-s>L</c-s>, e.g., <c-s>VerboseLog</c-s> and <c-s>MuteLog</c-s>.
+        <spacer-15></spacer-15>
+        The RustComm library:
+        <t-b class="mtz">
+          <ul class="tight mtz">
+            <li>
+              Uses queued full-duplex buffered message sending and receiving
+            </li>
+            <li>
+              Each message has a fixed size header and <c-s>Vec&lt;u8&gt;</c-s> body.
+            </li>
+            <li>
+              For each <c-s>Connector&lt;P, M, L&gt;</c-s> connection, <c-s>Listener&lt;P, L&gt;</c-s> processes messages 
+              until receiving a message with MessageType::END.
+            </li>
+            <li>
+              <c-s>Listener&lt;P, L&gt;</c-s> requests a thread from ThreadPool&lt;P&gt; for each client connection and 
+              processes messages in <c-s>P::process_message</c-s>.
+            </li>
+            <li>
+              In this version, <c-s>P::process_message</c-s> echos back message with &quot;reply&quot; appended as 
+              reply to sender.  You observe that behavior by running test1, e.g., <c-s>cargo run --example test1</c-s>. 
+            </li>
+          </ul>
+        </t-b>
+      </t-b>
+      <t-b>
+        The long-term goal for RustComm is to serve as a prototyping platform for various messaging and processing
+        strategies.  This version defines traits: <c-s>Sndr&lt;M&gt;</c-s>, <c-s>Rcvr&lt;M&gt;</c-s>, 
+        <c-s>Process&lt;M&gt;</c-s>, <c-s>Msg</c-s>, and <c-s>Logger</c-s>.
+      </t-b>
+      <t-b>
+        The user-defined types, <c-s>M</c-s> and <c-s>P</c-s>, are things that change as we change the message structure, defined
+        by <c-s>M</c-s> and connector and listener processing defined by <c-s>P</c-s>.  
+        These types are defined in the rust_comm_processing crate.
+        <spacer-15></spacer-15>
+        The somewhat complex handling of TcpStreams and TcpListener are expected to remain fixed.  They are defined in
+        the crate rust_comm.
+        
+        Finally, logger <c-s>L</c-s> provides a write method that will,  
+        using <c-s>VerboseLog</c-s> for <c-s>L</c-s>, write its argument to the console.  <c-s>MuteLog</c-s> simply discards its argument.
+      </t-b>
+      <div>
+        <photosizer-block src="Pictures/RustCommOutput_test4.jpg" width="400" class="photoSizerBlock right" style="margin-top:0;">
+          <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS, Tahoma';
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;
+        ">
+            Fig 2. RustComm Output Test4
+          </span>
+        </photosizer-block>
+      </div>
+      <t-b>
+        RustComm uses a threadpool, as shown in Fig. 1., to avoid context trashing for a large number of concurrent
+        clients.  In Fig 2. we show message processing for 16 clients on a machine with 4 hyper-threaded processors.
+      </t-b>
+      <t-b>
+        Each client sends a stream of 100 4kB messages, all running concurrently.  Timing was executed with a high
+        resolution clock with microsecond precision.
+      </t-b>
+      <t-b>
+        Client sends and receives where executed on separate threads, so message sending did not wait for message
+        receptions.  Note that the client&apos;s connector internally blocks waiting for reply messages, then enqueues 
+        them for the client.
+      </t-b>
+    <h3>Current Design:</h3>
+    <t-b>
+      <t-b>
+        There are three user-defined types: Message, Connector, and Listener.  Connector and Listener each use an
+        existing component BlockingQueue&lt;Message&gt;
+        <indent-block class="pad5">
+          <t-b>
+            <strong>Message:</strong>
+            Methods:
+          </t-b>
+          <ol class="tight">
+            <li>
+              <strong><c-s>new() -> Message</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Create new <c-s>Message</c-s> with empty body and MessageType::TEXT.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>set_type(&mut self, mt: u8)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Set <c-s>MessageType</c-s> member to one of: <c-s>TEXT, BYTES, END</c-s>.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>get_type(&self) -> MessageType</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Return <c-s>MessageType</c-s> member value.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>set_body_bytes(&mut self, b: Vec&lt;u8&gt;)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Set <c-s>body_buffer</c-s> member to bytes from<c-s>b: Vec&lt;u8&gt;</c-s>.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>set_body_str(&mut self, s: &str;)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Set <c-s>body_buffer</c-s> member to bytes from<c-s>s: &str</c-s>.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>get_body_size(&self) -> usize</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Return size in bytes of body member.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>get_body(&self) -> &Vec&lt;u8&gt;</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Return <c-s>body_buffer</c-s> member.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>get_body_str(&self) -> String</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Return body contents as lossy <c-s>String</c-s>.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>clear(&self)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                clear body contents.
+              </div>
+            </li>
+          </ol>
+          <t-b>
+            <hr />
+            <div class="pad10">
+              Both <c-s>Connector&lt;P, M, L&gt;</c-s> and <c-s>Listener&lt;P, L&gt;</c-s> are parameterized with <c-s>L</c-s>,
+              a type satisfying a <c-s>Logger</c-s> trait.  The package defines two types that implement the trait,
+              <c-s>VerboseLog</c-s> and <c-s>MuteLog</c-s> that allow users to easily turn on and off event display
+              outputs.  Fig 2. uses <c-s>MuteLog</c-s> in both <c-s>Connector&lt;P, M, L&gt;</c-s> and 
+              <c-s>Listener&lt;P, L&gt;</c-s>.
+            </div>
+            <hr />
+          </t-b>
+          <t-b><strong>Connector&lt;P, M, L&gt;</strong> methods:</t-b>
+          <ol class="tight">
+            <li>
+              <strong><c-s>new(addr: &'static str) -> std::io::Result&lt;Connector&lt;P,M,L&gt;&gt;</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Create new <c-s>Connector&lt;P,M,L&gt;</c-s> with running send and receive threads.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>is_connected(&self) -> bool</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                is connected to <c-s>addr</c-s>?.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>post_message(&self, msg: M)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Enqueues msg to send to connected Receiver.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>get_message(&mut self) -> M</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Reads reply message if available, else blocks.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>has_message(&self) -> bool</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Returns true if reply message is available.
+              </div>
+            </li>
+          </ol>
+          <t-b><strong>Listener&lt;P, L&gt;</strong> methods:</t-b>
+          <ol class="tight">
+            <li>
+              <strong><c-s>new(nt: u8) -> Listener&lt;P, L&gt;</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Create new <c-s>Listener&lt;P, L&gt;</c-s> with nt threads running.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>start(&mut self, addr: &'static str) -> std::io::Result&lt;JoinHandle&lt;()&gt;&gt;</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Bind <c-s>Listener&lt;P,L&gt;</c-s> to <c-s>addr</c-s> and start listening on dedicated thread.
+              </div>
+            </li>
+          </ol>
+        </indent-block>
+      </t-b>
+    </t-b>
     </rust-content>
   </two-column>
   <div class="clear"></div>
-  <div class="bb-55">
+  <!--<div class="bb-55">
     <div style="width:calc(100vw - 6rem);">
       <photosizer-block src="Pictures/RustCommConcept.jpg" width="600" class="photoSizerBlock right" style="margin-top:0;">
         <span style="
@@ -192,48 +493,34 @@
     </div>
   </div>
   <div class="bb-55">
-      <!--<div style="width:calc(100vw - 6rem);">
-        <photosizer-block src="Pictures/RustCommStructure.jpg" width="400" class="photoSizerBlock right clear" style="margin-top:0;">
-          <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;
-        ">
-            Fig 2. Current RustComm Structure
-          </span>
-        </photosizer-block>
-      </div>-->
-      <div style="width:calc(100vw - 6rem);">
-        <photosizer-block src="Pictures/RustCommTest3.jpg" width="400" class="photoSizerBlock right clear" style="margin-top:0;">
-          <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;
-        ">
-            Fig 2. RustComm Output Test3
-          </span>
-        </photosizer-block>
-      </div>
-      <div style="width:calc(100vw - 6rem);">
-        <photosizer-block src="Pictures/RustCommOutput_test4.jpg" width="400" class="photoSizerBlock right clear" style="margin-top:0;">
-          <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;
-        ">
-            Fig 3. RustComm Output Test4
-          </span>
-        </photosizer-block>
-      </div>
+    <div style="width:calc(100vw - 6rem);">
+      <photosizer-block src="Pictures/RustCommTest3.jpg" width="400" class="photoSizerBlock right clear" style="margin-top:0;">
+        <span style="
+        display: inline-block;
+        font-weight: bold;
+        font-family: 'Comic Sans MS, Tahoma';
+        background-color: #ddd;
+        width: 100%;
+        padding: 5px 0px;
+      ">
+          Fig 2. RustComm Output Test3
+        </span>
+      </photosizer-block>
+    </div>
+    <div style="width:calc(100vw - 6rem);">
+      <photosizer-block src="Pictures/RustCommOutput_test4.jpg" width="400" class="photoSizerBlock right clear" style="margin-top:0;">
+        <span style="
+        display: inline-block;
+        font-weight: bold;
+        font-family: 'Comic Sans MS, Tahoma';
+        background-color: #ddd;
+        width: 100%;
+        padding: 5px 0px;
+      ">
+          Fig 3. RustComm Output Test4
+        </span>
+      </photosizer-block>
+    </div>
     <h3>Concept:</h3>
     <t-b>
       RustComm is a facility for sending messages between a Sender and Receiver.  It uses the std::net::TcpStream and
@@ -416,9 +703,9 @@
           </ol>
         </indent-block>
       </t-b>
-    </t-b>
+    </t-b>-->
     <!--<div class="clear"></div>-->
-    <h3>Operation:</h3>
+    <!--<h3>Operation:</h3>
     <t-b class="indent">
       This is intended to be a simple test-bed for ideas - easy to use and with very little setup and configuration.
     </t-b>
@@ -440,7 +727,26 @@
         </ul>
       </t-b>
     </t-b>
-  </div>  <spacer-15></spacer-15>
+  </div>-->  
+    <h3>Build:</h3>
+    <t-b class="indent">
+      Download and, in a command prompt, <c-s>cargo build</c-s> or <c-s>cargo run</c-s>.
+    </t-b>
+    <h3>Status:</h3>
+    <t-b class="indent mtz">
+      Expected Changes and Additions:
+      <t-b class="mtz">
+        <ul class="tight">
+          <li>
+            Add file transfer capability
+          </li>
+          <li>
+            Add user-defined Comm type that composes a <c-s>Connector</c-s> and <c-s>Listener</c-s>.
+          </li>
+        </ul>
+      </t-b>
+    </t-b>
+  <spacer-15></spacer-15>
   <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
 
   <info-bar></info-bar>
