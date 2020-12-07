@@ -215,8 +215,8 @@
           connections between instances of TCPConnector and ClientHandler.
         </t-b>
         <t-b>
-          For each incoming connection the TCPResponder requests a threadpool thread execute ClientHandler
-          code to support messaging with the TCPConnector instance.
+          Fig. 2 illustrates a typical set of sessions between 16 TCPConnector clients and their server-side
+          ClientHandlers.  Clients send 1000 4K messages concurrently with the other clients.
         </t-b>
         </div>
         <div>
@@ -233,10 +233,6 @@
             </span>
           </photosizer-block>
         </div>
-        <t-b>
-          Fig. 2 illustrates a typical set of sessions between 16 TCPConnector clients and their server-side
-          ClientHandlers.  Clients send 1000 4K messages concurrently with the other clients.
-        </t-b>
         <t-b>
           Each client has a sending thread and a receiving thread, so the client does not wait for a reply
           before sending its next message.
@@ -507,6 +503,129 @@
           Unlike Rust, C++ does not have a networking library yet (probably coming with C++2023).  So MPL
           implements a networking library with three main classes, TCPConnector, TCPResponder, and TCPSocket.
           These take care of a lot of the low-level things that are hard to implement cleanly.
+        </t-b>
+        <t-b>
+          The MPL library:
+          <ul class="tight">
+            <li>
+              Uses queued full-duplex buffered message transfers.
+            </li>
+            <li>
+              Each message has a fixed size header and a body consisting of an array of bytes.
+            </li>
+            <li>
+              For each incoming connection the TCPResponder requests a threadpool thread and processes
+              messages with an instance of ClientHandler.
+            </li>
+            <li>
+              For this demonstration ClientHandler instances echo back the incoming message, marked as
+              reply.
+            </li>
+          </ul>
+        </t-b>
+        <h3>Current Design:</h3>
+        <t-b>
+          There are user-defined types Message, TCPConnector, TCPResponder, ClientHandler, and TCPSocket.
+          TCPConnector and ClientHandler have derived classes for specific message types, which in this
+          demonstration are: VariableSizeConnector and VariableSizeClientHandler.
+        </t-b>
+        <t-b>
+          TCPSocket has derived classes TCPClientSocket nad TCPServerSocket.
+        </t-b>
+        <t-b class="indent">
+          Message methods:
+          <ul class="tight">
+            <li>
+              <c-s>Message(usize sz, const u8 content_buf[], usize content_len, u8 mtype)</c-s>
+              <div style="padding:3px 10px 5px 10px;">
+                Create new <c-s>Message</c-s> from array of bytes
+              </div>
+            </li>
+            <li>
+              <c-s>Message(usize sz, const std::string& str, u8 mtype)</c-s>
+              <div style="padding:3px 10px 5px 10px;">
+                Create new <c-s>Message</c-s> from string
+              </div>
+            </li>
+            <li>
+              <c-s>Message(MessageType mtype=MessageType::DEFAULT)</c-s>
+              <div style="padding:3px 10px 5px 10px;">
+                Create new <c-s>Message</c-s> with no contents
+              </div>
+            </li>
+            <li>
+              <c-s>Message(const Message &msg) </c-s>
+              <div style="padding:3px 10px 5px 10px;">
+                Copy constructor
+              </div>
+            </li>
+            <li>
+              <c-s>Message &operator=(const Message &msg)</c-s>
+              <div style="padding:3px 10px 5px 10px;">
+                Copy assignment
+              </div>
+            </li>
+            <li>
+              <c-s>Message(Message &&msg)</c-s>
+              <div style="padding:3px 10px 5px 10px;">
+                Move constructor
+              </div>
+            </li>
+            <li>
+              <c-s>Message &operator=(Message &&msg) </c-s>
+              <div style="padding:3px 10px 5px 10px;">
+                Move assignment
+              </div>
+            </li>
+            <li>
+              <c-s>~Message()</c-s>
+              <div style="padding:3px 10px 5px 10px;">
+                Destructor
+              </div>
+            </li>
+            <li>
+              <c-s>u8 operator[](int index) const</c-s>
+              <div style="padding:3px 10px 5px 10px;">
+                Const index operator
+              </div>
+            </li>
+            <li>
+              <c-s>void set_type(u8 mt)</c-s>
+              <div style="padding:3px 10px 5px 10px;">
+                Set MessageType to one of TEXT, BYTES, STRING
+              </div>
+            </li>
+            <li>
+              <c-s>unsigned get_type() const</c-s>
+              <div style="padding:3px 10px 5px 10px;">
+                Returns instance of MessageType
+              </div>
+            </li>
+            <li>
+              <c-s>usize get_content_len() const</c-s>
+              <div style="padding:3px 10px 5px 10px;">
+                Returns length of message body in bytes
+              </div>
+            </li>
+            <li>
+              <c-s>void set_content_bytes(const u8 buff[], size_t len)</c-s>
+              <div style="padding:3px 10px 5px 10px;">
+                Copy byte array into message body
+              </div>
+            </li>
+            <li>
+              <c-s>void set_content_str(const std::string &str)</c-s>
+              <div style="padding:3px 10px 5px 10px;">
+                Copy string to message body
+              </div>
+            </li>
+            <li>
+              <c-s>std::string get_content_str()</c-s>
+              <div style="padding:3px 10px 5px 10px;">
+                Return message body as string
+              </div>
+            </li>
+          </ul>
         </t-b>
       <!--<div>
         <photosizer-block src="Pictures/TestMPL.jpg" width="400" class="photoSizerBlock right" style="margin-top:0;">
