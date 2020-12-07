@@ -188,13 +188,169 @@
     </ol>
   </t-b>
   <hr class="above" />
+  <h3>Communicator Concepts</h3>
+  <div>
+    <two-column>
+      <cpp-content style="padding-top:0.25em;">
+        <h3>C++ Communicator</h3>
+        <div>
+        <t-b>
+          Message-Passing Library (MPL) provides message-passing communication between a TCPConnector
+          and TCPResponder.  
+        </t-b>
+        <photosizer-block src="Pictures/MPL.jpg" width="350" class="photoSizerBlock" style="margin-top:0;">
+          <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS, Tahoma';
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;
+          ">
+            Fig 1. MPL Concept
+          </span>
+        </photosizer-block>
+        <t-b>
+          It uses TCPClientSocket and TCPServerSocket classes to establish synchronous bilateral
+          connections between instances of TCPConnector and ClientHandler.
+        </t-b>
+        <t-b>
+          For each incoming connection the TCPResponder requests a threadpool thread execute ClientHandler
+          code to support messaging with the TCPConnector instance.
+        </t-b>
+        </div>
+        <div>
+          <photosizer-block src="Pictures/TestMPL.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
+            <span style="
+            display: inline-block;
+            font-weight: bold;
+            font-family: 'Comic Sans MS, Tahoma';
+            background-color: #ddd;
+            width: 100%;
+            padding: 5px 0px;
+          ">
+              Fig 2. RustComm Output Test4
+            </span>
+          </photosizer-block>
+        </div>
+        <t-b>
+          Fig. 2 illustrates a typical set of sessions between 16 TCPConnector clients and their server-side
+          ClientHandlers.  Clients send 1000 4K messages concurrently with the other clients.
+        </t-b>
+        <t-b>
+          Each client has a sending thread and a receiving thread, so the client does not wait for a reply
+          before sending its next message.
+        </t-b>
+      </cpp-content>
+      <rust-content style="padding-top:0.5em;">
+        <h3>Rust Communicator</h3>
+        <div>
+          <t-b>
+            RustComm is a facility for sending messages between a Connector and Listener.  
+          </t-b>
+          <photosizer-block src="Pictures/RustCommConcept.jpg" width="300" class="photoSizerBlock" style="margin-top:0;">
+            <span style="
+            display: inline-block;
+            font-weight: bold;
+            font-family: 'Comic Sans MS, Tahoma';
+            background-color: #ddd;
+            width: 100%;
+            padding: 5px 0px;
+            ">
+              Fig 1. RustComm Concept
+            </span>
+          </photosizer-block>
+          <t-b>
+            It uses the std::net::TcpStream and
+            std::net::TcpListener types to establish communication between Connector and Listener::Process components.
+          </t-b>
+          <t-b>
+            Listener::Process plays the same role as the MPL ClientHandler, handling message transactions between
+            the Listener and its associated Connector.
+          </t-b>
+          <t-b>
+            For each incoming connection the Listener dispatches a threadpool thread to execute Listener::Process
+            code for the associated Connector.
+          </t-b>
+        </div>
+        <div>
+          <photosizer-block src="Pictures/TestRustCommExper.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
+            <span style="
+            display: inline-block;
+            font-weight: bold;
+            font-family: 'Comic Sans MS, Tahoma';
+            background-color: #ddd;
+            width: 100%;
+            padding: 5px 0px;
+          ">
+              Fig 2. RustComm Output Test4
+            </span>
+          </photosizer-block>
+        </div>
+        <t-b>
+          Fig 2. illustrates communication sessions for 16 clients and their associated Listener::Process components.
+          As with MPL, clients send 1000 4K messages while other clients are also sending.
+        </t-b>
+        <t-b>
+          Each client has a sending and a receiving thread, so the client does not wait for a reply before sending the
+          next message.
+        </t-b>
+      </rust-content>
+    </two-column>
+  </div>
+  <hr class="above" />
   <h3>Communicator Comparisons</h3>
   <t-b>
     <ol class="tight">
       <li>
         <h4>Performance:</h4>
-        <div class="indent pad3">
-          TBD
+        <div class="indents pad3" style="width:calc(100vw - 10em);">
+          <two-column>
+            <cpp-content style="padding-top:0em;">
+              <div style="font-weight:bold; padding:0.25em;">C++ MPL</div>
+              <table style="width:100%">
+                <tr>
+                  <td colspan="7">
+                    Intel Core i7-7700 CPU, 16 GB RAM, 932GB SSD, 64b&nbsp;Windows&nbsp;10&nbsp;ver&nbsp;2004
+                  </td>
+                </tr>
+                <tr>
+                  <td>Thruput MB/s with 8 thrds, 16 clients</td>
+                  <td>214</td>
+                  <td>192</td>
+                  <td>186</td>
+                  <td>188</td>
+                  <td>190</td>
+                  <td>197</td>
+                </tr>
+                <tr>
+                  <td colspan="7">Avg Thruput: 194.5 MB/s</td>
+                </tr>
+              </table>
+            </cpp-content>
+            <rust-content style="padding-top:0em;">
+              <div style="font-weight:bold; padding:0.25em;">Rust Comm</div>
+              <table style="width:100%">
+                <tr>
+                  <td colspan="7">
+                    Intel Core i7-7700 CPU, 16 GB RAM, 932GB SSD, 64b&nbsp;Windows&nbsp;10&nbsp;ver&nbsp;2004
+                  </td>
+                </tr>
+                <tr>
+                  <td>Thruput MB/s with 8 thrds, 16 clients</td>
+                  <td>233</td>
+                  <td>246</td>
+                  <td>249</td>
+                  <td>232</td>
+                  <td>242</td>
+                  <td>252</td>
+                </tr>
+                <tr>
+                  <td colspan="7">Avg Thruput: 242.3 MB/s</td>
+                </tr>
+              </table>
+            </rust-content>
+          </two-column>
         </div>
       </li>
       <li>
@@ -217,8 +373,86 @@
       </li>
       <li>
         <h4>Safety:</h4>
-        <div class="indent pad3">
-          TBD
+        <div class="indents pad3" style="width:calc(100vw - 10em);">
+          <two-column>
+            <cpp-content style="padding-top:0em;">
+              <div style="font-weight:bold; padding:0.25em;">C++ MPL</div>
+              <hr />
+              <t-b>
+                C++17 has facilities to ensure data safety by convention:
+                <ul class="tight">
+                  <li>
+                    range-based for loops prevent indexing outside collections
+                  </li>
+                  <li>
+                    iterators prevent dangling pointers when containers reallocate memory
+                  </li>
+                  <li>
+                    std::unique_ptr and std::shared_ptr provide deallocation when they go out of scope
+                  </li>
+                </ul>
+                However, it can be difficult to ensure that in large systems all code satisfies those
+                conventions.
+              </t-b>
+              <t-b>
+                C++ has locks to avoid data races by protecting blocks of code, but provides no guarentees 
+                that they are used 
+                correctly, e.g., do all threads share the same lock, are locks released in the presence
+                of errors, ...
+              </t-b>
+              <hr />
+              <t-b>
+                During construction of MPL a significant portion of the development time was spent finding
+                data races. 
+              </t-b>
+            </cpp-content>
+            <rust-content style="padding-top:0em;">
+              <div style="font-weight:bold; padding:0.25em;">Rust Comm</div>
+              <hr />
+              <t-b>
+                Rust guarentees memory saftey by construction:
+                <ul class="tight">
+                  <li>
+                    Indexing out-of-bounds an array or container causes an ordered shutdown, called a panic,
+                    that prevents accessing unowned memory.
+                  </li>
+                  <li>
+                    Rust enforces data ownership at compile-time using a reference checker that ensures
+                    that references to data:
+                    <ul class="tight" style="list-style-type:square;">
+                      <li>
+                        are initialized before use.
+                      </li>
+                      <li>
+                        do not out live their referends.
+                      </li>
+                      <li>
+                        do not view data mutated by the owner or other references.
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+                Code that does not conform will fail to build, ensuring memory saftey even for large
+                systems.
+              </t-b>
+              <t-b>
+                Rust locks protect data, not sections of code, which gaurentees that all threads accessing
+                the same data use the same lock.
+              </t-b>
+              <t-b>
+                That, combinded with Rust&apos;s data ownership rules, avoid data races.
+              </t-b>
+              <hr />
+              <t-b>
+              When implementing Rust Comm, it took care to create multi-threaded code that commpiled successfully.
+              But once built there were no data races to find.
+              </t-b>
+              <t-b>
+                So, its harder to build, but much easier to debug
+                multi-threaded code in Rust.
+              </t-b>
+            </rust-content>
+          </two-column>
         </div>
       </li>
       <li>
@@ -247,9 +481,9 @@
   </t-b>-->
   <two-column>
     <cpp-content>
-      <h3>C++ Communication</h3>
+      <h3>C++ Communicator</h3>
       <div>
-        <photosizer-block src="Pictures/MPL.jpg" width="350" class="photoSizerBlock right" style="margin-top:0;">
+        <!--<photosizer-block src="Pictures/MPL.jpg" width="350" class="photoSizerBlock right" style="margin-top:0;">
           <span style="
           display: inline-block;
           font-weight: bold;
@@ -268,13 +502,13 @@
         <t-b>
           It uses TCPClientSocket and TCPServerSocket classes to establish synchronous bilateral
           connections between instances of TCPConnector and ClientHandler.
-        </t-b>
+        </t-b>-->
         <t-b>
           Unlike Rust, C++ does not have a networking library yet (probably coming with C++2023).  So MPL
           implements a networking library with three main classes, TCPConnector, TCPResponder, and TCPSocket.
           These take care of a lot of the low-level things that are hard to implement cleanly.
         </t-b>
-      <div>
+      <!--<div>
         <photosizer-block src="Pictures/TestMPL.jpg" width="400" class="photoSizerBlock right" style="margin-top:0;">
           <span style="
           display: inline-block;
@@ -287,7 +521,7 @@
             Fig 2. RustComm Output Test4
           </span>
         </photosizer-block>
-      </div>
+      </div>-->
         <t-b>
 
         </t-b>
@@ -297,7 +531,7 @@
     <rust-content>
       <h3>Rust Communication</h3>
       <div>
-        <photosizer-block src="Pictures/RustCommConcept.jpg" width="300" class="photoSizerBlock right" style="margin-top:0;">
+        <!--<photosizer-block src="Pictures/RustCommConcept.jpg" width="300" class="photoSizerBlock right" style="margin-top:0;">
           <span style="
           display: inline-block;
           font-weight: bold;
@@ -309,60 +543,61 @@
             Fig 1. RustComm Concept
           </span>
         </photosizer-block>
-      </div>
-      <t-b>
-        RustComm is a facility for sending messages between a Sender and Receiver.  It uses the std::net::TcpStream and
-        std::net::TcpListener types.
-        <spacer-15></spacer-15>
-        This is a prototype for message-passing communication system. It provides three user defined types: <c-s>Connector</c-s>,
-        <c-s>Listener</c-s>, and <c-s>Message</c-s>, with generic parameters <c-s>M</c-s>, <c-s>P</c-s>, and <c-s>L</c-s>, as shown in Fig. 1.  
-        <spacer-15></spacer-15>
-        <c-s>M</c-s> implements the <c-s>Msg</c-s> trait and represents a message to be sent between endpoints. 
-        <c-s>P</c-s> implements the <c-s>Process&lt;M&gt;</c-s> trait that defines message processing, and 
-        <c-s>L</c-s> implements the <c-s>Logger</c-s> trait that supports logging events to the console that can be 
-        turned on or off by the types supplied for <c-s>L</c-s>, e.g., <c-s>VerboseLog</c-s> and <c-s>MuteLog</c-s>.
-        <spacer-15></spacer-15>
-        The RustComm library:
-        <t-b class="mtz">
-          <ul class="tight mtz">
-            <li>
-              Uses queued full-duplex buffered message sending and receiving
-            </li>
-            <li>
-              Each message has a fixed size header and <c-s>Vec&lt;u8&gt;</c-s> body.
-            </li>
-            <li>
-              For each <c-s>Connector&lt;P, M, L&gt;</c-s> connection, <c-s>Listener&lt;P, L&gt;</c-s> processes messages 
-              until receiving a message with MessageType::END.
-            </li>
-            <li>
-              <c-s>Listener&lt;P, L&gt;</c-s> requests a thread from ThreadPool&lt;P&gt; for each client connection and 
-              processes messages in <c-s>P::process_message</c-s>.
-            </li>
-            <li>
-              In this version, <c-s>P::process_message</c-s> echos back message with &quot;reply&quot; appended as 
-              reply to sender.  You observe that behavior by running test1, e.g., <c-s>cargo run --example test1</c-s>. 
-            </li>
-          </ul>
+      </div>-->
+        <t-b>
+          RustComm is a facility for sending messages between a Sender and Receiver.  It uses the std::net::TcpStream and
+          std::net::TcpListener types.
+          <spacer-15></spacer-15>
+          This is a prototype for message-passing communication system. It provides three user defined types: <c-s>Connector</c-s>,
+          <c-s>Listener</c-s>, and <c-s>Message</c-s>, with generic parameters <c-s>M</c-s>, <c-s>P</c-s>, and <c-s>L</c-s>, as shown in Fig. 1.  
+          <spacer-15></spacer-15>
+          <c-s>M</c-s> implements the <c-s>Msg</c-s> trait and represents a message to be sent between endpoints. 
+          <c-s>P</c-s> implements the <c-s>Process&lt;M&gt;</c-s> trait that defines message processing, and 
+          <c-s>L</c-s> implements the <c-s>Logger</c-s> trait that supports logging events to the console that can be 
+          turned on or off by the types supplied for <c-s>L</c-s>, e.g., <c-s>VerboseLog</c-s> and <c-s>MuteLog</c-s>.
+          <spacer-15></spacer-15>
+          The RustComm library:
+          <t-b class="mtz">
+            <ul class="tight mtz">
+              <li>
+                Uses queued full-duplex buffered message sending and receiving
+              </li>
+              <li>
+                Each message has a fixed size header and <c-s>Vec&lt;u8&gt;</c-s> body.
+              </li>
+              <li>
+                For each <c-s>Connector&lt;P, M, L&gt;</c-s> connection, <c-s>Listener&lt;P, L&gt;</c-s> processes messages 
+                until receiving a message with MessageType::END.
+              </li>
+              <li>
+                <c-s>Listener&lt;P, L&gt;</c-s> requests a thread from ThreadPool&lt;P&gt; for each client connection and 
+                processes messages in <c-s>P::process_message</c-s>.
+              </li>
+              <li>
+                In this version, <c-s>P::process_message</c-s> echos back message with &quot;reply&quot; appended as 
+                reply to sender.  You observe that behavior by running test1, e.g., <c-s>cargo run --example test1</c-s>. 
+              </li>
+            </ul>
+          </t-b>
         </t-b>
-      </t-b>
-      <t-b>
-        The long-term goal for RustComm is to serve as a prototyping platform for various messaging and processing
-        strategies.  This version defines traits: <c-s>Sndr&lt;M&gt;</c-s>, <c-s>Rcvr&lt;M&gt;</c-s>, 
-        <c-s>Process&lt;M&gt;</c-s>, <c-s>Msg</c-s>, and <c-s>Logger</c-s>.
-      </t-b>
-      <t-b>
-        The user-defined types, <c-s>M</c-s> and <c-s>P</c-s>, are things that change as we change the message structure, defined
-        by <c-s>M</c-s> and connector and listener processing defined by <c-s>P</c-s>.  
-        These types are defined in the rust_comm_processing crate.
-        <spacer-15></spacer-15>
-        The somewhat complex handling of TcpStreams and TcpListener are expected to remain fixed.  They are defined in
-        the crate rust_comm.
+        <t-b>
+          The long-term goal for RustComm is to serve as a prototyping platform for various messaging and processing
+          strategies.  This version defines traits: <c-s>Sndr&lt;M&gt;</c-s>, <c-s>Rcvr&lt;M&gt;</c-s>, 
+          <c-s>Process&lt;M&gt;</c-s>, <c-s>Msg</c-s>, and <c-s>Logger</c-s>.
+        </t-b>
+        <t-b>
+          The user-defined types, <c-s>M</c-s> and <c-s>P</c-s>, are things that change as we change the message structure, defined
+          by <c-s>M</c-s> and connector and listener processing defined by <c-s>P</c-s>.  
+          These types are defined in the rust_comm_processing crate.
+          <spacer-15></spacer-15>
+          The somewhat complex handling of TcpStreams and TcpListener are expected to remain fixed.  They are defined in
+          the crate rust_comm.
         
-        Finally, logger <c-s>L</c-s> provides a write method that will,  
-        using <c-s>VerboseLog</c-s> for <c-s>L</c-s>, write its argument to the console.  <c-s>MuteLog</c-s> simply discards its argument.
-      </t-b>
-      <div>
+          Finally, logger <c-s>L</c-s> provides a write method that will,  
+          using <c-s>VerboseLog</c-s> for <c-s>L</c-s>, write its argument to the console.  <c-s>MuteLog</c-s> simply discards its argument.
+        </t-b>
+      </div>
+      <!--<div>
         <photosizer-block src="Pictures/TestRustCommExper.jpg" width="400" class="photoSizerBlock right" style="margin-top:0;">
           <span style="
           display: inline-block;
@@ -375,7 +610,7 @@
             Fig 2. RustComm Output Test4
           </span>
         </photosizer-block>
-      </div>
+      </div>-->
       <t-b>
         RustComm uses a threadpool, as shown in Fig. 1., to avoid context trashing for a large number of concurrent
         clients.  In Fig 2. we show message processing for 16 clients on a machine with 4 hyper-threaded processors.
