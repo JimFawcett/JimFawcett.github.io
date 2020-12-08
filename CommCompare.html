@@ -28,7 +28,7 @@
     }
     two-column {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 50% 50%;
       grid-template-areas: "cppcomm rustcomm";
       /*grid-gap: 0.15em;*/
       width: 100%;
@@ -238,7 +238,7 @@
           before sending its next message.
         </t-b>
       </cpp-content>
-      <rust-content style="padding-top:0.5em;">
+      <rust-content style="padding-top:0.25em;">
         <h3>Rust Communicator</h3>
         <div>
           <t-b>
@@ -461,44 +461,11 @@
   </t-b>
   <hr class="above" />
   <h3>Implementations</h3>
-  <!--<t-b>
-    We both are seasoned professional developers.
-    <ul>
-      <li>
-        I&apos;ve used C++ since 1988 when the Zortec compiler was first issued.  My intersts then were for computer-aided
-        design for control systems.  My experience with Rust began when I retired from Syracuse University in 2019.
-        I was particularly attracted to its memory and data race safety.
-      </li>
-      <li>
-        Mike has been developing code in C++, C#, and Java since the beginning of 2000.  He does a lot of prototyping of
-        interesting applications to determine feasibility and aquire funding for advanced development acitivities.
-      </li>
-    </ul>
-  </t-b>-->
+  <div>
   <two-column>
-    <cpp-content>
+    <cpp-content style="padding-top:0.25em;">
       <h3>C++ Communicator</h3>
       <div>
-        <!--<photosizer-block src="Pictures/MPL.jpg" width="350" class="photoSizerBlock right" style="margin-top:0;">
-          <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;
-          ">
-            Fig 1. MPL Concept
-          </span>
-        </photosizer-block>
-        <t-b>
-          Message-Passing Library (MPL) provides message-passing communication between a TCPConnector
-          and TCPResponder.  
-        </t-b>
-        <t-b>
-          It uses TCPClientSocket and TCPServerSocket classes to establish synchronous bilateral
-          connections between instances of TCPConnector and ClientHandler.
-        </t-b>-->
         <t-b>
           Unlike Rust, C++ does not have a networking library yet (probably coming with C++2023).  So MPL
           implements a networking library with three main classes, TCPConnector, TCPResponder, and TCPSocket.
@@ -523,6 +490,17 @@
             </li>
           </ul>
         </t-b>
+        <t-b>
+          The long-term goal for MPL Comm is to serve as a lightweight, flexible, and performant messaging 
+          middleware for systems that require simple and robust end to end messaging.  
+          The TCPConnector and TCPResponder each provide an object-oriented interface that gives users 
+          ability to define application specific message processing.  
+        </t-b>
+        <t-b>
+          Additionally, The TCP socket library is an efficient and portable C++ wrapper around native 
+          TCP socket APIs available on Windows and Linux.  This library can be extracted and used on Windows 
+          and Linux as an alternative the native (non-portable platform specific) APIs.
+        </t-b>
         <h3>Current Design:</h3>
         <t-b>
           There are user-defined types Message, TCPConnector, TCPResponder, ClientHandler, and TCPSocket.
@@ -532,137 +510,293 @@
         <t-b>
           TCPSocket has derived classes TCPClientSocket nad TCPServerSocket.
         </t-b>
-        <t-b class="indent">
-          Message methods:
-          <ul class="tight">
+        <hr />
+        <div class="pad10">
+        Messages consist of a header with mtype and content_len attributes and an array of bytes for the
+        body.
+        </div>
+        <hr />
+        <t-b class="indents">
+          <strong>Message methods:</strong>
+          <ol class="tight">
             <li>
-              <c-s>Message(usize sz, const u8 content_buf[], usize content_len, u8 mtype)</c-s>
+              <strong><c-s>Message(usize sz, const u8 content_buf[], usize content_len, u8 mtype)</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Create new <c-s>Message</c-s> from array of bytes
               </div>
             </li>
             <li>
-              <c-s>Message(usize sz, const std::string& str, u8 mtype)</c-s>
+              <strong><c-s>Message(usize sz, const std::string& str, u8 mtype)</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Create new <c-s>Message</c-s> from string
               </div>
             </li>
             <li>
-              <c-s>Message(MessageType mtype=MessageType::DEFAULT)</c-s>
+              <strong><c-s>Message(MessageType mtype=MessageType::DEFAULT)</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Create new <c-s>Message</c-s> with no contents
               </div>
             </li>
             <li>
-              <c-s>Message(const Message &msg) </c-s>
+              <strong><c-s>Message(const Message &msg) </c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Copy constructor
               </div>
             </li>
             <li>
-              <c-s>Message &operator=(const Message &msg)</c-s>
+              <strong><c-s>Message &operator=(const Message &msg)</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Copy assignment
               </div>
             </li>
             <li>
-              <c-s>Message(Message &&msg)</c-s>
+              <strong><c-s>Message(Message &&msg)</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Move constructor
               </div>
             </li>
             <li>
-              <c-s>Message &operator=(Message &&msg) </c-s>
+              <strong><c-s>Message &operator=(Message &&msg)</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Move assignment
               </div>
             </li>
             <li>
-              <c-s>~Message()</c-s>
+              <strong><c-s>~Message()</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Destructor
               </div>
             </li>
             <li>
-              <c-s>u8 operator[](int index) const</c-s>
+              <strong><c-s>u8 operator[](int index) const</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Const index operator
               </div>
             </li>
             <li>
-              <c-s>void set_type(u8 mt)</c-s>
+              <strong><c-s>void set_type(u8 mt)</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Set MessageType to one of TEXT, BYTES, STRING
               </div>
             </li>
             <li>
-              <c-s>unsigned get_type() const</c-s>
+              <strong><c-s>unsigned get_type() const</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Returns instance of MessageType
               </div>
             </li>
             <li>
-              <c-s>usize get_content_len() const</c-s>
+              <strong><c-s>usize get_content_len() const</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Returns length of message body in bytes
               </div>
             </li>
             <li>
-              <c-s>void set_content_bytes(const u8 buff[], size_t len)</c-s>
+              <strong><c-s>void set_content_bytes(const u8 buff[], size_t len)</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Copy byte array into message body
               </div>
             </li>
             <li>
-              <c-s>void set_content_str(const std::string &str)</c-s>
+              <strong><c-s>void set_content_str(const std::string &str)</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Copy string to message body
               </div>
             </li>
             <li>
-              <c-s>std::string get_content_str()</c-s>
+              <strong><c-s>std::string get_content_str()</c-s></strong>
               <div style="padding:3px 10px 5px 10px;">
                 Return message body as string
               </div>
             </li>
-          </ul>
+          </ol>
         </t-b>
-      <!--<div>
-        <photosizer-block src="Pictures/TestMPL.jpg" width="400" class="photoSizerBlock right" style="margin-top:0;">
-          <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;
-        ">
-            Fig 2. RustComm Output Test4
-          </span>
-        </photosizer-block>
-      </div>-->
+        <hr />
+        <div class="pad10">
+          TCPConnector supports direct and queued messaging with a connected TCPResponder.
+        </div>
+        <hr />
         <t-b>
-
+          TCPConnector methods:
+          <ol class="tight">
+            <li>
+              <strong><c-s>TCPConnector(TCPSocketOptions *sc = nullptr);</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Create new TCPConnector
+              </div>
+            </li>
+            <li>
+              <strong><c-s>bool Close()</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Shutdown TCPConnector and signal server-side ClientHandler to shutdown.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>bool IsConnected() const;</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Has valid connection?
+              </div>
+            </li>
+            <li>
+              <strong><c-s>bool IsSending() const;</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Is send thread running?
+              </div>
+            </li>
+            <li>
+              <strong><c-s>bool IsReceiving() const;</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Is receive thread running?
+              </div>
+            </li>
+            <li>
+              <strong><c-s>void UseSendReceiveQueues(bool use_qs);</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Starts dedicated send and receive threads.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>void UseSendQueue(bool use_q);</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Start send thread on connection established.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>void UseReceiveQueue(bool use_q);</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Start receive thread on connection established.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>void PostMessage(const Message &m);</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Enqueues message for sending to associated TCPResponder.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>void SendMessage(const Message &m);</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Sends message directly instead of posting to send queue.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>Message GetMessage()</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Dequeue received message if available, else block.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>Message ReceiveMessage()</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Read message from socket if available, else block.
+              </div>
+            </li>
+          </ol>
+        </t-b>
+        <hr />
+        <div class="pad10">
+          TCPResponder uses threadpool threads to support concurrent communication sessions.
+        </div>
+        <hr />
+        <t-b>
+          <strong>TCPResponder methods:</strong>
+          <ol class="tight">
+            <li>
+              <strong><c-s>TCPResponder(const EndPoint& ep, TCPSocketOptions* sc = nullptr)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Create new TCPResponder
+              </div>
+            </li>
+            <li>
+              <strong><c-s>void RegisterClientHandler(ClientHandler* ch);</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Register ClientHandler prototype - defines server-side message processing.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>void Start(int backlog=20)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Start dedicated server listening thread.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>void Stop()</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Stop listening service.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>void UseClientSendReceiveQueues(bool use_qs);</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Start dedicated send and receive threads when extablishing a connection.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>void UseClientSendQueue(bool use_q);</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Start dedicated send thread when establishing a connection.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>void UseClientReceiveQueue(bool use_q);</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Start dedicated receive thread when establishing a connection.
+              </div>
+            </li>
+          </ol>
+        </t-b>
+        <hr />
+        <div class="pad10">
+          ClientHandlers communicate directly with associated TCPConnectors. Derived ClientHandler
+          classes define application specific message handling operations.
+        </div>
+        <hr />
+        <t-b>
+          <strong>ClientHandler methods:</strong>
+          <ol class="tight">
+            <li>
+              <strong><c-s>Message GetMessage()</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Dequeue message from receive queue if available, else blocks.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>Message ReceiveMessage()</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Read message directly from socket if available, else blocks.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>void PostMessage(const Message& m)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Enqueues message for connected client.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>void SendMessage(const Message& m)</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Write message directly to connected socket.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>virtual void AppProc() = 0</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Application message processing supplied by derived ClientHandler class.
+              </div>
+            </li>
+            <li>
+              <strong><c-s>virtual ClientHandler* Clone() = 0;</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Create application defined ClientHandler instances.
+              </div>
+            </li>
+          </ol>
         </t-b>
       </div>
-
     </cpp-content>
-    <rust-content>
+    <rust-content style="padding-top:0.25em;">
       <h3>Rust Communication</h3>
       <div>
-        <!--<photosizer-block src="Pictures/RustCommConcept.jpg" width="300" class="photoSizerBlock right" style="margin-top:0;">
-          <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;
-          ">
-            Fig 1. RustComm Concept
-          </span>
-        </photosizer-block>
-      </div>-->
         <t-b>
           RustComm is a facility for sending messages between a Sender and Receiver.  It uses the std::net::TcpStream and
           std::net::TcpListener types.
@@ -716,20 +850,6 @@
           using <c-s>VerboseLog</c-s> for <c-s>L</c-s>, write its argument to the console.  <c-s>MuteLog</c-s> simply discards its argument.
         </t-b>
       </div>
-      <!--<div>
-        <photosizer-block src="Pictures/TestRustCommExper.jpg" width="400" class="photoSizerBlock right" style="margin-top:0;">
-          <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;
-        ">
-            Fig 2. RustComm Output Test4
-          </span>
-        </photosizer-block>
-      </div>-->
       <t-b>
         RustComm uses a threadpool, as shown in Fig. 1., to avoid context trashing for a large number of concurrent
         clients.  In Fig 2. we show message processing for 16 clients on a machine with 4 hyper-threaded processors.
@@ -748,7 +868,7 @@
       <t-b>
         There are three user-defined types: Message, Connector, and Listener.  Connector and Listener each use an
         existing component BlockingQueue&lt;Message&gt;
-        <indent-block class="pad5">
+        <div class="pad5">
           <t-b>
             <strong>Message:</strong>
             Methods:
@@ -868,264 +988,78 @@
               </div>
             </li>
           </ol>
-        </indent-block>
+          <t-b>
+            <hr />
+            <div class="pad10">
+              <c-s>CommProcessing&lt;L&gt;</c-s> is parameterized with <c-s>L</c-s>,
+              a type satisfying a <c-s>Logger</c-s> trait.  The package defines two types that implement the trait,
+              <c-s>VerboseLog</c-s> and <c-s>MuteLog</c-s> that allow users to easily turn on and off event display
+              outputs.
+            </div>
+            <hr />
+          </t-b>
+          <t-b>
+            <strong>CommProcessing&lt;L&gt;</strong> methods:
+            <ol class="tight">
+              <li>
+                <strong><c-s>new() -> CommProcessing&lt;L&gt;</c-s></strong>
+              <div style="padding:3px 10px 5px 10px;">
+                Create instance of CommProcessing&lt;L&gt;
+              </div>
+              </li>
+              <li>
+                <strong><c-s>send_message(msg:&M, stream:&mut&lt;TcpStream) -> std::io::Result&lt;()&gt;</c-s></strong>
+                <div style="padding:3px 10px 5px 10px;">
+                  Write message to TcpStream connected to Connector&lt;P,M,L&gt;
+                </div>
+              </li>
+              <li>
+                <strong><c-s>buf_send_message(msg:&M, stream:&mut&nbsp;BufWriter&lt;TcpStream&gt;) -> std::io::Result&lt;()&gt;</c-s></strong>
+                <div style="padding:3px 10px 5px 10px;">
+                  Write message to TcpStream connected to Connector&lt;P,M,L&gt;
+                </div>
+              </li>
+              <li>
+                <strong><c-s>recv_message(stream:&mut&nbsp;TcpStream) -> std::io::Result&lt;M&gt;</c-s></strong>
+                <div style="padding:3px 10px 5px 10px;">
+                  Read message from TcpStream connected to Connector&lt;P,M,L&gt;
+                </div>
+              </li>
+              <li>
+                <strong><c-s>buf_recv_message(stream:&mut&nbsp;BufReader&lt;TcpStream&gt;) -> std::io::Result&lt;M&gt;</c-s></strong>
+                <div style="padding:3px 10px 5px 10px;">
+                  Read message from TcpStream connected to Connector&lt;P,M,L&gt;
+                </div>
+              </li>
+              <li>
+                <strong><c-s>process_message(msg:&mut&nbsp;M)</c-s></strong>
+                <div style="padding:3px 10px 5px 10px;">
+                  Process message using mutable reference.
+                </div>
+              </li>
+            </ol>
+          </t-b>
+        </div>
       </t-b>
     </t-b>
     </rust-content>
   </two-column>
-  <div class="clear"></div>
-  <!--<div class="bb-55">
-    <div style="width:calc(100vw - 6rem);">
-      <photosizer-block src="Pictures/RustCommConcept.jpg" width="600" class="photoSizerBlock right" style="margin-top:0;">
-        <span style="
-        display: inline-block;
-        font-weight: bold;
-        font-family: 'Comic Sans MS, Tahoma';
-        background-color: #ddd;
-        width: 100%;
-        padding: 5px 0px;
-      ">
-          Fig 1. RustComm Concept
-        </span>
-      </photosizer-block>
-    </div>
   </div>
-  <div class="bb-55">
-    <div style="width:calc(100vw - 6rem);">
-      <photosizer-block src="Pictures/RustCommTest3.jpg" width="400" class="photoSizerBlock right clear" style="margin-top:0;">
-        <span style="
-        display: inline-block;
-        font-weight: bold;
-        font-family: 'Comic Sans MS, Tahoma';
-        background-color: #ddd;
-        width: 100%;
-        padding: 5px 0px;
-      ">
-          Fig 2. RustComm Output Test3
-        </span>
-      </photosizer-block>
-    </div>
-    <div style="width:calc(100vw - 6rem);">
-      <photosizer-block src="Pictures/RustCommOutput_test4.jpg" width="400" class="photoSizerBlock right clear" style="margin-top:0;">
-        <span style="
-        display: inline-block;
-        font-weight: bold;
-        font-family: 'Comic Sans MS, Tahoma';
-        background-color: #ddd;
-        width: 100%;
-        padding: 5px 0px;
-      ">
-          Fig 3. RustComm Output Test4
-        </span>
-      </photosizer-block>
-    </div>
-    <h3>Concept:</h3>
-    <t-b>
-      RustComm is a facility for sending messages between a Sender and Receiver.  It uses the std::net::TcpStream and
-      std::net::TcpListener types.
-      <spacer-15></spacer-15>
-      This is a prototype for message-passing communication system. It provides three user defined types: <c-s>Connector</c-s>,
-      <c-s>Listener</c-s>, and <c-s>Message</c-s>, with generic parameters <c-s>M</c-s>, <c-s>P</c-s>, and <c-s>L</c-s>, as shown in Fig. 1.  
-      <spacer-15></spacer-15>
-      <c-s>M</c-s> implements the <c-s>Msg</c-s> trait and represents a message to be sent between endpoints. 
-      <c-s>P</c-s> implements the <c-s>Process&lt;M&gt;</c-s> trait that defines message processing, and 
-      <c-s>L</c-s> implements the <c-s>Logger</c-s> trait that supports logging events to the console that can be 
-      turned on or off by the types supplied for <c-s>L</c-s>, e.g., <c-s>VerboseLog</c-s> and <c-s>MuteLog</c-s>.
-      <spacer-15></spacer-15>
-      The RustComm library:
-      <t-b class="mtz">
-        <ul class="tight mtz">
-          <li>
-            Uses queued full-duplex buffered message sending and receiving
-          </li>
-          <li>
-            Each message has a fixed size header and <c-s>Vec&lt;u8&gt;</c-s> body.
-          </li>
-          <li>
-            For each <c-s>Connector&lt;P, M, L&gt;</c-s> connection, <c-s>Listener&lt;P, L&gt;</c-s> processes messages 
-            until receiving a message with MessageType::END.
-            <c-s>Listener&lt;P, L&gt;</c-s> spawns a thread for each client connection and processes messages in 
-            <c-s>P::process_message</c-s>.
-          </li>
-          <li>
-            In this version, <c-s>P::process_message</c-s> echos back message with &quot;reply&quot; appended as 
-            reply to sender.  You observe that behavior by running test1, e.g., <c-s>cargo run --example test1</c-s>. 
-          </li>
-        </ul>
-      </t-b>
-      <t-b>
-        The long-term goal for RustComm is to serve as a prototyping platform for various messaging and processing
-        strategies.  This version defines traits: <c-s>Sndr&lt;M&gt;</c-s>, <c-s>Rcvr&lt;M&gt;</c-s>, 
-        <c-s>Process&lt;M&gt;</c-s>, <c-s>Msg</c-s>, and <c-s>Logger</c-s>.
-      </t-b>
-      <t-b>
-        The user-defined types, <c-s>M</c-s> and <c-s>P</c-s>, are things that change as we change the message structure, defined
-        by <c-s>M</c-s> and connector and listener processing defined by <c-s>P</c-s>.  
-        These types are defined in the rust_comm_processing crate.
-        <spacer-15></spacer-15>
-        The somewhat complex handling of TcpStreams and TcpListener are expected to remain fixed.  They are defined in
-        the crate rust_comm.
-        
-        Finally, logger <c-s>L</c-s> provides a write method that will,  
-        using <c-s>VerboseLog</c-s> for <c-s>L</c-s>, write its argument to the console.  <c-s>MuteLog</c-s> simply discards its argument.
-      </t-b>
-      <t-b>
-        The last step in this phase of development was to add a threadpool, as shown in Fig. 1.  The threadpool
-        exists and has been integrated into the Listener component. Fig 2. shows the results.
-      </t-b>
-    </t-b>
-    <h3>Current Design:</h3>
-    <t-b>
-      <t-b>
-        There are three user-defined types: Message, Connector, and Listener.  Connector and Listener each use an
-        existing component BlockingQueue&lt;Message&gt;
-        <indent-block class="pad5">
-          <t-b>
-            <strong>Message:</strong>
-            Methods:
-          </t-b>
-          <ol class="tight">
-            <li>
-              <strong><c-s>new() -> Message</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Create new <c-s>Message</c-s> with empty body and MessageType::TEXT.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>set_type(&mut self, mt: u8)</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Set <c-s>MessageType</c-s> member to one of: <c-s>TEXT, BYTES, END</c-s>.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>get_type(&self) -> MessageType</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Return <c-s>MessageType</c-s> member value.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>set_body_bytes(&mut self, b: Vec&lt;u8&gt;)</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Set <c-s>body_buffer</c-s> member to bytes from<c-s>b: Vec&lt;u8&gt;</c-s>.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>set_body_str(&mut self, s: &str;)</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Set <c-s>body_buffer</c-s> member to bytes from<c-s>s: &str</c-s>.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>get_body_size(&self) -> usize</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Return size in bytes of body member.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>get_body(&self) -> &Vec&lt;u8&gt;</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Return <c-s>body_buffer</c-s> member.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>get_body_str(&self) -> String</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Return body contents as lossy <c-s>String</c-s>.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>clear(&self)</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                clear body contents.
-              </div>
-            </li>
-          </ol>
-          <t-b>
-            <hr />
-            <div class="pad10">
-              Both <c-s>Connector&lt;P, M, L&gt;</c-s> and <c-s>Listener&lt;P, L&gt;</c-s> are parameterized with <c-s>L</c-s>,
-              a type satisfying a <c-s>Logger</c-s> trait.  The package defines two types that implement the trait,
-              <c-s>VerboseLog</c-s> and <c-s>MuteLog</c-s> that allow users to easily turn on and off event display
-              outputs.  Fig 2. uses <c-s>MuteLog</c-s> in both <c-s>Connector&lt;P, M, L&gt;</c-s> and 
-              <c-s>Listener&lt;P, L&gt;</c-s>.
-            </div>
-            <hr />
-          </t-b>
-          <t-b><strong>Connector&lt;P, M, L&gt;</strong> methods:</t-b>
-          <ol class="tight">
-            <li>
-              <strong><c-s>new(addr: &'static str) -> std::io::Result&lt;Connector&lt;P,M,L&gt;&gt;</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Create new <c-s>Connector&lt;P,M,L&gt;</c-s> with running send and receive threads.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>is_connected(&self) -> bool</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                is connected to <c-s>addr</c-s>?.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>post_message(&self, msg: M)</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Enqueues msg to send to connected Receiver.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>get_message(&mut self) -> M</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Reads reply message if available, else blocks.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>has_message(&self) -> bool</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Returns true if reply message is available.
-              </div>
-            </li>
-          </ol>
-          <t-b><strong>Listener&lt;P, L&gt;</strong> methods:</t-b>
-          <ol class="tight">
-            <li>
-              <strong><c-s>new(nt: u8) -> Listener&lt;P, L&gt;</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Create new <c-s>Listener&lt;P, L&gt;</c-s> with nt threads running.
-              </div>
-            </li>
-            <li>
-              <strong><c-s>start(&mut self, addr: &'static str) -> std::io::Result&lt;JoinHandle&lt;()&gt;&gt;</c-s></strong>
-              <div style="padding:3px 10px 5px 10px;">
-                Bind <c-s>Listener&lt;P,L&gt;</c-s> to <c-s>addr</c-s> and start listening on dedicated thread.
-              </div>
-            </li>
-          </ol>
-        </indent-block>
-      </t-b>
-    </t-b>-->
-    <!--<div class="clear"></div>-->
-    <!--<h3>Operation:</h3>
-    <t-b class="indent">
-      This is intended to be a simple test-bed for ideas - easy to use and with very little setup and configuration.
-    </t-b>
-    <h3>Build:</h3>
-    <t-b class="indent">
-      Download and, in a command prompt, <c-s>cargo build</c-s> or <c-s>cargo run</c-s>.
-    </t-b>
-    <h3>Status:</h3>
-    <t-b class="indent mtz">
-      Expected Changes and Additions:
-      <t-b class="mtz">
-        <ul class="tight">
-          <li>
-            Add file transfer capability
-          </li>
-          <li>
-            Add user-defined Comm type that composes a <c-s>Connector</c-s> and <c-s>Listener</c-s>.
-          </li>
-        </ul>
-      </t-b>
-    </t-b>
-  </div>-->  
+  <!--<t-b>
+    We both are seasoned professional developers.
+    <ul>
+      <li>
+        I&apos;ve used C++ since 1988 when the Zortec compiler was first issued.  My intersts then were for computer-aided
+        design for control systems.  My experience with Rust began when I retired from Syracuse University in 2019.
+        I was particularly attracted to its memory and data race safety.
+      </li>
+      <li>
+        Mike has been developing code in C++, C#, and Java since the beginning of 2000.  He does a lot of prototyping of
+        interesting applications to determine feasibility and aquire funding for advanced development acitivities.
+      </li>
+    </ul>
+  </t-b>-->
+  <div class="clear"></div>
     <h3>Build:</h3>
     <t-b class="indent">
       Download and, in a command prompt, <c-s>cargo build</c-s> or <c-s>cargo run</c-s>.
@@ -1145,7 +1079,6 @@
       </t-b>
     </t-b>
   <spacer-15></spacer-15>
-  <!--<img class="strip-photo" src="Pictures/CampusAtNight.jpg" alt="campus at night" />-->
 
   <info-bar></info-bar>
 </body>
