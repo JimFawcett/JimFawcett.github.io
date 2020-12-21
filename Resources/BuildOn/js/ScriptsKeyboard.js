@@ -7,32 +7,35 @@
 var HelpWin
 
 function keyAction(keyEvent) {
+  //alert('in keyAction');
   keystate = 'down';
   var key = String.fromCharCode(keyEvent.which);
+  var content = document.getElementById("content");
+
   if (key === 'R') {
     location.reload();
   }
-  if (key === 'S')
+  else if (key === 'S')
     toggleSwipeEvents();
-  if (key === 'T')
-    window.scrollTo(0, 0);
-  if (key === 'B')
-    window.scrollTo(0, 100000);
-  if (key === 'U')
-    window.scrollBy(0, -200);
-  if (key === 'D')
-    window.scrollBy(0, 200);
-  if (key === 'N') {
+  else if (key === 'T')
+    content.scrollTo(0, 0);
+  else if (key === 'B')
+    content.scrollTo(0, 100000);
+  else if (key === 'U')
+    content.scrollBy(0, -200);
+  else if (key === 'D')
+    content.scrollBy(0, 200);
+  else if (key === 'N') {
     let nxt = document.getElementById("Next");
     if (isDefined(nxt))
       nxt.click();
   }
-  if (key === 'P') {
+  else if (key === 'P') {
     let prv = document.getElementById('Prev');
     if (isDefined(prv))
       prv.click();
   }
-  if (key === 'H') {
+  else if (key === 'H') {
     HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
 };
