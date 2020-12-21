@@ -340,15 +340,15 @@ function isEdge() {
  */
 function srcChange() {
   console.log('entered srcChange');
-  //if (!isLocalFile()) {
-  //  console.log('leaving srcChange - not local file');
-  //  return;
-  //}
-  //if (isChrome()) {
-  //  console.log('leaving srcChange - isChrome');
-  //  return;
-  //}
-  showStorage();
+  if (!isLocalFile()) {
+    console.log('leaving srcChange - not local file');
+    return;
+  }
+  if (isChrome()) {
+    console.log('leaving srcChange - isChrome');
+    return;
+  }
+
   let signal = localStorage.getItem('storySaved');
   console.log('signal = ' + signal);
   console.log(localStorage.length);
@@ -424,7 +424,7 @@ function storageChange(event) {
 
 function addStorageEvent() {
   //alert('addStorageEvent called');
-  //window.addEventListener("storage", function (e) { storageChange(e); }, false);
+  window.addEventListener("storage", function (e) { storageChange(e); }, false);
 }
 
 /* --------------------------------------------------------------
