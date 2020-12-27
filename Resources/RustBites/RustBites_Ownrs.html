@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html id="top">
   <head>
     <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
@@ -113,8 +113,8 @@
       <h3>1. Ownership Rules:</h3>
       <t-b>
         Ownership rules are, in principle, quite simple, essentially RwLock semantics:
-        <a-notice class="tight">
-          <ul class="tight">
+        <a-notice class="tight" style="padding-left:0rem;">
+          <ul class="tight" style="margin-left:1rem;">
             <li>There is only one owner for every data item</li>
             <li>Ownership can be transferred with move operations</li>
             <li>Ownership can be borrowed by creating references</li>
@@ -125,10 +125,10 @@
       </t-b>
       <t-b>
         What are readers and writers?
-        <ul class="tight">
+        <ul class="tight" style="margin-left:0rem;">
           <li>
             Any variable bound to a value with no mut qualifier is a reader.
-            <ul class="tight">
+            <ul class="tight" style="margin-left:0rem;">
               <li>
                 Owner: <c-s>let s = String::from("a string");</c-s>
               </li>
@@ -139,7 +139,7 @@
           </li>
           <li>
             Any variable bound to a value with a mut qualifier is a writer.
-            <ul class="tight">
+            <ul class="tight" style="margin-left:0rem;">
               <li>
                 Owner: <c-s>let mut u = String::from("a string");</c-s>
               </li>
@@ -151,7 +151,7 @@
           <li>
             References are called borrows because they block the owner u&apos;s 
             ability to mutate its owned resource.
-            <ul class="tight">
+            <ul class="tight" style="margin-left:0rem;">
               <li>
                 While mutable reference, v, is active, owner, u, is not allowed
                 to mutate its owned value - that&apos;s borrowed by v.
@@ -165,13 +165,12 @@
                 References are active from the time they are created (with a let statement)
                 until they go out of scope.
                 <div>
-                  <ul class="tight">
+                  <ul class="tight" style="margin-left:0rem;">
                     <li>
                       References can be dropped.  What that does is interesting, but not very useful.
                     </li>
                     <li>
-                      Dropping an immutable reference <strong>copies</strong> the reference, but not the referend, to a stackframe 
-                      managed by drop, so no programmatic effect.  
+                      Dropping an immutable reference does nothing.  reference is valid after the drop.  
                     </li>
                     <li>
                       Dropping a mutable reference <strong>moves</strong> the reference, but not the 
@@ -179,6 +178,44 @@
                     </li>
                   </ul>
                 </div>
+              </li>
+              <li>
+                Nuances:
+                <ul class="tight" style="margin-left:0rem;">
+                  <li>
+                    No practical process can exactly divide all programs into safe and not-safe code.  The borrow-checker is conservative.
+                    If it can&apos;t prove that a program is safe it will not build the program.
+                  </li>
+                  <li>
+                    The rules stated above have some qualifications that allow more programs to build safely.  These
+                    are known by the Rust community as non-lexical lifetime rules - see 
+                    <a href="https://doc.rust-lang.org/edition-guide/rust-2018/ownership-and-lifetimes/non-lexical-lifetimes.html">
+                      Rust 2018 edition-guide
+                    </a>.
+                    <ul class="tight" style="margin-left:0rem;">
+                      <li>
+                        An expression with non-mutable reference to x, inside the scope where a mutable reference
+                        to x is defined,
+                        will compile if no other expression argument supports mutation of x.
+                      </li>
+                      <li>
+                        A non-mutable reference to x may be defined and used in the scope where a mutable reference
+                        to x is defined, provided that the mutable reference is not used after the non-mutable 
+                        reference is declared.
+                      </li>
+                    </ul>
+                    These rule relaxations still maintain the &quot;no aliases when mutating&quot; invariant.
+                  </li>
+                  <li>
+                    There is one other case: It may be that during program operation a variable will never be
+                    mutated at the same time that an alias to the variable exists, even though the scope rules
+                    above are violated.  In this case a RefCell&lt;T&gt; may be created.  That appears to the
+                    compiler to be non-mutable, but a mutable reference can be extracted from it.  
+                    The RefCell tracks references and mutation in time.
+                    If our reasoning about the timing of mutation and aliasing is incorrect, the
+                    RefCell will panic and program operation terminates, preventing undefined behavior.
+                  </li>
+                </ul>
               </li>
             </ul>
           </li>
