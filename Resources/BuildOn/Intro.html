@@ -1,0 +1,405 @@
+﻿<!DOCTYPE html>
+<!--
+  BuildOn::Intro.html
+  -------------
+  This page is a prototype for pages that provide:
+  - Header block at the top
+  - page menu in the left panel
+  - content in the right panel
+  - content section links in a footer block
+  Its design uses:
+  - CSS grid to lay out the page in three rows, header, main, footer
+  - The grid is fixed to the viewport using margins and height attributes
+  - flex grid in the main row to hold the page menu and content panels
+  - flex grid in the footer holding a toggle button and section links
+  - JavaScript to respond to the toggle button by:
+    a. Setting the menu panel display to none or block which toggles
+       its visibility and space
+    b. Setting the right area in the footer to a menu of section links
+       or a copyright notice.
+  This is a test prototype for story pages.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuildOn Intro</title>
+  <link rel="stylesheet" href="css/Styles_Basic.css" />
+  <link rel="stylesheet" href="css/Styles_Structure.css" />
+  <link rel="stylesheet" href="css/Styles_RustTheme.css" />
+  <link rel="stylesheet" href="css/Styles_StoryPagesGrid.css" />
+  <link rel="stylesheet" href="css/StylesWebComponents.css" />
+  <script src="js/ScriptsUtilities.js"></script>
+  <script src="js/ScriptsWebComponents.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/Scripts_StoryPageMenu.js"></script>
+</head>
+<body id="github" onload="init()">
+  <grid-container>
+    <grid-header class="dark" onclick="togglemenus()">
+       <h2 class="dark">BuildOn Introduction</h2>
+     </grid-header>
+     <grid-main>
+       <a href="#top"></a>
+       <main-wrapper>
+         <main-left id="nav" class="light">
+           <ul>
+            <li><a href="../../index.html">Home</a></li>
+            <li><a href="../../BuildOn.html">Repo</a></li>
+            <li><a href="Intro.html">Introduction</a>&nbsp;&nbsp;</li>
+            <li><a href="Step0.html">Step&nbsp;#0&nbsp;-&nbsp;TF</a>&nbsp;&nbsp;</li>
+            <li><a href="Step1.html">Step&nbsp;#1&nbsp;-&nbsp;TS</a>&nbsp;&nbsp;</li>
+            <li><a href="Step2.html">Step&nbsp;#2&nbsp;-&nbsp;DN</a>&nbsp;&nbsp;</li>
+            <li class="undefined"><a href="JavaScript:;">Step&nbsp;#3&nbsp;-&nbsp;CP</a>&nbsp;&nbsp;</li>
+            <li class="undefined"><a href="JavaScript:;">Step&nbsp;#4&nbsp;-&nbsp;Exc</a>&nbsp;&nbsp;</li>
+            <li class="undefined"><a href="JavaScript:;">Step&nbsp;#5&nbsp;-&nbsp;REx</a>&nbsp;&nbsp;</li>
+            <li class="undefined"><a href="JavaScript:;">Step&nbsp;#6&nbsp;-&nbsp;Par</a>&nbsp;&nbsp;</li>
+            <li><a href="../../IndexPage.html">Glossary</a>&nbsp;&nbsp;</li>
+            <li><a href="../../RustStory_References.html">References</a>&nbsp;&nbsp;</li>
+            <li><a href="../../RustStory_Prologue.html">Rust Story</a>&nbsp;&nbsp;</li>
+           </ul>
+         </main-left>
+         <main-right id="content" class="light">
+         <a id="buildon" name="buildon"></a>
+        <h3>BuildOn</h3>
+        <t-b>
+          BuildOn is a process for learning Rust programming by writing code.  You need to have
+          some skill in a modern programming language, but need have no past experience with Rust. The
+          process takes you through a series of steps building interesting, not too complex,
+          projects.
+        </t-b>
+        <t-b>
+          Each step will start with a remote presentation that:
+          <ol>
+            <li>
+              Looks at my implementation of the previous step&apos;s code, usually a single package.
+            </li>
+            <li>
+              Answers questions you may have about the implementation.  You can post questions, while working
+              on your code, on a Discord server set up for that purpose.
+            </li>
+            <li>
+              Presents the next step&apos;s specification.
+            </li>
+            <li>
+              Discusses things you need to learn about Rust for that next step.
+            </li>
+            <li>
+              Provides links to Rust reference materials here or, for question specific details, on the Discord Server.
+            </li>
+          </ol>
+        </t-b>
+        <t-b>
+          Each succeeding step adds another package to the project.  Steps are organized so that you only
+          need to learn a relatively small part of Rust to complete the current step.  Later steps get
+          into progressively more language details.
+        </t-b>
+        <t-b>
+          I plan to post a video of each remote session on YouTube with links to that in the Discord server
+          and in these web pages.
+        </t-b>
+        <div style="height:0.25em;">&nbsp;</div>
+        <hr class="spread" />
+        <a id="rust"></a>
+        <h3>Why Rust?</h3>
+        <t-b>
+          Rust is an interesting language, combining memory safety of C# and Java with
+          performance of C++.  Unlike these languages, Rust also provides data race safety by construction.
+        </t-b>
+        <t-b>
+          Using modern idioms, one can build, with C++, memory safe programs without data
+          races.  But when building large systems, with many thousands of lines of code, it is 
+          easy to forget, in a few of those lines, to use an idiom or
+          unintentionally share data between threads without proper locking.  C++ is memory and data race
+          safe by convention.
+        </t-b>
+        <t-b>
+          Rust, however,
+          ensures memory and data safety by construction.  Code with unsafe memory access and
+          data races will fail to compile.  It accomplishes that with an intersting ownership model.
+          We go over the details below, and will explore code in later steps in this BuildOn process.
+        </t-b>
+        <div style="height:0.25em;">&nbsp;</div>
+        <hr class="spread" />
+        <a id="safety"></a>
+        <h3>Memory Safety</h3>
+        <t-b>
+          Memory Safety means that a program:
+          <ol class="tight smallspread">
+            <li>
+              Can not construct uninitialized references.
+            </li>
+            <li>
+              References cannot become invalid due to a reallocation of memory by the referend.
+              <div class="largeindent smallspread smaller">
+                This could be caused by a vector reallocating to make room for additional data, for example.
+                Note that vector indices, unlike references, are not invalidated, since an
+                index is just an offset from the beginning of the vector, and remains valid over a reallocation.
+              </div>
+            </li>
+            <li>
+              References cannot outlive the instances they reference.
+            </li>
+            <li>
+              Can not read from, or write to, memory it has not allocated by any other means.
+            </li>
+            <li>
+              An attempt to access unowned memory terminates the thread making attempt before a read or write
+              can complete.
+            </li>
+          </ol>
+        </t-b>
+        <div style="height:0.25em;">&nbsp;</div>
+        <hr class="spread" />
+        <a id="invariants"></a>
+        <h3>Rust Safety Invariants</h3>
+        <t-b>
+          Rust ensures memory safety, for all code outside <c-s>unsafe</c-s> blocks, by enforcing two invariants:
+          <ol class="tight smallspread">
+            <li>
+              Safe referencing - No shared mutabilty through references.
+            </li>
+            <li>
+              Safe indexing - All collections, including native arrays, are sized, and any attempt to index outside that sized
+              area results in a panic, e.g., an orderly shutdown of the current thread before any reads or writes
+              can complete.
+            </li>
+          </ol>
+        </t-b>
+        <t-b>
+          Note that the first invariant is a very strong condition.  There are useful program constructs, like
+          directed graphs, that depend on shared mutability to function as expected.  A child graph node may be
+          shared between several parents and without mutation of the nodes value(s) we could only build constant
+          graphs.
+        </t-b>
+        <t-b>
+          We can build non-constant directed graphs using Rust.  We simply cannot construct graph edges 
+          using references.
+          If we move all graph nodes into a vector, then each parent can refer to its children using vector
+          indices.  We will need to mark &quot;deleted&quot; nodes as unused, removing their parent&apos;s index,
+          and will want to recycle any marked nodes when new nodes are added.
+        </t-b>
+        <t-b>
+          The message is that the safety mechanisms used by Rust will lead us to write some of our code using
+          different strategies than we would with C++ or other modern languages.  And that is eventually a good thing.
+        </t-b>
+        <div style="height:0.25em;">&nbsp;</div>
+        <hr class="spread" />
+        <a id="ownership"></a>
+        <h3>Ownership<span class="normal"> - static analysis</span></h3>
+        <t-b>
+          Rust rejects most unsafe programs at compile time with ownership rules derived from the no &quot;shared mutability
+          through references&quot; invariant.  
+        </t-b>
+        <t-b>
+          <a href="../RustBites/RustBites_Ownrs.html">Ownership Rules:</a>
+          <ol class="tight smallspread">
+            <li>
+              There is only one owner for every data item.  That owner is responsible for deallocating the data 
+              when it goes out of scope.  It does that with a drop operation, very like a C++ destructor invocation.
+            </li>
+            <li>
+              Ownership can be transferred with <a href="../RustBites/RustBites_Data.html">move operations</a>.
+            </li>
+            <li>
+              Ownership can be borrowed by creating references.
+            </li>
+            <li>
+              Any number of readers (immutable references) may have access to a data value simultaneously.
+            </li>
+            <li>
+              Writers (owner or mutable reference) get exclusive access to a value - no other readers or writers.
+            </li>
+          </ol>
+          Borrowing from an owner inhibits owner from mutating its data.  Mutably borrowing inhibits all other borrows.
+        </t-b>
+        <t-b>
+          It can be a bit complicated to evaluate these rules when you first start creating Rust code.  But you don&apos;t
+          have to.  The Rust compiler does a great job of reporting errors with just the right amount of detail, and often
+          provides a suggested solution.
+        </t-b>
+          Rust checks these rules with static analysis by a &quot;borrow-checker&quot;.  The checker is attempting to
+          determine if you violated the &quot;no shared mutability with references&quot; invariant.
+        <div style="height:0.25em;">&nbsp;</div>
+        <hr class="spread" />
+        <a id="non-lexical"></a>
+        <h3>Non-lexical Filters<span class="normal"> - refining static analysis</span></h3>
+        <t-b>
+          No build environment can accept and build every safe program and reject every unsafe program.  As a 
+          consequence, Rust is conservative.  It chooses to reject some safe programs to insure that it rejects
+          all unsafe programs.
+        </t-b>
+        <t-b>
+          Rust reduces the number of false alarms generated by the Ownership Rules with a couple of additional filters.
+          <ol class="tight smallspread">
+            <li>
+              Calling a function with one or more immutable references following a mutable borrow will succeed, 
+              since no data in the function can be mutated while the function is being invoked.  The same is true
+              of other types of expressions that take immutable references.
+            </li>
+            <li>
+              Creating and using an immutable reference in the scope of a mutable reference will succeed if, and 
+              only if, the mutable reference is not used after declaration of the immutable reference.
+            </li>
+          </ol>
+          The Rust community calls these non-lexical scope rules.
+        </t-b>
+        <div style="height:0.25em;">&nbsp;</div>
+        <hr class="spread" />
+        <a id="intmut"></a>
+        <h3>Interior Mutability<span class="normal"> - invariant analysis at run-time</span></h3>
+        <t-b>
+          There are blocks of code that do not violate the &quot;no shared mutability of references&quot; invariant
+          but fail static analysis, because they violate the Ownership rules, stated above, but never share mutability
+          because of the way they operate in time.  For example, you might wish to create a constant collection, but
+          can&apos;t initialize it until runtime, e.g., some values are not known at compile time.
+        </t-b>
+        <t-b>
+          Rust provides a construct called RefCell&lt;T&gt; that appears to the compiler to be immutable, but from
+          which code can extract a mutable reference.  That doesn&apos;t allow you to violate the invariant, because
+          it checks at run-time the sequence of operations and assesses their mutability.  If your program violates
+          the invariant, using RefCell&lt;T&gt;, it will panic, terminating the thread on which it runs.
+        </t-b>
+        <t-b>
+          In the initialization example, above, we can initialize the collection with a single mutable reference
+          obtained from RefCell&lt;the_collection&gt;,
+          then never use it again.  Your code can then take mulitple immutable references, as needed, to access
+          the collection.  This won&apos;t fail due to the non-lexical scope filter.
+        </t-b>
+        <t-b>
+          Note that, for single threaded programs, we would only resort to run-time checking with RefCell&lt;T&gt; 
+          when static analysis results in a false alarm, due to the (small additional) expense of run-time checking.
+        </t-b>
+        <t-b>
+          Rust uses this same run-time checking process for threads using a Mutex&lt;T&gt; which is a thread safe
+          version of RefCell&lt;T&gt; holding both the protected data and a lock. A great benefit of Rust&apos;s
+          design is that Mutexes protect specific data, not critical sections of code, so there is no chance of
+          accidentally allowing two threads to use different locks to access the &quot;protected&quot; data.
+        </t-b>
+        <t-b>
+          We will discuss data race safety later in this BuildOn sequence.
+        </t-b>
+        <div style="height:0.25em;">&nbsp;</div>
+        <hr class="spread" />
+        <a id="refs"></a>
+        <h3>Getting Started References</h3>
+        <t-b>
+          Table 1., below, provides a few references suitable for Rust beginners.  They all assume competence
+          in some modern programming language, but not with Rust.  You will find references specific to the
+          first BuildOn step in Table 2., further down this page.
+        </t-b>
+        <div style="height:0.15em;">&nbsp;</div>
+        <h4>Table 1. - Beginning Rust References</h4>
+        <div>
+          <table style="width:100%;" class="lightItem">
+            <tr>
+              <th class="darkItem" style="width: 10em;">Topic</th>
+              <th class="darkItem" style-"width: auto;">Description</th>
+              <th class="darkItem" style="width: 15em;">Link</th>
+            </tr>
+            <tr>
+              <td>Survey</td>
+              <td>
+                This blog post walks through most of Rust, explaining, with code fragments and short simple language,
+                the core ideas.
+              </td>
+              <td>
+                <a href="https://fasterthanli.me/articles/a-half-hour-to-learn-rust">A half-hour to learn Rust</a><br />
+              </td>
+            </tr>
+            <tr>
+              <td>Survey</td>
+              <td>
+                This is an extensive github Readme.md file with table of contents and most of the ideas 
+                expressed in simple language with lots of details.
+              </td>
+              <td>
+                <a href="https://github.com/Dhghomon/easy_rust">easy-rust</a><br />
+              </td>
+            </tr>
+            <tr>
+              <td>Syntax</td>
+              <td>
+                This is is a github Gist that presents much of the Rust syntax without much drill-down.
+                This is a good starting place, but you will find, as you learn Rust, that a lot is missing
+                here.  But starting out, that is probably a good thing.  Almost all the missing details you can
+                find in the previous easy-rust link.
+              </td>
+              <td>
+                <a href="https://gist.github.com/brson/9dec4195a88066fa42e6">syntax guide</a><br />
+              </td>
+            </tr>
+            <tr>
+              <td>Language Cheat Sheet</td>
+              <td>
+                This is a very condensed illustration of almost all of the Rust ideas - little tiny statements,
+                code fragments, and a lot of diagrams if you scroll down far enough.
+              </td>
+              <td>
+                <a href="https://cheats.rs">Rust Lanaguage Cheat Sheet</a><br />
+              </td>
+            </tr>
+            <tr>
+              <td>Ownership</td>
+              <td>
+                Discussion of the ownership rules with several small code examples.
+              </td>
+              <td>
+                <a href="../RustBites/RustBites_Ownrs.html">Rust Bites Ownership</a><br />
+              </td>
+            </tr>
+            <tr>
+              <td>Rust Story</td>
+              <td>
+                A narrative walk through of the Rust Language, provide by this site.
+              </td>
+              <td>
+                <a href="../../RustStory_Prologue.html">Rust Story</a><br />
+              </td>
+            </tr>
+            <tr>
+              <td>Rust Bite by Byte</td>
+              <td>
+                A sequence of small bites from the Rust language with examples.
+              </td>
+              <td>
+                <a href="../../RustBiteByByte.html#bites">Rust Bites</a><br />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <t-b>
+          The first three references are the first things to look at.  The rest you might
+          skim over, just to see what is there, and come back later for details as you need them.
+        </t-b>
+        <!--
+          placeholder for list of companies using Rust  
+        -->
+        <div style="height:10em;">&nbsp;</div>
+        <a id="bottom"></a>
+         </main-right>
+       </main-wrapper>
+     </grid-main>
+     <grid-footer class="light">
+       <footer-wrapper>
+         <footer-left class="dark" onclick="togglemenus()">
+           &nbsp;toggle&nbsp;menu&nbsp;
+         </footer-left>
+         <footer-right id="sects" style="display:flex; padding:0em 1em;">
+           <ul>
+             <li><a href="#buildon">BuildOn</a></li>
+             <li><a href="#rust">Why Rust?</a></li>
+             <li><a href="#safety">Memory Safety</a></li>
+             <li><a href="#invariants">Safety Invariants</a></li>
+             <li><a href="#ownership">Ownership</a></li>
+             <li><a href="#non-lexical">Non-Lex Filt</a></li>
+             <li><a href="#intmut">Inter Mut</a></li>
+             <li><a href="#refs">References</a></li>
+             <!--<li><a href="#code">Starter Code</a></li>-->
+           </ul>
+         </footer-right>
+       </footer-wrapper>
+     </grid-footer>
+   </grid-container>
+</body>
+</html>
