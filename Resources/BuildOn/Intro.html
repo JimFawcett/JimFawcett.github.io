@@ -252,7 +252,8 @@
           There are blocks of code that do not violate the &quot;no shared mutability of references&quot; invariant
           but fail static analysis, because they violate the Ownership rules, stated above, but never share mutability
           because of the way they operate in time.  For example, you might wish to create a constant collection, but
-          can&apos;t initialize it until runtime, e.g., some values are not known at compile time.
+          can&apos;t initialize it until runtime, e.g., some values are not known at compile time.  So you want to
+          mutate it once, then provide immutable shared access.
         </t-b>
         <t-b>
           Rust provides a construct called RefCell&lt;T&gt; that appears to the compiler to be immutable, but from
@@ -263,7 +264,7 @@
         </t-b>
         <t-b>
           In the initialization example, above, we can build the collection values with a single mutable reference
-          obtained from RefCell&lt;the_collection&gt;, then never use it again.  Your code can then take mulitple 
+          obtained from RefCell&lt;the_collection&gt;, but never use it again.  Your code can then take mulitple 
           immutable references, as needed, to view the collection.  This won&apos;t fail due to the non-lexical 
           scope filter.
         </t-b>
@@ -272,15 +273,16 @@
           when static analysis results in a false alarm, due to the (small additional) expense of run-time checking.
         </t-b>
         <t-b>
-          Rust uses this same run-time checking process for threads using a Mutex&lt;T&gt; which is a thread safe
-          version of RefCell&lt;T&gt; holding both the protected data and a lock. A great benefit of Rust&apos;s
+          Rust uses this same run-time checking process for threads that need to share and mutate data by using 
+          a Mutex&lt;T&gt; which is similar to a thread safe
+          version of RefCell&lt;T&gt;.  It holds both the protected data and a lock. A great benefit of Rust&apos;s
           design is that Mutexes protect specific data, not critical sections of code, so there is no chance of
           accidentally allowing two threads to use different locks to access the &quot;protected&quot; data,
           e.g., they share the Mutex which wraps the data.  They don&apos;t share the data inside a protected
           area.
         </t-b>
         <t-b>
-          We will discuss data race safety later in this BuildOn sequence.
+          We will discuss data race safety near the end of this BuildOn sequence.
         </t-b>
         <div style="height:0.25em;">&nbsp;</div>
         <hr class="spread" />
