@@ -208,7 +208,7 @@
               Any number of readers (immutable references) may have access to a data value simultaneously.
             </li>
             <li>
-              Writers (owner or mutable reference) get exclusive access to a value - no other readers or writers.
+              Writers (mutable owner or mutable reference) get exclusive access to a value - no other readers or writers.
             </li>
           </ol>
           Borrowing from an owner inhibits owner from mutating its data.  Mutably borrowing inhibits all other borrows.
@@ -256,15 +256,16 @@
         </t-b>
         <t-b>
           Rust provides a construct called RefCell&lt;T&gt; that appears to the compiler to be immutable, but from
-          which code can extract a mutable reference.  That doesn&apos;t allow you to violate the invariant, because
-          it checks at run-time the sequence of operations and assesses their mutability.  If your program violates
-          the invariant, using RefCell&lt;T&gt;, it will panic, terminating the thread on which it runs.
+          which code can extract both mutable and immutable references.  That doesn&apos;t allow you to violate 
+          the invariant, because it checks at run-time each borrow, looking for shared mutability.  If your program 
+          does have concurrent mutable and immutable borrows, using RefCell&lt;T&gt;, it will panic, terminating 
+          the thread on which it runs.
         </t-b>
         <t-b>
-          In the initialization example, above, we can initialize the collection with a single mutable reference
-          obtained from RefCell&lt;the_collection&gt;,
-          then never use it again.  Your code can then take mulitple immutable references, as needed, to access
-          the collection.  This won&apos;t fail due to the non-lexical scope filter.
+          In the initialization example, above, we can build the collection values with a single mutable reference
+          obtained from RefCell&lt;the_collection&gt;, then never use it again.  Your code can then take mulitple 
+          immutable references, as needed, to view the collection.  This won&apos;t fail due to the non-lexical 
+          scope filter.
         </t-b>
         <t-b>
           Note that, for single threaded programs, we would only resort to run-time checking with RefCell&lt;T&gt; 
@@ -274,7 +275,9 @@
           Rust uses this same run-time checking process for threads using a Mutex&lt;T&gt; which is a thread safe
           version of RefCell&lt;T&gt; holding both the protected data and a lock. A great benefit of Rust&apos;s
           design is that Mutexes protect specific data, not critical sections of code, so there is no chance of
-          accidentally allowing two threads to use different locks to access the &quot;protected&quot; data.
+          accidentally allowing two threads to use different locks to access the &quot;protected&quot; data,
+          e.g., they share the Mutex which wraps the data.  They don&apos;t share the data inside a protected
+          area.
         </t-b>
         <t-b>
           We will discuss data race safety later in this BuildOn sequence.
