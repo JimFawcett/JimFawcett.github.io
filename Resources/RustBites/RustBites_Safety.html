@@ -1,0 +1,361 @@
+﻿<!DOCTYPE html>
+<html id="top">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="keywords" content="Rust, Introduction" />
+    <meta name="Author" content="Jim Fawcett" />
+    <meta name="Author" content="James Fawcett" />
+    <title>RustBites Safety</title>
+    <!--<link rel="stylesheet" href="css/Styles_basic.css" />
+    <link rel="stylesheet" href="css/Styles_Structure.css" />-->
+    <link rel="stylesheet" href="css/BiteStyles.css" />
+    <script src="js/BiteScripts.js"></script>
+    <style>
+      hr {
+        max-width: 55rem;
+        margin:1.5rem 0rem;
+      }
+    </style>
+  </head>
+  <body id="github" onload="initBites()">
+    <div class="top-banner">
+      <span id="hctr">Consuming Rust Bite by Byte</span>
+      <div style="position:relative; left:calc(100vw - 15rem);">
+        <span class="top-center">Safety</span>
+        <!-- <a class="top-right" href="../../RustBiteByByte.html">RustBiteByByte.html</a> -->
+      </div>
+  </div>
+  <next-prev>
+    <a href="../../index.html" style="color:#fefefa;">Home</a>&nbsp;
+    <a id="repo" href="../../RustBiteByByte.html">Repo</a> 
+    <a id="prev" href="RustBites_Intro.html">prev</a> 
+    <a id="next" href="RustBites_UDB.html">next</a>
+  </next-prev>
+
+    <toc-b id="toc">
+      <div style="display:flex; flex-direction:row">
+        <a href="Javascript:;" onclick="storyMenu.toggleTOC()" style="color:#fefefa;">E</a>&nbsp;
+        <a href="Javascript:;" onclick="storyMenu.closeTOC()" style="color:#fefefa;">C</a>&nbsp;
+        <a href="Javascript:;" onclick="storyMenu.sects()" style="color: #fefefa; ">Sects</a>&nbsp;
+        <a href="Javascript:;" onclick="storyMenu.chaps()" style="color:#fefefa;">Bites</a>&nbsp;
+    </div>
+    <!-- <up-b id="chaps" onmouseout="storyMenu.chaps()"> -->
+        <up-b id="chaps">
+          <a href="RustBites_Facts.html">Facts</a><br />
+          <a href="RustBites_Intro.html">Introduction</a><br />
+          <a href="RustBites_Safety.html">Safety</a><br />
+          <a href="RustBites_UDB.html">UndefBehavior</a><br />
+          <a href="RustBites_Data.html">Data</a><br />
+          <a href="RustBites_DataStr.html">DataStructs</a><br />
+          <a href="RustBites_SmrtPtrs.html">SmartPtrs</a><br />
+          <a href="RustBites_LifeCycle.html">LifeCycle</a><br />
+          <a href="RustBites_Ownrs.html">Ownership</a><br />
+          <a href="RustBites_Traits.html">Generics&Traits</a><br />
+          <a href="RustBites_Functs.html">Functions</a><br />
+          <a href="RustBites_Structs.html">Structs</a><br />
+          <a href="RustBites_LifeTime.html">LifeTime</a><br />
+          <a href="RustBites_Abstract.html">Abstractions</a><br />
+          <a href="RustBites_ErrHnd.html">ErrHandling</a><br />
+          <a href="RustBites_Collects.html">Collections</a><br />
+          <a href="RustBites_Iterator.html">Iterators</a><br />
+          <a href="RustBites_Threads.html">Threads</a><br />
+          <a href="RustBites_Synchron.html">Synchronize</a><br />
+          <a href="RustBites_Channels.html">Channels</a><br />
+          <a href="RustBites_AsyncAwt.html">AsyncAwait</a><br />
+          <a href="RustBites_Macros.html">Macros</a><br />
+          <a href="RustBites_TipsAndTricks.html">Hacks and Helpers</a><br />
+          <a href="../../indexPage.html">Glossary</a><br />
+          <!-- <a href="RustBites_Generics.html">Generics</a><br /> -->
+          <!-- <a href="RustBites_Intmut.html">InterMutat</a><br /> -->
+          <a href="Javascript.;#"></a><br />
+        </up-b>
+        <rt-b id="sects">
+          <a href="#top">top</a>, <a href="#why">why?</a>, <a href="#safety">saftey</a>,
+          <a href="#invar">invar</a>, <a href="#ownership">ownership</a>, 
+          <a href="#nlscope">nlscope</a>, <a href="#intmut">intmut</a>, 
+          <a href="#refs">Refs</a>, <a href="#bottom">Bottom</a>
+        </rt-b>
+      </toc-b>
+    <div id="hlp" style="display:none;">
+      <table>
+        <tr>
+          <td style="padding-right:5px;">Esc</td>
+          <td>toggle menus</td>
+        </tr>
+        <tr>
+          <td>C</td>
+          <td>close menus</td>
+        </tr>
+        <tr>
+          <td>R</td><td>Refresh</td>
+        </tr>
+        <tr>
+          <td>N</td><td>Next Bite</td>
+        </tr>
+        <tr>
+          <td>P</td><td>Prev Bite</td>
+        </tr>
+        <tr>
+          <td>T</td><td>scroll to top</td>
+        </tr>
+        <tr>
+          <td>B</td><td>scroll to bottom</td>
+        </tr>
+        <tr>
+          <td>H</td><td>Help</td>
+        </tr>
+      </table>
+      </div>
+  
+      <bb-55>
+      <h1>Rust Bite - Safety</h1>
+        <a id="why"></a>
+        <div style="height:0.55em;">&nbsp;</div>
+        <hr class="spread" />
+        <h3>1.0 Why Rust?</h3>
+        <t-b>
+          Rust is an interesting language, combining memory safety of C# and Java with
+          performance of C++.  Unlike these languages, Rust also provides data race safety by construction.
+        </t-b>
+        <t-b>
+          Using modern idioms, one can build, with C++, memory safe programs without data
+          races.  But when building large systems, with many thousands of lines of code, it is 
+          easy to forget, in a few of those lines, to use an idiom or
+          unintentionally share data between threads without proper locking.  C++ is memory and data race
+          safe by convention.
+        </t-b>
+        <t-b>
+          Rust, however,
+          ensures memory and data safety by construction.  Code with unsafe memory access and
+          data races will fail to compile.  It accomplishes that with an intersting ownership model.
+          We go over the details below, and will explore code in later steps in this BuildOn process.
+        </t-b>
+        <a id="safety"></a>
+        <div style="height:0.55em;">&nbsp;</div>
+        <hr class="spread" />
+        <h3>2.0 Memory Safety</h3>
+        <t-b>
+          Memory Safety means that a program:
+          <ol class="tight smallspread">
+            <li>
+              Can not construct uninitialized references.
+            </li>
+            <li>
+              References cannot become invalid due to a reallocation of memory by the referend.
+              <div class="largeindent smallspread smaller">
+                This could be caused by a vector reallocating to make room for additional data, for example.
+                Note that vector indices, unlike references, are not invalidated, since an
+                index is just an offset from the beginning of the vector, and remains valid over a reallocation.
+              </div>
+            </li>
+            <li>
+              References cannot outlive the instances they reference.
+            </li>
+            <li>
+              Can not read from, or write to, memory it has not allocated by any other means.
+            </li>
+            <li>
+              An attempt to access unowned memory terminates the thread making attempt before a read or write
+              can complete.
+            </li>
+          </ol>
+        </t-b>
+        <t-b>
+          To see what could happen without these constraints, look at 
+          <a href="RustBites_UDB.html">Undefined Behavior with C++</a>. Modern C++ has facilities and idioms that
+          prevent undefined behavior by convention.  We will see the Rust does so by construction.
+        </t-b>
+        <a id="invar"></a>
+        <div style="height:0.55em;">&nbsp;</div>
+        <hr class="spread" />
+        <h3>3.0 Rust Safety Invariants</h3>
+        <t-b>
+          Rust ensures memory safety, for all code outside <c-s>unsafe</c-s> blocks, by enforcing two invariants:
+          <ol class="tight smallspread">
+            <li>
+              Safe referencing - <strong>No shared mutabilty through references</strong>.
+            </li>
+            <li>
+              Safe indexing - All collections, including native arrays, are sized, and any attempt to index outside that sized
+              area results in a panic, e.g., an orderly shutdown of the current thread before any reads or writes
+              can complete.
+            </li>
+          </ol>
+        </t-b>
+        <t-b>
+          Note that the first invariant is a <strong>very strong condition</strong>.  There are useful program constructs, like
+          directed graphs, that depend on shared mutability to function as expected.  A child graph node may be
+          shared between several parents and without mutation of the nodes value(s) we could only build constant
+          graphs.
+        </t-b>
+        <t-b>
+          We can build non-constant directed graphs using Rust.  We simply cannot construct graph edges 
+          using references.
+          If we move all graph nodes into a vector, then each parent can refer to its children using vector
+          indices.  We will need to mark &quot;deleted&quot; nodes as unused, removing their parent&apos;s index,
+          and will want to recycle any marked nodes when new nodes are added.
+        </t-b>
+        <t-b>
+          The message is that the safety mechanisms used by Rust will lead us to write some of our code using
+          different strategies than we would with C++ or other modern languages.  And that is eventually a good thing.
+        </t-b>
+        <a id="ownership"></a>
+        <div style="height:0.55em;">&nbsp;</div>
+        <hr class="spread" />
+        <h3>4.0 Ownership<span class="normal"> - static analysis</span></h3>
+        <t-b>
+          Rust rejects most unsafe programs at compile time with ownership rules derived from the &quot;no shared mutability
+          through references&quot; invariant.  
+        </t-b>
+        <t-b>
+          <a href="../RustBites/RustBites_Ownrs.html">Ownership Rules:</a>
+          <ol class="tight smallspread">
+            <li>
+              There is only one owner for every data item.  That owner is responsible for deallocating the data 
+              when it goes out of scope.  It does that with a drop operation, very like a C++ destructor invocation.
+            </li>
+            <li>
+              Ownership can be transferred with <a href="../RustBites/RustBites_Data.html">move operations</a>.
+            </li>
+            <li>
+              Ownership can be borrowed by creating references.
+            </li>
+            <li>
+              Any number of readers (immutable references) may have access to a data value simultaneously.
+            </li>
+            <li>
+              Writers (mutable owner or mutable reference) get exclusive access to a value - no other readers or writers.
+            </li>
+          </ol>
+          Borrowing from an owner inhibits owner from mutating its data.  Mutably borrowing inhibits all other borrows.
+        </t-b>
+        <t-b>
+          It can be a bit complicated to evaluate these rules when you first start creating Rust code.  But you don&apos;t
+          have to.  The Rust compiler does a great job of reporting errors with just the right amount of detail, and often
+          provides a suggested solution.
+        </t-b>
+        <t-b>
+          Rust checks these rules with static analysis by a &quot;borrow-checker&quot;.  The checker is attempting to
+          determine if you violated the &quot;no shared mutability with references&quot; invariant.
+        </t-b>
+        <a id="nlscope"></a>
+        <div style="height:0.55em;">&nbsp;</div>
+        <hr class="spread" />
+        <h3>5.0 Non-lexical Filters<span class="normal"> - refining static analysis</span></h3>
+        <t-b>
+          No build environment can accept and build every safe program and reject every unsafe program.  As a 
+          consequence, Rust is conservative.  It chooses to reject some safe programs to insure that it rejects
+          all unsafe programs.
+        </t-b>
+        <t-b>
+          Rust reduces the number of false alarms generated by the Ownership Rules with a couple of additional filters.
+          <ol class="tight smallspread">
+            <li>
+              Calling a function with one or more immutable references following a mutable borrow will build successfully, 
+              since no data in the function can be mutated while the function is being invoked.  The same is true
+              of other types of expressions that take immutable references.
+            </li>
+            <li>
+              Creating and using an immutable reference in the scope of a mutable reference will build if, and 
+              only if, the mutable reference is not used after declaration of the immutable reference.
+            </li>
+          </ol>
+          The Rust community calls these non-lexical scope rules.
+        </t-b>
+        <a id="intmut"></a>
+        <div style="height:0.55em;">&nbsp;</div>
+        <hr class="spread" />
+        <h3>6.0 Interior Mutability<span class="normal"> - invariant analysis at run-time</span></h3>
+        <t-b>
+          There are blocks of code that do not violate the &quot;no shared mutability of references&quot; invariant
+          but fail static analysis, because they violate the Ownership rules, stated above, but never share mutability
+          because of the way they operate in time.  For example, you might wish to create a constant collection, but
+          can&apos;t initialize it until runtime, e.g., some values are not known at compile time.  So you want to
+          mutate it once, then provide immutable shared access.
+        </t-b>
+        <t-b>
+          Rust provides a construct called RefCell&lt;T&gt; that appears to the compiler to be immutable, but from
+          which code can extract both mutable and immutable references.  That doesn&apos;t allow you to violate 
+          the invariant, because it checks at run-time each borrow, looking for shared mutability.  If your program 
+          does have concurrent mutable and immutable borrows, using RefCell&lt;T&gt;, it will panic, terminating 
+          the thread on which it runs.
+        </t-b>
+        <t-b>
+          In the initialization example, above, we can build the collection values with a single mutable reference
+          obtained from RefCell&lt;the_collection&gt;, but never use it again.  Your code can then take mulitple 
+          immutable references, as needed, to view the collection.  This won&apos;t fail to build due to the non-lexical 
+          scope filter, and will not fail at run-time since there is no concurrent mutation and aliasing.
+        </t-b>
+        <t-b>
+          Note that, for single threaded programs, we would only resort to run-time checking with RefCell&lt;T&gt; 
+          when static analysis results in a false alarm, due to the (small additional) expense of run-time checking.
+        </t-b>
+        <t-b>
+          Rust uses this same run-time checking process for threads that need to share and mutate data by using 
+          a Mutex&lt;T&gt; which is similar to a thread safe
+          version of RefCell&lt;T&gt;.  It holds both the protected data and a lock. A great benefit of Rust&apos;s
+          design is that Mutexes protect specific data, not critical sections of code, so there is no chance of
+          accidentally allowing two threads to use different locks to access the &quot;protected&quot; data,
+          e.g., they share the Mutex which wraps the data.  They don&apos;t share the data inside a protected
+          area.
+        </t-b>
+      <t-b>
+        <div style="height:0.25em;">&nbsp;</div>
+        <a id="refs"></a>
+        <hr class="spread" />
+        <h3>7.0 References:</h3>
+        <div class="pad10 indent">
+          <table style="border-collapse: collapse; width:calc(100vw - 12rem);">
+            <tr>
+              <th class="darkItem">Reference</th>
+              <th class="darkItem">Description</th>
+            </tr>
+            <tr>
+              <td class="lightItem"><a href="https://www.youtube.com/watch?v=DnT-LUQgc7s">Jon Gjengset</a></td>
+              <td class="lightItem">Considering Rust - why should you explore Rust?</td>
+            </tr>
+            <tr>
+              <td class="lightItem"><a href="../../Resources/RustTour.pdf">RustTour.pdf</a></td>
+              <td class="lightItem">Quick tour of the Rust programming language emphasizing its unique attributes.</td>
+            </tr>
+            <tr>
+              <td class="lightItem">
+                <a href="https://msrc-blog.microsoft.com/2019/07/22/why-rust-for-safe-systems-programming/">
+                  Why Rust for safe systems programming - Microsoft
+                </a>
+              </td>
+              <td class="lightItem">Microsoft is exploring Rust for system programming.</td>
+            </tr>
+            <tr>
+              <td class="lightItem">
+                <a href="https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html">
+                  The Rust Book - Ownership
+                </a>
+              </td>
+              <td class="lightItem">Ownership rules with examples and discussion</td>
+            </tr>
+            <tr>
+              <td class="lightItem">
+                <a href="https://doc.rust-lang.org/edition-guide/rust-2018/ownership-and-lifetimes/non-lexical-lifetimes.html">
+                  Rust edition-guide
+                </a>
+              </td>
+              <td class="lightItem">Non-lexical lifetimes</td>
+            </tr>
+            <tr>
+              <td class="lightItem">
+                <a href="https://doc.rust-lang.org/book/ch15-05-interior-mutability.html">
+                  Rust Book
+                </a>
+              </td>
+              <td class="lightItem">RefCell&lt;T&gt; and the Interior Mutability Pattern</td>
+            </tr>
+          </table>
+        </div>
+        </t-b>
+    </bb-55>
+    <s-5em></s-5em>
+    <a id="bottom"></a>
+    <s-halfEm></s-halfEm>
+  </body>
+</html>
