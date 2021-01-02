@@ -99,6 +99,11 @@ storyMenu.closeTOC = function () {
   toc.style.display = "none";
 };
 
+storyMenu.hide = function (elem) {
+  var elm = document.getElementById(elem);
+  elm.style.display = "none";
+};
+
 // listen for keyboard events:
   // - key actions are defined in ScriptsKeyboard.js
 
@@ -161,6 +166,8 @@ storyMenu.closeTOC = function () {
       }
       // HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
     }
+
+  };
     // if (key === 'N') {
     //   let nxt = document.getElementById("Next");
     //   if (isDefined(nxt))
@@ -174,5 +181,13 @@ storyMenu.closeTOC = function () {
     // if (key === 'H') {
     //   HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
     // }
-  };
+storyMenu.getHelp = function () {
+  var help = document.getElementById("hlp");
+  if (isDefined(help)) {
+    if (help.style.display !== "block")
+      help.style.display = "block";
+    else
+      help.style.display = "none";
+  }
+};
   
