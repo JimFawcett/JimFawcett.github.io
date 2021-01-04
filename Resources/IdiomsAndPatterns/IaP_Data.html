@@ -92,7 +92,7 @@
     <div style="padding:2rem 2rem 5rem 2rem;">
     <h1>Hello Data</h1>
     <h3 style="margin-left:3em; margin-top:0em; font-weight:normal;">
-      Demonstration compares C#, C++, and Rust &quot;Hello World&quot; programs 
+      Demonstration compares C#, C++, and Rust &quot;Data Operations&quot; programs 
     </h3>
     <hr class="spread" />
     <t-b>
@@ -101,13 +101,10 @@
       you know of C++ or C# (or Java) to learn Rust more easily.
     </t-b>
     <t-b>
-      We start here with the  simplest programs in each of the three languagues.
+      This page demonstrates bind, copy, and move operations.
     </t-b>
     <t-b>
       Find instructions for downloading build chains for each of these languages in <a href="Tooling.html">Tooling</a>.
-      <note-block>
-        I&apos;ve experimented, below, with code colors.  Haven&apos;t decided which I like best.
-      </note-block>
     </t-b>
     <div style="height:1rem;"></div>
     <defn-outerBlock style="width:calc(100vw - 6rem);">
@@ -117,67 +114,202 @@
           <span class="right darkBlue smallpad cursor" onclick="storyMenu.hide('cpp')">hide</span>
         </defn-head>
         <defn-code class="lightBlue">
-// Hello.cpp
+/* DataOps.cpp - demo data operations */
 
-#include <iostream>
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+
+template &lt;typename Coll&gt;
+void show(
+  const Coll&amp; c, const std::string&amp; msg = ""
+) {
+  std::cout &lt;&lt; "\n  ";
+  if(msg.length() &gt; 0) {
+    std::cout &lt;&lt; msg &lt;&lt; " ";
+  }
+  using typename ValType = Coll::value_type;
+
+  for(ValType item : c) {
+    std::cout &lt;&lt; item &lt;&lt; " ";
+  }
+}
 
 int main() {
-  std::cout << "\n  Hello World from C++"   
-            << "\n\n";
+    std::cout &lt;&lt; 
+      "\n  -- demo data operations --\n";
+    /*
+      Primitive data types: int, double, ... 
+      occupy contiguous regions of memory,
+      so copies simply copy memory.
+    */
+    std::cout &lt;&lt; "\n  -- integer ops --";
+
+    int x = 42;
+    auto y = x - 2;  // copy construction
+    std::cout &lt;&lt; "\n  x = " 
+              &lt;&lt; x &lt;&lt; ", y = " &lt;&lt; y;
+
+    x = y;              // copy assign
+    std::cout &lt;&lt; "\n  after copy assign: x = y";
+    std::cout &lt;&lt; "\n  x = " &lt;&lt; x 
+              &lt;&lt; ", y = " 
+              &lt;&lt; y &lt;&lt; "\n";
+   
+    /*
+      Most non-primitive types: 
+      Vec&lt;T&gt;, String, ...
+      occupy memory on stack and heap,
+      so they do not satisfy copy trait
+    */
+    std::cout &lt;&lt; "\n  -- Vec ops --";
+    
+    std::vector&lt;int&gt; v { 1,2,4 };
+    show(v, "v = ");
+
+    auto w = v;  // copy assign - a clone
+    std::cout &lt;&lt; 
+      "\n  after copy construction: let w = v:";
+    show(v, "v = ");
+    show(w, "w = ");
+
+    std::cout &lt;&lt; "\n  set w[1] = -2";
+    w[1] = -2;
+    show(v, "v = ");
+    show(w, "w = ");
+
+    std::cout &lt;&lt; 
+      "\n\n  That's all Folks!!\n\n";
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
           </defn-code>
         <defn-head class="defnBorderTop">C++ build and execute</defn-head>
         <defn-code class="darkBlue">
-cd build
+  -- demonstrating data operations --
 
-C:\...\HelloWorld\Cpp\build>
-cmake .. >NULL
+  -- integer ops --
+  x = 42, y = 40
+  after copy assign: x = y
+  x = 40, y = 40
 
-C:\...\HelloWorld\Cpp\build>
-cmake --build . >NULL
+  -- Vec ops --
+  v =  1 2 4
+  after copy construction: let w = v:
+  v =  1 2 4
+  w =  1 2 4
+  set w[1] = -2
+  v =  1 2 4
+  w =  1 -2 4
 
-C:\...\HelloWorld\Cpp\build>
-"./debug/HelloPrj.exe"
+  That's all Folks!!
 
-  Hello World from C++
-        </defn-code>
-        <defn-head class="defnBorderTop">CMakeLists.txt</defn-head>
-        <defn-code class="lightBlue">
-# CMake HelloPrj - build C++ with CMake
 
-project(HelloPrj)
-set(CMake_CXX_STANDARD 20)
 
-# build HelloCMake.obj in folder 
-#   build/debug
 
-add_executable(HelloPrj Hello.cpp)
-        </defn-code>
-        <defn-head class="defnBorderTop">C++ Project Setup</defn-head>
-        <defn-code class="darkBlue">
-Steps to create Project:
-- Create directory for project
-- Add source code file
-- Add CmakeLists.txt
-  - <a  href="../../CppBasicDemos.html" style="color: lightyellow;">CMakeDemo</a>
-- mkdir build
-- cd build
-- cmake .. >NULL
-- cmake --build . >NULL
-- "./debug/PrjName.exe"
+
         </defn-code>
       </defn-block>
       <defn-block>
         <defn-head>Rust - Rust Theme</defn-head>
         <defn-code class="lightRust">
-// HelloWorld::main.rs
+/* DataOps::main.rs - demo Rust Data Ops */
 
 fn main() {
-    println!("Hello, world!");
+    print!(
+      "\n  -- demo data operations --\n"
+    );
+    /*
+      Primitive data types: i32, f64, ... 
+      occupy contiguous regions of memory, 
+      so they satisfy the copy trait
+    */
+    print!("\n  -- integer ops --");
+
+    let mut x :i32 = 42;
+    let y = x - 2;  // copy construction
+    print!("\n  x = {}, y = {}", x, y);
+
+    x = y;              // copy assign
+    print!("\n  after copy assign: x = y");
+    print!("\n  x = {}, y = {}\n", x, y);
+   
+    /*
+      Most non-primitive types: 
+      Vec&lt;T&gt;, String, ...
+      occupy memory on stack and heap,
+      so they do not satisfy the copy trait
+    */
+    print!("\n  -- Vec ops --");
+    
+    let v:Vec&lt;i32&gt; = vec![1,2,4];
+    print!("\n  v = {:?}", v);
+
+    let w = v;  // move assign
+    print!(
+      "\n  after move construction: let w = v:"
+    );
+    print!("\n  w = {:?}", w);
+    print!(
+      "\n  now v is invalid (been moved)\n"
+    );
+
+    let x = w.clone();
+    print!(
+      "\n  after clone oper: let x = w.clone():"
+    );
+    print!("\n  w = {:?}", w);
+    print!("\n  x = {:?}", x);
+
+    println!("\n\n  That's all Folks!!\n\n");
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -189,44 +321,27 @@ fn main() {
           Rust build and execute
         </defn-head>
         <defn-code class="darkRust">
-C:\...\HelloWorld\Rust>
+C:\...\DataOperations\RustData>
 cargo run -q
-Hello, world!
 
+  -- demonstrating data operations --
 
+  -- integer ops --
+  x = 42, y = 40
+  after copy assign: x = y
+  x = 40, y = 40
 
+  -- Vec ops --
+  v = [1, 2, 4]
+  after move construction: let w = v:
+  w = [1, 2, 4]
+  now v is invalid (been moved)
 
+  after clone operation: let x = w.clone():
+  w = [1, 2, 4]
+  x = [1, 2, 4]
 
-
-
-
-
-        </defn-code>
-        <defn-head class="defnBorderTop">
-          cargo.toml
-        </defn-head>
-        <defn-code class="lightRust">
-[package]
-name = "rust"
-version = "0.1.0"
-authors = ["James W. Fawcett <jfawcett@twcny.rr.com>"]
-edition = "2018"
-
-[dependencies]
-
-
-        </defn-code>
-        <defn-head class="defnBorderTop">Rust Project Setup</defn-head>
-        <defn-code class="darkRust">
-Steps to create Project:
-- Issue command: cargo new PkgName
-- Edit cargo.toml to provide 
-  pkg_name in snake_case
-- cd src
-- Edit main.rs for project constent   
-- cargo run -q
-
-
+  That's all Folks!!
 
         </defn-code>
       </defn-block>
@@ -235,60 +350,118 @@ Steps to create Project:
           C# - Black Theme
           <span class="right darkBlack smallpad cursor" onclick="storyMenu.hide('csh')">hide</span>
         </defn-head>
-        <defn-code class="lightBlack">using System;
+        <defn-code class="lightBlack">
+/* Program.cs -- Demo Data Operations */
 
-namespace HelloWorld
+using System;
+using System.Collections.Generic;
+
+namespace CSharpData
 {
   class Program
   {
+    static void show&lt;T&gt;(
+      IEnumerable&lt;T&gt; c, String msg = ""
+    ) {
+      Console.Write("\n  ");
+      if(msg.Length &gt; 0)
+        Console.Write("{0} ", msg);
+      foreach(T item in c) {
+        Console.Write("{0} ", item);
+      }
+    }
+
     static void Main(string[] args)
     {
-      Console.WriteLine("Hello World!");  
+      Console.Write(
+        "\n  -- C# data operations --\n"
+      );
+      /*
+        Primitive types in C# are copy types, 
+        just like C++ and Rust.
+      */
+      Console.Write("\n  -- integer ops --");
+           
+      int x = 42;
+      int y = x - 2;
+      Console.Write(
+        "\n  x = {0}, y = {1}", x, y
+      );
+
+      x = y;
+      Console.Write("\n  after copy assign:");
+      Console.Write(
+        "\n  x = {0}, y = {1}\n", x, y
+      );
+            
+      /*
+        Non-primitive types are handle copy types
+        not instance copy.  Instances reside in
+        the managed heap, and are accessed only
+        through handles, like v and w, below.
+
+        Copy construction creates a new handle to
+        the original instance.  Copy assignment
+        does the same thing.
+      */
+      Console.Write("\n  -- List&lt;int&gt; ops --");
+
+      List&lt;int&gt; v = new List&lt;int&gt;();
+      int[] rng = { 1, 2, 3 };
+      v.AddRange(rng);
+      show(v, "v = ");
+            
+      var w = v;
+      Console.Write(
+        "\n  after copy construct var w = v:"
+      );
+      show(v, "v = ");
+      show(w, "w = ");
+
+      w[1] = -2;
+      Console.Write(
+        "\n  after setting w[1] = -2:"
+      );
+      show(v, "v = ");
+      show(w, "w = ");
+      /*
+        Note that both v and w show change,
+        because they are both handles to same 
+        managed heap instance.
+      */
+
+      Console.WriteLine(
+        "\n\n  That's all Folks!\n\n"
+      );
     }
   }
 }
+
         </defn-code>
         <defn-head class="defnBorderTop">
           C# build and execute
         </defn-head>
         <defn-code class="darkBlack">
-C:\...\HelloWorld\CSharp>
+C:\...\DataOperations\CSharpData>
 dotnet run
-Hello World!
 
+  -- C# data operations --
 
+  -- integer ops --
+  x = 42, y = 40
+  after copy assign:
+  x = 40, y = 40
 
+  -- List<int> ops --
+  v =  1 2 3
+  after copy construct var w = v:
+  v =  1 2 3
+  w =  1 2 3
+  after setting w[1] = -2:       
+  v =  1 -2 3
+  w =  1 -2 3
 
-
-
-
-
-
-        </defn-code>
-        <defn-head class="topborder">
-          C# Project
-        </defn-head>
-        <defn-code class="lightBlack">
-&lt;Project Sdk="Microsoft.NET.Sdk"&gt;
-  &lt;PropertyGroup&gt;
-    &lt;OutputType&gt;Exe&lt;/OutputType&gt;
-    &lt;TargetFramework&gt;
-      net5.0
-    &lt;/TargetFramework&gt;
-  &lt;/PropertyGroup&gt;
-&lt;/Project&gt;
-
-        </defn-code>
-        <defn-head class="defnBorderTop">C# Project Setup</defn-head>
-        <defn-code class="darkBlack">
-Steps to create Project:
-- Issue command: dotnet new console
-- Edit Program.cs for project constent
-- dotnet run
-
-
-
-
+  That's all Folks!
 
 
         </defn-code>
