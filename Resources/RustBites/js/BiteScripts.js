@@ -99,6 +99,27 @@ storyMenu.closeTOC = function () {
   toc.style.display = "none";
 };
 
+//storyMenu.scrollTo(id) {
+//  location.id = "#" + id;
+//}
+storyMenu.top = function () {
+  window.location = "#top";
+}
+
+storyMenu.bottom = function () {
+  window.scrollTo(0, 100000);
+}
+
+storyMenu.help = function () {
+  var help = document.getElementById("hlp");
+  if (isDefined(help)) {
+    if (help.style.display !== "block")
+      help.style.display = "block";
+    else
+      help.style.display = "none";
+  }
+}
+
 // listen for keyboard events:
   // - key actions are defined in ScriptsKeyboard.js
 
