@@ -33,7 +33,10 @@ window.onerror = function (msg, url, linenumber) {
 
 var storyMenu = new Object();
 
-initBites = function() {
+initBites = function () {
+  storyMenu.bitesMenu();
+  storyMenu.bottomMenu();
+  storyMenu.helpMenu();
   //  // alert("init");
   //   var chaps = document.getElementById("chaps");
   //   //if (isDefined(chaps)) {
@@ -41,6 +44,77 @@ initBites = function() {
   //    var sects = document.getElementById("sects");
   //    //if (isDefined(sects)) {
   //        sects.style.display = "block";
+}
+
+storyMenu.bitesMenu = function () {
+  var bitesMenu = document.getElementById("chaps");
+  bitesMenu.innerHTML = '<a href="RustBites_Facts.html">Facts</a><br />\
+    <a href="RustBites_Intro.html">Introduction</a><br />\
+    <a href="RustBites_FlashCards.html">FlashCards</a><br />\
+    <a href="RustBites_Safety.html">Safety</a><br />\
+    <a href="RustBites_UDB.html">UndefBehavior</a><br />\
+    <a href="RustBites_Data.html">Data</a><br />\
+    <a href="RustBites_DataStr.html">DataStructs</a><br />\
+    <a href="RustBites_SmrtPtrs.html">SmartPtrs</a><br />\
+    <a href="RustBites_LifeCycle.html">LifeCycle</a><br />\
+    <a href="RustBites_Ownrs.html">Ownership</a><br />\
+    <a href="RustBites_Traits.html">Generics&Traits</a><br />\
+    <a href="RustBites_Functs.html">Functions</a><br />\
+    <a href="RustBites_Structs.html">Structs</a><br />\
+    <a href="RustBites_LifeTime.html">LifeTime</a><br />\
+    <a href="RustBites_Abstract.html">Abstractions</a><br />\
+    <a href="RustBites_ErrHnd.html">ErrHandling</a><br />\
+    <a href="RustBites_Collects.html">Collections</a><br />\
+    <a href="RustBites_Iterator.html">Iterators</a><br />\
+    <a href="RustBites_Threads.html">Threads</a><br />\
+    <a href="RustBites_Synchron.html">Synchronize</a><br />\
+    <a href="RustBites_Channels.html">Channels</a><br />\
+    <a href="RustBites_AsyncAwt.html">AsyncAwait</a><br />\
+    <a href="RustBites_Macros.html">Macros</a><br />\
+    <a href="RustBites_TipsAndTricks.html">Hacks and Helpers</a><br />\
+    <a href="../../indexPage.html">Glossary</a><br />\
+    <a href="Javascript.;#"></a><br />';
+}
+
+storyMenu.bottomMenu = function () {
+  var bottomMenu = document.getElementById("bottom-menu");
+  bottomMenu.innerHTML = '<a href="Javascript:;" onclick="storyMenu.help()" style="color:#fefefa;">Hlp</a>&nbsp;\
+  <a href = "Javascript:;" onclick = "storyMenu.toggleTOC()" style = "color:#fefefa;" >Esc</a>&nbsp;\
+  <a href="Javascript:;" onclick="storyMenu.closeTOC()" style="color:#fefefa;">Cls</a> &nbsp;\
+  <a href="Javascript:;" onclick="storyMenu.sects()" style="color: #fefefa; ">Sects</a> &nbsp;\
+  <a href="Javascript:;" onclick="storyMenu.chaps()" style="color:#fefefa;">Bites</a> &nbsp;';
+}
+
+storyMenu.helpMenu = function () {
+  var helpMenu = document.getElementById("hlp");
+  helpMenu.innerHTML = '<table>\
+    <tr>\
+      <td style="padding-right:5px;" onclick="storyMenu.toggleTOC()">Esc</td>\
+      <td>toggle menus</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyMenu.closeTOC()">C</td>\
+      <td>close menus</td>\
+    </tr>\
+    <tr>\
+      <td onclick="location.reload()">R</td><td>Refresh</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyMenu.next()">N</td><td>Next Bite</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyMenu.prev()">P</td><td>Prev Bite</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyMenu.top()">T</td><td>scroll to top</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyMenu.bottom()">B</td><td>scroll to bottom</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyMenu.help()">H</td><td>Help</td>\
+    </tr>\
+  </table>';
 }
 
 storyMenu.prev = function() {
@@ -180,20 +254,6 @@ storyMenu.help = function () {
         else
           help.style.display = "none";
       }
-      // HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
     }
-    // if (key === 'N') {
-    //   let nxt = document.getElementById("Next");
-    //   if (isDefined(nxt))
-    //     nxt.click();
-    // }
-    // if (key === 'P') {
-    //   let prv = document.getElementById('Prev');
-    //   if (isDefined(prv))
-    //     prv.click();
-    // }
-    // if (key === 'H') {
-    //   HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
-    // }
   };
   
