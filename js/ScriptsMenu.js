@@ -121,7 +121,7 @@ function initializeMenu() {
         <a href='RustStory_Prologue.html'>Rust Story</a>\
         <a href='IndexPage.html'>Rust Glossary</a>\
         <a href='RustBiteByByte.html'>Rust&nbsp;bite&nbsp;by&nbsp;byte&nbsp;</a>\
-        <a href='Resources/FlashCards/FlashCard.html'>Rust&nbsp;Flash&nbsp;Cards&nbsp;&nbsp;</a>\
+        <a href='Resources/RustBites/RustBites_FlashCards.html'>Rust&nbsp;Flash&nbsp;Cards&nbsp;&nbsp;</a>\
         <a href='BuildOn.html'>BuildOn:&nbsp;learn&nbsp;Rust&nbsp;&nbsp;</a>\
         <a href='RustStory_CodeIndex.html'>Rust Code Index</a>\
         <a href='InfDataLib_1.html'>Inf Data Lib - A.Zaitsev</a>\

@@ -11,24 +11,24 @@
  *   easier.
  */
 window.onerror = function (msg, url, linenumber) {
-  alert('Error message: ' + msg + '\nURL: ' + url + '\nLine Number: ' + linenumber);
-  return true;
-}
-/* --------------------------------------------------------------
- *  isDefined(elem)
- * --------------------------------------------------------------
- *  Checks to see if a JavaScript variable has been declared and
- *  initialized
- */
-function isDefined(elem) {
-  //if (typeof elem === 'function')
-  //  return true;
-  if (elem === null || elem === undefined || typeof elem === 'undefined') {
-    return false;
+    alert('Error message: ' + msg + '\nURL: ' + url + '\nLine Number: ' + linenumber);
+    return true;
   }
-  return true;
-}
-
+  /* --------------------------------------------------------------
+   *  isDefined(elem)
+   * --------------------------------------------------------------
+   *  Checks to see if a JavaScript variable has been declared and
+   *  initialized
+   */
+  function isDefined(elem) {
+    //if (typeof elem === 'function')
+    //  return true;
+    if (elem === null || elem === undefined || typeof elem === 'undefined') {
+      return false;
+    }
+    return true;
+  }
+  
 // RustBiteByByte.js
 
 var storyMenu = new Object();
@@ -48,11 +48,31 @@ initBites = function () {
 
 storyMenu.bitesMenu = function () {
   var bitesMenu = document.getElementById("chaps");
-  bitesMenu.innerHTML = '<a href="Tooling.html">Tooling</a><br />\
-    <a href="IaP_Hello.html">Hello World</a><br />\
-    <a href="Iap_Data.html">Hello Data</a><br />\
-    <a href="Iap_Objects.html">Hello Objects</a><br />\
-    <a class="undefined" href="Iap_Libs.html">Hello Libs</a><br />\
+  bitesMenu.innerHTML = '<a href="RustBites_Facts.html">Facts</a><br />\
+    <a href="RustBites_Intro.html">Introduction</a><br />\
+    <a href="RustBites_FlashCards.html">FlashCards</a><br />\
+    <a href="RustBites_Safety.html">Safety</a><br />\
+    <a href="RustBites_UDB.html">UndefBehavior</a><br />\
+    <a href="RustBites_Data.html">Data</a><br />\
+    <a href="RustBites_DataStr.html">DataStructs</a><br />\
+    <a href="RustBites_SmrtPtrs.html">SmartPtrs</a><br />\
+    <a href="RustBites_LifeCycle.html">LifeCycle</a><br />\
+    <a href="RustBites_Ownrs.html">Ownership</a><br />\
+    <a href="RustBites_Traits.html">Generics&Traits</a><br />\
+    <a href="RustBites_Functs.html">Functions</a><br />\
+    <a href="RustBites_Structs.html">Structs</a><br />\
+    <a href="RustBites_LifeTime.html">LifeTime</a><br />\
+    <a href="RustBites_Abstract.html">Abstractions</a><br />\
+    <a href="RustBites_ErrHnd.html">ErrHandling</a><br />\
+    <a href="RustBites_Collects.html">Collections</a><br />\
+    <a href="RustBites_Iterator.html">Iterators</a><br />\
+    <a href="RustBites_Threads.html">Threads</a><br />\
+    <a href="RustBites_Synchron.html">Synchronize</a><br />\
+    <a href="RustBites_Channels.html">Channels</a><br />\
+    <a href="RustBites_AsyncAwt.html">AsyncAwait</a><br />\
+    <a href="RustBites_Macros.html">Macros</a><br />\
+    <a href="RustBites_TipsAndTricks.html">Hacks and Helpers</a><br />\
+    <a href="../../indexPage.html">Glossary</a><br />\
     <a href="Javascript.;#"></a><br />';
 }
 
@@ -97,7 +117,7 @@ storyMenu.helpMenu = function () {
   </table>';
 }
 
-storyMenu.prev = function () {
+storyMenu.prev = function() {
   var prv = document.getElementById("prev");
   prv.click();
   // if(isDefined(prv)) {
@@ -105,7 +125,7 @@ storyMenu.prev = function () {
   // }
 }
 
-storyMenu.next = function () {
+storyMenu.next = function() {
   var nxt = document.getElementById("next");
   nxt.click();
   // if(isDefined(nxt)) {
@@ -174,72 +194,66 @@ storyMenu.help = function () {
   }
 }
 
-storyMenu.hide = function (elem) {
-  var elm = document.getElementById(elem);
-  elm.style.display = "none";
-};
-
 // listen for keyboard events:
-// - key actions are defined in ScriptsKeyboard.js
+  // - key actions are defined in ScriptsKeyboard.js
 
-document.addEventListener('keydown', (event) => { keyAction(event); }, false);
+  document.addEventListener('keydown', (event) => { keyAction(event); }, false);
 
-// listen for mouse events:
-// - mouse actions are defined below
+  // listen for mouse events:
+  // - mouse actions are defined below
 
-//document.addEventListener('mousedown', (event) => { mouseAction(event); }, false);
+  //document.addEventListener('mousedown', (event) => { mouseAction(event); }, false);
 
-function keyAction(keyEvent) {
-  keystate = 'down';
-  var key = String.fromCharCode(keyEvent.which);
-  if (event.keyCode == 27) {
-    // alert("escape");
-    var menu = document.getElementById("chaps");
-    if (isDefined(menu)) {
-      if (menu.style.display !== "block")
-        menu.style.display = "block";
-      else
-        menu.style.display = "none";
+  function keyAction(keyEvent) {
+    keystate = 'down';
+    var key = String.fromCharCode(keyEvent.which);
+    if (event.keyCode == 27) {
+      // alert("escape");
+      var menu = document.getElementById("chaps");
+      if (isDefined(menu)) {
+        if (menu.style.display !== "block")
+          menu.style.display = "block";
+        else
+          menu.style.display = "none";
+      }
+      var menu = document.getElementById("sects");
+      if (isDefined(menu)) {
+        if (menu.style.display !== "block")
+          menu.style.display = "block";
+        else
+          menu.style.display = "none";
+      }
     }
-    var menu = document.getElementById("sects");
-    if (isDefined(menu)) {
-      if (menu.style.display !== "block")
-        menu.style.display = "block";
-      else
-        menu.style.display = "none";
+    if (key === 'P') {
+      storyMenu.prev();
     }
-  }
-  if (key === 'P') {
-    storyMenu.prev();
-  }
-  if (key === 'N') {
-    storyMenu.next();
-  }
-  if (key === 'R') {
-    location.reload();
-  }
-  if (key === 'C') {
-    storyMenu.closeTOC();
-  }
-  // if (key === 'S')
-  //   toggleSwipeEvents();
-  if (key === 'T')
-    window.scrollTo(0, 0);
-  if (key === 'B')
-    window.scrollTo(0, 100000);
-  if (key === 'U')
-    window.scrollBy(0, -200);
-  if (key === 'D')
-    window.scrollBy(0, 200);
-  if (key === 'H') {
-    var help = document.getElementById("hlp");
-    if (isDefined(help)) {
-      if (help.style.display !== "block")
-        help.style.display = "block";
-      else
-        help.style.display = "none";
+    if (key === 'N') {
+      storyMenu.next();
     }
-  }
-};
-
-
+    if (key === 'R') {
+      location.reload();
+    }
+    if (key === 'C') {
+      storyMenu.closeTOC();
+    }
+    // if (key === 'S')
+    //   toggleSwipeEvents();
+    if (key === 'T')
+      window.scrollTo(0, 0);
+    if (key === 'B')
+      window.scrollTo(0, 100000);
+    if (key === 'U')
+      window.scrollBy(0, -200);
+    if (key === 'D')
+      window.scrollBy(0, 200);
+    if (key === 'H') {
+      var help = document.getElementById("hlp");
+      if (isDefined(help)) {
+        if (help.style.display !== "block")
+          help.style.display = "block";
+        else
+          help.style.display = "none";
+      }
+    }
+  };
+  
