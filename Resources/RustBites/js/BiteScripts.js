@@ -49,6 +49,8 @@ initBites = function () {
 storyMenu.bitesMenu = function () {
   var bitesMenu = document.getElementById("chaps");
   bitesMenu.innerHTML = '<a href="RustBites_Intro.html">Introduction</a><br />\
+    <a href="RustBites_GettingStarted.html">Starting</a><br />\
+    <a href="RustBites_Tooling.html">Tooling</a><br />\
     <a href="RustBites_Safety.html">Safety</a><br />\
     <a href="RustBites_UDB.html">UndefBehavior</a><br />\
     <a href="RustBites_Data.html">Data</a><br />\
