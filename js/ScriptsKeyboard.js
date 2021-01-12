@@ -5,6 +5,122 @@
 /////////////////////////////////////////////////////////////////////
 
 var HelpWin
+var storyHlpMenu = new Object();
+
+function initHelp() {
+  storyHlpMenu.helpMenu();
+}
+
+
+storyHlpMenu.helpMenu = function() {
+  //alert('helpMenu');
+  var hlpMenu = document.getElementById("hlp");
+  hlpMenu.innerHTML = '<table>\
+    <tr>\
+      <td style="padding-right:5px;" onclick="storyHlpMenu.toggleTOC()">Esc</td>\
+      <td>toggle menus</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyHlpMenu.closeTOC()">C</td>\
+      <td>close menus</td>\
+    </tr>\
+    <tr>\
+      <td onclick="location.reload()">R</td><td>Refresh</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyHlpMenu.next()">N</td><td>Next Bite</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyHlpMenu.prev()">P</td><td>Prev Bite</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyHlpMenu.top()">T</td><td>scroll to top</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyHlpMenu.bottom()">B</td><td>scroll to bottom</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyHlpMenu.help()">H</td><td>Help</td>\
+    </tr>\
+  </table>';
+}
+
+storyHlpMenu.prev = function () {
+  var prv = document.getElementById("Prev");
+  prv.click();
+  // if(isDefined(prv)) {
+  //   prv.click();
+  // }
+}
+
+storyHlpMenu.next = function () {
+  var nxt = document.getElementById("Next");
+  nxt.click();
+  // if(isDefined(nxt)) {
+  //   nxt.click();
+  // }
+}
+storyHlpMenu.chaps = function () {
+  var menu = document.getElementById("chaps");
+  if (isDefined(menu)) {
+    if (menu.style.display !== "block")
+      menu.style.display = "block";
+    else
+      menu.style.display = "none";
+  }
+};
+
+storyHlpMenu.sects = function () {
+  var menu = document.getElementById("sects");
+  if (isDefined(menu)) {
+    if (menu.style.display !== "block")
+      menu.style.display = "block";
+    else
+      menu.style.display = "none";
+  }
+};
+
+
+storyHlpMenu.toggleTOC = function () {
+  storyHlpMenu.chaps();
+  storyHlpMenu.sects();
+  // let chaps = document.getElementById("chaps");
+  // chaps.style.display = "none";
+  // let sects = document.getElementById("sects");
+  // sects.style.display = "none";
+  // let toc = document.getElementById("toc");
+  // toc.style.display = "none";
+};
+
+storyHlpMenu.closeTOC = function () {
+  // let chaps = document.getElementById("chaps");
+  // chaps.style.display = "none";
+  // let sects = document.getElementById("sects");
+  // sects.style.display = "none";
+  let toc = document.getElementById("toc");
+  toc.style.display = "none";
+};
+
+//storyHlpMenu.scrollTo(id) {
+//  location.id = "#" + id;
+//}
+storyHlpMenu.top = function () {
+  window.location = "#top";
+}
+
+storyHlpMenu.bottom = function () {
+  window.scrollTo(0, 100000);
+}
+
+storyHlpMenu.help = function () {
+  var help = document.getElementById("hlp");
+  if (isDefined(help)) {
+    if (help.style.display !== "block")
+      help.style.display = "block";
+    else
+      help.style.display = "none";
+  }
+}
 
 function keyAction(keyEvent) {
   keystate = 'down';
@@ -33,7 +149,8 @@ function keyAction(keyEvent) {
       prv.click();
   }
   if (key === 'H') {
-    HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
+    storyHlpMenu.help();
+    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
 };
 
@@ -41,3 +158,4 @@ function keyAction(keyEvent) {
 function helpWin() {
   window.open('Help.html', 'target=_blank', 'location=yes, width=900, height=650, resizable');
 }
+
