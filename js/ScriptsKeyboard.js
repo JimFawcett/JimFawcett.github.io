@@ -125,6 +125,23 @@ storyHlpMenu.help = function () {
 function keyAction(keyEvent) {
   keystate = 'down';
   var key = String.fromCharCode(keyEvent.which);
+  if (event.keyCode == 27) {
+    // alert("escape");
+    var menu = document.getElementById("chaps");
+    if (isDefined(menu)) {
+      if (menu.style.display !== "block")
+        menu.style.display = "block";
+      else
+        menu.style.display = "none";
+    }
+    var menu = document.getElementById("sects");
+    if (isDefined(menu)) {
+      if (menu.style.display !== "block")
+        menu.style.display = "block";
+      else
+        menu.style.display = "none";
+    }
+  }
   if (key === 'R') {
     location.reload();
   }
