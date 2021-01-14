@@ -78,6 +78,15 @@
             <span style="font-family:'Comic Sans MS';">Figure 1. TextFinder Packages</span>
           </photosizer-block>
         </div>
+        <div style="float:right; clear:both;" class="light clear">
+          <photosizer-block 
+            src="pictures/ClassesStep1.jpg" 
+            width="300" class="photoSizerBlock left"
+            style="background-color: #fefefa;"  
+          >
+            <span style="font-family:'Comic Sans MS';">Figure 2. TextSearch Types</span>
+          </photosizer-block>
+        </div>
        <t-b>
          TextSearch is a package in the first BuildOn project, TextFinder.  Figure 1 is a package diagram for
          Textfinder, discussed in Step #0.
@@ -120,7 +129,7 @@
         </indent-block>
         <t-b>
           TextSearch is provided file information by DirNav, searches for text in each file, and sends results
-          to Display.
+          to Display.  You will find sample starter code <a href="#code">below</a>.
         </t-b>
         <div style="height:0.5rem;"></div>
         <hr class="spread" />
@@ -132,8 +141,12 @@
           into useful user information.
         </t-b>
         <t-b>
-          In this step we will create the TextSearch package.  It:
+          In this step we will create the TextSearch package.  It contains a <c-s>Finder</c-s> type that:
           <ol>
+            <li>
+              Accepts a directory name which it interprets as the currently analyzed directory, and passes
+              on to an instance of a <c-s>GenOut</c-s> type, implemented by the Display package.
+            </li>
             <li>
               Accepts a file name and search text in a find method.
             </li>
@@ -144,26 +157,30 @@
               If successful, searches the file for the specified text.
             </li>
             <li>
-              Sends a tuple of file name and boolean to the display package where
-              the boolean value is true if specified text was found in the file, otherwise false.
+              Sends a tuple of file name, boolean found value, and the search text to the display package&apos;s
+              <c-s>GenOut</c-s> type.
+              The boolean value is true if specified text was found in the file, otherwise false.
             </li>
           </ol>
         </t-b>
         <t-b>
           TextSearch package defines a struct <c-s>Finder</c-s> that provides the methods:
           <indent-block>
-            <c-s>fn setDir(&mut self, dirnm: &str)</c-s><br />
+            <c-s>fn set_dir(&mut self, dirnm: &str)</c-s><br />
             <c-s>fn find(&mut self, flnm: &str, stxt: &str)</c-s>
           </indent-block>
-          where <c-s>find</c-s> sends its results directly to <c-s>Display</c-s> rather than 
+          Method <c-s>find</c-s> sends its results directly to <c-s>GenOut</c-s>, below, rather than 
           returning them to DirNav.
         </t-b>
         <t-b>
-          It also defines struct <c-s>Display</c-s> that provides methods:
+          It defines struct <c-s>GenOut</c-s> to provide methods:
           <indent-block>
-            <c-s>fn setDir(&mut self, dir: &str)</c-s><br />
-            <c-s>fn setRslt(&mut self, r:(String, bool))</c-s>
+            <c-s>fn set_dir(&mut self, dir: &str)</c-s><br />
+            <c-s>/* rslt args, below, are: filename, found, and search_text */</c-s><br />
+            <c-s>fn set_file(&mut self, rslt:(&str, bool, &str))</c-s>
           </indent-block>
+          <c-s>GenOut</c-s> will migrate to the Display package in
+          Step #4.
           <!--<c-s>Finder</c-s> is a generic type with parameter <c-s>D</c-s>, e.g., 
           <c-s>struct Finder&lt;D&gt; { ... }</c-s>.
           For this application, <c-s>Finder</c-s>&apos;s creator, <c-s>Executive</c-s>, will configure 
@@ -179,8 +196,8 @@
               prologues, for example.
             </li>
             <li>
-              TextSearch package will create an instance of Display and send its events directly instead
-              of passing its results back to Executive to forward.
+              TextSearch package will create an instance of <c-s>GenOut</c-s> and send its events directly instead
+              of passing them back to Executive to forward.
             </li>
             <li>
               In a later step, after looking at generics, we will show how this structure can allow the
@@ -218,10 +235,24 @@
             </t-b>
             <hr />
             <t-b>
-              After building a package with the command:
+              After building a package, containing an executable, with the command:
               <indent-block class="code">cargo run [arg1, ...]</indent-block>
               cargo invokes the executable it built with rustc, passing command line arguments, if any, to the
               executable.
+            </t-b>
+            <hr />
+            <t-b>
+              After building a libray package with the command:
+              <indent-block class="code">cargo new pkgFolder --lib --n name</indent-block>
+              cargo runs configured tests with the command:
+              <indent-block class="code">cargo test</indent-block>
+            </t-b>
+            <hr />
+            <t-b>
+              If the project has an /examples sister directory to /src, any console application in that
+              directory, say test1.rs,
+              can be bound to the library and run with the command:
+              <indent-block class="code">cargo run --example test1</indent-block>
             </t-b>
             <hr />
             <t-b>
@@ -240,7 +271,247 @@
           Win, Lin, and Mac.
         </t-b>
         <t-b>
-          For more details check out this: <a href="../IdiomsAndPatterns/Tooling.html">Tooling</a> page.
+          For more details check out this: <a href="../RustBites/RustBites_Tooling.html">Tooling</a> page.
+        </t-b>
+        <div style="height:1.0em;">&nbsp;</div>
+        <hr class="spread" />
+        <a id="code"></a>
+        <h3>Starter Code</h3>
+        <t-b>
+          This section contains a code example showing how to:
+          <ol>
+            <li>
+              Define a struct with methods - similar in use to a C++ or C# class.
+            </li>
+            <li>
+              Build a library that contains the struct and test its methods.
+            </li>
+            <li>
+              Link the static library to a test console application and run that.
+            </li>
+            <li>
+              That is done for a project structure very similar to what you will use
+              for TextFinder - Step #1
+            </li>
+          </ol>
+        </t-b>
+        <div style="height:0.75em">&nbsp;</div>
+        <details>
+          <summary class="dark" style="width:max-content;">Starter Code Example</summary>
+          <t-b>
+            This is a test mock for Step #1&apos;s project structure.  It gives you a good
+            start for building Step #1 so you can focus on starting to learn the Rust
+            programming language.
+          </t-b>
+        <two-column style="width:max-content;">
+          <left-content class="code" style="font-size:0.9em;"><div style="font-size:1.15rem; font-weight:bold;">TextSearch Library Source</div><hr style="width:100%;" />
+///////////////////////////////////////////////////////////
+// BuildOnStructure::TextSearch.rs                       //
+//   - demonstrate code structure for Step #1            //
+// Jim Fawcett, https://JimFawcett.github.io, 14 Jan 21  //
+///////////////////////////////////////////////////////////
+
+/*-----------------------------------------------
+  Trait is not needed here, but will be in Step #4
+*/
+pub trait ToOut {
+    fn set_dir(&amp;mut self, dir: &amp;str);
+    fn set_file(&amp;mut self, rslt: (&amp;str, bool, &amp;str));
+}
+/*-----------------------------------------------
+  GenOut converts Finder's data into information
+  for user.
+*/
+#[derive(Debug)]
+pub struct GenOut {
+    dir: String
+}
+/*-- implement trait --------------------------*/
+impl ToOut for GenOut {
+    fn set_dir(&amp;mut self, rdir: &amp;str) {
+        self.dir = rdir.to_string();
+        print!("\n  {}", rdir);
+    }
+    fn set_file(&amp;mut self, rslt: (&amp;str, bool, &amp;str)) {
+        let (file, found, text) = rslt;
+        if found {
+            print!("\n    {}: {:?} found", file, text);
+        }
+        else {
+            print!("\n    {}: {:?} not found", file, text);
+        }
+    }
+}
+/*-- implement other member functions ---------*/
+impl GenOut {
+    pub fn new() -&gt; GenOut {
+        GenOut {
+            dir: String::new()
+        }
+    }
+}
+/*-----------------------------------------------
+  Finder searches for text in specified file
+*/
+#[derive(Debug)]
+pub struct Finder {
+      dir: String,
+      out: GenOut
+}
+/*-- implement Finder methods -----------------*/
+impl Finder {
+    pub fn new() -&gt; Finder {
+        Finder {
+            dir: String::new(),
+            out: GenOut::new()
+        }
+    }
+    pub fn set_dir(&amp;mut self, dirnm: &amp;str) {
+        self.dir = dirnm.to_string();
+        self.out.set_dir(dirnm);
+    }
+    pub fn find(&amp;mut self, flnm: &amp;str, stxt: &amp;str) {
+        /* 
+            Pretending to search for text in file.
+            Function should:
+              1. append flnm to dir
+              2. attempt to open file
+              3. search for text
+              4. send result to out 
+        */
+        if stxt == "BuildOn" {
+            self.out.set_file((flnm, true, stxt));
+        }
+        else {
+            self.out.set_file((flnm, false, stxt));
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn construct_genout() {
+        let g = GenOut::new();
+        assert_eq!(g.dir , "".to_string());
+    }
+    #[test]
+    fn construct_finder() {
+        let f = Finder::new();
+        assert_eq!(f.dir, "".to_string());
+    }
+}
+
+          <div style="font-size:1.15rem; font-weight:bold;">TextSearch Test Results</div><hr style="width:100%;" /><hr style="width:100%;" />
+cargo test
+   Compiling text_search v0.1.0 
+     (C:\su\temp\BuildOnStructure\Step1\TextSearch)
+    Finished test [unoptimized + debuginfo] 
+      target(s) in 0.53s
+     Running 
+       target\debug\deps\text_search-ebf377eb2c5e40d1.exe
+
+running 2 tests
+test tests::construct_finder ... ok
+test tests::construct_genout ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 
+                 0 measured; 0 filtered out
+
+   Doc-tests text_search
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 
+                 0 measured; 0 filtered out
+
+
+          </left-content>
+          <right-content class="code" style="font-size:0.9em;"><div style="font-size:1.15rem; font-weight:bold;">Test1 Example Source</div><hr style="width:100%;" />
+
+///////////////////////////////////////////////////////////
+// BuildOnStructure::Step1::test1.rs                     //
+//   - demonstrate code structure for Step #1            //
+// Jim Fawcett, https://JimFawcett.github.io, 14 Jan 21  //
+///////////////////////////////////////////////////////////
+
+use text_search::*;
+
+fn main() {
+    print!("\n  -- demonstrate structure for Step#1 --\n");
+   let mut finder = Finder::new();
+   finder.set_dir("Dir1");
+   finder.find("file1.txt", "BuildOn");
+   finder.find("file2.txt", "BuildOff");
+   finder.set_dir("Dir2");
+   finder.find("file3.txt", "abc");
+   finder.find("file4.txt", "123");
+
+   print!("\n\n  That's all Folks!\n\n");
+}
+
+<div style="font-size:1.15rem; font-weight:bold;">Test1 Example Output</div><hr style="width:100%;" />
+C:\su\temp\BuildOnStructure\Step1\TextSearch>
+cargo run --example test1
+    Finished dev [unoptimized + debuginfo] 
+     target(s) in 0.01s
+     Running `target\debug\examples\test1.exe`
+
+  -- demonstrate structure for Step#1 --
+
+  Dir1
+    file1.txt: "BuildOn" found
+    file2.txt: "BuildOff" not found
+  Dir2
+    file3.txt: "abc" not found
+    file4.txt: "123" not found
+
+  That's all Folks!
+
+
+C:\su\temp\BuildOnStructure\Step1\TextSearch>
+cargo clean
+
+
+<div style="font-size:1.15rem; font-weight:bold;">Project Structure</div><hr style="width:100%;" />
+
+<div class="light" style="display:block; white-space:normal;">
+  <photosizer-block 
+    src="pictures/ProjectStep1.jpg" 
+    width="400" class="photoSizerBlock left"
+    style="background-color: #fefefa;"  
+  >
+    <span style="font-family:'Comic Sans MS';">Figure 1. Project Structure - Step #1</span>
+  </photosizer-block>
+</div>
+
+<div style="font-size:1.15rem; font-weight:bold;">cargo.toml</div><hr style="width:100%;" />
+[package]
+name = "text_search"
+version = "0.1.0"
+authors = ["James W. Fawcett <jfawcett@twcny.rr.com>"]
+edition = "2018"
+
+# See more keys and their definitions at 
+# https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+          </right-content>
+        </two-column>
+        </details>
+        <t-b>
+          You may wish to open this code in Visual Studio Code.  To do that, clone the 
+          <a href="https://github.com/JimFawcett/BuildOn">BuildOn Repository</a>.  Then navigate to the cloned directory
+          in a command window, cd into step_1, and emit the command <c-s>code .</c-s>, e.g.:
+          <indent-block class="code">code .</indent-block>
+          That will bring up VSCode with the library and test1 code loaded.
+        </t-b>
+        <t-b>
+          You can do the same thing with the <a href="https://github.com/JimFawcett/RustTextFinder">RustTextFinder</a> 
+          code. Clone the repository, then navigate into it in a command Widnow, and emit the command:
+          <indent-block class="code">code .</indent-block>
+          You then select the directory of the package you want to examine and build.
         </t-b>
         <div style="height:0.15em;">&nbsp;</div>
         <hr class="spread" />
@@ -263,6 +534,15 @@
               <th class="darkItem" style="width: 10em;">Topic</th>
               <th class="darkItem" style-"width: auto;">Description</th>
               <th class="darkItem" style="width: 15em;">Link</th>
+            </tr>
+            <tr>
+              <td>Look here first</td>
+              <td>
+                Starts with quick to intermediate tutorials on the Rust language.
+              </td>
+              <td>
+                <a href="../RustBites/RustBites_GettingStarted.html">Getting Started</a>
+              </td>
             </tr>
             <tr>
               <td>Tooling</td>
@@ -347,222 +627,6 @@
             </tr>
           </table>
         </div>
-        <div style="height:1.0em;">&nbsp;</div>
-        <hr class="spread" />
-        <a id="code"></a>
-        <h3>Starter Code</h3>
-        <t-b>
-          This section contains a simple code example showing how to:
-          <ol>
-            <li>
-              Define a struct with methods - similar in use to a C++ or C# class.
-            </li>
-            <li>
-              Build a library that contains the struct and test its methods.
-            </li>
-            <li>
-              Link the static library to a test console application and run that.
-            </li>
-          </ol>
-        </t-b>
-        <div style="height:0.75em">&nbsp;</div>
-        <details>
-          <summary class="dark" style="width:max-content;">Starter Code Example</summary>
-        <two-column style="width:max-content;">
-          <left-content class="code" style="font-size:0.9em;">/////////////////////////////////////////////////////////////
-/// BuildOn::step_1::lib.rs
-///
-/// Jim Fawcett, https://JimFawcett.github.io, 23 Nov 2020 
-/////////////////////////////////////////////////////////////
-/// This demo illustrates how you define structs and use them
-/// like you do classes in C++ and C#.
-/// 
-/// This package builds a static library.  There is a console
-/// application, called test1 in the examples directory, sister
-/// to the src directory where this file resides.
-/// 
-/// test1 uses this library by declaring:
-///   uses step_1::*;
-/// e.g., use any of the facilities provided by this library.
-/// The name, step_1, is defined in Cargo.toml.
-/// 
-/// You build test1 and link to this library with cargo command:
-///   cargo run --example test1
-/// Note that option is example (singular) even though directory
-/// name is examples.
-///////////////////////////////////////////////////////
-/// Rust Notes:
-/// 1. Two string types are defined in the std library
-///    a. String is a type that manages a collection of
-///       utf-8 characters in the native heap.
-///    b. str is a type that represents literal strings
-///       stored in stack or static memory, e.g., fixed
-///       size arrays of utf-8 characters.
-///    c. str instances are almost always managed through
-///       references, e.g., &str
-///    d. It is easy to convert between String and str 
-///       types - see code below.
-/// https://github.com/Dhghomon/easy_rust#strings
-/// 2. Rust uses Structs where C++ and C# use classes.
-///    e. Methods are defined using impl blocks, as shown
-///       below.
-///    f. Associated methods, like new are not declared 
-///       with a reference to self.  They act like C++
-///       static methods.
-///    g. All other methods are declared with a reference
-///       to self, which may be mutable.  On invocation,
-///       &self or &mut self is passed to the method code
-///       implicitly, e.g., not supplied by the using
-///       code. 
-
-/// Debug, Clone, and Default are traits, much like Java 
-/// or C# interfaces.
-/// Some traits, like these can be implemented by the 
-/// compiler.  The
-/// #[derive(Debug, Clone, Default)] annotation is asking
-/// the compiler to do that.
-/// 
-#[derive(Debug, Clone, Default)]
-pub struct Demo {
-    value: f64,
-    name: String
-}
-
-impl Demo {
-    /// static constructor method
-    /// -----------------------------------------
-    pub fn new() -> Self {
-        Demo {
-            value: 0.0,
-            name: String::from("un_named"),
-        }
-    }
-    /// method that sets Demo::value to v
-    /// -----------------------------------------
-    pub fn set_value(&mut self, v:f64) {
-        self.value = v
-    }
-    /// method that retrieves Demo::value
-    /// -----------------------------------------
-    pub fn get_value(&self) -> f64 {
-        self.value
-    }
-    /// method that sets Demo::name
-    /// -----------------------------------------
-    /// Note that nm is passed by reference &str
-    /// If we passed by value, e.g., nm:String
-    /// that would move nm into the function and
-    /// it would become invalid in the caller's scope
-    /// -----------------------------------------
-    pub fn set_name(&mut self, nm:&str) {
-        self.name = String::from(nm);
-    }
-    /// method returns name as a reference
-    /// -----------------------------------------
-    pub fn get_name(&self) -> &str {
-        &self.name
-    }
-}//////////////////////////////////////////////////////
-/// Testing:
-/// ---------------------------------------------------
-/// Rust libraries can be configured with unit tests,
-/// as you see below.  You run them with the command:
-///   cargo test
-/// By default, cargo runs each test on separate thread,
-/// so you can not count on the ordering of tests.
-/// If you want to run all tests on single thread, which
-/// will preserve test order, use the command: 
-///   cargo test -- --test-threads=1
-#[cfg(test)]
-/// Notes:
-/// 1. test_construct() uses typ_name method from std::any
-/// 2. All tests use the fact that private data in struct
-///    is accessible (only) within the defining library
-mod tests {
-    use super::*;
-    #[test]
-    fn test_construct() {
-        let demo = Demo::new();
-        let tn = std::any::type_name::<Demo>();
-        assert_eq!(tn, "step_1::Demo");
-        assert_eq!(demo.value, 0.0);
-        assert_eq!(demo.name, "un_named".to_string());
-    }
-   #[test]
-   fn test_setters() {
-        let mut demo = Demo::new();
-        demo.set_name("test2");
-        demo.set_value(3.14159);
-        assert_eq!(demo.name, "test2".to_string());
-        assert_eq!(demo.value, 3.14159);
-   }
-   #[test]
-   fn test_getters() {
-       let mut demo = Demo::new();
-       demo.name = String::from("test3");
-       demo.value = 0.33333;
-       assert_eq!(demo.get_name(), "test3".to_string());
-       assert_eq!(demo.get_value(), 0.33333);
-   }
-}
-          </left-content>
-          <right-content class="code" style="font-size:0.9em;">
-Microsoft Windows [Version 10.0.19042.685]
-(c) 2020 Microsoft Corporation. All rights reserved.
-
-C:\github\JimFawcett\BuildOn\step_1>
-cargo test
-   Compiling step_1 v0.1.0 
-     (C:\github\JimFawcett\BuildOn\step_1)
-   Finished test [unoptimized + debuginfo] target(s)
-     in 1.24s  
-   Running target\debug\deps\step_1-acfe1e9cd7ec2332.exe      
-
-running 3 tests
-test tests::test_construct ... ok
-test tests::test_getters ... ok
-test tests::test_setters ... ok
-
-test result: 
-   ok. 3 passed; 0 failed; 0 ignored; 0 measured; 
-       0 filtered out
-
-
-C:\github\JimFawcett\BuildOn\step_1>
-cargo run --example test1
-    Finished dev [unoptimized + debuginfo] target(s)
-      in 0.02s   
-    Running `target\debug\examples\test1.exe`
-
-  -- Demonstration of Demo type --
-
-  demo.name  = "un_named"
-  demo.value = 0.0
-
-  demo.name  = "JoeDemo"
-  demo.value = 0.5
-
-  That's all Folks
-          </right-content>
-        </two-column>
-        </details>
-        <t-b>
-          You will need to know how to implement code like this for Step #1, where we build the TextSearch package
-          and test it.
-        </t-b>
-        <t-b>
-          You may wish to open this code in Visual Studio Code.  To do that, clone the 
-          <a href="https://github.com/JimFawcett/BuildOn">BuildOn Repository</a>.  Then navigate to the cloned directory
-          in a command window, cd into step_1, and emit the command <c-s>code .</c-s>, e.g.:
-          <indent-block class="code">code .</indent-block>
-          That will bring up VSCode with the library and test1 code loaded.
-        </t-b>
-        <t-b>
-          You can do the same thing with the <a href="https://github.com/JimFawcett/RustTextFinder">RustTextFinder</a> 
-          code. Clone the repository, then navigate into it in a command Widnow, and emit the command:
-          <indent-block class="code">code .</indent-block>
-          You then select the directory of the package you want to examine and build.
-        </t-b>
         <div style="height:10em;">&nbsp;</div>
         <a id="bottom"></a>
          </main-right>
@@ -581,8 +645,8 @@ cargo run --example test1
              <li><a href="#textsearch">TextSearch Pkg</a></li>
              <li><a href="#step1">Build TextSearch Pkg</a></li>
              <li><a href="#tooling">Tooling</a></li>
-             <li><a href="#refs">References</a></li>
              <li><a href="#code">Starter Code</a></li>
+             <li><a href="#refs">References</a></li>
            </ul>
          </footer-right>
        </footer-wrapper>
