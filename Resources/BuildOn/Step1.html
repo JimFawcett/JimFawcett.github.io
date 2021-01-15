@@ -132,7 +132,7 @@
           to Display.  You will find sample starter code <a href="#code">below</a>.
         </t-b>
         <div style="height:0.5rem;"></div>
-        <hr class="spread" />
+        <!--<hr class="spread" />-->
         <a id="step1"></a>
         <h3>Step #1 - Build TextSearch Package</h3>
         <t-b>
@@ -312,9 +312,14 @@
 ///////////////////////////////////////////////////////////
 
 /*-----------------------------------------------
-  Trait is not needed here, but will be in Step #4
+  A trait is similar to an interface, most often
+  used to convey a communication protocol for
+  generic types.
+
+  SearchEvent trait is not needed here, but will be in 
+  Step #4
 */
-pub trait ToOut {
+pub trait SearchEvent {
     fn set_dir(&amp;mut self, dir: &amp;str);
     fn set_file(&amp;mut self, rslt: (&amp;str, bool, &amp;str));
 }
@@ -327,7 +332,7 @@ pub struct GenOut {
     dir: String
 }
 /*-- implement trait --------------------------*/
-impl ToOut for GenOut {
+impl SearchEvent for GenOut {
     fn set_dir(&amp;mut self, rdir: &amp;str) {
         self.dir = rdir.to_string();
         print!("\n  {}", rdir);
@@ -351,26 +356,31 @@ impl GenOut {
     }
 }
 /*-----------------------------------------------
+  Trait DirEvents specifies functions that
+  Finder provides to support DirNav calls.
+
+  Not used in this step.
+*/
+pub trait DirEvent {
+    fn do_dir(&amp;mut self, dir: &amp;str);
+    fn do_file(&amp;mut self, file: &amp;str);
+}
+/*-----------------------------------------------
   Finder searches for text in specified file
 */
 #[derive(Debug)]
 pub struct Finder {
       dir: String,
+      srctxt: String,
       out: GenOut
 }
-/*-- implement Finder methods -----------------*/
-impl Finder {
-    pub fn new() -&gt; Finder {
-        Finder {
-            dir: String::new(),
-            out: GenOut::new()
-        }
+/*-- implement DirEvent --*/
+impl DirEvent for Finder {
+    fn do_dir(&amp;mut self, dir: &amp;str) {
+        self.dir = dir.to_string();
+        self.out.set_dir(dir);
     }
-    pub fn set_dir(&amp;mut self, dirnm: &amp;str) {
-        self.dir = dirnm.to_string();
-        self.out.set_dir(dirnm);
-    }
-    pub fn find(&amp;mut self, flnm: &amp;str, stxt: &amp;str) {
+    fn do_file(&amp;mut self, file: &amp;str) {
         /* 
             Pretending to search for text in file.
             Function should:
@@ -379,12 +389,25 @@ impl Finder {
               3. search for text
               4. send result to out 
         */
-        if stxt == "BuildOn" {
-            self.out.set_file((flnm, true, stxt));
+        if self.srctxt == "BuildOn" {
+            self.out.set_file((file, true, &amp;self.srctxt));
         }
         else {
-            self.out.set_file((flnm, false, stxt));
+            self.out.set_file((file, false, &amp;self.srctxt));
         }
+    }
+}
+/*-- implement Finder methods -----------------*/
+impl Finder {
+    pub fn new() -&gt; Finder {
+        Finder {
+            dir: String::new(),
+            srctxt: String::new(),
+            out: GenOut::new()
+        }
+    }
+    pub fn set_txt(&amp;mut self, txt: &amp;str) {
+        self.srctxt = txt.to_string();
     }
 }
 
@@ -404,13 +427,14 @@ mod tests {
 }
 
           <div style="font-size:1.15rem; font-weight:bold;">TextSearch Test Results</div><hr style="width:100%;" /><hr style="width:100%;" />
+C:\su\temp\BuildOnStructure\Step1\TextSearch>
 cargo test
    Compiling text_search v0.1.0 
      (C:\su\temp\BuildOnStructure\Step1\TextSearch)
     Finished test [unoptimized + debuginfo] 
-      target(s) in 0.53s
-     Running 
-       target\debug\deps\text_search-ebf377eb2c5e40d1.exe
+      target(s) in 0.49s       
+    Running 
+      target\debug\deps\text_search-ebf377eb2c5e40d1.exe
 
 running 2 tests
 test tests::construct_finder ... ok
@@ -441,21 +465,22 @@ use text_search::*;
 fn main() {
     print!("\n  -- demonstrate structure for Step#1 --\n");
    let mut finder = Finder::new();
-   finder.set_dir("Dir1");
-   finder.find("file1.txt", "BuildOn");
-   finder.find("file2.txt", "BuildOff");
-   finder.set_dir("Dir2");
-   finder.find("file3.txt", "abc");
-   finder.find("file4.txt", "123");
+   finder.set_txt("BuildOn");
+   finder.do_dir("Dir1");
+   finder.do_file("file1.txt");
+   finder.set_txt("BuildOff");
+   finder.do_file("file2.txt");
+   finder.do_dir("Dir2");
+   finder.set_txt("abc");
+   finder.do_file("file3.txt");
+   finder.set_txt("123");
+   finder.do_file("file4.txt");
 
    print!("\n\n  That's all Folks!\n\n");
-}
-
-<div style="font-size:1.15rem; font-weight:bold;">Test1 Example Output</div><hr style="width:100%;" />
+}<div style="font-size:1.15rem; font-weight:bold;">Test1 Example Output</div><hr style="width:100%;" />
 C:\su\temp\BuildOnStructure\Step1\TextSearch>
 cargo run --example test1
-    Finished dev [unoptimized + debuginfo] 
-     target(s) in 0.01s
+    Finished dev [unoptimized + debuginfo] target(s) in 0.01s
      Running `target\debug\examples\test1.exe`
 
   -- demonstrate structure for Step#1 --
@@ -468,7 +493,6 @@ cargo run --example test1
     file4.txt: "123" not found
 
   That's all Folks!
-
 
 C:\su\temp\BuildOnStructure\Step1\TextSearch>
 cargo clean
