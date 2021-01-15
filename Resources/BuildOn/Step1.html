@@ -84,7 +84,7 @@
             width="300" class="photoSizerBlock left"
             style="background-color: #fefefa;"  
           >
-            <span style="font-family:'Comic Sans MS';">Figure 2. TextSearch Types</span>
+            <span style="font-family:'Comic Sans MS';">Figure 2. Step #1 Types</span>
           </photosizer-block>
         </div>
        <t-b>
@@ -144,11 +144,14 @@
           In this step we will create the TextSearch package.  It contains a <c-s>Finder</c-s> type that:
           <ol>
             <li>
-              Accepts a directory name which it interprets as the currently analyzed directory, and passes
-              on to an instance of a <c-s>GenOut</c-s> type, implemented by the Display package.
+              Accepts a search string in method Finder::set_txt.
             </li>
             <li>
-              Accepts a file name and search text in a find method.
+              Accepts a directory name in DirEvent::do_dir which it stores and passes on to an instance
+              of the <c-s>GenOut</c-s> type, which will move to the Display package in Step #4.
+            </li>
+            <li>
+              Accepts a file name in DirEvent::do_file.
             </li>
             <li>
               Attempts to open the file.
@@ -157,30 +160,31 @@
               If successful, searches the file for the specified text.
             </li>
             <li>
-              Sends a tuple of file name, boolean found value, and the search text to the display package&apos;s
+              Sends a tuple of file name, boolean found value, and the search text to the
               <c-s>GenOut</c-s> type.
               The boolean value is true if specified text was found in the file, otherwise false.
             </li>
           </ol>
         </t-b>
         <t-b>
-          TextSearch package defines a struct <c-s>Finder</c-s> that provides the methods:
+          TextSearch package defines struct <c-s>Finder</c-s> that provides the methods:
           <indent-block>
-            <c-s>fn set_dir(&mut self, dirnm: &str)</c-s><br />
-            <c-s>fn find(&mut self, flnm: &str, stxt: &str)</c-s>
+            <c-s>fn do_dir(&mut self, dir: &str)</c-s><br />
+            <c-s>fn do_file(&mut self, file: &str)</c-s><br />
+            <c-s>fn set_txt(&mut self, srctxt: &str)</c-s>
           </indent-block>
-          Method <c-s>find</c-s> sends its results directly to <c-s>GenOut</c-s>, below, rather than 
+          Method <c-s>do_file</c-s> sends its results directly to <c-s>GenOut</c-s>, below, rather than 
           returning them to DirNav.
         </t-b>
         <t-b>
-          It defines struct <c-s>GenOut</c-s> to provide methods:
+          It defines, in this Step, struct <c-s>GenOut</c-s> to provide methods:
           <indent-block>
             <c-s>fn set_dir(&mut self, dir: &str)</c-s><br />
             <c-s>/* rslt args, below, are: filename, found, and search_text */</c-s><br />
             <c-s>fn set_file(&mut self, rslt:(&str, bool, &str))</c-s>
           </indent-block>
-          <c-s>GenOut</c-s> will migrate to the Display package in
-          Step #4.
+          In this Step, <c-s>GenOut</c-s> is a test mock, supporting <c-s>Finder</c-s> testing.
+          A completed version will migrate to Display package in Step&nbsp;#4.
           <!--<c-s>Finder</c-s> is a generic type with parameter <c-s>D</c-s>, e.g., 
           <c-s>struct Finder&lt;D&gt; { ... }</c-s>.
           For this application, <c-s>Finder</c-s>&apos;s creator, <c-s>Executive</c-s>, will configure 
