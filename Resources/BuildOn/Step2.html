@@ -225,6 +225,273 @@ fn visit(&mut self, path: &Path) {
             </li>
           </ol>
         </t-b>
+        <div style="height:1.0em;">&nbsp;</div>
+        <hr class="spread" />
+        <a id="code"></a>
+        <h3>Starter Code</h3>
+        <t-b>
+          This section contains a code example showing how to:
+          <ol>
+            <li>
+              Define a generic struct DirNav that implements methods for a trait, similar to an interface,
+              as well as other methods.
+            </li>
+            <li>
+              Use the Dependency Inversion Principle to allow DirNav to avoid depending on TextSearch
+              implementation details:
+              <ul class="tight">
+                <li>
+                  Constrain generic type parameter with trait DirEvent
+                </li>
+                <li>
+                  Create an instance, using a factory function, of the generic parameter for use in 
+                  DirNav&apos;s methods.
+                </li>
+              </ul>
+            </li>
+            <li>
+              Build a library that contains the struct and test its methods.
+            </li>
+            <li>
+              Link the static library to a test console application and run that.
+            </li>
+            <li>
+              That is done for a project structure very similar to what you will use
+              for TextFinder - Step #1
+            </li>
+          </ol>
+        </t-b>
+        <div style="height:0.75em">&nbsp;</div>
+        <details>
+          <summary class="dark" style="width:max-content;">Starter Code Example</summary>
+          <t-b>
+            This is a test mock for Step #2&apos;s project structure.  It gives you a good
+            start for building Step #2 so you can focus on learning the Rust
+            programming language.
+          </t-b>
+          <t-b>
+            You will need to provide directory navigation code, using facilities of the
+            <a href="https://doc.rust-lang.org/std/fs/index.html">std::fs</a> file system facilities.
+            This demonstration focuses on its Dependency Inversion structure.
+          </t-b>
+        <two-column style="width:max-content;">
+          <left-content class="code" style="font-size:0.9em;"><div style="font-size:1.15rem; font-weight:bold;">DirNav Library Source</div><hr style="width:100%;" />
+/////////////////////////////////////////////////////////////
+// Step#2::DirNav::lib.rs - demos mock DirNav operations   //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 15 Jan 2021  //
+/////////////////////////////////////////////////////////////
+
+
+/*-----------------------------------------------
+  Rust traits are similar to interfaces.
+
+  Trait DirEvent requires implementer to be
+  constructible and have members to handle
+  DirNav events.
+
+  Constructability allows DirNav to create an
+  instance for a type defined by a generic 
+  parameter.
+*/
+pub trait DirEvent {
+    /*-- constructible --*/
+    fn new() -&gt; Self;
+    /*-- event handlers --*/
+    fn do_dir(&amp;mut self, dir:&amp;str);
+    fn do_file(&amp;mut self, file: &amp;str);
+}
+
+//#region : Sample App implementing DirEvent
+/*-----------------------------------------------
+  App is a type that implements application
+  specific processing of a DirEvent sent by
+  DirNav.  This is a demo for the DirNav library
+  that illustrates how an application can use
+  DirNav.
+  -----------------------------------------------
+pub struct App {
+    curr_dir: String
+}
+impl DirEvent for App {
+    fn new() -&gt; Self {
+        App { curr_dir: String::new() }
+    }
+    fn do_dir(&amp;mut self, dir: &amp;str) {
+        print!("\n  directory: {:?}",dir);
+        self.curr_dir = dir.to_string();
+    }
+    fn do_file(&amp;mut self, file: &amp;str) {
+        print!("\n    file: {:?}", file);
+    }
+}
+*/
+//#endregion
+
+/*-----------------------------------------------
+  DirNav searches directory tree looking for
+  files with specified patterns (extensions).
+
+  This is a mock type defined as an illustration
+  of what Step #2 needs.
+*/
+pub struct DirNav&lt;T&gt; where T:DirEvent {
+    app : T
+}
+impl&lt;T&gt; DirNav&lt;T&gt; where T:DirEvent {
+    pub fn new() -&gt; DirNav&lt;T&gt; {
+        DirNav {
+          app: T::new()
+        }
+    }
+    pub fn get_app(&amp;self) -&gt; &amp;T {
+        &amp;self.app
+    }
+    pub fn start(&amp;mut self) {
+        /* pretending to search a dir tree */
+        self.app.do_dir("dir1");
+        self.app.do_file("file1");
+        self.app.do_file("file2");
+        self.app.do_dir("dir2");
+        self.app.do_file("file3");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        assert_eq!(2 + 2, 4);
+    }
+}
+
+          <div style="font-size:1.15rem; font-weight:bold;">DirNav Test Results</div><hr style="width:100%;" /><hr style="width:100%;" />
+cargo test
+   Compiling dir_nav v0.1.0 
+     (C:\github\JimFawcett\BuildOn\BuildOnStructure\Step2\DirNav)
+   Finished test [unoptimized + debuginfo] target(s) in 0.95s
+     Running target\debug\deps\dir_nav-21ee146e7826029a.exe   
+
+running 1 test
+test tests::it_works ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 
+                 0 measured; 0 filtered out
+
+   Doc-tests dir_nav
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 
+                 0 measured; 0 filtered out
+
+
+          </left-content>
+          <right-content class="code" style="font-size:0.9em;"><div style="font-size:1.15rem; font-weight:bold;">Test1 Example Source</div><hr style="width:100%;" />
+
+/////////////////////////////////////////////////////////////
+// test1.rs - demonstrates mock DirNav operations          //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 15 Jan 2021  //
+/////////////////////////////////////////////////////////////
+
+use dir_nav::*;
+
+/*-----------------------------------------------
+  Type MyApp is a test type that:
+  - is a generic parameter for DirNav&lt;App&gt;
+  - responds to DirNav's events
+  - can be retrieved with DirNav::get_app()
+    and interrogated using its member functions.
+*/
+struct MyApp {}
+
+impl DirEvent for MyApp {
+    fn new() -&gt; Self {
+        MyApp {}
+    }
+    fn do_dir(&amp;mut self, dir:&amp;str) {
+        print!("\n  directory: {:?}", dir);
+    }
+    fn do_file(&amp;mut self, file:&amp;str) {
+        print!("\n    file: {:?}", file);
+    }
+}
+impl MyApp {
+    pub fn show_type(&amp;self) {
+        print!("\n  {:?}", std::any::type_name::&lt;MyApp&gt;());
+    }
+}
+
+fn main() {
+    print!("\n  -- demonstrate mock DirNav --\n");
+
+    let mut dn = DirNav::&lt;MyApp&gt;::new();
+    dn.start();
+    println!();
+    dn.get_app().show_type();
+
+    print!("\n\n  That's all Folks!\n\n");
+}<div style="font-size:1.15rem; font-weight:bold;">Test1 Example Output</div><hr style="width:100%;" />
+C:\github\JimFawcett\BuildOn\BuildOnStructure\Step2\DirNav>
+cargo run --example test1
+    Finished dev [unoptimized + debuginfo] 
+      target(s) in 0.01s
+    Running `target\debug\examples\test1.exe`
+
+  -- demonstrate mock DirNav --
+
+  directory: "dir1"
+    file: "file1"
+    file: "file2"
+  directory: "dir2"
+    file: "file3"
+
+  "test1::MyApp"
+
+  That's all Folks!
+
+
+
+<div style="font-size:1.15rem; font-weight:bold;">Project Structure</div><hr style="width:100%;" />
+
+<div class="light" style="display:block; white-space:normal;">
+  <photosizer-block 
+    src="pictures/ProjectStep2.jpg" 
+    width="400" class="photoSizerBlock left"
+    style="background-color: #fefefa;"  
+  >
+    <span style="font-family:'Comic Sans MS';">Figure 1. Project Structure - Step #2</span>
+  </photosizer-block>
+</div>
+
+<div style="font-size:1.15rem; font-weight:bold;">cargo.toml</div><hr style="width:100%;" />
+[package]
+name = "dir_nav"
+version = "0.1.0"
+authors = ["James W. Fawcett <jfawcett@twcny.rr.com>"]
+edition = "2018"
+
+# See more keys and their definitions at 
+# https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+          </right-content>
+        </two-column>
+        </details>
+        <t-b>
+          You may wish to open this code in Visual Studio Code.  To do that, clone the 
+          <a href="https://github.com/JimFawcett/BuildOn">BuildOn Repository</a>.  Then navigate to the cloned directory
+          in a command window, cd into step_1, and emit the command <c-s>code .</c-s>, e.g.:
+          <indent-block class="code">code .</indent-block>
+          That will bring up VSCode with the library and test1 code loaded.
+        </t-b>
+        <t-b>
+          You can do the same thing with the <a href="https://github.com/JimFawcett/RustTextFinder">RustTextFinder</a> 
+          code. Clone the repository, then navigate into it in a command Widnow, and emit the command:
+          <indent-block class="code">code .</indent-block>
+          You then select the directory of the package you want to examine and build.
+        </t-b>
         <div style="height:0.15em;">&nbsp;</div>
         <hr class="spread" />
         <a id="refs"></a>
