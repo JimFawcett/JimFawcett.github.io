@@ -83,9 +83,9 @@
       Table 1., below, lists things that distinguish the Rust programing language from C++ and C#.  Rust provides
       performance and memory management in a manner similar to C++ but adds memory and data race safety by construction.  
       It delivers memory safe operation like
-      C#, but without its performance penalties and non-deterministic release of resources due to garbage collection.
+      C#, but without performance penalties and non-deterministic release of resources due to garbage collection.
     </t-b>
-    <h3>Table 1. What Rust Omits, Requires, and Supports</h3>
+    <h3>Table 1. What Rust Omits, Changes, Requires, and Supports</h3>
     <table>
       <tr>
         <th>Rust Omits:</th>
@@ -95,22 +95,11 @@
         <td>
           Rust does not support <strongs>function overloading</strongs>.
           <div class="indent pad5">
-            Not needed since constructors and destructor do not share the type name.
+            Not needed since constructors do not share the type name.
           </div>
         </td>
         <td>
           <a href="https://internals.rust-lang.org/t/justification-for-rust-not-supporting-function-overloading-directly/7012">internals.rust-lang.org</a>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <strongs>Unlike C++, user defined semantics for copy and move</strongs> are not available.
-          <div class="indent pad5">
-            They are not needed due to the way data is managed in Rust.
-          </div>
-        </td>
-        <td>
-          <a href="RustBites_Data.html">RustBites_Data</a>
         </td>
       </tr>
       <tr>
@@ -143,6 +132,58 @@
         </td>
         <td>
           <a href="https://doc.rust-lang.org/rust-by-example/types/cast.html">Casting - Rust by example</a>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          Rust Changes:
+        </th>
+        <th>
+          References:
+        </th>
+      </tr>
+      <tr>
+        <td>
+          Only types with contiguous memory are implicitly copied.  All else are implicitly moved.
+          <div class="indent pad5">
+            That applies to construction, assignment, passing arguments and returning results from functions. 
+          </div>
+        </td>
+        <td>
+          <a href="RustBites_Data.html#traits">RustBites copy &amp; move</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Rust supports deep clones and defines a Clone trait that cloneable types implement.
+          <div class="indent pad5">
+            Clones are always invoked explicitly.
+          </div>
+        </td>
+        <td>
+          <a href="RustBites_Data.html#move_clone">RustBites_Data clone</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <strongs>Unlike C++, semantics for copy and move</strongs> are fixed.
+          <div class="indent pad5">
+            User defined semantics are not needed due to the way data is managed in Rust.
+          </div>
+        </td>
+        <td>
+          <a href="RustBites_Data.html#traits">RustBites_Data</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Rust enumerations have elements that may wrap instances of specified types.
+          <div class="indent pad5">
+            <c-s>enum Animals { name(String), endangered(Bool) };</c-s>
+          </div>
+        </td>
+        <td>
+          <a href="../../RustStory_Data.html#enums">RustStory_Data enums</a>
         </td>
       </tr>
       <tr>
@@ -196,7 +237,7 @@
         <td>
           All access to heap storage uses smart pointer Box&lt;T&gt;. 
           <div class="indent pad5">
-            Using Box&lt;T&gt; places t &epsilon; T in the heap and dereferences the Box pointer, giving
+            Using Box&lt;T&gt; places t &epsilon; T in the heap and implicitly dereferences the Box pointer, giving
             code access to t&apos;s interface.
           </div>
 
@@ -207,7 +248,16 @@
       </tr>
       <tr>
         <td>
-          Function invocations on a generic type require a type constrait using a trait declaring that function.
+          Function invocations on a generic type, T, require a type constrait on T using a trait declaring that function.
+          <div class="indent pad5 code">
+fn demo&lt;T&gt;(rt: &T) where T:Clone {
+    let tc = rt.clone();
+    // use tc
+}
+          </div>
+          <div style="padding: 0px 0px 5px 0px;" class="indent">
+            Here, clone() function is invoked on generic type rt with Clone constraint.
+          </div>
           <div style="height: 0.25rem;"></div>
         </td>
         <td>
@@ -224,13 +274,17 @@
       </tr>
       <tr>
         <td>
-          Error handling with Result&lt;T, E&gt; and Option&lt;T&gt;
+          Rust supports error handling with enums Result&lt;T, E&gt; and Option&lt;T&gt;:
+          <div class="indent pad5">
+            <c-s>enum Result&lt;T, E&gt; { Ok(T), Err(E) }</c-s><br />
+            <c-s>enum Option&lt;T&gt; { Some(T), None }</c-s>
+          </div>
         </td>
         <td>
-          <a href="../../RustStory_Operations.html#errors">RustStory_Operations</a>
+          <a href="../../RustStory_Operations.html#errors">RustStory Error Handling</a>
         </td>
       </tr>
-      <tr>
+     <tr>
         <td>
           Rust Strings are collections of utf-8 characters, which may have sizes from 1 to 4 bytes.
           That enables Strings to contain texts using diacritics, arabic scripts, kangi, ...
@@ -246,8 +300,8 @@
       </tr>
       <tr>
         <td>
-          Rust also provides OsString which wraps platform specific strings, e.g., Unicode Strings from Windows
-          and ASCII strings from Unix, Linux, and macOs.  OsStr is a literal string with platform enccoding.
+          Rust also provides OsString which wraps platform specific strings and
+          OsStr, a literal string with platform enccoding.
         </td>
         <td>
           <a href="https://doc.rust-lang.org/std/ffi/struct.OsString.html">std::ffi::OsString</a>,
