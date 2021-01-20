@@ -255,6 +255,9 @@ fn visit(&mut self, path: &Path) {
                   <c-s>DirNav</c-s>&apos;s methods.
                 </li>
               </ul>
+              For demonstrations of the <strong>Dependency Inversion Principle</strong>, see
+              <a href="../IdiomsAndPatterns/IaP_BasicDIP.html">Basic DIP</a> and
+              <a href="../IdiomsAndPatterns/IaP_GenericDIP.html">Generic DIP</a>.
             </li>
             <li>
               Build a library that contains the struct and test its methods.
@@ -289,6 +292,7 @@ fn visit(&mut self, path: &Path) {
 // Jim Fawcett, https://JimFawcett.github.io, 15 Jan 2021  //
 /////////////////////////////////////////////////////////////
 
+use std::path::{Path};
 
 /*-----------------------------------------------
   Rust traits are similar to interfaces.
@@ -354,13 +358,17 @@ impl&lt;T&gt; DirNav&lt;T&gt; where T:DirEvent {
     pub fn get_app(&amp;self) -&gt; &amp;T {
         &amp;self.app
     }
-    pub fn start(&amp;mut self) {
+    pub fn visit(&amp;mut self, path: &amp;Path) {
         /* pretending to search a dir tree */
-        self.app.do_dir("dir1");
+        let path_string = Self::path_to_string(path);
+        self.app.do_dir(&amp;path_string);
         self.app.do_file("file1");
         self.app.do_file("file2");
         self.app.do_dir("dir2");
         self.app.do_file("file3");
+    }
+    pub fn path_to_string(path:Path) -&gt; String {
+        format!("{}", path)
     }
 }
 
@@ -371,13 +379,13 @@ mod tests {
         assert_eq!(2 + 2, 4);
     }
 }
-
           <div style="font-size:1.15rem; font-weight:bold;">DirNav Test Results</div><hr style="width:100%;" /><hr style="width:100%;" />
 cargo test
    Compiling dir_nav v0.1.0 
-     (C:\github\JimFawcett\BuildOn\BuildOnStructure\Step2\DirNav)
-   Finished test [unoptimized + debuginfo] target(s) in 0.95s
-     Running target\debug\deps\dir_nav-21ee146e7826029a.exe   
+     (C:\...\BuildOn\BuildOnStructure\Step2\DirNav)
+   Finished test [unoptimized + debuginfo] 
+      target(s) in 0.95s
+   Running target\debug\deps\dir_nav-21ee146e7826029a.exe   
 
 running 1 test
 test tests::it_works ... ok
@@ -396,11 +404,11 @@ test result: ok. 0 passed; 0 failed; 0 ignored;
           </left-content>
           <right-content class="code" style="font-size:0.9em;"><div style="font-size:1.15rem; font-weight:bold;">Test1 Example Source</div><hr style="width:100%;" />
 
-/////////////////////////////////////////////////////////////
-// test1.rs - demonstrates mock DirNav operations          //
-//                                                         //
-// Jim Fawcett, https://JimFawcett.github.io, 15 Jan 2021  //
-/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
+// test1.rs - demos mock DirNav operations     //
+//                                             //
+// Jim Fawcett, 15 Jan 2021                    //
+/////////////////////////////////////////////////
 
 use dir_nav::*;
 
@@ -411,7 +419,7 @@ use dir_nav::*;
   - can be retrieved with DirNav::get_app()
     and interrogated using its member functions.
 */
-struct MyApp {}
+struct MyApp {}  // mock for TextSearch
 
 impl DirEvent for MyApp {
     fn new() -&gt; Self {
@@ -426,7 +434,10 @@ impl DirEvent for MyApp {
 }
 impl MyApp {
     pub fn show_type(&amp;self) {
-        print!("\n  {:?}", std::any::type_name::&lt;MyApp&gt;());
+        print!(
+            "\n  my type is: {:?}", 
+            std::any::type_name::&lt;MyApp&gt;()
+        );
     }
 }
 
@@ -434,13 +445,14 @@ fn main() {
     print!("\n  -- demonstrate mock DirNav --\n");
 
     let mut dn = DirNav::&lt;MyApp&gt;::new();
-    dn.start();
+    let path = std::path::Path("dir1");
+    dn.visit(&amp;path);
     println!();
     dn.get_app().show_type();
 
     print!("\n\n  That's all Folks!\n\n");
 }<div style="font-size:1.15rem; font-weight:bold;">Test1 Example Output</div><hr style="width:100%;" />
-C:\github\JimFawcett\BuildOn\BuildOnStructure\Step2\DirNav>
+C:\...\BuildOn\BuildOnStructure\Step2\DirNav>
 cargo run --example test1
     Finished dev [unoptimized + debuginfo] 
       target(s) in 0.01s
@@ -479,8 +491,7 @@ version = "0.1.0"
 authors = ["James W. Fawcett <jfawcett@twcny.rr.com>"]
 edition = "2018"
 
-# See more keys and their definitions at 
-# https://doc.rust-lang.org/cargo/reference/manifest.html
+# comments elided 
 
 [dependencies]
           </right-content>
