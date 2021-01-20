@@ -187,61 +187,47 @@ fn visit(&mut self, path: &Path) {
         <t-b>
           <ol>
             <li>
-              DirEvent is Rust Trait, similar to a C# constraint specifying an interface:
+              DirEvent is a Rust trait, similar to a C# constraint specifying an interface:
               <indent-block class="code">pub trait DirEvent {
     fn new() -> Self                   // factory function
     fn do_dir(&mut self, dn: &str);    // dir event handler
     fn do_file(&mut self, fn: &str);   // file event handler
 }</indent-block>
               <c-s>DirNav</c-s> is parameterised with a generic type that is constrained to implement the 
-              <c-s>DirEvent</c-s> trait,
-              e.g., <c-s>struct DirNav&lt;T&gt, where T:DirEvent { ... }</c-s>.  For this BuildOn project,
+              <c-s>DirEvent</c-s> trait:
+              <div style="margin:0.25rem 1.5rem 0.5rem 1.5rem;">
+                <c-s>struct DirNav&lt;T&gt where T:DirEvent { ... }</c-s>
+              </div>
+              For this BuildOn project,
               <c-s>DirNav</c-s> will be parameterized on TextSearcher&apos;s <c-s>Finder</c-s> type
               which implements the <c-s>DirEvent</c-s> trait, as shown in Figure 2.
             </li>
             <li>
-              Any struct may implement the <c-s>DirEvent</c-s> trait, applying application specific code to process
-              directories and files.  So <c-s>DirNav</c-s> can carry out its function without ever needing to know
-              the application&apos;s details.  It just needs to get access to an instance of the implementing
-              struct.  We see how to do this in the next item.
+              Parameterization of <c-s>DirNav&lt;T&gt;</c-s> with <c-s>T</c-s> simply makes <c-s>T</c-s> available
+              to <c-s>DirNav</c-s>, but doesn&apos;t specify what that type is.  It instead specifies
+              conditions that <c-s>T</c-s> must satisfy with constraints, as shown in the previous item.
             </li>
             <li>
-              There are two flexible design strategies that can be used here to couple <c-s>DirNav</c-s> to 
-              TextSearch&apos;s <c-s>Finder</c-s>:
-              <ul class="tights" style="margin-left:0.85rem;">
-                <li>
-                  Create struct <c-s>DirNav&lt;App: DirEvent&gt;</c-s>.  One of <c-s>DirNav</c-s>&apos;s members 
-                  is <c-s>app:App</c-s>, which implements <c-s>DirEvent</c-s>, so <c-s>DirNav</c-s>
-                  can pass the directories it enters and the files it finds on to an instance of the <c-s>App</c-s>.
-                  In this case, the generic parameter <c-s>App</c-s> will be an instance of TextSearcher&apos;s
-                  <c-s>Finder</c-s>, developed in
-                  Step #1.  <c-s>DirNav</c-s> uses the <c-s>DirEvent::new()</c-s> factory function to create
-                  an instance of App, which it then uses while navigating a directory tree, calling
-                  <c-s>app.do_file(file)</c-s> and <c-s>app.do_dir(dir)</c-s> when it encounters files and
-                  directories.
-                </li>
-                <li>
-                  Instead of asking <c-s>DirNav</c-s> to create an instance of App, the Executive can instead pass
-                  a mutable referece to an instance of TextSearcher&apos;s <c-s>Finder</c-s>.  Then, <c-s>DirNav</c-s>
-                  simply invokes the <c-s>DirEvent</c-s> methods on the
-                  reference when it has information to pass.
-                </li>
-              </ul>
-              The only significant difference between these two strategies is the way <c-s>DirNav</c-s> accesses
-              <c-s>Finder</c-s>.
-              In the first <c-s>DirNav</c-s> creates <c-s>Finder</c-s> using <c-s>DirEvent::new</c-s>, while the 
-              second relies on <c-s>Executive</c-s> to create the <c-s>Finder</c-s> instance and pass it a reference. 
+              Any struct may implement the <c-s>DirEvent</c-s> trait, applying its application specific code to process
+              directories and files.  So <c-s>DirNav</c-s> can carry out its function without ever needing to know
+              the application&apos;s details.  It just needs to get access to an instance of the implementing
+              struct, which it can do using the <c-s>DirEvent::new()</c-s> factory function.
+            </li>
+            <li>
+              For this Step #2 you don&apos;t need to use TextSearch&apos;s <c-s>Finder</c-s> type for <c-s>T</c-s>.  
+              You can use a simple mock type that pretends to do what <c-s>Finder</c-s> does.  Of course, you can use
+              the <c-s>Finder</c-s> you built in Step #1 if you wish.
+            </li>
+            <li>
+              This structure implements the 
+              <a href="https://stackify.com/dependency-inversion-principle/">Dependency Inversion Principle</a>. e.g.,
+              <c-s>DirNav</c-s> doesn&apos;t depend on <c-s>Finder</c-s>.  Instead, both <c-s>DirNav</c-s> and
+              <c-s>Finder</c-s> depend on the invariant <c-s>DirEvent</c-s>.
             </li>
             <li>
               Using the <c-s>DirEvent</c-s> trait allows <c-s>DirNav</c-s> to be ignorant of the implementation details 
               of TextSearcher&apos;s <c-s>Finder</c-s>.
               It simply calls its trait methods.
-            </li>
-            <li>
-              You may find that using the first strategy&apos;s generic <c-s>DirNav&lt;App: DirEvent&gt;</c-s> 
-              easier because a mutable 
-              reference may encounter some ownership issues. I will implement my solution code with the first
-              generic <c-s>DirNav&lt;T&gt;</c-s> design.
             </li>
           </ol>
         </t-b>
