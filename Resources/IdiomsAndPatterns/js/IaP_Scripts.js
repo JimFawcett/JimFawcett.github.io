@@ -53,6 +53,8 @@ storyMenu.bitesMenu = function () {
     <a href="Iap_Data.html">Hello Data</a><br />\
     <a href="Iap_Objects.html">Hello Objects</a><br />\
     <a class="undefined" href="Iap_Libs.html">Hello Libs</a><br />\
+    <a href="Iap_BasicDIP.html">DIP-Basic</a><br />\
+    <a href="Iap_GenericDIP.html">DIP-Generic</a><br />\
     <a href="Javascript.;#"></a><br />';
 }
 
