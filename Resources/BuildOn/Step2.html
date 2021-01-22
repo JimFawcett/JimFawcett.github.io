@@ -199,7 +199,7 @@ fn visit(&mut self, path: &Path) {
                 <c-s>struct DirNav&lt;T&gt where T:DirEvent { ... }</c-s>
               </div>
               For this BuildOn project,
-              <c-s>DirNav</c-s> will be parameterized on TextSearcher&apos;s <c-s>Finder</c-s> type
+              <c-s>DirNav</c-s> will be parameterized on a mock of TextSearcher&apos;s <c-s>Finder</c-s> type
               which implements the <c-s>DirEvent</c-s> trait, as shown in Figure 2.
             </li>
             <li>
@@ -229,6 +229,64 @@ fn visit(&mut self, path: &Path) {
               of TextSearcher&apos;s <c-s>Finder</c-s>.
               It simply calls its trait methods.
             </li>
+            <li>
+              You need to use <c-s>PathBuf</c-s> and <c-s>&Path</c-s> which you probably have not seen before.
+              Rust defines six string types:
+              <div style="height:0.5rem;"></div>
+              <table>
+                <tr class="dark">
+                  <th>String&nbsp;type</th><th>Description</th><th>Reference</th>
+                </tr>
+                <tr>
+                  <td>String</td>
+                  <td>
+                    A collection of utf-8 characters, stored in the heap and managed with a control block on
+                    the stack.
+                  </td>
+                  <td><a href="https://doc.rust-lang.org/std/string/struct.String.html">std::String</a></td>
+                </tr>
+                <tr>
+                  <td>&str</td>
+                  <td>
+                    A collection of utf-8 characters in a contiguous block on the stack, sometimes in static memory too.
+                  </td>
+                  <td><a href="https://doc.rust-lang.org/std/str/index.html">std::str</a></td>
+                </tr>
+                <tr>
+                  <td>OsString</td>
+                  <td>
+                    Same structure as std::String, but holding characters from the platform string type, used
+                    most often to interoperate with C code through Rust&apos;s foreign function interface (ffi).
+                  </td>
+                  <td><a href="https://doc.rust-lang.org/std/ffi/struct.OsString.html">std::ffi::OsString</a></td>
+                </tr>
+                <tr>
+                  <td>OsStr</td>
+                  <td>
+                    A literal string with the same character encoding as OsString.
+                  </td>
+                  <td><a href="https://doc.rust-lang.org/std/ffi/struct.OsStr.html">std::ffi::OsStr</a></td>
+                </tr>
+                <tr>
+                  <td>PathBuf</td>
+                  <td>
+                    Same structure as std::String, but holding characters from the platform string type, 
+                    and providing methods for working with paths, e.g., extracting names, extensions, doing joins,
+                    etc.
+                  </td>
+                  <td><a href="https://doc.rust-lang.org/std/path/struct.PathBuf.html">std::path::PathBuf</a></td>
+                </tr>
+                <tr>
+                  <td>&Path</td>
+                  <td>
+                    A literal string with the same character encoding as PathBuf.
+                  </td>
+                  <td><a href="https://doc.rust-lang.org/std/path/struct.Path.html">std::path::Path</a></td>
+                </tr>
+              </table>
+              <div style="height: 0.5rem;"></div>
+              You will need to use <c-s>PathBuf</c-s> and <c-s>&Path</c-s> to work with the Rust file system.
+            </li>
           </ol>
         </t-b>
         <div style="height:1.0em;">&nbsp;</div>
@@ -251,8 +309,8 @@ fn visit(&mut self, path: &Path) {
                   Constrain generic type parameter <c-s>T</c-s> with trait <c-s>DirEvent</c-s>.
                 </li>
                 <li>
-                  Create an instance, using a factory function, of the generic parameter for use in 
-                  <c-s>DirNav</c-s>&apos;s methods.
+                  Create an instance, using the <c-s>DirEvent</c-s> factory function, of the generic parameter for 
+                  use in <c-s>DirNav</c-s>&apos;s methods.
                 </li>
               </ul>
               For demonstrations of the <strong>Dependency Inversion Principle</strong>, see
@@ -286,11 +344,12 @@ fn visit(&mut self, path: &Path) {
           </t-b>
         <two-column style="width:max-content;">
           <left-content class="code" style="font-size:0.9em;"><div style="font-size:1.15rem; font-weight:bold;">DirNav Library Source</div><hr style="width:100%;" />
-/////////////////////////////////////////////////////////////
-// Step#2::DirNav::lib.rs - demos mock DirNav operations   //
-//                                                         //
-// Jim Fawcett, https://JimFawcett.github.io, 15 Jan 2021  //
-/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
+// Step#2::DirNav::lib.rs                      //
+//   - demos mock DirNav operations            //
+//                                             //
+// Jim Fawcett, 22 Jan 2021                    //
+/////////////////////////////////////////////////
 
 use std::path::{Path};
 
@@ -309,50 +368,33 @@ pub trait DirEvent {
     /*-- constructible --*/
     fn new() -&gt; Self;
     /*-- event handlers --*/
-    fn do_dir(&amp;mut self, dir:&amp;str);
-    fn do_file(&amp;mut self, file: &amp;str);
+    fn do_dir(&amp;mut self, dir:&amp;Path);
+    fn do_file(&amp;mut self, file: &amp;Path);
 }
-
-//#region : Sample App implementing DirEvent
-/*-----------------------------------------------
-  App is a type that implements application
-  specific processing of a DirEvent sent by
-  DirNav.  This is a demo for the DirNav library
-  that illustrates how an application can use
-  DirNav.
-  -----------------------------------------------
-pub struct App {
-    curr_dir: String
-}
-impl DirEvent for App {
-    fn new() -&gt; Self {
-        App { curr_dir: String::new() }
-    }
-    fn do_dir(&amp;mut self, dir: &amp;str) {
-        print!("\n  directory: {:?}",dir);
-        self.curr_dir = dir.to_string();
-    }
-    fn do_file(&amp;mut self, file: &amp;str) {
-        print!("\n    file: {:?}", file);
-    }
-}
-*/
-//#endregion
 
 /*-----------------------------------------------
   DirNav searches directory tree looking for
   files with specified patterns (extensions).
 
-  This is a mock type defined as an illustration
-  of what Step #2 needs.
+  App is a DirNav member that implements 
+  application specific processing of a 
+  DirEvent sent by DirNav::visit.  
+  
+  See test1.rs in examples directory for an
+  example App type.
+
+  This DirNav is a mock type defined as an 
+  illustration of what Step #2 needs.
 */
-pub struct DirNav&lt;T&gt; where T:DirEvent {
+pub struct DirNav&lt;T&gt; 
+       where T:DirEvent {
     app : T
 }
-impl&lt;T&gt; DirNav&lt;T&gt; where T:DirEvent {
+impl&lt;T&gt; DirNav&lt;T&gt; 
+       where T:DirEvent {
     pub fn new() -&gt; DirNav&lt;T&gt; {
         DirNav {
-          app: T::new()
+          app: T::new()  // factory function
         }
     }
     pub fn get_app(&amp;self) -&gt; &amp;T {
@@ -360,57 +402,85 @@ impl&lt;T&gt; DirNav&lt;T&gt; where T:DirEvent {
     }
     pub fn visit(&amp;mut self, path: &amp;Path) {
         /* pretending to search a dir tree */
-        let path_string = Self::path_to_string(path);
-        self.app.do_dir(&amp;path_string);
-        self.app.do_file("file1");
-        self.app.do_file("file2");
-        self.app.do_dir("dir2");
-        self.app.do_file("file3");
+        self.app.do_dir(path);
+        self.app.do_file(&amp;Path::new("file1"));
+        self.app.do_file(&amp;Path::new("file2"));
+        self.app.do_dir(&amp;Path::new("dir2"));
+        self.app.do_file(&amp;Path::new("file3"));
     }
-    pub fn path_to_string(path:Path) -&gt; String {
-        format!("{}", path)
+    pub fn path_to_string(
+          path:&amp;Path) -&gt; String {
+        format!("{:?}", path)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use std::path::{Path, PathBuf};
+    struct App {
+        test_file: PathBuf,
+        test_dir: PathBuf
+    }
+    impl DirEvent for App {
+        fn new() -&gt; App {
+            App {
+                test_file: PathBuf::from(""),
+                test_dir: PathBuf::from("")
+            }
+        }
+        fn do_dir(
+          &amp;mut self, dir: &amp;Path
+          ) {
+            self.test_dir = dir.to_path_buf();
+        }
+        fn do_file(
+          &amp;mut self, file: &amp;Path
+          ) {
+            self.test_file = file.to_path_buf();
+        }
+    }
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn test_events() {
+        let mut dn = DirNav::&lt;App&gt;::new();  
+        let test_path = Path::new("test");
+        dn.visit(test_path);
+        let app = dn.get_app();
+        let dir_app:String = 
+          format!("{:?}", app.test_dir);
+        let dir_rqt:String = 
+          format!("{:?}", "dir2");
+        assert_eq!(dir_app, dir_rqt);   
+        let file_app = 
+          format!("{:?}", app.test_file);
+        let file_rqt = 
+          format!("{:?}", "file3");
+        assert_eq!(file_app, file_rqt);   
     }
 }
           <div style="font-size:1.15rem; font-weight:bold;">DirNav Test Results</div><hr style="width:100%;" /><hr style="width:100%;" />
 cargo test
-   Compiling dir_nav v0.1.0 
-     (C:\...\BuildOn\BuildOnStructure\Step2\DirNav)
-   Finished test [unoptimized + debuginfo] 
-      target(s) in 0.95s
-   Running target\debug\deps\dir_nav-21ee146e7826029a.exe   
+    Finished test [unoptimized + debuginfo]
+      target(s) in 0.01s
+    Running target\debug\deps\...
 
 running 1 test
-test tests::it_works ... ok
+test tests::test_events ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 
                  0 measured; 0 filtered out
-
-   Doc-tests dir_nav
-
-running 0 tests
-
-test result: ok. 0 passed; 0 failed; 0 ignored; 
-                 0 measured; 0 filtered out
-
 
           </left-content>
           <right-content class="code" style="font-size:0.9em;"><div style="font-size:1.15rem; font-weight:bold;">Test1 Example Source</div><hr style="width:100%;" />
 
 /////////////////////////////////////////////////
-// test1.rs - demos mock DirNav operations     //
+// test1.rs - demonstrates mock DirNav ops     //
 //                                             //
-// Jim Fawcett, 15 Jan 2021                    //
+// Jim Fawcett, 22 Jan 2021                    //
 /////////////////////////////////////////////////
 
 use dir_nav::*;
+use std::path::{Path};
 
 /*-----------------------------------------------
   Type MyApp is a test type that:
@@ -425,10 +495,10 @@ impl DirEvent for MyApp {
     fn new() -&gt; Self {
         MyApp {}
     }
-    fn do_dir(&amp;mut self, dir:&amp;str) {
+    fn do_dir(&amp;mut self, dir:&amp;Path) {
         print!("\n  directory: {:?}", dir);
     }
-    fn do_file(&amp;mut self, file:&amp;str) {
+    fn do_file(&amp;mut self, file:&amp;Path) {
         print!("\n    file: {:?}", file);
     }
 }
@@ -445,8 +515,8 @@ fn main() {
     print!("\n  -- demonstrate mock DirNav --\n");
 
     let mut dn = DirNav::&lt;MyApp&gt;::new();
-    let path = std::path::Path("dir1");
-    dn.visit(&amp;path);
+    let path = &amp;Path::new("dir1");
+    dn.visit(path);
     println!();
     dn.get_app().show_type();
 
@@ -466,10 +536,9 @@ cargo run --example test1
   directory: "dir2"
     file: "file3"
 
-  "test1::MyApp"
+  my type is: "test1::MyApp"
 
   That's all Folks!
-
 
 
 <div style="font-size:1.15rem; font-weight:bold;">Project Structure</div><hr style="width:100%;" />
@@ -491,7 +560,10 @@ version = "0.1.0"
 authors = ["James W. Fawcett <jfawcett@twcny.rr.com>"]
 edition = "2018"
 
-# comments elided 
+# comment elided
+
+[lib]
+doctest=false
 
 [dependencies]
           </right-content>
