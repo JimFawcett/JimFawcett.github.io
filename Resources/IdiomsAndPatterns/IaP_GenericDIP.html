@@ -121,7 +121,157 @@
           <span class="right darkBlue smallpad cursor" onclick="storyMenu.hide('cpp')">hide</span>
         </defn-head>
         <defn-code class="lightBlue">
-To appear eventually
+/////////////////////////////////////////////
+// GenericDIP.cpp                          //
+//                                         //
+// Jim Fawcett, 23 Jan 2021                //
+/////////////////////////////////////////////
+/*
+  Demonstrates Dependency Inversion Principle:
+    "High level modules should not depend on
+      low level modules.  Both should depend
+      on abstractions."
+
+  This demonstration builds a basic demo with
+  self-annunciating low level components.
+    
+    - High level part: Demo&lt;T&gt;
+    - Low level parts: First, Second
+    - Abstraction defined in this package: 
+      - trait Say
+  The definitons of First and Second could be
+  changed in any way that is compatible with 
+  trait Say without affecting compilation of
+  Demo&lt;T&gt;.
+*/
+#include &lt;iostream&gt;
+using Byte = unsigned short;
+
+template&lt;typename T&gt;
+struct Calc {
+    /*---------------------------------------
+      C++ creational functions normally
+      return a base pointer, e.g.
+      Calc&lt;T&gt;*, supporting dynamic
+      polymorphic operations.
+
+      We are only using static polymorphic
+      operations, so this works, and is
+      close to the way Rust works. 
+    */
+    static Calc&lt;T&gt; create();
+    T calc(T arg1, T arg2);
+};
+
+/*-------------------------------------------
+  Adds two T types
+*/
+template&lt;typename T&gt;
+class Plus : public Calc&lt;T&gt; {
+public:
+    static Plus&lt;T&gt; create() {
+        return Plus();
+    }
+    T calc(T arg1, T arg2)
+    {
+        return arg1 + arg2;
+    }
+};
+
+/*-------------------------------------------
+  Multiplies two T types
+*/
+template&lt;typename T&gt;
+class Times : public Calc&lt;T&gt; {
+public:
+    static Times&lt;T&gt; create() {
+        return Times();
+    }
+    T calc(T arg1, T arg2)
+    {
+        return arg1 * arg2;
+    }
+};
+
+/*---------------------------------------
+  Demo uses any Calc type without need to 
+  know which one.  Only needs to know that
+  it's Calc.
+
+  Uses Calc's factory function create() to 
+  generate an instance of calculator 
+  function without knowing what type its 
+  using.
+
+  Demo is isolated from calculator's impl,
+  just depending on Calc.
+
+    U is the type of a calculator function.
+    T is the type of the calculation data.
+*/
+template&lt;typename U, typename T&gt;
+class Demo {
+public:
+    Demo() {
+        U oper = U::create();
+    }
+    T do_calc(T arg1, T arg2) {
+        T rslt = oper.calc(arg1, arg2);
+        result = rslt;
+        return rslt;
+    }
+    T get_result() {
+        return result;
+    }
+private:
+    U oper;
+    T result;
+};
+/*---------------------------------------
+  Executive, main(), needs to have all
+  type information.
+*/
+int main() {
+    std::cout 
+      &lt;&lt; "\n  -- generic DIP demo --\n";
+
+    Demo&lt;Plus&lt;int&gt;, int&gt; demo1;
+    int tmou = demo1.do_calc(40, 2);
+    std::cout 
+      &lt;&lt; "\n  The meaning of the universe is " 
+      &lt;&lt; tmou;
+    std::cout 
+      &lt;&lt; "\n  saved result: " 
+      &lt;&lt; demo1.get_result();
+    std::cout &lt;&lt; "\n";
+    
+    Demo&lt;Times&lt;double&gt;, double&gt; demo2;
+    double some_number 
+      = demo2.do_calc(42.0, 2.0);
+    std::cout 
+      &lt;&lt; "\n  some-number = " 
+      &lt;&lt; some_number;
+    std::cout 
+      &lt;&lt; "\n  saved result: " 
+      &lt;&lt; demo2.get_result();
+
+    std::cout 
+      &lt;&lt; "\n\n  That's all Folks!\n\n";
+}
+        </defn-code>
+        <defn-head class="darkBlue">Output</defn-head>
+        <defn-code class="lightBlue">
+
+  -- generic DIP demo --
+
+  The meaning of the universe is 42
+  saved result: 42
+
+  some-number = 84
+  saved result: 84
+
+  That's all Folks!
+
         </defn-code>
       </defn-block>
       <defn-block>

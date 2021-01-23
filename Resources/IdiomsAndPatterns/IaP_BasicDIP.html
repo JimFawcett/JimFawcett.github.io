@@ -120,7 +120,152 @@
           <span class="right darkBlue smallpad cursor" onclick="storyMenu.hide('cpp')">hide</span>
         </defn-head>
         <defn-code class="lightBlue">
-To appear eventually
+/////////////////////////////////////////////
+// BasicDIP.cpp                            //
+//                                         //
+// Jim Fawcett, 23 Jan 2021                //
+/////////////////////////////////////////////
+/*
+  Demonstrate Dependency Inversion Principle:
+    "High level modules should not depend on
+      low level modules.  Both should depend
+      on abstractions."
+
+  This demonstration builds a basic demo with
+  self-annunciating low level components.
+    
+    - High level part: Demo&lt;T&gt;
+    - Low level parts: First, Second
+    - Abstraction defined in this package: 
+      - trait Say
+  The definitons of First and Second could be
+  changed in any way that is compatible with 
+  trait Say without affecting compilation of
+  Demo&lt;T&gt;.
+*/
+#include &lt;iostream&gt;
+using Byte = unsigned short;
+
+/*-------------------------------------------
+  Interface Say provides abstraction that 
+  Demo&lt;T&gt; uses to avoid depending on 
+  types First and Second.
+*/
+struct Say {
+    static Say create();
+    void set_id(Byte id);
+    void say();
+};
+
+/*-------------------------------------------
+  - First is a component that Demo&lt;T&gt; 
+    depends on when executive (main) declares 
+    Demo&lt;First&gt;.
+  - Demo's compilation only depends on Say,
+    not on details of First.
+*/
+class First : public Say {
+public:
+    First() : id_(0) {}
+    Say create() {
+        return First();
+    }
+    void set_id(Byte id)
+    {
+        id_ = id;
+    }
+    void say() {
+        std::cout 
+            &lt;&lt; "\n  First here with id = " 
+            &lt;&lt; id_;
+    }
+private: 
+    Byte id_;
+};
+
+/*-------------------------------------------
+  - Second is a component that Demo&lt;T&gt; 
+    depends on when executive (main) declares 
+    Demo&lt;Second&gt;.
+  - Demo's compilation only depends on Say,
+    not on details of Second.
+*/
+class Second : public Say {
+public:
+    Second() : id_(0) {}
+    Say create() {
+        return Second();
+    }
+    void set_id(Byte id)
+    {
+        id_ = id;
+    }
+    void say() {
+        std::cout 
+            &lt;&lt; "\n  Second here with id = " 
+            &lt;&lt; id_;
+    }
+private: 
+    Byte id_;
+};
+
+/*-------------------------------------------
+  Demo is high level type that uses low level
+  types First and Second without incurring
+  compilation dependencies on their impl's.
+*/
+template&lt;typename T&gt;
+class Demo {
+public:
+    void set_id(Byte id) {
+        my_say.set_id(id);
+    }
+    Byte get_id() {
+        return my_say.get_id();
+    }
+    void say_it() {
+        my_say.say();
+    }
+private:
+    T my_say;
+};
+
+/*-------------------------------------------
+  main() is program executive.  It depends 
+  directly on Demo, First, and Second.
+
+  DIP allows reusable component, which 
+  Demo&lt;T&gt; pretends to be, to be 
+  used in applications without change, 
+  even though parts it uses through 
+  Say Interface change.
+*/
+int main() {
+    std::cout 
+        &lt;&lt; "\n  -- basic_dip demo --\n";
+
+    Demo&lt;First&gt; demo1;
+    demo1.set_id(1);
+    demo1.say_it();
+
+    Demo&lt;Second&gt; demo2;
+    demo2.set_id(2);
+    demo2.say_it();
+
+    std::cout 
+        &lt;&lt; "\n  That's all Folks!\n\n";
+}        
+          </defn-code>
+        <defn-head class="darkBlue">Output</defn-head>
+        <defn-code class="lightBlue">
+"./debug/BasicDIP"
+
+  -- basic_dip demo --
+
+  First here with id = 1
+  Second here with id = 2
+  That's all Folks!
+
         </defn-code>
       </defn-block>
       <defn-block>
@@ -129,35 +274,37 @@ To appear eventually
           <span class="right darkRust smallpad cursor" onclick="location.reload()">unhide</span>
         </defn-head>
         <defn-code class="lightRust">
-///////////////////////////////
-// basic_dip::main.rs        //
-//                           //
-// Jim Fawcett, 19 Jan 2021  //
-///////////////////////////////
+/////////////////////////////////////////////
+// basic_dip::main.rs                      //
+//                                         //
+// Jim Fawcett, 23 Jan 2021                //
+/////////////////////////////////////////////
 /*
-    Dependency Inversion Principle:
-      "High level modules should not depend on
-       low level modules.  Both should depend
-       on abstractions."
+  Demonstrates Dependency Inversion Principle:
+    "High level modules should not depend on
+      low level modules.  Both should depend
+      on abstractions."
 
-    This demonstration builds a basic demo with
-    self annunciating low level components.    
-      - High level part: Demo&lt;T&gt;
-      - Low level parts: First, Second
-      - Abstraction: 
-        - trait Say
-
-    The definitons of First and Second could be
-    changed in any way that is compatible with 
-    trait Say without affecting compilation of
-    Demo&lt;T&gt;.
+  This demonstration builds a basic demo with
+  self-annunciating low level components.
+    
+    - High level part: Demo&lt;T&gt;
+    - Low level parts: First, Second
+    - Abstraction defined in this package: 
+      - trait Say
+  The definitons of First and Second could be
+  changed in any way that is compatible with 
+  trait Say without affecting compilation of
+  Demo&lt;T&gt;.
 */
 
 
 #![allow(dead_code)]
 
 /*-------------------------------------------
-  trait - very like C# interface
+  Trait Say provides abstraction that 
+  Demo&lt;T&gt; uses to avoid depending on 
+  types First and Second.
 */
 pub trait Say {
     fn new() -&gt; Self;  // factory function
@@ -166,14 +313,15 @@ pub trait Say {
     fn say(&amp;self);
 }
 /*-------------------------------------------
-  First "low-level" component
+  - First is a component that Demo&lt;T&gt; 
+    depends on when executive (main) declares 
+    Demo&lt;First&gt;.
+  - Demo's compilation only depends on Say,
+    not on details of First.
 */
 pub struct First {
     id: u8
 }
-/*-------------------------------------------
-  implementing trait - very like inheritance
-*/
 impl Say for First {
     fn new() -&gt; First {
         First {
@@ -194,7 +342,11 @@ impl Say for First {
     }
 }
 /*-------------------------------------------
-  Second "low-level" component
+  Second is a component that Demo&lt;T&gt; 
+  depends on when executive (main) declares 
+  Demo&lt;Second&gt;.
+  Demo's compilation only depends on Say,
+  not on details of Second.
 */
 pub struct Second {
     id: u8
@@ -219,48 +371,52 @@ impl Say for Second {
     }
 }
 /*-------------------------------------------
-  A "high-level" component
+  Demo is high level type that uses low level
+  types First and Second without incurring
+  compilation dependencies on their impl's.
 */
 struct Demo&lt;T&gt; where T: Say {
     my_say: T
 }
-/*-------------------------------------------
-  Implementing Demo methods
-*/
 impl&lt;T&gt; Demo&lt;T&gt; where T: Say {
     fn new() -&gt; Demo&lt;T&gt; {
         Demo {
-            /*-- use factory function */
-            my_say: T::new()
+            my_say: T::new()  // factory func
         }
     }
     fn set_id(&amp;mut self, id:u8) {
-        /*-- use trait method --*/
-        self.my_say.set_id(id);
+        self.my_say.set_id(id);  // trait meth
     }
     fn get_id(&amp;self) -&gt; u8 {
-        /*-- use trait method --*/
-        self.my_say.get_id()
+        self.my_say.get_id()     // trait meth
     }
     fn say_it(&amp;self) {
-        /*-- use trait method --*/
-        self.my_say.say();
+        self.my_say.say();       // trait meth
     }
 }
 /*-------------------------------------------
-  Using DIP structure
+  main() is program executive.  It depends 
+  directly on Demo, First, and Second.
+
+  DIP allows reusable component, which 
+  Demo&lt;T&gt; pretends to be, to be 
+  used in applications without change, 
+  even though parts it uses through 
+  traits change.
 */
+
 fn main() {
     print!("\n  -- basic_dip demo --\n");
 
-    let mut first = Demo::&lt;First&gt;::new();
-    first.set_id(1);
-    first.say_it();
-    let mut second = Demo::&lt;Second&gt;::new();
-    second.set_id(2);
-    second.say_it();
+    let mut demo = Demo::&lt;First&gt;::new();
+    demo.set_id(1);
+    demo.say_it();
+    let mut demo = Demo::&lt;Second&gt;::new();
+    demo.set_id(2);
+    demo.say_it();
     println!("\n\n  That's all Folks!\n\n");
 }
+
         </defn-code>
         <defn-head class="darkRust">Output</defn-head>
         <defn-code class="lightRust">
