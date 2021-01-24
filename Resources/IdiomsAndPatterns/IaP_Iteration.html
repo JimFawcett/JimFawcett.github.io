@@ -1,0 +1,747 @@
+﻿<!DOCTYPE html>
+<html id="top">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="keywords" content="Rust, Introduction" />
+    <meta name="Author" content="Jim Fawcett" />
+    <meta name="Author" content="James Fawcett" />
+    <title>IaP Iteration</title>
+    <link rel="stylesheet" href="../BuildOn/css/Styles_Basic.css" />
+    <link rel="stylesheet" href="../BuildOn/css/Styles_Structure.css" />
+    <link rel="stylesheet" href="css/IaP_Styles.css" />
+    <!--<link rel="stylesheet" href="css/BiteStyles.css" />-->
+    <script src="js/IaP_Scripts.js"></script>
+    <!--<script src="js/BiteScripts.js"></script>-->
+    <script src="js/ScriptsWebComponents.js"></script>
+    <link rel="stylesheet" href="css/StylesWebComponents.css" />
+    <script>
+      function hide(elem) {
+        var elm = document.getElementById(elem);
+        elm.style.display = "none";
+      }
+    </script>
+    <style>
+      #github .large {
+        font-size: 1.25rem;
+      }
+    </style>
+  </head>
+  <body id="github" onload="initBites()">
+    <div class="top-banner" onclick="storyMenu.getHelp()">
+      <span id="hctr">Idioms and Patterns Story</span>
+      <div style="position:relative; left:calc(100vw - 15rem);">
+        <span class="top-center">Iteration</span>
+        <!-- <a class="top-right" href="../../RustBiteByByte.html">RustBiteByByte.html</a> -->
+      </div>
+    </div>
+    <next-prev>
+      <a href="../../index.html" style="color:#fefefa;">Home</a>&nbsp;
+      <a id="repo" href="../../IdiomsAndPatterns.html">Repo</a> 
+      <a id="prev" href="IaP_GenericDIP.html">prev</a> 
+      <a id="next" href="IaP_Iteration.html">next</a>
+    </next-prev>
+
+    <toc-b id="toc">
+      <div id="bottom-menu" style="display:flex; flex-direction:row">
+        <!--<a href="Javascript:;" onclick="storyMenu.toggleTOC()" style="color:#fefefa;">E</a>&nbsp;
+        <a href="Javascript:;" onclick="storyMenu.closeTOC()" style="color:#fefefa;">C</a>&nbsp;
+        <a href="Javascript:;" onclick="storyMenu.sects()" style="color: #fefefa; ">Sects</a>&nbsp;
+        <a href="Javascript:;" onclick="storyMenu.chaps()" style="color:#fefefa;">Bites</a>&nbsp;-->
+      </div>
+      <!-- <up-b id="chaps" onmouseout="storyMenu.chaps()"> -->
+      <up-b id="chaps">
+        <!--<a href="ObjectModels.html">Object Models</a><br />-->
+        <!--<a href="Tooling.html">Tooling</a><br />
+        <a href="IaP_Hello.html">Hello World</a><br />
+        <a href="IaP_Objects.html">Hello Objects</a><br />
+        <a href="IaP_Data.html">Manage Data</a><br />
+        <a href="IaP_Libs.html">Static Libs</a><br />
+        <a href="javascript:;"></a><br />-->
+      </up-b>
+      <rt-b id="sects">
+        <a href="#top">Top</a>, <a href="#bottom">Bottom</a>
+      </rt-b>
+    </toc-b>
+    <div id="hlp" style="display:none;">
+      <!--<table>
+        <tr>
+          <td style="padding-right:5px;">Esc</td>
+          <td>toggle menus</td>
+        </tr>
+        <tr>
+          <td>C</td>
+          <td>close menus</td>
+        </tr>
+        <tr>
+          <td>R</td><td>Refresh</td>
+        </tr>
+        <tr>
+          <td>N</td><td>Next Bite</td>
+        </tr>
+        <tr>
+          <td>P</td><td>Prev Bite</td>
+        </tr>
+        <tr>
+          <td>T</td><td>scroll to top</td>
+        </tr>
+        <tr>
+          <td>B</td><td>scroll to bottom</td>
+        </tr>
+        <tr>
+          <td>H</td><td>Help</td>
+        </tr>
+      </table>-->
+    </div>
+    <div style="padding:2rem 2rem 5rem 2rem;">
+    <h1>Iteration and Iteration Adapters</h1>
+    <h3 style="margin-left:3em; margin-top:0em; font-weight:normal;">
+      Iteration through Strings and Byte Arrays 
+    </h3>
+    <hr class="spread" />
+    <t-b>
+      Iteration is a very basic program operation on collections.  It has relatively primitive
+      operations, but languages are adding new and more powerful ways of manipulating collections.
+    </t-b>
+    <t-b>
+      Iterating through Rust Strings is complicated by its utf-8 characters.  The sizes of these
+      vary from 1 to 4 bytes, so they cannot be indexed.  Rust provides a String iterator, chars(),
+      that knows how to detect byte sequences that indicate utf-8 character boundaries.
+    </t-b>
+    <t-b>
+      Rust defines an iterator trait for which there are many useful adapters.  We will demonstrate
+      a few of those here.
+    </t-b>
+    <t-b>
+      C++ std::strings are simpler, holding constant size characters.  As of C++ 20, there is a 
+      ranges facility that defines views and adapters, similar in concept to the Rust adapters.
+    </t-b>
+    <t-b>
+      The code below shows how to use both Rust and C++ iterators and adapters.
+    </t-b>
+    <div style="height:1rem;"></div>
+    <defn-outerBlock style="width:calc(100vw - 6rem);">
+      <defn-block id="cpp">
+        <defn-head class="darkBlue">
+          C++
+          <span class="right darkBlue smallpad cursor" onclick="storyMenu.hide('cpp')">hide</span>
+        </defn-head>
+        <defn-code class="lightBlue">
+/////////////////////////////////////////////////
+// idioms::iteration_cpp::Iteration.cpp        //
+//   - idioms are styles of writing snippets   //
+//     in ways that are valued by language     //
+//     community                               //
+//   - this idiom code focuses on iteration    //
+// Jim Fawcett, 24 Jan 2021                    //
+/////////////////////////////////////////////////
+/*
+  C++ std::String
+  ----------------
+  C++ std::String is a container of ascii chars 
+  with null terminator.
+  - ascii characters are all 1 byte, so String 
+    instances can be indexed.
+
+    References:
+    -----------
+    std::string      
+      https://doc.rust-lang.org/std/string
+            /struct.String.html
+    std::ranges
+      https://en.cppreference.com/w/cpp/ranges
+    std::string_view
+      https://en.cppreference.com/w/cpp/string
+            /basic_string_view
+    std::vector
+      https://en.cppreference.com/w/cpp
+            /container/vector
+    std::distance
+      https://en.cppreference.com/w/cpp
+            /iterator/distance
+    STL std::algorithms
+      https://jimfawcett.github.io
+            /CppStory_LibrarySTL.html#algor
+    std::all_of ...
+      https://en.cppreference.com/w/cpp
+            /algorithm/all_any_none_of
+*/
+#include&lt;string&gt;
+#include&lt;ranges&gt;
+#include&lt;iostream&gt;
+#include &lt;locale&gt;
+#include &lt;algorithm&gt;
+#include &lt;string_view&gt;
+#include &lt;typeinfo&gt;
+#include &lt;iterator&gt;
+#include &lt;vector&gt;
+
+/*-- helper function --*/
+void putln(size_t num = 1) {
+  for(size_t i=0; i&lt;num; ++i)
+    std::cout &lt;&lt; "\n";
+}
+/*-- basic string iteration demos --*/
+void string_iteration() {
+    std::string test_string = "a test string";
+    std::cout &lt;&lt; "\n  ascii characters from " 
+              &lt;&lt; test_string &lt;&lt; "\n  ";
+
+    std::string::iterator iter = 
+      test_string.begin();
+    while(iter != test_string.end()) {
+      char ch = *iter;
+      std::cout &lt;&lt; ch &lt;&lt; " ";
+      if(iter == test_string.end())
+        break;
+      ++iter;
+    }
+    std::cout &lt;&lt; "\n  test_string: " 
+              &lt;&lt; test_string;
+    putln();
+}
+/*-- idiomatic string iteration demos --*/
+void idomatic_string_iteration() {
+  std::string test_string = 
+    "another test string";
+  std::cout 
+    &lt;&lt; "\n  idiomatic ascii chars from:\n  "
+    &lt;&lt; test_string &lt;&lt; "\n  ";
+
+  for(auto ch : test_string) {
+    std::cout &lt;&lt; ch &lt;&lt; " ";
+  }
+  putln();
+  char ch2 = test_string[1];
+  std::cout &lt;&lt; "\n  2nd character of " 
+            &lt;&lt; test_string 
+            &lt;&lt; " is " &lt;&lt; ch2;
+  std::cout &lt;&lt; "\n  test_string: " 
+            &lt;&lt; test_string;
+  putln();
+}
+
+/*-----------------------------------------------
+  demonstrate all_of(...), is_alphabetic, is_..., 
+  ranges, and string_view.
+*/
+/*-- helper function show collection items --*/
+template&lt;typename C&gt;
+void put_coll(
+  C&amp; coll, const std::string&amp; prefix = ""
+) {
+  std::cout &lt;&lt; prefix;
+  for(auto item : coll) {
+    std::cout &lt;&lt; item;
+  }
+}
+/*-- helper function, displays test results --*/
+void test(
+  bool pred, 
+  const std::string&amp; src, 
+  const std::string&amp; category
+) {
+  if(pred)
+  {
+    std::cout &lt;&lt; "\n  " &lt;&lt; src 
+              &lt;&lt; " is " &lt;&lt; category;
+  }
+  else {
+    std::cout &lt;&lt; "\n  " &lt;&lt; src 
+              &lt;&lt; " is not " &lt;&lt; category;
+  }
+}
+/*-- demonstrate string adapter functions --*/
+void string_adapters() {
+  std::string ls = "abc123";
+
+  /*-- are all chars alphbetic --*/
+
+  auto is_alpha = 
+    [](char ch) -&gt; bool { 
+      return std::isalpha(ch); 
+    };
+  test(
+    std::all_of(ls.begin(), ls.end(), is_alpha),
+    ls, "alphabetic"
+  );
+  /*-- are all chars alphanumeric --*/
+
+  auto is_alnum = [](char ch) -&gt; bool
+                  { return std::isalnum(ch); };
+  test(
+    std::all_of(ls.begin(), ls.end(), is_alnum),
+    ls, "alphanumeric"
+  );
+  /*-- are all chars ascii --*/
+
+  auto is_ascii = [](char ch) -&gt; bool 
+    { 
+        return 0 &lt;= ch &amp;&amp; ch &lt; 128; 
+    };
+  test(
+    std::all_of(ls.begin(), ls.end(), is_ascii),
+    ls, "ascii"
+  );
+  /*-- are all chars numeric --*/
+
+  auto is_num = [](char ch) -&gt; bool 
+                { return std::isdigit(ch); };
+  test(
+    std::all_of(ls.begin(), ls.end(), is_num),
+    ls, "numeric"
+  );
+  putln();
+
+  /*-- using range::view with pipe --*/
+  auto r = ls | std::views::filter(is_num);
+  put_coll(r,"\n  r is ");
+  /*-- 
+    numeric if numeric range, r, is same size as ls 
+  --*/
+  test(
+    std::distance(r.begin(), r.end()) == ls.size(),
+    ls, "numeric"
+  );
+  putln();
+
+  /*-- display chars from str slice --*/
+  ls = "abc123";
+  /*-- non-owning view --*/
+  std::string_view slice{ ls };
+  slice.remove_prefix(2);
+  slice.remove_suffix(2);
+  std::cout &lt;&lt; "\n  third and fourth chars of " 
+            &lt;&lt; ls &lt;&lt; " are " 
+            &lt;&lt; slice;
+  put_coll(slice, "\n  slice is ");
+  std::cout &lt;&lt; "\n  ls is still " &lt;&lt; ls;
+  putln();
+
+  /*---------------------------------------------
+     Form string from numeric chars in source, ls.
+     Uses std::range adapter std::view.
+  */
+  auto results = ls | std::views::filter(is_num);
+  std::cout &lt;&lt; "\n  numeric chars of " 
+            &lt;&lt; ls &lt;&lt; " are ";
+  for(auto r:results) {
+    std::cout &lt;&lt; r;
+  }
+  put_coll(results, "\n  ");
+
+  /*---------------------------------------------
+    The results item has a very ugly type.
+    Uncomment lines below to see it.
+    That means that std::cout &lt;&lt; results;
+    will fail to compile.
+  */
+  // std::cout &lt;&lt; typeid(results).name();
+  
+  putln();
+}
+
+/*-----------------------------------------------
+  Define and iterate through byte array
+*/
+using byte = short int;
+using Iter = byte*;
+
+void define_and_iterate_byte_array() {
+  byte ba[] = { 1, 2, 3, 4, 5 };
+  std::cout &lt;&lt; "\n  ";
+  for(
+    Iter it=std::begin(ba); 
+    it != std::end(ba); 
+    ++it
+  )
+    std::cout &lt;&lt; *it &lt;&lt; " ";
+  putln();
+}
+void idiomatic_define_and_iterate_byte_array() {
+  short int ba[] = { 1, 2, 3, 4, 5 };
+  std::cout &lt;&lt; "\n  ";
+  for(auto i : ba) {
+    std::cout &lt;&lt; i &lt;&lt; " ";
+  }
+  put_coll(ba, "\n  ");
+  putln();
+
+  std::cout &lt;&lt; "\n  [";
+  auto temp = ba | std::views::take(4);
+  for(auto i : temp) {
+    std::cout &lt;&lt; i &lt;&lt; ", ";
+  }
+  auto iter = std::end(ba);
+  auto last = *(--iter);
+  std::cout &lt;&lt; last &lt;&lt; "]";
+}
+
+int main() {
+    std::cout 
+        &lt;&lt; "\n  -- demonstrate iteration --\n";
+
+    std::cout &lt;&lt; "\n  -- string iteration --";
+    string_iteration();
+    idomatic_string_iteration();
+    std::cout 
+        &lt;&lt; "\n  -- string iteration adapters --";
+    string_adapters();
+    std::cout 
+        &lt;&lt; "\n\n  -- byte array iteration --";
+    define_and_iterate_byte_array();
+    std::cout 
+         &lt;&lt; "\n  -- idiomatic byte array iter'n --";
+    idiomatic_define_and_iterate_byte_array();
+
+    std::cout &lt;&lt; "\n\n  That's all Folks!\n\n";
+}
+          </defn-code>
+        <defn-head class="darkBlue">Output</defn-head>
+        <defn-code class="lightBlue">
+  -- demonstrate iteration --
+
+  -- string iteration --
+  ascii characters from a test string
+  a   t e s t   s t r i n g
+  test_string: a test string
+
+  idiomatic ascii characters from:
+  another test string
+  a n o t h e r   t e s t   s t r i n g
+
+  2nd character of another test string is n
+  test_string: another test string
+
+  -- string iteration adapters --
+  abc123 is not alphabetic
+  abc123 is alphanumeric
+  abc123 is ascii
+  abc123 is not numeric
+
+  r is 123
+  abc123 is not numeric
+
+  third and fourth chars of abc123 are c1
+  slice is c1
+  ls is still abc123
+
+  numeric chars of abc123 are 123
+  123
+
+
+  -- byte array iteration --
+  1 2 3 4 5
+
+  -- idiomatic byte array iteration --
+  1 2 3 4 5
+  12345
+
+  [1, 2, 3, 4, 5]
+
+  That's all Folks!
+
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head class="darkRust">
+          Rust
+          <span class="right darkRust smallpad cursor" onclick="location.reload()">unhide</span>
+        </defn-head>
+        <defn-code class="lightRust">
+/////////////////////////////////////////////////
+// idioms::iteration::main.rs                  //
+//   - idioms are styles of writing snippets   //
+//     in ways that are valued by language     //
+//     community                               //
+//   - this idiom code focuses on iteration    //
+// Jim Fawcett, 24 Jan 2021                    //
+/////////////////////////////////////////////////
+/*
+  Rust std::String
+  ----------------
+  Rust std::String is a container of utf8 chars 
+  with no null terminator.
+  - utf8 characters may consist of 1 up to 6 
+    bytes, so String instances can not be indexed.
+    Character boundaries are defined by specific
+    byte sequences, used by String's chars() 
+    iterator to return characters.
+
+    References:
+    -----------
+    String      
+      https://doc.rust-lang.org/std/string
+            /struct.String.html
+    chars()     
+      https://doc.rust-lang.org/std/string
+            /struct.String.html#method.chars
+    slice
+      https://doc.rust-lang.org/std/slice
+            /index.html
+    iterator
+      https://doc.rust-lang.org/std/iter
+            /trait.Iterator.html
+    array
+      https://doc.rust-lang.org/std
+            /primitive.array.html
+    Vector
+      https://doc.rust-lang.org/std/vec
+            /struct.Vec.html
+*/
+fn string_iteration() {
+    let test_string = 
+        String::from("a test string");
+    /* chars() returns iter over utf8 chars */
+    let mut iter = test_string.chars();  
+    print!(
+        "\n  utf8 characters from {:?}:\n  ", 
+        &amp;test_string
+    );
+
+    loop {
+        /*-- iter returns std::Option&lt;char&gt; --*/
+        let opt = iter.next();
+        if opt == None {
+            break;
+        }
+        /*-- unwrap char from Some(char) --*/
+        print!("{} ",opt.unwrap()); 
+    }
+
+    let ls = test_string.as_str();
+    print!("\n  test_string: {:?}", ls);
+    println!();
+}
+
+fn idomatic_string_iteration() {
+    let test_string = 
+      String::from("another test string");
+    print!(
+      "\n  idiomatic utf8 chars from {:?}:\n  ", 
+      &amp;test_string
+    );
+
+    for ch in test_string.chars() {
+        /*-- option handling implicit here --*/
+        print!("{} ",ch);
+    }
+    /*-- nth(i) returns Option --*/
+    let rslt = &amp;test_string.chars().nth(1);
+    if rslt.is_some() {
+        let char2 = rslt.unwrap();
+        print!(
+          "\n  2nd character of {:?} is {}", 
+          test_string, 
+          char2
+        );
+    }
+
+    let ls = test_string.as_str();
+    print!("\n  test_string: {:?}", ls);
+    println!();
+}
+/*-----------------------------------------------
+  demonstrate chars(), is_alphabetic, is_..., 
+  for_each, filter, and collect
+
+  There are many iterator adapters.  These are
+  some of the most often used.
+*/
+fn string_adapters() {
+    let ls = "abc123";
+
+    /*-- are all chars alphabetic --*/
+    print!(
+        "\n  {:?} is alphabetic   {}", ls,  
+        ls.chars().all(|c| {c.is_alphabetic()})
+    );
+
+    /*-- are all chars alphanumeric? --*/
+    print!(
+        "\n  {:?} is alphanumeric {}", ls, 
+        ls.chars().all(|c| {c.is_alphanumeric()})
+    );
+
+    /*-- are all chars numeric? --*/
+    print!(
+        "\n  {:?} is numeric      {}", ls, 
+        ls.chars().all(|c| {c.is_numeric()})
+    );
+
+    /*-- are all chars ascii? --*/
+    print!(
+        "\n  {:?} is ascii        {}", ls, 
+        ls.chars().all(|c| {c.is_ascii()})
+    );
+    
+    /*-- display chars from str slice --*/
+    let (min, max) = (2usize, 4usize);
+    if min &lt;= 
+          ls.len() &amp;&amp; 
+          max &lt;= ls.len() &amp;&amp; 
+          min &lt;= max {
+        let slice = &amp;ls[min..max];
+        print!(
+          "\n  3rd and 4th chars of {:?} are: ", 
+          ls
+        );
+        slice.chars()
+             .for_each(|c| print!("{}", c));
+    }
+    else {
+        print!(
+          "\n  invalid {} and {} for {}",
+          min, max, ls
+        )
+    }
+
+    /*-- from numeric chars in source, ls --*/
+    print!(
+        "\n  numeric chars of {:?} are: {:?}", ls,
+        ls.chars()
+          .filter(|c| c.is_numeric())
+          .collect::&lt;String&gt;()
+    );
+    println!();
+}
+/*
+  Rust byte arrays
+  ----------------
+  Rust arrays have sizes that must be determined at 
+  compile-time, even those created on the heap.
+
+  Rust Vectors have sizes that can be determined at 
+  run-time, and they will readily give access to 
+  their internal heap-based arrays by takeing slices.
+
+  This is perfectly data-safe, because:
+  - slices have a len() function
+  - even if you index past the end of the array, 
+    you can't read or write that memory, because a 
+    panic occurs immediately.
+*/
+fn define_and_iterate_byte_array() {
+    let ba: [u8;5] = [1,2,3,4,5];  
+    // size is determined at compile-time, even for
+    // arrays created on the heap (unlike C++)
+    let max = ba.len();
+    print!("\n  bytes from byte array:\n  [");
+    /*-- display all but last --*/
+    for i in 0..max-1 {
+        print!("{}, ", ba[i]);
+    }
+    /*-- display last char --*/
+    print!("{}]", ba[max-1]);
+}
+
+fn idiomatic_define_and_iterate_byte_array() {
+    let v: Vec&lt;u8&gt; = vec![5,4,3,2,1];
+    let ba: &amp;[u8] = &amp;v[..];  
+    /*-------------------------------------------
+      type of slice of Vector&lt;u8&gt; is 
+      byte slice: &amp;[u8]
+      - slices implement len() function
+      - &amp;v[..] slice of all elements of v
+      - &amp;v[m..n] slice of elements m up to,
+        but not including n 
+      - Length of slice &amp;v[..] determined by 
+        length of v, which can be determined at 
+        run-time.
+    */
+    print!("\n  idiomatic bytes from byte array:");
+    print!(
+      "\n  length of byte slice: {}", 
+      ba.len()
+    );
+    let max = ba.len();
+    /*-- print all but the last --*/
+    print!("\n  [");
+    for item in ba.iter().take(max-1) {
+        print!("{}, ", item);
+    }
+    /*-- print last one without trailing comma --*/
+    print!("{}]", ba[max - 1]);
+
+    print!(
+      "\n  printing array with implicit iteration:"
+    );
+    print!("\n  {:?}", ba);
+}
+
+fn main() {
+    print!("\n  -- demonstrate iteration --\n");
+
+    print!("\n  -- string iteration --");
+    string_iteration();
+    idomatic_string_iteration();
+    print!("\n  -- string iteration adapters --");
+    string_adapters();
+    print!("\n\n  -- byte array iteration --");
+    define_and_iterate_byte_array();
+    idiomatic_define_and_iterate_byte_array();
+
+    print!("\n\n  That's all Folks!\n");
+}
+
+        </defn-code>
+        <defn-head class="darkRust">Output</defn-head>
+        <defn-code class="lightRust">
+  -- demonstrate iteration --
+
+  -- string iteration --
+  utf8 characters from "a test string":
+  a   t e s t   s t r i n g 
+  test_string: "a test string"
+
+  idiomatic utf8 chars from "another test string":
+  a n o t h e r   t e s t   s t r i n g 
+  2nd character of "another test string" is n
+  test_string: "another test string"
+
+  -- string iteration adapters --
+  "abc123" is alphabetic   false
+  "abc123" is alphanumeric true
+  "abc123" is numeric      false
+  "abc123" is ascii        true
+  third and fourth chars of "abc123" are: c1
+  numeric chars of "abc123" are: "123"
+
+
+  -- byte array iteration --
+  bytes from byte array:
+  [1, 2, 3, 4, 5]
+  idiomatic bytes from byte array:
+  length of byte slice: 5
+  [5, 4, 3, 2, 1]
+  printing array with implicit iteration:
+  [5, 4, 3, 2, 1]
+
+  That's all Folks!
+
+
+        </defn-code>
+      </defn-block>
+      <defn-block id="csh">
+        <defn-head class="darkBlack">
+          C#
+          <span class="right darkBlack smallpad cursor" onclick="storyMenu.hide('csh')">hide</span>
+        </defn-head>
+        <defn-code class="lightBlack">
+To appear eventually
+        </defn-code>
+      </defn-block>
+    </defn-outerBlock>
+
+    <div style="height:2em;"></div>
+
+      <h3 style="margin-top:0px;">4. Epilogue</h3>
+      <t-b>
+        The following pages provide sequences of code examples for idioms and principles in each of the three languages 
+        cited here, e.g. C#, C++, and Rust.  Object model differences will often be pointed out in comments within the 
+        code blocks.
+      </t-b>
+    </div>
+      <s-1em></s-1em>
+      <a id="bottom"></a>
+  </body>
+</html>
