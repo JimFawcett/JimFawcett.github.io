@@ -149,7 +149,7 @@ function keyAction(keyEvent) {
     toggleSwipeEvents();
   if (key === 'T')
     window.scrollTo(0, 0);
-  if (key === 'B')
+  if (key === 'E')
     window.scrollTo(0, 100000);
   if (key === 'U')
     window.scrollBy(0, -200);
@@ -165,8 +165,14 @@ function keyAction(keyEvent) {
     if (isDefined(prv))
       prv.click();
   }
+  if (key === 'F') {
+    window.history.forward();
+  }
+  if (key === 'B') {
+    window.history.back();
+  }
   if (key === 'H') {
-    storyHlpMenu.help();
+    window.location.href = "SiteMap.html";
     //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
 };
