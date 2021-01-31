@@ -13,10 +13,11 @@
       #github table {
         width:auto;
         border-collapse: collapse;
+        border:5px solid #444;
       }
         #github table th {
           color: #fefefa;
-          background-color: #222;
+          background-color: #444;
           border: 1px solid #222;
           padding: 0.25rem 1rem;
         }
@@ -44,6 +45,20 @@
           color:white;
           padding: 0.25rem 0.5rem;
         }
+        #github defn-block {
+          border: 3px solid #111;
+        }
+      #github defn-head {
+        color: #222;
+        background-color: #ffd;
+        font-size: 1.0rem;
+      }
+      #github defn-code {
+        padding: 0.0rem 1.5rem;
+        color: #ffd;
+        background-color: #222;
+        font-size: 0.9rem;
+      }
     </style>
   </head>
   <body id="github" onload="initBites()">
@@ -100,15 +115,125 @@
       lines of code are found, and often tell you how to fix the
       problem it detected.
     </t-b>
-    <t-b class="ztm">
+    <div class="indent">
+      <details>
+        <summary class="darkItem">Thinking about Rust&apos;s Safety rules</summary>
+        <t-b>
+          These invariants are strong conditions that essentially imply that no program code can allow data to change
+          if it is the target of a reference. That makes reasoning about program behavior much simpler, but also seems
+          to mean that some things we may wish to build will not compile.  Think, for example, of a directed graph.
+          If we use references to link nodes together, most graphs would violate these safety rules.
+        </t-b>
+        <t-b>
+          However, we can build graph classes in Rust.  We just can&apos;t represent edges with references.  Instead
+          We move nodes into a vector and establish node linkage using vector indexing.  The safety rules do not
+          include indexes because indexes are not invalidated when the vector reallocates its storage to provide room
+          for more nodes.
+        </t-b>
+        <t-b>
+          After a year of intensive coding with Rust, building more than 20 repositories of code, I was able to
+          build everything without unusual contortions or resorting to unsafe code blocks. And, I spent a lot less
+          time debugging than I have with other languages because the compiler&apos;s great error messages guided
+          me toward sound implementations and I didn&apos;t need to chase memory handling defects and data races.
+        </t-b>
+      </details>
+    </div>
+    <t-b>
+      Below, in Figure 1., you glimpse a little bit of code that implements a user defined type in
+      Rust.  You may have questions about some things you see there but notice
+      that the code looks familiar, with clear and efficient syntax.
+    </t-b>
+    <t-b>
+      <div class="indent">
+        <defn-OuterBlock style="margin-bottom:1.5rem; float:left;">
+          <defn-block>
+            <defn-head>Figure 1. Source for User-Defined Type</defn-head>
+            <defn-code>
+// CreateObject::main.rs
+
+/*-----------------------------------------------
+  - Declare DemoObj struct, like C++ class
+  - Request compiler impl traits Debug & Clone
+*/
+#[derive(Debug, Clone)]
+pub struct DemoObj {
+    name : String
+}
+/*-- implement functions new and name --*/
+impl DemoObj {
+    pub fn new(obj_name: &str) -> DemoObj {
+        DemoObj {
+            name: obj_name.to_string()
+        }
+    }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+}
+/*-- Demo DemoObj instance in action --*/
+fn main() {
+    print!(
+      "\n  -- demonstrate object creation --\n"
+    );
+
+    let dob = DemoObj::new("Frank");
+    print!(
+      "\n  DemoObj instance name is {:?}", 
+      dob.name()
+    );
+
+    let cdob = dob.clone();
+    print!(
+      "\n  name of clone is {:?}", cdob.name()
+    );
+
+    print!("\n\n  That's all Folks!\n\n");
+}
+
+            </defn-code>
+          </defn-block>
+          <defn-block style="border:none;">
+            <defn-head style="border:3px solid #111;">Output</defn-head>
+            <defn-code style="border:3px solid #111;">
+cargo run -q
+
+  -- demonstrate object creation --
+
+  DemoObj instance name is "Frank"
+  name of clone is "Frank"
+
+  That's all Folks!
+
+            </defn-code>
+            <defn-head style="background-color: #fefefa; border:none;">&nbsp;</defn-head>
+            <defn-head style="border:3px solid #222;">Playground</defn-head>
+            <defn-body style="border:3px solid #222; border-top:none;">
+              <t-b style="max-width:20rem;">
+                Rust playground provides a web-based environment for testing out small code ideas
+                and looking at assembly or WAsm representations.
+              </t-b>
+              <div class="indent">
+                <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=09e5176b0c8f47708371d65fc78145ef">
+                  interactive demo
+                </a>
+              </div>
+              <t-b style="max-width:20rem;">
+                You can make changes to this demo code to see what happens.
+              </t-b>
+            </defn-body>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+    <t-b>
       Table 1., below, lists things that distinguish the Rust programing language from C++ and C#.  Rust provides
       performance and memory management in a manner similar to C++ but adds memory and data race safety by construction.  
       It delivers memory safe operation like
       C#, but without performance penalties and non-deterministic release of resources due to garbage collection.
     </t-b>
     <t-b>
-      This gives a quick overview of what makes Rust the language that it is. The features 
-      are described, with a few small code examples.
+      This gives a quick overview of what makes Rust the language that it is, describing features briefly and 
+      providing a few small code examples.  References supply additional details.
     </t-b>
     <!--<details class="indent">
       <summary class="darkItem">Table 1.&nbsp;&nbsp;&nbsp;What Rust Omits, Changes, and Supports</summary>
@@ -128,17 +253,6 @@
         </td>
         <td>
           <a href="https://internals.rust-lang.org/t/justification-for-rust-not-supporting-function-overloading-directly/7012">internals.rust-lang.org</a>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <strong>dereferencing raw pointers</strong> outside unsafe blocks.
-        </td>
-        <td>
-          <a href="https://doc.rust-lang.org/1.30.0/book/2018-edition/ch19-01-unsafe-rust.html#dereferencing-a-raw-pointer">
-            Unsafe - The Book
-          </a><br />
-          <a href="https://blog.logrocket.com/unsafe-rust-how-and-when-not-to-use-it/">Unsafe - how and when</a>
         </td>
       </tr>
       <tr>
@@ -173,6 +287,17 @@
         </td>
       </tr>
       <tr>
+        <td>
+          <strong>dereferencing raw pointers</strong> outside unsafe blocks.
+        </td>
+        <td>
+          <a href="https://doc.rust-lang.org/1.30.0/book/2018-edition/ch19-01-unsafe-rust.html#dereferencing-a-raw-pointer">
+            Unsafe - The Book
+          </a><br />
+          <a href="https://blog.logrocket.com/unsafe-rust-how-and-when-not-to-use-it/">Unsafe - how and when</a>
+        </td>
+      </tr>
+      <tr>
         <th>
           Rust Changes:
         </th>
@@ -182,7 +307,8 @@
       </tr>
       <tr>
         <td>
-          <strong>Only types with contiguous memory are implicitly copied.  All else are implicitly moved.</strong>
+          <strong>Copy Types - Only types with contiguous memory are implicitly copied.<br />
+          Move Types - All else are implicitly moved.</strong>
           <div class="indent pad10">
             That applies to construction, assignment, passing arguments and returning results from functions. 
           </div>
@@ -196,7 +322,7 @@
       </tr>
       <tr>
         <td>
-          <strong>semantics for copy and move are fixed</strong>, unlike C++.
+          <strong>semantics for copy types and move types are fixed</strong>.
           <div class="indent pad10">
             User defined semantics are not needed due to the way data is managed in Rust.
           </div>
