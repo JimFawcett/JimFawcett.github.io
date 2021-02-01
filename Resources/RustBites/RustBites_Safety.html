@@ -11,7 +11,9 @@
     <link rel="stylesheet" href="css/BiteStyles.css" />
     <script src="js/BiteScripts.js"></script>
     <script src="js/ScriptsKeyboard.js"></script>
-    <style>
+    <script src="js/ScriptsWebComponents.js"></script>
+    <link rel="stylesheet" href="css/StylesWebComponents.css" />
+   <style>
       hr {
         max-width: 55rem;
         margin:1.5rem 0rem;
@@ -201,9 +203,59 @@
           and will want to recycle any marked nodes when new nodes are added.
         </t-b>
         <t-b>
-          The message is that the safety mechanisms used by Rust will lead us to write some of our code using
+          The message is that the safety mechanisms used by Rust will lead us to write some small part of our code using
           different strategies than we would with C++ or other modern languages.  And that is eventually a good thing.
         </t-b>
+        <div style="padding-right:0.5rem;" class="left">
+          <photosizer-block src="pictures/soundness.jpg" width="500" class="photoSizerBlock">
+            <span style="font-family:'Comic Sans MS';">Figure 1. Soundness Metaphor</span>
+          </photosizer-block>
+        </div>
+        <div>
+          <h3 style="margin-bottom:0.75rem;">Some Philosophy</h3>
+          <t-b style="margin-top:0rem;">
+            Suppose that we could map program activities into the x-y plane, as shown in Figure 1. - don&apos;t
+            quibble, this is a metaphor.  Further, suppose that we can measure the effort required to separate
+            sound code from unsound code exactly, as shown by the soundness boundary.  As we approach the 
+            boundary we have to spend more evaluation time, and be very clever, to determine if a program is sound.
+          </t-b>
+          <t-b>
+            Clearly, that is not feasible for a practical compiler, so instead, we choose a simpler evaluation
+            strategy, as outlined at the beginning of this section.  That creates a second boundary inside 
+            the soundness region
+            which is relatively easy to evaluate, but will reject some sound programs.  Rust chooses to reject
+            some safe programs to insure that it rejects all unsafe programs. 
+          </t-b>
+          <t-b>
+            So every program activity in area (1) is proveably sound, every activity in area (2) is sound, but
+            cannot be easily proven to be so.
+            This may worry you.  Suppose that the program you are developing requires program activities between
+            the two boundaries, e.g., sound, but not easily evaluated as sound.  There are three things that
+            you can do to resolve this tension:
+            <ol>
+              <li>
+                Much of the territory between the boundaries is covered by Rust standard types, which use unsafe
+                blocks that are very carefully vetted by the development team to be sound.  So your program 
+                simply uses one or more of those types without directly using unsafe blocks.
+              </li>
+              <li>
+                In some of that territory, program operations don&apos;t violate the invariants, but that can&apos;t
+                be determined via static analysis, e.g., there is no simultaneous shared mutation using references
+                because of the way the program operates in time.  But that cannot be evaluated statically.  For
+                this case one may use &quot;interior mutability&quot;, discussed in a later section.
+              </li>
+              <li>
+                The design may be changed to avoid violating invariants, often by using indexing instead of 
+                references, like the directed graph class we mentioned above.
+              </li>
+            </ol>
+          </t-b>
+          <t-b>
+            After writing a lot of Rust code I never had to use unsafe blocks or write contorted code to build
+            projects.  And it was&apos;t that hard!  The compiler&apos;s error messages are so good that it guides you to a sound implementation.
+          </t-b>
+        </div>
+        <div class="clear"></div>
         <a id="ownership"></a>
         <div style="height:0.55em;">&nbsp;</div>
         <hr class="spread" />
