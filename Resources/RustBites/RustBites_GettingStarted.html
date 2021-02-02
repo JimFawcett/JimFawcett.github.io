@@ -101,6 +101,7 @@
       but also incorporates some unique and clever ideas that allow it to make guarantees, by construction, about freedom 
       from memory handling defects and race conditions.
     </t-b>
+    <h4>Rust&apos;s Look and Feel:</h4>
     <t-b>
       Once you are used to the language, programming in Rust feels a lot like using a simpler C++ with some nice features
       from C# sprinkled in.  Add to that an Oracle, sitting at your elbow, with firm opinions about safe code. 
@@ -139,9 +140,121 @@
       </details>
     </div>
     <t-b>
-      Below, in Figure 1., you glimpse a little bit of code that implements a user defined type in
-      Rust.  You may have questions about some things you see there but notice
-      that the code looks familiar, with clear and efficient syntax.
+      You may find it a bit disconcerting a first to work with the Rust&apos;s safety Oracle called the 
+      &quot;borrow-checker&quot; since Rust docs refer to references as borrows.  Soon however, you will come
+      to think of the borrow-checker as a stern friend.  Here&apos;s a great reference for understanding borrows:
+      <a href="https://intorust.com">intorust</a>.
+    </t-b>
+    <h4>Code Sample - functions:</h4>
+    <t-b>
+      Below, in Figure 1., you see Rust code that implements a factorial function in a slightly unusual way.
+      It uses, in <c-s>function(i:u64) -> u64</c-s> an iterator <c-s>(2..=i)</c-s> over the range of intergers 
+      from 2 up to and including the value of i.
+      It begins iterating when its function <c-s>product()</c-s> is invoked.  There are a number of functions defined
+      by the iterator trait that make many computations like this sytactically simple.
+    </t-b>
+    <t-b>
+      The first function, <c-s>demo_iter(i:64)</c-s>, illustrates how iterators work.  We usually don&apos;t explicitly
+      call  the iterator function <c-s>next()</c-s>, but rather let other iterator functions, like <c-s>product()</c-s> do that.
+      Not only do they call <c-s>next()</c-s>, they also handle the Option that indicates that that are or are not any
+      more items to access.
+    </t-b>
+    <t-b>
+      You probably have questions about some things you see here but notice that the code looks familiar, with 
+      clear and efficient syntax.  References for Iterators and Options are provided below, along with a link
+      to the Rust Playground with this code installed.  You can run it, modify the code, and see what happens.
+    </t-b>
+    <t-b>
+      <div class="indent">
+        <defn-OuterBlock style="margin-bottom:1.5rem; float:left;">
+          <defn-block>
+            <defn-head>Figure 1. Source for Factorial Demo</defn-head>
+            <defn-code>
+/*-- demonstrate simple iterator --*/
+
+fn demo_iter(i: u64) {
+    /* iterator over 0 to i */
+    let mut iter = 0..=i;
+    /* iter.next() returns Option&lt;Some(j), None&gt; */
+    loop {
+        let opt = iter.next();
+        if opt.is_some() {
+            print!(
+              "\n  iter item = {}", 
+              opt.unwrap()
+            );
+        /* unwrap returns value of 
+           Some else panics */
+        }
+        else {
+            break;
+        }
+    }
+}
+/*-- compute factorial with iterator
+     Wikipedia: Rust Programming --*/
+
+fn factorial(i: u64) -> u64 {
+    (2..=i).product()
+}
+
+fn main() {
+    demo_iter(5);
+    println!();
+    for i in 0..=5 {
+        print!(
+          "\n  factorial of {} = {}", 
+          i, factorial(i)
+        );
+    }
+}
+            </defn-code>
+          </defn-block>
+          <defn-block style="border:none;">
+            <defn-head style="border:3px solid #111;">Output</defn-head>
+            <defn-code style="border:3px solid #111;">
+  iter item = 0
+  iter item = 1
+  iter item = 2
+  iter item = 3
+  iter item = 4
+  iter item = 5
+
+  factorial of 0 = 1
+  factorial of 1 = 1
+  factorial of 2 = 2
+  factorial of 3 = 6
+  factorial of 4 = 24
+  factorial of 5 = 120
+            </defn-code>
+            <defn-head style="background-color: #fefefa; border:none;">&nbsp;</defn-head>
+            <defn-head style="border:3px solid #222;">Playground</defn-head>
+            <defn-body style="border:3px solid #222; border-top:none;">
+              <t-b style="max-width:20rem;">
+                Rust playground provides a web-based environment for testing out small code ideas
+                and looking at assembly or WAsm representations.
+              </t-b>
+              <div class="indent">
+                <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=5fa5726a5f9d1f10c8bd2391a34dcea7">
+                  interactive demo
+                </a><br />
+                <a href="RustBites_DataStr.html#iters">Iterators</a><br />
+                <a href="../../RustStory_Operations.html#errors">Option&lt;T&gt;</a>
+              </div>
+              <t-b style="max-width:20rem;">
+                You can make changes to this demo code to see what happens.
+              </t-b>
+            </defn-body>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+    <div class="clear"></div>
+    <h4>Code Sample - user-defined types:</h4>
+    <t-b>
+      Below, in Figure 2., you glimpse a little bit of code that implements a user defined type in
+      Rust.  You may have questions about some things you see here but notice, as before,
+      that code looks familiar, with clear and efficient syntax.
     </t-b>
     <t-b>
       <div class="indent">
@@ -215,7 +328,8 @@ cargo run -q
               <div class="indent">
                 <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=09e5176b0c8f47708371d65fc78145ef">
                   interactive demo
-                </a>
+                </a><br />
+                <a href="RustBites_Structs.html">structs</a>
               </div>
               <t-b style="max-width:20rem;">
                 You can make changes to this demo code to see what happens.
@@ -225,8 +339,56 @@ cargo run -q
         </defn-OuterBlock>
       </div>
     </t-b>
+    <div class="clear"></div>
+    <h3>First Steps:</h3>
     <t-b>
-      Table 1., below, lists things that distinguish the Rust programing language from C++ and C#.  Rust provides
+      The references in Table 1 area a great way to get started.  You can go through all in a morning and
+      wind up with a clear idea of what Rust is all about.  Pay special attention to the &quot;Considering Rust&quot; video.
+    </t-b>
+    <t-b>
+      <div>
+        <table>
+          <tr>
+            <th colspan="3" style="text-align:left;">
+              Table 1. - Getting your arms around Rust
+            </th>
+          </tr>
+          <tr>
+            <th>Topic</th><th>Description</th><th>link</th>
+          </tr>
+          <tr>
+            <td>Rust Intro</td>
+            <td>
+              Basic introduction in three articles: Basics, Enums and Matching, and Generics. A bit long
+              in places, but with interesting example codes.
+            </td>
+            <td><a href="https://www.softax.pl/blog/author/bartlomiej-kozielski/">Rust in a NutShell</a></td>
+          </tr>
+          <tr>
+            <td>Ownership</td>
+            <td>Very clear discussion of ownership in five short videos.</td>
+            <td><a href="https://intorust.com">intorust</a></td>
+          </tr>
+          <tr>
+            <td>Rust&nbsp;Survey</td>
+            <td>Smart discussion that introduces the most important parts of Rust</td>
+            <td><a href="https://www.youtube.com/watch?v=DnT-LUQgc7s">Considering&nbsp;Rust&nbsp;video</a></td>
+          </tr>
+        </table>
+      </div>
+    </t-b>
+    <t-b>
+      If you are fairly new to software development you may want to stop here and look over the first three
+      <a href="../../BuildOn.html">BuildOn Steps</a> to get familiar with our project.
+    </t-b>
+    <t-b>
+      Then follow instructions in <a href="Tooling.html">Tooling</a> to set up Rust and Visual Studio Code.
+      After a break, you can try some of the &quot;Rust in a Nutshell&quot; examples, copying the screen code
+      into the VS Code editor, then compiling with cargo in the attached terminal window.
+    </t-b>
+    <h4>So What is Rust?</h4>
+    <t-b>
+      Table 2., below, lists things that distinguish the Rust programing language from C++ and C#.  Rust provides
       performance and memory management in a manner similar to C++ but adds memory and data race safety by construction.  
       It delivers memory safe operation like
       C#, but without performance penalties and non-deterministic release of resources due to garbage collection.
@@ -238,7 +400,7 @@ cargo run -q
     <!--<details class="indent">
       <summary class="darkItem">Table 1.&nbsp;&nbsp;&nbsp;What Rust Omits, Changes, and Supports</summary>
       <div>-->
-    <h3>Table 1. What Rust Omits, Changes, Requires, and Supports</h3>
+    <h3>Table 2. What Rust Omits, Changes, Requires, and Supports</h3>
     <table>
       <tr>
         <th>Rust Omits:</th>
@@ -574,13 +736,13 @@ fn demo&lt;T&gt;(rt: &T) where T:Clone {
     <a id="starting"></a>
     <div style="height:0.75rem;"></div>
     <t-b>
-      The references in Table 2. are great places to get a quick tast of Rust and find out what it is all about.
+      The references in Table 3. are great places to get a quick tast of Rust and find out what it is all about.
       Most won&apos;t take too much of your time - an hour or so for each.
     </t-b>
     <div>
       <details>
-        <summary class="darkItem">Table 2. - References for Starting Rust</summary>
-    <h3>Table 2. - Starting Rust at the trailhead</h3>
+        <summary class="darkItem">Table 3. - References for Starting Rust</summary>
+    <h3>Table 3. - Starting Rust at the trailhead</h3>
     <table>
       <tr>
         <th style="width:15rem;">Topics</th><th>Descriptions</th>
@@ -687,12 +849,12 @@ fn demo&lt;T&gt;(rt: &T) where T:Clone {
     <div style="height:0.75rem;"></div>
     <t-b class="zbm">
       Once you have the basic ideas it&apos;s time to start looking at language details and building some code.
-      Items in Table 3. will help you do that.  These references take a bigger committment of your time.
+      Items in Table 4. will help you do that.  These references take a bigger committment of your time.
     </t-b>
     <div>
       <details>
-        <summary class="darkItem">Table 3. - Intermediate References for Rust</summary>
-    <h3>Table 3. - Getting up to Speed on the Intermediate trail</h3>
+        <summary class="darkItem">Table 4. - Intermediate References for Rust</summary>
+    <h3>Table 4. - Getting up to Speed on the Intermediate trail</h3>
     <table>
       <tr>
         <th style="width:15rem;">Topics</th><th>Descriptions</th>
