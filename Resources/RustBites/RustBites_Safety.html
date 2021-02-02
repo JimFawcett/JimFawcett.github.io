@@ -191,9 +191,19 @@
             </li>
           </ol>
         </t-b>
+        <div style="padding-right:0.5rem;" class="left">
+          <photosizer-block src="pictures/Graph1.jpg" width="200" class="photoSizerBlock">
+            <span style="font-family:'Comic Sans MS';">Fig 1. Directed Graph using references</span>
+          </photosizer-block>
+        </div>
+        <div style="padding-right:0.5rem;" class="left">
+          <photosizer-block src="pictures/Graph2.jpg" width="200" class="photoSizerBlock">
+            <span style="font-family:'Comic Sans MS';">Fig 2. Directed Graph using vector indexes</span>
+          </photosizer-block>
+        </div>
         <t-b>
           Note that the first invariant is a <strong>very strong condition</strong>.  There are useful program constructs, like
-          directed graphs, that depend on shared mutability to function as expected.  A child graph node may be
+          directed graphs, that depend on shared mutability to function as expected.  A child graph node, like node 0 in Fig 1.,  may be
           shared between several parents and without mutation of the node&apos;s value we could only build constant
           graphs.
         </t-b>
@@ -201,11 +211,15 @@
           We can build non-constant directed graphs using Rust.  We simply cannot construct graph edges 
           using references.
           If we move all graph nodes into a vector, then each parent can refer to its children using vector
-          indices.  We will need to mark &quot;deleted&quot; nodes as unused, removing their parent&apos;s index,
-          and will want to recycle any marked nodes when new nodes are added.
+          indices.  We will need to handle node deletions and reuse slots, but that is straight forward.
         </t-b>
         <t-b>
-          The message is that the safety mechanisms used by Rust will lead us to write some small part of our code using
+          A program can safely share mutability through vector indices because indexes remain valid over
+          vector buffer reallocation when adding new nodes.  The first safety invariant applies to references,
+          but not to indexes.
+        </t-b>
+        <t-b>
+          The message is that the safety mechanisms used by Rust may lead us to write some small part of our code using
           different strategies than we would with C++ or other modern languages.  And that is eventually a good thing.
         </t-b>
         <div style="padding-right:0.5rem;" class="left">
@@ -229,16 +243,31 @@
             some safe programs to insure that it rejects all unsafe programs. 
           </t-b>
           <t-b>
-            So every program activity in area (1) is proveably sound and compiles, every activity in area (2) 
+            So every program activity in area (1) is proveably sound and compiles; every activity in area (2) 
             is sound, but cannot be easily proven to be so, and does not compile.
-            This may worry you.  Suppose that the program you are developing requires program activities between
-            the two boundaries, e.g., sound, but not easily evaluated as sound.  There are three things that
-            you can do to resolve this tension:
+            This may worry you.  Suppose a program you are developing requires program activities between
+            the two boundaries, e.g., sound, but not easily evaluated as sound.  Compilation will fail and the
+            compiler&apos;s error messages will tell you why it failed.
+          </t-b>
+          <t-b>
+            There are three things that you can do to resolve this issue:
             <ol>
               <li>
                 Much of the territory between the boundaries is covered by Rust standard types, which use unsafe
                 blocks that are very carefully vetted by the development team to be sound.  So your program 
-                simply uses one or more of those types without directly using unsafe blocks.
+                simply uses one or more of those types without directly using unsafe blocks. 
+                <div style="height:0.75rem;"></div>
+                Consider the standard 
+                library&apos;s vector.  Some of its operations clearly violate the scope-based rule about no shared 
+                mutability.  It holds a reference to its internal memory, but will hand out a mutable reference to 
+                your program.  That is safe because the vector (and compiler) conspire to manage change
+                on your behalf by refusing to mutate when there are outstanding references.  You can look at
+                the unsafe blocks in vector from its 
+                <a href="https://doc.rust-lang.org/src/alloc/vec.rs.html#300-303">source documentation</a>.
+                <div style="height:0.75rem;"></div>
+                We use the vector, the compiler doesn&apos;t complain because of vector&apos;s few small 
+                well crafted unsafe 
+                blocks, and we benefit from the library developer&apos;s expertise.
               </li>
               <li>
                 In some of that territory, program operations don&apos;t violate the invariants, but that can&apos;t
@@ -251,6 +280,11 @@
                 references, like the directed graph class we mentioned above.
               </li>
             </ol>
+          </t-b>
+          <t-b>
+            You don&apos;t need to think about all this when developing code.  The compiler will do the low-level
+            thinking for you.  It does help to understand why the language works the way it does and understand
+            why it works so well.
           </t-b>
           <t-b>
             After writing a lot of Rust code I never had to use unsafe blocks or write contorted code to build
