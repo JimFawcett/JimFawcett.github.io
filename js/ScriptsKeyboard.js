@@ -125,6 +125,7 @@ storyHlpMenu.help = function () {
 function keyAction(keyEvent) {
   keystate = 'down';
   var key = String.fromCharCode(keyEvent.which);
+  //var key = keyEvent.key();
   if (event.keyCode == 27) {
     // alert("escape");
     var menu = document.getElementById("chaps");
