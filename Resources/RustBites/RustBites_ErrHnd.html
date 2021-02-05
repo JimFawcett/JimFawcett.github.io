@@ -96,7 +96,287 @@
         </table>-->
        </div>
    
-      <h2>Rust Bite - Error Handling</h2>
+    <h2>Rust Bite - Error Handling</h2>
+    <hr class="spread" />
+    <h3>1.0 - Introduction</h3>
+    <t-b>
+      Rust error handling is based on two things: enumerations and matching. Rust&apos;s enumerations are more 
+      powerful than those of C++ and C#.  Each element of the enumeration may wrap some type, as shown in the
+      example below.
+    </t-b>
+    <t-b>
+      Often in code we use enums defined in the standard libraries, e.g., Option&lt;T&gt; or Result&lt;T, E&gt;,
+      which we discuss later in this Bite.  However, it can be quite useful to develope custom enumerations
+      like the one shown below.
+    </t-b>
+    <t-b>
+      This example shows an
+      Event&lt;T&gt; enumeration that represents different levels of events, and wraps information
+      about the event inside the event item except for the NoEvent item. This example shows how to 
+      write code to wrap and unwrap values from enumeration items.  
+    </t-b>
+    <div style="height:0.25rem;"></div>
+    <t-b>
+      <div>
+        <defn-OuterBlock>
+          <defn-block>
+          <defn-head>Custom Enumeration Example</defn-head>
+          <defn-code>
+#![allow(unused_variables)]
 
+/*-----------------------------------------------------
+   The generic parameter T represents some value 
+   associated with events, perhaps a name String 
+   or id number.
+*/
+#[derive(Debug, Clone)]
+enum Event&lt;T&gt; { 
+    Normal(T), Warning(T), Critical(T), NoEvent 
+}
+impl&lt;T&gt; Event&lt;T&gt; {
+    fn unwrap(&amp;self) -&gt; &amp;T {
+        if let Event::Normal(ev) = self{ ev } 
+        else if let Event::Warning(ev) = self{ev}
+        else if let Event::Critical(ev) = self{ev}
+        else { panic!() }
+    }
+}
+
+use Event::*;
+
+fn main() {
+    /*-- numbers are event ids --*/
+    let e1: Event&lt;u8&gt; = 
+        Event::&lt;u8&gt;::Normal(1);
+    let e2 = Warning(2);
+    let e3 = Critical(3);
+    let e4: Event&lt;u8&gt; = NoEvent;
+    
+    /*-- match works like switch stmt on steriods --*/
+
+    match e3 {
+        Normal(ev) =&gt; 
+            print!("\n  event {} is Normal", ev),
+        Warning(ev) =&gt; 
+            print!("\n  event {} is Warning", ev),
+        Critical(ev) =&gt; 
+            print!("\n  event {} is Critical!", ev),
+        NoEvent =&gt; print!("\n  no events occurred"),
+    }
+    
+    /*-------------------------------------------------
+      without the clone() operation below e2 would 
+      move into e and become invalid for future 
+      operations.
+    */
+    let e = e2.clone();
+    
+    /*-------------------------------------------------  
+      if let statements use "=" as match operator
+    */
+    
+      if let Warning(ev) = e {
+        print!("\n  event {} is Warning", ev);
+    }
+    
+    /*-- next stmt panics if event is NoEvent type --*/
+
+    let v = e3.unwrap();
+    print!("\n  inner value of {:?} is {}", e3, v);
+
+    /*-- will panic if you unwrap() e4 --*/
+} 
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Output</defn-head>
+            <defn-code>
+  event 3 is Critical!
+  event 2 is Warning
+  inner value of Critical(3) is 3   
+            
+            </defn-code>
+            <defn-head class="defnBorderTop">Comments</defn-head>
+            <defn-body>
+              Enumerations can have methods defined<br />
+              in the same way we define methods for<br />
+              structs.  That let&apos;s us acess and use<br />
+              their inner values.
+              <div style="height:0.75rem;"></div>
+              Match statements require us to handle<br />
+              all of the enum items. 
+              <div style="height:0.75rem;"></div>
+              Sometimes we don&apos;t need to do that.<br />
+              Then, we can use the if let statement to<br />
+              test for a single enum item type.  
+              <div style="height:0.75rem;"></div>
+              Here,
+              the &quot;=&quot; operator is not<br />
+              assignment.
+              It is a matching operator that<br />
+              selects on a
+              single enum item type.
+              <div style="height:1.75rem;"></div>
+              How cool is Rust?  Very cool!
+              <div style="height:0.75rem;"></div>
+              <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=400f48cff6f4682db6eb93a8beae317f">
+                playground example
+              </a>
+            </defn-body>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+    <div style="height:0.75rem;"></div>
+    <t-b>
+      Matching is Rust&apos;s model for alternates selection - more powerful than switch-case operations, as
+      shown by the example, above. 
+      Matching works for more than just enum items.  The example below shows matching on char ranges.
+    </t-b>
+    <t-b>
+      <div>
+        <defn-OuterBlock>
+          <defn-block>
+          <defn-head>Matching Ordinary Data</defn-head>
+          <defn-code>
+fn do_match(c: char) {
+    match c {
+        ('0'..='9') => 
+            print!("\n  {} is a digit", c),
+        ('a'..='z') => 
+            print!("\n  {} is lower case ascii char", c),
+        ('A'..='Z') => 
+            print!("\n  {} is upper case ascii char", c),
+        _ => print!("\n  {} is some other char type", c)
+    }
+}
+
+fn main() {
+    let x = 'a';
+    do_match(x);
+    do_match('Q');
+    do_match('7');
+    do_match('@');
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Output</defn-head>
+            <defn-code>
+  a is lower case ascii character
+  Q is upper case ascii character
+  7 is a digit
+  @ is some other char type
+  
+            </defn-code>
+            <defn-head class="defnBorderTop">Comments</defn-head>
+            <defn-body>
+              
+              Lexer here we come!
+              <div style="height:0.75rem;"></div>
+              <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=63a5e4c1b5b3a1f4ff1d3a986b540d4b">
+                playground example
+              </a>
+            </defn-body>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+    <div style="height:0.25rem;"></div>
+    <h3>2.0 - Error Handling</h3>
+    <t-b>
+      Error handling in Rust does not use exceptions.  Instead, it uses error returns, but those are much more
+      useful than simply returning error codes.  Because Result&lt;T, E&gt; is a Rust style enumeration,
+      functions can return either a result of computation or an error with a single return value.  The 
+      functions for testing those conditions are all part of the enum. 
+    </t-b>
+    <t-b>
+      The example, above, showed how that is done, and the example below shows how it is used.
+    </t-b>
+    <t-b>
+      <defn-block>
+        <defn-head>
+          Result Type&nbsp;&nbsp;<a href="https://doc.rust-lang.org/std/result/">std::result</a>
+        </defn-head>
+        <defn-code style="font-size:1rem;">
+enum Result&lt;T, E&gt; { Ok(T), Err(E), }
+        </defn-code>
+      </defn-block>
+    </t-b>
+    <t-b>
+      <defn-OuterBlock>
+        <defn-block>
+          <defn-head>Custom Error</defn-head>
+          <defn-code>
+use std::result::*;
+use std::fmt;
+
+/*-- define custom error --*/
+#[derive(Debug, Clone)]
+struct MyCustomError;
+impl fmt::Display for MyCustomError {
+    fn fmt(&self, f: &mut fmt::Formatter)
+        -> fmt::Result {
+        write!(f, "whooooppps - an error")
+    }
+}
+
+/*-- () is unit type, e.g., nothing --*/
+fn do_no_error() 
+    -> Result&lt;(),MyCustomError&gt; {
+    Ok(())
+}
+
+fn do_error_prone() 
+    -> Result&lt;(),MyCustomError&gt; {
+    let err = MyCustomError;
+    Err(err)
+}
+
+fn main() {
+
+    print!("\n  calling do_no_error()");
+    let rslt = do_no_error();
+    /*-- equivalent to if let matching --*/    
+    if rslt.is_ok() {
+        print!(
+            "\n    result is: {:?}", 
+            rslt.unwrap()
+        );
+    }
+    
+    print!("\n  calling do_error_prone()");
+    let rslt = do_error_prone();
+    /*-- equivalent to if let matching --*/
+    if rslt.is_err() {
+        print!(
+            "\n    result is: {}", 
+            rslt.unwrap_err()
+        );
+    }
+}
+          </defn-code>
+        </defn-block>
+        <defn-block>
+          <defn-head>Output</defn-head>
+          <defn-code>
+  calling do_no_error()
+    result is: ()
+  calling do_error_prone()
+    result is: whooooppps - an error  
+            
+          </defn-code>
+          <defn-head class="defnBorderTop">Reference:</defn-head>
+          <defn-body>
+            <div style="height:0.75rem;"></div>
+            <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=bd86ace956670f12ff83d577f2bea1de">
+              playground example
+            </a><br />
+            <a href="../../RustStory_Operations.html#errors">RustStory Error Handling</a>
+            <div style="height:0.75rem;"></div>
+          </defn-body>
+        </defn-block>
+      </defn-OuterBlock>
+    </t-b>
   </body>
 </html>
