@@ -296,14 +296,23 @@ fn main() {
       The example, above, showed how that is done, and the example below shows how it is used.
     </t-b>
     <t-b>
-      <defn-block>
-        <defn-head>
-          Result Type&nbsp;&nbsp;<a href="https://doc.rust-lang.org/std/result/">std::result</a>
-        </defn-head>
-        <defn-code style="font-size:1rem;">
+      <defn-OuterBlock>
+        <defn-block>
+          <defn-head>
+            Result Type
+          </defn-head>
+          <defn-code style="font-size:1rem;">
 enum Result&lt;T, E&gt; { Ok(T), Err(E), }
-        </defn-code>
-      </defn-block>
+          </defn-code>
+        </defn-block>
+        <defn-block>
+          <defn-head>References:</defn-head>
+          <defn-body>
+            <a href="https://doc.rust-lang.org/std/result/">std::result</a><br />
+            <a href="https://doc.rust-lang.org/std/error/trait.Error.html">std::error::Error</a>
+          </defn-body>
+        </defn-block>
+      </defn-OuterBlock>
     </t-b>
     <t-b>
       <defn-OuterBlock>
@@ -376,6 +385,127 @@ fn main() {
             </a><br />
             <a href="../../RustStory_Operations.html#errors">RustStory Error Handling</a>
             <div style="height:0.75rem;"></div>
+          </defn-body>
+        </defn-block>
+      </defn-OuterBlock>
+    </t-b>
+    <h3>2.1 - Bubbling Up Errors</h3>
+    <t-b>
+      Rust requires Result&lt;T, E&gt;, returned from functions, to be handled, or explicitly
+      ignored by binding the result to a variable with leading underscore, e.g.
+      <div class="indent pad5">
+        <c-s>let _ign = function_returning_result(...);</c-s>
+      </div>
+      Otherwise, it must match against the returned result, as shown above.  If a function calls many other
+      functions that return results, the code gets cluttered with all the error handling.  One very nice way
+      to avoid that is to use error bubbling.
+    </t-b>
+    <t-b>
+      If we suffix the function call with a ?, called try operator, then if the result is not an error, ? binds
+      the unwrapped <c-s>T</c-s> value from <c-s>Result&lt;T, E&gt;</c-s>.  So the expression:
+      <div class="indent pad5">
+        <c-s>let ret_val = function_returns_result()?</c-s>
+      </div>
+      Binds the result value to <c-s>ret_val</c-s>.  If, on the other hand, the function returns an error, then
+      operator ? immediately returns Err(Error) to the caller.
+    </t-b>
+    <t-b>
+      This is illustrated in the example below:
+    </t-b>
+    <div style="height:0.25rem;"></div>
+    <t-b>
+      <defn-OuterBlock>
+        <defn-block>
+          <defn-head>Error Bubbling</defn-head>
+          <defn-code>
+#[derive(Debug)]
+struct Error;
+
+#[derive(Debug)]
+struct Demo;
+impl Demo {
+    fn do_int(&amp;self, i:i32) -&gt; &amp;Self {
+        print!("\n  my argument is {}", i);
+        &amp;self
+    }
+    fn do_float(&amp;self, f:f64) -&gt; &amp;Self {
+        print!("\n  my argument is {}", f);
+        &amp;self
+    }
+    fn do_vec(&amp;self, v:Vec&lt;i32&gt;) 
+            -&gt; &amp;Self {
+        print!("\n  my argument is {:?}", v);
+        &amp;self
+    }
+    fn do_err(&amp;self, p:bool) 
+            -&gt; Result&lt;String, Error&gt; {
+        let e = Error {};
+        if p { 
+            Ok("no error".to_string()) 
+        } else { 
+            Err(e) 
+        }
+    } 
+}
+
+fn main() -&gt; Result&lt;(),Error&gt; {
+    let d = Demo {};
+    let rslt = d.do_int(42)
+                .do_float(3.14159)
+                .do_vec(vec![1,2,3])
+                .do_err(true);
+    print!("\n  rslt = {:?}", rslt);
+    
+    /*-------------------------------------------
+      Bubbling up Errors
+        If do_err returns Ok(value) then bind 
+        value to rslt,
+        else return Err(Error).
+    */
+    let rslt = d.do_int(42)
+                .do_float(3.1415927)
+                .do_err(true)?;  // binds to rslt
+    print!("\n  rslt = {:?}", rslt);
+    let rslt = d.do_int(42)
+                .do_float(3.1415927)
+                .do_err(false)?;  // returns Err
+    print!("\n  rslt = {:?}", rslt);
+    Ok(())
+}
+          </defn-code>
+        </defn-block>
+        <defn-block>
+          <defn-head>Output</defn-head>
+          <defn-code>
+   Compiling playground v0.0.1 (/playground)
+    Finished dev [unoptimized + debuginfo]
+        target(s) in 3.83s
+    Running `target/debug/playground`
+Error: Error
+
+Standard Output
+
+
+  my argument is 42
+  my argument is 3.14159
+  my argument is [1, 2, 3]
+  rslt = Ok("no error")
+  my argument is 42
+  my argument is 3.1415927
+  rslt = "no error"
+  my argument is 42
+  my argument is 3.1415927
+          
+          </defn-code>
+          <defn-head class="defnBorderTop">References:</defn-head>
+          <defn-body>
+            <div style="height:0.75rem;"></div>
+            <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=2f2e450526a86ba5424cd26270646007">
+              playground example
+            </a><br />
+            <a href="https://doc.rust-lang.org/1.29.0/book/2018-edition/ch09-02-recoverable-errors-with-result.html">
+              Error handling - The Rust Book
+            </a>
           </defn-body>
         </defn-block>
       </defn-OuterBlock>
