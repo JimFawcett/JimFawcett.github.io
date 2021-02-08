@@ -84,7 +84,7 @@ function initializeMenu() {
         <a href='CppStory_Prologue.html'>C++ Story</a>\
         <a href='RustStory_Prologue.html'>Rust Story</a>\
         <a href='RustBiteByByte.html'>Rust&nbsp;bite&nbsp;by&nbsp;byte&nbsp;</a>\
-h        <a href='BuildOn.html'>BuildOn:&nbsp;learn&nbsp;Rust&nbsp;&nbsp;</a>\
+        <a href='BuildOn.html'>BuildOn:&nbsp;learn&nbsp;Rust&nbsp;&nbsp;</a>\
         <a href='IdiomsAndPatterns.html'>Idioms&nbsp;&amp;&nbsp;Patterns&nbsp;</a>\
         <a href='IndexPage.html'>Rust Glossary</a>\
         <a href='InfDataLib_1.html'>Inf Data Lib - A.Zaitsev</a>\
