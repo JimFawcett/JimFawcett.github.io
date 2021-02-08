@@ -63,7 +63,8 @@
             <!--<a href="Javascript.;#"></a><br />-->
           </up-b>
             <rt-b id="sects">
-          <a href="#top">Top</a>, <a href="#bottom">Bottom</a>
+          <a href="#top">Top</a>, <a href="#opt">Intro</a>, <a href="#pluggin">Pluggins</a>, 
+          <a href="#bottom">Bottom</a>
         </rt-b>
       </toc-b>
       <div id="hlp" style="display:none;">
@@ -98,6 +99,7 @@
        </div>
    
     <h2>Rust Bite - Options</h2>
+    <a id="opt"></a>
     <hr class="spread" />
     <h3>1.0 - Introduction</h3>
     <t-b>
@@ -123,6 +125,237 @@ enum Option&lt;T&gt; { Some(T), None, }
         </defn-block>
       </defn-OuterBlock>
     </t-b>
+    <t-b>
+      Rust defines iterators for most of its collection types.  A Rust iterator defines the function:
+      <div class="indent pad5">
+        <c-s>fn next() -> Option&lt;T&gt;</c-s>
+      </div>
+      where <c-s>T</c-s> is the Item type of the collection being iterated.  During iteration <c-s>next()</c-s>
+      returns <c-s>Some(t)</c-s>.  When the end is reached <c-s>next()</c-s> returns <c-s>None</c-s>.
+    </t-b>
+    <t-b>
+      This is illustrated by the example below.  Usually we don&apos;t use the iterator directly, as
+      done in function <c-s>do_iter(v: &Vec&lt;i32&gt;)</c-s> but instead use a for-in loop, as
+      in function <c-s>do_idiomatic_iter(v: &Vec&lt;i32&gt;)</c-s>.
+    </t-b>
+    <t-b>
+      <defn-OuterBlock>
+        <defn-block>
+          <defn-head>Iteration uses Option</defn-head>
+          <defn-code>
+/*
+  iterators provide next function that
+  returns an Option containing Some(item)
+  if there is a next item, otherwise None
+*/
+fn do_iter(v: &amp;Vec&lt;i32&gt;) {
+    print!("\n  ");
+    let mut iter = v.iter();
+    loop {
+        let item = iter.next();
+        if item.is_none() {
+            print!("{:?}", item);
+            break;
+        }
+        print!("{:?} ", item);
+    }
+}
+/*------------------------------------
+  Demonstrate idiomatic iteration
+    for loop iterates and unwraps Option
+*/
+fn do_idiomatic_iter(v: &amp;Vec&lt;i32&gt;) { 
+    print!("\n  ");
+    for item in v {
+        print!("{:?} ", item);
+    }
+}
+
+fn main() {
+    do_iter(&amp;vec![1, 2, 3]);
+    do_idiomatic_iter(&amp;vec![1, 2, 3]);
+}          
+          </defn-code>
+        </defn-block>
+        <defn-block>
+          <defn-head>Output</defn-head>
+          <defn-code>
+  Some(1) Some(2) Some(3) None    
+  1 2 3 
+            </defn-code>
+          <defn-head class="defnBorderTop">Comments</defn-head>
+          <defn-body>
+            <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=53030e9e8e06413538dfa61f3d02f2e8">
+              playground example
+            </a>
+          </defn-body>
+        </defn-block>
+      </defn-OuterBlock>
+    </t-b>
+    <t-b>
+      In the example below, we show how to make these functions generic, and apply those to a variety of
+      collection types.  Since this has more to do with iteration than with <c-s>Option&lt;T&gt;</c-s> it
+      is placed in a details dropdown, closed by default.
+    </t-b>
+    <t-b>
+      <details>
+        <summary class="darkItem">Iterating over Generic Types</summary>
+      <defn-OuterBlock>
+        <defn-block>
+          <defn-head>Functions iterate over generic types</defn-head>
+          <defn-code>
+use std::fmt::*;
+use std::collections::HashMap;
+
+fn type_is&lt;T&gt;(_t:T) -&gt; String {
+    format!("{}", std::any::type_name::&lt;T&gt;())
+}
+/*----------------------------------------
+  - Pass by ref to avoid moving t into
+    function.
+  - that prepends &amp; char to type
+  - remove first &amp; char from type
+    string by taking slice
+*/
+fn show_type&lt;T&gt;(t:&amp;T) {
+    let s = type_is(t);
+    let s = &amp;s[1..];  // remove leading &amp; char
+    print!("\n  type is {}", s);
+}
+/*--------------------------------------
+  Demonstrate basic iteration
+*/
+fn do_iter&lt;T&gt;(iter: &amp;mut T) 
+  where T: Iterator + Debug, T::Item: Debug {
+    print!("\n  ");
+    loop {
+        let item = iter.next();
+        if item.is_none() {
+            break;
+        }
+        print!("{:?} ", item.unwrap());
+    }
+}
+/*------------------------------------
+  Demonstrate idiomatic iteration
+*/
+fn do_idiomatic_iter&lt;T&gt;(t:T) 
+  where T: IntoIterator, T::Item: Debug {
+    print!("\n  ");
+    for item in t {
+        print!("{:?} ", item);
+    }
+}
+
+fn main() {
+    let putln = || println!();
+    let putmsg = 
+            |msg:&amp;str| print!("\n  {}", msg);
+    
+    putmsg("-- iterating over array --");
+    let arr = [1, 2, 3];
+    show_type(&amp;arr);
+    do_iter(&amp;mut arr.iter());
+    do_idiomatic_iter(&amp;arr);
+    putln();
+    
+    putmsg("-- iterating over String --");
+    let s = "a string".to_string();
+    show_type(&amp;s);
+    do_iter(&amp;mut s.chars());
+    /* String doesn't implement IntoIterator */
+    do_idiomatic_iter(s.bytes());
+    putln();
+    
+    putmsg("-- iterating over String slice --");
+    let slice = &amp;s[2..];
+    show_type(&amp;slice);
+    do_iter(&amp;mut slice.char_indices());
+    /* &amp;str doesn't implement IntoIterator */
+    do_idiomatic_iter(slice.bytes());
+    putln();
+
+    putmsg("-- iterating over byte array --");
+    let bytes = &amp;s[2..].as_bytes();
+    show_type(&amp;bytes);
+    do_iter(&amp;mut bytes.iter());
+    do_idiomatic_iter(&amp;**bytes);
+    putln();
+    
+    putmsg("-- iterating over Vec --");
+    let v = vec![1, 2, 3];
+    show_type(&amp;v);
+    do_iter(&amp;mut v.iter());
+    do_idiomatic_iter(&amp;v);
+    putln();
+    
+    putmsg("-- iterating over HashMap --");
+    let mut h = HashMap::&lt;String, i32&gt;::new();
+    h.insert("zero".to_string(), 0);
+    h.insert("one".to_string(), 1);
+    h.insert("two".to_string(), 2);
+    h.insert("three".to_string(), 3);
+    show_type(&amp;h);
+    do_iter(&amp;mut h.iter());
+    do_idiomatic_iter(&amp;h);
+    
+    print!("\n\n  That's all Folks\n\n");
+}
+          </defn-code>
+        </defn-block>
+        <defn-block>
+          <defn-head>Output</defn-head>
+          <defn-code>
+  -- iterating over array --
+  type is [i32; 3]
+  1 2 3 
+  1 2 3 
+
+  -- iterating over String --
+  type is alloc::string::String
+  'a' ' ' 's' 't' 'r' 'i' 'n' 'g' 
+  97 32 115 116 114 105 110 103 
+
+  -- iterating over String slice --
+  type is &str
+  (0, 's') (1, 't') (2, 'r') 
+           (3, 'i') (4, 'n') (5, 'g') 
+  115 116 114 105 110 103 
+
+  -- iterating over byte array --
+  type is &&[u8]
+  115 116 114 105 110 103 
+  115 116 114 105 110 103 
+
+  -- iterating over Vec --
+  type is alloc::vec::Vec<i32>
+  1 2 3 
+  1 2 3 
+
+  -- iterating over HashMap --
+  type is std::collections::hash::map::HashMap<alloc::string::String, i32>
+  ("two", 2) ("one", 1) ("zero", 0) ("three", 3) 
+  ("two", 2) ("one", 1) ("zero", 0) ("three", 3) 
+
+  That's all Folks
+          </defn-code>
+          <defn-head class="defnBorderTop">Comments</defn-head>
+          <defn-body>
+            <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=356cc54361d2f732aa183f09cfdc9f4e">
+              playground example
+            </a>
+          </defn-body>
+        </defn-block>
+      </defn-OuterBlock>
+      </details>
+    </t-b>
+    <t-b>
+      There is a lot to learn about the different kinds of Rust collections and about generics in the dropdown,
+      so you might want to come back an review later.
+    </t-b>
+    <a id="pluggin"></a>
+    <div style="height:0.75rem;"></div>
+    <h3>2. - Pluggin Architectures</h3>
     <t-b>
       The example, below, describes a pluggin architecture.  User-defined types may use pluggins to interact with
       their environment in flexible ways.  In Figure 1. we show a user-defined type, Plugged, that may use any
