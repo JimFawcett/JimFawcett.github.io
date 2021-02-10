@@ -121,7 +121,7 @@ storyMenu.helpMenu = function () {
 }
 
 storyMenu.prev = function() {
-  var prv = document.getElementById("prev");
+  var prv = document.getElementById("Prev");
   prv.click();
   // if(isDefined(prv)) {
   //   prv.click();
@@ -129,7 +129,7 @@ storyMenu.prev = function() {
 }
 
 storyMenu.next = function() {
-  var nxt = document.getElementById("next");
+  var nxt = document.getElementById("Next");
   nxt.click();
   // if(isDefined(nxt)) {
   //   nxt.click();

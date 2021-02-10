@@ -36,6 +36,7 @@ var storyMenu = new Object();
 initBites = function() {
   storyMenu.bitesMenu();
   storyMenu.bottomMenu();
+  storyMenu.helpMenu();
  //  // alert("init");
   //   var chaps = document.getElementById("chaps");
   //   //if (isDefined(chaps)) {
@@ -45,8 +46,40 @@ initBites = function() {
   //        sects.style.display = "block";
 }
 
+storyMenu.helpMenu = function () {
+  var helpMenu = document.getElementById("hlp");
+  helpMenu.innerHTML = '<table>\
+    <tr>\
+      <td style="padding-right:5px;" onclick="storyMenu.toggleTOC()">Esc</td>\
+      <td>toggle menus</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyMenu.closeTOC()">C</td>\
+      <td>close menus</td>\
+    </tr>\
+    <tr>\
+      <td onclick="location.reload()">R</td><td>Refresh</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyMenu.next()">N</td><td>Next Bite</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyMenu.prev()">P</td><td>Prev Bite</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyMenu.top()">T</td><td>scroll to top</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyMenu.bottom()">B</td><td>scroll to bottom</td>\
+    </tr>\
+    <tr>\
+      <td onclick="storyMenu.help()">H</td><td>Help</td>\
+    </tr>\
+  </table>';
+}
+
 storyMenu.prev = function() {
-  var prv = document.getElementById("prev");
+  var prv = document.getElementById("Prev");
   prv.click();
   // if(isDefined(prv)) {
   //   prv.click();
@@ -54,11 +87,21 @@ storyMenu.prev = function() {
 }
 
 storyMenu.next = function() {
-  var nxt = document.getElementById("next");
+  var nxt = document.getElementById("Next");
   nxt.click();
   // if(isDefined(nxt)) {
   //   nxt.click();
   // }
+}
+
+storyMenu.help = function () {
+  var help = document.getElementById("hlp");
+  if (isDefined(help)) {
+    if (help.style.display !== "block")
+      help.style.display = "block";
+    else
+      help.style.display = "none";
+  }
 }
 
 storyMenu.chaps = function () {
