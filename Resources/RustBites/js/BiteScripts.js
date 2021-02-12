@@ -75,6 +75,7 @@ storyMenu.bitesMenu = function () {
     <a class="undefined" href="RustBites_Channels.html">Channels</a><br />\
     <a class="undefined" href="RustBites_AsyncAwt.html">AsyncAwait</a><br />\
     <a class="undefined" href="RustBites_Macros.html">Macros</a><br />\
+    <a class="undefined" href="RustBites_Experiments.html">Experiments</a><br />\
     <a href="RustBites_TipsAndTricks.html">Hacks and Helpers</a><br />\
     <a href="../../IndexPage.html">Glossary</a><br />\
     <a href="Javascript.;#"></a><br />';
