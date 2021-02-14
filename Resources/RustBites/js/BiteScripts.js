@@ -65,6 +65,7 @@ storyMenu.bitesMenu = function () {
     <a href="RustBites_Structs.html">Structs</a><br />\
     <a href="RustBites_LifeTime.html">LifeTime</a><br />\
     <a href="RustBites_Abstract.html">Abstractions</a><br />\
+    <a href="RustBites_Enums.html">Enumerations</a><br />\
     <a href="RustBites_ErrHnd.html">ErrHandling</a><br />\
     <a href="RustBites_Options.html">Options</a><br />\
     <a href="RustBites_Conversions.html">Conversions</a><br />\
