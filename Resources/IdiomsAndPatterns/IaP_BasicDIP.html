@@ -254,7 +254,15 @@ int main() {
 
     std::cout 
         &lt;&lt; "\n  That's all Folks!\n\n";
-}        
+}    
+          
+
+
+
+
+
+
+
           </defn-code>
         <defn-head class="darkBlue">Output</defn-head>
         <defn-code class="lightBlue">
@@ -297,8 +305,6 @@ int main() {
   trait Say without affecting compilation of
   Demo&lt;T&gt;.
 */
-
-
 #![allow(dead_code)]
 
 /*-------------------------------------------
@@ -417,6 +423,8 @@ fn main() {
     println!("\n\n  That's all Folks!\n\n");
 }
 
+
+
         </defn-code>
         <defn-head class="darkRust">Output</defn-head>
         <defn-code class="lightRust">
@@ -438,7 +446,164 @@ cargo run -q
           <span class="right darkBlack smallpad cursor" onclick="storyMenu.hide('csh')">hide</span>
         </defn-head>
         <defn-code class="lightBlack">
-To appear eventually
+/////////////////////////////////////////////
+// basic_dip::Program.cs                   //
+//                                         //
+// Jim Fawcett, 14 Feb 2021                //
+/////////////////////////////////////////////
+/*
+  Demonstrates Dependency Inversion Principle:
+    "High level modules should not depend on
+      low level modules.  Both should depend
+      on abstractions."
+
+  This demonstration builds a basic demo with
+  self-annunciating low level components.
+    
+    - High level part: Demo&lt;T&gt;
+    - Low level parts: First, Second
+    - Abstraction defined in this package: 
+      - interface ISay
+  The definitons of First and Second could be
+  changed in any way that is compatible with 
+  ISay without affecting compilation of
+  Demo&lt;T&gt;.
+*/
+using System;
+
+namespace BasicDip_C_ {
+    /*-------------------------------------------
+      Interface ISay provies abstraction that
+      Demo&lt;T&gt; uses to avoid depending on
+      types First and Second.
+    */
+    public interface ISay {
+        void set_id(uint id);
+        uint get_id();
+        void say();
+    }
+
+    /*-------------------------------------------
+      - First is a component that Demo&lt;T&gt; 
+        depends on when executive (main) declares 
+        Demo&lt;First&gt;.
+      - Demo's compilation only depends on ISay,
+        not on details of First.
+    */
+    public class First : ISay {
+        public First() {
+            id_ = 0;
+        }
+        public void set_id(uint id) {
+            id_ = id;
+        }
+        public uint get_id() {
+            return id_;
+        }
+        public void say() {
+            Console.Write(
+                "\n  First here with id = {0}", id_
+            );
+        }
+        uint id_;
+    }
+
+    /*-------------------------------------------
+      - Second is a component that Demo&lt;T&gt; 
+        depends on when executive (main) declares 
+        Demo&lt;Second&gt;.
+      - Demo's compilation only depends on ISay,
+        not on details of Second.
+    */
+    public class Second : ISay {
+        public Second() {
+            id_ = 0;
+        }
+        public void set_id(uint id) {
+            id_ = id;
+        }
+        public uint get_id() {
+            return id_;
+        }
+        public void say() {
+            Console.Write(
+                "\n  Second here with id = {0}", id_
+            );
+        }
+        uint id_;
+    }
+    /*-------------------------------------------
+      Demo is high level type that uses low level
+      types First and Second without incurring
+      compilation dependencies on their impl's.
+    */
+    public class Demo&lt;T&gt; where T : ISay, new() {
+        public Demo() {
+          my_say = new T();
+        }
+        public void set_id(uint id) {
+            my_say.set_id(id);
+        }
+        public uint get_id() {
+            return my_say.get_id();
+        }
+        public void say_it() {
+            Console.Write(
+                "\n  Demo with id {0} here", get_id()
+            );
+            my_say.say();
+        }
+        T my_say;
+    }
+    /*-------------------------------------------
+      main() is program executive.  It depends 
+      directly on Demo, First, and Second.
+
+      DIP allows reusable component, which 
+      Demo&lt;T&gt; pretends to be, to be 
+      used in applications without change, 
+      even though parts it uses through 
+      interface change.
+    */
+    class Program {
+        static void Main(string[] args) {
+            Demo&lt;First&gt; df = 
+                new Demo&lt;First&gt;();
+            df.set_id(1);
+            df.say_it();
+            Console.WriteLine();
+
+            Demo&lt;Second&gt; ds = 
+                new Demo&lt;Second&gt;();
+            ds.set_id(2);
+            ds.say_it();
+
+            Console.Write(
+                "\n\n  That's all Folks!\n\n"
+            );
+        }
+    }
+}
+
+
+
+
+
+        </defn-code>
+        <defn-head class="darkBlack">Output</defn-head>
+        <defn-code class="lightBlack">
+dotnet run
+
+  -- basic_dip demo ---
+
+  Demo with id 1 here
+  First here with id = 1
+
+  Demo with id 2 here
+  Second here with id = 2
+
+  That's all Folks!
+
         </defn-code>
       </defn-block>
     </defn-outerBlock>
