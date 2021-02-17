@@ -1,0 +1,305 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="keywords" content="Rust, Introduction" />
+    <meta name="Author" content="Jim Fawcett" />
+    <meta name="Author" content="James Fawcett" />
+    <title>RustBites Enums</title>
+    <link rel="stylesheet" href="css/BiteStyles.css" />
+    <script src="js/BiteScripts.js"></script>
+    <script src="js/ScriptsKeyboard.js"></script>
+  </head>
+  <body id="github" onload="initBites()">
+    <div class="top-banner">
+      <span id="hctr">Consuming Rust Bite by Byte</span>
+      <span class="top-center">Enumerations</span>
+      <!-- <a class="top-right" href="../../RustBiteByByte.html">RustBiteByByte.html</a> -->
+    </div>
+  <next-prev>
+    <a href="../../index.html" style="color:#fefefa;">Home</a>&nbsp;
+    <a id="repo" href="../../RustBiteByByte.html">Repo</a> 
+    <a id="Prev" href="RustBites_Abstract.html">prev</a> 
+    <a id="Next" href="RustBites_ErrHnd.html">next</a>
+  </next-prev>
+
+      <toc-b id="toc">
+        <div id="bottom-menu" style="display:flex; flex-direction:row">
+          <!--<a href="Javascript:;" onclick="storyMenu.toggleTOC()" style="color:#fefefa;">E</a>&nbsp;
+          <a href="Javascript:;" onclick="storyMenu.closeTOC()" style="color:#fefefa;">C</a>&nbsp;
+          <a href="Javascript:;" onclick="storyMenu.sects()" style="color: #fefefa; ">Sects</a>&nbsp;
+          <a href="Javascript:;" onclick="storyMenu.chaps()" style="color:#fefefa;">Bites</a>&nbsp;-->
+        </div>
+        <!-- <up-b id="chaps" onmouseout="storyMenu.chaps()"> -->
+          <up-b id="chaps">
+            <!--<a href="RustBites_Facts.html">Facts</a><br />
+            <a href="RustBites_Intro.html">Introduction</a><br />
+            <a href="RustBites_Safety.html">Safety</a><br />
+            <a href="RustBites_UDB.html">UndefBehavior</a><br />
+            <a href="RustBites_Data.html">Data</a><br />
+            <a href="RustBites_DataStr.html">DataStructs</a><br />
+            <a href="RustBites_SmrtPtrs.html">SmartPtrs</a><br />
+            <a href="RustBites_LifeCycle.html">LifeCycle</a><br />
+            <a href="RustBites_Ownrs.html">Ownership</a><br />
+            <a href="RustBites_Traits.html">Generics&Traits</a><br />
+            <a href="RustBites_Functs.html">Functions</a><br />
+            <a href="RustBites_Structs.html">Structs</a><br />
+            <a href="RustBites_LifeTime.html">LifeTime</a><br />
+            <a href="RustBites_Abstract.html">Abstractions</a><br />
+            <a href="RustBites_ErrHnd.html">ErrHandling</a><br />
+            <a href="RustBites_Collects.html">Collections</a><br />
+            <a href="RustBites_Iterator.html">Iterators</a><br />
+            <a href="RustBites_Threads.html">Threads</a><br />
+            <a href="RustBites_Synchron.html">Synchronize</a><br />
+            <a href="RustBites_Channels.html">Channels</a><br />
+            <a href="RustBites_AsyncAwt.html">AsyncAwait</a><br />
+            <a href="RustBites_Macros.html">Macros</a><br />
+            <a href="RustBites_TipsAndTricks.html">Hacks and Helpers</a><br />
+            <a href="../../indexPage.html">Glossary</a><br />-->
+            <!-- <a href="RustBites_Generics.html">Generics</a><br /> -->
+            <!-- <a href="RustBites_Intmut.html">InterMutat</a><br /> -->
+            <!--<a href="Javascript.;#"></a><br />-->
+          </up-b>
+            <rt-b id="sects">
+          <a href="#top">Top</a>, <a href="#enums">Enums</a>, <a href="#matching">Matching</a>, 
+          <a href="#refs">Refs</a>
+        </rt-b>
+      </toc-b>
+      <div id="hlp" style="display:none;">
+        <!--<table>
+          <tr>
+            <td style="padding-right:5px;">Esc</td>
+            <td>toggle menus</td>
+          </tr>
+          <tr>
+            <td>C</td>
+            <td>close menus</td>
+          </tr>
+          <tr>
+            <td>R</td><td>Refresh</td>
+          </tr>
+          <tr>
+            <td>N</td><td>Next Bite</td>
+          </tr>
+          <tr>
+            <td>P</td><td>Prev Bite</td>
+          </tr>
+          <tr>
+            <td>T</td><td>scroll to top</td>
+          </tr>
+          <tr>
+            <td>B</td><td>scroll to bottom</td>
+          </tr>
+          <tr>
+            <td>H</td><td>Help</td>
+          </tr>
+        </table>-->
+       </div>
+    <h2>Rust Bite - Enumerations</h2>
+    <a id="enums"></a>
+    <t-b>
+      <hr class="spread" />
+    </t-b>
+    <h3>1.0 - Introduction</h3>
+    <t-b>
+      Rust error handling is based on two things: enumerations and matching. Rust&apos;s enumerations are more 
+      powerful than those of C++ and C#.  Each element of the enumeration may wrap some type, as shown in the
+      example below.
+    </t-b>
+    <t-b>
+      Often in code we use enums defined in the standard libraries, e.g., Option&lt;T&gt; or Result&lt;T, E&gt;,
+      which we discuss later in this Bite.  However, it can be quite useful to develop custom enumerations
+      like the one shown below.
+    </t-b>
+    <t-b>
+      This example shows an
+      Event&lt;T&gt; enumeration that represents different levels of events, and wraps information
+      about the event inside the event item except for the NoEvent item. This example shows how to 
+      write code to wrap and unwrap values from enumeration items.  
+    </t-b>
+    <div style="height:0.25rem;"></div>
+    <t-b>
+      <div>
+        <defn-OuterBlock>
+          <defn-block>
+          <defn-head>Custom Enumeration Example</defn-head>
+          <defn-code>
+#![allow(unused_variables)]
+
+/*-----------------------------------------------------
+   The generic parameter T represents some value 
+   associated with events, perhaps a name String 
+   or id number.
+*/
+#[derive(Debug, Clone)]
+enum Event&lt;T&gt; { 
+    Normal(T), Warning(T), Critical(T), NoEvent 
+}
+impl&lt;T&gt; Event&lt;T&gt; {
+    fn unwrap(&amp;self) -&gt; &amp;T {
+        if let Event::Normal(ev) = self{ ev } 
+        else if let Event::Warning(ev) = self{ev}
+        else if let Event::Critical(ev) = self{ev}
+        else { panic!() }
+    }
+}
+
+use Event::*;
+
+fn main() {
+    /*-- numbers are event ids --*/
+    let e1: Event&lt;u8&gt; = 
+        Event::&lt;u8&gt;::Normal(1);
+    let e2 = Warning(2);
+    let e3 = Critical(3);
+    let e4: Event&lt;u8&gt; = NoEvent;
+    
+    /*-- match works like switch stmt on steriods --*/
+
+    match e3 {
+        Normal(ev) =&gt; 
+            print!("\n  event {} is Normal", ev),
+        Warning(ev) =&gt; 
+            print!("\n  event {} is Warning", ev),
+        Critical(ev) =&gt; 
+            print!("\n  event {} is Critical!", ev),
+        NoEvent =&gt; print!("\n  no events occurred"),
+    }
+    
+    /*-------------------------------------------------
+      without the clone() operation below e2 would 
+      move into e and become invalid for future 
+      operations.
+    */
+    let e = e2.clone();
+    
+    /*-------------------------------------------------  
+      if let statements use "=" as match operator
+    */
+    
+      if let Warning(ev) = e {
+        print!("\n  event {} is Warning", ev);
+    }
+    
+    /*-- next stmt panics if event is NoEvent type --*/
+
+    let v = e3.unwrap();
+    print!("\n  inner value of {:?} is {}", e3, v);
+
+    /*-- will panic if you unwrap() e4 --*/
+} 
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Output</defn-head>
+            <defn-code>
+  event 3 is Critical!
+  event 2 is Warning
+  inner value of Critical(3) is 3   
+            
+            </defn-code>
+            <defn-head class="defnBorderTop">Comments</defn-head>
+            <defn-body>
+              Enumerations can have methods defined<br />
+              in the same way we define methods for<br />
+              structs.  That let&apos;s us acess and use their<br />
+              inner values.
+              <div style="height:0.75rem;"></div>
+              Match statements require us to handle all of<br />    
+              the enum items. 
+              <div style="height:0.75rem;"></div>
+              Sometimes we don&apos;t need to do that.<br />
+              Then, we can use the if let statement to<br />
+              test for a single enum item type.  
+              <div style="height:0.75rem;"></div>
+              Here,
+              the &quot;=&quot; operator is not assignment.<br />
+              It is a matching operator that selects on a<br />
+              single enum item type.
+              <div style="height:1.75rem;"></div>
+              How cool is Rust?  Very cool!
+              <div style="height:0.75rem;"></div>
+            </defn-body>
+            <defn-head class="defnBorderTop">Example:</defn-head>
+            <defn-body>
+              <div style="height:0.75rem;"></div>
+              <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=400f48cff6f4682db6eb93a8beae317f">
+                playground example
+              </a>
+            </defn-body>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+    <a id="matching"></a>
+    <div style="height:0.75rem;"></div>
+    <h3>2.0 Matching</h3>
+    <t-b>
+      Matching is Rust&apos;s model for alternates selection - more powerful than switch-case operations, as
+      shown by the example, above. 
+      Matching works for more than just enum items.  The example below shows matching on char ranges.
+    </t-b>
+    <t-b>
+      <div>
+        <defn-OuterBlock>
+          <defn-block>
+          <defn-head>Matching Ordinary Data</defn-head>
+          <defn-code>
+fn do_match(c: char) {
+    match c {
+        ('0'..='9') => 
+            print!("\n  {} is a digit", c),
+        ('a'..='z') => 
+            print!("\n  {} is lower case ascii char", c),
+        ('A'..='Z') => 
+            print!("\n  {} is upper case ascii char", c),
+        _ => print!("\n  {} is some other char type", c)
+    }
+}
+
+fn main() {
+    let x = 'a';
+    do_match(x);
+    do_match('Q');
+    do_match('7');
+    do_match('@');
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Output</defn-head>
+            <defn-code>
+  a is lower case ascii character
+  Q is upper case ascii character
+  7 is a digit
+  @ is some other char type
+  
+            </defn-code>
+            <defn-head class="defnBorderTop">Comments</defn-head>
+            <defn-body>
+              
+              Lexer here we come!
+              <div style="height:0.75rem;"></div>
+              <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=63a5e4c1b5b3a1f4ff1d3a986b540d4b">
+                playground example
+              </a>
+            </defn-body>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+    <a id="refs"></a>
+    <div style="height:0.25Rem;"></div>
+    <h3>3.0 References</h3>
+    <t-b>
+      <hr class="spread" />
+    </t-b>
+    <div>
+      <table>
+        <tr>
+          <th>Link</th><th>Description</th>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>
