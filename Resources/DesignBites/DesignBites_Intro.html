@@ -105,22 +105,68 @@
         </table>-->
        </div>
    
-      <h2>Design Bite - Introduction to Design</h2>
+      <h2>Design Bite - Introduction</h2>
       <hr />
       <h3>1.0 Prologue</h3>
       <div class="indent">
         <t-b>
-          Design Bites are a short sequence of Bites (pages), each focused on a specific aspect
-          of software design.  They are each brief, pragmatic, and relevent to things you and I do professionally.
+          Design Bites are a short sequence of pages, each focused on a specific aspect
+          of software design.  They are brief, pragmatic, and relevent to things you and I do professionally.
         </t-b>
         <t-b>
           This page is an introduction to the sequence. We use the <strong>TextFinder</strong> project, 
           introduced in BuildOn presentations, to make discussion concrete and specific.
         </t-b>
+        <t-b>
+          Design has two main phases: defining an architecture and implementing it.  It has a precursor,
+          concept development. When an architecture is relatively complete, a design specification is
+          developed. Then, design begins.
+        </t-b>
+        <t-b>
+          For small brief projects, like TextFinder, This likely to be a linear sequence.  For larger projects
+          development may be staged into producing a core release, and then a series of releases with progressively
+          more functionality, until the specification has been satisfied.
+        </t-b>
+        <t-b>
+          It is important to note that design need not be a huge process.  Its size, effort, and products should 
+          be scaled to match the project. For projects like TextFinder, it might be a day or two of work with a
+          few pages of documentation.
+        </t-b>
       </div>
-      <div class="indent">
-        <h4>1.1 - Concept</h4>
-        <div class="indent">
+      <h3>2.0 Concept Development</h3>
+      <div style="width:calc(100vw - 6rem);">
+        <div class="right">
+          <photosizer-block src="pictures/Design.jpg" width="600" class="photoSizerBlock" style="margin-top:0;">
+            <span style="
+              display: inline-block;
+              font-weight: bold;
+              font-family: 'Comic Sans MS, Tahoma';
+              background-color: #ddd;
+              width: 100%;
+              padding: 5px 0px;
+            ">
+              Figure 1. Software Design
+            </span>
+          </photosizer-block>
+        </div>
+      </div>
+      <div>
+        <t-b>
+          There we think about who the users will be, what their goals and expected
+          activities are, and we also think about issues that may become apparent as the design proceeds.
+        </t-b>
+        <t-b>
+          Issues may be things like performance, ease of use, scope of activities, complexity, and ability
+          of the development team to complete the project at reasonable cost with a practical schedule.
+        </t-b>
+        <t-b>
+
+        </t-b>
+      </div>
+    <div class="indent">
+      <div class="indents">
+        <h4>2.1 - TextFinder Concept</h4>
+        <div class="indents">
           <t-b>
             Design concept deals with what?, why?, and so what?
           </t-b>
@@ -163,6 +209,191 @@
               </li>
             </ul>
           </t-b>
+        <t-b>
+          When the concept is complete, we begin developing an architecture.
+        </t-b>
+      </div>
+      <h3>3.0 Architecture</h3>
+      <div class="indent">
+        <t-b>
+          Architecture is an abstraction that leaves out all of the details of language and platform, 
+          letting ideas take precedence. Its purpose is to think about how the project will function,
+          what its parts will be, their responsibilities,
+          how they will communicate, and how data flows through the system.
+        </t-b>
+        <h4>3.1 TextFinder Architecture</h4>
+        <div style="width:calc(100vw - 9rem);">
+          <div class="right">
+            <photosizer-block src="pictures/TextFinderPackages.jpg" width="500" class="photoSizerBlock" style="margin-top:0;">
+              <span style="
+                display: inline-block;
+                font-weight: bold;
+                font-family: 'Comic Sans MS, Tahoma';
+                background-color: #ddd;
+                width: 100%;
+                padding: 5px 0px;
+              ">
+                Figure 2. TextFinder Packages
+              </span>
+            </photosizer-block>
+          </div>
+        </div>
+        <t-b>
+          One useful way to start is to summarize tasks the system will need to execute in order
+          to to find files with specified text:
+          <ul class="tight">
+            <li>
+              Accept information from the command line that specifies directories to search, kinds of 
+              files to analyze, text to find, and any options that seem appropriate.
+            </li>
+            <li>
+              Navigate through the directory tree rooted at an input path, find names of all files that match
+              specified patterns, e.g., extensions like &quot;.html&quot;, &quot;.rs&quot;, &quot;.h&quot;, &quot;.cpp&quot;, ...,
+              and the paths where they are found, and send on for text search.
+            </li>
+            <li>
+              Open each such file and search for specified text.  Send results on for display.
+            </li>
+            <li>
+              Extract useful information from the data stream, perform any required post-processing,
+              and display the results.
+            </li>
+          </ul>
+          Each task is a candidate to become a package. Note that we&apos;ve described a data flow process.
+          That&apos;s not the only way to configure TextFinder, but will be effective.  That&apos;s because
+          Information can be supplied to the user as part of the processing, which may visit hundreds or
+          even thousands of files and directories.  We will see later, that data-flow lends itself to
+          concurrent processing for text search in files. 
+        </t-b>
+        <t-b>
+          Now the parts - source code packages - are emerging from that thought process, e.g.:
+          <ul class="tight">
+            <li>
+              <strong>TextFinder</strong> executive creates instances of the implementation&apos;s types 
+              and starts the processing flow.
+              It creates CmdlnParser and accepts its parsed output, creates an instance of DirNav
+              and configures it with the TextSearch type.  It creates an instance of the Display type,
+              and configures TextSearch with text and a reference to the Display type.
+            </li>
+            <li>
+              <strong>CmdlnParser</strong> accepts the input command line, parses it into an associative list of
+              attributes - path, patterns, text, ... - and returns that information to TextFinder.
+            </li>
+            <li>
+              <strong>DirNav</strong> accepts a starting path and the set of file patterns to find, and recursively
+              visits all directories in the directory tree rooted at the specified path.  Each time it
+              enters a directory and finds file names that match one of its patterns it passes that
+              information on for text search, using an eventing interface.
+            </li>
+            <li>
+              <strong>TextSearch</strong> opens each file it&apos;s given and searches for the specified text. 
+              It then passes that information on for display.
+            </li>
+            <li>
+              <strong>Display</strong> is interesting.  What it needs to do is very application specific, 
+              as indicated in the Textfinder Concept.  Since TextFinder executive configures TextSearch with
+              a reference to its display, the application can provide several display types, one of
+              which is instantiated based on user input.
+            </li>
+          </ul>
+          Now, we have a clear picture of what needs to be implemented and what structure to use.  Next, we
+          need to describe what we are going to deliver.
+        </t-b>
+      </div>
+      <h3>4.0 TextFinder Specification:</h3>
+      <dir class="indent">
+        <t-b>
+          A specification should be as brief as practical while still being complete and unambiguous.  We are
+          electing to make display quite simple, but the architecture leaves open the possibility of easily
+          replacing that with alternate display processing in a later version.
+        </t-b>
+        <t-b>
+          <ol class="tight">
+            <li>
+              Identify all files in a directory subtree that match one or more patterns and contain a specified text.
+            </li>
+            <li>
+              Specify root path, one or more file patterns (.h, .cpp, .cs, .rs, ...), and search text on command line.
+            </li>
+            <li>
+              Specify options <c-s>/s [true|false]</c-s>, <c-s>/v [true|false]</c-s>, <c-s>/H [true|false]</c-s>
+              <c-s>/h [true|false]</c-s> for recursive directory walk, verbose output header, Hidden dirs with no match,
+              and help message, respectively.
+            </li>
+            <li>
+              Display file name and path, without duplication of path name, e.g., organized by directory, for files
+              containing the search text.
+            </li>
+            <li>
+              Interesting extensions, not required for this implementation:
+              <ul class="tight" style="margin-left:0.85rem;">
+                <li>
+                  Replace text by regular expressions for both search text and file patterns.
+                </li>
+                <li>
+                  Replace sequential file searches with parallel searches to improve performance and useability.
+                </li>
+              </ul>
+            </li>
+          </ol>
+          At this point, we can begin developing code, focusing on generating specified processing with user-defined
+          types and their methods.  We know how data will flow, which makes it relatively simple to build test mocks
+          for functionality not yet in place.
+        </t-b>
+      </dir>
+      <h3>5.0 Implementation</h3>
+      <div class="indent">
+        <t-b>
+          Implementation is all about details.  Every single line of code for every package matters. Once an
+          architecture is defined, each package can be built in near isolation from the others until we tie
+          everything together near the end. So that makes it much easier to handle this level of detail.
+        </t-b>
+         <div style="width:calc(100vw - 9rem);">
+            <div class="right clear">
+              <photosizer-block src="pictures/TextFinderClassDiagram2.jpg" width="600" class="photoSizerBlock" style="margin-top:0;">
+                <span style="
+                  display: inline-block;
+                  font-weight: bold;
+                  font-family: 'Comic Sans MS, Tahoma';
+                  background-color: #ddd;
+                  width: 100%;
+                  padding: 5px 0px;
+                ">
+                  Figure 3. TextFinder Types
+                </span>
+              </photosizer-block>
+            </div>
+          </div>
+          <t-b>
+            The implementation process often starts with a single package, populating that with types and functions.
+            Since we will be using Rust, we won&apos;t use the term class as it builds user-defined types with
+            structs.
+          </t-b>
+          <t-b>
+            Each package will have a primary type, as shown in Figure 3.  The types DirEvent and SearchEvent are
+            traits, used to support communication, as described below.
+            <t-b>
+              <ul class="tight">
+                <li>
+                  <strong><c-s>Executive</c-s></strong> type is defined in the TextFinder package.  It creates an instance
+                  of <c-s>DirNav&lt;Finder&gt;</c-s> and configures its internal <c-s>Finder</c-s> instance with a reference 
+                  to an instance of <c-s>GenOut</c-s>.  This generates a data flow pipe-line which dominates TextFinder processing.
+                </li>
+                <li>
+                  <strong><c-s>DirNav&lt;Finder&gt;</c-s></strong> in its constructor creates an instance of 
+                  <c-s>Finder</c-s> using a
+                  factory function specified in the DirEvent trait and implemented by Finder.  It exposes a 
+                  public method <c-s>get_app(&mut self) -> &mut App</c-s>.  The App type is a generic parameter
+                  which Executive supplied by constructing <c-s>DirNav&lt;Finder&gt;</c-s>.  That is called
+                  by <c-s>Executive</c-s> to configure the <c-s>Finder</c-s> app with an instance of GenOut.
+                </li>
+                <li>
+                  <strong><c-s>TextSearch</c-s></strong>
+                </li>
+              </ul>
+            </t-b>
+            
+          </t-b>
         </div>
         <h4>1.2 - Specification</h4>
         <h4>1.3 - Tasks</h4>
@@ -185,41 +416,10 @@
           An abstraction consists of a set of components with specified responsibilities and usually one or more diagrams That
           illustrate ownership and usage relationships between components.
         </t-b>
-      </div>      
+      </div> 
+    </div>
     <h3>2. RustComm Abstraction</h3>
-    <div class="indent">
-      <div style="width:calc(100vw - 9rem);">
-        <div class="right">
-          <photosizer-block src="pictures/TextFinderPackages.jpg" width="500" class="photoSizerBlock" style="margin-top:0;">
-            <span style="
-              display: inline-block;
-              font-weight: bold;
-              font-family: 'Comic Sans MS, Tahoma';
-              background-color: #ddd;
-              width: 100%;
-              padding: 5px 0px;
-            ">
-              Figure 1. TextFinder Packages
-            </span>
-          </photosizer-block>
-        </div>
-      </div>
-      <div style="width:calc(100vw - 9rem);">
-        <div class="right clear">
-          <photosizer-block src="pictures/TextFinderClassDiagram2.jpg" width="500" class="photoSizerBlock" style="margin-top:0;">
-            <span style="
-              display: inline-block;
-              font-weight: bold;
-              font-family: 'Comic Sans MS, Tahoma';
-              background-color: #ddd;
-              width: 100%;
-              padding: 5px 0px;
-            ">
-              Figure 1. TextFinder Classes
-            </span>
-          </photosizer-block>
-        </div>
-      </div>
+<!--         <div class="indent">-->
       <t-b>
         We will use code from the <a href="../../RustComm.html">RustComm</a> repository as an Example for this discussion.
         RustComm is a message-passing communication system based on Tcp Sockets provided by the Rust std::net library.
