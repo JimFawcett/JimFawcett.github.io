@@ -176,8 +176,8 @@
         <t-b>
           TextSearch package defines struct <c-s>Finder</c-s> that provides the methods:
           <indent-block>
-            <c-s>fn do_dir(&mut self, dir: &str)</c-s><br />
-            <c-s>fn do_file(&mut self, file: &str)</c-s><br />
+            <c-s>fn do_dir(&mut self, dir: &Path)</c-s><br />
+            <c-s>fn do_file(&mut self, file: &Path)</c-s><br />
             <c-s>fn set_txt(&mut self, srctxt: &str)</c-s>
           </indent-block>
           Method <c-s>do_file</c-s> sends its results directly to <c-s>GenOut</c-s>, below, rather than 
@@ -186,9 +186,9 @@
         <t-b>
           It defines, in this Step, struct <c-s>GenOut</c-s> to provide methods:
           <indent-block>
-            <c-s>fn set_dir(&mut self, dir: &str)</c-s><br />
+            <c-s>fn set_dir(&mut self, dir: &Path)</c-s><br />
             <c-s>/* rslt args, below, are: filename, found, and search_text */</c-s><br />
-            <c-s>fn set_file(&mut self, rslt:(&str, bool, &str))</c-s>
+            <c-s>fn set_file(&mut self, rslt:(&Path, bool, &str))</c-s>
           </indent-block>
           In this Step, <c-s>GenOut</c-s> is a test mock, supporting <c-s>Finder</c-s> testing.
           A completed version will migrate to Display package in Step&nbsp;#4.
@@ -330,6 +330,8 @@
 // Jim Fawcett, https://JimFawcett.github.io, 14 Jan 21  //
 ///////////////////////////////////////////////////////////
 
+use std::path::{Path, PathBuf};
+
 /*-----------------------------------------------
   A trait is similar to an interface, most often
   used to convey a communication protocol for
@@ -339,8 +341,8 @@
   Step #4
 */
 pub trait SearchEvent {
-    fn set_dir(&amp;mut self, dir: &amp;str);
-    fn set_file(&amp;mut self, rslt: (&amp;str, bool, &amp;str));
+    fn set_dir(&amp;mut self, dir: &amp;Path);
+    fn set_file(&amp;mut self, rslt: (&amp;Path, bool, &amp;str));
 }
 /*-----------------------------------------------
   GenOut converts Finder's data into information
@@ -348,21 +350,21 @@ pub trait SearchEvent {
 */
 #[derive(Debug)]
 pub struct GenOut {
-    dir: String
+    dir: PathBuf
 }
 /*-- implement trait --------------------------*/
 impl SearchEvent for GenOut {
-    fn set_dir(&amp;mut self, rdir: &amp;str) {
-        self.dir = rdir.to_string();
-        print!("\n  {}", rdir);
+    fn set_dir(&amp;mut self, rdir: &amp;Path) {
+        self.dir = rdir.to_path_buf();
+        print!("\n  {:?}", rdir);
     }
-    fn set_file(&amp;mut self, rslt: (&amp;str, bool, &amp;str)) {
+    fn set_file(&amp;mut self, rslt: (&amp;Path, bool, &amp;str)) {
         let (file, found, text) = rslt;
         if found {
-            print!("\n    {}: {:?} found", file, text);
+            print!("\n    {:?}: {:?} found", file, text);
         }
         else {
-            print!("\n    {}: {:?} not found", file, text);
+            print!("\n    {:?}: {:?} not found", file, text);
         }
     }
 }
@@ -370,7 +372,7 @@ impl SearchEvent for GenOut {
 impl GenOut {
     pub fn new() -&gt; GenOut {
         GenOut {
-            dir: String::new()
+            dir: PathBuf::new()
         }
     }
 }
@@ -381,25 +383,25 @@ impl GenOut {
   Not used in this step.
 */
 pub trait DirEvent {
-    fn do_dir(&amp;mut self, dir: &amp;str);
-    fn do_file(&amp;mut self, file: &amp;str);
+    fn do_dir(&amp;mut self, dir: &amp;Path);
+    fn do_file(&amp;mut self, file: &amp;Path);
 }
 /*-----------------------------------------------
   Finder searches for text in specified file
 */
 #[derive(Debug)]
 pub struct Finder {
-      dir: String,
+      dir: PathBuf,
       srctxt: String,
       out: GenOut
 }
 /*-- implement DirEvent --*/
 impl DirEvent for Finder {
-    fn do_dir(&amp;mut self, dir: &amp;str) {
-        self.dir = dir.to_string();
+    fn do_dir(&amp;mut self, dir: &amp;Path) {
+        self.dir = dir.to_path_buf();
         self.out.set_dir(dir);
     }
-    fn do_file(&amp;mut self, file: &amp;str) {
+    fn do_file(&amp;mut self, file: &amp;Path) {
         /* 
             Pretending to search for text in file.
             Function should:
@@ -420,7 +422,7 @@ impl DirEvent for Finder {
 impl Finder {
     pub fn new() -&gt; Finder {
         Finder {
-            dir: String::new(),
+            dir: PathBuf::new(),
             srctxt: String::new(),
             out: GenOut::new()
         }
@@ -436,12 +438,12 @@ mod tests {
     #[test]
     fn construct_genout() {
         let g = GenOut::new();
-        assert_eq!(g.dir , "".to_string());
+        assert_eq!(g.dir , PathBuf::from(""));
     }
     #[test]
     fn construct_finder() {
         let f = Finder::new();
-        assert_eq!(f.dir, "".to_string());
+        assert_eq!(f.dir,  PathBuf::from(""));
     }
 }
 
@@ -480,23 +482,25 @@ test result: ok. 0 passed; 0 failed; 0 ignored;
 ///////////////////////////////////////////////////////////
 
 use text_search::*;
+use std::path::{Path};
 
 fn main() {
     print!("\n  -- demonstrate structure for Step#1 --\n");
    let mut finder = Finder::new();
    finder.set_txt("BuildOn");
-   finder.do_dir("Dir1");
-   finder.do_file("file1.txt");
+   finder.do_dir(&amp;Path::new("Dir1"));
+   finder.do_file(&amp;Path::new("file1.txt"));
    finder.set_txt("BuildOff");
-   finder.do_file("file2.txt");
-   finder.do_dir("Dir2");
+   finder.do_file(&amp;Path::new("file2.txt"));
+   finder.do_dir(&amp;Path::new("Dir2"));
    finder.set_txt("abc");
-   finder.do_file("file3.txt");
+   finder.do_file(&amp;Path::new("file3.txt"));
    finder.set_txt("123");
-   finder.do_file("file4.txt");
+   finder.do_file(&amp;Path::new("file4.txt"));
 
    print!("\n\n  That's all Folks!\n\n");
-}<div style="font-size:1.15rem; font-weight:bold;">Test1 Example Output</div><hr style="width:100%;" />
+}
+<div style="font-size:1.15rem; font-weight:bold;">Test1 Example Output</div><hr style="width:100%;" />
 C:\su\temp\BuildOnStructure\Step1\TextSearch>
 cargo run --example test1
     Finished dev [unoptimized + debuginfo] target(s) in 0.01s
@@ -608,6 +612,7 @@ edition = "2018"
               <td>
                 <a href="../../RustStory_Libraries.html#fs">Rust story File System</a><br />
                 <a href="https://doc.rust-lang.org/std/fs/index.html">std::fs</a><br />
+                <a href="https://doc.rust-lang.org/std/path/index.html">std::path</a>
                 &nbsp;
               </td>
             </tr>
