@@ -48,37 +48,12 @@ initBites = function () {
 
 storyMenu.bitesMenu = function () {
   var bitesMenu = document.getElementById("chaps");
-  bitesMenu.innerHTML = '<a href="RustBites_Intro.html">Introduction</a><br />\
-    <a href="RustBites_GettingStarted.html">Starting</a><br />\
-    <a href="RustBites_Tooling.html">Tooling</a><br />\
-    <a href="RustBites_Safety.html">Safety</a><br />\
-    <a href="RustBites_UDB.html">UndefBehavior</a><br />\
-    <a href="RustBites_Data.html">Data</a><br />\
-    <a href="RustBites_FlashCards.html">FlashCards</a><br />\
-    <a href="RustBites_Facts.html">Facts</a><br />\
-    <a href="RustBites_DataStr.html">DataStructs</a><br />\
-    <a href="RustBites_SmrtPtrs.html">SmartPtrs</a><br />\
-    <a href="RustBites_LifeCycle.html">LifeCycle</a><br />\
-    <a href="RustBites_Ownrs.html">Ownership</a><br />\
-    <a href="RustBites_Traits.html">Generics&Traits</a><br />\
-    <a href="RustBites_Functs.html">Functions</a><br />\
-    <a href="RustBites_Structs.html">Structs</a><br />\
-    <a href="RustBites_LifeTime.html">LifeTime</a><br />\
-    <a href="RustBites_Abstract.html">Abstractions</a><br />\
-    <a href="RustBites_Enums.html">Enumerations</a><br />\
-    <a href="RustBites_ErrHnd.html">ErrHandling</a><br />\
-    <a href="RustBites_Options.html">Options</a><br />\
-    <a href="RustBites_Conversions.html">Conversions</a><br />\
-    <a href="RustBites_Collects.html">Collections</a><br />\
-    <a class="undefined" href="RustBites_Iterator.html">Iterators</a><br />\
-    <a class="undefined" href="RustBites_Threads.html">Threads</a><br />\
-    <a class="undefined" href="RustBites_Synchron.html">Synchronize</a><br />\
-    <a class="undefined" href="RustBites_Channels.html">Channels</a><br />\
-    <a class="undefined" href="RustBites_AsyncAwt.html">AsyncAwait</a><br />\
-    <a class="undefined" href="RustBites_Macros.html">Macros</a><br />\
-    <a class="undefined" href="RustBites_Experiments.html">Experiments</a><br />\
-    <a href="RustBites_TipsAndTricks.html">Hacks and Helpers</a><br />\
-    <a href="../../IndexPage.html">Glossary</a><br />\
+  bitesMenu.innerHTML = '<a href="DesignBites_Intro.html">Introduction</a><br />\
+    <a href="DesignBites_Structure.html">Structure</a><br />\
+    <a class="undefined" href="DesignBites_DIP.html">Dep Inversion</a><br />\
+    <a class="undefined" href="DesignBites_PluggIn.html">Pluggins</a><br />\
+    <a href="Javascript.;#"></a><br />\
+    <a href="../../Design.html">Design</a><br />\
     <a href="Javascript.;#"></a><br />';
 }
 
