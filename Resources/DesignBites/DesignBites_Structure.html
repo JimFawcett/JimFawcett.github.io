@@ -129,7 +129,7 @@
     </div>      
     <a id="structure"></a>
     <div style="height:0.75rem;"></div>
-    <h3>2. TextFinder Structure</h3>
+    <h3>2. Application Structure</h3>
     <div class="indent">
       <t-b>
         Let&apos;s build up to the TextFinder structure by considering some design alternatives:
@@ -137,7 +137,7 @@
     </div>
     <div style="width:calc(100vw - 9rem);">
       <div style="display:flex;">
-        <photosizer-block src="pictures/Design1.jpg" width="300" class="photoSizerBlock" style="margin-top:0;">
+        <photosizer-block src="pictures/Design1.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
           <span style="
             display: inline-block;
             font-weight: bold;
@@ -146,7 +146,7 @@
             width: 100%;
             padding: 5px 0px;
           ">
-            Figure 2. Basic Structure
+            Figure 2. Basic Pkg Structure
           </span>
         </photosizer-block>
         <explain-block>
@@ -179,7 +179,7 @@
       <div style="height:0.5rem;"></div>
       <hr />
       <div style="display:flex;">
-        <photosizer-block src="pictures/Design2.jpg" width="300" class="photoSizerBlock" style="margin-top:0;">
+        <photosizer-block src="pictures/Design2.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
           <span style="
             display: inline-block;
             font-weight: bold;
@@ -188,7 +188,7 @@
             width: 100%;
             padding: 5px 0px;
           ">
-            Figure 3. Factored Structure
+            Figure 3. Factored Pkg Structure
           </span>
         </photosizer-block>
         <explain-block>
@@ -212,6 +212,7 @@
                 <ol>
                   <li>Project setup gets more complex</li>
                   <li>More pieces to track and deploy</li>
+                  <li>Executive has to participate in each stage of the processing</li>
                 </ol>
               </div>
             </pros-cons>
@@ -221,7 +222,7 @@
       <div style="height:0.5rem;"></div>
       <hr />
       <div style="display:flex;">
-        <photosizer-block src="pictures/Design4.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
+        <photosizer-block src="pictures/Design4.jpg" width="500" class="photoSizerBlock" style="margin-top:0;">
           <span style="
             display: inline-block;
             font-weight: bold;
@@ -230,7 +231,7 @@
             width: 100%;
             padding: 5px 0px;
           ">
-            Figure 5. Data Flow Structure
+            Figure 4. Data Flow Type Structure
           </span>
         </photosizer-block>
         <explain-block>
@@ -266,7 +267,7 @@
       <div style="height:0.5rem;"></div>
       <hr />
       <div style="display:flex">
-        <photosizer-block src="pictures/Design5.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
+        <photosizer-block src="pictures/Design5.jpg" width="600" class="photoSizerBlock" style="margin-top:0;">
           <span style="
             display: inline-block;
             font-weight: bold;
@@ -275,19 +276,21 @@
             width: 100%;
             padding: 5px 0px;
           ">
-            Figure 6. Type Erasure Structure
+            Figure 5. Type Erasure Type Structure
           </span>
         </photosizer-block>
         <explain-block>
           <h4>Type Erasure Structure</h4>
           <t-b>
-            Type erasure changes dependency relationships. In Figure 5, Input holds a &quot;type erased&quot;
-            instance of the compute block.  Input defines an interface it will call, CInterface, that Compute implements.
-            The Executive creates an instance of Input&lt;Compute&gt; but Input, internally, just uses the
-            Compute interface, CInterface.
+            Type erasure changes dependency relationships. In Figure 5, <c-s>Input</c-s> holds a &quot;type erased&quot;
+            instance of the compute block.  Input defines an interface it will call, <c-s>Compute</c-s>, that 
+            <c-s>ComputeImpl</c-s> implements.
+            The Executive creates an instance of <c-s>Input&lt;ComputeImpl&gt;</c-s> but Input, internally, 
+            just uses the Compute interface, <c-s>Compute</c-s>.
           </t-b>
           <t-b>
-            That means that both Input and Compute depend on CInterface.  Since Input defines CInterface,
+            That means that both <c-s>Input</c-s> and <c-s>ComputeImpl</c-s> depend on <c-s>Compute</c-s>.  
+            Since <c-s>Input</c-s> defines <c-s>Compute</c-s>,
             the Compute package now depends on the Input package - the opposite of the basic
             data flow structure.  Because of that, we say this design uses dependency inversion.
           </t-b>
@@ -321,8 +324,78 @@
     </div>
     <div style="height:0.5rem;"></div>
     <hr />
+    <div style="display:flex">
+      <photosizer-block src="pictures/Design6.jpg" width="600" class="photoSizerBlock" style="margin-top:0;">
+        <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS, Tahoma';
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;
+        ">
+          Figure 6. PlugIn Type Structure
+        </span>
+      </photosizer-block>
+      <explain-block>
+        <h4>PlugIn Structure</h4>
+        <t-b>
+          The PlugIn structure is very similar to Type Erasure, but with the flexibility to define output processing
+          at run-time.  The <c-s>Executive</c-s> creates an <c-s>OutputImpl</c-s> type at run-time and configures
+          <c-s>ComputeImpl</c-s> with that type.  
+        </t-b>
+        <t-b>
+          That can be any type that implements the <c-s>Output</c-s> trait.  We get that freedom by not
+          parameterizing <c-s>ComputeImpl</c-s> on <c-s>OutputImpl</c-s>, as we did in Type Erasure.  
+          Now, <c-s>ComputeImpl</c-s> cannot
+          create an instance of the <c-s>OutputImpl</c-s> type because now it only has the <c-s>Output</c-s> trait
+          definition, but no paramaterized type to get an instance using a factory function.
+        </t-b>
+        <t-b>
+          This gives the application freedom to choose the type of output processing based on a command line input.
+          PlugIn has most of the characteristics of the Type Erasure structure, with the addition of freedom of 
+          choice for output processing.
+        </t-b>
+        <t-b>
+          Implementation gets a bit more complicated because <c-s>Executive</c-s> has to create an instance of
+          the desired type and give it to <c-s>ComputeImpl</c-s>.  It depends on <c-s>Input</c-s> to provide
+          access via an <c-s>get_app(&mut self)</c-s> method.
+        </t-b>
+        <pros-cons>
+          <div>
+            <h4>Pros:</h4>
+            <ol>
+              <li>Same as data flow</li>
+              <li>
+                The Input, Compute, and Output parts are now decoupled, each depending only on
+                the interfaces it defines and the interfaces of upstream components.
+              </li>
+              <li>
+                Freedom to define <c-s>Output</c-s> processing at run-time through a polymorphic run-time
+                dispatch.
+              </li>
+            </ol>
+          </div>
+          <div>
+            <h4>Cons:</h4>
+            <ol>
+              <li>
+                The building process becomes more complex.  Each component needs to use a factory
+                function to create its downstream component (to maintain type ignorance).
+              </li>
+              <li>
+                Again, more complex because <c-s>Executive</c-s> needs access to <c-s>Compute</c-s> to configure
+                it with <c-s>Output</c-s>.
+              </li>
+            </ol>
+          </div>
+        </pros-cons>
+      </explain-block>
+    </div>
+    <div style="height:0.5rem;"></div>
+    <hr />
       <div style="display:flex;">
-        <photosizer-block src="pictures/Design3.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
+        <photosizer-block src="pictures/Design3.jpg" width="500" class="photoSizerBlock" style="margin-top:0;">
           <span style="
             display: inline-block;
             font-weight: bold;
@@ -331,7 +404,7 @@
             width: 100%;
             padding: 5px 0px;
           ">
-            Figure 4. Rust Project Structure
+            Figure 6. Rust Project Structure
           </span>
         </photosizer-block>
         <explain-block>
