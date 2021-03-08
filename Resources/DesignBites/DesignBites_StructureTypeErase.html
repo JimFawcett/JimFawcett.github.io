@@ -48,8 +48,8 @@
     <next-prev>
       <a href="../../index.html" style="color:#fefefa;">Home</a>&nbsp;
       <a id="repo" href="../../RustBiteByByte.html">Repo</a> 
-      <a id="Prev" href="DesignBites_Intro.html">prev</a> 
-      <a id="Next" href="DesignBites_Structure.html">next</a>
+      <a id="Prev" href="DesignBites_StructureDataFlow.html">prev</a> 
+      <a id="Next" href="DesignBites_StructurePlugIn.html">next</a>
     </next-prev>
 
     <toc-b id="toc">
@@ -73,23 +73,42 @@
       <t-b>
         This DesignBite sequence was inspired by BuildOn project <a href="../BuildOn/Step0.html">TextFinder</a>.
         As that project is designed and implemented, a number of design decisions are made, consciously or unconsciously.
-        Each of these pages addresses one answer to questions about the fundamental design decision, structure.
+        Each of these pages addresses one answer to questions about fundamental decisions of structure.
       </t-b>
       <t-b>
-        We consider both package structure and logical structure, e.g., the functions and structs used to order
-        design and implementation.  In this Basic Structure page all code is implemented in a single package and
-        a single struct provides all of the organization for processing.
+        We consider both package structure and logical structure, e.g., functions and structs used to order
+        design and implementation.  In this PlugIn Structure page code is implemented in a set of packages
+        Executive, Input, Compute, and Output and their
+        structs.  That provides all of the organization for processing.
       </t-b>
     </div>
     <a id="basic_str"></a>
     <div style="height:0.25rem;"></div>
-    <h3>2. Application Structure - TypeErase</h3>
+    <h3>2. Application Structure - PlugIn</h3>
     <div class="indent">
       <t-b>
-        This structure is monolithic, e.g., all code is packaged in a single file and there is only one struct
-        used to implement processing, e.g., counting lines of code in files specified on the command line.
+        This structure is modular with a data flow structure.  It differs from the previous dataflow structure
+        in that:
+        <ul class="tight">
+          <li>
+            Its Input and Compute parts are parameterized on the types to which they send output.  
+          </li>
+          <li>
+            Each parameterized part depends only on the trait used by its downstream part.  That trait
+            is definded in the caller&apos;s package.
+          </li>
+          <li>
+            That means that all non-Executive parts are immune to build breakage when other parts change.
+          </li>
+          <li>
+            Its dependencies are opposite of the data flow structure.  Each part depends on its upstream
+            package where the trait it uses is defined.  For that reason it is often said to implement the
+            Dependency Inversion Principle.
+          </li>
+        </ul>
       </t-b>
     </div>
+    <div style="width:calc(100vw - 9rem);"></div>
     <div style="display:flex">
       <photosizer-block src="pictures/Design5.jpg" width="600" class="photoSizerBlock" style="margin-top:0;">
         <span style="
@@ -148,6 +167,7 @@
     </div>
     <div style="height:0.5rem;"></div>
     <hr />
+    <div style="height:0.5rem;"></div>
     <div class="indent">
       <defn-OuterBlock>
         <defn-block>
@@ -219,7 +239,7 @@ fn main() {
   file "../Input/examples/test1.rs" has 30 lines of code    
 
   file "../Compute/src/lib.rs" has 61 lines of code
-  file "../Compute/examples/test1.rs" has 39 lines of code  
+  file "../Compute/examples/test1.rs" has 39 lines of code   
 
   file "../Output/src/lib.rs" has 28 lines of code
   file "../Output/examples/test1.rs" has 16 lines of code   
@@ -560,7 +580,9 @@ impl Output for OutputImpl {
         OutputImpl {}
     }
     fn do_output(&amp;self, name: &amp;str, lines: usize) {
-        print!("\n  file {:?} has {} lines of code", name, lines);
+        print!(
+            "\n  file {:?} has {} lines of code", name, lines
+        );
     }
 }
 #[cfg(test)]
@@ -626,10 +648,11 @@ compute = { path = "../Compute" }
       <t-b>
         The fourh design alternatives considered here:
         <ol class="tight">
-          <li>Monolithic Structure</li>
-          <li>Factored Structure</li>
-          <li>Data Pipeline</li>
-          <li>Type Erasure Pipeline</li>
+          <li><a href="DesignBites_StructureBasic.html">Monolithic Structure</a></li>
+          <li><a href="DesignBites_StructureFactored.html">Factored Structure</a></li>
+          <li><a href="DesignBites_StructureDataFlow.html">DataFlow Structure</a></li>
+          <li><a href="DesignBites_StructureTypeErase.html">TypeErase Structure</a></li>
+          <li><a href="DesignBites_StructurePlugIn.html">PlugIn Structure</a></li>
         </ol>
         are progressively more flexible, eventually resulting in reusable components, but also increasingly
         complex.  Where you settle in these alternatives is determined by design context.  Is this a 
