@@ -5,7 +5,7 @@
     <meta name="keywords" content="Rust, Introduction" />
     <meta name="Author" content="Jim Fawcett" />
     <meta name="Author" content="James Fawcett" />
-    <title>DesignBites FactoredStructure</title>
+    <title>DesignBites DataFlowStructure</title>
     <link rel="stylesheet" href="css/BiteStyles.css" />
     <link rel="stylesheet" href="css/StylesWebComponents.css" />
     <script src="js/BiteScripts.js"></script>
@@ -42,7 +42,7 @@
   <body id="github" onload="initBites()">
     <div class="top-banner">
       <span id="hctr">Design Bites</span>
-      <span class="top-center">Factored Structure</span>
+      <span class="top-center">DataFlow Structure</span>
       <!-- <a class="top-right" href="../../RustBiteByByte.html">RustBiteByByte.html</a> -->
     </div>
     <next-prev>
@@ -64,7 +64,7 @@
     </toc-b>
     <div id="hlp" style="display:none;">
     </div>
-    <h1>Design Bite - Factored Structure</h1>
+    <h1>Design Bite - Dataflow Structure</h1>
     <hr />
     <a id="intro"></a>
     <div style="height:0.75rem;"></div>
@@ -83,7 +83,7 @@
     </div>
     <a id="basic_str"></a>
     <div style="height:0.25rem;"></div>
-    <h3>2. Application Structure - Basic</h3>
+    <h3>2. Application Structure - Dataflow</h3>
     <div class="indent">
       <t-b>
         This structure is monolithic, e.g., all code is packaged in a single file and there is only one struct
@@ -92,7 +92,7 @@
     </div>
     <div style="width:calc(100vw - 9rem);">
       <div style="display:flex;">
-        <photosizer-block src="pictures/Design2.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
+        <photosizer-block src="pictures/Design4.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
           <span style="
             display: inline-block;
             font-weight: bold;
@@ -101,11 +101,11 @@
             width: 100%;
             padding: 5px 0px;
           ">
-            Figure 3. Factored Pkg Structure
+            Figure 1. DataFlow Logical Structure
           </span>
         </photosizer-block>
         <explain-block>
-          <h4>Factored Structure</h4>
+          <h4>DataFlow Structure</h4>
           <t-b>
             Program&apos;s operations are implemented in separate packages. Some of the factored packages
             may, themselves, be factored.
@@ -141,101 +141,48 @@
           <defn-head>Executive::main.rs</defn-head>
           <defn-code>
 /////////////////////////////////////////////////////////////
-// FactoredStructure::Executive::main.rs                   //
+// DataFlowStructure::Executive::main.rs                   //
 //   - Executive creates and uses all lower level parts    //
 // Jim Fawcett, https://JimFawcett.github.io, 04 Mar 2021  //
 /////////////////////////////////////////////////////////////
-#![allow(dead_code)]
-#![allow(unused_imports)]
+/*
+  Note: 
+    Executive only creates Input instance.  The rest of
+    the pipeline self installs, e.g., Input creates Compute,
+    and Compute creates Output.
+*/
 use input::*;
-use compute::*;
-use output::*;
 
-//use crate::exec_proc_mod::{parse_cmdln, show_args};
-mod exec_proc_mod;
-use exec_proc_mod::{parse_cmdln, show_cmdln};
+fn main() {
+    let putln = || println!();
 
-/*-- run using command line args --*/
-fn use_args_for_run() -&gt; usize {
-    let args = parse_cmdln();
-    let mut total_lines:usize = 0;
+    print!("\n  -- DataFlowStructure::Executive --\n");
 
-    for name in &amp;args {
-        let mut lines = 0;
-        let mut inp = Input::new();
-        let mut cmp = Compute::new();
-        let out = Output::new();
-    
-        let opt = inp.do_input(name);
-        if let Some(file) = opt {
-            cmp.do_compute(name, file);
-            lines = cmp.lines();
-            out.do_output(name, lines);
-        }
-        else {
-            print!("\n  couldn't process {:?}", name);
-        }
-        total_lines += lines;   
-    }
-    total_lines        
-}
-/*-- attempt to open file and count its lines of code --*/
-fn test_ops(name: &amp;str) -&gt; usize {
-    let mut inp = Input::new();
-    let mut cmp = Compute::new();
-    let out = Output::new();
-
-    let mut lines:usize = 0;
-    let opt = inp.do_input(name);
-    if let Some(file) = opt {
-        cmp.do_compute(name, file);
-        lines = cmp.lines();
-        out.do_output(name, lines);
-    }
-    else {
-        print!("\n  couldn't process {:?}", name);
-    }
-    lines
-}
-/*-- run test_ops for each package in this project --*/
-fn run_test_ops() -&gt; usize {
-    let name = "../Executive/src/main.rs";
     let mut lines = 0;
-    lines += test_ops(name);
-    println!();
+
+    let mut inp = Input::new();
+    let name = "./src/main.rs";
+    lines += inp.do_input(name);
+    putln();
 
     let name = "../Input/src/lib.rs";
-    lines += test_ops(name);
+    lines += inp.do_input(name);
     let name = "../Input/examples/test1.rs";
-    lines += test_ops(name);
-    println!();
+    lines += inp.do_input(name);
+    putln();
  
     let name = "../Compute/src/lib.rs";
-    lines += test_ops(name);
+    lines += inp.do_input(name);
     let name = "../Compute/examples/test1.rs";
-    lines += test_ops(name);
-    println!();
+    lines += inp.do_input(name);
+    putln();
  
     let name = "../Output/src/lib.rs";
-    lines += test_ops(name);
+    lines += inp.do_input(name);
     let name = "../Output/examples/test1.rs";
-    lines += test_ops(name);
-    println!();
+    lines += inp.do_input(name);
+    putln();
  
-    let name = "no-exist";
-    lines += test_ops(name);
-    println!();
-
-    lines
-}
-/*-- Executive processing --*/
-fn main() {
-
-    print!("\n  -- FactoredStructure::Executive --\n");
-
-    let lines = run_test_ops();
-    // let lines = use_args_for_run();
-
     print!("\n  total lines: {}", lines);
 
     print!("\n\n  That's all Folks!\n\n");
@@ -243,54 +190,22 @@ fn main() {
           </defn-code>
         </defn-block>
         <defn-block>
-          <defn-head>Executive::exec_proc_mod.rs</defn-head>
+          <defn-head>Output</defn-head>
           <defn-code>
-/////////////////////////////////////////////////////////////
-// FactoredStructure::Executive::exec_proc_mod.rs          //
-//   - Executive creates and uses all lower level parts    //
-// Jim Fawcett, https://JimFawcett.github.io, 04 Mar 2021  //
-/////////////////////////////////////////////////////////////
-/*
-  Extracted as Module since these could be useful in 
-  other programs.
-*/
-/*-- extract command line arguments into vector --*/
-pub fn parse_cmdln() -&gt; Vec&lt;String&gt; {
-    let cl_iter = std::env::args().into_iter();
-    let args: Vec&lt;String&gt; = cl_iter.skip(1).collect();
-    args
-}
-/*-- display command line args in comma seperated list --*/
-pub fn show_cmdln(args: &amp;Vec&lt;String&gt;)  {
-    if args.len() == 0 {
-        return;
-    }
-    print!("\n  {}", args[0]);
-    for arg in &amp;args[1..] {
-        print!(", {}", arg);
-    }
-}
-          </defn-code>
-          <defn-head class="defnBorderTop">Output</defn-head>
-          <defn-code>
-  -- FactoredStructure::Executive --
+  -- DataFlowStructure::Executive --
 
-   103 lines in file "../Executive/src/main.rs"
-    26 lines in file "../Executive/src/exec_proc_mod.rs"    
+  file "./src/main.rs" has 48 lines of code
 
-    41 lines in file "../Input/src/lib.rs"
-    22 lines in file "../Input/examples/test1.rs"
+  file "../Input/src/lib.rs" has 52 lines of code
+  file "../Input/examples/test1.rs" has 17 lines of code  
 
-    60 lines in file "../Compute/src/lib.rs"
-    45 lines in file "../Compute/examples/test1.rs"
+  file "../Compute/src/lib.rs" has 66 lines of code       
+  file "../Compute/examples/test1.rs" has 29 lines of code
 
-    24 lines in file "../Output/src/lib.rs"
-    15 lines in file "../Output/examples/test1.rs"
+  file "../Output/src/lib.rs" has 26 lines of code        
+  file "../Output/examples/test1.rs" has 15 lines of code    
 
-  can't open file "no-exist"
-  couldn't process "no-exist"
-
-  total lines: 336
+  total lines: 253
 
   That's all Folks!
 
@@ -307,8 +222,7 @@ edition = "2018"
 
 [dependencies]
 input = { path = "../Input" }
-compute = { path = "../Compute" }
-output = { path = "../Output" }
+
           </defn-code>
         </defn-block>
       </defn-OuterBlock>
@@ -317,43 +231,45 @@ output = { path = "../Output" }
           <defn-head>Input::lib.rs</defn-head>
           <defn-code>
 /////////////////////////////////////////////////////////////
-// FactoredStructure::Input::lib.rs                        //
-//   - Input attempts to open named file and return File   //
+// DataFlowStructure::Input::lib.rs                        //
+//   - Attempts to return line count from file             //
 // Jim Fawcett, https://JimFawcett.github.io, 04 Mar 2021  //
 /////////////////////////////////////////////////////////////
-
-use std::fs::*;
-
-// fn open_file_for_read(file_name:&amp;str) 
-//      -&gt;Result&lt;File, std::io::Error&gt; {
-//     let rfile = OpenOptions::new()
-//                .read(true)
-//                .open(file_name);
-//     rfile
-// }
-
+/*
+  Note:
+    - Input owns and instantiates Compute.
+    - It attempts to open file and pass to Compute for
+      processing.
+    - Returns line count if successful
+*/
+use compute::*;
 mod file_utilities;
-use file_utilities::open_file_for_read;
+use file_utilities::{open_file_for_read};
 
 #[derive(Debug)]
 pub struct Input {
     name: String,
+    compute: Compute
 }
 impl Input {
     pub fn new() -&gt; Input {
         Input {
             name: String::new(),
+            compute: Compute::new()
         }
     }
-    pub fn do_input(&amp;mut self, name: &amp;str) -&gt; Option&lt;File&gt; {
+    pub fn do_input(&amp;mut self, name: &amp;str) -&gt; usize {
+        let mut lines: usize = 0;
+        self.name = name.to_string();
         let rslt = open_file_for_read(name);
         if let Ok(file) = rslt {
-            return Some(file);
+            self.compute.do_compute(name, file);
+            lines = self.compute.lines();
         }
         else {
             print!("\n  can't open file {:?}", name);
-            return None;
         }
+        lines
     }
 }
 
@@ -368,7 +284,7 @@ mod tests {
           <defn-head class="defnBorderTop">file_utilities module</defn-head>
           <defn-code>
 /////////////////////////////////////////////////////////////
-// FactoredStructure::Input::file_utilities.rs             //
+// DataFlowStructure::Input::file_utilities.rs             //
 //   - Input attempts to open named file and return File   //
 // Jim Fawcett, https://JimFawcett.github.io, 04 Mar 2021  //
 /////////////////////////////////////////////////////////////
@@ -406,8 +322,8 @@ pub fn read_file_to_string(f:&amp;mut File)
           <defn-head>test1.rs</defn-head>
           <defn-code>
 /////////////////////////////////////////////////////////////
-// FactoredStructure::Input::test1.rs                      //
-//   - Input attempts to open named file and return File   //
+// DataFlowStructure::Input::test1.rs                      //
+//   - Attempts to return line count from file             //
 // Jim Fawcett, https://JimFawcett.github.io, 04 Mar 2021  //
 /////////////////////////////////////////////////////////////
 
@@ -418,25 +334,19 @@ fn main() {
 
     let mut inp = Input::new();
     let name = "./src/lib.rs";
-    let opt = inp.do_input(name);
-    if let Some(_) = opt {
-        print!("\n  opened file {:?}", name);
-    }
-    else {
-        print!("\n  couldn't open file {:?}", name);
-    }
+    let lines = inp.do_input(name);
+    print!("\n  received {} lines from compute", lines);
     print!("\n\n  That's all Folks!\n\n");
-}          
+}
           </defn-code>
           <defn-head class="defnBorderTop">Test Output</defn-head>
           <defn-code>
-
   -- input::test1 --
 
-  opened file "./src/lib.rs"
+  file "./src/lib.rs" has 51 lines of code
+  received 51 lines from compute
 
   That's all Folks!
-
 
           </defn-code>
           <defn-head class="defnBorderTop">cargo.toml</defn-head>
@@ -450,7 +360,7 @@ edition = "2018"
 # See more keys ...
 
 [dependencies]
-
+compute = { path = "../Compute" }
           </defn-code>
         </defn-block>
       </defn-OuterBlock>
@@ -459,12 +369,18 @@ edition = "2018"
           <defn-head>Compute::lib.rs</defn-head>
           <defn-code>
 /////////////////////////////////////////////////////////////
-// FactoredStructure::Compute::lib.rs                      //
-//   - Input attempts to read File to string &amp; count lines //
+// DataFlowStructure::Compute::lib.rs                      //
+//   - Attempts to read opened file to string, count lines //
 // Jim Fawcett, https://JimFawcett.github.io, 04 Mar 2021  //
 /////////////////////////////////////////////////////////////
-
+/* 
+  Note:
+    - creates instance of Output
+    - attempts to read file to string and count its lines
+    - sends results to Output
+*/
 use std::fs::*;
+use output::{Output};
 use std::io::{Read, Error, ErrorKind};
 
 fn read_file_to_string(f:&amp;mut File) 
@@ -479,18 +395,18 @@ fn read_file_to_string(f:&amp;mut File)
   }
 }
 
-
 #[derive(Debug)]
 pub struct Compute {
   lines: usize,
+  out: Output
 }
 impl Compute {
     pub fn new() -&gt; Compute {
         Compute {
             lines: 0,
+            out: Output::new()
         }
     }
-    /*-- read file, count lines and save count --*/
     pub fn do_compute(&amp;mut self, name: &amp;str, mut file:File) {
         let rslt = read_file_to_string(&amp;mut file);
         if let Ok(contents) = rslt {
@@ -500,12 +416,12 @@ impl Compute {
                     self.lines += 1;
                 }
             }
+            self.out.do_output(name, self.lines);
         }
         else {
-            print!("\n  couldn't open {:?}", name);
+            print!("\n  could not read {:?}", name);
         }
     }
-    /*-- return saved line count --*/
     pub fn lines(&amp;self) -&gt; usize {
         self.lines
     }
@@ -523,8 +439,8 @@ mod tests {
           <defn-head>test1.rs</defn-head>
           <defn-code>
 /////////////////////////////////////////////////////////////
-// FactoredStructure::Compute::test1.rs                    //
-//   - Compute attempts to read file and count lines       //
+// DataFlowStructure::Compute::test1.rs                    //
+//   - Attempts to read opened file to string, count lines //
 // Jim Fawcett, https://JimFawcett.github.io, 04 Mar 2021  //
 /////////////////////////////////////////////////////////////
 
@@ -540,31 +456,15 @@ fn open_file_for_read(file_name:&amp;str)
     rfile
 }
 
-fn test_compute(name: &amp;str) -&gt; usize {
-    let mut lines = 0usize;
-    let rslt = open_file_for_read(name);
-    if let Ok(file) = rslt {
-        let mut compute = Compute::new();
-        compute.do_compute(name, file);
-        lines = compute.lines();
-    }
-    else {
-        print!("\n  couldn't open {:?}", name);
-    }
-    lines
-}
-
 fn main() {
     print!("\n  -- compute::test1 --\n");
 
     let name = "./src/lib.rs";
-    let lines = test_compute(name);
-    print!("\n  lines in {:?} = {}", name, lines);
-
-    let name = "no-exist";
-    let lines = test_compute(name);
-    print!("\n  lines in {:?} = {}", name, lines);
-
+    let rslt = open_file_for_read(name);
+    if let Ok(file) = rslt {
+        let mut compute = Compute::new();
+        let _ = compute.do_compute(name, file);
+    }
     print!("\n\n  That's all Folks!\n\n");
 }
           </defn-code>
@@ -572,9 +472,7 @@ fn main() {
           <defn-code>
   -- compute::test1 --
 
-  lines in "./src/lib.rs" = 60
-  couldn't open "no-exist"
-  lines in "no-exist" = 0
+  file "./src/lib.rs" has 66 lines of code
 
   That's all Folks!
 
@@ -590,6 +488,7 @@ edition = "2018"
 # See more keys ...
 
 [dependencies]
+output = { path = "../Output" }
 
           </defn-code>
         </defn-block>
@@ -599,19 +498,23 @@ edition = "2018"
           <defn-head>Output::lib.rs</defn-head>
           <defn-code>
 /////////////////////////////////////////////////////////////
-// FactoredStructure::Output::lib.rs                       //
-//   - Output displays line count                          //
+// DataFlowStructure::Output::lib.rs                       //
+//   - Sends results to console                            //
 // Jim Fawcett, https://JimFawcett.github.io, 04 Mar 2021  //
 /////////////////////////////////////////////////////////////
 
 #[derive(Debug)]
-pub struct Output {}
+pub struct Output {
+
+}
 impl Output {
     pub fn new() -&gt; Output {
         Output {}
     }
     pub fn do_output(&amp;self, name: &amp;str, lines: usize) {
-        print!("\n  {:4} lines in file {:?}", lines, name);
+        print!(
+            "\n  file {:?} has {} lines of code", name, lines
+        );
     }
 }
 #[cfg(test)]
@@ -627,8 +530,8 @@ mod tests {
           <defn-head>test1.rs</defn-head>
           <defn-code>
 /////////////////////////////////////////////////////////////
-// FactoredStructure::Output::test1.rs                     //
-//   - Output displays line count                          //
+// DataFlowStructure::Output::test1.rs                     //
+//   - Sends results to console                            //
 // Jim Fawcett, https://JimFawcett.github.io, 04 Mar 2021  //
 /////////////////////////////////////////////////////////////
 
@@ -646,7 +549,8 @@ fn main() {
           <defn-code>
   -- test Output --
 
-     3 lines in file "SomeFile.rs"
+  file "SomeFile.rs" has 3 lines of code
+
   That's all Folks!
 
           </defn-code>
