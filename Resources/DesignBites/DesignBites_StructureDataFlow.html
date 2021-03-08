@@ -105,31 +105,34 @@
           </span>
         </photosizer-block>
         <explain-block>
-          <h4>DataFlow Structure</h4>
+          <h4>Data Flow Structure</h4>
           <t-b>
-            Program&apos;s operations are implemented in separate packages. Some of the factored packages
-            may, themselves, be factored.
+            Data flow structure is designed to provide continuing output to users while the application
+            is running, e.g., not just at the end.  For programs that process a lot of data and may
+            continue running for a while, continuous display is much more satisfactory for the user, e.g.,
+            no questions like: is it still running? am I getting the output I want? did the program crash?
           </t-b>
           <t-b>
-            <hr />
-            <pros-cons>
-              <div>
-                <h4>Pros:</h4>
-                <ol>
-                  <li>If only one package is changed, only that one is compiled</li>
-                  <li>Much easier to understand and test</li>
-                </ol>
-              </div>
-              <div>
-                <h4>Cons:</h4>
-                <ol>
-                  <li>Project setup gets more complex</li>
-                  <li>More pieces to track and deploy</li>
-                  <li>Executive has to participate in each stage of the processing</li>
-                </ol>
-              </div>
-            </pros-cons>
+            Data flow structure changes ownership.  Instead of the Executive owning everything, a pipeline
+            is set up where each element of the pipeline owns the next element in the sequence.
           </t-b>
+          <hr />
+          <pros-cons>
+            <div>
+              <h4>Pros:</h4>
+              <ol>
+                <li>Continuous output</li>
+                <li>Data has fewer passes, e.g., doesn't need to go back to Executive</li>
+              </ol>
+            </div>
+            <div>
+              <h4>Cons:</h4>
+              <ol>
+                <li>Harder to implement and test piece by piece</li>
+                <li>Most data flow applications will need test mocks</li>
+              </ol>
+            </div>
+          </pros-cons>
         </explain-block>
       </div>
     </div>
@@ -196,16 +199,16 @@ fn main() {
 
   file "./src/main.rs" has 48 lines of code
 
-  file "../Input/src/lib.rs" has 52 lines of code
+  file "../Input/src/lib.rs" has 51 lines of code
   file "../Input/examples/test1.rs" has 17 lines of code  
 
-  file "../Compute/src/lib.rs" has 66 lines of code       
+  file "../Compute/src/lib.rs" has 56 lines of code       
   file "../Compute/examples/test1.rs" has 29 lines of code
 
   file "../Output/src/lib.rs" has 26 lines of code        
   file "../Output/examples/test1.rs" has 15 lines of code    
 
-  total lines: 253
+  total lines: 242
 
   That's all Folks!
 
@@ -381,19 +384,9 @@ compute = { path = "../Compute" }
 */
 use std::fs::*;
 use output::{Output};
-use std::io::{Read, Error, ErrorKind};
 
-fn read_file_to_string(f:&amp;mut File) 
-     -&gt; Result&lt;String, std::io::Error&gt; {
-  let mut contents = String::new();
-  let bytes_rslt = f.read_to_string(&amp;mut contents);
-  if bytes_rslt.is_ok() {
-    Ok(contents)
-  }
-  else {
-      Err(Error::new(ErrorKind::Other, "read error"))
-  }
-}
+mod file_utilities;
+use file_utilities::read_file_to_string;
 
 #[derive(Debug)]
 pub struct Compute {
@@ -434,6 +427,10 @@ mod tests {
     }
 }
           </defn-code>
+          <defn-head class="defnBorderTop">Module file utilities</defn-head>
+          <defn-code>
+Module copied from input/src
+          </defn-code>
         </defn-block>
         <defn-block>
           <defn-head>test1.rs</defn-head>
@@ -472,7 +469,7 @@ fn main() {
           <defn-code>
   -- compute::test1 --
 
-  file "./src/lib.rs" has 66 lines of code
+  file "./src/lib.rs" has 56 lines of code
 
   That's all Folks!
 
