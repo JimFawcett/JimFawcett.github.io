@@ -63,7 +63,6 @@ function initializeMenu() {
       <button class='dropbutton'>Prjs &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Projects</div>\
-        <a href='IdiomsAndPatterns.html'>Idioms&nbsp;&amp;&nbsp;Patterns&nbsp;</a>\
         <a href='CommCompare.html'>Comm&nbsp;Compare&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:smaller;'>&nbsp;</div>\
       </div>\
@@ -72,6 +71,7 @@ function initializeMenu() {
       <button class='dropbutton'>Dems &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Demonstrations</div>\
+        <a href='DesignBites.html'>Design&nbsp;Bites&nbsp;&nbsp;</a>\
         <a href='IdiomsAndPatterns.html'>Idioms&nbsp;and&nbsp;Patterns&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:smaller;'>&nbsp;</div>\
       </div>\
