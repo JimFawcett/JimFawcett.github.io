@@ -50,8 +50,11 @@ storyMenu.bitesMenu = function () {
   var bitesMenu = document.getElementById("chaps");
   bitesMenu.innerHTML = '<a href="DesignBites_Intro.html">Introduction</a><br />\
     <a href="DesignBites_Structure.html">Structure</a><br />\
-    <a class="undefined" href="DesignBites_DIP.html">Dep Inversion</a><br />\
-    <a class="undefined" href="DesignBites_PluggIn.html">Pluggins</a><br />\
+    <a href="DesignBites_StructureBasic.html">Basic</a><br />\
+    <a href="DesignBites_StructureFactored.html">Factored</a><br />\
+    <a href="DesignBites_StructureDataFlow.html">DataFlow</a><br />\
+    <a href="DesignBites_StructureTypeErase.html">TypeErase</a><br />\
+    <a href="DesignBites_StructurePlugIn.html">PlugIn</a><br />\
     <a href="Javascript.;#"></a><br />\
     <a href="../../Design.html">Design</a><br />\
     <a href="Javascript.;#"></a><br />';
