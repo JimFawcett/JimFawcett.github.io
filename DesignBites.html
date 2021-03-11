@@ -153,6 +153,10 @@
         a simple file line counting process, along with commentary about what distinguishes each.
       </t-b>
       <t-b>
+        That simplicity allows us to focus on the structure of the design - how are these structures different?
+        Why should we chose one? How do we implement it?
+      </t-b>
+      <t-b>
         <a id="steps"></a>
         <div style="height: 0.25rem;"></div>
       </t-b>
@@ -174,14 +178,14 @@
             <hr />
             <menu-item class="top"><a href="Resources/DesignBites/DesignBites_Intro.html">Introduction</a></menu-item><br />
             <menu-right>
-              TextFinder example, Concept development, Architecture, TextFinder Specification, Implementation
+              TextFinder example: Concept development, Architecture, TextFinder Specification, Implementation
             </menu-right>
           </li>
           <li class="top">
             <hr />
             <menu-item class="top"><a href="Resources/DesignBites/DesignBites_Structure.html">Structure</a></menu-item><br />
             <menu-right>
-              Quick survey of Basic, Factored, DataFlow, TypeErasure, and PlugIn
+              Line Counter: Quick survey of Basic, Factored, DataFlow, TypeErasure, and PlugIn structures
             </menu-right>
           </li>
           <li class="top">
@@ -229,6 +233,149 @@
           </li>-->
         </ol>
       </div>
+      <div style="height:0.75rem;"></div>
+      <h3>Summary of Structures:</h3>
+      <t-b>
+        <div class="indent">
+          <t-b>
+            Each of the structures, presented in the table below, has implementing Rust Code in 
+            <a href="https://github.com/JimFawcett/DesignStructure">DesignStructure Code</a>.
+            You can see what is required to support each of them and Rust idioms needed to make
+            that work.
+            <div style="height:0.5rem;"></div>
+          </t-b>
+          <table>
+            <tr>
+              <th>Structure</th><th>Diagram</th><th>size</th><th>Pros</th><th>Cons</th>
+            </tr>
+            <tr>
+              <td>Basic</td>
+              <td>
+                <photosizer-block src="Resources/DesignBites/pictures/Design1.jpg" width="150" class="photoSizerBlock" style="margin-top:0;">
+                  <span style="
+                    display: inline-block;
+                    font-weight: bold;
+                    font-family: 'Comic Sans MS, Tahoma';
+                    background-color: #ddd;
+                    width: 100%;
+                    padding: 5px 0px;
+                  ">
+                    Fig 1. Basic
+                  </span>
+                </photosizer-block>
+              </td>
+              <td>120&nbsp;lines</td>
+              <td>
+                simple, easy to test
+              </td>
+              <td>
+                as code size increases: hard to understand and test
+              </td>
+            </tr>
+            <tr>
+              <td>Factored</td>
+              <td>
+                <photosizer-block src="Resources/DesignBites/pictures/Design2.jpg" width="150" class="photoSizerBlock" style="margin-top:0;">
+                  <span style="
+                    display: inline-block;
+                    font-weight: bold;
+                    font-family: 'Comic Sans MS, Tahoma';
+                    background-color: #ddd;
+                    width: 100%;
+                    padding: 5px 0px;
+                  ">
+                    Fig 2. Factored
+                  </span>
+                </photosizer-block>
+              </td>
+              <td>336&nbsp;lines</td>
+              <td>
+                If only one package is changed, only that one is compiled.
+                Much easier to understand and test.
+              </td>
+              <td>
+                Project gets more complex with more pieces to track and deploy.
+                Executive has to participate in each stage of the processing.
+              </td>
+            </tr>
+            <tr>
+              <td>DataFlow</td>
+              <td>
+                <photosizer-block src="Resources/DesignBites/pictures/Design4.jpg" width="150" class="photoSizerBlock" style="margin-top:0;">
+                  <span style="
+                    display: inline-block;
+                    font-weight: bold;
+                    font-family: 'Comic Sans MS, Tahoma';
+                    background-color: #ddd;
+                    width: 100%;
+                    padding: 5px 0px;
+                  ">
+                    Fig 3. DataFlow
+                  </span>
+                </photosizer-block>
+              </td>
+              <td>242&nbsp;lines</td>
+              <td>
+                Continuous output - good ergonomics for user. Executive doesn&apos;t need to handle data.
+              </td>
+              <td>
+                Harder to implement and test piece by piece. Most applications will need test mocks.
+              </td>
+            </tr>
+            <tr>
+              <td>TypeErase</td>
+              <td>
+                <photosizer-block src="Resources/DesignBites/pictures/Design5.jpg" width="150" class="photoSizerBlock" style="margin-top:0;">
+                  <span style="
+                    display: inline-block;
+                    font-weight: bold;
+                    font-family: 'Comic Sans MS, Tahoma';
+                    background-color: #ddd;
+                    width: 100%;
+                    padding: 5px 0px;
+                  ">
+                    Fig 4. TypeErase
+                  </span>
+                </photosizer-block>
+              </td>
+              <td>284&nbsp;lines</td>
+              <td>
+                Same as DataFlow plus Input, Compute, and Output are now decoupled.  Each depends only
+                on interfaces provided by upstream component.
+              </td>
+              <td>
+                Construction is more complex.  Each component needs to use factory function to create
+                its down-stream component.
+              </td>
+            </tr>
+            <tr>
+              <td>PlugIn</td>
+              <td>
+                <photosizer-block src="Resources/DesignBites/pictures/Design6.jpg" width="150" class="photoSizerBlock" style="margin-top:0;">
+                  <span style="
+                    display: inline-block;
+                    font-weight: bold;
+                    font-family: 'Comic Sans MS, Tahoma';
+                    background-color: #ddd;
+                    width: 100%;
+                    padding: 5px 0px;
+                  ">
+                    Fig 5. PlugIn
+                  </span>
+                </photosizer-block>
+              </td>
+              <td>321&nbsp;lines</td>
+              <td>
+                Same as DataFlow plus Input, Compute, and Output are now decoupled.  Freedom to define Output
+                processing at run-time through a polymorphic dispatch.
+              </td>
+              <td>
+                Same as TypeErase plus Executive needs access to Compute to configure it with Output.
+              </td>
+            </tr>
+          </table>
+        </div>
+      </t-b>
       <s-1Em></s-1Em>
       <!--<t-b>
         The current plan is to conduct a Zoom remote session for each step, perhaps bi-weekly or once a month.
