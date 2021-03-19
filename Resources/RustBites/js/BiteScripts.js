@@ -71,7 +71,7 @@ storyMenu.bitesMenu = function () {
     <a href="RustBites_Conversions.html">Conversions</a><br />\
     <a href="RustBites_Collects.html">Collections</a><br />\
     <a href="RustBites_Iterator.html">Iterators</a><br />\
-    <a class="undefined" href="RustBites_Idioms.html">Idiomatic Rust</a><br />\
+    <a href="RustBites_Idioms.html">Idiomatic Rust</a><br />\
     <a class="undefined" href="RustBites_Threads.html">Threads</a><br />\
     <a class="undefined" href="RustBites_Synchron.html">Synchronize</a><br />\
     <a class="undefined" href="RustBites_Channels.html">Channels</a><br />\
