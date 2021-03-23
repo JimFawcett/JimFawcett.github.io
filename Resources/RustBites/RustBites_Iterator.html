@@ -32,7 +32,8 @@
         </up-b>
         <rt-b id="sects">
         <a href="#top">Top</a>, <a href="#iter">Iterators</a>, <a href="#coll">Collections</a>, 
-        <a href="#strings">Strings</a>, <a href="#adapters">Adapters</a>, <a href="#bottom">Bottom</a>
+        <a href="#strings">Strings</a>, <a href="#adapters">Adapters</a>, <a href="#itersup">Iter Support</a>
+        <a href="#bottom">Bottom</a>
       </rt-b>
     </toc-b>
     <div id="hlp" style="display:none;">
@@ -407,14 +408,75 @@ fn do_idiomatic_iter&lt;T&gt;(t:T)
       </table>
       </div>
     </t-b>
-    <div style="height:0.5rem;"></div>
+    <div style="height:0.25rem;"></div>
     <t-b>
       <div class="indent">
         <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=b8e64032de7531c06d757b3dd36101bb">
-          examples of iterator methods
+          playground examples of iterator methods
         </a>
       </div>
     </t-b>
+    <div style="height: 0.25rem;"></div>
+    <a id="itersup"></a>
+    <t-b><hr class="spread" /></t-b>
+    <h3>Providing Iterator Support</h3>
+    <t-b>
+      The code below was provided by 
+      <a href="https://users.rust-lang.org/t/rust-is-very-aggressive-towards-beginners/57125">
+        Matt Brubeck</a>
+      in a reply to a post on users.rust-lang.org.
+    </t-b>
+    <t-b>
+        <defn-OuterBlock>
+          <defn-block>
+            <defn-head>Return iterator from custom type</defn-head>
+            <defn-code>
+struct MyStruct {
+    items: Vec&lt;String&gt;
+}
+
+impl MyStruct {
+    fn strings(&self) 
+        -> impl Iterator&lt;Item = &String&gt; {
+        self.items.iter()
+    }
+}
+
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Create custom iterator type</defn-head>
+          <defn-code>
+impl MyStruct {
+    fn strings(&self) -> MyIterator&lt;'_&gt; {
+        MyIterator { 
+            index: 0, items: &self.items 
+        }
+    }
+}
+
+struct MyIterator&lt;'a&gt; {
+    index: usize,
+    items: &'a [String],
+}
+
+impl&lt;'a&gt; Iterator for MyIterator&lt;'a&gt; {
+    type Item = &'a String;
+    
+    fn next(&mut self) 
+        -> Option&lt;&'a String&gt; {
+        let item = self.items.get(self.index);
+        self.index += 1;
+        item
+    }
+}
+
+          </defn-code>
+            </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+
     <!--<t-b>
       <div class="indent">
         <h4>Rust playground examples</h4>
