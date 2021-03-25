@@ -325,23 +325,23 @@ impl&lt;'a&gt; Iterator for MyIterator&lt;'a&gt; {
         </tr>
         <tr>
           <td class="no-wrap"><strong>next</strong>(&mut self) -> Option&lt;Self::Item&gt;</td>
-          <td>Return next element in collection</td>
-          <td>Consumes&nbsp;returned&nbsp;element</td>
+          <td>Return next element in collection via Option</td>
+          <td></td>
         </tr>
         <tr>
           <td class="no-wrap"><strong>count</strong>(self) -> usize</td>
           <td>Returns number of iterations</td>
-          <td>Consumes iterator</td>
+          <td>Terminal,&nbsp;consumes&nbsp;iterator</td>
         </tr>
         <tr>
           <td class="no-wrap"><strong>last</strong>(self) -> Option&lt;Self::Item&gt;</td>
-          <td>Returns last item</td>
-          <td>Consumes iterator</td>
+          <td>Returns last item via Option</td>
+          <td>Terminal, consumes iterator</td>
         </tr>
         <tr>
           <td class="no-wrap"><strong>nth</strong>(&mut self, n: usize) -> Option&lt;Self::Item&gt;</td>
           <td>Returns nth element</td>
-          <td>Consumes all preceding elements</td>
+          <td></td>
         </tr>
         <tr>
           <td class="no-wrap"><strong>step-by</strong>(self, step: usize) ->StepBy&lt;Self&gt;</td>
@@ -354,7 +354,7 @@ impl&lt;'a&gt; Iterator for MyIterator&lt;'a&gt; {
         <tr>
           <td class="no-wrap"><strong>skip</strong>(self, n: usize) -> Skip&lt;Self&gt;</td>
           <td>Creates an iterator that skips the first n elements</td>
-          <td>Consumes iterator</td>
+          <td>Consumes original iterator</td>
         </tr>
         <tr>
           <td class="no-wrap"><strong>
@@ -364,7 +364,7 @@ impl&lt;'a&gt; Iterator for MyIterator&lt;'a&gt; {
           <td>
             Creates an iterator that skips elements if predicate is true.  Returns after first false.
           </td>
-          <td>Consumes iterator</td>
+          <td>Consumes original iterator</td>
         </tr>
         <tr>
           <td class="no-wrap"><strong>take</strong>(self, n:usize) -> Take&lt;Self&gt;</td>
@@ -409,7 +409,7 @@ impl&lt;'a&gt; Iterator for MyIterator&lt;'a&gt; {
         <tr>
           <td class="no-wrap"><strong>collect</strong>&lt;B&gt;(self) -> B</td>
           <td>Transforms iterator into collection</td>
-          <td>Consumes iterator</td>
+          <td>Terminal, consumes iterator</td>
         </tr>
         <tr>
           <td class="no-wrap">
@@ -417,7 +417,7 @@ impl&lt;'a&gt; Iterator for MyIterator&lt;'a&gt; {
             &nbsp;&nbsp;where F: FnMut(Self::Item) -> bool
           </td>
           <td>Tests if any element of iterator matches a predicate</td>
-          <td></td>
+          <td>Terminal</td>
         </tr>
         <tr>
           <td class="no-wrap">
@@ -425,7 +425,7 @@ impl&lt;'a&gt; Iterator for MyIterator&lt;'a&gt; {
             &nbsp;&nbsp;where F: FnMut(Self::Item) -> bool
           </td>
           <td>Tests if every element of iterator matches a predicate</td>
-          <td></td>
+          <td>Terminal</td>
         </tr>
         <tr>
           <td class="no-wrap">
@@ -433,7 +433,7 @@ impl&lt;'a&gt; Iterator for MyIterator&lt;'a&gt; {
             &nbsp;&nbsp;where F: FnMut(Self::Item)
           </td>
           <td>Calls closure on each element of iterator</td>
-          <td></td>
+          <td>Terminal, consumes iterator</td>
         </tr>
         <tr>
           <td class="no-wrap">
@@ -441,7 +441,7 @@ impl&lt;'a&gt; Iterator for MyIterator&lt;'a&gt; {
             &nbsp;&nbsp;where F: FnMut(Self::Item) -> bool
           </td>
           <td>Returns index of first match</td>
-          <td></td>
+          <td>Terminal</td>
         </tr>
         <tr>
           <td class="no-wrap">
@@ -449,7 +449,7 @@ impl&lt;'a&gt; Iterator for MyIterator&lt;'a&gt; {
             &nbsp;&nbsp;where P: Product&lt;Self::Item&gt;
           </td>
           <td>Returns product of all elements, else 1 if empty</td>
-          <td></td>
+          <td>Terminal</td>
         </tr>
         <tr>
           <td class="no-wrap">
@@ -457,7 +457,7 @@ impl&lt;'a&gt; Iterator for MyIterator&lt;'a&gt; {
             &nbsp;&nbsp;where S: Sum&lt;Self::Item&gt;
           </td>
           <td>Returns sum of all elements, else 0 if empty</td>
-          <td></td>
+          <td>Terminal</td>
         </tr>
         <tr>
           <td class="no-wrap"><strong>by_ref</strong>(&mut self) -> &mut Self</td>
@@ -505,11 +505,99 @@ impl&lt;'a&gt; Iterator for MyIterator&lt;'a&gt; {
     <div style="height:0.25rem;"></div>
     <t-b>
       <div class="indent">
-        <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=b8e64032de7531c06d757b3dd36101bb">
+        <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=31a41e76f3356c3931d6dd7bbf4c3ce3">
           playground examples of iterator methods
         </a>
       </div>
     </t-b>
+    <div style="height: 0.25rem;"></div>
+    <a id="for"></a>
+    <t-b><hr class="spread" /></t-b>
+    <h3>For loops</h3>
+    <t-b>
+      Rust&apos;s for loops are evidently closely related to iterators.  The code shown below, taken from
+      <a href="https://doc.rust-lang.org/std/keyword.for.html">Rust keyword for</a> documentation, illustrates
+      that.
+    </t-b>
+    <t-b>
+      <div class="indent">
+        <defn-OuterBlock>
+          <defn-block>
+            <defn-head>for loop code</defn-head>
+            <defn-code>
+#![allow(unused)]
+
+fn code(i:usize) { print!(" {}", i)}
+
+fn main() {
+    let iterator = 0..2;
+    for loop_variable in iterator {
+        code(loop_variable)
+    }
+}
+
+
+
+
+
+
+
+            
+            
+            </defn-code>
+            <defn-head class="defnBorderTop">Output</defn-head>
+            <defn-code>
+ 0 1
+            </defn-code>
+            <defn-head class="defnBorderTop" style="border-bottom:none;">
+              <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=92e189882058479fda5cd042b4ffb807">
+                code in playground
+              </a>
+            </defn-head>
+          </defn-block>
+          <defn-block>
+            <defn-head>for loop converts to this code</defn-head>
+            <defn-code>
+#![allow(unused)]
+
+fn code(i:usize) { print!("{} ", i) }
+
+fn main() {
+    let iterator = 0..2;
+    {
+        let mut _iter = 
+              std::iter::IntoIterator::into_iter(iterator);
+        loop {
+            match _iter.next() {
+                Some(loop_variable) => {
+                    code(loop_variable)
+                },
+                None => break,
+            }
+        }
+    }
+}
+            </defn-code>
+            <defn-head class="defnBorderTop">Output</defn-head>
+            <defn-code>
+0 1 
+            </defn-code>
+            <defn-head class="defnBorderTop" style="border-bottom:none;">
+              <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=8a1873a09f09d64118270a3717b6b5f4">
+                code in playground
+              </a>
+              <div style="height:0.25rem;"></div>
+            </defn-head>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+
+    <div style="height: 0.25rem;"></div>
+    <a id="rngslc"></a>
+    <t-b><hr class="spread" /></t-b>
+    <h3>Ranges and Slices</h3>
+
     <div style="height: 0.25rem;"></div>
     <a id="refs"></a>
     <t-b><hr class="spread" /></t-b>
