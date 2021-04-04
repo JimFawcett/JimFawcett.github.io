@@ -19,8 +19,8 @@
     <next-prev>
       <a href="../../index.html" style="color:#fefefa;">Home</a>&nbsp;
       <a id="repo" href="../../RustBiteByByte.html">Repo</a> 
-      <a id="Prev" href="RustBites_AsyncAwt.html">prev</a> 
-      <a id="Next" href="RustBites_Experiments.html">next</a>
+      <a id="Prev" href="RustBites_Idioms.html">prev</a> 
+      <a id="Next" href="RustBites_Threads.html">next</a>
     </next-prev>
 
     <toc-b id="toc">
@@ -29,18 +29,131 @@
         <up-b id="chaps">
         </up-b>
           <rt-b id="sects">
-        <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#starting">Starting</a>, 
-        <a href="#contents">Contents</a>, <a href="#refs">References</a>
+        <a href="#top">Top</a>, <a href="#basics">Basics</a>, <a href="#variadics">Variadics</a>, 
+        <a href="#stdmac">StdMacros</a>, <a href="#final">Final thoughts</a>, <a href="#refs">References</a>
       </rt-b>
     </toc-b>
     <div id="hlp" style="display:none;"></div>
    
     <h2>Rust Bite - Macros</h2>
     <t-b><hr class="spread" /></t-b>
-    <h3>Basics:</h3>
     <t-b>
-      Rust macros come in two flavors: declarative and procedural.  We will focus on declarative macros.  They take
-      the form:
+      Macros allow users to extend Rust syntax by replacing a macro declaration with code specified by the 
+      macro body.  There are two useful consequences of using macros:
+      <ol>
+        <li>
+          Code can be writen once and applied in many places.  Functions do that too, but macros create code in
+          the same scope as the macro declaration, where functions create code in a child scope.  That means that
+          a locally defined macro can use local data - very like cut and paste code, but with the advantage that
+          there is only one source for change.
+        </li>
+        <li>
+          Macros can be variadic, i.e., accept an arbitrary number of arguments.  That is a consequence of 
+          pattern matching used to define macros.
+        </li>
+      </ol>
+    </t-b>
+    <t-b>
+      <div class="indent">
+        <defn-OuterBlock>
+          <defn-block>
+            <defn-head>Locally defined macro</defn-head>
+            <defn-code>
+fn main() {
+
+    let offset = 5;
+    
+    macro_rules! add_with_local_offset {
+        ($left:expr , $right:expr) => {
+            $left + $right + offset
+        };
+    }
+
+    let (a, b) = (1, 2);
+    let result = add_with_local_offset!(a, b);
+    let s = stringify!(1 + 2 + offset);
+    print!("\n  {:?} = {:?}", s, result);
+}
+
+
+
+
+
+
+            </defn-code>
+            <defn-head class="defnBorderTop">Output - locally defined macro</defn-head>
+            <defn-code>
+"1 + 2 + offset" = 8
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Variadic macro</defn-head>
+            <defn-code>
+/* Demonstrate variadic macros */
+
+macro_rules! variadic_macro {
+    /* terminating rule */
+    ($h:expr) => {
+        print!("\n  processing argument {}", $h);
+    };
+    /* process arguments recursively */
+    ($h:expr, $($t:expr),+) => {
+        /* process head */
+        variadic_macro! { $h }
+        /* process tail */
+        variadic_macro! { $($t),+ }
+    };
+}
+
+fn main() {
+    variadic_macro!(1, 2, 3, 4);
+    println!();
+    variadic_macro!('a', 'b', 'c');
+}
+              </defn-code>
+            <defn-head class="defnBorderTop">Output - Variadic macro</defn-head>
+            <defn-code>
+  processing argument 1
+  processing argument 2
+  processing argument 3
+  processing argument 4
+
+  processing argument a
+  processing argument b
+  processing argument c
+
+            </defn-code>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+    <t-b>
+      <div class="indent">
+        <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=5b8915840477817f2062abe0bbb4de08">
+          Local Macro in playground
+        </a><br />
+        <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=d4b442a99a79965739eac785dee19bd6">
+          Variadic Macro in playground
+        </a>
+      </div>
+      <a id="basics"></a>
+    </t-b>
+    <hr class="spread" />
+    <h3>1.0 Basics:</h3>
+    <t-b>
+      Rust macros come in two flavors: declarative and procedural.  Procedural macros support defining custom
+      #[derive] macros, function-like macros that run at compile-time, and custom attributes.  They can be 
+      defined in a crate, loaded by Rust and executed as the macro is expanded.
+    </t-b>
+    <t-b>
+      Procedure macros operate on <c-s>proc_macro::TokenStream</c-s>s.  Those are iterators over <c-s>TokenTree</c-s>s.
+      A <c-s>TokenTree</c-s> contains identifiers, literals, punctuators, and groups.  Developing a proc macro involves
+      parsing <c-s>TokenTrees</c-s>.
+    </t-b>
+    <t-b>
+      We won&apos;t consider procedural macros further in this Bite.  Instead we focus on declarative macros.
+      They take the form:
+      <div style="height:0.5rem;"></div>
       <div class="indent pad10">
         <defn-OuterBlock>
           <defn-block>
@@ -65,7 +178,9 @@
         </defn-OuterBlock>
       </div>
       <t-b>
-        The
+        They are composed of one or more rules that describe how to generate code based on their inputs.
+        Each rule has a pattern matcher and an associated block that generates code from the pattern.
+        Here&apos;s an example:
       </t-b>
       <div class="indent pad10">
         <defn-OuterBlock>
@@ -108,10 +223,17 @@ fn main() {
           </defn-block>
         </defn-OuterBlock>
       </div>
+      <div style="height:0.5rem;"></div>
+      It isn&apos;t very useful except to illustrate how pattern matching works.  In the first rule
+      the pattern is an expression, <c-s>&a</c-s>, that is expanded using a print! macro, just displaying
+      the input.  The second rule has no input and simply prints out that fact.
+      <a id="variadics"></a>
     </t-b>
-    <h3>Variadic Macros</h3>
+    <hr class="spread" />
+    <h3>2.0 Variadic Macros</h3>
     <t-b>
       Patterns and expansions support repetitions using a syntax reminiscent of regular expressions.
+      We saw this in the second opening example.  
       <div class="indent">
         <h4>Table 1. - Repetition Syntax</h4>
         <table>
@@ -132,6 +254,10 @@ fn main() {
           </tr>
         </table>
       </div>
+    </t-b>
+    <t-b>
+      The Example below extends our <c-s>indent_print</c-s> macro to accept an arbitry number of
+      input arguments and simply passes the input repeated sequence to a <c-s>print</c-s> macro. 
     </t-b>
     <t-b>
       <div class="indent pad10">
@@ -176,13 +302,22 @@ fn main() {
           </defn-block>
         </defn-OuterBlock>
       </div>
+      <t-b>
+        That is not too complicated.  But we need to explore how repetitive expansions are handled, rather
+        than simply passing them along to another variadic macro like <c-s>print</c-s>.  That we do in the
+        next example.
+      </t-b>
       <div class="indent">
         <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=c946dda8951e7696651da110fe13efe6">
           code in playground
         </a>
       </div>
     </t-b>
-    <h3>Practical Example:</h3>
+    <h3>2.1 Practical Example:</h3>
+    <t-b>
+      The next example usea inputs more structured that simple expressions.  Table 2 provides a partial list
+      of types that declarative macros can accept and process.
+    </t-b>
     <t-b>
       <div class="indent">
         <h4>Table 2. - Partial list of Macro Fragments</h4>
@@ -241,6 +376,11 @@ fn main() {
           </tr>
         </table>
       </div>
+    </t-b>
+    <t-b>
+      In this example we will construct a timer that accepts a rich set of inputs for which we want performance
+      data.  The inputs are a <c-s>literal</c-s> that displays what we are timing and a token tree, <c-s>tt</c-s>,
+      that allows us to specify statements, functions, and arbitrary combinations of them.
     </t-b>
     <t-b>
       <div class="indent">
@@ -325,10 +465,318 @@ fn main() {
       </div>
     </t-b>
     <t-b>
+      Token trees, <c-s>tt</c-s>, may include tokens that are not expressions, like identifiers.  We could add another
+      rule that ignores them, like the empty rule.  If a user supplies an identifier as an input, that causes a
+      compiler warning to be emitted, but no build or execution errors.  Since it is clear that an identifier
+      has no inherent execution I chose not to provide that rule.
+    </t-b>
+    <t-b>
       <div class="indent">
-        <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=1b06dd11c3bd47317ddf224d4e1bbf63">
+        <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=116dcf7992ec4b682897ead41a807fa5">
           code in playground
         </a>
+      </div>
+    </t-b>
+    <t-b>
+      Here is another useful macro example that presents a variadic macro:
+    </t-b>
+    <t-b>
+      <div class="indent">
+        <defn-OuterBlock>
+          <defn-block>
+            <defn-head>Macro for Creating Hashmaps</defn-head>
+            <defn-code>
+use std::collections::HashMap;
+
+macro_rules! hash_map {
+/* expr can be separated only by , ; or => */
+    ($( $key:expr => $value:expr ),*) => {
+        {
+            let mut h = HashMap::new();
+            $( h.insert($key, $value); )*
+            h
+        }
+    };
+}
+
+fn main() {
+    let map = hash_map!(
+        "zero" => 0,
+        "one" => 1,
+        "two" => 2,
+        "three" => 3,
+        "four" => 4
+    );
+    
+    print!("\n  {:?}", map);
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Output</defn-head>
+            <defn-code>
+ {
+     "two": 2, "four": 4, "zero": 0, 
+     "one": 1, "three": 3
+ }
+            </defn-code>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+    <t-b>
+      <div class="indent">
+        <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=8bd7e8fe8027229d469fd8be973ab568">
+          code in playground
+        </a>
+      </div>
+      <a id="stdmac"></a>
+    </t-b>
+    <hr class="spread" />
+    <h3>3.0 Standard Macros</h3>
+    <t-b>
+      Rust provides a number of frequently used macros.  Many of these we have encountered in previous bites:
+    </t-b>
+    <t-b>
+      <div class="indent">
+        <h4>Table 3. - Partial list of Standard Macros</h4>
+        <table>
+          <tr>
+            <th>std Macro</th><th>Description</th><th>Example</th>
+          </tr>
+          <tr>
+            <td>assert</td>
+            <td>Asserts that boolean expression is true</td>
+            <td>assert!(x==y, "x != y");</td>
+          </tr>
+          <tr>
+            <td>assert_eq</td>
+            <td>Asserts that expressions are equal</td>
+            <td>assert_eq!(x, y, msg);</td>
+          </tr>
+          <tr>
+            <td>assert_ne</td>
+            <td>Asserts expressions are not equal</td>
+            <td>assert_ne!(x, y, msg);</td>
+          </tr>
+          <tr>
+            <td>concat</td>
+            <td>concatenates literals into static string slice</td>
+            <td>let x = concat!(a,2.5,"lit_str");</td>
+          </tr>
+          <tr>
+            <td>debug</td>
+            <td>prints and returns value of expression</td>
+            <td>dbg!(a*2);</td>
+          </tr>
+          <tr>
+            <td>file</td>
+            <td>returns name of containing file</td>
+            <td>file!();</td>
+          </tr>
+          <tr>
+            <td>format</td>
+            <td>same as print! except returns String</td>
+            <td>let s = format!("{:?}",x);</td>
+          </tr>
+          <tr>
+            <td>line</td>
+            <td>returns number of containing line</td>
+            <td>let n = line!();</td>
+          </tr>
+          <tr>
+            <td>panic</td>
+            <td>panics current thread</td>
+            <td>panic!();</td>
+          </tr>
+          <tr>
+            <td>print</td>
+            <td>Prints to std out</td>
+            <td>print!(frm, x, y, ...);</td>
+          </tr>
+          <tr>
+            <td>stringify</td>
+            <td>converts argument symbols to strings and concatenates</td>
+            <td>stringify!(a + b, "lit str");</td>
+          </tr>
+          <tr>
+            <td>vec</td>
+            <td>creates new vector</td>
+            <td>let v = vec![0, 1, 2];</td>
+          </tr>
+          <tr>
+            <td>write</td>
+            <td>writes formatted data to buffer</td>
+            <td>write!(&mut buff, fmt_str, x, y, ...);</td>
+          </tr>
+        </table>
+        <a id="final"></a>
+        <div style="height:0.25rem;"></div>
+      </div>
+    </t-b>
+    <hr class="spread" />
+    <h3>4.0 Final Thoughts:</h3>
+    <t-b>
+      One issue with macros that is easy to overlook: macro processing may move non-copy types so they become invalid
+      after executing the offending macro.  In the example below, we provide two versions of a demonstration
+      macro.  The first, <c-s>show_compare1</c-s>, uses a rust match operation that takes its arguments by value, 
+      consuming them.  So use of its arguments after macro execution will cause a build failure.
+    </t-b>
+    <t-b>
+      The second version, <c-s>show_compare2</c-s> passes its arguments by reference for matching and does not
+      invalidate its arguments.  You can open the playground example and experiment with calling either one for
+      both copy and non-copy arguments.
+    </t-b>
+    <div style="height:0.15rem;"></div>
+    <t-b>
+      <div class="indent">
+        <defn-OuterBlock>
+          <defn-block>
+            <defn-head>Macros</defn-head>
+            <defn-code>
+#![allow(unused_macros)]
+/*----------------------------------------
+  macro show_compare1 will move its args
+  if they are not copy
+----------------------------------------*/
+macro_rules! show_compare1 {
+    ($left:expr , $right:expr) => {
+        match ($left, $right) {
+            (left_val, right_val) => {
+                if(left_val == right_val) {
+                    print!(
+                        "\n  {:?} == {:?}", 
+                        left_val, right_val
+                    );
+                }
+                else {
+                    print!(
+                        "\n  {:?} != {:?}", 
+                        left_val, right_val
+                    );
+                }
+            }
+        }
+    };
+}
+
+/*----------------------------------------
+  macro show_compare2 will not move its 
+  args even if they are not copy
+----------------------------------------*/
+macro_rules! show_compare2 {
+    ($left:expr , $right:expr) => {
+        match (&$left, &$right) {
+            (left_val, right_val) => {
+                if(*left_val == *right_val) {
+                    print!(
+                        "\n  {:?} == {:?}", 
+                        left_val, right_val
+                    );
+                }
+                else {
+                    print!(
+                        "\n  {:?} != {:?}", 
+                        left_val, right_val
+                    );
+                }
+            }
+        }
+    };
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code</defn-head>
+            <defn-code>
+fn main() {
+    // let (a, b) = (1, 2);
+    let a = String::from("a string");
+    let mut b = a.clone();
+    b.push_str(" and another");
+    // let a = vec![1, 2, 3];
+    // let mut b = a.clone();
+    // b.push(4);
+    show_compare2!(a,b);
+    /*---------------------------------------
+      Statements below fail to compile if
+      a or b are moved.
+    ---------------------------------------*/
+    print!("\n  {:?}", a);
+    print!("\n  {:?}", b);
+}
+            </defn-code>
+            <defn-head class="defnBorderTop">Output</defn-head>
+            <defn-code>
+  "a string" != "a string and another"
+  "a string"
+  "a string and another"
+            </defn-code>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+    <t-b>
+      <div class="indent">
+        <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=a4e18ecb5a72105023251b8b851cbb15">
+          code in playground
+        </a>
+        <a id="refs"></a>
+      </div>
+    </t-b>
+    <hr class="spread" />
+    <h3>5.0 References:</h3>
+    <t-b>
+      <div class="indent pad10">
+        <table>
+          <tr>
+            <th>Ref Link</th><th>Description</th>
+          </tr>
+          <tr>
+            <td><a href="https://doc.rust-lang.org/reference/macros-by-example.html">Macros By Example</a></td>
+            <td>Part of the Rust reference, describes declarative syntax with precise BNF productions.</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://notes.iveselov.info/programming/time_it-a-case-study-in-rust-macros">
+                time_it:&nbsp;a&nbsp;Case&nbsp;Study&nbsp;in&nbsp;Rust&nbsp;Macros.
+              </a>
+            </td>
+            <td>The timer example above has modifications of code presented here.</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://doc.rust-lang.org/rust-by-example/flow_control/match.html">
+                rust by example
+              </a>
+            </td>
+            <td>Collection of annotated macro examples</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://veykril.github.io/tlborm/macros/syntax/source-analysys.html">
+                The Little Book of Rust Macros
+              </a>
+            </td>
+            <td>Presents background details and some usefule macro patterns.</td>
+          </tr>
+          <tr>
+            <td>
+              <a style="white-space:nowrap;" href="https://blog.logrocket.com/macros-in-rust-a-tutorial-with-examples/#typesofmacrosinrust">
+                Macros in Rust: A tutorial with examples
+              </a>
+            </td>
+            <td>Presents examples of both Declarative and Procedural macros.</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://blog.rust-lang.org/2018/12/21/Procedural-Macros-in-Rust-2018.html">
+                Procedural Macros in Rust 2018
+              </a>
+            </td>
+            <td>Presents ideas, but no fully formed examples.</td>
+          </tr>
+        </table>
       </div>
     </t-b>
   </body>
