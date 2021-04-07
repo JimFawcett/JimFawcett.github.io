@@ -1,0 +1,247 @@
+﻿<!DOCTYPE html>
+<!--
+  BuildOn-Step4.html
+  -------------
+  This page is a prototype for pages that provide:
+  - Header block at the top
+  - page menu in the left panel
+  - content in the right panel
+  - content section links in a footer block
+  Its design uses:
+  - CSS grid to lay out the page in three rows, header, main, footer
+  - The grid is fixed to the viewport using margins and height attributes
+  - flex grid in the main row to hold the page menu and content panels
+  - flex grid in the footer holding a toggle button and section links
+  - JavaScript to respond to the toggle button by:
+    a. Setting the menu panel display to none or block which toggles
+       its visibility and space
+    b. Setting the right area in the footer to a menu of section links
+       or a copyright notice.
+  This is a test prototype for story pages.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuildOn Step#5 - RE</title>
+  <link rel="stylesheet" href="css/Styles_Basic.css" />
+  <link rel="stylesheet" href="css/Styles_Structure.css" />
+  <link rel="stylesheet" href="css/Styles_RustTheme.css" />
+  <link rel="stylesheet" href="css/Styles_StoryPagesGrid.css" />
+  <link rel="stylesheet" href="css/StylesWebComponents.css" />
+  <script src="js/ScriptsUtilities.js"></script>
+  <script src="js/ScriptsWebComponents.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/Scripts_StoryPageMenu.js"></script>
+  <style>
+    #github .refsep {
+      font-weight: normal;
+      text-align: left;
+    }
+  </style>
+</head>
+<body id="github" onload="init()">
+
+  <a id="Next" href="Step6.html">N</a>
+  <a id="Prev" href="Step4.html">P</a>
+
+  <grid-container>
+    <grid-header class="dark" onclick="togglemenus()">
+       <h2 class="dark">BuildOn - Step #5:&nbsp;&nbsp;&nbsp;RegEx in TextSearch</h2>
+     </grid-header>
+     <grid-main>
+       <a href="#top"></a>
+       <main-wrapper>
+         <main-left id="nav" class="light">
+           <ul>
+              <li><a href="../../index.html">Home</a></li>
+              <li><a href="../../BuildOn.html">Repo</a></li>
+              <li><a href="Intro.html">BuildOn Intro</a>&nbsp;&nbsp;</li>
+              <li><a href="Step0.html">Step&nbsp;#0&nbsp;-&nbsp;TF</a>&nbsp;&nbsp;</li>
+              <li><a href="Step1.html">Step&nbsp;#1&nbsp;-&nbsp;TS</a>&nbsp;&nbsp;</li>
+              <li><a href="Step2.html">Step&nbsp;#2&nbsp;-&nbsp;DN</a>&nbsp;&nbsp;</li>
+              <li><a href="Step3.html">Step&nbsp;#3&nbsp;-&nbsp;CP</a>&nbsp;&nbsp;</li>
+              <li><a href="Step4.html">Step&nbsp;#4&nbsp;-&nbsp;Exc</a>&nbsp;&nbsp;</li>
+              <li><a href="Step5.html">Step&nbsp;#5&nbsp;-&nbsp;RE</a>&nbsp;&nbsp;</li>
+              <li><a href="Step6.html">Step&nbsp;#6&nbsp;-&nbsp;Par</a>&nbsp;&nbsp;</li>
+              <li><a href="StepsRefs.html">StepsRefs</a>&nbsp;&nbsp;</li>
+              <li><a href="../../DesignBites.html">Design Bites</a>&nbsp;&nbsp;</li>
+              <li><a href="https://doc.rust-lang.org/std/fmt/">std::fmt</a>&nbsp;&nbsp;</li>
+              <li><a href="../RustBites/RustBites_GettingStarted.html">Starting Rust</a>&nbsp;&nbsp;</li>
+              <li><a href="../RustBites/RustBites_Intro.html">Rust Bites</a>&nbsp;&nbsp;</li>
+              <li><a href="../../RustStory_Prologue.html">Rust Story</a>&nbsp;&nbsp;</li>
+              <li><a href="../../IndexPage.html">Glossary</a>&nbsp;&nbsp;</li>
+              <!--<li><a href="../../RustStory_References.html">References</a>&nbsp;&nbsp;</li>-->
+           </ul>
+         </main-left>
+         <main-right id="content" class="light">
+        <div style="height:1.0em;">&nbsp;</div>
+        <a id="regex"></a>
+        <h3>BuildOn Project - Text Search with RegEx</h3>
+        <div style="float:right;" class="light">
+          <photosizer-block 
+            src="pictures/TextFinderPackages.jpg" 
+            width="300" class="photoSizerBlock left"
+            style="background-color: #fefefa;"  
+          >
+            <span style="font-family:'Comic Sans MS';">Figure 1. TextFinder Packages</span>
+          </photosizer-block>
+        </div>
+        <div style="float:right; clear:both; background-color: #fefefa;">
+          <photosizer-block 
+            src="pictures/TextFinderClassDiagram2.jpg" 
+            width="400" class="photoSizerBlock left"
+            style="background-color: #fefefa;"  
+          >
+            <span style="font-family:'Comic Sans MS';">Figure 2. TextFinder Structs</span>
+          </photosizer-block>
+        </div>
+        <t-b>
+          This Step replaces simple text search in TextSearch::Finder with regular expression matches.
+        </t-b>
+        <t-b>
+          Figure 1 is a package diagram for Textfinder, showing how its parts fit together.
+        </t-b>
+        <indent-block>
+          <details>
+            <summary class="darkItem" style="width:max-content;">TextFinder Specification</summary>
+        <h4>TextFinder Specification:</h4>
+        <t-b>
+          <ol class="tight">
+            <li>
+              Identify all files in a directory subtree that match a pattern and contain a specified text.
+            </li>
+            <li>
+              Specify root path, one or more file patterns (.h, .cpp, .cs, .rs, ...), and search text on command line.
+            </li>
+            <li>
+              Specify options <c-s>/s [true|false]</c-s>, <c-s>/v [true|false]</c-s>, <c-s>/H [true|false]</c-s>
+              <c-s>/h [true|false]</c-s> for recursive directory walk, verbose output header, Hidden dirs with no match,
+              and help message, respectively.
+            </li>
+            <li>
+              Display file name and path, without duplication of path name, e.g., organized by directory, for files
+              containing the search text.
+            </li>
+            <li>
+              Interesting extensions:
+              <ul class="tight" style="margin-left:0.85rem;">
+                <li>
+                  Replace text by regular expressions for both search text and file patterns.
+                </li>
+                <li>
+                  Replace sequential file searches with parallel searches to improve performance and useability.
+                </li>
+              </ul>
+            </li>
+          </ol>
+        </t-b>
+          </details>
+        </indent-block>
+
+        <t-b>
+          <c-s>Executive</c-s> uses <c-s>CmdlnParser</c-s> to access the program&apos;s starting path,
+          file patterns, search text, and options.
+        </t-b>
+        <t-b>
+          <c-s>Executive</c-s> configures the <c-s>CLPparser</c-s> instance for 
+          TextFinder&apos;s <c-s>Finder</c-s> operations by 
+          defining default values of program attributes not already defined on the command line. 
+        </t-b>
+        <t-b>
+          It then creates a member instance of <c-s>DirNav</c-s>, providing it access to 
+          <c-s>TextSearch::Finder</c-s> as a generic parameter.
+        </t-b>
+        <t-b>
+          DirNav creates an instance of TextSearch&apos;s <c-s>Finder</c-s> and provides access to it
+          via a member function <c-s>DirNav&lt;App&gt;::getApp()</c-s>.  This may be used to configure
+          <c-s>Finder</c-s> before starting a search.  It may also be used to collect results that are
+          specific to <c-s>DirNav</c-s>, e.g., the number of files and directories processed.
+        </t-b>
+        <t-b>
+          <c-s>Executive</c-s> uses <c-s>getApp()</c-s> to configure it with search text.
+        </t-b>
+        <div style="height:0.15em;">&nbsp;</div>
+        <hr class="spread" />
+        <a id="step5"></a>
+        <h3>Step #5 - Replace text search with RegEx matching</h3>
+        <t-b>
+          In this step we replace the simple String::find in TextSearch::Finder with a RegEx 
+          match operation.  This should be a relatively minor modification of Finder&apos;s 
+          processing.
+        </t-b>
+        <t-b>
+          Rust does not have regular expression processing in its std libraries.  However, there is
+          a widely used <a href="https://docs.rs/regex/1.4.5/regex/">RegEx crate</a> in 
+          <a href="https://crates.io/search?q=regex">crates.io</a>.  The documentation provided
+          has a nice set of examples and a good summary of RegEx syntax supported by the crate.
+        </t-b>
+        <div style="height:0.15em;">&nbsp;</div>
+        <hr class="spread" />
+        <a id="refs"></a>
+        <h3>Step #5 References</h3>
+        <t-b>
+          The table below provides references relevant for Step #5 : RegEx.
+        </t-b>
+        <div style="height:0.5rem;">&nbsp;</div>
+        <h4>Table 1. - Step #5 References</h4>
+        <div>
+          <table style="width:100%;" class="lightItem">
+            <tr>
+              <th class="darkItem" style="width: 10em;">Topic</th>
+              <th class="darkItem" style-"width: auto;">Description</th>
+              <th class="darkItem" style="width: 15em;">Link</th>
+            </tr>
+            <tr>
+              <td>RegEx</td>
+              <td>
+                Regular expressions are a &quot;little language&quot; for specifying text to find.
+              </td>
+              <td><a href="https://docs.rs/regex/1.4.5/regex/">RegEx crate</a></td>
+            </tr>
+            <tr>
+              <td>Strings</td>
+              <td>
+                Rust std strings come in two flavors: <c-s>String</c-s> and <c-s>str</c-s>, representing
+                string objects and literal strings.  Each contains utf-8 characters.  The Rust library path
+                also provides PathBuf, similar to String, and Path, similar to &str, but uses the encoding
+                for paths provided by the current platform, e.g., Windows, Linux, or macOS.
+              </td>
+              <td>
+                <a href="https://doc.rust-lang.org/std/string/struct.String.html">std::String</a><br />
+                <a href="https://doc.rust-lang.org/std/str/index.html">std::str</a><br />
+                <a href="https://doc.rust-lang.org/std/path/index.html">std::path</a><br />
+                <a href="https://doc.rust-lang.org/std/path/struct.PathBuf.html">std::path::PathBuf</a>
+                <a href="https://doc.rust-lang.org/std/path/struct.Path.html">std::path::Path</a><br />
+                <a href="https://doc.rust-lang.org/rust-by-example/std_misc/path.html">Rust by Example</a>
+                <div style="height:0.25rem;"></div>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <t-b>
+          You don&apos;t need to use all of the references in the right-most column.  Just look at
+          each quickly and use the one(s) that work(s) best for you.
+        </t-b>
+        <div style="height:10em;">&nbsp;</div>
+        <a id="bottom"></a>
+         </main-right>
+       </main-wrapper>
+     </grid-main>
+     <grid-footer class="light">
+       <footer-wrapper>
+         <footer-left class="dark" onclick="togglemenus()">
+           &nbsp;toggle&nbsp;menu&nbsp;
+         </footer-left>
+         <footer-right id="sects" style="display:flex; padding:0em 1em;">
+           <ul>
+             <li><a href="#regex">TextSearch Pkg</a></li>
+             <li><a href="#step5">Step5</a></li>
+             <li><a href="#refs">References</a></li>
+           </ul>
+         </footer-right>
+       </footer-wrapper>
+     </grid-footer>
+   </grid-container>
+</body>
+</html>
