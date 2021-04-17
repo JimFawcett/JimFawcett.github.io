@@ -8,6 +8,8 @@
     <title>RustBites Threads</title>
     <link rel="stylesheet" href="css/BiteStyles.css" />
     <link rel="stylesheet" href="css/BiteTables.css" />
+    <script src="js/ScriptsWebComponents.js"></script>
+    <link rel="stylesheet" href="css/StylesWebComponents.css" />
     <script src="js/BiteScripts.js"></script>
     <script src="js/ScriptsKeyboard.js"></script>
     <style>
@@ -41,7 +43,507 @@
 
     <h2>Rust Bite - Threads</h2>
     <hr class="spread" />
-    <h3>Basic Threads:</h3>
+    <t-b>
+      To ensure data safety Rust maintains an invariant:
+      <div class="indent pad5">
+        &quot;no simultaneous shared mutability through references&quot;
+      </div>
+      Program code may hold any number of immutable references to a data item but only one immutable reference.
+    </t-b>
+    <t-b>
+      The Rust compiler checks the invariant at compile time through static analysis.  But it can only do partial
+      analysis of the &quot;simultaneous&quot; part using 
+      <a href="RustBites_Safety.html#nlscope">non-lexical analysis</a>.  For applications that need to share data
+      between threads, Rust code defers checking of thread accesses to run-time.  It does that with types that
+      internally use 
+      <c-s><a href="https://doc.rust-lang.org/stable/std/cell/struct.UnsafeCell.html">UnsafeCell&lt;T&gt;</a></c-s>.
+      This type wraps an unsafe block holding an instance of T.
+      
+    </t-b>
+    <h3>1.0 - Interior Mutability</h3>
+    <t-b>
+      The types that wrap <c-s>UnsafeCell&lt;T&gt;</c-s>, e.g., 
+      <c-s>Cell&lt;T&gt;</c-s> and <c-s>RefCell&lt;T&gt;</c-s> provide safe interfaces that support deferring
+      borrow checking to run time.
+    </t-b>
+    <t-b class="indent">
+      <div style="float:left; padding-right:1rem; margin-left:-0.75rem;">
+        <photosizer-block src="pictures/InteriorMutTypes.jpg" width="400" class="photoSizerBlock left clear">
+          <span style="font-family:'Comic Sans MS';">Fig 1. Supporting Interior Mutability</span>
+        </photosizer-block>
+      </div>
+    </t-b>
+    <t-b>
+      Calling methods on <c-s>UnsafeCell&lt;T&gt;</c-s> is unsafe, but the types <c-s>Cell&lt;T&gt;</c-s> and
+      <c-s>RefCell&lt;T&gt;</c-s> provide safe interfaces by calling into <c-s>UnsafeCell&lt;T&gt;</c-s>
+      in ways that are verifiably safe.
+    </t-b>
+    <t-b>
+      The purpose of <c-s>UnsafeCell&lt;T&gt;</c-s> is to support mutation from methods with immutable interfaces.
+      That is, at compile-time mutability is hidden from the static checker so code that is sound but does not
+      statisfy the static &quot;no shared mutability&quot; invariant will build.  That means that borrow checking now must
+      be enforced at run-time, and that is the purpose of <c-s>RefCell&lt;T&gt;</c-s>.
+    </t-b>
+    <t-b>
+      The <c-s>Cell&lt;T&gt;</c-s> type has a pass and return by value interface so no run-time checks are needed.
+    </t-b>
+    <div class="clear" style="height:0.75rem;"></div>
+    <div class="indent">
+      <defn-OuterBlock>
+        <defn-block>
+          <defn-head>
+            <a href="https://doc.rust-lang.org/stable/std/cell/struct.UnsafeCell.html">UnsafeCell&lt;T&gt;</a> - partial definition
+          </defn-head>
+          <defn-code>
+pub struct UnsafeCell&lt;T: ?Sized&gt; {
+    value: T,
+}
+
+impl&lt;T: ?Sized&gt; !Sync for UnsafeCell&lt;T&gt; {}
+
+impl&lt;T&gt; UnsafeCell&lt;T&gt; {
+    pub const fn new(value: T) -&gt; UnsafeCell&lt;T&gt; {
+        UnsafeCell { value }
+    }
+
+    pub const fn into_inner(self) -&gt; T {
+        self.value
+    }
+}
+
+impl&lt;T: ?Sized&gt; UnsafeCell&lt;T&gt; {
+    /// immutable interface yields mutable pointer !!
+    pub const fn get(&self) -&gt; *mut T {
+        // We can just cast pointer from `UnsafeCell&lt;T&gt;` to `T` 
+        self as *const UnsafeCell&lt;T&gt; as *const T as *mut T
+    }
+
+    /// This call borrows the `UnsafeCell` mutably 
+    /// (at compile-time) which guarantees that we 
+    /// possess the only reference.
+     pub fn get_mut(&mut self) -&gt; &mut T {
+        &mut self.value
+    }
+
+    pub const fn raw_get(this: *const Self) -&gt; *mut T {
+        // We can just cast pointer from `UnsafeCell&lt;T&gt;` to `T` 
+        this as *const T as *mut T
+    }
+}
+          </defn-code>
+          <defn-head class="defnBorderTop">
+            <a href="https://doc.rust-lang.org/stable/std/cell/struct.Cell.html">Cell&lt;T&gt;</a> - Partial Definition
+          </defn-head>
+          <defn-code>
+pub struct Cell&lt;T: ?Sized&gt; {
+    value: UnsafeCell&lt;T&gt;,
+}
+
+unsafe impl&lt;T: ?Sized&gt; Send for Cell&lt;T&gt; where T: Send {}
+impl&lt;T: ?Sized&gt; !Sync for Cell&lt;T&gt; {}
+
+impl&lt;T: Copy&gt; Clone for Cell&lt;T&gt; {
+    fn clone(&self) -&gt; Cell&lt;T&gt; {
+        Cell::new(self.get())
+    }
+}
+
+impl&lt;T: Default&gt; Default for Cell&lt;T&gt; {
+    /// Creates a `Cell&lt;T&gt;`, with the `Default` value for T.
+    fn default() -&gt; Cell&lt;T&gt; {
+        Cell::new(Default::default())
+    }
+}
+
+impl&lt;T&gt; From&lt;T&gt; for Cell&lt;T&gt; {
+    fn from(t: T) -&gt; Cell&lt;T&gt; {
+        Cell::new(t)
+    }
+}
+
+impl&lt;T&gt; Cell&lt;T&gt; {
+    /// Creates a new `Cell` containing the given value.
+    pub const fn new(value: T) -&gt; Cell&lt;T&gt; {
+        Cell { value: UnsafeCell::new(value) }
+    }
+
+    /// Sets the contained value.
+    pub fn set(&self, val: T) {
+        let old = self.replace(val);
+        drop(old);
+    }
+
+    /// Swaps the values of two Cells.
+    /// Difference with `std::mem::swap` is that this 
+    /// function doesn't require `&mut` reference.
+    pub fn swap(&self, other: &Self) {
+        if ptr::eq(self, other) {
+            return;
+        }
+        // SAFETY: This can be risky if called from 
+        // separate threads, but `Cell` is `!Sync` 
+        // so this won't happen. This also won't 
+        // invalidate any pointers since `Cell` makes
+        // sure nothing else will be pointing into
+        // either of these `Cell`s.
+        unsafe {
+            ptr::swap(self.value.get(), other.value.get());
+        }
+    }
+
+    /// Replaces the contained value, and returns it.
+    pub fn replace(&self, val: T) -&gt; T {
+        // SAFETY: This can cause data races if called 
+        // from a separate thread,
+        // but `Cell` is `!Sync` so this won't happen.
+        mem::replace(unsafe { &mut *self.value.get() }, val)
+    }
+
+    /// Unwraps the value.
+    pub const fn into_inner(self) -&gt; T {
+        self.value.into_inner()
+    }
+}
+
+impl&lt;T: Copy&gt; Cell&lt;T&gt; {
+    /// Returns a copy of the contained value.
+    pub fn get(&self) -&gt; T {
+        // SAFETY: This can cause data races if called
+        // from a separate thread,
+        // but `Cell` is `!Sync` so this won't happen.
+        unsafe { *self.value.get() }
+    }
+}
+
+impl&lt;T: ?Sized&gt; Cell&lt;T&gt; {
+    /// Returns raw pointer to underlying data in cell.
+    pub const fn as_ptr(&self) -&gt; *mut T {
+        self.value.get()
+    }
+
+    /// Returns mutable reference to underlying data.
+    ///
+    /// Call borrows `Cell` mutably (at compile-time)
+    /// which guarantees that we possess the only
+    /// reference.
+    pub fn get_mut(&mut self) -&gt; &mut T {
+        self.value.get_mut()
+    }
+
+    /// Returns a `&Cell&lt;T&gt;` from a `&mut T`
+    pub fn from_mut(t: &mut T) -&gt; &Cell&lt;T&gt; {
+        // SAFETY: `&mut` ensures unique access.
+        unsafe { &*(t as *mut T as *const Cell&lt;T&gt;) }
+    }
+}
+
+impl&lt;T: Default&gt; Cell&lt;T&gt; {
+    /// Takes value of cell, leaving `Default::default()` 
+    /// in its place.
+    pub fn take(&self) -&gt; T {
+        self.replace(Default::default())
+    }
+}
+
+impl&lt;T&gt; Cell&lt;[T]&gt; {
+    /// Returns a `&[Cell&lt;T&gt;]` from a `&Cell&lt;[T]&gt;`
+    pub fn as_slice_of_cells(&self) -&gt; &[Cell&lt;T&gt;] {
+        // SAFETY: `Cell&lt;T&gt;` has same memory layout as `T`.
+        unsafe { 
+            &*(self as *const Cell&lt;[T]&gt; as *const [Cell&lt;T&gt;]) 
+        }
+    }
+}
+          </defn-code>
+        </defn-block>
+        <defn-block>
+          <defn-head>
+            <a href="https://doc.rust-lang.org/stable/std/cell/struct.RefCell.html">RefCell&lt;T&gt;</a> - partial definition
+          </defn-head>
+          <defn-code>
+pub struct RefCell&lt;T: ?Sized&gt; {
+    borrow: Cell&lt;BorrowFlag&gt;,
+    value: UnsafeCell&lt;T&gt;,
+}
+
+/// An error returned by [`RefCell::try_borrow`].
+pub struct BorrowError {
+    _private: (),
+}
+
+/// An error returned by [`RefCell::try_borrow_mut`].
+pub struct BorrowMutError {
+    _private: (),
+}
+
+type BorrowFlag = isize;
+const UNUSED: BorrowFlag = 0;
+
+impl&lt;T&gt; RefCell&lt;T&gt; {
+    pub const fn new(value: T) -&gt; RefCell&lt;T&gt; {
+        RefCell { 
+            value: UnsafeCell::new(value), 
+            borrow: Cell::new(UNUSED) 
+        }
+    }
+
+    pub const fn into_inner(self) -&gt; T {
+        // Since function takes `self` (the `RefCell`) by value,
+        // compiler statically verifies that it is not currently
+        // borrowed.
+        self.value.into_inner()
+    }
+
+    pub fn replace(&self, t: T) -&gt; T {
+        mem::replace(&mut *self.borrow_mut(), t)
+    }
+
+    pub fn swap(&self, other: &Self) {
+        mem::swap(
+            &mut *self.borrow_mut(), 
+            &mut *other.borrow_mut()
+        )
+    }
+}
+
+impl&lt;T: ?Sized&gt; RefCell&lt;T&gt; {
+    /// Immutably borrows the wrapped value.
+    ///
+    /// Borrow lasts until returned `Ref` exits scope. 
+    /// Multiple immutable borrows can be taken out at 
+    /// the same time.
+    ///
+    /// # Panics
+    ///
+    /// Panics if value is currently mutably borrowed. 
+    /// For a non-panicking variant, use
+    /// [`try_borrow`](#method.try_borrow).
+    ///
+    pub fn borrow(&self) -&gt; Ref&lt;'_, T&gt; {
+        self.try_borrow()
+            .expect("already mutably borrowed")
+    }
+
+    /// Immutably borrows wrapped value, returning error 
+    /// if value is currently mutably borrowed.
+    ///
+    /// Borrow lasts until returned `Ref` exits scope. 
+    /// Multiple immutable borrows can be taken out at 
+    /// the same time.
+    ///
+    pub fn try_borrow(&self) 
+            -&gt; Result&lt;Ref&lt;'_, T&gt;, BorrowError&gt; {
+        match BorrowRef::new(&self.borrow) {
+            // SAFETY: 
+            //   `BorrowRef` ensures there is only immutable
+            //   access to value while borrowed.
+            Some(b) =&gt; Ok(
+                    Ref { 
+                      value: unsafe { &*self.value.get() }, 
+                      borrow: b 
+                    }
+            ),
+            None =&gt; Err(BorrowError { _private: () }),
+        }
+    }
+
+    /// Mutably borrows the wrapped value.
+    ///
+    /// Borrow lasts until returned `RefMut` or all `RefMut`s
+    /// derived from it exit scope. Value cannot be borrowed
+    /// while this borrow is active.
+    ///
+    /// # Panics
+    ///
+    /// Panics if value is currently borrowed. For non-panicking
+    /// variant, use [`try_borrow_mut`](#method.try_borrow_mut).
+    ///
+    /*--------------------------------------------------------
+      Here is the core of interior mutability - Part 1
+    --------------------------------------------------------*/
+    pub fn borrow_mut(&self) -&gt; RefMut&lt;'_, T&gt; {
+        self.try_borrow_mut().expect("already borrowed")
+    }
+
+    /// Mutably borrows wrapped value, returning error if value 
+    /// is currently borrowed.
+    ///
+    /// Borrow lasts until returned `RefMut` or all `RefMut`s
+    /// derived from it exit scope. Value cannot be borrowed
+    /// while this borrow is active.
+    ///
+    pub fn try_borrow_mut(&self) 
+            -&gt; Result&lt;RefMut&lt;'_, T&gt;, BorrowMutError&gt; {
+        match BorrowRefMut::new(&self.borrow) {
+            // SAFETY: `BorrowRef` guarantees unique access.
+            Some(b) =&gt; Ok(
+                  RefMut { 
+                      value: unsafe { 
+                          &mut *self.value.get() }, 
+                          borrow: b 
+                      }
+            ),
+            None =&gt; Err(BorrowMutError { _private: () }),
+        }
+    }
+
+    /// Returns a raw pointer to the underlying data in this cell.
+    pub fn as_ptr(&self) -&gt; *mut T {
+        self.value.get()
+    }
+
+    /// Returns a mutable reference to the underlying data.
+    ///
+    /// Call borrows `RefCell` mutably (at compile-time) so no
+    /// need for dynamic checks.
+    ///
+    pub fn get_mut(&mut self) -&gt; &mut T {
+        self.value.get_mut()
+    }
+
+}
+
+impl&lt;T: Default&gt; RefCell&lt;T&gt; {
+    /// Takes wrapped value, leaving `Default::default()` 
+    /// in its place.
+    pub fn take(&self) -&gt; T {
+        self.replace(Default::default())
+    }
+}
+
+unsafe impl&lt;T: ?Sized&gt; Send for RefCell&lt;T&gt; where T: Send {}
+impl&lt;T: ?Sized&gt; !Sync for RefCell&lt;T&gt; {}
+
+impl&lt;T: Clone&gt; Clone for RefCell&lt;T&gt; {
+    /// Panics if the value is currently mutably borrowed.
+    fn clone(&self) -&gt; RefCell&lt;T&gt; {
+        RefCell::new(self.borrow().clone())
+    }
+}
+
+impl&lt;T: Default&gt; Default for RefCell&lt;T&gt; {
+    /// Creates `RefCell&lt;T&gt;`, with `Default` value for T.
+    fn default() -&gt; RefCell&lt;T&gt; {
+        RefCell::new(Default::default())
+    }
+}
+
+impl&lt;T&gt; From&lt;T&gt; for RefCell&lt;T&gt; {
+    fn from(t: T) -&gt; RefCell&lt;T&gt; {
+        RefCell::new(t)
+    }
+}
+
+struct BorrowRef&lt;'b&gt; {
+    borrow: &'b Cell&lt;BorrowFlag&gt;,
+}
+
+/// Wraps borrowed reference to value in a `RefCell` box.
+/// Wrapper type for immutably borrowed value from 
+/// `RefCell&lt;T&gt;`.
+pub struct Ref&lt;'b, T: ?Sized + 'b&gt; {
+    value: &'b T,
+    borrow: BorrowRef&lt;'b&gt;,
+}
+
+impl&lt;T: ?Sized&gt; Deref for Ref&lt;'_, T&gt; {
+    type Target = T;
+
+    fn deref(&self) -&gt; &T {
+        self.value
+    }
+}
+
+struct BorrowRefMut&lt;'b&gt; {
+    borrow: &'b Cell&lt;BorrowFlag&gt;,
+}
+
+impl Drop for BorrowRefMut&lt;'_&gt; {
+    fn drop(&mut self) {
+        let borrow = self.borrow.get();
+        debug_assert!(is_writing(borrow));
+        self.borrow.set(borrow + 1);
+    }
+}
+
+impl&lt;'b&gt; BorrowRefMut&lt;'b&gt; {
+    fn new(borrow: &'b Cell&lt;BorrowFlag&gt;) 
+            -&gt; Option&lt;BorrowRefMut&lt;'b&gt;&gt; {
+        // NOTE: 
+        // Unlike BorrowRefMut::clone, new is called to 
+        // create initial mutable reference, and so there 
+        // must currently be no existing references. Thus, 
+        // while clone increments mutable refcount,
+        // we only allow going from UNUSED to UNUSED - 1.
+        match borrow.get() {
+            UNUSED =&gt; {
+                borrow.set(UNUSED - 1);
+                Some(BorrowRefMut { borrow })
+            }
+            _ =&gt; None,
+        }
+    }
+}
+
+/// Wrapper type for mutably borrowed value from `RefCell&lt;T&gt;`.
+pub struct RefMut&lt;'b, T: ?Sized + 'b&gt; {
+    value: &'b mut T,
+    borrow: BorrowRefMut&lt;'b&gt;,
+}
+
+impl&lt;T: ?Sized&gt; Deref for RefMut&lt;'_, T&gt; {
+    type Target = T;
+
+    fn deref(&self) -&gt; &T {
+        self.value
+    }
+}
+
+/*--------------------------------------------------------
+  Here is the core of interior mutability - Part 2
+--------------------------------------------------------*/
+impl&lt;T: ?Sized&gt; DerefMut for RefMut&lt;'_, T&gt; {
+    fn deref_mut(&mut self) -&gt; &mut T {
+        self.value
+    }
+}
+
+          </defn-code>
+        </defn-block>
+      </defn-OuterBlock>
+    </div>
+    <div style="height:0.75rem;"></div>
+    <t-b>
+      The code blocks above show how &quot;interior mutability&quot; is implemented.  Look at the 
+      <c-s>RefCell&lt;T&gt;</c-s> functions:
+      <div class="indent pad5">
+        - <c-s>fn borrow_mut(&self) -> RefMut<'_, T></c-s><br />
+        - <c-s>fn deref_mut(&mut self) -> &mut T</c-s>.
+      </div>
+      The first uses an immutable interface to return a <c-s>RefMut<'_, T></c-s> wrapper of the value
+      which can be implicitly dereferenced by the second to yield a mutable reference to the value.
+    </t-b>
+    <t-b>
+      <c-s>RefCell&lt;T&gt;</c-s> tracks references at run-time, using its borrow member to remember
+      the current state of references and if an attempt to create a mutable reference is made when
+      there are any other active references the cell will panic.
+    </t-b>
+    <t-b class="indent">
+      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=977111a5f5f619f00580dfdf1f3c6675">
+        demonstration code in playground
+      </a>
+    </t-b>
+    <t-b>
+      Adding synchronization with <c-s>Mutex&lt;T&gt;</c-s> or <c-s>RWLock&lt;T&gt;</c-s> will then ensure
+      that locked data can only be accessed by a single thread at any given time.  Both of these constructs
+      use <c-s>RefCell&lt;T&gt;</c-s>s to allow multiple threads to mutably share a guarded data item, but not
+      simultaneously, so there won&apos;t be any data races or memory faults.
+    </t-b>
+    <t-b>
+      A Rust <c-s>Mutex&lt;T&gt;</c-s> guards data, t &epsilon; T, not regions of code.      
+      The only way to access protected shared data is through its <c-s>Mutex&lt;T&gt;</c-s> or other lock.  
+    </t-b>
+    <h3>2.0 - Basic Threads:</h3>
     <t-b>
       Rust threads are represented by the <c-s>thread</c-s> type and created
       with an associated function:
@@ -109,7 +611,7 @@ fn main() {
           <defn-code>
   -- Basic Threads --
 
-   main thread printing
+   main thread printing    
   child thread printing
   child thread printing
   child thread printing
@@ -151,7 +653,7 @@ fn main() {
         Interior mutability in Rust, by Ricardo Martins
       </a>.
     </t-b>
-    <h3>Sharing non-thread-safe Resources:</h3>
+    <h3>3.0 - Sharing non-thread-safe Resources:</h3>
     <t-b>
       The previous example was relatively simple because threads only shared inherently thread-safe objects, e.g., 
       an Atomic and std::output.  The example below illustrates how non-thread-safe objects need to be handled.
