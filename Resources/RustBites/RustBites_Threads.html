@@ -50,11 +50,11 @@
       <div class="indent pad10">
         &quot;no simultaneous shared mutability through references&quot;
       </div>
-      This is essentially equivalent to the conditions: any given program scope code may hold any number of 
+      This is nearly equivalent to the conditions: any given program scope code may hold any number of 
       immutable references to a data item but only one immutable reference with no immutable references.
     </t-b>
     <t-b>
-      These are sufficient conditions for data safety, but not sufficient 
+      These are sufficient conditions for data safety, but not necessary
       (see <a href="RustBites_Safety.html">RustBites Safety</a>).  That means that safe code may fail the static tests
       and so fail to build.
     </t-b>
@@ -931,5 +931,376 @@ fn main() {
       example.
     </t-b>
     <h3>4.0 - ThreadResult:</h3>
+    <t-b>
+      The C++ programming language has a <c-s>std::future</c-s> type that allows a thread to return a promise 
+      to deliver a result when it&apos;s done.  Users can do work then block on the thread&apos;s future until
+      the thread finishes.
+    </t-b>
+    <t-b>
+      Rust also has a Future type, associated with async/await processing, but its operation is tied to the
+      mechanisms used for that, e.g., a special-purpose runtime, often provided by the 
+      <a href="https://crates.io/crates/tokio">Tokio crate</a>.
+    </t-b>
+    <t-b>
+      In this section we develop a <c-s>ThreadResult&lt;T&gt;</c-s> type that behaves in a way very similar
+      to the C++ std::future.
+    </t-b>
+    <t-b>
+      <div class="indent">
+        <defn-OuterBlock>
+          <defn-block>
+            <defn-head>ThreadResult&lt;T&gt;</defn-head>
+            <defn-code>
+////////////////////////////////////////////////
+// thread_result::lib.rs                      //
+//     - Wait for thread to complete          //
+//                                            //
+// Jim Fawcett, https://JimFawcett.github.io  //
+////////////////////////////////////////////////
+
+#![allow(clippy::mutex_atomic)]
+#![allow(dead_code)]
+use std::sync::*;
+use std::fmt::Debug;
+
+#[derive(Debug, Default)]
+pub struct ThreadResult<T> {
+    pub result: Mutex<T>,
+    cv: Condvar,
+    ready: Mutex<bool>
+}
+
+impl<T: Debug + Default + Clone> ThreadResult<T> {
+    pub fn new() -> Self {
+        Self {
+            result: Mutex::new(T::default()),
+            cv: Condvar::new(),
+            ready: Mutex::new(false),
+        }
+    }
+    /*--------------------------------------------
+      Unwrapping is appropriate here.  The 
+      operation fails if the Mutex becomes
+      poisoned, due to panic on a thread
+      holding the lock.  But then you can't
+      do much except quit, which the unwrap
+      does for you.
+    --------------------------------------------*/
+    pub fn set(&self, t:T) {
+        let mut lr = self.ready.lock().unwrap();
+        *lr = true;
+        let mut lrslt = self.result.lock().unwrap();
+        *lrslt = t;
+        self.cv.notify_one();
+    }
+    pub fn get(&self) -> T {
+        let mut rdy = self.ready.lock().unwrap();
+        while !*rdy {
+            rdy = self.cv.wait(rdy).unwrap();
+        }
+        let rslt = self.result.lock().unwrap();
+        rslt.clone()
+    }
+    pub fn ready(&self) -> bool {
+        *self.ready.lock().unwrap()
+    }
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code</defn-head>
+            <defn-code>
+/////////////////////////////////////////////////////////////
+// thread_result::test1.rs - basic ThreadResult test       //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 14 Apr 2021  //
+/////////////////////////////////////////////////////////////
+
+use thread_result::*;
+use std::sync::Arc;
+use std::thread;
+use std::time::Duration;
+
+fn test() {
+    let thrd_rslt = Arc::new(ThreadResult::<i32>::new());
+    let thrd_rslt1 = Arc::clone(&thrd_rslt);
+    let thrd_rslt2 = Arc::clone(&thrd_rslt);
+
+    let cls = move || {
+        let dur = Duration::from_secs(10u64);
+        thread::sleep(dur);
+        thrd_rslt2.set(42);
+    };
+    let handle = thread::spawn(cls);
+
+    let dur = Duration::from_secs(1);
+    loop {
+        if !thrd_rslt1.ready() {
+            print!("\n  main waiting");
+            thread::sleep(dur);
+        }
+        else {
+            print!("\n  thread result is {}", thrd_rslt.get());
+            break;
+        }
+    }
+    let _ = handle.join();
+}
+fn main() {
+    test();
+}
+              </defn-code>
+            <defn-head class="defnBorderTop">Output</defn-head>
+            <defn-code>
+  main waiting
+  main waiting
+  main waiting
+  main waiting
+  main waiting
+  main waiting
+  main waiting
+  main waiting
+  main waiting
+  main waiting
+  thread result is 42
+
+            </defn-code>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+    <t-b class="indent">
+      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=8b1a5accb918672f6c288a5786a653f4">
+        code in playground
+      </a>
+    </t-b>
+    <t-b>
+      Normally we would not continuously poll the <c-s>ThreadResult</c-s>.  Instead start the thread, go off and do work
+      until you must use the result and then call <c-s>get()</c-s> which blocks until the result is ready.  
+    </t-b>
+    <t-b>
+      Note that the <c-s>ThreadResult&lt;T&gt;</c-s> is generic so the thread can return a rich set of possible data.
+    </t-b>
+    <h3>5.0 BlockingQueue:</h3>
+    <t-b>
+      The last example in this Bite is an implementation of a 
+      <a href="https://jimfawcett.github.io/RustBlockingQueue.html">BlockingQueue&lt;T&gt;</a>.
+      It allows multiple enqueuers and, with a little more work we can build a 
+      <a href="https://jimfawcett.github.io/RustThreadPool.html">ThreadPool&lt;T&gt;</a> that supports
+      multiple dequeuers too.  That you can explore using the link.
+    </t-b>
+    <t-b>
+      <div class="indent">
+        <defn-OuterBlock>
+          <defn-block>
+            <defn-head>BlockingQueue&lt;T&gt; library</defn-head>
+            <defn-code>
+/////////////////////////////////////////////////
+// rust_blocking_queue::lib.rs - BlockingQueue //
+//                                             //
+// Jim Fawcett, https://JimFawcett.github.io   //
+/////////////////////////////////////////////////
+/*
+   This is a BlockingQueue abstraction.  To be shared
+   between threads, without using unsafe code, any 
+   abstraction must be composed only of Mutexes and 
+   Condvars or struct or tuple with only those members.
+
+   That means that the blocking queue must hold its 
+   native queue in a Mutex, as shown below.
+   
+   There is another alternative, based on Rust 
+   channels, which are essentially blocking queues.
+*/
+#![allow(dead_code)]
+use std::sync::*;
+use std::collections::*;
+
+#[derive(Debug)]
+/// Thread-safe queue that blocks de_q on empty
+pub struct BlockingQueue<T> {
+    q: Mutex<VecDeque<T>>,
+    cv: Condvar,
+}
+impl<T> BlockingQueue<T> {
+    /// Create empty blocking queue
+    pub fn new() -> Self {
+        Self {
+            q: Mutex::new(VecDeque::new()),
+            cv: Condvar::new(),
+        }
+    }
+    /// push input on back of queue
+    /// - unrecoverable if lock fails so just unwrap
+    pub fn en_q(&self, t:T) {
+        let mut lq = self.q.lock().unwrap();
+        lq.push_back(t);
+        self.cv.notify_one();
+    }
+    /// pop element from front of queue
+    /// - unrecoverable if lock fails so just unwrap
+    /// - same for condition variable
+    pub fn de_q(&self) -> T {
+        let mut lq = self.q.lock().unwrap();
+        while lq.len() == 0 {
+            lq = self.cv.wait(lq).unwrap();
+        }
+        lq.pop_front().unwrap()
+    }
+    /// return number of elements in queue
+    pub fn len(&self) -> usize {
+        self.q.lock().unwrap().len()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn bq_len() {
+        let bq = BlockingQueue::<f64>::new();
+        assert_eq!(bq.len(), 0);
+    }
+    #[test]
+    fn bq_en_queue() {
+        let bq = BlockingQueue::<f64>::new();
+        bq.en_q(3.5);
+        assert_eq!(bq.len(), 1);
+    }
+    #[test]
+    fn bq_de_queue() {
+        let bq = BlockingQueue::<f64>::new();
+        bq.en_q(3.5);
+        assert_eq!(bq.de_q(), 3.5);
+        assert_eq!(bq.len(), 0);
+    }
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code</defn-head>
+            <defn-code>
+////////////////////////////////////////////////
+// rust_blocking_queue::test1.rs              //
+//     - demo blocking queue                  //
+//                                            //
+// Jim Fawcett, https://JimFawcett.github.io  //
+////////////////////////////////////////////////
+/*
+   This is a good demonstration of the way 
+   BlockingQueue will be used in applications.
+*/
+use std::io::*;
+use std::sync::*;
+use std::thread;
+use rust_blocking_queue::{BlockingQueue};
+use std::time::Duration;
+
+fn main() {
+
+    print!(
+        "\n  Demonstrate queue shared between threads"
+    );
+    print!(
+        "\n =========================================="
+    );
+
+    test();
+    print!("\n\n  That's all Folks!\n");
+}
+
+/*-- simple test of BlockingQueue --*/
+fn test() {
+
+    let share = Arc::new(BlockingQueue::<String>::new());
+    let share1 = Arc::clone(&share);
+    let share2 = Arc::clone(&share);
+
+    let flush = || { let _ = std::io::stdout().flush(); };
+
+    /*-- child thread dequeues messages --*/
+    let handle = thread::spawn(move || {
+        print!("\n  child thread started");
+        flush();
+        let dur = Duration::from_millis(50);
+        loop {
+            let t = share1.de_q();
+            print!("\n  dequeued {} on child thread", t);
+            flush();
+            if &t == "quit" {
+                break;
+            }
+            thread::sleep(dur);
+        }
+        print!("\n  thread shutting down");
+        flush();
+    });
+
+    /*-- main thread enqueues messages --*/
+    let dur = Duration::from_millis(20);
+    for i in 0..5 {
+        let msg = format!("msg #{}", i.to_string());
+        print!("\n  enqueued {:?} on main thread", msg);
+        flush();
+        share2.en_q(msg);
+        thread::sleep(dur);
+    }
+    /*-- shut down child thread --*/
+    print!("\n  enqueued {:?} on main thread", "quit");
+    flush();
+    share2.en_q("quit".to_string());
+
+    /*-- child thread must complete before exiting --*/
+    print!("\n  waiting for child thread to stop");
+    flush();
+    let _ = handle.join();
+
+    print!("\n  queue length = {}", share2.len());
+}
+            </defn-code>
+            <defn-head class="defnBorderTop">Output</defn-head>
+            <defn-code>
+  Demonstrate queue shared between threads
+ ==========================================
+  enqueued "msg #0" on main thread
+  child thread started
+  dequeued msg #0 on child thread
+  enqueued "msg #1" on main thread
+  dequeued msg #1 on child thread
+  enqueued "msg #2" on main thread
+  enqueued "msg #3" on main thread
+  dequeued msg #2 on child thread
+  enqueued "msg #4" on main thread
+  enqueued "quit" on main thread
+  waiting for child thread to stop
+  dequeued msg #3 on child thread
+  dequeued msg #4 on child thread
+  dequeued quit on child thread
+  thread shutting down
+  queue length = 0
+
+  That's all Folks!
+
+            </defn-code>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+    <h3>6.0 - Epilogue:</h3>
+    <t-b>
+      Well, this has been some journey - yeah!  Lot&apos;s of interesting things in the thread code mix.
+      And, we haven&apos;t talked seriously about synchronization: 
+      <ul class="tight" style="margin-left:0.0rem;">
+        <li>How does CondVar work and why do we need to use it?</li>
+        <li>What does RWLock&lt;T&gt; do and when would we use it?</li>
+        <li>What is a Barrier and should we care?</li>
+      </ul>
+      For those, stay tuned for the <a href="RustBites_Synchron.html">Synchronization</a> bite.  
+      That probably will appear soon.  In the mean
+      time, look here: <a href="https://doc.rust-lang.org/std/sync/">std::sync</a>.  That will eventually
+      be followed by <a href="RustBites_Channels.html">Channels</a>.  For now, look here:
+      <a href="https://doc.rust-lang.org/std/sync/mpsc/index.html">mpsc</a>.  Both locks and channels are
+      treated lightly in the <a href="../../RustStory_Libraries.html">Rust Story</a>.
+    </t-b>
   </body>
 </html>
