@@ -44,11 +44,19 @@
     <h2>Rust Bite - Threads</h2>
     <hr class="spread" />
     <t-b>
+      Rust guarantees data safety - it is impossible to read from or write to memory that the current program
+      scope does not own.  
       To ensure data safety Rust maintains an invariant:
-      <div class="indent pad5">
+      <div class="indent pad10">
         &quot;no simultaneous shared mutability through references&quot;
       </div>
-      Program code may hold any number of immutable references to a data item but only one immutable reference.
+      This is essentially equivalent to the conditions: any given program scope code may hold any number of 
+      immutable references to a data item but only one immutable reference with no immutable references.
+    </t-b>
+    <t-b>
+      These are sufficient conditions for data safety, but not sufficient 
+      (see <a href="RustBites_Safety.html">RustBites Safety</a>).  That means that safe code may fail the static tests
+      and so fail to build.
     </t-b>
     <t-b>
       The Rust compiler checks the invariant at compile time through static analysis.  But it can only do partial
@@ -57,8 +65,11 @@
       between threads, Rust code defers checking of thread accesses to run-time.  It does that with types that
       internally use 
       <c-s><a href="https://doc.rust-lang.org/stable/std/cell/struct.UnsafeCell.html">UnsafeCell&lt;T&gt;</a></c-s>.
-      This type wraps an unsafe block holding an instance of T.
-      
+      This type wraps an unsafe block holding an instance of T.  We examine partial code for this type and two types 
+      that use it and show how that enables building safe code that would otherwise fail to build.
+    </t-b>
+    <t-b>
+
     </t-b>
     <h3>1.0 - Interior Mutability</h3>
     <t-b>
@@ -87,7 +98,139 @@
     <t-b>
       The <c-s>Cell&lt;T&gt;</c-s> type has a pass and return by value interface so no run-time checks are needed.
     </t-b>
-    <div class="clear" style="height:0.75rem;"></div>
+    <t-b>
+      Before diving into code for <c-s>UnsafeCell&lt;T&gt;</c-s> and its <c-s>Cell&lt;T&gt;</c-s> and 
+      <c-s>RefCell&lt;T&gt;</c-s> users, let&apos;s look at a simple demonstration of the later.  In the
+      left panel we present code that doesn&apos;t use interior mutability.  It fails to build if the last
+      print! is uncommented.  That violates the rule about no use of immutable references when a mutable
+      reference is in scope.
+    </t-b>
+    <t-b>
+      In the right panel we use <c-s>RefCell</c-s> to support interior mutability.  That all works.  The code
+      builds and works as expected.  But if we uncomment the drop(rx) statement we get a run-time panic.  That
+      shows that the run-time checking is working.  This behavior is just enough to allow threads to share
+      and mutate a common resource.  That works because, due to locking, the shares are isolated in the scope
+      of a lock.
+    </t-b>
+    <t-b>
+      <div style="height:1.0rem;"></div>
+      <div class="indent">
+        <defn-OuterBlock>
+          <defn-block>
+            <defn-head>No Interior Mutability</defn-head>
+            <defn-code>
+/*-----------------------------------------------------
+  Illustrates that perfectly safe code can fail to 
+  compile.  The safety invariant is very strong.
+-----------------------------------------------------*/
+fn may_fail_to_build() {
+    print!("\n  -- no interior mutability --");
+    let mut x = 42i32;
+    print!("\n    x = {}", x);
+    print!("\n    - immutable reference -");
+    let rx = &x;
+    print!("\n    *rx = {}", rx);
+    print!("\n    - mutable reference -");
+    let mrx = &mut x;
+    *mrx += 1;
+    // drop(mrx); won't save compilation - not used by borrow chkr
+    print!("\n    *mrx = {}", mrx);
+    // error: attempt to use immutable ref with mutable ref in scope
+    //        causes compile failure
+    // print!("\n    *rx = {}", rx);
+    println!();
+    // final observation: error is not due to declaration
+    // it's due to use.
+}
+
+fn main() {
+    may_fail_to_build();
+}
+            </defn-code>
+            <defn-head class="defnBorderTop">Output</defn-head>
+            <defn-code>
+  -- no interior mutability --
+    x = 42
+    - immutable reference -
+    *rx = 42
+    - mutable reference -
+    *mrx = 43
+
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Interior Mutability</defn-head>
+            <defn-code>
+/*-----------------------------------------------------
+  Illustrates that code violating safety invariant
+  can compile with the help of interior mutability.
+  - you still can't break the iinvariant rule due to
+    run-time checks.  However, using locks avoids 
+    run-time failure (not illustrated here, but later).
+-----------------------------------------------------*/
+fn may_fail_at_runtime() {
+    print!("\n  -- interior mutability --");
+    let x = RefCell::new(42i32);
+    print!("\n    x = {}", x.into_inner());
+    // RefCell is not copy so now invalid
+    print!("\n    - immutable reference -");
+    let x = RefCell::new(42i32);
+    let rx = x.borrow();
+    print!("\n    *rx = {}", rx);
+    // commenting out drop causes run-time panic
+    drop(rx);
+    print!("\n    - mutable reference -");
+    *x.borrow_mut() += 1;  // mutable ref ends here
+    print!("\n    *mrx = {}", x.borrow());
+    
+}
+fn main() {
+    may_fail_at_runtime();
+}
+
+              </defn-code>
+            <defn-head class="defnBorderTop">Output</defn-head>
+            <defn-code>
+  -- interior mutability --
+    x = 42
+    - immutable reference -
+    *rx = 42
+    - mutable reference -
+    *mrx = 43
+            
+            </defn-code>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+    <t-b class="indent">
+      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=a168386d3691f5c2ebf8286591a7602e">
+        code in playground
+      </a>
+    </t-b>
+    <t-b>
+      So, you say to yourself "we&apos;ve moved failure from compile-time to run-time.  That&apos;s good??". The answer
+      is yes, that&apos;s good, because now, as shown in Section 2., the use of locks avoids run-time failure.  Without interior
+      mutability we could&apos;t get there.
+    </t-b>
+    <t-b>
+      Now, let&apos;s see how interior mutability is molded out of the <c-s>std::cell</c-s> components.  There&apos;s
+      a lot of code here (only part of what is in the std::cell library).  But all the important stuff happens in the
+      <c-s>RefCell&lt;T&gt;</c-s> functions:
+      <div class="indent pad10">
+        - <c-s>fn borrow_mut(&self) -> RefMut<'_, T></c-s><br />
+        - <c-s>fn deref_mut(&mut self) -> &mut T</c-s>.
+      </div>
+      The signature for <c-s>borrow_mut</c-s> is immutable, but we get a wrapper <c-s>RefMut</c-s> which can be
+      implicitly dereferenced to yield a mutable pointer!  This lie satisfies the borrow checker and lets our
+      code build.  But now, <c-s>RefCell</c-s> is obligated to undo the lie by checking the borrowing invariants
+      at run-time.  If you look closely you will see some of that in other parts of the code.
+    </t-b>
+    <t-b>
+      If you are interested you can see all the details in the <c-s>std::cell::RefCell</c-s> library, linked at the
+      top of the right panel.
+    </t-b>
+    <div class="clear" style="height:0.5rem;"></div>
     <div class="indent">
       <defn-OuterBlock>
         <defn-block>
@@ -516,7 +659,7 @@ impl&lt;T: ?Sized&gt; DerefMut for RefMut&lt;'_, T&gt; {
     <t-b>
       The code blocks above show how &quot;interior mutability&quot; is implemented.  Look at the 
       <c-s>RefCell&lt;T&gt;</c-s> functions:
-      <div class="indent pad5">
+      <div class="indent pad10">
         - <c-s>fn borrow_mut(&self) -> RefMut<'_, T></c-s><br />
         - <c-s>fn deref_mut(&mut self) -> &mut T</c-s>.
       </div>
@@ -535,7 +678,7 @@ impl&lt;T: ?Sized&gt; DerefMut for RefMut&lt;'_, T&gt; {
     </t-b>
     <t-b>
       Adding synchronization with <c-s>Mutex&lt;T&gt;</c-s> or <c-s>RWLock&lt;T&gt;</c-s> will then ensure
-      that locked data can only be accessed by a single thread at any given time.  Both of these constructs
+      that locked data can only be accessed by a single thread at any given time.  Both of these locking constructs
       use <c-s>RefCell&lt;T&gt;</c-s>s to allow multiple threads to mutably share a guarded data item, but not
       simultaneously, so there won&apos;t be any data races or memory faults.
     </t-b>
@@ -556,7 +699,12 @@ impl&lt;T: ?Sized&gt; DerefMut for RefMut&lt;'_, T&gt; {
       When the thread exits this closure it is terminated.
     </t-b>
     <t-b>
-      The demonstration, below, illustrates creation of a child thread.  The main thread and child share std::output
+      Note that f: F is passed by value, e.g., moved into the closure.  If the closure uses any captured local
+      data then you must explicitly move the closure into <c-s>spawn</c-s>.  That&apos;s illustrated in the next
+      demonstration.
+    </t-b>
+    <t-b>
+      The code, below, illustrates creation of a child thread.  The main thread and child share std::output
       and an AtomicUsize global variable.  Global variables are usually avoided in Rust and other languages as well
       due to possibly widely distributed side affects.  It&apos;s used here for local thread-safe sharing between
       main and child threads just to illustrate how that works.
@@ -676,7 +824,13 @@ fn main() {
         <c-s>let shared2 = Arc::clone(&shared)</c-s>
       </div>
       <c-s>shared1</c-s> and <c-s>shared2</c-s> are pointers to the wrapped <c-s>Mutex</c-s> which, in turn, wraps
-      the shared entity, <c-s>s</c-s>, affording sychronized access.
+      the shared entity, <c-s>s</c-s>, affording sychronized access.  
+    </t-b>
+    <t-b>
+      Note that shared1 and shared2 will both mutate
+      a shared String resource.  But they are not declared mutable because that would violate the static safety
+      invariant.  Instead they both use interior mutability offered by <c-s>Mutex&lt;T&gt;</c-s> because it holds
+      a <c-s>RefCell&lt;T&gt;</c-s>.
     </t-b>
     <div style="height:0.25rem;"></div>
     <div class="indent">
@@ -773,7 +927,9 @@ fn main() {
     </t-b>
     <t-b>
       Rust has two other synchronizing constructs that are often used in threaded code: <c-s>RWLock</c-s>, a
-      reader-writer lock, and <c-s>Condvar</c-s> a condition variable.
+      reader-writer lock, and <c-s>Condvar</c-s> a condition variable.  We use <c-s>Condvar</c-s> in the next
+      example.
     </t-b>
+    <h3>4.0 - ThreadResult:</h3>
   </body>
 </html>
