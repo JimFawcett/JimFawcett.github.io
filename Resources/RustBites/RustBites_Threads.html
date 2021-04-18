@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html id="top">
   <head>
     <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
     <meta name="keywords" content="Rust, Introduction" />
@@ -34,8 +34,9 @@
         <up-b id="chaps">
         </up-b>
           <rt-b id="sects">
-        <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#starting">Starting</a>, 
-        <a href="#contents">Contents</a>, <a href="#refs">References</a>
+            <a href="#top">Top</a>, <a href="#intermut">InterMut</a>, <a href="#threads">Threads</a>, 
+            <a href="#sharing">Sharing</a>, <a href="#thrdrslt">ThrdRslt</a>, <a href="#bq">BlkgQ</a>, 
+            <a href="#epilog">Epilog</a>
       </rt-b>
     </toc-b>
     <div id="hlp" style="display:none;">
@@ -67,10 +68,9 @@
       <c-s><a href="https://doc.rust-lang.org/stable/std/cell/struct.UnsafeCell.html">UnsafeCell&lt;T&gt;</a></c-s>.
       This type wraps an unsafe block holding an instance of T.  We examine partial code for this type and two types 
       that use it and show how that enables building safe code that would otherwise fail to build.
+      <a id="itermut"></a>
     </t-b>
-    <t-b>
-
-    </t-b>
+    <div style="height:0.25rem;"></div>
     <h3>1.0 - Interior Mutability</h3>
     <t-b>
       The types that wrap <c-s>UnsafeCell&lt;T&gt;</c-s>, e.g., 
@@ -685,7 +685,9 @@ impl&lt;T: ?Sized&gt; DerefMut for RefMut&lt;'_, T&gt; {
     <t-b>
       A Rust <c-s>Mutex&lt;T&gt;</c-s> guards data, t &epsilon; T, not regions of code.      
       The only way to access protected shared data is through its <c-s>Mutex&lt;T&gt;</c-s> or other lock.  
+      <a id="thrds"></a>
     </t-b>
+    <div style="height:0.25rem;"></div>
     <h3>2.0 - Basic Threads:</h3>
     <t-b>
       Rust threads are represented by the <c-s>thread</c-s> type and created
@@ -800,7 +802,9 @@ fn main() {
       <a href="https://ricardomartins.cc/2016/06/25/interior-mutability-thread-safety">
         Interior mutability in Rust, by Ricardo Martins
       </a>.
+      <a id="sharing"></a>
     </t-b>
+    <div style="height:0.25rem;"></div>
     <h3>3.0 - Sharing non-thread-safe Resources:</h3>
     <t-b>
       The previous example was relatively simple because threads only shared inherently thread-safe objects, e.g., 
@@ -964,14 +968,14 @@ use std::sync::*;
 use std::fmt::Debug;
 
 #[derive(Debug, Default)]
-pub struct ThreadResult<T> {
-    pub result: Mutex<T>,
+pub struct ThreadResult&lt;T&gt; {
+    pub result: Mutex&lt;T&gt;,
     cv: Condvar,
-    ready: Mutex<bool>
+    ready: Mutex&lt;bool&gt;
 }
 
-impl<T: Debug + Default + Clone> ThreadResult<T> {
-    pub fn new() -> Self {
+impl&lt;T: Debug + Default + Clone&gt; ThreadResult&lt;T&gt; {
+    pub fn new() -&gt; Self {
         Self {
             result: Mutex::new(T::default()),
             cv: Condvar::new(),
@@ -993,7 +997,7 @@ impl<T: Debug + Default + Clone> ThreadResult<T> {
         *lrslt = t;
         self.cv.notify_one();
     }
-    pub fn get(&self) -> T {
+    pub fn get(&self) -&gt; T {
         let mut rdy = self.ready.lock().unwrap();
         while !*rdy {
             rdy = self.cv.wait(rdy).unwrap();
@@ -1001,7 +1005,7 @@ impl<T: Debug + Default + Clone> ThreadResult<T> {
         let rslt = self.result.lock().unwrap();
         rslt.clone()
     }
-    pub fn ready(&self) -> bool {
+    pub fn ready(&self) -&gt; bool {
         *self.ready.lock().unwrap()
     }
 }
@@ -1023,7 +1027,8 @@ use std::thread;
 use std::time::Duration;
 
 fn test() {
-    let thrd_rslt = Arc::new(ThreadResult::<i32>::new());
+    let thrd_rslt 
+        = Arc::new(ThreadResult::&lt;i32&gt;::new());
     let thrd_rslt1 = Arc::clone(&thrd_rslt);
     let thrd_rslt2 = Arc::clone(&thrd_rslt);
 
@@ -1084,7 +1089,9 @@ fn main() {
     </t-b>
     <t-b>
       Note that the <c-s>ThreadResult&lt;T&gt;</c-s> is generic so the thread can return a rich set of possible data.
+      <a id="bq"></a>
     </t-b>
+    <div style="height:0.25rem;"></div>
     <h3>5.0 BlockingQueue:</h3>
     <t-b>
       The last example in this Bite is an implementation of a 
@@ -1122,13 +1129,13 @@ use std::collections::*;
 
 #[derive(Debug)]
 /// Thread-safe queue that blocks de_q on empty
-pub struct BlockingQueue<T> {
-    q: Mutex<VecDeque<T>>,
+pub struct BlockingQueue&lt;T&gt; {
+    q: Mutex&lt;VecDeque&lt;T&gt;&gt;,
     cv: Condvar,
 }
-impl<T> BlockingQueue<T> {
+impl&lt;T&gt; BlockingQueue&lt;T&gt; {
     /// Create empty blocking queue
-    pub fn new() -> Self {
+    pub fn new() -&gt; Self {
         Self {
             q: Mutex::new(VecDeque::new()),
             cv: Condvar::new(),
@@ -1144,7 +1151,7 @@ impl<T> BlockingQueue<T> {
     /// pop element from front of queue
     /// - unrecoverable if lock fails so just unwrap
     /// - same for condition variable
-    pub fn de_q(&self) -> T {
+    pub fn de_q(&self) -&gt; T {
         let mut lq = self.q.lock().unwrap();
         while lq.len() == 0 {
             lq = self.cv.wait(lq).unwrap();
@@ -1152,7 +1159,7 @@ impl<T> BlockingQueue<T> {
         lq.pop_front().unwrap()
     }
     /// return number of elements in queue
-    pub fn len(&self) -> usize {
+    pub fn len(&self) -&gt; usize {
         self.q.lock().unwrap().len()
     }
 }
@@ -1162,18 +1169,18 @@ mod tests {
     use super::*;
     #[test]
     fn bq_len() {
-        let bq = BlockingQueue::<f64>::new();
+        let bq = BlockingQueue::&lt;f64&gt;::new();
         assert_eq!(bq.len(), 0);
     }
     #[test]
     fn bq_en_queue() {
-        let bq = BlockingQueue::<f64>::new();
+        let bq = BlockingQueue::&lt;f64&gt;::new();
         bq.en_q(3.5);
         assert_eq!(bq.len(), 1);
     }
     #[test]
     fn bq_de_queue() {
-        let bq = BlockingQueue::<f64>::new();
+        let bq = BlockingQueue::&lt;f64&gt;::new();
         bq.en_q(3.5);
         assert_eq!(bq.de_q(), 3.5);
         assert_eq!(bq.len(), 0);
@@ -1216,7 +1223,7 @@ fn main() {
 /*-- simple test of BlockingQueue --*/
 fn test() {
 
-    let share = Arc::new(BlockingQueue::<String>::new());
+    let share = Arc::new(BlockingQueue::&lt;String&gt;::new());
     let share1 = Arc::clone(&share);
     let share2 = Arc::clone(&share);
 
@@ -1289,7 +1296,9 @@ fn test() {
           </defn-block>
         </defn-OuterBlock>
       </div>
+      <a id="epilog"></a>
     </t-b>
+    <div style="height:0.25rem;"></div>
     <h3>6.0 - Epilogue:</h3>
     <t-b>
       Well, this has been some journey - yeah!  Lot&apos;s of interesting things in the thread code mix.
