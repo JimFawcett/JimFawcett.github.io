@@ -68,7 +68,7 @@
       <c-s><a href="https://doc.rust-lang.org/stable/std/cell/struct.UnsafeCell.html">UnsafeCell&lt;T&gt;</a></c-s>.
       This type wraps an unsafe block holding an instance of T.  We examine partial code for this type and two types 
       that use it and show how that enables building safe code that would otherwise fail to build.
-      <a id="itermut"></a>
+      <a id="intermut"></a>
     </t-b>
     <div style="height:0.25rem;"></div>
     <h3>1.0 - Interior Mutability</h3>
@@ -214,8 +214,8 @@ fn main() {
       mutability we could&apos;t get there.
     </t-b>
     <t-b>
-      Now, let&apos;s see how interior mutability is molded out of the <c-s>std::cell</c-s> components.  There&apos;s
-      a lot of code here (only part of what is in the std::cell library).  But all the important stuff happens in the
+      Now, let&apos;s see how interior mutability is molded out of the <c-s>std::cell</c-s> components.  
+      All the important stuff happens in the
       <c-s>RefCell&lt;T&gt;</c-s> functions:
       <div class="indent pad10">
         - <c-s>fn borrow_mut(&self) -> RefMut<'_, T></c-s><br />
@@ -224,14 +224,96 @@ fn main() {
       The signature for <c-s>borrow_mut</c-s> is immutable, but we get a wrapper <c-s>RefMut</c-s> which can be
       implicitly dereferenced to yield a mutable pointer!  This lie satisfies the borrow checker and lets our
       code build.  But now, <c-s>RefCell</c-s> is obligated to undo the lie by checking the borrowing invariants
-      at run-time.  If you look closely you will see some of that in other parts of the code.
+      at run-time.  If you look closely you will see some of that in the details section below this block.
     </t-b>
+    <div style="height:0.15rem;"></div>
+    <t-b>
+      <div class="indent">
+        <defn-block>
+          <defn-head><c-s>RefCell&lt;T&gt;</c-s> - Excerpts from std::cell code</defn-head>
+          <defn-code>
+pub struct RefCell&lt;T: ?Sized&gt; {
+    borrow: Cell&lt;BorrowFlag&gt;,
+    value: UnsafeCell&lt;T&gt;,
+}
+type BorrowFlag = isize;
+const UNUSED: BorrowFlag = 0;
+
+impl&lt;T&gt; RefCell&lt;T&gt; {
+
+    // elided code
+
+    /// Mutably borrows the wrapped value.
+    ///
+    /// Borrow lasts until returned `RefMut` or all `RefMut`s
+    /// derived from it exit scope. Value cannot be borrowed
+    /// while this borrow is active.
+    ///
+    /// # Panics
+    ///
+    /// Panics if value is currently borrowed. For non-panicking    
+    /// variant, use [`try_borrow_mut`](#method.try_borrow_mut).
+    ///
+    /*--------------------------------------------------------
+      Here is the core of interior mutability - Part 1
+    --------------------------------------------------------*/
+    pub fn borrow_mut(&self) -&gt; RefMut&lt;'_, T&gt; {
+        self.try_borrow_mut().expect("already borrowed")
+    }
+
+    /// Mutably borrows wrapped value, returning error if value 
+    /// is currently borrowed.
+    ///
+    /// Borrow lasts until returned `RefMut` or all `RefMut`s
+    /// derived from it exit scope. Value cannot be borrowed
+    /// while this borrow is active.
+    ///
+    pub fn try_borrow_mut(&self) 
+            -&gt; Result&lt;RefMut&lt;'_, T&gt;, BorrowMutError&gt; {
+        match BorrowRefMut::new(&self.borrow) {
+            // SAFETY: `BorrowRef` guarantees unique access.
+            Some(b) =&gt; Ok(
+                  RefMut { 
+                      value: unsafe { 
+                          &mut *self.value.get() }, 
+                          borrow: b 
+                      }
+            ),
+            None =&gt; Err(BorrowMutError { _private: () }),
+        }
+    }
+
+    // elided code
+
+}
+
+/*--------------------------------------------------------
+  Here is the core of interior mutability - Part 2
+--------------------------------------------------------*/
+impl&lt;T: ?Sized&gt; DerefMut for RefMut&lt;'_, T&gt; {
+    fn deref_mut(&mut self) -&gt; &mut T {
+        self.value
+    }
+}
+
+          </defn-code>
+        </defn-block>
+      </div>
+    </t-b>
+    <t-b>
+      The code block above shows how &quot;interior mutability&quot; is implemented.  
+      Excerpts of more of the std::cell library code are shown in the details below.
+    </t-b>
+    <t-b>
+      <div class="indent">
+        <details>
+          <summary class="darkItem">Larger Code Excerpts for std::cell types</summary>
     <t-b>
       If you are interested you can see all the details in the <c-s>std::cell::RefCell</c-s> library, linked at the
       top of the right panel.
     </t-b>
     <div class="clear" style="height:0.5rem;"></div>
-    <div class="indent">
+    <div class="indents">
       <defn-OuterBlock>
         <defn-block>
           <defn-head>
@@ -655,24 +737,18 @@ impl&lt;T: ?Sized&gt; DerefMut for RefMut&lt;'_, T&gt; {
         </defn-block>
       </defn-OuterBlock>
     </div>
-    <div style="height:0.75rem;"></div>
-    <t-b>
-      The code blocks above show how &quot;interior mutability&quot; is implemented.  Look at the 
-      <c-s>RefCell&lt;T&gt;</c-s> functions:
-      <div class="indent pad10">
-        - <c-s>fn borrow_mut(&self) -> RefMut<'_, T></c-s><br />
-        - <c-s>fn deref_mut(&mut self) -> &mut T</c-s>.
+          <div style="height:0.75rem;"></div>
+        </details>
       </div>
-      The first uses an immutable interface to return a <c-s>RefMut<'_, T></c-s> wrapper of the value
-      which can be implicitly dereferenced by the second to yield a mutable reference to the value.
     </t-b>
+    <!--<div style="height:0.75rem;"></div>-->
     <t-b>
       <c-s>RefCell&lt;T&gt;</c-s> tracks references at run-time, using its borrow member to remember
       the current state of references and if an attempt to create a mutable reference is made when
       there are any other active references the cell will panic.
     </t-b>
     <t-b class="indent">
-      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=977111a5f5f619f00580dfdf1f3c6675">
+      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=9d173d6a85d88532be2eab9ea24d67f9">
         demonstration code in playground
       </a>
     </t-b>
@@ -685,9 +761,9 @@ impl&lt;T: ?Sized&gt; DerefMut for RefMut&lt;'_, T&gt; {
     <t-b>
       A Rust <c-s>Mutex&lt;T&gt;</c-s> guards data, t &epsilon; T, not regions of code.      
       The only way to access protected shared data is through its <c-s>Mutex&lt;T&gt;</c-s> or other lock.  
-      <a id="thrds"></a>
+      <a id="threads"></a>
     </t-b>
-    <div style="height:0.25rem;"></div>
+    <div style="height:0.1rem;"></div>
     <h3>2.0 - Basic Threads:</h3>
     <t-b>
       Rust threads are represented by the <c-s>thread</c-s> type and created
@@ -933,7 +1009,9 @@ fn main() {
       Rust has two other synchronizing constructs that are often used in threaded code: <c-s>RWLock</c-s>, a
       reader-writer lock, and <c-s>Condvar</c-s> a condition variable.  We use <c-s>Condvar</c-s> in the next
       example.
+      <a id="thrdrslt"></a>
     </t-b>
+    <div style="height:0.1rem;"></div>
     <h3>4.0 - ThreadResult:</h3>
     <t-b>
       The C++ programming language has a <c-s>std::future</c-s> type that allows a thread to return a promise 
