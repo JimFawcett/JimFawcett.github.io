@@ -1,0 +1,402 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="keywords" content="Rust, Introduction" />
+    <meta name="Author" content="Jim Fawcett" />
+    <meta name="Author" content="James Fawcett" />
+    <title>RustBites RegEx</title>
+    <link rel="stylesheet" href="css/BiteStyles.css" />
+    <link rel="stylesheet" href="css/BiteTables.css" />
+    <script src="js/BiteScripts.js"></script>
+    <script src="js/ScriptsKeyboard.js"></script>
+  </head>
+  <body id="github" onload="initBites()">
+    <div class="top-banner">
+      <span id="hctr">Consuming Rust Bite by Byte</span>
+      <span class="top-center">Synchronization</span>
+    </div>
+    <next-prev>
+      <a href="../../index.html" style="color:#fefefa;">Home</a>&nbsp;
+      <a id="repo" href="../../RustBiteByByte.html">Repo</a> 
+      <a id="Prev" href="RustBites_Threads.html">prev</a> 
+      <a id="Next" href="RustBites_Channels.html">next</a>
+    </next-prev>
+
+    <toc-b id="toc">
+      <div id="bottom-menu" style="display:flex; flex-direction:row">
+      </div>
+        <up-b id="chaps">
+        </up-b>
+          <rt-b id="sects">
+        <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#starting">Starting</a>, 
+        <a href="#contents">Contents</a>, <a href="#refs">References</a>
+      </rt-b>
+    </toc-b>
+    <div id="hlp" style="display:none;">
+      </div>
+   
+    <h2>Rust Bite - Regular Expressions</h2>
+    <t-b>
+      A regular expression is a String-based pattern that matches other Strings or parts of Strings.  Patterns are
+      constructed from a little language, discussed below.
+    </t-b>
+    <t-b>
+      <div class="indent">
+        <defn-OuterBlock>
+          <defn-block>
+            <defn-head>Example</defn-head>
+            <defn-code>
+fn re_check(re: &str, text: &str) -> bool {
+    /* panics if re is invalid */
+    let re: Regex = Regex::new(re).unwrap();
+    re.is_match(text)
+}
+
+fn show_re_test(re: &str, text: &str) {
+    if re_check(re, text) {
+        print!(
+            "\n  RegEx: {:?} matches text: {:?}", 
+            re, text
+        )
+    }    
+    else {
+        print!(
+            "\n  RegEx: {:?} does'nt match text: {:?}", 
+            re, text
+        )
+    }
+}
+
+fn main() {
+    let re = 
+        Regex::new(r"^\d{4}-\d{2}-\d{2}$").unwrap();
+    assert!(re.is_match("2014-01-01"));
+
+    let re = "abc";
+    let text1 = "123abc987";
+    show_re_test(re, text1);
+    let text2 = "123000987";
+    show_re_test(re, text2);
+    
+    let re = r"([a-z]+)|([A-Z][A-Z])";
+    let text3 = "???abc";
+    show_re_test(re, text3);
+    let text4 = "???A@@@";
+    show_re_test(re, text4);
+    let text4 = "???AK@@@";
+    show_re_test(re, text4);
+    let text5 = r"123";
+    show_re_test(re, text5);
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Result</defn-head>
+            <defn-code>
+  RegEx: "abc" 
+      matches text: "123abc987"
+  RegEx: "abc" 
+      does not match text: "123000987"
+  RegEx: "([a-z]+)|([A-Z][A-Z])" 
+      matches text: "???abc"
+  RegEx: "([a-z]+)|([A-Z][A-Z])" 
+      does not match text: "???A@@@"
+  RegEx: "([a-z]+)|([A-Z][A-Z])" 
+      matches text: "???AK@@@"
+  RegEx: "([a-z]+)|([A-Z][A-Z])" 
+      does not match text: "123"
+            </defn-code>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+    <t-b class="indent">
+      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=def5cce838cf257ac8b62e1dd00e94d2">
+        matching in rust playground
+      </a>
+    </t-b>
+    <t-b>
+      The std Rust libraries do not contain a regular expression parser facility.  However, there is a widely used
+      crate, regex&nbsp;ver&nbsp;1.4.5, available from <a href="https://crates.io/crates/regex">crates.io</a> that we will use
+      in this Bite.
+    </t-b>
+    <t-b>
+      It&apos;s primary struct, regex::Regex, is a processor for regular expressions that compiles a regular expression
+      into a state machine.  Using that it can:
+      <div class="pad5">
+        <ul class="tight" style="margin-left:0rem;">
+          <li>check if a regular expression matches a given text string, as shown above</li>
+          <li>return capture groups that describe possibly multiple matches in a given string</li>
+          <li>split text based on capture groups</li>
+          <li>replace text</li>
+        </ul>
+      </div>
+      Searching text with a Regex instance is guaranteed to be linear in the size of the text.  Compiling
+      regular expressions requires a non-trivial amount of time, so repeated invocations should not recompile 
+      unless the pattern changes.
+    </t-b>
+    <t-b>
+      <div class="indent">
+        <defn-OuterBlock>
+          <defn-block>
+            <defn-head>Partial Declarations from regex crate</defn-head>
+            <defn-code>
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub struct Match<'t> {
+    text: &'t str,
+    start: usize,
+    end: usize,
+}
+
+pub struct Regex(Exec);
+
+    /* compiles reg express, can be used repeatedly */
+    pub fn new(re: &str) -> Result<Regex, Error> 
+
+    /* cheapest way to detect a match */
+    pub fn is_match(&self, text: &str) -> bool
+              
+    /* returns start and end of first match if it exists */
+    pub fn find&lt;'t&gt;(&self, text: &'t str) -> Option&lt;Match&lt;'t&gt;&gt;
+
+    /* returns iterator for successive non-overlapping matches */
+    pub fn find_iter<'r, 't>(&'r self, text: &'t str) -> Matches<'r, 't> 
+
+    /* returns capture groups for first match in text */
+    pub fn captures&lt;'t&gt;(&self, text: &'t str) -> Option&lt;Captures&lt;'t&gt;&gt;
+
+    /* returns iterator over all non-overlapping capture groups */
+    pub fn captures_iter&lt;'r, 't&gt;(
+        &'r self,
+        text: &'t str,
+    ) -> CaptureMatches&lt;'r, 't&gt; 
+
+    /* returns iterator of substrings of matching text */
+    pub fn split&lt;'r, 't&gt;(&'r self, text: &'t str) -> Split&lt;'r, 't&gt;
+
+    /* replaces first match with replacement */
+    pub fn replace&lt;'t, R: Replacer&gt;(
+        &self,
+        text: &'t str,
+        rep: R,
+    ) -> Cow&lt;'t, str&gt;
+
+    /* replaces all non-overlapping matches in text with replacement */
+    pub fn replace_all&lt;'t, R: Replacer&gt;(
+        &self,
+        text: &'t str,
+        rep: R,
+    ) -> Cow&lt;'t, str&gt;
+
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Example Use</defn-head>
+            <defn-code>
+
+            </defn-code>
+          </defn-block>
+        </defn-OuterBlock>
+      </div>
+    </t-b>
+    <h3>Regular Expression Sytax Summary</h3>
+    <t-b>
+      A short list of syntax, extracted from the regex crate, is provided in Table 1.  This should be all that 
+      is needed for most applications.
+    </t-b>
+    <t-b class="indent">
+      <h4>Table 1. - Regular Expression Syntax</h4>
+      <table>
+        <tr>
+          <th>syntax</th><th>meaning</th>
+        </tr>
+        <tr>
+          <td>.</td>
+          <td>
+            any character except new line
+          </td>
+        </tr>
+        <tr>
+          <td>\d</td>
+          <td>
+            digit
+          </td>
+        </tr>
+        <tr>
+          <td>\D</td>
+          <td>
+            not digit
+          </td>
+        </tr>
+        <tr>
+          <td>\s</td>
+          <td>
+            white space
+          </td>
+        </tr>
+        <tr>
+          <td>\S</td>
+          <td>
+            not white space
+          </td>
+        </tr>
+        <tr>
+          <td>\w</td>
+          <td>
+            word character
+          </td>
+        </tr>
+        <tr>
+          <td>\W</td>
+          <td>
+            not word character
+          </td>
+        </tr>
+        <tr>
+          <td>[xyz]</td>
+          <td>
+            character class matching either x, y, or z
+          </td>
+        </tr>
+        <tr>
+          <td>[^xyz]</td>
+          <td>
+            character class matching any char except x, y, or z
+          </td>
+        </tr>
+        <tr>
+          <td>[b-q]</td>
+          <td>
+            character class matching any char in b-q range inclusive
+          </td>
+        </tr>
+        <tr>
+          <td>[0-7&&[^4]]</td>
+          <td>
+            matches any char in range 0-7 except 4
+          </td>
+        </tr>
+        <tr>
+          <td>xy</td>
+          <td>
+            concatenation - x followed by y
+          </td>
+        </tr>
+        <tr>
+          <td>x|y</td>
+          <td>
+            x or y
+          </td>
+        </tr>
+        <tr>
+          <td>x*</td>
+          <td>
+            zero or more of x
+          </td>
+        </tr>
+        <tr>
+          <td>x+</td>
+          <td>
+            one or more of x
+          </td>
+        </tr>
+        <tr>
+          <td>x?</td>
+          <td>
+            zero or one of x
+          </td>
+        </tr>
+        <tr>
+          <td>x{n}</td>
+          <td>
+            n repitions of x
+          </td>
+        </tr>
+        <tr>
+          <td>^</td>
+          <td>
+            beginning of text
+          </td>
+        </tr>
+        <tr>
+          <td>$</td>
+          <td>
+            end of text
+          </td>
+        </tr>
+        <tr>
+          <td>(...)</td>
+          <td>
+            capture group
+          </td>
+        </tr>
+      </table>
+    </t-b>
+    <t-b class="indent">
+      <a href="https://docs.rs/regex/1.4.5/regex/index.html#syntax">more complete list of syntax</a>
+    </t-b>
+    <t-b class="indent">
+      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=40e348bf065258102e7065cc548d1926">
+        code for match, find, find_iter, and capture
+      </a>
+    </t-b>
+    <h3>References:</h3>
+    <t-b class="indent">
+      <table>
+        <tr>
+          <th>Link</th><th>Description</th>
+        </tr>
+        <tr>
+          <td>
+            <a  href="https://docs.rs/regex/1.4.5/regex/index.html#syntax">Regular Expression Syntax</a>
+          </td>
+          <td>
+            Nice organization of regular expression pattern language syntax
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://docs.rs/regex/1.4.5/regex/struct.Regex.html">regex::Regex</a>
+          </td>
+          <td>
+            Documentation for Regex and its methods.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://docs.rs/regex/1.4.5/regex/index.html">Crate regex</a>
+          </td>
+          <td>
+            Regex crate documentation.
+          </td>
+        </tr>
+          <td>
+            <a href="https://en.wikipedia.org/wiki/Regular_expression">Regular expression - Wikipedia</a>
+          </td>
+          <td>
+            Quite extensive discussion of theory, syntax, and semantics.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://cheatography.com/davechild/cheat-sheets/regular-expressions/pdf_bw/">RE Cheat Sheet - Dave Child</a>
+          </td>
+          <td>
+            Nice compact summary.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285">RE Tutorial - Factory Mind</a>
+          </td>
+          <td>
+            Clear and fairly brief.
+            <div style="height:0.25rem;"></div>
+          </td>
+        </tr>
+      </table>
+    </t-b>
+
+  </body>
+</html>
