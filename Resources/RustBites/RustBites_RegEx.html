@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html id="top">
   <head>
     <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
     <meta name="keywords" content="Rust, Introduction" />
@@ -29,18 +29,22 @@
         <up-b id="chaps">
         </up-b>
           <rt-b id="sects">
-        <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#starting">Starting</a>, 
-        <a href="#contents">Contents</a>, <a href="#refs">References</a>
+        <a href="#top">Top</a>, <a href="#intro">Intro</a>, <a href="#regex">Regex</a>, 
+        <a href="#syntax">Syntax</a>, <a href="#refs">References</a>
       </rt-b>
     </toc-b>
     <div id="hlp" style="display:none;">
       </div>
    
     <h2>Rust Bite - Regular Expressions</h2>
+    <t-b><hr class="spread" /></t-b>
     <t-b>
       A regular expression is a String-based pattern that matches other Strings or parts of Strings.  Patterns are
-      constructed from a little language, discussed below.
+      constructed from a little language, discussed in Section 3.
+      <a id="intro"></a>
     </t-b>
+    <div style="height:0.25rem;"></div>
+    <h3>1.0 - Introduction</h3>
     <t-b>
       <div class="indent">
         <defn-OuterBlock>
@@ -120,7 +124,10 @@ fn main() {
       The std Rust libraries do not contain a regular expression parser facility.  However, there is a widely used
       crate, regex&nbsp;ver&nbsp;1.4.5, available from <a href="https://crates.io/crates/regex">crates.io</a> that we will use
       in this Bite.
+      <a id="regex"></a>
     </t-b>
+    <div style="height:0.25rem;"></div>
+    <h3>2.0 - Regex</h3>
     <t-b>
       It&apos;s primary struct, regex::Regex, is a processor for regular expressions that compiles a regular expression
       into a state machine.  Using that it can:
@@ -191,22 +198,185 @@ pub struct Regex(Exec);
 
             </defn-code>
           </defn-block>
+        </defn-OuterBlock>
+        <defn-OuterBlock>
           <defn-block>
             <defn-head>Example Use</defn-head>
             <defn-code>
+use regex::{Regex, Match, Captures};
 
+fn check(pattern: &str, text: &str, pred:bool) {
+    if pred {
+        print!("\n  pattern: {:?}  matches text: {:?}", pattern, text);
+    }
+    else {
+        print!("\n  pattern: {:?} !matches text: {:?}", pattern, text);
+    }
+}
+
+fn range(pattern: &str, text: &str, mat: &Option<Match>) {
+    if let Some(mt) = mat {
+        print!("\n  find pattern {:?} in text {:?}:", pattern, text);
+        print!("  match in [{}, {})", mt.start(), mt.end());
+    }
+    else {
+        print!("\n  no match");
+    }
+}
+
+fn range_iter(pattern: &str, text: &str, mat: Match) {
+    print!("\n  find pattern {:?} in text {:?}:", pattern, text);
+    print!("  match in [{}, {})", mat.start(), mat.end());
+}
+
+fn test_match() {
+    print!("\n  -- test_match --");
+    let pattern = r"[a-q]{3,4}$";
+    let re = Regex::new(pattern).unwrap();
+    let text = "12cde";
+    let pred = re.is_match(text);
+    check(pattern, text, pred);
+
+    let text = "12cdefg";
+    let pred = re.is_match(text);
+    check(pattern, text, pred);
+
+    let text = "12cd";
+    let pred = re.is_match(text);
+    check(pattern, text, pred);
+
+    let text = "12cd3e";
+    let pred = re.is_match(text);
+    check(pattern, text, pred);
+
+    let text = "12cds";
+    let pred = re.is_match(text);
+    check(pattern, text, pred);
+}
+
+fn test_find() {
+    print!("\n  -- test_find --");
+    let pattern = r"abc";
+    let re = Regex::new(pattern).unwrap();
+    let text = "123abc456";
+    let op: Option&lt;Match&gt; = re.find(text);
+    range(pattern, text, &op);
+}
+
+fn test_find_iter() {
+    print!("\n  -- test_find_iter --");
+    let pattern = r"abc";
+    let re = Regex::new(pattern).unwrap();
+    let text = "123abc456abc789";
+    let matches = re.find_iter(text);
+    for mat in matches {
+        range_iter(pattern, text, mat);
+    }
+}
+
+fn test_captures() {
+    print!("\n  -- test_captures --");
+    let text = "123abc456def789";
+    let pattern = "\
+        ([a-z]{3}|[0-9]{3})\
+        ([a-z]{3}|[0-9]{3})\
+        ([a-z]{3}|[0-9]{3})\
+        ([a-z]{3}|[0-9]{3})\
+    ";
+    // These don't work as you might expect
+    // let pattern = r"([a-z]{3}|[0-9]{3}){5}";
+    // let pattern = r"(([a-z]{3})([0-9]{3}))+";
+    // let pattern = r"((?:\d+)+)+";
+    
+    let re = Regex::new(pattern).unwrap();
+    let captures: Option&lt;Captures&gt; = re.captures(text);
+    print!("\n  captures: {:?}", captures);
+    let caps = captures.unwrap();
+    for i in 0..caps.len() {
+        print!("\n  captures[{}] = {:?}", i, &caps.get(i));
+        let cap = &caps.get(i).unwrap();
+        print!(
+            "\n  cap = {:?}, {}, {}", 
+            cap.as_str(), cap.start(), cap.end()
+        );
+    }
+}
+
+fn main() {
+    test_match();
+    test_find();
+    test_find_iter();
+    test_captures();
+}            
+              
+              </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Output</defn-head>
+            <defn-code>
+  -- test_match --
+  pattern: "[a-q]{3,4}$"  matches text: "12cde"
+  pattern: "[a-q]{3,4}$"  matches text: "12cdefg"
+  pattern: "[a-q]{3,4}$" !matches text: "12cd"
+  pattern: "[a-q]{3,4}$" !matches text: "12cd3e"
+  pattern: "[a-q]{3,4}$" !matches text: "12cds"
+  -- test_find --
+  find pattern "abc" in text "123abc456":  match in [3, 6)
+  -- test_find_iter --
+  find pattern "abc" in text "123abc456abc789":  match in [3, 6)
+  find pattern "abc" in text "123abc456abc789":  match in [9, 12)
+  -- test_captures --
+  captures: Some(
+      Captures({
+          0: Some("123abc456def"), 
+          1: Some("123"), 
+          2: Some("abc"), 
+          3: Some("456"), 
+          4: Some("def")
+      })
+  )
+  captures[0] = Some(
+      Match { text: "123abc456def789", start: 0, end: 12 }
+  )
+  cap = "123abc456def", 0, 12
+  captures[1] = Some(
+      Match { text: "123abc456def789", start: 0, end: 3 }
+  )
+  cap = "123", 0, 3
+  captures[2] = Some(
+      Match { text: "123abc456def789", start: 3, end: 6 }
+  )
+  cap = "abc", 3, 6
+  captures[3] = Some(
+      Match { text: "123abc456def789", start: 6, end: 9 }
+  )
+  cap = "456", 6, 9
+  captures[4] = Some(
+      Match { text: "123abc456def789", start: 9, end: 12 }
+  )
+  cap = "def", 9, 12
+            
             </defn-code>
           </defn-block>
         </defn-OuterBlock>
       </div>
     </t-b>
-    <h3>Regular Expression Sytax Summary</h3>
+    <t-b class="indent">
+      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=af2df132415d348c4686be7af87cb331">
+        code in playground
+      </a>
+      <a id="syntax"></a>
+    </t-b>
+    <div style="height:0.25rem;"></div>
+    <h3>3.0 - Regular Expression Syntax Summary</h3>
     <t-b>
       A short list of syntax, extracted from the regex crate, is provided in Table 1.  This should be all that 
       is needed for most applications.
     </t-b>
-    <t-b class="indent">
-      <h4>Table 1. - Regular Expression Syntax</h4>
+    <t-b class="indent" style="width:calc(100vw - 6rem);">
+      <div style="display:flex">
+        <div>
+      <h4>Table&nbsp;1.&nbsp;-&nbsp;Regular&nbsp;Expression&nbsp;Syntax</h4>
       <table>
         <tr>
           <th>syntax</th><th>meaning</th>
@@ -214,7 +384,7 @@ pub struct Regex(Exec);
         <tr>
           <td>.</td>
           <td>
-            any character except new line
+            any&nbsp;character&nbsp;except&nbsp;new&nbsp;line
           </td>
         </tr>
         <tr>
@@ -310,7 +480,7 @@ pub struct Regex(Exec);
         <tr>
           <td>x{n}</td>
           <td>
-            n repitions of x
+            n repetitions of x
           </td>
         </tr>
         <tr>
@@ -332,16 +502,71 @@ pub struct Regex(Exec);
           </td>
         </tr>
       </table>
+          </div>
+        <div style="margin-left:1rem;">
+          <h4>Table 2. - Examples</h4>
+          <table style="width: calc(100vw-0rem);">
+            <tr>
+              <th>Example</th>
+              <th>Action</th>
+            </tr>
+            <tr>
+              <td>
+                [A-Z]
+              </td>
+              <td>
+                matches C in "a Capital letter" 
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Rust
+              </td>
+              <td>
+                matches any string containing &quot;Rust&quot;
+              </td>
+            </tr>
+            <tr>
+              <td>
+                abc{3}
+              </td>
+              <td>
+                matches&nbsp;&quot;this&nbsp;is&nbsp;an&nbsp;example&nbsp;-&nbsp;abccc&nbsp;-&quot;
+              </td>
+            </tr>
+            <tr>
+              <td>
+                a(bc)*
+              </td>
+              <td>
+                matches a, abc, abcbc, ...
+              </td>
+            </tr>
+            <tr>
+              <td>
+                fn|struct
+              </td>
+              <td>
+                matches "fn funct()", "struct X {}"
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <a href="https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285">RE Tutorial - Factory Mind</a><br />
+                has many executable examples.
+                <div style="height:0.5rem;"></div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
     </t-b>
     <t-b class="indent">
       <a href="https://docs.rs/regex/1.4.5/regex/index.html#syntax">more complete list of syntax</a>
+      <a id="refs"></a>
     </t-b>
-    <t-b class="indent">
-      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=40e348bf065258102e7065cc548d1926">
-        code for match, find, find_iter, and capture
-      </a>
-    </t-b>
-    <h3>References:</h3>
+    <div style="height:0.25rem;"></div>
+    <h3>4.0 - References:</h3>
     <t-b class="indent">
       <table>
         <tr>
