@@ -37,10 +37,25 @@
       </div>
    
     <h2>Rust Bite - Regular Expressions</h2>
+    <t-b>
+      <div style="width:90%; margin-left:2rem;">
+        &quot;Some people, when confronted with a problem, think "I know, I'll use regular expressions." 
+        Now they have two problems.&quot;<br />
+        - Jamie Zawinski
+      </div>
+    </t-b>
     <t-b><hr class="spread" /></t-b>
     <t-b>
       A regular expression is a String-based pattern that matches other Strings or parts of Strings.  Patterns are
-      constructed from a little language, discussed in Section 3.
+      constructed from a little language, discussed in Section 3.  A program in that language is compiled by
+      a regular expression compiler.  The result is used to search text for matches.
+    </t-b>
+    <t-b>
+      Rust does not have a regular expression library, but the there is a widely used regex library posted on
+      <a href="https://crates.io/search?q=regex">crates.io</a> that we will use in this Bite.
+      The compiler, <c-s>regex::RegEx</c-s>, expects syntax similar to that used in the string processing language 
+      Perl.  <c-s>RegEx</c-s> has a number of methods, discussed in Section 2., that support finding matches and
+      retrieving text fragments.
       <a id="intro"></a>
     </t-b>
     <div style="height:0.25rem;"></div>
@@ -121,13 +136,15 @@ fn main() {
       </a>
     </t-b>
     <t-b>
-      The std Rust libraries do not contain a regular expression parser facility.  However, there is a widely used
-      crate, regex&nbsp;ver&nbsp;1.4.5, available from <a href="https://crates.io/crates/regex">crates.io</a> that we will use
-      in this Bite.
+      The code used in this example will be discussed in the next two sections.
       <a id="regex"></a>
     </t-b>
     <div style="height:0.25rem;"></div>
     <h3>2.0 - Regex</h3>
+    <t-b>
+      The crate, regex&nbsp;ver&nbsp;1.4.5, available from <a href="https://crates.io/crates/regex">crates.io</a> 
+      is used exclusively in this Bite.
+    </t-b>
     <t-b>
       It&apos;s primary struct, regex::Regex, is a processor for regular expressions that compiles a regular expression
       into a state machine.  Using that it can:
@@ -200,7 +217,9 @@ pub struct Regex(Exec);
           </defn-block>
         </defn-OuterBlock>
         <t-b>
-          Regular expressions are
+          Contents of the preceding block show the structure and methods of <c-s>regex::Regex</c-s>.  The
+          next block gives examples of their use, and Section 3.0 discusses regular expression pattern
+          syntax and semantics.
         </t-b>
         <defn-OuterBlock>
           <defn-block>
@@ -210,16 +229,25 @@ use regex::{Regex, Match, Captures};
 
 fn check(pattern: &str, text: &str, pred:bool) {
     if pred {
-        print!("\n  pattern: {:?}  matches text: {:?}", pattern, text);
+        print!(
+            "\n  pattern: {:?}  matches text: {:?}", 
+            pattern, text
+        );
     }
     else {
-        print!("\n  pattern: {:?} !matches text: {:?}", pattern, text);
+        print!(
+            "\n  pattern: {:?} !matches text: {:?}", 
+            pattern, text
+        );
     }
 }
 
 fn range(pattern: &str, text: &str, mat: &Option<Match>) {
     if let Some(mt) = mat {
-        print!("\n  find pattern {:?} in text {:?}:", pattern, text);
+        print!(
+            "\n  find pattern {:?} in text {:?}:", 
+            pattern, text
+        );
         print!("  match in [{}, {})", mt.start(), mt.end());
     }
     else {
@@ -228,7 +256,10 @@ fn range(pattern: &str, text: &str, mat: &Option<Match>) {
 }
 
 fn range_iter(pattern: &str, text: &str, mat: Match) {
-    print!("\n  find pattern {:?} in text {:?}:", pattern, text);
+    print!(
+        "\n  find pattern {:?} in text {:?}:", 
+        pattern, text
+    );
     print!("  match in [{}, {})", mat.start(), mat.end());
 }
 
@@ -323,11 +354,14 @@ fn main() {
   pattern: "[a-q]{3,4}$" !matches text: "12cd"
   pattern: "[a-q]{3,4}$" !matches text: "12cd3e"
   pattern: "[a-q]{3,4}$" !matches text: "12cds"
+
   -- test_find --
   find pattern "abc" in text "123abc456":  match in [3, 6)
   -- test_find_iter --
-  find pattern "abc" in text "123abc456abc789":  match in [3, 6)
-  find pattern "abc" in text "123abc456abc789":  match in [9, 12)
+  find pattern "abc" in text "123abc456abc789":  
+               match in [3, 6)
+  find pattern "abc" in text "123abc456abc789":  
+               match in [9, 12)
   -- test_captures --
   captures: Some(
       Captures({
@@ -339,23 +373,33 @@ fn main() {
       })
   )
   captures[0] = Some(
-      Match { text: "123abc456def789", start: 0, end: 12 }
+      Match { 
+          text: "123abc456def789", start: 0, end: 12 
+      }
   )
   cap = "123abc456def", 0, 12
   captures[1] = Some(
-      Match { text: "123abc456def789", start: 0, end: 3 }
+      Match { 
+          text: "123abc456def789", start: 0, end: 3 
+      }
   )
   cap = "123", 0, 3
   captures[2] = Some(
-      Match { text: "123abc456def789", start: 3, end: 6 }
+      Match { 
+          text: "123abc456def789", start: 3, end: 6 
+      }
   )
   cap = "abc", 3, 6
   captures[3] = Some(
-      Match { text: "123abc456def789", start: 6, end: 9 }
+      Match { 
+          text: "123abc456def789", start: 6, end: 9 
+      }
   )
   cap = "456", 6, 9
   captures[4] = Some(
-      Match { text: "123abc456def789", start: 9, end: 12 }
+      Match { 
+          text: "123abc456def789", start: 9, end: 12
+      }
   )
   cap = "def", 9, 12
             
@@ -599,6 +643,15 @@ fn main() {
             Regex crate documentation.
           </td>
         </tr>
+        <tr>
+          <td>
+            <a href="https://blog.codinghorror.com/regular-expressions-now-you-have-two-problems/">Jeff Atwood&apos;s Blog</a>
+          </td>
+          <td>
+            Establishes the arena, provides advice and several very good links.
+          </td>
+        </tr>
+        <tr>
           <td>
             <a href="https://en.wikipedia.org/wiki/Regular_expression">Regular expression - Wikipedia</a>
           </td>
