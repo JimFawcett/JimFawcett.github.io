@@ -8,5 +8,5 @@ get new tests and added functionality.  There will also be new code projects tha
 from Syracuse University, and there will be more focus on Linux code as well as Windows.
 
 <strong>Status:</strong>
-The site now has more than 40 repositories of mostly C++ code, all with documentation.  I've just started adding videos about the 
+The site now has more than 90 repositories of mostly C++ and Rust code, all with documentation.  I've just started adding videos about the 
 site content.  There are a lot of planned updates: https://JimFawcett.github.io/SitePlans.html.
