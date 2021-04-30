@@ -56,6 +56,7 @@ storyMenu.bitesMenu = function () {
     <a href="RustBites_Data.html">Data</a><br />\
     <a href="RustBites_FlashCards.html">FlashCards</a><br />\
     <a href="RustBites_Facts.html">Facts</a><br />\
+    <a href="RustBites_Strings.html">Strings</a><br />\
     <a href="RustBites_DataStr.html">DataStructs</a><br />\
     <a href="RustBites_SmrtPtrs.html">SmartPtrs</a><br />\
     <a href="RustBites_LifeCycle.html">LifeCycle</a><br />\
