@@ -60,6 +60,7 @@ function initializeMenu() {
         <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a>\
         <a href='DesignProcess.html'>Design Process</a>\
         <a href='ProjectsList.html'>Project suggestions</a>\
+        <a href='https://github.com/JimFawcett/RustPlaygroundExamples'>RustPlaygroundExamples</a>\
         <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
         <a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a>\
         <a href='CppReferences.html'>C++ References</a>\

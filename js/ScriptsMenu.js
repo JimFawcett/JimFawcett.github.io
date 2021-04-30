@@ -67,7 +67,8 @@ function initializeMenu() {
         <a href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a>\
         <a href='Design.html'>Design Process</a>\
         <a href='ProjectsList.html'>Project suggestions</a>\
-        <a href='RustStory_CodeIndex.html'>Rust code index</a>\
+        <a href='https://github.com/JimFawcett/RustPlaygroundExamples'>RustPlaygroundExamples</a>\
+        <a href='IndexPage.html'>Rust Glossary</a>\
         <a href='LangCpp.html'>C++ Language Resources</a>\
         <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
         <a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a>\
