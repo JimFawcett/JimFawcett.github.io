@@ -77,10 +77,10 @@
         </tr>
         <tr>
           <td>
-            <a href="https://doc.rust-lang.org/std/sync/struct.Barrier.html">Barrier</a>
+            <a href="https://doc.rust-lang.org/std/sync/atomic/">Atomic</a>
           </td>
           <td>
-            A barrier enables multiple threads to synchronize the beginning of some computation.
+            Atomic types provide primitive shared-memory communication between threads.
           </td>
         </tr>
         <tr>
@@ -92,6 +92,15 @@
             in programs with multiple threads.
             <div style="height:0.25rem;"></div>
           </td>
+        <tr>
+          <td>
+            <a href="https://doc.rust-lang.org/std/sync/struct.Barrier.html">Barrier</a>
+          </td>
+          <td>
+            A barrier enables multiple threads to synchronize the beginning of some computation.
+            <div style="height:0.25rem;"></div>
+          </td>
+        </tr>
         </tr>
       </table>
     </t-b>
@@ -119,7 +128,8 @@ fn test_mutex() {
     /* define reader processing */
     static RID:AtomicUsize = AtomicUsize::new(0usize);
 
-    let rd_cls = |shared:Arc&lt;Mutex&lt;Stringgt;gt;| {
+    let rd_cls = |shared:Arc&lt;Mutex&lt;String&gt;&gt;| {
+        /* fetch_add returns old value */
         let my_id = RID.fetch_add(1, Ordering::SeqCst) + 1;
         let dur = Duration::from_millis(2);
         for _i in 0..10 {
@@ -143,7 +153,8 @@ fn test_mutex() {
     /* define writer processing */
     static WID:AtomicUsize = AtomicUsize::new(2usize);
 
-    let wr_cls = |shared:Arc&lt;Mutex&lt;Stringgt;gt;| {
+    let wr_cls = |shared:Arc&lt;Mutex&lt;String&gt;&gt;| {
+        /* fetch_add returns old value */
         let my_id = WID.fetch_add(1, Ordering::SeqCst) + 1;
         let dur = Duration::from_millis(2);
         for _i in 0..10 {
@@ -172,8 +183,11 @@ fn test_mutex() {
     let _ = handle3.join();
     let _ = handle4.join();
 
-    let mod_str = share.lock().unwrap();
-    print!("\n  modified string: {:?}", mod_str);
+    /* lock will fail if thread holding lock panics */
+    if let Ok(mod_str) = share.lock() {
+        print!("\n  modified string: {:?}", mod_str);
+    };  
+    /* semicolon needed to ensure mod_str lives long enough */
 }
 
 fn main() {
@@ -233,7 +247,7 @@ fn main() {
       </details>
     </div>
     <t-b>
-      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=a78a37512ca71dbcb4adf649e35d8f47">
+      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=c295752fef36c089b16cc8ac0d7402fa">
         mutex demo in playground
       </a>
     </t-b>
