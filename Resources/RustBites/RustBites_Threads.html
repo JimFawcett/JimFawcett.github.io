@@ -1073,7 +1073,7 @@ impl&lt;T: Debug + Default + Clone&gt; ThreadResult&lt;T&gt; {
         *lr = true;
         let mut lrslt = self.result.lock().unwrap();
         *lrslt = t;
-        self.cv.notify_one();
+        self.cv.notify_all();
     }
     pub fn get(&self) -&gt; T {
         let mut rdy = self.ready.lock().unwrap();
@@ -1099,10 +1099,9 @@ impl&lt;T: Debug + Default + Clone&gt; ThreadResult&lt;T&gt; {
 // Jim Fawcett, https://JimFawcett.github.io  //
 ////////////////////////////////////////////////
 
-use thread_result::*;
 use std::sync::Arc;
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 fn test() {
     let thrd_rslt 
@@ -1110,54 +1109,86 @@ fn test() {
     let thrd_rslt1 = Arc::clone(&thrd_rslt);
     let thrd_rslt2 = Arc::clone(&thrd_rslt);
 
-    let cls = move || {
-        let dur = Duration::from_secs(10u64);
+    let cls = |share:Arc&lt;ThreadResult&lt;i32&gt;&gt;| {
+        print!("\n  starting thread");
+        let dur = Duration::from_millis(100u64);
         thread::sleep(dur);
-        thrd_rslt2.set(42);
+        share.set(42);
     };
-    let handle = thread::spawn(cls);
+    let handle1 = thread::spawn(
+        move || {cls(thrd_rslt1).clone()}
+    );
 
-    let dur = Duration::from_secs(1);
+    print!("\n  -- poll for result --");
+    let dur = Duration::from_millis(20);
     loop {
-        if !thrd_rslt1.ready() {
-            print!("\n  main waiting");
+        print!("\n  main polling");
+        if !thrd_rslt2.ready() {
             thread::sleep(dur);
         }
         else {
             print!(
-              "\n  thread result is {}", 
-              thrd_rslt.get()
+              "\n  thread result is {}\n", 
+              thrd_rslt2.get()
             );
             break;
         }
     }
-    let _ = handle.join();
+    print!("\n  -- wait for result --");
+    let thrd_rslt 
+        = Arc::new(ThreadResult::&lt;i32&gt;::new());
+    let thrd_rslt1 = Arc::clone(&thrd_rslt);
+    let thrd_rslt2 = Arc::clone(&thrd_rslt);
+
+    let dur = Duration::from_millis(50);
+    let now = Instant::now();
+    let handle2 = thread::spawn(
+        move || {cls(thrd_rslt1).clone()}
+    );
+    thread::sleep(dur);
+    let elapsed = now.elapsed().as_millis();
+    print!(
+        "\n  after {:?} millis calling get()", 
+        elapsed
+    );
+    let rslt = thrd_rslt2.get();
+    let elapsed = now.elapsed().as_millis();
+    print!(
+        "\n  at {:?} millis, thread result is {}", 
+        elapsed, rslt
+    );
+    
+    let _ = handle1.join();
+    let _ = handle2.join();
+    println!();
 }
 fn main() {
     test();
-}
+} 
               </defn-code>
             <defn-head class="defnBorderTop">Output</defn-head>
             <defn-code>
-  main waiting
-  main waiting
-  main waiting
-  main waiting
-  main waiting
-  main waiting
-  main waiting
-  main waiting
-  main waiting
-  main waiting
+  -- poll for result --
+  main polling
+  starting thread
+  main polling
+  main polling
+  main polling
+  main polling
+  main polling
   thread result is 42
 
+  -- wait for result --
+  starting thread
+  after 50 millis calling get()
+  at 100 millis, thread result is 42
             </defn-code>
           </defn-block>
         </defn-OuterBlock>
       </div>
     </t-b>
     <t-b class="indent">
-      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=8b1a5accb918672f6c288a5786a653f4">
+      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=56d47eafa4d2859a81b6cecdf40b68b2">
         code in playground
       </a>
     </t-b>
