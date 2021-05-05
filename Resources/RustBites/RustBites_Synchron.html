@@ -970,5 +970,102 @@ fn main() {
         </a>
       </t-b>
     </div>
+    <h3>4. Barrier</h3>
+    <div class="indent">
+      <t-b>
+        Barriers enable multiple threads to synchronize beginning of their computations.  All waiting threads start at
+        essentially the same time.  This avoids a thread, collaborating with several other threads, from starting before
+        the others are ready.
+      </t-b>
+      <h3>Table 4. - Barrier Methods</h3>
+      <table>
+        <tr>
+          <th>Method</th><th>Description</th>
+        </tr>
+        <tr>
+          <td><c-s>pub fn new(n: usize) -> Barrier</c-s></td>
+          <td>
+            Creates a new barrier that can block a given number of threads.
+          </td>
+        </tr>
+        <tr>
+          <td><c-s>pub fn wait(&self) -> BarrierWaitResult</c-s></td>
+          <td>
+            Blocks the current thread until all threads have rendezvoused here.
+            <div style="height:0.25rem"></div>
+          </td>
+        </tr>
+        <tr>
+          <th></th><th></th>
+        </tr>
+      </table>
+      <details>
+        <summary class="darkItem">Barrier Example</summary>
+        <defn-OuterBlock>
+          <defn-block>
+            <defn-head>Barrier Example</defn-head>
+            <defn-code>
+////////////////////////////////////////////////
+// Barrier Demos                              //
+//     - Wait for all threads to start        //
+//                                            //
+// Jim Fawcett, https://JimFawcett.github.io  //
+////////////////////////////////////////////////
+
+use std::sync::{Arc, Barrier};
+use std::thread;
+use std::thread::JoinHandle;
+ 
+ 
+fn main() {
+ 
+    let mut handles:Vec&lt;JoinHandle&lt;()&gt;&gt; = 
+        Vec::with_capacity(5);
+    let barrier = Arc::new(Barrier::new(5));
+ 
+    for i in 0..5 {
+        let c:Arc&lt;Barrier&gt; = barrier.clone();
+        handles.push(thread::spawn(move|| {
+            println!(
+              "Thread {} paused...awaiting other threads", 
+              i
+            );
+            c.wait();
+            println!("Thread {} processing done", i);
+        }));
+    }
+ 
+    // Wait for all threads to complete execution
+    for handle in handles {
+        handle.join().unwrap();
+    }
+}
+
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Output</defn-head>
+            <defn-code>
+Thread 0 paused...awaiting other threads
+Thread 1 paused...awaiting other threads
+Thread 2 paused...awaiting other threads
+Thread 3 paused...awaiting other threads
+Thread 4 paused...awaiting other threads
+Thread 0 processing done
+Thread 4 processing done
+Thread 1 processing done
+Thread 3 processing done
+Thread 2 processing done
+            
+            </defn-code>
+          </defn-block>
+        </defn-OuterBlock>
+      </details>
+      <t-b>
+        <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=cc34984ce28f678605637670410e1a87">
+          Barrier example in playground
+        </a>
+      </t-b>
+    </div>
   </body>
 </html>
