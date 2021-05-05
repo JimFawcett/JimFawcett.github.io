@@ -536,12 +536,20 @@ fn main() {
     <h3>3. Condvar</h3>
     <div class="indent">
       <t-b>
-        <c-s>Condvar</c-s> supports a thread sending notifications to waiting threads.  Threads that need a result from
-        the notifying thread block by calling a <c-s>wait</c-s> method on the <c-s>Condvar</c-s> instance.  That is
-        done 
-        
-        <c-s>Condvars</c-s> are associated
-        with <c-s>Mutex</c-s>(s)
+        <c-s>Condvar</c-s> supports one thread sending notifications to other waiting threads.  Threads that need
+        a result from the notifying thread block by calling <c-s>wait</c-s> method on the <c-s>Condvar</c-s> instance.  
+      </t-b>
+      <t-b>
+        Condvar instances are associated with a <c-s>Mutex</c-s> that guards information about the event.  A notifier
+        locks the <c-s>Mutex</c-s>, sets the information state, and then calls <c-s>notify_one</c-s> or <c-s>notify_all</c-s>
+        on the <c-s>Condvar</c-s>.
+      </t-b>
+      <t-b>
+        Threads that subscribe to the notification lock the <c-s>Mutex</c-s> and then call <c-s>wait</c-s> on the 
+        <c-s>Condvar</c-s> instance. <c-s>Condvars</c-s> do a special dance to avoid deadlocking by blocking the 
+        notifier.  When <c-s>wait</c-s> is called the <c-s>Condvar</c-s> library code puts the subscribing thead to sleep
+        and releases the lock so that notifiers can gain access.  When a notification is called the library code acquires
+        the lock, wakes the waiting thread, and locks.
       </t-b>
       <h3>Table 4. - Condvar Methods:</h3>
       <table>
@@ -583,9 +591,14 @@ fn main() {
           </td>
           <td>
             methods, descriptions, and examples
+            <div style="height:0.25rem;"></div>
           </td>
         </tr>
       </table>
+      <t-b>
+        The following example, repeated from the thread Bite, uses a <c-s>Condvar</c-s> to implement a &quot;Future&quot;
+        construct that is useful for returning results from threads.
+      </t-b>
       <div>
         <details>
           <summary class="darkItem">Condvar Example</summary>
@@ -750,6 +763,210 @@ fn main() {
       <t-b>
         <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=56d47eafa4d2859a81b6cecdf40b68b2">
           Condvar example in playground
+        </a>
+      </t-b>
+    </div>
+    <h3>Atomics</h3>
+    <div class="indent">
+      <t-b>
+        Atomics are a group of thread-safe constructs including: <c-s>AtomicBool</c-s>, <c-s>AtomicI32</c-s>, 
+        <c-s>AtomicU8</c-s>, <c-s>AtomicUsize</c-s>, ...
+      </t-b>
+      <div>
+        <table>
+          <tr>
+            <th>Method</th><th>Description</th>
+          </tr>
+          <tr>
+            <td>
+              <c-s>AtomicBool</c-s>
+            </td>
+            <td>Ordering: Acquire, Relaxed, SeqCst</td>
+          </tr>
+          <tr>
+            <td><c-s>pub const fn new(v: bool) -> AtomicBool</c-s></td>
+            <td>
+              Creates a new AtomicBool.
+            </td>
+          </tr>
+          <tr>
+            <td><c-s>pub fn load(&self, order: Ordering) -> bool</c-s></td>
+            <td>
+              Loads a value from the bool.
+            </td>
+          </tr>
+          <tr>
+            <td><c-s>pub fn store(&self, val: bool, order: Ordering)</c-s></td>
+            <td>
+              Stores a value into its bool.
+            </td>
+          </tr>
+          <tr>
+            <td><c-s>pub fn swap(&self, val: bool, order: Ordering) -> bool</c-s></td>
+            <td>
+              Stores value into its bool, returning previous value.
+            </td>
+          </tr>
+          <tr>
+            <td><c-s>pub fn into_inner(self) -> bool</c-s></td>
+            <td>
+              Consumes atomic and returns contained value.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="https://doc.rust-lang.org/std/sync/atomic/struct.AtomicBool.html">more methods ...</a></td>
+            <td>
+              methods, descriptions, and examples
+              <div style="height:0.25rem;"></div>
+            </td>
+          </tr>
+          <tr>
+            <th colspan="2"></th>
+          </tr>
+          <tr>
+            <td>AtomicUsize</td>
+            <td>Ordering: Acquire, Relaxed, SeqCst</td>
+          </tr>
+          <tr>
+            <td><c-s>pub const fn new(v: usize) -> AtomicUsize</c-s></td>
+            <td>
+              Creates a new atomic integer.
+            </td>
+          </tr>
+          <tr>
+            <td><c-s>pub fn load(&self, order: Ordering) -> usize</c-s></td>
+            <td>
+              Loads value from atomic integer.
+            </td>
+          </tr>
+          <tr>
+            <td><c-s>pub fn store(&self, val: usize, order: Ordering)</c-s></td>
+            <td>
+              Stores value into atomic integer.
+            </td>
+          </tr>
+          <tr>
+            <td><c-s>pub fn fetch_add(&self, val: usize, order: Ordering) -> usize</c-s></td>
+            <td>
+              Adds to the current value, returning the previous value.
+            </td>
+          </tr>
+          <tr>
+            <td><c-s>pub fn into_inner(self) -> usize</c-s></td>
+            <td>
+              Consumes atomic and returns contained value.
+            </td>
+          </tr>
+          <tr>
+            <td><a href="https://doc.rust-lang.org/std/sync/atomic/struct.AtomicUsize.html">more methods ...</a></td>
+            <td>
+              methods, descriptions, and examples
+              <div style="height:0.25rem;"></div>
+            </td>
+          </tr>
+          <tr>
+            <th colspan="2"></th>
+          </tr>
+          <tr>
+            <td><a href="https://doc.rust-lang.org/std/sync/atomic/index.html">more types ...</a></td>
+            <td>
+              AtomicI8, ...
+              <div style="height:0.25rem;"></div>
+            </td>
+          </tr>
+          <tr>
+            <th colspan="2"></th>
+          </tr>
+        </table>
+      </div>
+      <t-b>
+        The following example, repeated from the thread Bite, uses an <c-s>AtomicUsize</c-s> to count child thread operations and
+        share count value with main thread.
+      </t-b>
+      <div>
+        <details>
+          <summary class="darkItem">AtomicUsize Example</summary>
+      <defn-OuterBlock>
+        <defn-block>
+          <defn-head>Basic Thread Demo</defn-head>
+          <defn-code>
+// Basic Threads
+// sharing std::output and AtomicUsize - both thread safe
+
+use std::thread;
+use std::time::Duration;
+use std::sync::atomic::{AtomicUsize, Ordering};
+
+static COUNT: AtomicUsize = AtomicUsize::new(0usize);
+
+fn test() {
+    // child thread processing
+    let dur = Duration::from_millis(2);
+    let handle = thread::spawn(
+        move || {
+            for _i in 0..10 {
+                print!("\n  child thread printing");
+                let _ = COUNT.fetch_add(1, Ordering::SeqCst);
+                thread::sleep(dur);
+            }
+        }
+    );
+    // main thread processing
+    let dur = Duration::from_millis(3);
+    for _i in 0..10 {
+        print!("\n   main thread printing");
+        let _ = COUNT.fetch_add(1, Ordering::SeqCst);
+        thread::sleep(dur);
+    }
+    // wait for thread to complete
+    let _ = handle.join();
+    print!("\n\n  number of prints = {:?}", COUNT);
+}
+
+fn main() {
+    print!("\n  -- Basic Threads --\n");
+    test();
+    print!("\n\n  That's all Folks!\n\n");
+}
+          </defn-code>
+        </defn-block>
+        <defn-block>
+          <defn-head>Output</defn-head>
+          <defn-code>
+  -- Basic Threads --
+
+   main thread printing    
+  child thread printing
+  child thread printing
+  child thread printing
+   main thread printing
+  child thread printing
+   main thread printing
+  child thread printing
+   main thread printing
+  child thread printing
+  child thread printing
+   main thread printing
+  child thread printing
+   main thread printing
+  child thread printing
+  child thread printing
+   main thread printing
+   main thread printing
+   main thread printing
+   main thread printing
+
+  number of prints = 20
+
+  That's all Folks!
+         </defn-code>
+        </defn-block>
+      </defn-OuterBlock>
+        </details>
+      </div>
+      <t-b>
+        <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=c792e1f6af676048cbe51fce925085d5">
+          code in playground
         </a>
       </t-b>
     </div>
