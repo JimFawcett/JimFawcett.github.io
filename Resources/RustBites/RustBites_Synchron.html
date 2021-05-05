@@ -106,13 +106,14 @@
     <h3>1. Mutex&lt;T&gt;</h3>
     <div class="indent">
       <t-b>
-        The Rust <c-s>Mutex&lt;T&gt;</c-s> is a lock designed to grant a thread acquiring the lock to hold exclusive
-        access to its contained resource, <c-s>t &epsilon; T</c-s>.  Any other thread attempting to acquire the lock
-        will block until the owning thread relinquishes the lock.
+        The Rust <c-s>Mutex&lt;T&gt;</c-s> is a lock designed to grant a thread acquiring the lock exclusive
+        access to its contained resource, <c-s>t&epsilon;T</c-s>.  Any other thread attempting to acquire the lock
+        will block until the owning thread unlocks.
       </t-b>
       <t-b>
-        Note that Rust <c-s>Mutexes</c-s> protect a specified data item, not regions of code.  That makes it impossible
-        for two threads to attempt to share the data with separate locks, an error that some other language libraries allow.
+        Note that Rust <c-s>Mutexes</c-s> protect a specified data item, not regions of code.  Guarding regions
+        makes it impossible for two threads to attempt to share the data with separate locks, an error that some 
+        other language libraries allow.
       </t-b>
       <h3>Table 2. - Mutex Methods:</h3>
       <table>
@@ -311,7 +312,410 @@ fn main() {
         mutex demo in playground
       </a>
     </t-b>
+      </div>
+      <h3>2. RwLock&lt;T&gt;</h3>
+      <div class="indent">
+      <t-b>
+        <c-s>RwLock&lt;T&gt;</c-s>s held by a reader allow any number of simultaneous readers to access its protected data
+        simultaneously.  However, a <c-s>RwLock&lt;T&gt;</c-s> grants exclusive access to writers.  That is, only one
+        writer may own the lock, and all others attempting to acquire the lock with block.
+      </t-b>
+      <h3>Table 3. - RwLock&lt;T&gt; Methods:</h3>
+      <table>
+        <tr>
+          <th>Method</th><th>Description</th>
+        </tr>
+        <tr>
+          <td><c-s>pub fn new(t: T) -> RwLock<T></c-s></td>
+          <td>
+            Creates a new instance of an RwLock<T> which is unlocked.
+          </td>
+        </tr>
+        <tr>
+          <td><c-s>pub fn read(&self) -> LockResult&lt;RwLockReadGuard&lt;'_, T&gt;&gt;</c-s></td>
+          <td>
+            Locks rwlock with shared read access, blocking current thread until it can be acquired.
+          </td>
+        </tr>
+        <tr>
+          <td><c-s>pub fn write(&self) -> LockResult&lt;RwLockWriteGuard&lt;'_, T&gt;&gt;</c-s></td>
+          <td>
+            Locks rwlock with exclusive write access, blocking current thread until it can be acquired.
+          </td>
+        </tr>
+        <tr>
+          <td><c-s>pub fn into_inner(self) -> LockResult&lt;T&gt;</c-s></td>
+          <td>
+            Consumes RwLock, returning underlying data.
+          </td>
+        </tr>
+        <tr>
+          <td><a href="https://doc.rust-lang.org/std/sync/struct.RwLock.html">more methods ...</a></td>
+          <td>
+            methods, descriptions, and examples
+            <div style="height:0.25rem;"></div>
+          </td>
+        </tr>
+      </table>
+      <div>
+        <details>
+          <summary class="darkItem">RwLock Example</summary>
+          <defn-OuterBlock>
+            <defn-block>
+              <defn-head>RwLock Example</defn-head>
+              <defn-code>
+// Demonstrate threads sharing string resource 
+#![allow(unused_imports)]
+#![allow(dead_code)]
 
+use std::thread;
+use std::sync::{Mutex, RwLock, Condvar, Arc};
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::time::Duration;
+
+fn test_rwlock() {
+    /* define shared resource */
+    let s = String::new();
+    let share = Arc::new(RwLock::new(s));
+
+    /* define reader processing */
+    static RID:AtomicUsize = AtomicUsize::new(0usize);
+
+    let rd_cls = |shared:Arc<RwLock<String>>| {
+        let my_id = RID.fetch_add(1, Ordering::SeqCst) + 1;
+        let dur = Duration::from_millis(2);
+        for _i in 0..10 {
+            if let Ok(temp) = shared.read() {
+                print!(
+                    "\n  reader {} : str len = {}", 
+                    my_id, temp.len()
+                );
+            }
+            thread::sleep(dur);
+        }
+    };
+
+    /* start readers */
+    let shared = Arc::clone(&share);
+    let handle1 = thread::spawn(move || { rd_cls(shared); });
+    
+    let shared = Arc::clone(&share);
+    let handle2 = thread::spawn(move || { rd_cls(shared); });
+    
+    let shared = Arc::clone(&share);
+    let handle3 = thread::spawn(move || { rd_cls(shared); });
+    
+    let shared = Arc::clone(&share);
+    let handle4 = thread::spawn(move || { rd_cls(shared); });
+    
+    /* define writer processing */
+    static WID:AtomicUsize = AtomicUsize::new(4usize);
+
+    let wr_cls = |shared:Arc<RwLock<String>>| {
+        let my_id = WID.fetch_add(1, Ordering::SeqCst) + 1;
+        let dur = Duration::from_millis(2);
+        for _i in 0..10 {
+            if let Ok(mut temp) = shared.write() {
+                let digit = my_id.to_string();
+                temp.push_str(digit.as_str());
+                print!(
+                    "\n  writer {} : str len = {}", 
+                    my_id, temp.len()
+                );
+            }
+            thread::sleep(dur);
+        }
+    };
+
+    /* start writers */
+    let shared = Arc::clone(&share);
+    let handle5 = thread::spawn(move || { wr_cls(shared); });
+
+    let shared = Arc::clone(&share);
+    let handle6 = thread::spawn(move || { wr_cls(shared); });
+
+    /* main thread waits for children to finish */
+    let _ = handle1.join();
+    let _ = handle2.join();
+    let _ = handle3.join();
+    let _ = handle4.join();
+    let _ = handle5.join();
+    let _ = handle6.join();
+
+    /* lock will fail if thread holding lock panics */
+    if let Ok(mod_str) = share.read() {
+        print!("\n  modified string: {:?}", *mod_str);
+    };  
+    /* 
+        semicolon needed here to ensure mod_str lives 
+        long enough 
+    */
+}
+
+fn main() {
+    test_rwlock();
+}
+
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Output</defn-head>
+              <defn-code>
+  reader 1 : str len = 0
+  reader 1 : str len = 0
+  writer 5 : str len = 1
+  writer 6 : str len = 2
+  reader 2 : str len = 2
+  reader 3 : str len = 2
+  reader 4 : str len = 2
+  writer 5 : str len = 3
+  writer 6 : str len = 4
+  reader 2 : str len = 4
+  reader 3 : str len = 4
+  reader 1 : str len = 4
+  reader 4 : str len = 4
+  writer 5 : str len = 5
+  writer 6 : str len = 6
+  reader 2 : str len = 6
+  reader 3 : str len = 6
+  reader 4 : str len = 6
+  reader 1 : str len = 6
+  writer 5 : str len = 7
+  writer 6 : str len = 8
+  reader 2 : str len = 8
+  reader 3 : str len = 8
+  reader 4 : str len = 8
+  reader 1 : str len = 8
+  writer 5 : str len = 9
+  writer 6 : str len = 10
+  reader 2 : str len = 10
+  reader 3 : str len = 10
+  reader 4 : str len = 10
+  reader 1 : str len = 10
+  writer 5 : str len = 11
+  writer 6 : str len = 12
+  reader 2 : str len = 12
+  reader 3 : str len = 12
+  reader 4 : str len = 12
+  reader 1 : str len = 12
+  writer 5 : str len = 13
+  writer 6 : str len = 14
+  reader 2 : str len = 14
+  reader 3 : str len = 14
+  reader 4 : str len = 14
+  reader 1 : str len = 14
+  writer 5 : str len = 15
+  writer 6 : str len = 16
+  reader 2 : str len = 16
+  reader 3 : str len = 16
+  reader 4 : str len = 16
+  reader 1 : str len = 16
+  writer 5 : str len = 17
+  writer 6 : str len = 18
+  reader 2 : str len = 18
+  reader 3 : str len = 18
+  reader 4 : str len = 18
+  reader 1 : str len = 18
+  writer 5 : str len = 19
+  writer 6 : str len = 20
+  reader 2 : str len = 20
+  reader 3 : str len = 20
+  reader 4 : str len = 20
+  modified string: "56565656565656565656"
+              </defn-code>
+            </defn-block>
+          </defn-OuterBlock>
+        </details>
+      </div>
+      <t-b>
+        <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=eb258e20ac00ee505d54786364e33f87">
+          rwlock demo in playground
+        </a>
+      </t-b>
+    </div>
+    <h3>3. Condvar</h3>
+    <div class="indent">
+      <t-b>
+        <c-s>Condvar</c-s> supports a thread sending notifications to waiting threads.  Threads that need a result from
+        the notifying thread block by calling a <c-s>wait</c-s> method on the <c-s>Condvar</c-s> instance.  That is
+        done 
+        
+        <c-s>Condvars</c-s> are associated
+        with <c-s>Mutex</c-s>(s)
+      </t-b>
+      <h3>Table 4. - Condvar Methods:</h3>
+      <table>
+        <tr>
+          <th>Methods</th><th>Description</th>
+        </tr>
+        <tr>
+          <td><c-s>pub fn new() -> Condvar</c-s></td>
+          <td>
+            Creates new condition variable ready to be waited on and notified.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <c-s>
+              pub&nbsp;fn&nbsp;wait<'a,&nbsp;T>(&self,&nbsp;guard:&nbsp;MutexGuard<'a,&nbsp;T>)<br />
+              -> LockResult&lt;MutexGuard&lt;'a, T&gt;&gt;
+            </c-s>
+          </td>
+          <td>
+            Blocks current thread until condition variable receives a notification.
+          </td>
+        </tr>
+        <tr>
+          <td><c-s>pub fn notify_one(&self)</c-s></td>
+          <td>
+            Wakes up one blocked thread on this condvar.
+          </td>
+        </tr>
+        <tr>
+          <td><c-s>pub fn notify_all(&self)</c-s></td>
+          <td>
+            Wakes up all blocked threads on this condvar.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://doc.rust-lang.org/std/sync/struct.Condvar.html">more methods ...</a>
+          </td>
+          <td>
+            methods, descriptions, and examples
+          </td>
+        </tr>
+      </table>
+      <div>
+        <details>
+          <summary class="darkItem">Condvar Example</summary>
+        <defn-OuterBlock>
+          <defn-block>
+            <defn-head>ThreadResult&lt;T&gt;</defn-head>
+            <defn-code>
+////////////////////////////////////////////////
+// thread_result::lib.rs                      //
+//     - Wait for thread to complete          //
+//                                            //
+// Jim Fawcett, https://JimFawcett.github.io  //
+////////////////////////////////////////////////
+
+#![allow(clippy::mutex_atomic)]
+#![allow(dead_code)]
+use std::sync::*;
+use std::fmt::Debug;
+
+#[derive(Debug, Default)]
+pub struct ThreadResult&lt;T&gt; {
+    pub result: Mutex&lt;T&gt;,
+    cv: Condvar,
+    ready: Mutex&lt;bool&gt;
+}
+
+impl&lt;T: Debug + Default + Clone&gt; ThreadResult&lt;T&gt; {
+    pub fn new() -&gt; Self {
+        Self {
+            result: Mutex::new(T::default()),
+            cv: Condvar::new(),
+            ready: Mutex::new(false),
+        }
+    }
+    /*--------------------------------------------
+      Unwrapping is appropriate here.  The 
+      operation fails if the Mutex becomes
+      poisoned, due to panic on a thread
+      holding the lock.  But then you can't
+      do much except quit, which the unwrap
+      does for you.
+    --------------------------------------------*/
+    pub fn set(&self, t:T) {
+        let mut lr = self.ready.lock().unwrap();
+        *lr = true;
+        let mut lrslt = self.result.lock().unwrap();
+        *lrslt = t;
+        self.cv.notify_one();
+    }
+    pub fn get(&self) -&gt; T {
+        let mut rdy = self.ready.lock().unwrap();
+        while !*rdy {
+            rdy = self.cv.wait(rdy).unwrap();
+        }
+        let rslt = self.result.lock().unwrap();
+        rslt.clone()
+    }
+    pub fn ready(&self) -&gt; bool {
+        *self.ready.lock().unwrap()
+    }
+}
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code</defn-head>
+            <defn-code>
+////////////////////////////////////////////////
+// thread_result::test1.rs                    //
+//     - basic ThreadResult test              //
+//                                            //
+// Jim Fawcett, https://JimFawcett.github.io  //
+////////////////////////////////////////////////
+
+use thread_result::*;
+use std::sync::Arc;
+use std::thread;
+use std::time::Duration;
+
+fn test() {
+    let thrd_rslt 
+        = Arc::new(ThreadResult::&lt;i32&gt;::new());
+    let thrd_rslt1 = Arc::clone(&thrd_rslt);
+    let thrd_rslt2 = Arc::clone(&thrd_rslt);
+
+    let cls = move || {
+        let dur = Duration::from_secs(10u64);
+        thread::sleep(dur);
+        thrd_rslt2.set(42);
+    };
+    let handle = thread::spawn(cls);
+
+    let dur = Duration::from_secs(1);
+    loop {
+        if !thrd_rslt1.ready() {
+            print!("\n  main waiting");
+            thread::sleep(dur);
+        }
+        else {
+            print!(
+              "\n  thread result is {}", 
+              thrd_rslt.get()
+            );
+            break;
+        }
+    }
+    let _ = handle.join();
+}
+fn main() {
+    test();
+}
+              </defn-code>
+            <defn-head class="defnBorderTop">Output</defn-head>
+            <defn-code>
+  main waiting
+  main waiting
+  main waiting
+  main waiting
+  main waiting
+  main waiting
+  main waiting
+  main waiting
+  main waiting
+  main waiting
+  thread result is 42
+
+            </defn-code>
+          </defn-block>
+        </defn-OuterBlock>
+        </details>
+      </div>
     </div>
   </body>
 </html>
