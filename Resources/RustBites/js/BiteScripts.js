@@ -75,7 +75,7 @@ storyMenu.bitesMenu = function () {
     <a href="RustBites_Idioms.html">Idiomatic Rust</a><br />\
     <a href="RustBites_Macros.html">Macros</a><br />\
     <a href="RustBites_Threads.html">Threads</a><br />\
-    <a class="undefined" href="RustBites_Synchron.html">Synchronize</a><br />\
+    <a href="RustBites_Synchron.html">Synchronize</a><br />\
     <a class="undefined" href="RustBites_Channels.html">Channels</a><br />\
     <a class="undefined" href="RustBites_AsyncAwt.html">AsyncAwait</a><br />\
     <a href="RustBites_RegEx.html">Reg Expr</a><br />\
