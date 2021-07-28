@@ -96,7 +96,7 @@ function initializeMenu() {
       <div class='dropdown-content noScrollX'>\
         <a href='Stories.html'>What is a Story?</a>\
         <a href='CppStory_Prologue.html'>C++ Story</a>\
-        <a href='RustStory_Prologue.html'>Rust Story</a>\
+        <a href='RustStory.html'>Rust Story</a>\
         <a href='RustBiteByByte.html'>Rust&nbsp;bite&nbsp;by&nbsp;byte&nbsp;</a>\
         <a href='BuildOn.html'>BuildOn:&nbsp;learn&nbsp;Rust&nbsp;&nbsp;</a>\
         <a href='IdiomsAndPatterns.html'>Idioms&nbsp;&amp;&nbsp;Patterns&nbsp;</a>\
