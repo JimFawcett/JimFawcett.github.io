@@ -63,6 +63,9 @@ storyMenu.bitesMenu = function () {
     <a href="BasicBites_ObjLifetime.html">- Lifetime</a><br />\
     <a href="BasicBites_ObjResMgmt.html">- Resource Mgmt</a><br />\
     <a href="BasicBites_ObjOwnership.html">- Ownership</a><br />\
+    <a href="Javascript.;#"></a><br />\
+    <a href="BasicBites_SummaryNative.html">- Summary Native</a><br />\
+    <a href="BasicBites_SummaryManaged.html">- Summary Mangd</a><br />\
     <a href="Javascript.;#"></a><br />';
 }
 
