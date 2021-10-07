@@ -15,6 +15,21 @@
     <script src="js/BasicBiteScripts.js"></script>
     <script src="js/BiteTables.js"></script>
     <script src="js/ScriptsKeyboard.js"></script>
+    <style>
+      #github code {
+        display: block;
+        padding: 10px 25px;
+        font-size: 1.0rem;
+        font-family: Consolas;
+        font-weight: bold;
+      }
+      #github inline-code {
+        display: inline-block ;
+        font-size: 1.0rem;
+        font-family: Consolas;
+        font-weight: bold;
+      }
+    </style>
   </head>
   <body id="github" onload="initBites()">
     <div class="top-banner">
@@ -42,7 +57,16 @@
     </div>
    
     <h2>BasicBites - Program Execution</h2>
-    <photosizer-block src="pictures/process.png" width="400" class="photoSizerBlock" style="margin-top:0;">
+    <t-b>
+      Execution of all user code happens in the context of a process.  Native code is embedded, by the compiler, in
+      an execution image which is then loaded, at execution time, into a newly created process.
+    </t-b>
+    <t-b>
+      Managed source code compiles to bite code.  At execution time a new process is created and loads a virtual machine. 
+      Byte code is &quot;just-in-time&quot; compiled by the virtual machine on a function or assembly basis and run in the 
+      context of the new process.  Compiled byte code is cached and not compiled again.
+    </t-b>
+    <photosizer-block src="pictures/process.png" width="500" class="photoSizerBlock right" style="margin-top:0;">
       <span style="
         display: inline-block;
         font-weight: bold;
@@ -54,6 +78,49 @@
           Figure 1. Windows Process Model
       </span>
     </photosizer-block>
-
+    <!--<div style="height:0.25rem"></div>-->
+    <t-b>
+      In Windows a process is a container of one or more threads and resources they share.  All process resources are
+      accessed and manipulated using handles.  Figure 1. shows a process with handles for two threads, a dynamic link
+      library, loaded at execution time, and handles to GUI windows and heap memory.
+    </t-b>
+    <t-b>
+      Windows has an object model that provides programs with handles to object instances created with calls to the
+      Windows API.  For example, a heap object is created with:
+      <code>
+        HANDLE HeapCreate(DWORD flOptions, SIZE_T dwInitialSize, SIZE_T dwMaximumSize);
+      </code>
+      Most of a program&apos;s API calls are handled by the programming lanaguage&apos;s standard libraries so the
+      program doesn&apos;t need to know about these calls.
+    </t-b>
+    <t-b>
+      The Windows scheduler starts, runs, and interrupts threads, not processes.  A Windows process is just a container
+      for its threads and resources.
+    </t-b>
+    <t-b>
+      The process model for linux and Unix are similar to Windows except that a linux thread is simply a child process
+      that shares its parents address space.  That is hidden by the pthread library and linux no longer increments its
+      reported process count when a new thread is created.  So, the linux scheduler starts, runs, and interrupts processes. 
+    </t-b>
+    <t-b>
+      Process memory is divided into:
+      <ul>
+        <li>
+          Static memory holding code and global data
+        </li>
+        <li>
+          Stack memory allocated when the program&apos;s thread of execution enters a new scope, delineated by &quot;{...}&quot;,
+          and deallocated when execution leaves the scope.  For native code this scratch-pad memory holds function parameters
+          and all local objects declared within the scope.  For managed code stack memory holds
+          values for value types and references to heap-based objects for managed types.  This is true for both function parameters
+          and instances declared within the current scope.
+        </li>
+        <li>
+          Heap memory allocated with calls to <inline-code>new</inline-code>.  Native code deallocates heap-based instances with
+          calls to <inline-code>delete</inline-code>.  Managed code uses the services of a garbage collector to defer deallocation
+          for latter analysis to ensure that no references to the instance remain.
+        </li>
+      </ul>
+    </t-b>
   </body>
 </html>
