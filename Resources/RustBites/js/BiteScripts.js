@@ -61,7 +61,7 @@ storyMenu.bitesMenu = function () {
     <a href="RustBites_SmrtPtrs.html">SmartPtrs</a><br />\
     <a href="RustBites_LifeCycle.html">LifeCycle</a><br />\
     <a href="RustBites_Ownrs.html">Ownership</a><br />\
-    <a href="RustBites_Traits.html">Generics&Traits</a><br />\
+    <a href="RustBites_Traits.html">Generics&Traits</a>&nbsp;&nbsp;<br />\
     <a href="RustBites_Functs.html">Functions</a><br />\
     <a href="RustBites_Structs.html">Structs</a><br />\
     <a href="RustBites_LifeTime.html">LifeTime</a><br />\
@@ -99,13 +99,8 @@ storyMenu.helpMenu = function () {
   helpMenu.innerHTML = '<table>\
     <tr>\
       <td style="padding-right:5px;" onclick="storyMenu.toggleTOC()">Esc</td>\
-      <td>toggle menus</td>\
+      <td>toggle&nbsp;menus</td>\
     </tr>\
-    <tr>\
-      <td onclick="storyMenu.closeTOC()">C</td>\
-      <td>close menus</td>\
-    </tr>\
-    <tr>\
       <td onclick="location.reload()">R</td><td>Refresh</td>\
     </tr>\
     <tr>\
@@ -115,13 +110,13 @@ storyMenu.helpMenu = function () {
       <td onclick="storyMenu.prev()">P</td><td>Prev Bite</td>\
     </tr>\
     <tr>\
-      <td onclick="storyMenu.top()">T</td><td>scroll to top</td>\
+      <td onclick="storyMenu.top()">T</td><td>scroll&nbsp;to&nbsp;top</td>\
     </tr>\
     <tr>\
-      <td onclick="storyMenu.bottom()">B</td><td>scroll to bottom</td>\
+      <td onclick="storyMenu.bottom()">E</td><td>scroll&nbsp;to&nbsp;end</td>\
     </tr>\
     <tr>\
-      <td onclick="storyMenu.help()">H</td><td>Help</td>\
+      <td onclick="storyMenu.help()">H</td><td>SiteMap</td>\
     </tr>\
   </table>';
 }

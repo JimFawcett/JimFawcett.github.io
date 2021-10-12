@@ -85,11 +85,7 @@ storyMenu.helpMenu = function () {
   helpMenu.innerHTML = '<table>\
     <tr>\
       <td style="padding-right:5px;" onclick="storyMenu.toggleTOC()">Esc</td>\
-      <td>toggle menus</td>\
-    </tr>\
-    <tr>\
-      <td onclick="storyMenu.closeTOC()">C</td>\
-      <td>close menus</td>\
+      <td>toggle&nbsp;menus</td>\
     </tr>\
     <tr>\
       <td onclick="location.reload()">R</td><td>Refresh</td>\
@@ -101,13 +97,13 @@ storyMenu.helpMenu = function () {
       <td onclick="storyMenu.prev()">P</td><td>Prev Bite</td>\
     </tr>\
     <tr>\
-      <td onclick="storyMenu.top()">T</td><td>scroll to top</td>\
+      <td onclick="storyMenu.top()">T</td><td>scroll&nbsp;to&nbsp;top</td>\
     </tr>\
     <tr>\
-      <td onclick="storyMenu.bottom()">B</td><td>scroll to bottom</td>\
+      <td onclick="storyMenu.bottom()">E</td><td>scroll&nbsp;to&nbsp;end</td>\
     </tr>\
     <tr>\
-      <td onclick="storyMenu.help()">H</td><td>Help</td>\
+      <td onclick="storyMenu.help()">H</td><td>SiteMap</td>\
     </tr>\
   </table>';
 }
