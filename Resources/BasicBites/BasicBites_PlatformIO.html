@@ -77,6 +77,22 @@
       </span>
     </photosizer-block>
     <h3>I/O Completion Ports</h3>
+    <t-b>
+      I/O completion ports provide a mechanism for processing multiple asynchronous I/O requests.  When sending
+      a request the requesting thread returns without waiting for the I/O process to complete.
+    </t-b>
+    <t-b>
+      Asynchronous read or write requests using library methods may use I/O completion ports internally. 
+    </t-b>
+    <t-b>
+      When an asynchronous I/O request is made, an I/O Request (IOR) object is created and sent to the completion
+      port. The IOR holds a file handle for the specified destination and may also hold a callback reference.
+    </t-b>
+    <t-b>
+      Each IOR enqueues an I/O Completion Package (IOCPkg) that gets serviced by a thread pool thread which is responsible 
+      for sending the request to an appropriate
+      device driver and await its completion.  If a callback is registered it will invoke the callback on completion.
+    </t-b>
     <photosizer-block src="pictures/windows.png" width="500" class="photoSizerBlock right clear" style="margin-top:0;">
       <span style="
         display: inline-block;
@@ -89,7 +105,43 @@
           Figure 2. Windows Event Processing
       </span>
     </photosizer-block>
+    <t-b>
+      <details>
+        <summary class="lightItem">
+          <h3 style="display:inline;">Async Await</h3><br />
+          <span class="indent pad5">related details</span>
+        </summary>
+        <div class="indent">
+          <t-b>
+            .Net provides a Task type that is used with async functions that invoke await and is 
+            executed on the current synchronization context.  If that is a thread-pool
+            context each task is run on a thread-pool thread.  If a non thread-pool synchronization context is used, then
+            when the task blocks it is suspended, enqueued, and another task is dequeued by the same thread.
+          </t-b>
+          <t-b>
+            I suspect that the Rust async await functionality works the same way.
+          </t-b>
+        </div>
+      </details>
+    </t-b>
     <h3>Windows Messaging</h3>
+    <t-b>
+      When external devices are used to send key presses, mouse movements, button clicks, ... each device event
+      results in a device driver creating a message and enqueueing to a raw input queue.  
+    </t-b>
+    <t-b>
+      The Window manager
+      dequeues each message and routes it to an appropriate window.  For example, a mouse button click gets
+      routed to the first window which contains the mouse coordinates in its active area.  Keyboard key events
+      by default are routed to the window in focus.
+    </t-b>
+    <t-b>
+      Routing means that the Window manager enqueues a filtered version of the message to an appropriate window&apos;s
+      message queue.  Each window has an event dispatcher that sends the message to an event handler for processing.
+    </t-b>
+    <t-b>
+      Note that an application may send messages to a hidden window as a means of internal communication.
+    </t-b>
     <h3 class="clear">Streams</h3>
     <t-b>
       Streams provide buffered I/O operations that collect data from possibly several requests and send that 
@@ -99,12 +151,45 @@
       platform kernel and so improves program throughput.
     </t-b>
     <t-b>
-      Essentially, streams collect a continuing sequence of event data and, based on an internal algorithm,
+      Essentially, streams collect a continuing sequence of event data and, based on an internal threshold,
       send on all of the data since the last operation as a single new operation.  This happens for both
       input and output streams, that is, data events external to the program - input - and data events generated
       by the program - output.
     </t-b>
     <h3 class="clear">Consequences</h3>
+    <t-b>
+      Each application has the option of sending and receiving either synchronous or asynchronous I/O:
+      <ul>
+        <li>
+          Synchronous I/O requires the handling thread to block until completion so operations that may
+          block for a long time, like network communications, will adversely affect program performance
+          if handled on the main thread of execution.
+        </li>
+        <li>
+          Asynchronous I/O allows the requesting thread to return immediately, but increases the overall
+          processing load on machine&apos;s cores due to creation of I/O completion object and dispatching
+          to thread pool threads.
+        </li>
+      </ul>
+    </t-b>
+    <t-b>
+      Each application has the option of using buffered or unbuffered I/O.  This is independent of the choice
+      to use synchronous or asynchronous operations.
+      <ul>
+        <li>
+          Unbuffered I/O sends each request to the kernel for processing by a device driver.  For infrequent
+          requests this requires no addition processing at the expense of more (infrequent) system calls.
+        </li>
+        <li>
+          Buffered I/O collects a series of I/O requests before entering the kernel, resulting in fewer
+          expensive operations, but incurs the buffering overhead.
+        </li>
+      </ul>
+    </t-b>
+    <t-b>
+      For most programs the choice of buffering and asynchrony may or may not improve performance and so
+      should be tested before committing to production code.
+    </t-b>
     <h3 class="clear">References:</h3>
     <ol class="indent tight">
       <li>
@@ -113,9 +198,16 @@
       <li>
         <a href="https://dschenkelman.github.io/2013/10/29/asynchronous-io-in-c-io-completion-ports/">Asynchronous I/O: I/O Completion Ports</a>
       </li>
-      <!--<li>
-        <a href="https://www.microsoftpressstore.com/articles/article.aspx?p=2201309&seqNum=3">Understanding Windows I/O System</a>
-      </li>-->
+      <li>
+        <a href="https://weblogs.asp.net/kennykerr/parallel-programming-with-c-part-4-i-o-completion-ports">Part 4 - I/O Completion Ports</a>
+      </li>
+      <li>
+        <a href="https://stackoverflow.com/questions/35483763/async-and-await-are-single-threaded-really">async await - stackOverflow</a>&nbsp;&nbsp;
+        Read answer 4, at bottom
+      </li>
+      <li>
+        <a href="https://tooslowexception.com/net-asyncawait-in-a-single-picture/">.Net async/await in a single picture</a>
+      </li>
     </ol>
   </body>
 </html>
