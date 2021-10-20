@@ -15,6 +15,23 @@
     <script src="js/BasicBiteScripts.js"></script>
     <script src="js/BiteTables.js"></script>
     <script src="js/ScriptsKeyboard.js"></script>
+    <style>
+      #github .codesnip {
+        font-family: Consolas, monospace;
+        font-size: 1.0rem;
+        vertical-align: middle;
+      }
+      #github .textsnip {
+        font-size: 1.0rem;
+        vertical-align: middle;
+      }
+      #github .lightgray {
+        background-color: lightgray;
+      }
+      #github table {
+        border-spacing:1rem 0.5rem;
+      }
+    </style>
   </head>
   <body id="github" onload="initBites()">
     <div class="top-banner">
@@ -41,9 +58,52 @@
     <div id="hlp" style="display:none;">
     </div>
    
-    <h2>BasicBites - Program Types</h2>
-    <div style="float:right">
-      <photosizer-block src="pictures/NativeTypes.png" width="400" class="photoSizerBlock" style="margin-top:0;">
+    <h2>BasicBites - Program Static Data Types</h2>
+    <t-b>
+      "In programming languages, a type system is a logical system comprising a set of rules that 
+      assigns a property called a type to the various constructs of a computer program, such as variables, 
+      expressions, functions or modules." - <a href="https://en.wikipedia.org/wiki/Type_system">Wikipedia</a>
+    </t-b>
+    <t-b>
+      In this page we discuss static data types to illustrate some key differences between native and
+      managed code.  A static data type declaration defines, at compile-time, a set of rules for creating,
+      mutating, and disposing of a typed data instance.  Each instance has a fixed type throughout its lifetime
+      [We will not be concerned here with type coersions like cast operations].
+    </t-b>
+    <t-b>
+      In the following sections we define type categories: <strong>Copy</strong>, <strong>Move</strong>, 
+      and <strong>Reference</strong> types that have distinct
+      operations for setting the value of one instance based on the value held by another instance.  Common
+      languages like C++, Rust, C#, and Java, implement these operations in different ways and may use other
+      names for them.
+    </t-b>
+    <h3>Copy Types:</h3>
+    <div class="indent">
+      <t-b>
+        Copy types are modeled after primitive language types like integers and floats.  When instances are
+        copy constructed or copy assigned, their values are copied to new locations with new names and can be
+        independently mutated.  For types occupying one contiguous block of memory this is implemented with
+        a memcopy.
+        <div class="indent pad10">
+          <table>
+            <tr>
+              <td class="textsnip">Copy&nbsp;construction:</td>
+              <td class="codesnip">T&nbsp;t1&nbsp;=&nbsp;2;</td>
+              <td class="codesnip lightgray">T&nbsp;t2&nbsp;=&nbsp;t1;</td>
+              <td class="textsnip">t1 and t2 occupy disjoint blocks of memory with the same value</td>
+            </tr>
+            <tr>
+              <td class="textsnip">Copy assignment:</td>
+              <td class="codesnip">T t3 = 0;</td>
+              <td class="codesnip lightgray">t2 = t3;</td>
+              <td class="textsnip">t2 and t3 occupy disjoint blocks of memory with the same value</td>
+            </tr>
+          </table>
+        </div>
+      </t-b>
+    </div>
+    <div style="floatx:right">
+      <photosizer-block src="pictures/NativeCopy.png" width="300" class="photoSizerBlock" style="margin-top:0;">
         <span style="
           display: inline-block;
           font-weight: bold;
@@ -52,9 +112,171 @@
           width: 100%;
           padding: 5px 0px;"
         >
-            Figure 1. Native Types
+            Figure 1. Copy Types
         </span>
       </photosizer-block>
+    </div>
+    <h3>Move Types:</h3>
+    <div class="indent">
+      <t-b>
+        Move types efficiently transfer ownership of instance resources from the original named instance to another.  
+        The original becomes
+        invalid and the new instance takes ownership of the resources of the original without moving them in memory.  
+        We have moved the resources from one instance to another efficiently. This is
+        often implemented by giving the new owner the address of the resource.
+        <div class="indent pad10">
+          <table>
+            <tr>
+              <td class="textsnip">Move construction:</td>
+              <td class="codesnip">T t1 = new T(1, "xyz")</td>
+              <td class="codesnip lightgray">T t2 = t1;</td>
+              <td class="textsnip">t1&apos;s resources given to t2, t1 now invalid</td>
+            </tr>
+            <tr>
+              <td class="textsnip">Move assignment:</td>
+              <td class="codesnip">T&nbsp;t3&nbsp;=&nbsp;new&nbsp;T(2,&nbsp;"abc");</td>
+              <td class="codesnip lightgray">t2&nbsp;=&nbsp;t3;</td>
+              <td class="textsnip">t3&apos;s resources given to t2, t3 now invalid</td>
+            </tr>
+          </table>
+        </div>
+      </t-b>
+    </div>
+    <div style="floatx:right">
+      <photosizer-block src="pictures/MoveType.jpg" width="300" class="photoSizerBlock" style="margin-top:0;">
+        <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS, Tahoma';
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;"
+        >
+            Figure 2. Move Types
+        </span>
+      </photosizer-block>
+    </div>
+    <h3>Reference Types:</h3>
+    <div class="indent">
+      <t-b>
+        Reference types are handle-body pairs.  The handle resides in a local scope and body in the program&apos;s
+        heap.
+        Program code manipulates the handle to effect changes to
+        the body&apos;s value.
+        <div class="indent pad10">
+          <table>
+            <tr>
+              <td class="textsnip">Handle-body&nbsp;construction:</td>
+              <td class="codesnip">T&nbsp;h1&nbsp;=&nbsp;new&nbsp;T(1,&nbsp;"xyz")</td>
+              <td class="codesnip lightgray">T&nbsp;h2&nbsp;=&nbsp;h1;</td>
+              <td class="textsnip">h1&apos;s resources - the body - are now attached to both h1 and h2</td>
+            </tr>
+            <tr>
+              <td class="textsnip">Handle-body&nbsp;assignment:</td>
+              <td class="codesnip">T&nbsp;h3&nbsp;=&nbsp;new&nbsp;T(2,&nbsp;"abc");</td>
+              <td class="codesnip lightgray">h2&nbsp;=&nbsp;h3;</td>
+              <td class="textsnip">Both h2 and h3 point to the same body</td>
+            </tr>
+          </table>
+        </div>
+        <div style="floatx:right">
+          <photosizer-block src="pictures/ManagedCopy.png" width="300" class="photoSizerBlock" style="margin-top:0;">
+            <span style="
+              display: inline-block;
+              font-weight: bold;
+              font-family: 'Comic Sans MS, Tahoma';
+              background-color: #ddd;
+              width: 100%;
+              padding: 5px 0px;"
+            >
+                Figure 3. Reference Types
+            </span>
+          </photosizer-block>
+        </div>
+      </t-b>
+    </div>
+    <h3>C++ Types</h3>
+    <div class="indent">
+      <t-b>
+        C++ programs compile to native code and run directly in the processes created for them.
+      </t-b>
+      <h4>Copy Types</h4>
+      <t-b>
+        <div style="float:right">
+          <photosizer-block src="pictures/NativeTypes.png" width="400" class="photoSizerBlock" style="margin-top:0;">
+            <span style="
+              display: inline-block;
+              font-weight: bold;
+              font-family: 'Comic Sans MS, Tahoma';
+              background-color: #ddd;
+              width: 100%;
+              padding: 5px 0px;"
+            >
+                Figure 1. Native Types
+            </span>
+          </photosizer-block>
+        </div>
+      </t-b>
+      <t-b>
+        In the C++ programming language all primitives and any user defined type that has valid copy constructor
+        and valid copy assignment - compiler generated if all the user type data members have correct copy semantics - are value types.
+      </t-b>
+      <h4>Move Types</h4>
+      <t-b>
+        C++ user types that define move constructor and move assignment and do not define copy constructor and copy assignment,
+        and disallow compiler generation of them,
+        are Move types.  If copy construcor and copy assignment are also defined the type will act like copy or move type
+        depending on the context or use with a move modifier.
+      </t-b>
+      <h4>Reference Types</h4>
+      <t-b>
+        User types that define copy constructor and copy assignment to copy all stack-based resources - composed members - 
+        and do not copy any heap-based resources - aggregated members, are Reference types.  This is highly unusual in
+        C++ code and should be avoided unless there is some strong rational for doing so.
+      </t-b>
+      <t-b>
+        Should you intentionally define a C++ reference type you need to implement the class&apos;s destructor carefully to
+        avoid double deletion with its associated thrown exception.
+      </t-b>
+    </div>
+    <h3>Rust Types</h3>
+    <div class="indent">
+      <t-b>
+        Rust programs compile to native code and run directly in the processes created for them.
+      </t-b>
+      <t-b>
+        User defined types in Rust are structs and enums.  The struct plays essentially the same role in Rust as
+        classes do in C++, C#, and Java.
+      </t-b>
+      <h4>Copy Types</h4>
+      <!--<t-b>
+        <div style="float:right">
+          <photosizer-block src="pictures/NativeTypes.png" width="400" class="photoSizerBlock" style="margin-top:0;">
+            <span style="
+              display: inline-block;
+              font-weight: bold;
+              font-family: 'Comic Sans MS, Tahoma';
+              background-color: #ddd;
+              width: 100%;
+              padding: 5px 0px;"
+            >
+                Figure 1. Native Types
+            </span>
+          </photosizer-block>
+        </div>
+      </t-b>-->
+      <t-b>
+        In the Rust programming language all types that implement the Copy trait are copy types. That includes
+        all primitives and any user defined structs that have all copy members and are bounded by the Copy trait.
+      </t-b>
+      <h4>Move Types</h4>
+      <t-b>
+        Rust user defined structs that do not implement the Copy trait are Move types.
+      </t-b>
+      <h4>Reference Types</h4>
+      <t-b>
+        The standard smart reference counted pointers Rc&lt;T&gt; and Arc&lt;T&gt; are the only reference types in Rust.
+      </t-b>
     </div>
     <div class="right clear">
       <photosizer-block src="pictures/ManagedObjects.png" width="500" class="photoSizerBlock" style="margin-top:0;">
@@ -93,6 +315,12 @@
             Figure 4. Managed Classes and Objects
         </span>
       </photosizer-block>
+    </div>
+    <div class="indent">
+    <h4>C# and Java Value Types</h4>
+    <t-b>
+      Only primitive types are value types.  The only user-defined value type is the struct with all value type data members.
+    </t-b>
     </div>
     <t-b>
       <ul>
