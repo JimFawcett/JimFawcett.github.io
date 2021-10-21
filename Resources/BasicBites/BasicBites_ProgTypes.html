@@ -72,7 +72,7 @@
     </t-b>
     <t-b>
       In the following sections we define type categories: <strong>Copy</strong>, <strong>Move</strong>, 
-      and <strong>Reference</strong> types that have distinct
+      and <strong>Reference</strong> that have distinct
       operations for setting the value of one instance based on the value held by another instance.  Common
       languages like C++, Rust, C#, and Java, implement these operations in different ways and may use other
       names for them.
@@ -141,9 +141,18 @@
           </table>
         </div>
       </t-b>
+      <t-b>
+        Move types often provide a clone() method that gives the destination a copy of the source&apos;s
+        resources so the source remains valid.  
+      </t-b>
+      <t-b>
+        Move operations usually only copy a pointer and so are
+        fast.  Clone operations require copying all of the resources into a new instance and may be
+        slow if the resources are large.
+      </t-b>
     </div>
-    <div style="floatx:right">
-      <photosizer-block src="pictures/MoveType.jpg" width="300" class="photoSizerBlock" style="margin-top:0;">
+    <div style="float:left">
+      <photosizer-block src="pictures/MoveType.png" width="300" class="photoSizerBlock" style="margin-top:0;">
         <span style="
           display: inline-block;
           font-weight: bold;
@@ -152,10 +161,25 @@
           width: 100%;
           padding: 5px 0px;"
         >
-            Figure 2. Move Types
+            Figure 2a. Move Types
         </span>
       </photosizer-block>
     </div>
+    <div style="float:left">
+      <photosizer-block src="pictures/CloneType.png" width="300" class="photoSizerBlock" style="margin-top:0;">
+        <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS, Tahoma';
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;"
+        >
+            Figure 2b. Clone Operation
+        </span>
+      </photosizer-block>
+    </div>
+    <div style="height:0rem; clear:both"></div>
     <h3>Reference Types:</h3>
     <div class="indent">
       <t-b>
@@ -179,31 +203,42 @@
             </tr>
           </table>
         </div>
-        <div style="floatx:right">
-          <photosizer-block src="pictures/ManagedCopy.png" width="300" class="photoSizerBlock" style="margin-top:0;">
-            <span style="
-              display: inline-block;
-              font-weight: bold;
-              font-family: 'Comic Sans MS, Tahoma';
-              background-color: #ddd;
-              width: 100%;
-              padding: 5px 0px;"
-            >
-                Figure 3. Reference Types
-            </span>
-          </photosizer-block>
+        <div>
+          <div style="    float: left; padding-right: 1rem;">
+            <photosizer-block src="pictures/ManagedCopy.png" width="300" class="photoSizerBlock" style="margin-top:0;">
+              <span style="
+                display: inline-block;
+                font-weight: bold;
+                font-family: 'Comic Sans MS, Tahoma';
+                background-color: #ddd;
+                width: 100%;
+                padding: 5px 0px;"
+              >
+                  Figure 3. Reference Types
+              </span>
+            </photosizer-block>
+          </div>
         </div>
       </t-b>
+      <t-b>
+        Reference types require either reference counting or garbage collection to avoid double deletion or
+        memory leaks.  
+      </t-b>
+      <t-b>
+        Reference counting is fast and deterministic, but reference cycles will cause
+        memory leads unless some form of mark and remove is used.  
+      </t-b>
+      <t-b>
+        Garbage collection is non-deterministic
+        and must devote processing resources to track pointers.
+      </t-b>
     </div>
+    <div style="height:1rem; clear:both;"></div>
     <h3>C++ Types</h3>
     <div class="indent">
       <t-b>
-        C++ programs compile to native code and run directly in the processes created for them.
-      </t-b>
-      <h4>Copy Types</h4>
-      <t-b>
         <div style="float:right">
-          <photosizer-block src="pictures/NativeTypes.png" width="400" class="photoSizerBlock" style="margin-top:0;">
+          <photosizer-block src="pictures/NativeTypes.png" width="350" class="photoSizerBlock" style="margin-top:0;">
             <span style="
               display: inline-block;
               font-weight: bold;
@@ -212,14 +247,27 @@
               width: 100%;
               padding: 5px 0px;"
             >
-                Figure 1. Native Types
+                Figure 4. Native Types
             </span>
           </photosizer-block>
         </div>
       </t-b>
       <t-b>
+        C++ programs compile to native code and run directly in the processes created for them. 
+      </t-b>
+      <t-b>
+        Composed members
+        of a native type&apos;s instance reside within the memory footprint of the instance.  Aggregated members reside
+        in the heap and only a pointer to the heap instance resides in the native instance.
+      </t-b>
+      <h4>Copy Types</h4>
+      <t-b>
         In the C++ programming language all primitives and any user defined type that has valid copy constructor
-        and valid copy assignment - compiler generated if all the user type data members have correct copy semantics - are value types.
+        and valid copy assignment are value types.
+      </t-b>
+      <t-b>
+        The copy operations and destructor are compiler generated if all the user type data members have correct 
+        copy semantics.  Otherwise, the developer is obligated to provide definitions for them.
       </t-b>
       <h4>Move Types</h4>
       <t-b>
@@ -228,43 +276,65 @@
         are Move types.  If copy construcor and copy assignment are also defined the type will act like copy or move type
         depending on the context or use with a move modifier.
       </t-b>
+      <t-b>
+        Unlike Rust, the C++ compiler does not disallow use of the invalid source after it is moved, resulting
+        in undefined behavior.
+      </t-b>
       <h4>Reference Types</h4>
       <t-b>
-        User types that define copy constructor and copy assignment to copy all stack-based resources - composed members - 
-        and do not copy any heap-based resources - aggregated members, are Reference types.  This is highly unusual in
-        C++ code and should be avoided unless there is some strong rational for doing so.
+        C++ provides the primitives raw pointer, <span class="lightgray codesnip">T* ptr = *t;</span> and reference
+        <span class="lightgray codesnip">T& ref = &amp;t;</span>
       </t-b>
       <t-b>
-        Should you intentionally define a C++ reference type you need to implement the class&apos;s destructor carefully to
-        avoid double deletion with its associated thrown exception.
+        User types can take on reference behavior by using std::unique_ptr&lt;T&gt; or std::shared_ptr&lt;T&gt;
+        <div class="indent pad10 codesnip">
+          auto r = std::shared_ptr&lt;T&gt;(new T(args));
+        </div>
+        These pointer types are reference counted, so the lifetime of the instance ends when the last shared pointer
+        goes out of scope.
+      </t-b>
+      <t-b>
+        One could create a type with reference behavior by carefully crafting copy operations and destructor, but
+        requires care to avoid memory leaks or double delete exceptions.  Not recommended.
+      </t-b>
+      <h4>Type Aliases</h4>
+      <t-b>
+        An alias is simply another name for a given type.  C++ provides two means of defining aliases:
+        <ul class="tight" style="margin-left:0rem;">
+          <li>
+            <span class="lightgray codesnip">
+              using ID = unsigned int;
+            </span>
+          </li>
+          <li>
+            <span class="lightgray codesnip">
+              typedef unsigned int ID;
+            </span>
+          </li>
+        </ul>
+      </t-b>
+      <h4>Strong Types</h4>
+      <t-b>
+        TBD
       </t-b>
     </div>
     <h3>Rust Types</h3>
     <div class="indent">
       <t-b>
-        Rust programs compile to native code and run directly in the processes created for them.
+        Rust programs compile to native code and run directly in the processes created for them.  
       </t-b>
       <t-b>
-        User defined types in Rust are structs and enums.  The struct plays essentially the same role in Rust as
-        classes do in C++, C#, and Java.
+        User defined types in Rust are structs, enums, or unions.  The struct plays essentially the same role 
+        in Rust as classes do in C++, C#, and Java.
+      </t-b>
+      <t-b>
+        The Rust
+        compiler disallows use of instances that have been moved.  
+        It also disallows mutation of an instance
+        through a mutable reference whenever another reference is active unless the other reference is not used
+        after the mutation. 
       </t-b>
       <h4>Copy Types</h4>
-      <!--<t-b>
-        <div style="float:right">
-          <photosizer-block src="pictures/NativeTypes.png" width="400" class="photoSizerBlock" style="margin-top:0;">
-            <span style="
-              display: inline-block;
-              font-weight: bold;
-              font-family: 'Comic Sans MS, Tahoma';
-              background-color: #ddd;
-              width: 100%;
-              padding: 5px 0px;"
-            >
-                Figure 1. Native Types
-            </span>
-          </photosizer-block>
-        </div>
-      </t-b>-->
       <t-b>
         In the Rust programming language all types that implement the Copy trait are copy types. That includes
         all primitives and any user defined structs that have all copy members and are bounded by the Copy trait.
@@ -275,46 +345,158 @@
       </t-b>
       <h4>Reference Types</h4>
       <t-b>
-        The standard smart reference counted pointers Rc&lt;T&gt; and Arc&lt;T&gt; are the only reference types in Rust.
+        Rust provides the primitives unsafe raw pointer, <span class="lightgray codesnip">let ptr:T* = *t;</span> and reference
+        <span class="lightgray codesnip">let ref:&T = &t;</span>
+      </t-b>
+      <t-b>
+        The standard smart reference-counted pointers Rc&lt;T&gt; and Arc&lt;T&gt; 
+        and smart heap pointer <span class="lightgray codesnip">Box&lt;T&gt;</span> are the only stdlib reference 
+        types in Rust.
+      </t-b>
+      <t-b>
+        When any of them are initialized from an instance in the stack, the instance is copied to the heap.
+        <div class="indent pad10" style="width:max-content;">
+          <span class="lightgray codesnip">let t = T:new(); let boxed = Box::new(t);</span>
+        </div>
+        boxed is a smart pointer to a copy of t in the heap.
+      </t-b>
+      <details>
+        <summary class="darkItem">User defined reference types</summary>
+        <t-b>
+          A user defined reference type could be constructed with a struct using unsafe implementation blocks or
+          lifetime annotations; but users of that type will find it hard to craft compilable syntax.
+        </t-b>
+      </details>
+      <h4>Type Aliases</h4>
+      <t-b>
+        An alias is simply another name for a given type.  Rust provides two means of defining aliases:
+        <ul class="tight" style="margin-left:0rem;">
+          <li>
+            <span class="lightgray codesnip">
+              type ID = u32;
+            </span>
+          </li>
+          <li>
+            <span class="lightgray codesnip">
+              use u32 as ID;
+            </span>
+          </li>
+        </ul>
+      </t-b>
+      <h4>Strong Types</h4>
+      <t-b>
+        TBD
       </t-b>
     </div>
-    <div class="right clear">
-      <photosizer-block src="pictures/ManagedObjects.png" width="500" class="photoSizerBlock" style="margin-top:0;">
-        <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;"
-        >
-            Figure 2. Managed Types
-        </span>
-      </photosizer-block>
-      <photosizer-block src="pictures/ClassesAndObjects.png" width="500" class="photoSizerBlock" style="margin-top:0;">
-        <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;"
-        >
-            Figure 3. Native Classes and Objects
-        </span>
-      </photosizer-block>
-      <photosizer-block src="pictures/CS_ClassesAndObjects.png" width="500" class="photoSizerBlock" style="margin-top:0;">
-        <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;"
-        >
-            Figure 4. Managed Classes and Objects
-        </span>
-      </photosizer-block>
+    <div style="height:1rem;"></div>
+    <h3>C# Types:</h3>
+    <div class="indent">
+      <t-b>
+        <div class="right clear">
+          <photosizer-block src="pictures/ManagedObjects.png" width="400" class="photoSizerBlock" style="margin-top:0;">
+            <span style="
+              display: inline-block;
+              font-weight: bold;
+              font-family: 'Comic Sans MS, Tahoma';
+              background-color: #ddd;
+              width: 100%;
+              padding: 5px 0px;"
+            >
+                Figure 5. Managed Types
+            </span>
+          </photosizer-block>
+        </div>
+      </t-b>
+      <t-b>
+        C# programs compile to IL (byte code) and run in a virtual machine (CLR) hosted by the processes 
+        created for them.  At load time the CLR compiles IL to native code by function or assembly.  The
+        compiled code is cached and not compiled again.
+      </t-b>
+      <t-b>
+        C# types have two categories:
+        <ul class="tight" style="margin-left:-0.0rem;">
+          <li>
+            Value Types:
+            <div class="indent pad5">
+              primitive scalar types, struct and enum<br />
+              All reside in the stack
+            </div>
+          </li>
+          <li>
+            Reference Types:
+            <div class="indent pad5">
+              class, interface, array, and delegate<br />
+              All reside on the managed heap
+            </div>
+          </li>
+        </ul>
+        All value types reside in the stack; all reference types reside in the managed heap.
+      </t-b>
+      <t-b>
+        Java types are nearly isomorphic to C# types, e.g., they have the same behaviors.
+      </t-b>
+      <h4>Copy Types</h4>
+      <t-b>
+        All of the value types are Copy types with the exception of structs that have aggregated members, i.e.
+        contain references to instances on the managed heap.
+      </t-b>
+      <t-b>
+        Structs have the layout shown in Figure 4.  Struct members are composed if, and only if, they are
+        value types. All other members are aggregated.  If no member is aggreggated then the struct is Copy.
+      </t-b>
+      <h4>Move Types</h4>
+      <t-b>
+        C# has no Move types.
+      </t-b>
+      <h4>Reference Types</h4>
+      <t-b>
+        All C# reference types have the same behavior as the Reference Type, described above.
+        All classes are reference types and their instances reside in the managed heap.
+      </t-b>
+      <h4>Type Aliases</h4>
+      <t-b>
+        An alias is simply another name for a given type.  C# provides:
+        <ul class="tight" style="margin-left:0rem;">
+          <li>
+            <span class="lightgray codesnip">
+              using Records = List&lt;Tuple&lt;int, string, int&gt;&gt;
+            </span>
+          </li>
+        </ul>
+      </t-b>
+      <h4>Strong Types</h4>
+      <t-b>
+        TBD
+      </t-b>
+    </div>
+    <!--<div class="indent">
+      <t-b>
+        <div style="height:1rem; clear:both"></div>
+        <photosizer-block src="pictures/ClassesAndObjects.png" width="500" class="photoSizerBlock" style="margin-top:0;">
+          <span style="
+            display: inline-block;
+            font-weight: bold;
+            font-family: 'Comic Sans MS, Tahoma';
+            background-color: #ddd;
+            width: 100%;
+            padding: 5px 0px;"
+          >
+              Figure 3. Native Classes and Objects
+          </span>
+        </photosizer-block>
+        <photosizer-block src="pictures/CS_ClassesAndObjects.png" width="500" class="photoSizerBlock" style="margin-top:0;">
+          <span style="
+            display: inline-block;
+            font-weight: bold;
+            font-family: 'Comic Sans MS, Tahoma';
+            background-color: #ddd;
+            width: 100%;
+            padding: 5px 0px;"
+          >
+              Figure 4. Managed Classes and Objects
+          </span>
+        </photosizer-block>
+      </t-b>
     </div>
     <div class="indent">
     <h4>C# and Java Value Types</h4>
@@ -336,6 +518,6 @@
         <li>Type aliases</li>
         <li>Strong types</li>
       </ul>
-    </t-b>
+    </t-b>-->
   </body>
 </html>
