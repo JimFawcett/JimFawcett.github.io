@@ -80,16 +80,16 @@
       So, there are three parts to this discussion:
       <ul>
         <li>
-          Part 1. Defines abstract type behaviors as Copy, Move, and Reference.
+          Part 1. Defines abstract type behaviors Copy, Move, and Reference.
         </li>
         <li>
-          Part 2. compares native and managed code environments from a type perspective.
+          Part 2. Compares native and managed code environments from a type perspective.
         </li>
         <li>
           Part 3. Shows how C++, Rust, and C# implement the abstract type behaviors in their own type systems.
           <div style="height:0.75rem;"></div>
           A description for Java would use almost the same text as used for C#, as C# started out with a fork
-          of the Java JVM and some language syntax changes.
+          of the Java JVM, the same type structure with some language syntax changes.
         </li>
       </ul>
     </t-b>
@@ -276,15 +276,22 @@
         Native programs compile to platform instructions running in the process created for their executable.
       </t-b>
       <t-b>
+        C++ and Rust both compile to native code.
+      </t-b>
+      <t-b>
         Native data types are:
         <ul class="tight" style="margin-left:0rem;">
           <li>
-            types with contiguous memory footprints:<br />
-            primitive types, native arrays, and structs without pointer or reference members
+            types with contiguous memory footprints:
+            <div class="indent">
+              primitive types, native arrays, and structs without pointer or reference members
+            </div>
           </li>
           <li>
-            types with non-contiguous memory footprints:<br />
-            library and user-defined types.
+            types with non-contiguous memory footprints:
+            <div class="indent">
+              library and user-defined types.
+            </div>
           </li>
           <li>
             pointers and references to either of the above
@@ -327,6 +334,9 @@
         Managed programs compile to byte code and run in a virtual machine (VM) hosted by the process created for them.
         At load time the VM compiles byte code to native code by function or assembly. The compiled code is cached and
         not compiled again.
+      </t-b>
+      <t-b>
+        C# and Java are managed languages - there are many others based on the Java VM.
       </t-b>
       <t-b>
         Managed code has three kinds of data types: value types, managed reference types, and managed handles:
@@ -387,7 +397,7 @@
       <h4>Copy Types</h4>
       <t-b>
         In the C++ programming language all primitives and any user defined type that has valid copy constructor
-        and valid copy assignment are value types.
+        and valid copy assignment are Copy types.
       </t-b>
       <t-b>
         The copy operations and destructor are compiler generated if all the user type data members have correct 
@@ -395,13 +405,13 @@
       </t-b>
       <h4>Move Types</h4>
       <t-b>
-        C++ user types that define move constructor and move assignment and do not define copy constructor and copy assignment,
-        and disallow compiler generation of them,
-        are Move types.  If copy construcor and copy assignment are also defined the type will act like copy or move type
-        depending on the context or use with a move modifier.
+        C++ user types that define move constructor and move assignment behave like Move types when the source
+        is a temporary or is preceded with a move declarator.  
+        If copy constructor and copy assignment are correctly defined the type will act like a Copy or Move type
+        depending on the context.
       </t-b>
       <t-b>
-        Unlike Rust, the C++ compiler does not disallow use of the invalid source after it is moved, resulting
+        Unlike Rust, the C++ compiler does not disallow use of the invalid source after it is moved, which may result
         in undefined behavior.
       </t-b>
       <h4>Reference Types</h4>
@@ -414,12 +424,17 @@
         <div class="indent pad10 codesnip">
           auto r = std::shared_ptr&lt;T&gt;(new T(args));
         </div>
-        These pointer types are reference counted, so the lifetime of the instance ends when the last shared pointer
-        goes out of scope.
+        The shared_ptr is reference counted, so lifetime of the instance ends when the last shared pointer
+        instance goes out of scope.
       </t-b>
       <t-b>
-        One could create a type with reference behavior by carefully crafting copy operations and destructor, but
-        requires care to avoid memory leaks or double delete exceptions.  Not recommended.
+        <details>
+          <summary class="darkItem">User defined reference types</summary>
+          <t-b>
+            One could create a type with reference behavior by carefully crafting copy operations and destructor, but
+            requires care to avoid memory leaks or double delete exceptions.  Not recommended.
+          </t-b>
+        </details>
       </t-b>
       <h4>Type Aliases</h4>
       <t-b>
@@ -448,11 +463,10 @@
         in Rust as classes do in C++, C#, and Java.
       </t-b>
       <t-b>
-        The Rust
-        compiler disallows use of instances that have been moved.  
-        It also disallows mutation of an instance
+        The Rust compiler disallows mutation of an instance
         through a mutable reference whenever another reference to the same instance is active unless 
-        the other reference is not used after mutation. 
+        the other reference is not used after mutation. This is a sufficient condition for safety, e.g.,
+        prevents undefined behavior.
       </t-b>
       <h4>Copy Types</h4>
       <t-b>
@@ -462,6 +476,9 @@
       <h4>Move Types</h4>
       <t-b>
         Rust user defined structs that do not implement the Copy trait are Move types.
+      </t-b>
+      <t-b>
+        The Rust compiler disallows use of instances that have been moved.  
       </t-b>
       <h4>Reference Types</h4>
       <t-b>
@@ -483,7 +500,7 @@
       <details>
         <summary class="darkItem">User defined reference types</summary>
         <t-b>
-          A user defined reference type could be constructed with a struct using unsafe implementation blocks or
+          A user defined reference type could be constructed with a struct using unsafe implementation blocks and
           lifetime annotations; but users of that type will find it hard to craft compilable syntax.
         </t-b>
       </details>
@@ -550,7 +567,7 @@
       </t-b>
       <h4>Reference Types</h4>
       <t-b>
-        All C# reference types have the same behavior as the Reference Type, described above.
+        All C# reference types have the same behavior as the Reference Type, described in Part 1.
         All classes are reference types and their instances reside in the managed heap.
       </t-b>
       <h4>Type Aliases</h4>
