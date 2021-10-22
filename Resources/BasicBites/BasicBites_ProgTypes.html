@@ -74,24 +74,27 @@
       In the following sections we define type categories: <strong>Copy</strong>, <strong>Move</strong>, 
       and <strong>Reference</strong> that have distinct
       operations for setting the value of one instance based on the value held by another instance.  Common
-      languages like C++, Rust, C#, and Java, implement these operations in different ways and may use other
-      names for them.
+      languages like C++, Rust, C#, and Java, implement these operations in different ways, discussed below.
     </t-b>
     <t-b>
-      So, there are two parts to this discussion:
+      So, there are three parts to this discussion:
       <ul>
         <li>
-          Part 1. Define abstract type behaviors as Copy, Move, and Reference.
+          Part 1. Defines abstract type behaviors as Copy, Move, and Reference.
         </li>
         <li>
-          Part 2. Show how C++, Rust, and C# implement these abstract behaviors in their own type systems.
+          Part 2. compares native and managed code environments from a type perspective.
+        </li>
+        <li>
+          Part 3. Shows how C++, Rust, and C# implement the abstract type behaviors in their own type systems.
           <div style="height:0.75rem;"></div>
-          A description for Java would use almost the same text as used for C#, as C# started out as a fork
-          of the Java JVM with some language syntax changes.
+          A description for Java would use almost the same text as used for C#, as C# started out with a fork
+          of the Java JVM and some language syntax changes.
         </li>
       </ul>
     </t-b>
-    <h3>Copy Types:</h3>
+    <h3>Part 1. - Abstract Type Behaviors</h3>
+    <h4>Copy Types:</h4>
     <div class="indent">
       <t-b>
         Copy types are modeled after primitive language types like integers and floats.  When instances are
@@ -130,7 +133,7 @@
         </span>
       </photosizer-block>
     </div>
-    <h3>Move Types:</h3>
+    <h4>Move Types:</h4>
     <div class="indent">
       <t-b>
         Move types efficiently transfer ownership of instance resources from the original named instance to another.  
@@ -194,7 +197,7 @@
       </photosizer-block>
     </div>
     <div style="height:0rem; clear:both"></div>
-    <h3>Reference Types:</h3>
+    <h4>Reference Types:</h4>
     <div class="indent">
       <t-b>
         Reference types are handle-body pairs.  The handle resides in a local scope and body in the program&apos;s
@@ -248,7 +251,7 @@
       </t-b>
     </div>
     <div style="height:1rem; clear:both;"></div>
-    <h3>C++ Types</h3>
+    <h3>Part 2. - Comparing Native and Managed Code</h3>
     <div class="indent">
       <t-b>
         <div style="float:right">
@@ -266,13 +269,120 @@
           </photosizer-block>
         </div>
       </t-b>
+    </div>
+    <h4>Native Types</h4>
+    <div class="indent">
       <t-b>
-        C++ programs compile to native code and run directly in the processes created for them. 
+        Native programs compile to platform instructions running in the process created for their executable.
       </t-b>
       <t-b>
-        Composed members
-        of a native type&apos;s instance reside within the memory footprint of the instance.  Aggregated members reside
-        in the heap and only a pointer to the heap instance resides in the native instance.
+        Native data types are:
+        <ul class="tight" style="margin-left:0rem;">
+          <li>
+            types with contiguous memory footprints:<br />
+            primitive types, native arrays, and structs without pointer or reference members
+          </li>
+          <li>
+            types with non-contiguous memory footprints:<br />
+            library and user-defined types.
+          </li>
+          <li>
+            pointers and references to either of the above
+          </li>
+        </ul>
+      </t-b>
+      <t-b>
+        These types reside in the stack frame where they are declared.  Each type may compose instances of 
+        other native types and aggregations of native instances on the native heap, as shown in Figure 1.
+      </t-b>
+      <t-b>
+        Compositions of native types place the composed instances within the memory footprint of the composing
+        instance.  Aggregations place handles to the aggregated instance in the memory footprint of the
+        aggregator and places the instances themselves in the native heap.
+      </t-b>
+      <t-b>
+        Native types provide code that returns owned resources to the platform when they go out of scope.
+        this is an efficient deterministic destruction process.
+      </t-b>
+      <t-b>
+        <div class="right clear">
+          <photosizer-block src="pictures/ManagedObjects.png" width="400" class="photoSizerBlock" style="margin-top:0;">
+            <span style="
+              display: inline-block;
+              font-weight: bold;
+              font-family: 'Comic Sans MS, Tahoma';
+              background-color: #ddd;
+              width: 100%;
+              padding: 5px 0px;"
+            >
+                Figure 5. Managed Types
+            </span>
+          </photosizer-block>
+        </div>
+      </t-b>
+    </div>
+    <h4>Managed Types</h4>
+    <div class="indent">
+      <t-b>
+        Managed programs compile to byte code and run in a virtual machine (VM) hosted by the process created for them.
+        At load time the VM compiles byte code to native code by function or assembly. The compiled code is cached and
+        not compiled again.
+      </t-b>
+      <t-b>
+        Managed code has three kinds of data types: value types, managed reference types, and managed handles:
+        <ul class="tight" style="margin-left:0rem;">
+          <li>
+            Value types
+            <div class="indent">
+              primitives, native arrays, and structs<br />
+              implement Copy type behavior described in Part 1
+            </div>
+          </li>
+          <li>
+            Managed reference types
+            <div class="indent">
+              all user-defined types<br />
+              implement Reference type behavior of Part 1.
+            </div>
+          </li>
+          <li>
+            Managed handles (references)
+            <div class="indent">
+              support access and resource management
+            </div>
+          </li>
+        </ul>
+      </t-b>
+      <t-b>
+        All managed reference types reside in the managed heap.  They may compose instances of value types
+        that reside in the composers memory footprint.  They may also aggregate instances of reference types.
+        That results in a composed handle to an aggregated instance in the managed heap.
+      </t-b>
+      <t-b>
+        The resources of managed reference types are not managed by the instance; instead are managed by a
+        garbage collector that is part of the heaps management process.  When a managed reference instance
+        goes out of scope its resources are queued for disposal by the garbage collector.  That is a 
+        non-determinstic process that requires processing to track active references.
+      </t-b>
+    </div>
+    <h4>Consequences:</h4>
+    <div class="indent">
+      <t-b>
+        Native code handles resource management in an elegant efficient way, often referred to as &quot;Resource
+        Acquisition Is Initialization (RAII).  Use of native pointers and references open opportunities for 
+        undefined behavior.  The Rust language has an interesting way to avoid this deficit, see below.
+      </t-b>
+      <t-b>
+        Managed code requires placement of all user-defined types on the managed heap, accessed through handles.
+        This avoids problems with undefined behavior at the expense of processing required to manage instances
+        and latencies associated with compiling byte code to native code at run time.
+      </t-b>
+    </div>
+    <h3>Part 3. - Language Specific Details</h3>
+    <h4>C++ Types</h4>
+    <div class="indent">
+      <t-b>
+        C++ programs compile to native code. 
       </t-b>
       <h4>Copy Types</h4>
       <t-b>
@@ -328,7 +438,7 @@
         </ul>
       </t-b>
     </div>
-    <h3>Rust Types</h3>
+    <h4>Rust Types</h4>
     <div class="indent">
       <t-b>
         Rust programs compile to native code and run directly in the processes created for them.  
@@ -395,24 +505,8 @@
       </t-b>
     </div>
     <div style="height:1rem;"></div>
-    <h3>C# Types:</h3>
+    <h4>C# Types:</h4>
     <div class="indent">
-      <t-b>
-        <div class="right clear">
-          <photosizer-block src="pictures/ManagedObjects.png" width="400" class="photoSizerBlock" style="margin-top:0;">
-            <span style="
-              display: inline-block;
-              font-weight: bold;
-              font-family: 'Comic Sans MS, Tahoma';
-              background-color: #ddd;
-              width: 100%;
-              padding: 5px 0px;"
-            >
-                Figure 5. Managed Types
-            </span>
-          </photosizer-block>
-        </div>
-      </t-b>
       <t-b>
         C# programs compile to IL (byte code) and run in a virtual machine (CLR) hosted by the processes 
         created for them.  At load time the CLR compiles IL to native code by function or assembly.  The
