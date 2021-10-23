@@ -115,6 +115,12 @@
               <td class="codesnip lightgray">t2 = t3;</td>
               <td class="textsnip">t2 and t3 occupy disjoint blocks of memory with the same value</td>
             </tr>
+            <tr>
+              <td class="textsnip">Pass by value:</td>
+              <td class="codesnip">fn&nbsp;f(t:T)&nbsp;{&nbsp;...&nbsp;}</td>
+              <td class="codesnip lightgray">f(t2)</td>
+              <td class="textsnip">t2 copied onto f&apos;s stackframe</td>
+            </tr>
           </table>
         </div>
       </t-b>
@@ -154,6 +160,12 @@
               <td class="codesnip">T&nbsp;t3&nbsp;=&nbsp;new&nbsp;T(2,&nbsp;"abc");</td>
               <td class="codesnip lightgray">t2&nbsp;=&nbsp;t3;</td>
               <td class="textsnip">t3&apos;s resources given to t2, t3 now invalid</td>
+            </tr>
+            <tr>
+              <td class="textsnip">Pass by value:</td>
+              <td class="codesnip">fn f(t:T) { ... }</td>
+              <td class="codesnip lightgray">f(t2)</td>
+              <td class="textsnip">t2 moved into f, t2 now invalid</td>
             </tr>
           </table>
         </div>
@@ -218,6 +230,12 @@
               <td class="codesnip lightgray">h2&nbsp;=&nbsp;h3;</td>
               <td class="textsnip">Both h2 and h3 point to the same body</td>
             </tr>
+            <tr>
+              <td class="textsnip">Pass by value:</td>
+              <td class="codesnip">fn f(h:T) { ... }</td>
+              <td class="codesnip lightgray">f(h3)</td>
+              <td class="textsnip">Handle h3 copied to f&apos;s stackframe; copy points to h3&apos;s body</td>
+            </tr>
           </table>
         </div>
         <div>
@@ -243,7 +261,7 @@
       </t-b>
       <t-b>
         Reference counting is fast and deterministic, but reference cycles will cause
-        memory leads unless some form of mark and remove is used.  
+        memory leaks unless some form of mark and remove is used.  
       </t-b>
       <t-b>
         Garbage collection is non-deterministic
@@ -290,7 +308,7 @@
           <li>
             types with non-contiguous memory footprints:
             <div class="indent">
-              library and user-defined types.
+              most library and user-defined types, like String.
             </div>
           </li>
           <li>
@@ -364,15 +382,15 @@
         </ul>
       </t-b>
       <t-b>
-        All managed reference types reside in the managed heap.  They may compose instances of value types
-        that reside in the composers memory footprint.  They may also aggregate instances of reference types.
-        That results in a composed handle to an aggregated instance in the managed heap.
+        All managed reference types reside in the managed heap.  They may compose instances of value types.
+        Those reside in the composer&apos;s memory footprint.  They may also aggregate instances of reference types.
+        That results in the instance holding a composed handle to an aggregated instance in the managed heap.
       </t-b>
       <t-b>
         The resources of managed reference types are not managed by the instance; instead are managed by a
-        garbage collector that is part of the heaps management process.  When a managed reference instance
+        garbage collector that is part of the heap&apos;s management process.  When a managed reference instance
         goes out of scope its resources are queued for disposal by the garbage collector.  That is a 
-        non-determinstic process that requires processing to track active references.
+        non-determinstic, tiered process that requires platform processing to track active references.
       </t-b>
     </div>
     <h4>Consequences:</h4>
@@ -475,7 +493,7 @@
       </t-b>
       <t-b>
         The Rust compiler disallows mutation of an instance
-        through a mutable reference whenever another reference to the same instance is active unless 
+        through a mutable reference whenever another reference to the same instance is active, unless 
         the other reference is not used after mutation. This is a sufficient condition for safety, e.g.,
         prevents undefined behavior.
       </t-b>
@@ -535,7 +553,7 @@
       <t-b>
         Rust has essentially all of the advantages of the C++ language.  In addition the compiler applies 
         safety rules that
-        eliminate undefined behavior.  
+        eliminate undefined behavior, at the expense of longer compile times.  
       </t-b>
       <t-b>
         Rust has applied some smart ideas for its type system to achieve that.
@@ -547,12 +565,13 @@
         The compiler&apos;s safety rules are sufficient, but not necessary - to have both is not feasible. So,
         for example, new
         strategies are required to implement components that are linked, like lists and graphs.  Essentially,
-        we can use Vector indexing instead of references to extablish linked relationships.  Experience
+        we can use Vector indexing instead of references to establish linked relationships.  Experience
         indicates that anything that can be implemented in C++ can also be implemented in Rust without
         resorting to unsafe blocks.
       </t-b>
       <t-b>
-        It is more difficult to compile successfully in Rust, compared to C++, but once programs compile
+        It is more difficult to compile successfully in Rust, compared to C++, due to its safety checking. 
+        But once programs compile
         they are very likely to work, needing only fixes to program design logic.  There are no more
         long sessions looking for the source of pointer bugs.  In fairness, C++ now has many library types
         like smart pointers that help write bug free code.
