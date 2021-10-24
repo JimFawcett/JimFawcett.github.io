@@ -21,6 +21,15 @@
         font-size: 1.0rem;
         vertical-align: middle;
       }
+      #github .codebg {
+        padding: 5px 10px;
+        background-color: lightgray;
+      }
+      #github .inlinecodebg {
+        padding: 2px 5px;
+        background-color: lightgray;
+        vertical-align:baseline;
+      }
       #github .textsnip {
         font-size: 1.0rem;
         vertical-align: middle;
@@ -212,20 +221,20 @@
     <h4>Reference Types:</h4>
     <div class="indent">
       <t-b>
-        Reference types are handle-body pairs.  The handle resides in a local scope and body in the program&apos;s
+        Reference types are handle&#8209;body pairs.  The handle resides in a local scope and body in the program&apos;s
         heap.
         Program code manipulates the handle to effect changes to
         the body&apos;s value.
         <div class="indent pad10">
           <table>
             <tr>
-              <td class="textsnip">Handle-body&nbsp;construction:</td>
+              <td class="textsnip">Handle&#8209;body&nbsp;construction:</td>
               <td class="codesnip">T&nbsp;h1&nbsp;=&nbsp;new&nbsp;T(1,&nbsp;"xyz")</td>
               <td class="codesnip lightgray">T&nbsp;h2&nbsp;=&nbsp;h1;</td>
               <td class="textsnip">h1&apos;s resources - the body - are now attached to both h1 and h2</td>
             </tr>
             <tr>
-              <td class="textsnip">Handle-body&nbsp;assignment:</td>
+              <td class="textsnip">Handle&#8209;body&nbsp;assignment:</td>
               <td class="codesnip">T&nbsp;h3&nbsp;=&nbsp;new&nbsp;T(2,&nbsp;"abc");</td>
               <td class="codesnip lightgray">h2&nbsp;=&nbsp;h3;</td>
               <td class="textsnip">Both h2 and h3 point to the same body</td>
@@ -430,16 +439,31 @@
       </t-b>
       <h4>Reference Types</h4>
       <t-b>
-        C++ provides the primitives raw pointer, <span class="lightgray codesnip">T* ptr = *t;</span> and reference
+        C++ does not directly support Reference types, but it has the primitives:
+        <div class="indent pad10">raw pointer, 
+        <span class="lightgray codesnip">T* ptr = *t;</span> and reference
         <span class="lightgray codesnip">T& ref = &amp;t;</span>
+        </div>
+        The C++ reference is not a Reference type, as described in Part 1., but rather a type qualifier that 
+        creates a fixed
+        binding to its target with a pointer, but uses object syntax to manipulate the target.
       </t-b>
       <t-b>
-        User types can take on reference behavior by using std::unique_ptr&lt;T&gt; or std::shared_ptr&lt;T&gt;
-        <div class="indent pad10 codesnip">
-          auto r = std::shared_ptr&lt;T&gt;(new T(args));
+        The C++ std library provides std::unique_ptr&lt;T&gt;:
+        <div class="indent pad10">
+          <span class="codesnip codebg">auto r = std::unique_ptr&lt;T&gt;(new T(args));</span>
         </div>
-        The shared_ptr is reference counted, so lifetime of the instance ends when the last shared pointer
-        instance goes out of scope.
+        It provides a method <span class="codesnip inlinecodebg">move</span> that transfers ownership of
+        the target to another <span class="codesnip">std::unique_ptr</span>.
+      </t-b>
+      <t-b>
+        The std library also provides std::shared_ptr&lt;T&gt;, a reference counted smart pointer
+        that is reference counted, so lifetime of the instance ends when the last shared pointer
+        instance goes out of scope.  Another shared_ptr is added to the share through assignment:
+        <div class="indent pad10">
+          <span class="codesnip inlinecodebg">auto shareT1 = std::shared_ptr&lt;new(t)&gt;;</span><br />
+          <span class="codesnip inlinecodebg">auto shareT2 = shareT1;</span>
+        </div>
       </t-b>
       <t-b>
         <details>
@@ -507,13 +531,19 @@
       </t-b>
       <h4>Reference Types</h4>
       <t-b>
-        Rust provides the primitives unsafe raw pointer, <span class="lightgray codesnip">let ptr:T* = *t;</span> and reference
-        <span class="lightgray codesnip">let ref:&T = &t;</span>
+        Rust does not provide Reference types but does support pointing to other instances.
+        It provides the primitives unsafe raw pointer, <span class="lightgray codesnip">let ptr:T* = *t;</span> and reference
+        <span class="lightgray codesnip">let ref:&T = &t;</span>.  
       </t-b>
       <t-b>
-        The standard smart reference-counted pointers Rc&lt;T&gt; and Arc&lt;T&gt; 
-        and smart heap pointer <span class="lightgray codesnip">Box&lt;T&gt;</span> are the only stdlib reference 
-        types in Rust.
+        As with C++, the Rust reference is not a Reference type, as defined in Part 1.  Instead a Rust reference 
+        declaration forms a fixed binding to a target instance.  Its use is syntactically similar to the C++
+        reference, but has much less freedom.  Its use is analyzed by the compiler to prevent undefined behavior
+        due to dangling references.  If analysis results cannot ensure safety, the build fails.
+      </t-b>
+      <t-b>
+        Standard smart reference-counted pointers Rc&lt;T&gt; and Arc&lt;T&gt; 
+        and smart heap pointer Box&lt;T&gt; provide means to point to and manipulate instances stored in the heap.
       </t-b>
       <t-b>
         When any of them are initialized from an instance in the stack, the instance is copied to the heap.
@@ -569,7 +599,7 @@
         It is more difficult to compile successfully in Rust, compared to C++, due to its safety checking. 
         But once programs compile
         they are very likely to work, needing only fixes to program design logic.  There are no more
-        long sessions looking for the source of pointer bugs.  In fairness, C++ now has many library types
+        long sessions looking for the sources of pointer bugs.  In fairness, C++ now has many library types
         like smart pointers that help write bug free code.
       </t-b>
     </div>
