@@ -15,6 +15,21 @@
     <script src="js/BasicBiteScripts.js"></script>
     <script src="js/BiteTables.js"></script>
     <script src="js/ScriptsKeyboard.js"></script>
+    <style>
+      #github table {
+        border-collapse:collapse;
+        border-spacing:0px;
+      }
+      #github td {
+        padding:2px 5px;
+      }
+      #github .border {
+        border:1px solid black;
+      }
+      #github .padcode {
+        padding:5px 10px;
+      }
+    </style>
   </head>
   <body id="github" onload="initBites()">
     <div class="top-banner">
@@ -56,27 +71,140 @@
     </t-b>
     <t-b>
       <ul>
-        <li>Free Functions (C++ syntax)
-          <t-b style="margin-top:0px;">
-            <div class="indent">
+        <li>
+          Free Functions:
+          <t-b>
+            Free functions are found in native code, e.g., C, C++, and Rust, but not in managed code, e.g., 
+            C# and Java. Arguments are passed by value or reference.
+          </t-b>
+          <t-b>
+            When passed by value, Copy types are copied onto the function&apos;s stack frame while Move types are
+            moved into the stack frame.
+            <div class="indent pad10">
               <table>
                 <tr>
-                  <td class="codesnip codebg">auto f(T t) -> T {...}</td>
-                  <td>/* pass by value */</td>
+                  <td><span class="codesnip codebg">auto f(T t) -> T {...}</span></td><td></td>
+                  <td>/* C++ */</td>
                 </tr>
                 <tr>
-                  <td class="codesnip codebg">auto f(T&amp; t) -> T {...}</td>
+                  <td><span class="codesnip codebg">fn f(t:T) -> T {...}</span></td><td></td>
+                  <td>/* Rust */</td>
+                </tr>
+              </table>
+            </div>
+            Pass by value has no side-effects.  Should f mutate its copy the caller won&apos;t
+            see the change.
+          </t-b>
+          <t-b style="margin-top:0px;">
+            Arguments can also be passed by reference using either language references or pointers. 
+            <div class="indent pad10">
+              <table>
+                <tr>
+                  <td class="codesnip codebg">auto f(T&amp; t) -> T {...}</td><td></td>
                   <td>/* pass by C++ reference */</td>
                 </tr>
                 <tr>
-                  <td class="codesnip codebg">auto f(T* t) -> T {...}</td>
-                  <td>/* pass by reference using pointer */</td>
+                  <td class="codesnip codebg">fn f(t:&mut T) -> T {...}</td><td></td>
+                  <td>/* pass by Rust reference */</td>
+                </tr>
+                <tr>
+                  <td class="codesnip codebg">auto f(T* t) -> T {...}</td><td></td>
+                  <td>/* pass by C++ pointer */</td>
+                </tr>
+                <tr>
+                  <td class="codesnip codebg">fn f(t:*mut t) -> T {...}</td><td></td>
+                  <td>/* pass by unsafe Rust pointer */</td>
+                </tr>
+              </table>
+            </div>
+            Since a reference to the caller&apos;s instance is copied to the stackframe, the caller will
+            see a mutation of its instance effected by f.
+          </t-b>
+          <t-b>
+            If the function is required to change the passed object, not just its value, the only way
+            the caller will see that is if the function passes a reference by reference.  for native
+            code that function uses the signature shown below:
+            <div class="indent pad10">
+              <table>
+                <tr>
+                  <td class="codesnip codebg">auto f(T** t) -> T {...}</td><td></td>
+                  <td>/* pass by C++ pointer to pointer */</td>
+                </tr>
+                <tr>
+                  <td class="codesnip codebg">fn f(t:T**) -> T {...}</td><td></td>
+                  <td>/* pass by unsafe Rust pointer to pointer */</td>
+                </tr>
+              </table>
+            </div>
+            Note that you cannot use C++ or Rust references because their bindings are fixed once initialized, 
+            so the object can&apos;t be changed.
+          </t-b>
+        </li>
+        <li>
+          Methods:
+          <t-b>
+            Methods are functions that are bound to a type, like struct or class.  They are found in both
+            native and managed code, e.g., C++, Rust, and C#.
+          </t-b>
+          <t-b>
+            The code, immediately below, illustrates only pass by value, but pass by reference works with
+            essentially the same syntax.
+            <div class="indent pad10">
+              <table>
+                <tr>
+                  <td class="codesnip codebg padcode border">
+                    class X {<br />
+                      &nbsp;&nbsp;auto f(T t);<br />
+                      &nbsp;&nbsp;...<br />
+                    };<br />
+                  </td><td>&nbsp;&nbsp;</td>
+                  <td class="codesnip codebg padcode border" style="vertical-align:top;">X::f(T t) {...}</td>
+                  <td>&nbsp;&nbsp;</td><td>/* C++ method */</td>
+                </tr>
+                <tr>
+                  <td><div sytle="height:0.25rem;">&nbsp;</div></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td class="codesnip codebg padcode border">
+                    struct X {<br />
+                      &nbsp;&nbsp;...<br />
+                    };<br />
+                  </td><td>&nbsp;&nbsp;</td>
+                  <td class="codesnip codebg padcode border">
+                    impl X {<br />
+                    &nbsp;&nbsp;pub f(t:T) {...}<br />
+                    }
+                  </td>  
+                  <td>&nbsp;&nbsp;</td><td>/* Rust method */</td>
+                </tr>
+                <tr>
+                  <td><div>&nbsp;</div></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td class="codesnip codebg padcode border">
+                    class X {<br />
+                      &nbsp;&nbsp;f(T t) {...}<br />
+                      &nbsp;&nbsp;...<br />
+                    };<br />
+                  </td><td>&nbsp;&nbsp;</td>
+                  <td>&nbsp;&nbsp;</td><td>&nbsp;&nbsp;</td><td>/* C# method */</td>
+                </tr>
+                <tr>
+                  <td><div sytle="height:0.25rem;">&nbsp;</div></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
                 </tr>
               </table>
             </div>
           </t-b>
         </li>
-        <li>Methods</li>
         <li>Lambdas</li>
       </ul>
     </t-b>
