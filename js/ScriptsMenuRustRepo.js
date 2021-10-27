@@ -94,7 +94,10 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Stories &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Ordered&nbsp;Content</div>\
         <a href='Stories.html'>What is a Story?</a>\
+        <a href='BasicBiteByByte.html'>Basics Story</a>\
+        <a href='DesignBites.html'>Design Story</a>\
         <a href='CppStory_Prologue.html'>C++ Story</a>\
         <a href='RustStory.html'>Rust Story</a>\
         <a href='RustBiteByByte.html'>Rust&nbsp;bite&nbsp;by&nbsp;byte&nbsp;</a>\
@@ -106,7 +109,6 @@ function initializeMenu() {
         <a href='StoryTeller_LocalStorage.html'>StoryTeller&nbsp;depricated</a>\
         <a href='StoryTellerDesign.html'>StoryTeller Design</a>\
         <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div >\
     </div>\

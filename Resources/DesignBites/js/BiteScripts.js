@@ -48,7 +48,8 @@ initBites = function () {
 
 storyMenu.bitesMenu = function () {
   var bitesMenu = document.getElementById("chaps");
-  bitesMenu.innerHTML = '<a href="DesignBites_Intro.html">Introduction</a><br />\
+  bitesMenu.innerHTML = '<a href="Design.html">Design</a><br />\
+    <a href="DesignBites_Intro.html">Introduction</a><br />\
     <a href="DesignBites_Structure.html">Structure</a><br />\
     <a href="DesignBites_StructureBasic.html">Basic</a><br />\
     <a href="DesignBites_StructureFactored.html">Factored</a><br />\
