@@ -14,8 +14,19 @@ function initializeMenu() {
 
   var topMenu = document.getElementsByTagName("nav");
   topMenu[0].innerHTML = "<div class='navbar'>\
-    <a href='index.html' class='menuItem'>Home</a>\
+    <a href='index.html' class='menuItem'>&nbsp;&nbsp;Home</a>\
     <a href='SiteMap.html' class='menuItem'>SiteMap</a>\
+    <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Tracks &#9662;</button>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Language&nbsp;Tracks&nbsp;&nbsp;</div>\
+        <a href='indexBasic.html'>Basics&nbsp;&nbsp;</a>\
+        <a href='indexCpp.html'>C++&nbsp;Track&nbsp;&nbsp;</a>\
+        <a href='indexRust.html'>Rust&nbsp;Track&nbsp;&nbsp;</a>\
+        <a href='indexCs.html'>C#&nbsp;Track&nbsp;&nbsp;</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:smallest;'>&nbsp;</div>\
+      </div>\
+    </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Repos &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
@@ -28,37 +39,28 @@ function initializeMenu() {
         <div style='padding:0px 10px; margin:0px; font-size:smallest;'>&nbsp;</div>\
       </div>\
     </div>\
-    <a href='Videos.html' class='menuItem'>Videos</a>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Blogs &#9662;</button>\
+      <button class='dropbutton'>Stories &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;Opinions&nbsp;and&nbsp;Ideas&nbsp;</div>\
-        <a href='Blog.html'>First&nbsp;Things</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
-        <a href='BlogDesign.html'>SW&nbsp;Design</a>\
-        <a href='BlogPrinciples.html'>Design&nbsp;Principles</a>\
-        <a href='BlogOOD.html'>OO&nbsp;Design</a>\
-        <a href='BlogObjectModels.html'>Object&nbsp;Models</a>\
-        <a href='BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data&nbsp;&nbsp;</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Engineering&nbsp;SW&nbsp;---</div>\
-        <a href='BlogOCD.html'>Concept&nbsp;Document</a>\
-        <a href='BlogTesting.html'>SW&nbsp;Testing</a>\
-        <a href='SummerReading.html'>Summer&nbsp;Reading</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Software&nbsp;Sys&nbsp;------</div>\
-        <a href='BlogStructure.html'>SW&nbsp;Structure</a>\
-        <a href='BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a>\
-        <a href='BlogActiveObjects.html'>Active&nbsp;Objects</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Reusable&nbsp;Pkgs&nbsp;----</div>\
-        <a href='BlogNoSql.html'>noSQL&nbsp;Database</a>\
-        <a href='BlogParser.html'>Parsing</a>\
-        <a href='BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a>\
-        <a href='BlogMTree.html'>M-ary&nbsp;Trees</a>\
-        <a href='BlogGraph.html'>Directed&nbsp;Graphs</a>\
-        <a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a>\
+        <div class='darkItem maxWidth'>&nbsp;Ordered&nbsp;Content</div>\
+        <a href='Stories.html'>What is a Story?</a>\
+        <a href='BasicBiteByByte.html'>Basics Story</a>\
+        <a href='DesignBites.html'>Design Story</a>\
+        <a href='CppStoryRepo.html'>C++ Story</a>\
+        <a href='RustStoryRepo.html'>Rust Story</a>\
+        <a href='RustBiteByByte.html'>Rust&nbsp;bite&nbsp;by&nbsp;byte&nbsp;</a>\
+        <a href='BuildOn.html'>BuildOn:&nbsp;learn&nbsp;Rust&nbsp;&nbsp;</a>\
+        <a href='IdiomsAndPatterns.html'>Idioms&nbsp;&amp;&nbsp;Patterns&nbsp;</a>\
+        <a href='IndexPage.html'>Rust Glossary</a>\
+        <a href='InfDataLib_1.html'>Inf Data Lib - A.Zaitsev</a>\
+        <a href='MLiPS_1.html'>MLiPS - M.Corley</a>\
+        <a href='StoryTeller_LocalStorage.html'>StoryTeller&nbsp;depricated</a>\
+        <a href='StoryTellerDesign.html'>StoryTeller Design</a>\
+        <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
-      </div>\
+      </div >\
     </div>\
-    <div class='dropdown menuItem'>\
+     <div class='dropdown menuItem'>\
       <button id=res class='dropbutton'>Res &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
@@ -94,6 +96,36 @@ function initializeMenu() {
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
+   <a href='Videos.html' class='menuItem'>Videos</a>\
+    <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Blogs &#9662;</button>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Opinions&nbsp;and&nbsp;Ideas&nbsp;</div>\
+        <a href='Blog.html'>First&nbsp;Things</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
+        <a href='BlogDesign.html'>SW&nbsp;Design</a>\
+        <a href='BlogPrinciples.html'>Design&nbsp;Principles</a>\
+        <a href='BlogOOD.html'>OO&nbsp;Design</a>\
+        <a href='BlogObjectModels.html'>Object&nbsp;Models</a>\
+        <a href='BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data&nbsp;&nbsp;</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Engineering&nbsp;SW&nbsp;---</div>\
+        <a href='BlogOCD.html'>Concept&nbsp;Document</a>\
+        <a href='BlogTesting.html'>SW&nbsp;Testing</a>\
+        <a href='SummerReading.html'>Summer&nbsp;Reading</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Software&nbsp;Sys&nbsp;------</div>\
+        <a href='BlogStructure.html'>SW&nbsp;Structure</a>\
+        <a href='BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a>\
+        <a href='BlogActiveObjects.html'>Active&nbsp;Objects</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Reusable&nbsp;Pkgs&nbsp;----</div>\
+        <a href='BlogNoSql.html'>noSQL&nbsp;Database</a>\
+        <a href='BlogParser.html'>Parsing</a>\
+        <a href='BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a>\
+        <a href='BlogMTree.html'>M-ary&nbsp;Trees</a>\
+        <a href='BlogGraph.html'>Directed&nbsp;Graphs</a>\
+        <a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
+      </div>\
+    </div>\
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Nbrhds &#9662;</button>\
       <div class='dropdown-content noScrollX'>\
@@ -109,27 +141,6 @@ function initializeMenu() {
         <a href='https://openframeworks.cc/'>openFrameworks&nbsp;(C++ graphics)</a>\
         <a href='https://github.com/microsoft'>github.com/Microsoft</a>\
         <a href='https://www.taniarascia.com/'>taniarascia.com (JavaScript, CSS)</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
-      </div >\
-    </div>\
-    <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Stories &#9662;</button>\
-      <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;Ordered&nbsp;Content</div>\
-        <a href='Stories.html'>What is a Story?</a>\
-        <a href='BasicBiteByByte.html'>Basics Story</a>\
-        <a href='DesignBites.html'>Design Story</a>\
-        <a href='CppStoryRepo.html'>C++ Story</a>\
-        <a href='RustStoryRepo.html'>Rust Story</a>\
-        <a href='RustBiteByByte.html'>Rust&nbsp;bite&nbsp;by&nbsp;byte&nbsp;</a>\
-        <a href='BuildOn.html'>BuildOn:&nbsp;learn&nbsp;Rust&nbsp;&nbsp;</a>\
-        <a href='IdiomsAndPatterns.html'>Idioms&nbsp;&amp;&nbsp;Patterns&nbsp;</a>\
-        <a href='IndexPage.html'>Rust Glossary</a>\
-        <a href='InfDataLib_1.html'>Inf Data Lib - A.Zaitsev</a>\
-        <a href='MLiPS_1.html'>MLiPS - M.Corley</a>\
-        <a href='StoryTeller_LocalStorage.html'>StoryTeller&nbsp;depricated</a>\
-        <a href='StoryTellerDesign.html'>StoryTeller Design</a>\
-        <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div >\
     </div>\
