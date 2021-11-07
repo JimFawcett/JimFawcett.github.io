@@ -17,7 +17,7 @@ function initializeMenu() {
     <a href='index.html' class='menuItem'>&nbsp;&nbsp;Home</a>\
     <a href='SiteMap.html' class='menuItem'>SiteMap</a>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Tracks &#9662;</button>\
+      <button class='dropbutton'>Tracks&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Language&nbsp;Tracks&nbsp;&nbsp;</div>\
         <a href='indexBasic.html'>Basics&nbsp;&nbsp;</a>\
@@ -28,7 +28,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Repos &#9662;</button>\
+      <button class='dropbutton'>Repos&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Code&nbsp;Repositories&nbsp;&nbsp;</div>\
         <a href='CppRepositories.html'>C++&nbsp;Repositories&nbsp;&nbsp;</a>\
@@ -40,7 +40,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Stories &#9662;</button>\
+      <button class='dropbutton'>Stories&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Ordered&nbsp;Content</div>\
         <a href='Stories.html'>What is a Story?</a>\
@@ -61,7 +61,7 @@ function initializeMenu() {
       </div >\
     </div>\
      <div class='dropdown menuItem'>\
-      <button id=res class='dropbutton'>Res &#9662;</button>\
+      <button id=res class='dropbutton'>Res&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
         <a href='Videos.html' class='menuItem'>Videos</a>\
@@ -98,7 +98,7 @@ function initializeMenu() {
     </div>\
    <a href='Videos.html' class='menuItem'>Videos</a>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Blogs &#9662;</button>\
+      <button class='dropbutton'>Blogs&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Opinions&nbsp;and&nbsp;Ideas&nbsp;</div>\
         <a href='Blog.html'>First&nbsp;Things</a>\
@@ -127,7 +127,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Nbrhds &#9662;</button>\
+      <button class='dropbutton'>Nbrhds&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Site&nbsp;Neighborhoods&nbsp;-&nbsp;related&nbsp;content&nbsp;&nbsp;</div>\
         <a href='https://JimFawcett.github.io'>JimFawcett-github</a>\
@@ -145,7 +145,7 @@ function initializeMenu() {
       </div >\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>About &#9662;</button>\
+      <button class='dropbutton'>About&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;About&nbsp;this&nbsp;Site</div>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
