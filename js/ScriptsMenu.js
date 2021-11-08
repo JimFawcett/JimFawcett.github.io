@@ -22,8 +22,11 @@ function initializeMenu() {
         <div class='darkItem maxWidth'>&nbsp;Language&nbsp;Tracks&nbsp;&nbsp;</div>\
         <a href='indexBasic.html'>Basics&nbsp;&nbsp;</a>\
         <a href='indexCpp.html'>C++&nbsp;Track&nbsp;&nbsp;</a>\
+        <a href='https://www.w3schools.com/cpp/trycpp.asp?filename=demo_compiler' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a>\
         <a href='indexRust.html'>Rust&nbsp;Track&nbsp;&nbsp;</a>\
+        <a href='https://play.rust-lang.org/' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a>\
         <a href='indexCs.html'>C#&nbsp;Track&nbsp;&nbsp;</a>\
+        <a href='https://dotnetfiddle.net/' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:smallest;'>&nbsp;</div>\
       </div>\
     </div>\
