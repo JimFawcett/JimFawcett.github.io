@@ -14,9 +14,9 @@ function initializeMenu() {
 
   var topMenu = document.getElementsByTagName("nav");
   topMenu[0].innerHTML = "<div class='navbar'>\
-    <a href='index.html' class='menuItem'>Home</a>\
+    <a href='index.html' class='menuItem'>&nbsp;&nbsp;Home</a>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Repos &#9662;</button>\
+      <button class='dropbutton'>Repos&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Code&nbsp;Repositories&nbsp;&nbsp;</div>\
         <a href='CppRepositories.html'>C++&nbsp;Repositories&nbsp;&nbsp;</a>\
@@ -28,35 +28,35 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Utils &#9662;</button>\
+      <button class='dropbutton'>Utils&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Utilities</div>\
         <div class='maxWidth'>&nbsp;None yet&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Tools &#9662;</button>\
+      <button class='dropbutton'>Tools&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Tools</div>\
         <div class='maxWidth'>&nbsp;None yet&nbsp;</div>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Cmps &#9662;</button>\
+      <button class='dropbutton'>Cmps&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Components</div>\
         <a href='WebComponents.html'>WebComponents</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Libs &#9662;</button>\
+      <button class='dropbutton'>Libs&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Libraries</div>\
         <a href='WebLibraries.html'>WebLibraries</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Prjs &#9662;</button>\
+      <button class='dropbutton'>Prjs&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Projects</div>\
         <a href='SitePages.html'>SitePages</a>\
@@ -64,16 +64,16 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Dems &#9662;</button>\
+      <button class='dropbutton'>Dems&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Demonstrations</div>\
         <a href='WebComponentTests.html'>WebComponentTests</a>\
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Stories &#9662;</button>\
+      <button class='dropbutton'>Stories&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;Ordered&nbsp;Content</div>\
+        <div class='darkItem maxWidth'>&nbsp;Stories&nbsp;&amp;&nbsp;Bites</div>\
         <a href='Stories.html'>What is a Story?</a>\
         <a href='BasicBiteByByte.html'>Basics Story</a>\
         <a href='DesignBites.html'>Design Story</a>\
@@ -92,7 +92,7 @@ function initializeMenu() {
       </div >\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>About &#9662;</button>\
+      <button class='dropbutton'>About&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;About&nbsp;this&nbsp;Site</div>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\

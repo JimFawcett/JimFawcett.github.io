@@ -42,7 +42,7 @@ function initializeMenu() {
     <div class='dropdown menuItem'>\
       <button class='dropbutton'>Stories&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;Ordered&nbsp;Content</div>\
+        <div class='darkItem maxWidth'>&nbsp;Stories&nbsp;&amp;&nbsp;Bites&nbsp;</div>\
         <a href='Stories.html'>What is a Story?</a>\
         <a href='BasicBiteByByte.html'>Basics Story</a>\
         <a href='DesignBites.html'>Design Story</a>\
