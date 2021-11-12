@@ -19,8 +19,14 @@ function initializeMenu() {
   
     var topMenu = document.getElementsByTagName("nav");
     topMenu[0].innerHTML = "<div class='navbar'>\
-    <div class='menuItem'><a href='index.html'>Home</a></div>\
-    <div class='menuItem'><a href='SiteMap.html'>SiteMap</a></div>\
+    <div class='menuItem'>\
+        Home&#9662\
+        <div class='dropdown'>\
+            <div class='ddItem'><a href='index.html'>Home</a></div>\
+            <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
+            <div style='height:1em;'></div>\
+        </div>\
+    </div>\
     <div class='menuItem'>\
         Tracks&#9662\
         <div class='dropdown'>\
