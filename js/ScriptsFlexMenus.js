@@ -72,37 +72,85 @@ function initializeMenu() {
           <div class='ddLabel darkItem'>Code Resources</div>\
           <div class='ddItem'><a href='Videos.html' class='menuItem'>Videos</a></div>\
           <div class='ddItem'><a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a></div>\
-          <div class='ddItem'><a href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a></div>\
-          <div class='ddItem'><a href='Design.html'>Design Process</a></div>\
-          <div class='ddItem'><a href='ProjectsList.html'>Project suggestions</a></div>\
-          <div class='ddItem'><a href='https://github.com/JimFawcett/RustPlaygroundExamples'>RustPlaygroundExamples</a></div>\
-          <div class='ddItem'><a href='IndexPage.html'>Rust Glossary</a></div>\
-          <div class='ddItem'><a href='LangCpp.html'>C++ Language Resources</a></div>\
-          <div class='ddItem'><a href='https://en.cppreference.com/w/'>CppReference.com</a></div>\
-          <div class='ddItem'><a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a></div>\
-          <div class='ddItem'><a href='CppReferences.html'>C++ References</a></div>\
-          <div class='ddItem'><a href='CppExamples.html'>C++ Example Code</a></div>\
-          <div class='ddItem'><a href='CppSynopsis.html'>C++ Synopsis</a></div>\
-          <div class='ddItem'><a href='DesignNote-Cpp11.html'>C++11 Survey</a></div>\
-          <div class='ddItem'><a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a></div>\
-          <div class='ddItem'><a href='https://dev.to/chrisachard/intro-to-regex-for-web-developers-2fj4'>RegExp&nbsp;for&nbsp;JavaScript</a></div>\
-          <div class='ddItem'><a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a></div>\
-          <div class='ddItem'><a href='TechnicalLinks.html'>Technical Links</a></div>\
-          <div class='ddItem'><a href='WebNotes.html'>Web Notes</a></div>\
-          <div class='ddItem'><a href='WebComponentTests.html'>UI Widget Tests</a></div>\
-          <div class='ddItem'><a href='https://encycolorpedia.com/named'>Web Colors</a></div>\
-          <div class='ddItem'><a href='UML.html'>UML Diagrams</a></div>\
           <div class='ddItem'><a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a></div>\
+          <div class='ddItem'><a href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a></div>\
+          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+            <summary>Design</summary>\
+            <div style='margin-left:0.5em;'>\
+                <div class='ddItem ddDetails'><a href='Design.html'>Design Process</a></div>\
+                <div class='ddItem ddDetails'><a href='UML.html'>UML Diagrams</a></div>\
+                <div class='ddItem ddDetails'><a href='ProjectsList.html'>Project suggestions</a></div>\
+                <div style='height:0.25em;'></div>\
+            </div>\
+          </details>\
+          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+            <summary>C++</summary>\
+            <div style='margin-left:0.5em;'>\
+              <div class='ddItem ddDetails'><a href='LangCpp.html'>C++ Language Resources</a></div>\
+              <div class='ddItem ddDetails'><a href='LangCpp.html'>C++ Language Resources</a></div>\
+              <div class='ddItem ddDetails'><a href='https://en.cppreference.com/w/'>CppReference.com</a></div>\
+              <div class='ddItem ddDetails'><a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a></div>\
+              <div class='ddItem ddDetails'><a href='CppReferences.html'>C++ References</a></div>\
+              <div class='ddItem ddDetails'><a href='CppExamples.html'>C++ Example Code</a></div>\
+              <div class='ddItem ddDetails'><a href='CppSynopsis.html'>C++ Synopsis</a></div>\
+              <div class='ddItem ddDetails'><a href='DesignNote-Cpp11.html'>C++11 Survey</a></div>\
+              <div style='height:0.25em;'></div>\
+            </div>\
+          </details>\
+          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+            <summary>Rust</summary>\
+            <div style='margin-left:0.5em;'>\
+              <div class='ddItem ddDetails'><a href='https://github.com/JimFawcett/RustPlaygroundExamples'>RustPlaygroundExamples</a></div>\
+              <div class='ddItem ddDetails'><a href='IndexPage.html'>Rust Glossary</a></div>\
+              <div style='height:0.25em;'></div>\
+            </div>\
+          </details>\
+          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+            <summary>Regular Expressions</summary>\
+            <div style='margin-left:0.5em;'>\
+                <div class='ddItem ddDetails'><a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a></div>\
+                <div class='ddItem ddDetails'><a href='https://dev.to/chrisachard/intro-to-regex-for-web-developers-2fj4'>RegExp&nbsp;for&nbsp;JavaScript</a></div>\
+                <div class='ddItem ddDetails'><a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a></div>\
+                <div style='height:0.25em;'></div>\
+            </div>\
+          </details>\
+          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+            <summary>WebDev</summary>\
+            <div style='margin-left:0.5em;'>\
+              <div class='ddItem ddDetails'><a href='WebNotes.html'>Web Notes</a></div>\
+              <div class='ddItem ddDetails'><a href='WebComponentTests.html'>UI Widget Tests</a></div>\
+              <div class='ddItem ddDetails'><a href='https://encycolorpedia.com/named'>Web Colors</a></div>\
+              <div class='ddItem ddDetails'><a href='TestGrid.html'>TestGrid - Sized</a></div>\
+              <div class='ddItem ddDetails'><a href='TestGrid2.html'>TestGrid - AbsPos</a></div>\
+              <div class='ddItem ddDetails'><a href='TestFlexMenu.html'>TestFlexMenu</a></div>\
+              <div style='height:0.25em;'></div>\
+            </div>\
+          </details>\
+          <div class='ddItem'><a href='TechnicalLinks.html'>Technical Links</a></div>\
           <div class='ddItem'><a href='https://github.com/joshnh/Git-Commands'>git commands</a></div>\
           <div class='ddItem'><a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a></div>\
+          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+            <summary>Neighborhoods</summary>\
+            <div style='margin-left:0.5em;'>\
+              <div class='ddItem ddDetails'><a href='https://JimFawcett.github.io'>JimFawcett-github</a></div>\
+              <div class='ddItem ddDetails'><a href='https://ecs.syr.edu/faculty/fawcett'>JimFawcett-SyracuseUniv</a></div>\
+              <div class='ddItem ddDetails'><a href='https://mwcorley79.github.io/MikeCorley/'>Mike Corley</a></div>\
+              <div class='ddItem ddDetails'><a href='https://github.com/CommProjectComparisons'>CommProjectComparisons-github</a></div>\
+              <div class='ddItem ddDetails'><a href='https://csiac.org'>CSIAC</a></div>\
+              <div class='ddItem ddDetails'><a href='https://www.fluentcpp.com'>Fluent {C++}</a></div>\
+              <div class='ddItem ddDetails'><a href='https://www.boost.org/'>Boost&nbsp;Library&nbsp;(C++)</a></div>\
+              <div class='ddItem ddDetails'><a href='https://www.pocoproject.org/'>poco&nbsp;Library&nbsp;(C++ networking)</a></div>\
+              <div class='ddItem ddDetails'><a href='https://openframeworks.cc/'>openFrameworks&nbsp;(C++ graphics)</a></div>\
+              <div class='ddItem ddDetails'><a href='https://github.com/microsoft'>github.com/Microsoft</a></div>\
+              <div class='ddItem ddDetails'><a href='https://www.taniarascia.com/'>taniarascia.com (JavaScript, CSS)</a></div>\
+              <div style='height:0.25em;'></div>\
+            </div>\
+          </details>\
           <div class='ddItem'><a href='SummerReading.html'>Summer Reading</a></div>\
           <div class='ddItem'><a href='Interviews.html'>Job Interviews</a></div>\
-          <div class='ddItem'><a href='TestGrid.html'>TestGrid - Sized</a></div>\
-          <div class='ddItem'><a href='TestGrid2.html'>TestGrid - AbsPos</a></div>\
-          <div style='height:1em;'></div>\
+          <div style='height:2em;'></div>\
       </div>\
     </div>\
-    <div class='menuItem'><a href='Videos.html'>Videos</a></div>\
     <div class='menuItem'>\
       Blogs&#9662\
       <div class='dropdown'>\
@@ -129,24 +177,6 @@ function initializeMenu() {
           <div class='ddItem'><a href='BlogMTree.html'>M-ary&nbsp;Trees</a></div>\
           <div class='ddItem'><a href='BlogGraph.html'>Directed&nbsp;Graphs</a></div>\
           <div class='ddItem'><a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a></div>\
-          <div style='height:1em;'></div>\
-      </div>\
-    </div>\
-    <div class='menuItem'>\
-      Nbrhds&#9662\
-      <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Site&nbsp;Neighborhoods</div>\
-          <div class='ddItem'><a href='https://JimFawcett.github.io'>JimFawcett-github</a></div>\
-          <div class='ddItem'><a href='https://ecs.syr.edu/faculty/fawcett'>JimFawcett-SyracuseUniv</a></div>\
-          <div class='ddItem'><a href='https://mwcorley79.github.io/MikeCorley/'>Mike Corley</a></div>\
-          <div class='ddItem'><a href='https://github.com/CommProjectComparisons'>CommProjectComparisons-github</a></div>\
-          <div class='ddItem'><a href='https://csiac.org'>CSIAC</a></div>\
-          <div class='ddItem'><a href='https://www.fluentcpp.com'>Fluent {C++}</a></div>\
-          <div class='ddItem'><a href='https://www.boost.org/'>Boost&nbsp;Library&nbsp;(C++)</a></div>\
-          <div class='ddItem'><a href='https://www.pocoproject.org/'>poco&nbsp;Library&nbsp;(C++ networking)</a></div>\
-          <div class='ddItem'><a href='https://openframeworks.cc/'>openFrameworks&nbsp;(C++ graphics)</a></div>\
-          <div class='ddItem'><a href='https://github.com/microsoft'>github.com/Microsoft</a></div>\
-          <div class='ddItem'><a href='https://www.taniarascia.com/'>taniarascia.com (JavaScript, CSS)</a></div>\
           <div style='height:1em;'></div>\
       </div>\
     </div>\

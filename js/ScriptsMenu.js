@@ -87,6 +87,7 @@ function initializeMenu() {
         <a href='TechnicalLinks.html'>Technical Links</a>\
         <a href='WebNotes.html'>Web Notes</a>\
         <a href='WebComponentTests.html'>UI Widget Tests</a>\
+        <a href='TestFlexMenu.html'>Flex Menu Tests</a>\
         <a href='https://encycolorpedia.com/named'>Web Colors</a>\
         <a href='UML.html'>UML Diagrams</a>\
         <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
