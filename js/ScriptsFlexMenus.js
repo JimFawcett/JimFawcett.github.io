@@ -130,6 +130,7 @@ function initializeMenu() {
               <div class='ddItem ddDetails'><a href='TestGrid.html'>TestGrid - Sized</a></div>\
               <div class='ddItem ddDetails'><a href='TestGrid2.html'>TestGrid - AbsPos</a></div>\
               <div class='ddItem ddDetails'><a href='TestFlexMenu.html'>TestFlexMenu</a></div>\
+              <div class='ddItem ddDetails'><a href='../Test/FlexMenus/TestFlexMenu.html'>TestFlexMenu - Basic</a></div>\
               <div style='height:0.25em;'></div>\
             </div>\
           </details>\
