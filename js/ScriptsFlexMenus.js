@@ -22,6 +22,7 @@ function initializeMenu() {
     <div class='menuItem'>\
         Home&#9662\
         <div class='dropdown'>\
+            <div style='height:0.25em;'></div>\
             <div class='ddItem'><a href='index.html'>Home</a></div>\
             <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
             <div style='height:1em;'></div>\
@@ -73,7 +74,7 @@ function initializeMenu() {
         </div>\
     </div>\
     <div class='menuItem'>\
-      Res&#9662\
+      Resources&#9662\
       <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Resources</div>\
           <div class='ddItem'><a href='Videos.html' class='menuItem'>Videos</a></div>\
