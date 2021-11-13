@@ -41,10 +41,10 @@ function initializeMenu() {
               <div class='ddItem ddDetails'><a class='border' href='RsRepositories.html'>L2&nbsp;Repository&nbsp;webpage</a></div>\
               <div class='ddItem ddDetails'><a class='border' href='RustBiteByByte.html'>L3&nbsp;Rust&nbsp;Bites</a></div>\
               <div class='ddItem ddDetails'><a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a></div>\
-              <div style='height:2em;'></div>\
+              <div style='height:1em;'></div>\
             </div>\
           </details>\
-          <div style='height:1em;'></div>\
+          <div style='height:2em;'></div>\
         </div>\
     </div>\
     <div class='menuItem'>\
@@ -55,7 +55,7 @@ function initializeMenu() {
             <div class='ddItem'><a href='indexCpp.html'>C++ Track</a></div>\
             <div class='ddItem'><a href='indexRust.html'>Rust Track</a></div>\
             <div class='ddItem'><a href='indexCs.html'>C# Track</a></div>\
-            <div style='height:1em;'></div>\
+            <div style='height:2em;'></div>\
         </div>\
     </div>\
     <div class='menuItem'>\
@@ -67,7 +67,7 @@ function initializeMenu() {
             <div class='ddItem'><a href='CsRepositories.html'>C#</a></div>\
             <div class='ddItem'><a href='JsRepositories.html'>JavaScript</a></div>\
             <div class='ddItem'><a href='OtherRepositories.html'>Other</a></div>\
-            <div style='height:1em;'></div>\
+            <div style='height:2em;'></div>\
         </div>\
     </div>\
     <div class='menuItem'>\
@@ -88,8 +88,7 @@ function initializeMenu() {
             <div class='ddItem'><a href='StoryTeller_LocalStorage.html'>StoryTeller&nbsp;depricated</a></div>\
             <div class='ddItem'><a href='StoryTellerDesign.html'>StoryTeller Design</a></div>\
             <div class='ddItem'><a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a></div>\
-            <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
-            <div style='height:1em;'></div>\
+            <div style='height:2em;'></div>\
         </div>\
     </div>\
     <div class='menuItem'>\
@@ -204,7 +203,7 @@ function initializeMenu() {
           <div class='ddItem'><a href='BlogMTree.html'>M-ary&nbsp;Trees</a></div>\
           <div class='ddItem'><a href='BlogGraph.html'>Directed&nbsp;Graphs</a></div>\
           <div class='ddItem'><a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a></div>\
-          <div style='height:1em;'></div>\
+          <div style='height:2em;'></div>\
       </div>\
     </div>\
     <div class='menuItem'><a id='prevLink' href='#'>Prev</a></div>\
