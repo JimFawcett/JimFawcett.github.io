@@ -182,27 +182,47 @@ function initializeMenu() {
       <div class='dropdown'>\
           <div class='ddLabel darkItem'>Opinions&nbsp;&amp;&nbsp;Ideas</div>\
           <div class='ddItem'><a href='Blog.html'>First&nbsp;Things</a></div>\
-          <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Design&nbsp;--------------&nbsp;</div>\
-          <div class='ddItem'><a href='BlogDesign.html'>SW&nbsp;Design</a></div>\
-          <div class='ddItem'><a href='BlogPrinciples.html'>Design&nbsp;Principles</a></div>\
-          <div class='ddItem'><a href='BlogOOD.html'>OO&nbsp;Design</a></div>\
-          <div class='ddItem'><a href='BlogObjectModels.html'>Object&nbsp;Models</a></div>\
-          <div class='ddItem'><a href='BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data&nbsp;&nbsp;</a></div>\
-          <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Engineering&nbsp;SW&nbsp;---</div>\
-          <div class='ddItem'><a href='BlogOCD.html'>Concept&nbsp;Document</a></div>\
-          <div class='ddItem'><a href='BlogTesting.html'>SW&nbsp;Testing</a></div>\
+          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+            <summary>Design</summary>\
+            <div style='margin-left:0.5em;'>\
+              <div class='ddItem ddDetails'><a href='BlogDesign.html'>SW&nbsp;Design</a></div>\
+              <div class='ddItem ddDetails'><a href='BlogPrinciples.html'>Design&nbsp;Principles</a></div>\
+              <div class='ddItem ddDetails'><a href='BlogOOD.html'>OO&nbsp;Design</a></div>\
+              <div class='ddItem ddDetails'><a href='BlogObjectModels.html'>Object&nbsp;Models</a></div>\
+              <div class='ddItem ddDetails'><a href='BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data&nbsp;&nbsp;</a></div>\
+              <div style='height:0.25em;'></div>\
+            </div>\
+          </details>\
+          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+            <summary>Engineering SW</summary>\
+            <div style='margin-left:0.5em;'>\
+              <div class='ddItem ddDetails'><a href='BlogOCD.html'>Concept&nbsp;Document</a></div>\
+              <div class='ddItem ddDetails'><a href='BlogTesting.html'>SW&nbsp;Testing</a></div>\
+              <div style='height:0.25em;'></div>\
+            </div>\
+          </details>\
+          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+            <summary>Software Systems</summary>\
+            <div style='margin-left:0.5em;'>\
+              <div class='ddItem ddDetails'><a href='BlogStructure.html'>SW&nbsp;Structure</a></div>\
+              <div class='ddItem ddDetails'><a href='BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a></div>\
+              <div class='ddItem ddDetails'><a href='BlogActiveObjects.html'>Active&nbsp;Objects</a></div>\
+              <div style='height:0.25em;'></div>\
+            </div>\
+          </details>\
+          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+            <summary>Reusable Pkgs</summary>\
+            <div style='margin-left:0.5em;'>\
+              <div class='ddItem ddDetails'><a href='BlogNoSql.html'>noSQL&nbsp;Database</a></div>\
+              <div class='ddItem ddDetails'><a href='BlogParser.html'>Parsing</a></div>\
+              <div class='ddItem ddDetails'><a href='BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a></div>\
+              <div class='ddItem ddDetails'><a href='BlogMTree.html'>M-ary&nbsp;Trees</a></div>\
+              <div class='ddItem ddDetails'><a href='BlogGraph.html'>Directed&nbsp;Graphs</a></div>\
+              <div class='ddItem ddDetails'><a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a></div>\
+              <div style='height:0.25em;'></div>\
+            </div>\
+          </details>\
           <div class='ddItem'><a href='SummerReading.html'>Summer&nbsp;Reading</a></div>\
-          <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Software&nbsp;Sys&nbsp;------</div>\
-          <div class='ddItem'><a href='BlogStructure.html'>SW&nbsp;Structure</a></div>\
-          <div class='ddItem'><a href='BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a></div>\
-          <div class='ddItem'><a href='BlogActiveObjects.html'>Active&nbsp;Objects</a></div>\
-          <div style='padding:0px 10px; margin:0px; font-size:small;'>--&nbsp;Reusable&nbsp;Pkgs&nbsp;----</div>\
-          <div class='ddItem'><a href='BlogNoSql.html'>noSQL&nbsp;Database</a></div>\
-          <div class='ddItem'><a href='BlogParser.html'>Parsing</a></div>\
-          <div class='ddItem'><a href='BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a></div>\
-          <div class='ddItem'><a href='BlogMTree.html'>M-ary&nbsp;Trees</a></div>\
-          <div class='ddItem'><a href='BlogGraph.html'>Directed&nbsp;Graphs</a></div>\
-          <div class='ddItem'><a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a></div>\
           <div style='height:2em;'></div>\
       </div>\
     </div>\
