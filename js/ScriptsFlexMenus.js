@@ -25,6 +25,25 @@ function initializeMenu() {
             <div style='height:0.25em;'></div>\
             <div class='ddItem'><a href='index.html'>Home</a></div>\
             <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
+            <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+              <summary>About&nbsp;&nbsp;&nbsp;</summary>\
+              <div style='margin-left:0.5em;'>\
+              <div class='ddItem ddDetails'><a href='JimFawcett.html'>Jim Fawcett</a></div>\
+              <div class='ddItem ddDetails'><a href='Interesting.html'>Interesting&nbsp;things&nbsp;&nbsp;</a></div>\
+              <div class='ddItem ddDetails'><a href='Friends.html'>Friends&nbsp;&amp&nbsp;Collaborators&nbsp;&nbsp;</a></div>\
+              <div class='ddItem ddDetails'><a href='Help.html'>Help</a></div>\
+              <div class='ddItem ddDetails'><a href='SitePlans.html'>Site Plans</a></div>\
+              <div class='ddItem ddDetails'><a href='#' onclick='togglenavKeys()'>Toggle Nav Keys</a></div>\
+              <div class='ddItem ddDetails'><a href='#' onclick='toggleSwipeEvents()'>Toggle Swipe Events</a></div>\
+              <div class='ddItem ddDetails'><a href='SiteDesign.html'>Site Design</a></div>\
+              <div class='ddItem ddDetails'><a href='BookDesignCourse.html'>Design Course</a></div>\
+              <div class='ddItem ddDetails'><a class='border' href='index.html'>L1 Site Home</a></div>\
+              <div class='ddItem ddDetails'><a class='border' href='RsRepositories.html'>L2&nbsp;Repository&nbsp;webpage</a></div>\
+              <div class='ddItem ddDetails'><a class='border' href='RustBiteByByte.html'>L3&nbsp;Rust&nbsp;Bites</a></div>\
+              <div class='ddItem ddDetails'><a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a></div>\
+              <div style='height:0.25em;'></div>\
+            </div>\
+          </details>\
             <div style='height:1em;'></div>\
         </div>\
     </div>\
@@ -74,7 +93,7 @@ function initializeMenu() {
         </div>\
     </div>\
     <div class='menuItem'>\
-      Resources&#9662\
+      Resrcs&#9662\
       <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Resources</div>\
           <div class='ddItem'><a href='Videos.html' class='menuItem'>Videos</a></div>\
@@ -186,26 +205,6 @@ function initializeMenu() {
           <div class='ddItem'><a href='BlogGraph.html'>Directed&nbsp;Graphs</a></div>\
           <div class='ddItem'><a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a></div>\
           <div style='height:1em;'></div>\
-      </div>\
-    </div>\
-    <div class='menuItem'>\
-      About&#9662\
-      <div class='dropdown'>\
-          <div class='ddLabel darkItem'>About&nbsp;the&nbsp;Site</div>\
-          <div class='ddItem'><a href='JimFawcett.html'>Jim Fawcett</a></div>\
-          <div class='ddItem'><a href='Interesting.html'>Interesting&nbsp;things&nbsp;&nbsp;</a></div>\
-          <div class='ddItem'><a href='Friends.html'>Friends&nbsp;&amp&nbsp;Collaborators&nbsp;&nbsp;</a></div>\
-          <div class='ddItem'><a href='Help.html'>Help</a></div>\
-          <div class='ddItem'><a href='SitePlans.html'>Site Plans</a></div>\
-          <div class='ddItem'><a href='#' onclick='togglenavKeys()'>Toggle Nav Keys</a></div>\
-          <div class='ddItem'><a href='#' onclick='toggleSwipeEvents()'>Toggle Swipe Events</a></div>\
-          <div class='ddItem'><a href='SiteDesign.html'>Site Design</a></div>\
-          <div class='ddItem'><a href='BookDesignCourse.html'>Design Course</a></div>\
-          <div class='ddItem'><a class='border' href='index.html'>L1 Site Home</a></div>\
-          <div class='ddItem'><a class='border' href='RsRepositories.html'>L2&nbsp;Repository&nbsp;webpage</a></div>\
-          <div class='ddItem'><a class='border' href='RustBiteByByte.html'>L3&nbsp;Rust&nbsp;Bites</a></div>\
-          <div class='ddItem'><a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a></div>\
-        <div style='height:1em;'></div>\
       </div>\
     </div>\
     <div class='menuItem'><a id='prevLink' href='#'>Prev</a></div>\
