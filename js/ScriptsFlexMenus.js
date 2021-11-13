@@ -190,7 +190,7 @@ function initializeMenu() {
               <div class='ddItem ddDetails'><a href='BlogOOD.html'>OO&nbsp;Design</a></div>\
               <div class='ddItem ddDetails'><a href='BlogObjectModels.html'>Object&nbsp;Models</a></div>\
               <div class='ddItem ddDetails'><a href='BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data&nbsp;&nbsp;</a></div>\
-              <div style='height:0.25em;'></div>\
+              <div style='height:0.5em;'></div>\
             </div>\
           </details>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
@@ -198,7 +198,7 @@ function initializeMenu() {
             <div style='margin-left:0.5em;'>\
               <div class='ddItem ddDetails'><a href='BlogOCD.html'>Concept&nbsp;Document</a></div>\
               <div class='ddItem ddDetails'><a href='BlogTesting.html'>SW&nbsp;Testing</a></div>\
-              <div style='height:0.25em;'></div>\
+              <div style='height:0.5em;'></div>\
             </div>\
           </details>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
@@ -207,7 +207,7 @@ function initializeMenu() {
               <div class='ddItem ddDetails'><a href='BlogStructure.html'>SW&nbsp;Structure</a></div>\
               <div class='ddItem ddDetails'><a href='BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a></div>\
               <div class='ddItem ddDetails'><a href='BlogActiveObjects.html'>Active&nbsp;Objects</a></div>\
-              <div style='height:0.25em;'></div>\
+              <div style='height:0.5em;'></div>\
             </div>\
           </details>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
@@ -219,7 +219,7 @@ function initializeMenu() {
               <div class='ddItem ddDetails'><a href='BlogMTree.html'>M-ary&nbsp;Trees</a></div>\
               <div class='ddItem ddDetails'><a href='BlogGraph.html'>Directed&nbsp;Graphs</a></div>\
               <div class='ddItem ddDetails'><a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a></div>\
-              <div style='height:0.25em;'></div>\
+              <div style='height:0.5em;'></div>\
             </div>\
           </details>\
           <div class='ddItem'><a href='SummerReading.html'>Summer&nbsp;Reading</a></div>\
