@@ -202,7 +202,7 @@ function initializeMenu() {
             </div>\
           </details>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-            <summary>Software Systems</summary>\
+            <summary>Software Systems&nbsp;&nbsp;</summary>\
             <div style='margin-left:0.5em;'>\
               <div class='ddItem ddDetails'><a href='BlogStructure.html'>SW&nbsp;Structure</a></div>\
               <div class='ddItem ddDetails'><a href='BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a></div>\
