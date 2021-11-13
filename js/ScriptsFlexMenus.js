@@ -41,10 +41,10 @@ function initializeMenu() {
               <div class='ddItem ddDetails'><a class='border' href='RsRepositories.html'>L2&nbsp;Repository&nbsp;webpage</a></div>\
               <div class='ddItem ddDetails'><a class='border' href='RustBiteByByte.html'>L3&nbsp;Rust&nbsp;Bites</a></div>\
               <div class='ddItem ddDetails'><a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a></div>\
-              <div style='height:0.25em;'></div>\
+              <div style='height:2em;'></div>\
             </div>\
           </details>\
-            <div style='height:1em;'></div>\
+          <div style='height:1em;'></div>\
         </div>\
     </div>\
     <div class='menuItem'>\
