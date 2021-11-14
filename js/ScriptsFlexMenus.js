@@ -27,10 +27,10 @@ function initializeMenu() {
             <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
               <summary>About&nbsp;&nbsp;&nbsp;</summary>\
-              <div style='margin-left:0.5em;'>\
+              <div style='margin-left:1.0em;'>\
               <div class='ddItem ddDetails'><a href='JimFawcett.html'>Jim Fawcett</a></div>\
               <div class='ddItem ddDetails'><a href='Interesting.html'>Interesting&nbsp;things&nbsp;&nbsp;</a></div>\
-              <div class='ddItem ddDetails'><a href='Friends.html'>Friends&nbsp;&amp&nbsp;Collaborators&nbsp;&nbsp;</a></div>\
+              <div class='ddItem ddDetails'><a href='Friends.html'>Friends&nbsp;&amp;&nbsp;Collaborators</a></div>\
               <div class='ddItem ddDetails'><a href='Help.html'>Help</a></div>\
               <div class='ddItem ddDetails'><a href='SitePlans.html'>Site Plans</a></div>\
               <div class='ddItem ddDetails'><a href='#' onclick='togglenavKeys()'>Toggle Nav Keys</a></div>\
@@ -101,7 +101,7 @@ function initializeMenu() {
           <div class='ddItem'><a href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a></div>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Design</summary>\
-            <div style='margin-left:0.5em;'>\
+            <div style='margin-left:1.0em;'>\
                 <div class='ddItem ddDetails'><a href='Design.html'>Design Process</a></div>\
                 <div class='ddItem ddDetails'><a href='UML.html'>UML Diagrams</a></div>\
                 <div class='ddItem ddDetails'><a href='ProjectsList.html'>Project suggestions</a></div>\
@@ -110,7 +110,7 @@ function initializeMenu() {
           </details>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>C++</summary>\
-            <div style='margin-left:0.5em;'>\
+            <div style='margin-left:1.0em;'>\
               <div class='ddItem ddDetails'><a href='LangCpp.html'>C++ Language Resources</a></div>\
               <div class='ddItem ddDetails'><a href='LangCpp.html'>C++ Language Resources</a></div>\
               <div class='ddItem ddDetails'><a href='https://en.cppreference.com/w/'>CppReference.com</a></div>\
@@ -124,7 +124,7 @@ function initializeMenu() {
           </details>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Rust</summary>\
-            <div style='margin-left:0.5em;'>\
+            <div style='margin-left:1.0em;'>\
               <div class='ddItem ddDetails'><a href='https://github.com/JimFawcett/RustPlaygroundExamples'>RustPlaygroundExamples</a></div>\
               <div class='ddItem ddDetails'><a href='IndexPage.html'>Rust Glossary</a></div>\
               <div style='height:0.25em;'></div>\
@@ -132,7 +132,7 @@ function initializeMenu() {
           </details>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Regular Expressions</summary>\
-            <div style='margin-left:0.5em;'>\
+            <div style='margin-left:1.0em;'>\
                 <div class='ddItem ddDetails'><a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a></div>\
                 <div class='ddItem ddDetails'><a href='https://dev.to/chrisachard/intro-to-regex-for-web-developers-2fj4'>RegExp&nbsp;for&nbsp;JavaScript</a></div>\
                 <div class='ddItem ddDetails'><a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a></div>\
@@ -141,7 +141,7 @@ function initializeMenu() {
           </details>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>WebDev</summary>\
-            <div style='margin-left:0.5em;'>\
+            <div style='margin-left:1.0em;'>\
               <div class='ddItem ddDetails'><a href='WebNotes.html'>Web Notes</a></div>\
               <div class='ddItem ddDetails'><a href='WebComponentTests.html'>UI Widget Tests</a></div>\
               <div class='ddItem ddDetails'><a href='https://encycolorpedia.com/named'>Web Colors</a></div>\
@@ -157,18 +157,18 @@ function initializeMenu() {
           <div class='ddItem'><a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a></div>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Neighborhoods</summary>\
-            <div style='margin-left:0.5em;'>\
+            <div style='margin-left:1.0em;'>\
               <div class='ddItem ddDetails'><a href='https://JimFawcett.github.io'>JimFawcett-github</a></div>\
               <div class='ddItem ddDetails'><a href='https://ecs.syr.edu/faculty/fawcett'>JimFawcett-SyracuseUniv</a></div>\
               <div class='ddItem ddDetails'><a href='https://mwcorley79.github.io/MikeCorley/'>Mike Corley</a></div>\
-              <div class='ddItem ddDetails'><a href='https://github.com/CommProjectComparisons'>CommProjectComparisons-github</a></div>\
+              <div class='ddItem ddDetails'><a href='https://github.com/CommProjectComparisons'>CommProjectComparisons-github&nbsp;&nbsp;</a></div>\
               <div class='ddItem ddDetails'><a href='https://csiac.org'>CSIAC</a></div>\
               <div class='ddItem ddDetails'><a href='https://www.fluentcpp.com'>Fluent {C++}</a></div>\
               <div class='ddItem ddDetails'><a href='https://www.boost.org/'>Boost&nbsp;Library&nbsp;(C++)</a></div>\
-              <div class='ddItem ddDetails'><a href='https://www.pocoproject.org/'>poco&nbsp;Library&nbsp;(C++ networking)</a></div>\
+              <div class='ddItem ddDetails'><a href='https://www.pocoproject.org/'>poco&nbsp;Library&nbsp;(C++ networking)&nbsp;&nbsp;</a></div>\
               <div class='ddItem ddDetails'><a href='https://openframeworks.cc/'>openFrameworks&nbsp;(C++ graphics)</a></div>\
               <div class='ddItem ddDetails'><a href='https://github.com/microsoft'>github.com/Microsoft</a></div>\
-              <div class='ddItem ddDetails'><a href='https://www.taniarascia.com/'>taniarascia.com (JavaScript, CSS)</a></div>\
+              <div class='ddItem ddDetails'><a href='https://www.taniarascia.com/'>taniarascia.com (JavaScript, CSS)&nbsp;&nbsp;</a></div>\
               <div style='height:0.25em;'></div>\
             </div>\
           </details>\
@@ -184,18 +184,18 @@ function initializeMenu() {
           <div class='ddItem'><a href='Blog.html'>First&nbsp;Things</a></div>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Design</summary>\
-            <div style='margin-left:0.5em;'>\
+            <div style='margin-left:1.0em;'>\
               <div class='ddItem ddDetails'><a href='BlogDesign.html'>SW&nbsp;Design</a></div>\
               <div class='ddItem ddDetails'><a href='BlogPrinciples.html'>Design&nbsp;Principles</a></div>\
               <div class='ddItem ddDetails'><a href='BlogOOD.html'>OO&nbsp;Design</a></div>\
               <div class='ddItem ddDetails'><a href='BlogObjectModels.html'>Object&nbsp;Models</a></div>\
-              <div class='ddItem ddDetails'><a href='BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data&nbsp;&nbsp;</a></div>\
+              <div class='ddItem ddDetails'><a href='BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data</a></div>\
               <div style='height:0.5em;'></div>\
             </div>\
           </details>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Engineering SW</summary>\
-            <div style='margin-left:0.5em;'>\
+            <div style='margin-left:1.0em;'>\
               <div class='ddItem ddDetails'><a href='BlogOCD.html'>Concept&nbsp;Document</a></div>\
               <div class='ddItem ddDetails'><a href='BlogTesting.html'>SW&nbsp;Testing</a></div>\
               <div style='height:0.5em;'></div>\
@@ -203,7 +203,7 @@ function initializeMenu() {
           </details>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Software Systems&nbsp;&nbsp;</summary>\
-            <div style='margin-left:0.5em;'>\
+            <div style='margin-left:1.0em;'>\
               <div class='ddItem ddDetails'><a href='BlogStructure.html'>SW&nbsp;Structure</a></div>\
               <div class='ddItem ddDetails'><a href='BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a></div>\
               <div class='ddItem ddDetails'><a href='BlogActiveObjects.html'>Active&nbsp;Objects</a></div>\
@@ -212,7 +212,7 @@ function initializeMenu() {
           </details>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Reusable Pkgs</summary>\
-            <div style='margin-left:0.5em;'>\
+            <div style='margin-left:1.0em;'>\
               <div class='ddItem ddDetails'><a href='BlogNoSql.html'>noSQL&nbsp;Database</a></div>\
               <div class='ddItem ddDetails'><a href='BlogParser.html'>Parsing</a></div>\
               <div class='ddItem ddDetails'><a href='BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a></div>\
@@ -223,7 +223,7 @@ function initializeMenu() {
             </div>\
           </details>\
           <div class='ddItem'><a href='SummerReading.html'>Summer&nbsp;Reading</a></div>\
-          <div style='height:2em;'></div>\
+          <div style='height:2em;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='menuItem'><a id='prevLink' href='#'>Prev</a></div>\
