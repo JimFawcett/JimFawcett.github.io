@@ -111,8 +111,7 @@ function initializeMenu() {
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>C++</summary>\
             <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a href='LangCpp.html'>C++ Language Resources</a></div>\
-              <div class='ddItem ddDetails'><a href='LangCpp.html'>C++ Language Resources</a></div>\
+              <div class='ddItem ddDetails'><a href='LangCpp.html'>C++&nbsp;Language&nbsp;Resources&nbsp;&nbsp;</a></div>\
               <div class='ddItem ddDetails'><a href='https://en.cppreference.com/w/'>CppReference.com</a></div>\
               <div class='ddItem ddDetails'><a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a></div>\
               <div class='ddItem ddDetails'><a href='CppReferences.html'>C++ References</a></div>\
