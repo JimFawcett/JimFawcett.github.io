@@ -1,0 +1,247 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - Test_WebComponents.html - test image sizer
+   - ver 1.0 - 03 August 2019
+   - Jim Fawcett, Syracuse University
+  -->
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Projects. Code Samples. Software Links" />
+  <meta name="keywords" content="Repository, Design, Code" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Test Photo</title>
+  <script src="js/ScriptsUtilities.js"></script>
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenuCppRepo.js"></script>
+  <script src="js/ScriptsPhoto.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+  <link rel="stylesheet" href="css/StylesPhoto.css" />
+  <style>
+    #github code-container {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      /*justify-content:space-between;*/
+      background-color: white;
+    }
+
+    #github code-block {
+      display: block;
+      padding: 0px 10px;
+      width: min-content;
+    }
+
+    #github content-block {
+      padding: 0px 25px;
+      display: block;
+      font-family: Consolas, monospace;
+      white-space: pre;
+    }
+
+    #github caption-block {
+      padding: 15px 25px;
+      text-align: center;
+      display: block;
+      font-family: Tahoma, Consolas, sans-serif;
+    }
+
+    #github flex-break {
+      flex-basis: 100%;
+      width: 0px;
+      height: 0px;
+      overflow: hidden;
+    }
+
+    #github .codeDarkBrownTheme {
+      /*width: min-content;*/
+      background-color: #4c2f27; /* Acajou */
+      color: #f2f0e6; /* Alabaster */
+      border: 1px solid #000000;
+      box-shadow: 3px 3px 5px #6a432d;
+    }
+
+    #github .codeLightBrownTheme {
+      /*width: min-content;*/
+      background-color: #f2f0e6;
+      color: #4c2f27;
+      border: 1px solid #3d0c02;
+      box-shadow: 3px 3px 5px #6a432d;
+    }
+
+    #github .codeDarkBlueTheme {
+      /*width: min-content;*/
+      background-color: #2e5694;
+      color: #faffff;
+      border: 1px solid #000000;
+      box-shadow: 3px 3px 5px #6a432d;
+    }
+
+    #github .codeLightBlueTheme {
+      /*width: min-content;*/
+      background-color: #faffff;
+      color: #2e5694;
+      border: 1px solid #3d0c02;
+      box-shadow: 3px 3px 5px #6a432d;
+    }
+
+    #github .codeDarkGrayTheme {
+      /*width: min-content;*/
+      background-color: #253529;
+      color: #ffebcd;
+      border: 1px solid #000000;
+      box-shadow: 3px 3px 5px #6a432d;
+    }
+
+    #github .codeLightGrayTheme {
+      /*width: min-content;*/
+      background-color: #ffebcd;
+      color: #253529;
+      border: 1px solid #3d0c02;
+      box-shadow: 3px 3px 5px #6a432d;
+    }
+
+    #github #pagetitle {
+      background-color: #4c2f27; /* Acajou */
+      color: #f2f0e6; /* Alabaster */
+    }
+
+    #github #title {
+      background-color: #4c2f27; /* Acajou */
+      color: #f2f0e6; /* Alabaster */
+    }
+
+    #github .repoLink {
+      background-color: #4c2f27; /* Acajou */
+      color: #f2f0e6; /* Alabaster */
+    }
+    .codeBlock {
+
+    }
+    #github .blue {
+      background-color:blue;
+    }
+  </style>
+  <script>
+    function createCodeBlockTemplate() {
+      let template = document.createElement('template');
+      let outerBlk = document.createElement('div');
+      template.setAttribute('style', 'border:2px solid yellow');
+      outerBlk.setAttribute('id', 'outer');
+      outerBlk.setAttribute(
+        'style',
+        'width:min-content; padding:0px;' + ' border:4px solid green;'
+      );
+      let innerBlk = document.createElement('div');
+      innerBlk.setAttribute('id', 'inner');
+      innerBlk.setAttribute(
+        'style',
+        'white-space:pre; font-family:consolas, monospace; line-height:1.2;'
+        //+ 'background-color:#4c2f27; color:#f2f0e6;'
+        + 'border: 1px solid red; padding: 0px 25px; '
+      );
+      innerBlk.innerHTML = '<slot></slot>';
+      outerBlk.appendChild(innerBlk);
+      template.innerHTML = outerBlk.outerHTML;
+      template.setAttribute('style', 'display:flex;');
+      alert(template.outerHTML);
+      return template;
+    }
+
+    class CodeBlock extends HTMLElement {
+      constructor() {
+        super();
+        this.sroot = this.attachShadow({ mode: 'open' });
+      }
+      connectedCallback() {
+        this.class = this.getAttribute('class');
+        //this.style.background = this.getAttribute('style.background');
+        //this.style.background = this.getAttribute('style.color');
+        const { shadowRoot } = this;
+        let template = createCodeBlockTemplate();
+        const node = document.importNode(template.content, true);
+        shadowRoot.appendChild(node);
+        let inner = this.shadowRoot.querySelector('#inner');
+        alert('connectedCallback: ' + inner);
+        if (isDefined(inner)) {
+          alert('connectedCallback: ' + inner);
+          inner.setAttribute('class', this.class);
+          //inner.setAttribute('style', this.style);
+        }
+      }
+      static get observedAttributes() {
+        return ['class', 'style.background', 'style.color'];
+      }
+      attributeChangedCallback(attrName, oldValue, newValue) {
+        if (newValue !== oldValue) {
+          this[attrName] = this.hasAttribute(attrName);
+          const { shadowRoot } = this;
+          let inner = this.sroot.querySelector('#inner');
+          alert('attributedChangedCallback: ' + inner);
+          if (isDefined(inner))
+            inner.setAttribute(attrName, newValue);
+        }
+      }
+      set class(value) {
+        this.setAttribute('class', value);
+      }
+      get class() {
+        return this.getAttribute('class');
+      }
+      set style(value) {
+        this.setAttribute('style', value);
+      }
+      get style() {
+        return this.getAttribute('style');
+      }
+    }
+    window.customElements.define('code-block', CodeBlock);
+
+  </script>
+</head>
+<body id="github" onload="initializeMenu()">
+
+  <navKeys-Container>
+    <nav-Key id="sKey" onclick="toggleSwipeEvents()">S</nav-Key>
+    <nav-Key id="rKey" onclick="location.reload()">R</nav-Key>
+    <nav-Key id="tKey" onclick="scrollPageTop()">T</nav-Key>
+    <nav-Key id="bKey" onclick="scrollPageBottom()">B</nav-Key>
+    <nav-Key id="hKey" onclick="helpWin()">H</nav-Key>
+    <nav-Key id="pKey" onclick="loadPrev()">P</nav-Key>
+    <nav-Key id="nKey" onclick="loadNext()">N</nav-Key>
+  </navKeys-Container>
+
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <!--<a id="Next" href="BlogDesign.htm">N</a>
+  <a id="Prev" href="BlogFileSystem.htm">P</a>-->
+  <header>
+    <a class="repoLink" href="Tests.html">Tests.html</a>
+    <hgroup id="pagetitle">
+      <h1 id="title">Test Code Element</h1>
+    </hgroup>
+  </header>
+
+  <spacer-10></spacer-10>
+  <hr class="spread" />
+
+  <indent-block>
+    Some initial text.
+    <code-block class="blue">
+class X {
+  X();
+  X(const X&amp; x);
+};
+
+<hr style="border-top:1px solid white;" />Fig 1. a caption
+    </code-block>
+  </indent-block>
+
+  <info-bar></info-bar>
+</body>
+</html>

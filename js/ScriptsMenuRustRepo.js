@@ -14,9 +14,23 @@ function initializeMenu() {
 
   var topMenu = document.getElementsByTagName("nav");
   topMenu[0].innerHTML = "<div class='navbar'>\
-    <a href='index.html' class='menuItem'>Home</a>\
+    <a href='index.html' class='menuItem'>&nbsp;&nbsp;Home</a>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Repos &#9662;</button>\
+      <button class='dropbutton'>Tracks&#9662;</button>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Language&nbsp;Tracks&nbsp;&nbsp;</div>\
+        <a href='indexBasic.html'>Basics&nbsp;&nbsp;</a>\
+        <a href='indexCpp.html'>C++&nbsp;Track&nbsp;&nbsp;</a>\
+        <a href='https://www.w3schools.com/cpp/trycpp.asp?filename=demo_compiler' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a>\
+        <a href='indexRust.html'>Rust&nbsp;Track&nbsp;&nbsp;</a>\
+        <a href='https://play.rust-lang.org/' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a>\
+        <a href='indexCs.html'>C#&nbsp;Track&nbsp;&nbsp;</a>\
+        <a href='https://dotnetfiddle.net/' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:smallest;'>&nbsp;</div>\
+      </div>\
+    </div>\
+    <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Repos&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Code&nbsp;Repositories&nbsp;&nbsp;</div>\
         <a href='CppRepositories.html'>C++&nbsp;Repositories&nbsp;&nbsp;</a>\
@@ -28,7 +42,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Utils &#9662;</button>\
+      <button class='dropbutton'>Utils&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Utilities</div>\
         <a href='Javascript:;'>None yet</a>\
@@ -36,7 +50,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Tools &#9662;</button>\
+      <button class='dropbutton'>Tools&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Tools</div>\
         <a href='RustLogger.html'>RustLogger</a>\
@@ -45,7 +59,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Cmps &#9662;</button>\
+      <button class='dropbutton'>Cmps&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Components</div>\
         <a href='RustBlockingQueue.html'>BlockingQueue&nbsp;</a>\
@@ -54,7 +68,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Libs &#9662;</button>\
+      <button class='dropbutton'>Libs&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Libraries</div>\
         <a href='RustCmdLine.html'>CmdLine</a>\
@@ -68,7 +82,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Prjs &#9662;</button>\
+      <button class='dropbutton'>Prjs&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Projects</div>\
         <a href='BuildOn.html'>BuildOn</a>\
@@ -77,7 +91,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Dems &#9662;</button>\
+      <button class='dropbutton'>Dems&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Demonstrations</div>\
         <a href='RustByteRecord.html'>Rust&nbsp;Byte&nbsp;Record&nbsp;</a>\
@@ -92,9 +106,9 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Stories &#9662;</button>\
+      <button class='dropbutton'>Stories&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;Ordered&nbsp;Content</div>\
+        <div class='darkItem maxWidth'>&nbsp;Stories&nbsp;&amp;&nbsp;Bites</div>\
         <a href='Stories.html'>What is a Story?</a>\
         <a href='BasicBiteByByte.html'>Basics Story</a>\
         <a href='DesignBites.html'>Design Story</a>\
@@ -113,7 +127,7 @@ function initializeMenu() {
       </div >\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>About &#9662;</button>\
+      <button class='dropbutton'>About&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;About&nbsp;this&nbsp;Site</div>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
@@ -133,8 +147,8 @@ function initializeMenu() {
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
-    <a id='prevLink' class='nextprev' href='#'>Prev</a>\
-    <a id='nextLink' class='nextprev' href='#'>Next</a>\
+    <a id='prevLink' class='menuItem' href='#'>Prev</a>\
+    <a id='nextLink' class='menuItem' href='#'>Next</a>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\
     <button class='pageScroll' onclick='scrollPageBottom()'>Bottom</button>\
     <button class='menuScroll' onclick='scrollMenuLeft()'>&lt;</button>\

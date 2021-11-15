@@ -14,10 +14,24 @@ function initializeMenu() {
 
   var topMenu = document.getElementsByTagName("nav");
   topMenu[0].innerHTML = "<div class='navbar'>\
-    <a href='index.html' class='menuItem'>Home</a>\
+    <a href='index.html' class='menuItem'>&nbsp;&nbsp;Home</a>\
     <a href='SiteMap.html' class='menuItem'>SiteMap</a>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Repos &#9662;</button>\
+      <button class='dropbutton'>Tracks&#9662;</button>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Language&nbsp;Tracks&nbsp;&nbsp;</div>\
+        <a href='indexBasic.html'>Basics&nbsp;&nbsp;</a>\
+        <a href='indexCpp.html'>C++&nbsp;Track&nbsp;&nbsp;</a>\
+        <a href='https://www.w3schools.com/cpp/trycpp.asp?filename=demo_compiler' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a>\
+        <a href='indexRust.html'>Rust&nbsp;Track&nbsp;&nbsp;</a>\
+        <a href='https://play.rust-lang.org/' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a>\
+        <a href='indexCs.html'>C#&nbsp;Track&nbsp;&nbsp;</a>\
+        <a href='https://dotnetfiddle.net/' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:smallest;'>&nbsp;</div>\
+      </div>\
+    </div>\
+    <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Repos&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Code&nbsp;Repositories&nbsp;&nbsp;</div>\
         <a href='CppRepositories.html'>C++&nbsp;Repositories&nbsp;&nbsp;</a>\
@@ -28,9 +42,68 @@ function initializeMenu() {
         <div style='padding:0px 10px; margin:0px; font-size:smallest;'>&nbsp;</div>\
       </div>\
     </div>\
-    <a href='Videos.html' class='menuItem'>Videos</a>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Blogs &#9662;</button>\
+      <button class='dropbutton'>Stories&#9662;</button>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Stories&nbsp;&amp;&nbsp;Bites&nbsp;</div>\
+        <a href='Stories.html'>What is a Story?</a>\
+        <a href='BasicBiteByByte.html'>Basics Story</a>\
+        <a href='DesignBites.html'>Design Story</a>\
+        <a href='CppStoryRepo.html'>C++ Story</a>\
+        <a href='RustStoryRepo.html'>Rust Story</a>\
+        <a href='RustBiteByByte.html'>Rust&nbsp;bite&nbsp;by&nbsp;byte&nbsp;</a>\
+        <a href='BuildOn.html'>BuildOn:&nbsp;learn&nbsp;Rust&nbsp;&nbsp;</a>\
+        <a href='IdiomsAndPatterns.html'>Idioms&nbsp;&amp;&nbsp;Patterns&nbsp;</a>\
+        <a href='IndexPage.html'>Rust Glossary</a>\
+        <a href='InfDataLib_1.html'>Inf Data Lib - A.Zaitsev</a>\
+        <a href='MLiPS_1.html'>MLiPS - M.Corley</a>\
+        <a href='StoryTeller_LocalStorage.html'>StoryTeller&nbsp;depricated</a>\
+        <a href='StoryTellerDesign.html'>StoryTeller Design</a>\
+        <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
+      </div >\
+    </div>\
+     <div class='dropdown menuItem'>\
+      <button id=res class='dropbutton'>Res&#9662;</button>\
+      <div class='dropdown-content noScrollX'>\
+        <div class='darkItem maxWidth'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
+        <a href='Videos.html' class='menuItem'>Videos</a>\
+        <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a>\
+        <a href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a>\
+        <a href='Design.html'>Design Process</a>\
+        <a href='ProjectsList.html'>Project suggestions</a>\
+        <a href='https://github.com/JimFawcett/RustPlaygroundExamples'>RustPlaygroundExamples</a>\
+        <a href='IndexPage.html'>Rust Glossary</a>\
+        <a href='LangCpp.html'>C++ Language Resources</a>\
+        <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
+        <a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a>\
+        <a href='CppReferences.html'>C++ References</a>\
+        <a href='CppExamples.html'>C++ Example Code</a>\
+        <a href='CppSynopsis.html'>C++ Synopsis</a>\
+        <a href='DesignNote-Cpp11.html'>C++11 Survey</a>\
+        <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
+        <a href='https://dev.to/chrisachard/intro-to-regex-for-web-developers-2fj4'>RegExp&nbsp;for&nbsp;JavaScript</a>\
+        <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
+        <a href='TechnicalLinks.html'>Technical Links</a>\
+        <a href='WebNotes.html'>Web Notes</a>\
+        <a href='WebComponentTests.html'>UI Widget Tests</a>\
+        <a href='TestFlexMenu.html'>Test Flex Menu</a>\
+        <a href='TestBasicFlexMenu.html'>Test Basic Flex Menu</a>\
+        <a href='https://encycolorpedia.com/named'>Web Colors</a>\
+        <a href='UML.html'>UML Diagrams</a>\
+        <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
+        <a href='https://github.com/joshnh/Git-Commands'>git commands</a>\
+        <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
+        <a href='SummerReading.html'>Summer Reading</a>\
+        <a href='Interviews.html'>Job Interviews</a>\
+        <a href='TestGrid.html'>TestGrid - Sized</a>\
+        <a href='TestGrid2.html'>TestGrid - AbsPos</a>\
+        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
+      </div>\
+    </div>\
+   <a href='Videos.html' class='menuItem'>Videos</a>\
+    <div class='dropdown menuItem'>\
+      <button class='dropbutton'>Blogs&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Opinions&nbsp;and&nbsp;Ideas&nbsp;</div>\
         <a href='Blog.html'>First&nbsp;Things</a>\
@@ -59,43 +132,7 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='dropdown menuItem'>\
-      <button id=res class='dropbutton'>Res &#9662;</button>\
-      <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
-        <a href='Videos.html' class='menuItem'>Videos</a>\
-        <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a>\
-        <a href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a>\
-        <a href='Design.html'>Design Process</a>\
-        <a href='ProjectsList.html'>Project suggestions</a>\
-        <a href='https://github.com/JimFawcett/RustPlaygroundExamples'>RustPlaygroundExamples</a>\
-        <a href='IndexPage.html'>Rust Glossary</a>\
-        <a href='LangCpp.html'>C++ Language Resources</a>\
-        <a href='https://en.cppreference.com/w/'>CppReference.com</a>\
-        <a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a>\
-        <a href='CppReferences.html'>C++ References</a>\
-        <a href='CppExamples.html'>C++ Example Code</a>\
-        <a href='CppSynopsis.html'>C++ Synopsis</a>\
-        <a href='DesignNote-Cpp11.html'>C++11 Survey</a>\
-        <a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a>\
-        <a href='https://dev.to/chrisachard/intro-to-regex-for-web-developers-2fj4'>RegExp&nbsp;for&nbsp;JavaScript</a>\
-        <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
-        <a href='TechnicalLinks.html'>Technical Links</a>\
-        <a href='WebNotes.html'>Web Notes</a>\
-        <a href='WebComponentTests.html'>UI Widget Tests</a>\
-        <a href='https://encycolorpedia.com/named'>Web Colors</a>\
-        <a href='UML.html'>UML Diagrams</a>\
-        <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
-        <a href='https://github.com/joshnh/Git-Commands'>git commands</a>\
-        <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
-        <a href='SummerReading.html'>Summer Reading</a>\
-        <a href='Interviews.html'>Job Interviews</a>\
-        <a href='TestGrid.html'>TestGrid - Sized</a>\
-        <a href='TestGrid2.html'>TestGrid - AbsPos</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
-      </div>\
-    </div>\
-    <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Nbrhds &#9662;</button>\
+      <button class='dropbutton'>Nbrhds&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Site&nbsp;Neighborhoods&nbsp;-&nbsp;related&nbsp;content&nbsp;&nbsp;</div>\
         <a href='https://JimFawcett.github.io'>JimFawcett-github</a>\
@@ -113,28 +150,7 @@ function initializeMenu() {
       </div >\
     </div>\
     <div class='dropdown menuItem'>\
-      <button class='dropbutton'>Stories &#9662;</button>\
-      <div class='dropdown-content noScrollX'>\
-        <div class='darkItem maxWidth'>&nbsp;Ordered&nbsp;Content</div>\
-        <a href='Stories.html'>What is a Story?</a>\
-        <a href='BasicBiteByByte.html'>Basics Story</a>\
-        <a href='DesignBites.html'>Design Story</a>\
-        <a href='CppStoryRepo.html'>C++ Story</a>\
-        <a href='RustStoryRepo.html'>Rust Story</a>\
-        <a href='RustBiteByByte.html'>Rust&nbsp;bite&nbsp;by&nbsp;byte&nbsp;</a>\
-        <a href='BuildOn.html'>BuildOn:&nbsp;learn&nbsp;Rust&nbsp;&nbsp;</a>\
-        <a href='IdiomsAndPatterns.html'>Idioms&nbsp;&amp;&nbsp;Patterns&nbsp;</a>\
-        <a href='IndexPage.html'>Rust Glossary</a>\
-        <a href='InfDataLib_1.html'>Inf Data Lib - A.Zaitsev</a>\
-        <a href='MLiPS_1.html'>MLiPS - M.Corley</a>\
-        <a href='StoryTeller_LocalStorage.html'>StoryTeller&nbsp;depricated</a>\
-        <a href='StoryTellerDesign.html'>StoryTeller Design</a>\
-        <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
-        <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
-      </div >\
-    </div>\
-    <div class='dropdown menuItem'>\
-      <button class='dropbutton'>About &#9662;</button>\
+      <button class='dropbutton'>About&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;About&nbsp;this&nbsp;Site</div>\
         <a href='JimFawcett.html'>Jim Fawcett</a>\
@@ -154,8 +170,8 @@ function initializeMenu() {
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
-    <a id='prevLink' class='nextprev' href='#'>Prev</a>\
-    <a id='nextLink' class='nextprev' href='#'>Next</a>\
+    <a id='prevLink' class='menuItem' href='#'>Prev</a>\
+    <a id='nextLink' class='menuItem' href='#'>Next</a>\
     <button class='pageScroll' onclick='scrollPageTop()'>Top</button>\
     <button class='pageScroll' onclick='scrollPageBottom()'>Bottom</button>\
     <button class='menuScroll' onclick='scrollMenuLeft()'>&lt;</button>\
