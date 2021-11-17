@@ -232,7 +232,36 @@ function initializeMenu() {
   <button class='menuItem menuUnscroll' onclick='scrollMenuRight()'>&gt;</button>\
   <div style='clear:all;'></div>";
 
+  // show footer with copyright notice and revision date
+
+  var bottomMenu = document.getElementsByTagName("info-bar");
+  if (!isDefined(bottomMenu)) {
+    return;
+  }
+  var date = document.lastModified;
+  var str = "<div id='btmMenuLeft' class='navbarleft'>";
+  str += "copyright &copy; Jim Fawcett, 2020" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "Page Revised: ";
+  str += date.toString();
+  str += "</div>"
+  bottomMenu[0].innerHTML = str.toString();
+
+  var bottomMenuRight = document.getElementsByTagName("info-bar");
+  bottomMenuRight[0].innerHTML += "<div id='btmMenuRight' class='navbarright'>\
+    <div class='menuItem'>Sects</div>\
+    <div class='menuItem'>Pages</div>\
+    <div class='menuItem'><a id='prevLink2' href='#'>Prev</a></div>\
+    <div class='menuItem'><a id='nextLink2' href='#'>Next</a></div>\
+  </div>";
+  var ht = document.getElementById("btmMenuRight");
+  if (!isDefined(ht)) {
+    alert("no ht");
+    return;
+  }
+  var test = window.getComputedStyle(ht, null).getPropertyValue("height");
+  bottomMenu[0].style.height = window.getComputedStyle(ht, null).getPropertyValue("height");
+  bottomMenu[0].addEventListener('click', function () { location.reload(); });
 }
+
 function initializeNextPrev() {
   
   // hide Next and Prev links if page has no next or previous pages
@@ -243,6 +272,7 @@ function initializeNextPrev() {
   var swKey = document.getElementById("sKey");
   if (nxt === null) {
     document.getElementById("nextLink").style.display = "none";  // button top right menu
+    document.getElementById("nextLink2").style.display = "none";  // button top right menu
     if(isDefined(nKey))
       nKey.style.display = "none";
     if (isDefined(swKey))
@@ -250,6 +280,8 @@ function initializeNextPrev() {
   }
   else {
     var nl = document.getElementById("nextLink");
+    nl.setAttribute('href', nxt.href);
+    var nl = document.getElementById("nextLink2");
     nl.setAttribute('href', nxt.href);
     // document.getElementById("nextLink").href = nxt.href;
     if (isDefined(nKey))
@@ -262,26 +294,21 @@ function initializeNextPrev() {
   var pKey = document.getElementById("pKey");
   if (prv === null) {
     document.getElementById("prevLink").style.display = "none";  // button top right menu
+    document.getElementById("prevLink2").style.display = "none";  // button top right menu
     if(isDefined(pKey))
       pKey.style.display = "none";
   }
   else {
     document.getElementById("prevLink").href = prv.href;
+    document.getElementById("prevLink2").href = prv.href;
     if(isDefined(pKey))
       pKey.style.display = "inline";
   }
+}
 
-  // show footer with copyright notice and revision date
-
-  var rvsd = document.getElementsByTagName("info-bar");
-  if(!isDefined(rvsd)) {
-    return;
-  }
-  var date = document.lastModified;
-  rvsd[0].innerHTML = 
-    "copyright &copy; Jim Fawcett, 2020" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + 
-    "Page Revised: " + date;
-  rvsd[0].addEventListener('click', function () { location.reload(); });
+function setPages() {
+  var pgs = document.createElement("pages");
+  
 }
 
 function initialize() {
