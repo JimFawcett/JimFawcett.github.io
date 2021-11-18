@@ -239,19 +239,29 @@ function initializeMenu() {
     return;
   }
   var date = document.lastModified;
-  var str = "<div id='btmMenuLeft' class='navbarleft'>";
-  str += "copyright &copy; Jim Fawcett, 2020" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "Page Revised: ";
+    /*var str = "<div id='btmMenuLeft' class='navbarleft'>";*/
+    var str = "";
+  str += "copyright &copy; Jim Fawcett, 2021" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "Page Revised: ";
   str += date.toString();
-  str += "</div>"
-  bottomMenu[0].innerHTML = str.toString();
+    /*str += "</div>"*/
+    var bml = document.getElementById("btmMenuLeft");
+    bml.innerHTML = str.toString();
+    /*bottomMenu[0].innerHTML = str.toString();*/
 
-  var bottomMenuRight = document.getElementsByTagName("info-bar");
-  bottomMenuRight[0].innerHTML += "<div id='btmMenuRight' class='navbarright'>\
-    <div class='menuItem'>Sects</div>\
+  //var bottomMenuRight = document.getElementsByTagName("info-bar");
+  //bottomMenuRight[0].innerHTML += "<div id='btmMenuRight' class='navbarright'>\
+  //  <div class='menuItem'>Sects</div>\
+  //  <div class='menuItem'>Pages</div>\
+  //  <div class='menuItem'><a id='prevLink2' href='#'>Prev</a></div>\
+  //  <div class='menuItem'><a id='nextLink2' href='#'>Next</a></div>\
+    //</div>";
+    var bmr = document.getElementById("btmMenuRight");
+    bmr.innerHTML =
+        "<div class='menuItem'>Sects</div>\
     <div class='menuItem'>Pages</div>\
     <div class='menuItem'><a id='prevLink2' href='#'>Prev</a></div>\
-    <div class='menuItem'><a id='nextLink2' href='#'>Next</a></div>\
-  </div>";
+    <div class='menuItem'><a id='nextLink2' href='#'>Next</a></div>";
+
   var ht = document.getElementById("btmMenuRight");
   if (!isDefined(ht)) {
     alert("no ht");
@@ -259,7 +269,12 @@ function initializeMenu() {
   }
   var test = window.getComputedStyle(ht, null).getPropertyValue("height");
   bottomMenu[0].style.height = window.getComputedStyle(ht, null).getPropertyValue("height");
-  bottomMenu[0].addEventListener('click', function () { location.reload(); });
+    //btmlf = document.getElementById(btmMenuLeft);
+    //alert(btmlf);
+    //if (isDefinded(btmlf)) {
+    //    btmlf.addEventListener('click', function () { location.reload(); });
+    //}
+    bml.addEventListener('click', function () { location.reload(); });
 }
 
 function initializeNextPrev() {
