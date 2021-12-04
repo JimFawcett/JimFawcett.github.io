@@ -48,26 +48,47 @@ initBites = function () {
 
 storyMenu.bitesMenu = function () {
   var bitesMenu = document.getElementById("chaps");
-  bitesMenu.innerHTML = '<a href="BasicBites_Intro.html">Introduction</a><br />\
-    <a href="BasicBites_Platform.html">Platforms</a><br />\
-    <a href="BasicBites_PlatformMemory.html">- Memory</a><br />\
-    <a href="BasicBites_PlatformSched.html">- Scheduling</a><br />\
-    <a href="BasicBites_PlatformIO.html">- IO</a><br />\
-    <a href="BasicBites_PlatformSysRescr.html">- Sys Rescr</a><br />\
-    <a href="BasicBites_Programming.html">Programming</a><br />\
-    <a href="BasicBites_ProgExec.html">- Execution</a><br />\
-    <a href="BasicBites_ProgTypes.html">- Types</a><br />\
-    <a href="BasicBites_ProgFunctions.html">- Functions</a><br />\
-    <a href="BasicBites_ProgSafety.html">- Safety</a><br />\
-    <a href="BasicBites_ProgPlatformAPI.html">- Platform API</a><br />\
-    <a href="BasicBites_ProgStruct.html">- Prog Struct</a><br />\
-    <a href="BasicBites_ObjModel.html">Object Models</a><br />\
-    <a href="BasicBites_ObjLifetime.html">- Lifetime</a><br />\
-    <a href="BasicBites_ObjResMgmt.html">- Resource Mgmt</a><br />\
-    <a href="BasicBites_ObjOwnership.html">- Ownership</a><br />\
-    <a href="Javascript.;#"></a><br />\
-    <a href="BasicBites_SummaryNative.html">- Summary Native</a><br />\
-    <a href="BasicBites_SummaryManaged.html">- Summary Mangd</a><br />\
+  bitesMenu.innerHTML = '<a href="CppBites_Intro.html">Introduction</a><br />\
+    <a class="undefined" href="javascript:;">memory</a><br />\
+    <a class="undefined" href="javascript:;">types</a><br />\
+    <a class="undefined" href="javascript:;">classes</a><br />\
+    <a class="undefined" href="javascript:;">templates</a><br />\
+    <a class="undefined" href="javascript:;">STL</a><br />\
+    <div class="lightItem" style="padding:0em 0.5em;">C++11</div>\
+    <a class="undefined" href="javascript:;">auto</a><br />\
+    <a class="undefined" href="javascript:;">shared_ptr</a><br />\
+    <a class="undefined" href="javascript:;">range-based for</a><br />\
+    <a class="undefined" href="javascript:;">move</a><br />\
+    <a class="undefined" href="javascript:;">lambdas</a><br />\
+    <a class="undefined" href="javascript:;">variadic templs</a><br />\
+    <a class="undefined" href="javascript:;">few more things</a><br />\
+    <div class="lightItem" style="padding:0em 0.5em;">C++14</div>\
+    <a class="undefined" href="javascript:;">func rtn type deduct</a><br />\
+    <a class="undefined" href="javascript:;">var templs</a><br />\
+    <a class="undefined" href="javascript:;">agg initialization</a><br />\
+    <a class="undefined" href="javascript:;">generic lambdas</a><br />\
+    <a class="undefined" href="javascript:;">shared mutex</a><br />\
+    <a class="undefined" href="javascript:;">tuple member access by type</a><br />\
+    <a class="undefined" href="javascript:;">quoted stream</a><br />\
+    <a class="undefined" href="javascript:;">few more things</a><br />\
+    <div class="lightItem" style="padding:0em 0.5em;">C++17</div>\
+    <a class="undefined" href="javascript:;">if constexpr</a><br />\
+    <a class="undefined" href="javascript:;">structured bindings</a><br />\
+    <a class="undefined" href="javascript:;">fold expressions</a><br />\
+    <a class="undefined" href="javascript:;">std::filesystem()</a><br />\
+    <a class="undefined" href="javascript:;">std::apply()</a><br />\
+    <a class="undefined" href="javascript:;">std::any()</a><br />\
+    <a class="undefined" href="javascript:;">few more things</a><br />\
+    <div class="lightItem" style="padding:0em 0.5em;">C++20</div>\
+    <a class="undefined" href="javascript:;">concepts</a><br />\
+    <a class="undefined" href="javascript:;">modules</a><br />\
+    <a class="undefined" href="javascript:;">coroutines</a><br />\
+    <a class="undefined" href="javascript:;">ranges</a><br />\
+    <a class="undefined" href="javascript:;">std::format</a><br />\
+    <a class="undefined" href="javascript:;">operator &lt;=&gt;</a><br />\
+    <a class="undefined" href="javascript:;">__FILE__</a><br />\
+    <a class="undefined" href="javascript:;">__LINE__</a><br />\
+    <a class="undefined" href="javascript:;">few more things</a><br />\
     <a href="Javascript.;#"></a><br />';
 }
 
