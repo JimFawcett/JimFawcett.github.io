@@ -93,6 +93,7 @@ function initializeMenu() {
         <a href='UML.html'>UML Diagrams</a>\
         <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
         <a href='https://github.com/joshnh/Git-Commands'>git commands</a>\
+        <a href='https://www.git-tower.com/learn/git/faq'>git faq</a>\
         <a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a>\
         <a href='SummerReading.html'>Summer Reading</a>\
         <a href='Interviews.html'>Job Interviews</a>\

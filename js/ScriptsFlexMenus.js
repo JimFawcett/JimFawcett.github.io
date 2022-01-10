@@ -26,7 +26,7 @@ function initializeMenu() {
             <div class='ddItem'><a href='index.html'>Home</a></div>\
             <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-              <summary>About&nbsp;&nbsp;&nbsp;</summary>\
+              <summary>About&nbsp;Site&nbsp;&nbsp;&nbsp;</summary>\
               <div style='margin-left:1.0em;'>\
               <div class='ddItem ddDetails'><a href='JimFawcett.html'>Jim Fawcett</a></div>\
               <div class='ddItem ddDetails'><a href='Interesting.html'>Interesting&nbsp;things&nbsp;&nbsp;</a></div>\
@@ -238,14 +238,15 @@ function initializeMenu() {
   if (!isDefined(bottomMenu)) {
     return;
   }
-  var date = document.lastModified;
-    /*var str = "<div id='btmMenuLeft' class='navbarleft'>";*/
-    var str = "";
-  str += "copyright &copy; Jim Fawcett, 2021" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "Page Revised: ";
-  str += date.toString();
-    /*str += "</div>"*/
-    var bml = document.getElementById("btmMenuLeft");
-    bml.innerHTML = str.toString();
+  var modified = document.getElementById("modified");
+  //var date = document.lastModified;
+  //  /*var str = "<div id='btmMenuLeft' class='navbarleft'>";*/
+  //  var str = "";
+  //str += "copyright &copy; Jim Fawcett, 2021" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "Page Revised: ";
+  //str += date.toString();
+  //  /*str += "</div>"*/
+  //  var bml = document.getElementById("btmMenuLeft");
+  //  bml.innerHTML = str.toString();
     /*bottomMenu[0].innerHTML = str.toString();*/
 
   //var bottomMenuRight = document.getElementsByTagName("info-bar");
@@ -255,26 +256,28 @@ function initializeMenu() {
   //  <div class='menuItem'><a id='prevLink2' href='#'>Prev</a></div>\
   //  <div class='menuItem'><a id='nextLink2' href='#'>Next</a></div>\
     //</div>";
-    var bmr = document.getElementById("btmMenuRight");
-    bmr.innerHTML =
-        "<div class='menuItem'>Sects</div>\
-    <div class='menuItem'>Pages</div>\
-    <div class='menuItem'><a id='prevLink2' href='#'>Prev</a></div>\
-    <div class='menuItem'><a id='nextLink2' href='#'>Next</a></div>";
+    //var bmr = document.getElementById("btmMenuRight");
+    bottomMenu[0].innerHTML =
+        "<div class='menuItem right' style='width:2em;'>&nbsp;</div>\
+    <div class='menuItem'><a id='nextLink2' href='#'>Next</a></div>\
+    <div class='menuItem right'><a id='prevLink2' href='#'>Prev</a></div>\
+    <div class='menuItem right'>Pages</div>\
+    <div class='menuItem right'>Sectns</div>\
+    <div class='menuItem right'>About</div>";
 
-  var ht = document.getElementById("btmMenuRight");
-  if (!isDefined(ht)) {
-    alert("no ht");
-    return;
-  }
-  var test = window.getComputedStyle(ht, null).getPropertyValue("height");
-  bottomMenu[0].style.height = window.getComputedStyle(ht, null).getPropertyValue("height");
+  //var ht = document.getElementById("btmMenuRight");
+  //if (!isDefined(ht)) {
+  //  alert("no ht");
+  //  return;
+  //}
+  //var test = window.getComputedStyle(ht, null).getPropertyValue("height");
+  //bottomMenu[0].style.height = window.getComputedStyle(ht, null).getPropertyValue("height");
     //btmlf = document.getElementById(btmMenuLeft);
     //alert(btmlf);
     //if (isDefinded(btmlf)) {
     //    btmlf.addEventListener('click', function () { location.reload(); });
     //}
-    bml.addEventListener('click', function () { location.reload(); });
+    bottomMenu[0].addEventListener('click', function () { location.reload(); });
 }
 
 function initializeNextPrev() {
