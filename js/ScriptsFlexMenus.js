@@ -13,6 +13,8 @@ function isDefined(elem) {
   return true;
 }
 
+var flexMenu = new Object();
+
 function initializeMenu() {
 
     // create top menu
@@ -239,45 +241,15 @@ function initializeMenu() {
     return;
   }
   var modified = document.getElementById("modified");
-  //var date = document.lastModified;
-  //  /*var str = "<div id='btmMenuLeft' class='navbarleft'>";*/
-  //  var str = "";
-  //str += "copyright &copy; Jim Fawcett, 2021" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "Page Revised: ";
-  //str += date.toString();
-  //  /*str += "</div>"*/
-  //  var bml = document.getElementById("btmMenuLeft");
-  //  bml.innerHTML = str.toString();
-    /*bottomMenu[0].innerHTML = str.toString();*/
-
-  //var bottomMenuRight = document.getElementsByTagName("info-bar");
-  //bottomMenuRight[0].innerHTML += "<div id='btmMenuRight' class='navbarright'>\
-  //  <div class='menuItem'>Sects</div>\
-  //  <div class='menuItem'>Pages</div>\
-  //  <div class='menuItem'><a id='prevLink2' href='#'>Prev</a></div>\
-  //  <div class='menuItem'><a id='nextLink2' href='#'>Next</a></div>\
-    //</div>";
-    //var bmr = document.getElementById("btmMenuRight");
-    bottomMenu[0].innerHTML =
-        "<div class='menuItem right' style='width:2em;'>&nbsp;</div>\
-    <div class='menuItem'><a id='nextLink2' href='#'>Next</a></div>\
-    <div class='menuItem right'><a id='prevLink2' href='#'>Prev</a></div>\
-    <div class='menuItem right'>Pages</div>\
-    <div class='menuItem right'>Sectns</div>\
-    <div class='menuItem right'>About</div>";
-
-  //var ht = document.getElementById("btmMenuRight");
-  //if (!isDefined(ht)) {
-  //  alert("no ht");
-  //  return;
-  //}
-  //var test = window.getComputedStyle(ht, null).getPropertyValue("height");
-  //bottomMenu[0].style.height = window.getComputedStyle(ht, null).getPropertyValue("height");
-    //btmlf = document.getElementById(btmMenuLeft);
-    //alert(btmlf);
-    //if (isDefinded(btmlf)) {
-    //    btmlf.addEventListener('click', function () { location.reload(); });
-    //}
-    bottomMenu[0].addEventListener('click', function () { location.reload(); });
+  bottomMenu[0].innerHTML =
+    "<div class='menuItem right' style='width:2em;'>&nbsp;</div>\
+  <div class='menuItem'><a id='nextLink2' href='#'>Next</a></div>\
+  <div class='menuItem right'><a id='prevLink2' href='#'>Prev</a></div>\
+  <div class='menuItem right'><a onclick='flexMenu.pages()' href='javascript:;'>Pages</a></div>\
+  <div class='menuItem right'><a onclick='flexMenu.sections()' href='javascript:;'>Sections</a></div>\
+  <div class='menuItem right'><a onclick='flexMenu.about()' href='javascript:;'>About</a></div>";
+//   <div onclick='flexMenu.pages()' class='menuItem right'><a onclick='flexMenu.pages()' href='javascript:;'>Pages</a></div>\
+//  bottomMenu[0].addEventListener('click', function () { location.reload(); });
 }
 
 function initializeNextPrev() {
@@ -329,7 +301,73 @@ function setPages() {
   
 }
 
+flexMenu.prev = function () {
+  var prv = document.getElementById("Prev");
+  prv.click();
+  // if(isDefined(prv)) {
+  //   prv.click();
+  // }
+}
+
+flexMenu.next = function () {
+  var nxt = document.getElementById("Next");
+  nxt.click();
+  // if(isDefined(nxt)) {
+  //   nxt.click();
+  // }
+}
+
+//flexMenu.pages = function () {
+//  //alert("in pages");
+//  var menu = document.getElementById("pages");
+//  if (isDefined(menu)) {
+//    const cssObj = window.getComputedStyle(menu, null);
+//    let display = cssObj.getPropertyValue("display");
+//    //alert(display);
+//    if (display !== "block")
+//      menu.style.display = "block";
+//    else
+//      menu.style.display = "none";
+//  }
+//};
+
+flexMenu.pages = function () {
+  //alert("in pages");
+  var menu = document.getElementById("pages");
+  var pageStyle = menu.style.display;
+  //alert(pageStyle);
+  if (isDefined(menu)) {
+    if (menu.style.display == "block")
+      menu.style.display = "none";
+    else
+      menu.style.display = "block";
+  }
+};
+
+flexMenu.sections = function () {
+  var menu = document.getElementById("sections");
+  if (isDefined(menu)) {
+    if (menu.style.display == "block")
+      menu.style.display = "none";
+    else
+      menu.style.display = "block";
+  }
+}
+
+flexMenu.about = function () {
+  var date = document.getElementById("modified").innerText;
+  var menu = document.getElementById("about");
+  menu.innerHTML = menu.innerText + "<br />" + "Last modified: " + date;
+  if (isDefined(menu)) {
+    if (menu.style.display == "block")
+      menu.style.display = "none";
+    else
+      menu.style.display = "block";
+  }
+}
+
 function initialize() {
+  initializePages();
   initializeMenu();
   initializeNextPrev();
 }
@@ -395,7 +433,7 @@ function scrollMenuLeft() {
   // listen for mouse events:
   // - mouse actions are defined below
 
-  document.addEventListener('mousedown', (event) => { mouseAction(event); }, false);
+  //document.addEventListener('mousedown', (event) => { mouseAction(event); }, false);
 
 
   
