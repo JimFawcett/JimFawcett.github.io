@@ -371,7 +371,7 @@ flexMenu.about = function () {
   var date = document.getElementById("modified").innerText;
   var menu = document.getElementById("about");
   var help = document.getElementById("hlp");
-  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021" + "<br />" + "Last modified: " + date;
+  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021" + "<br />" + "Page last modified: " + date;
   menu.innerHTML += "<br /><a href='#' onclick='flexMenu.showHelp()'>help menu</a>"
   if (isDefined(menu)) {
     if (menu.style.display == "block") {
