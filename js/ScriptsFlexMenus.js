@@ -153,6 +153,18 @@ function initializeMenu() {
               <div style='height:0.25em;'></div>\
             </div>\
           </details>\
+          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+            <summary>Tests</summary>\
+            <div style='margin-left:1.0em;'>\
+              <div class='ddItem ddDetails'><a href='TestFlexMenu.html'>Test Flex Menu</a></div>\
+              <div class='ddItem ddDetails'><a href='TestSiblingFlexMenu.html'>Test Sibling Flex Menu</a></div>\
+              <div class='ddItem ddDetails'><a href='WebComponentTests.html'>UI Widget Tests</a></div>\
+              <div class='ddItem ddDetails'><a href='TestGrid.html'>TestGrid - Sized</a></div>\
+              <div class='ddItem ddDetails'><a href='TestGrid2.html'>TestGrid - AbsPos</a></div>\
+              <div class='ddItem ddDetails'><a href='../Test/FlexMenus/TestFlexMenu.html'>TestFlexMenu - Basic</a></div>\
+              <div style='height:0.25em;'></div>\
+            </div>\
+          </details>\
           <div class='ddItem'><a href='TechnicalLinks.html'>Technical Links</a></div>\
           <div class='ddItem'><a href='https://github.com/joshnh/Git-Commands'>git commands</a></div>\
           <div class='ddItem'><a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a></div>\
@@ -248,8 +260,6 @@ function initializeMenu() {
   <div class='menuItem right'><a onclick='flexMenu.pages()' href='javascript:;'>Pages</a></div>\
   <div class='menuItem right'><a onclick='flexMenu.sections()' href='javascript:;'>Sections</a></div>\
   <div class='menuItem right'><a onclick='flexMenu.about()' href='javascript:;'>About</a></div>";
-//   <div onclick='flexMenu.pages()' class='menuItem right'><a onclick='flexMenu.pages()' href='javascript:;'>Pages</a></div>\
-//  bottomMenu[0].addEventListener('click', function () { location.reload(); });
 }
 
 function initializeNextPrev() {
@@ -317,53 +327,89 @@ flexMenu.next = function () {
   // }
 }
 
-//flexMenu.pages = function () {
-//  //alert("in pages");
-//  var menu = document.getElementById("pages");
-//  if (isDefined(menu)) {
-//    const cssObj = window.getComputedStyle(menu, null);
-//    let display = cssObj.getPropertyValue("display");
-//    //alert(display);
-//    if (display !== "block")
-//      menu.style.display = "block";
-//    else
-//      menu.style.display = "none";
-//  }
-//};
+flexMenu.top = function () {
+  location.hash = "#top";
+}
+
+flexMenu.bottom = function () {
+  location.hash = "#bottom";
+}
+
+flexMenu.siteMap = function () {
+  window.location.assign("SiteMap.html");
+}
 
 flexMenu.pages = function () {
-  //alert("in pages");
   var menu = document.getElementById("pages");
   var pageStyle = menu.style.display;
-  //alert(pageStyle);
   if (isDefined(menu)) {
-    if (menu.style.display == "block")
+    if (menu.style.display == "flex")
       menu.style.display = "none";
     else
-      menu.style.display = "block";
+      menu.style.display = "flex";
   }
 };
 
 flexMenu.sections = function () {
   var menu = document.getElementById("sections");
   if (isDefined(menu)) {
-    if (menu.style.display == "block")
+    if (menu.style.display == "flex")
       menu.style.display = "none";
     else
-      menu.style.display = "block";
+      menu.style.display = "flex";
   }
 }
 
 flexMenu.about = function () {
   var date = document.getElementById("modified").innerText;
   var menu = document.getElementById("about");
-  menu.innerHTML = menu.innerText + "<br />" + "Last modified: " + date;
+  var help = document.getElementById("hlp");
+  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021" + "<br />" + "Last modified: " + date;
+  menu.innerHTML += "<br /><a href='#' onclick='flexMenu.showHelp()'>help menu</a>"
   if (isDefined(menu)) {
-    if (menu.style.display == "block")
+    if (menu.style.display == "block") {
       menu.style.display = "none";
-    else
+      help.style.display = "none";
+    }
+    else {
       menu.style.display = "block";
+    }
   }
+}
+
+flexMenu.showHelp = function () {
+  var helpMenu = document.getElementById("hlp");
+  helpMenu.style.display = "block";
+  //if (!defined(helpMenu)) {
+  //  return;
+  //}
+  helpMenu.innerHTML = '<table>\
+    <tr>\
+      <td class="helpItem" onclick="storyMenu.toggleTOC()">Esc</td>\
+      <td>toggle&nbsp;menus</td>\
+    </tr>\
+    <tr>\
+      <td class="helpItem" onclick="location.reload()">R</td><td>Refresh</td>\
+    </tr>\
+    <tr>\
+      <td class="helpItem" onclick="flexMenu.next()">N</td><td>Next Bite</td>\
+    </tr>\
+    <tr>\
+      <td class="helpItem" onclick="flexMenu.prev()">P</td><td>Prev Bite</td>\
+    </tr>\
+    <tr>\
+      <td class="helpItem" onclick="history.back()">B</td><td>Back</td>\
+    </tr>\
+    <tr>\
+      <td class="helpItem" onclick="flexMenu.top()">T</td><td>scroll&nbsp;to&nbsp;top</td>\
+    </tr>\
+    <tr>\
+      <td class="helpItem" onclick="flexMenu.bottom()">E</td><td>scroll&nbsp;to&nbsp;end</td>\
+    </tr>\
+    <tr>\
+      <td class="helpItem" onclick="flexMenu.siteMap()">H</td><td>SiteMap</td>\
+    </tr>\
+  </table>';
 }
 
 function initialize() {
@@ -405,26 +451,6 @@ function scrollMenuLeft() {
     }
   }
 
-// //----< load page defined in current page's Prev link >--------------
-
-// function loadPrev() {
-//   try {
-//     document.getElementById("Prev").click();
-//   }
-//   catch (err) {
-//     console.log('exception: ' + err);
-//   }
-// }
-// //----< load page defined in current page's Next link >--------------
-
-// function loadNext() {
-//   try {
-//     document.getElementById("Next").click();
-//   }
-//   catch (err) {
-//     console.log('exception: ' + err);
-//   }
-// }
   // listen for keyboard events:
   // - key actions are defined in ScriptsKeyboard.js
 

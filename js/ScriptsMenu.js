@@ -67,6 +67,9 @@ function initializeMenu() {
       <button id=res class='dropbutton'>Res&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
+        <a href='TestFlexMenu.html'>Test Flex Menu</a>\
+        <a href='TestBasicFlexMenu.html'>Test Basic Flex Menu (depr)</a>\
+        <a href='WebComponentTests.html'>UI Widget Tests</a>\
         <a href='Videos.html' class='menuItem'>Videos</a>\
         <a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a>\
         <a href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a>\
@@ -86,9 +89,6 @@ function initializeMenu() {
         <a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a>\
         <a href='TechnicalLinks.html'>Technical Links</a>\
         <a href='WebNotes.html'>Web Notes</a>\
-        <a href='WebComponentTests.html'>UI Widget Tests</a>\
-        <a href='TestFlexMenu.html'>Test Flex Menu</a>\
-        <a href='TestBasicFlexMenu.html'>Test Basic Flex Menu</a>\
         <a href='https://encycolorpedia.com/named'>Web Colors</a>\
         <a href='UML.html'>UML Diagrams</a>\
         <a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a>\
