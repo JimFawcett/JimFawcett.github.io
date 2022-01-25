@@ -71,6 +71,7 @@ function initializeMenu() {
       <button id=res class='dropbutton'>Res&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Coding&nbsp;Resources&nbsp;</div>\
+        <a href='PageFrame.html'>Test Page Frame</a>\
         <a href='TestFlexMenu.html'>Test Flex Menu</a>\
         <a href='TestBasicFlexMenu.html'>Test Basic Flex Menu (depr)</a>\
         <a href='WebComponentTests.html'>UI Widget Tests</a>\

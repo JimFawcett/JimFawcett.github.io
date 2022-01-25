@@ -1,0 +1,54 @@
+/* 
+ * ScriptsPageFramePages2.js
+ * initialize pages script with enough pages to overflow page container 
+ */
+
+function initializePages() {
+
+  var pagesMenu = document.getElementById("pages");
+  if (isDefined(pagesMenu)) {
+    pagesMenu.innerHTML = "<div style='height:0.5em;'>&nbsp;</div>\
+          <div class='ddItem'><a href='PageFrame.html'>PageFrame</a></div>\
+          <div class='ddItem'><a href='PageFrame2.html'>PageFrame2&nbsp;</a></div>\
+          <div class='ddItem'><a href='PageFrame3.html'>PageFrame3</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #4</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #5</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #6</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #7</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #8</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #9</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #10</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #11</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #12</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #13</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #14</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #15</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #16</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #17</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #18</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #19</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #20</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #21</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #22</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #23</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #24</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #25</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #26</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #27</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #28</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #29</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #30</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #31</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #32</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #33</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #34</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #35</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #36</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #37</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #38</a></div>\
+          <div class='undef ddItem'><a href='javascript:;'>Page #39</a></div>\
+          <div>&nbsp;</div>\
+          <div>&nbsp;</div>\
+          <div>&nbsp;</div>";
+  }
+}
