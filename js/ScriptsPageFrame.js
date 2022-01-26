@@ -1,3 +1,10 @@
+/*
+ * ScriptsPageFrame.js
+ * - Builds top menu so only one place to change for adding or removing link
+ * - Builds bottom Pages menu since all pages in thread have same sibling pages
+ * - Builds About popup, used by all pages
+ *   - About gets its date last modified data from an element with id="modified"
+ */
 
 function isDefined(elem) {
   if (typeof elem === 'undefined' || elem === null || elem === undefined) {
@@ -8,15 +15,17 @@ function isDefined(elem) {
 
 var bottomMenu = new Object();
 
+/* run menu builders at startup */
+
 function initialize() {
   initializeMenu();
   initializePages();
   initializeNextPrev();
 }
 
-function initializeMenu() {
+/* create top menu */
 
-  // create top menu
+function initializeMenu() {
 
   var topMenu = document.getElementById("navbar");
   topMenu.innerHTML = "<div class='navbar'>\
@@ -254,7 +263,6 @@ function initializeNextPrev() {
 
   // hide Next and Prev links if page has no next or previous pages
   // otherwise load href from page link
-  /*alert("nxtprv");*/
   var nxt = document.getElementById("Next");
   if (!isDefined(nxt)) {
     document.getElementById("nextLink").style.display = "none";  // button top right menu
@@ -278,6 +286,8 @@ function initializeNextPrev() {
     document.getElementById("prevLink2").href = prv.href;
   }
 }
+
+/* provide click functionality for menu buttons */
 
 bottomMenu.next = function () {
   var nxt = document.getElementById("Next");
