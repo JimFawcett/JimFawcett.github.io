@@ -162,8 +162,8 @@ function initializeMenu() {
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Tests</summary>\
             <div style='margin-left:1.0em;'>\
+              <div class='ddItem ddDetails'><a href='PageFrame.html'>Test Page Frame</a></div>\
               <div class='ddItem ddDetails'><a href='TestFlexMenu.html'>Test Flex Menu</a></div>\
-              <div class='ddItem ddDetails'><a href='TestSiblingFlexMenu.html'>Test Sibling Flex Menu</a></div>\
               <div class='ddItem ddDetails'><a href='WebComponentTests.html'>UI Widget Tests</a></div>\
               <div class='ddItem ddDetails'><a href='TestGrid.html'>TestGrid - Sized</a></div>\
               <div class='ddItem ddDetails'><a href='TestGrid2.html'>TestGrid - AbsPos</a></div>\
