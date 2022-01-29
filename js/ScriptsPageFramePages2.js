@@ -11,6 +11,7 @@ function initializePages() {
           <div class='ddItem'><a href='PageFrame.html'>PageFrame</a></div>\
           <div class='ddItem'><a href='PageFrame2.html'>PageFrame2&nbsp;</a></div>\
           <div class='ddItem'><a href='PageFrame3.html'>PageFrame3</a></div>\
+          <div class='ddItem'><a href='PageFrame4.html'>PageFrame4</a></div>\
           <div class='undef ddItem'><a href='javascript:;'>Page #4</a></div>\
           <div class='undef ddItem'><a href='javascript:;'>Page #5</a></div>\
           <div class='undef ddItem'><a href='javascript:;'>Page #6</a></div>\
