@@ -4,6 +4,8 @@
  * - Builds bottom Pages menu since all pages in thread have same sibling pages
  * - Builds About popup, used by all pages
  *   - About gets its date last modified data from an element with id="modified"
+ * - Builds Keys popup, used by all pages
+ *   - Shows list of key actions, e.g., B is History.back()
  */
 
 function isDefined(elem) {
@@ -12,8 +14,6 @@ function isDefined(elem) {
   }
   return true;
 }
-
-var bottomMenu = new Object();
 
 /* run menu builders at startup */
 
@@ -259,43 +259,50 @@ function initializeMenu() {
   </div>\
   <div style='clear:all;'></div>";
 }
+
+/* define page object with page methods and data fields */
+
+let page = new Object();
+
 function initializeNextPrev() {
 
-  // hide Next and Prev links if page has no next or previous pages
-  // otherwise load href from page link
-  var nxt = document.getElementById("Next");
-  if (!isDefined(nxt)) {
-    document.getElementById("nextLink").style.display = "none";  // button top right menu
-    document.getElementById("nextLink2").style.display = "none";  // button top right menu
+  /* these page items cannot be boosted to global level (not defined there) */
+
+  page.nxt = document.getElementById("Next");
+  page.prv = document.getElementById("Prev");
+  page.nxtlnk = document.getElementById("nextLink");
+  page.prvlnk = document.getElementById("prevLink");
+  page.nxtlnk2 = document.getElementById("nextLink2");
+  page.prvlnk2 = document.getElementById("prevLink2");
+
+  if (!isDefined(page.nxt)) {
+    page.nxtlnk.style.display = "none";  // button top right menu
+    page.nxtlnk2.style.display = "none";  // button bottom right menu
   }
   else {
-    var nl = document.getElementById("nextLink");
-    nl.setAttribute('href', nxt.href);
-    var nl = document.getElementById("nextLink2");
-    nl.setAttribute('href', nxt.href);
-    // document.getElementById("nextLink").href = nxt.href;
+    page.nxtlnk.setAttribute('href', page.nxt.href);
+    page.nxtlnk2.setAttribute('href', page.nxt.href);
   }
 
-  var prv = document.getElementById("Prev");
-  if (prv === null) {
-    document.getElementById("prevLink").style.display = "none";  // button top right menu
-    document.getElementById("prevLink2").style.display = "none";  // button top right menu
+  if (page.prv === null) {
+    page.prvlnk.style.display = "none";  // button top right menu
+    page.prvlnk2.style.display = "none";  // button bottom right menu
   }
   else {
-    document.getElementById("prevLink").href = prv.href;
-    document.getElementById("prevLink2").href = prv.href;
+    page.prvlnk.href = page.prv.href;
+    page.prvlnk2.href = page.prv.href;
   }
 }
 
 /* provide click functionality for menu buttons */
 
+var bottomMenu = new Object();
+
 bottomMenu.next = function () {
-  var nxt = document.getElementById("Next");
-  nxt.click();
+  page.nxt.click();
 }
 bottomMenu.prev = function () {
-  var prv = document.getElementById("Prev");
-  prv.click();
+  page.prv.click();
 }
 bottomMenu.top = function () {
   location.hash = "#top";
@@ -330,6 +337,19 @@ bottomMenu.sections = function () {
   }
 }
 
+bottomMenu.keys = function () {
+  var help = document.getElementById("hlp");
+  if (isDefined(help)) {
+    if (help.style.display == "block") {
+      help.style.display = "none";
+    }
+    else {
+      help.style.display = "block";
+      bottomMenu.showHelp();
+    }
+  }
+}
+
 bottomMenu.toggleMenus = function () {
   bottomMenu.pages();
   bottomMenu.sections();
@@ -338,13 +358,10 @@ bottomMenu.toggleMenus = function () {
 bottomMenu.about = function () {
   var date = document.getElementById("modified").innerText;
   var menu = document.getElementById("about");
-  var help = document.getElementById("hlp");
   menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021" + "<br />" + "Page last modified: " + date;
-  menu.innerHTML += "<br /><a href='#' onclick='bottomMenu.showHelp()'>help menu</a>"
   if (isDefined(menu)) {
     if (menu.style.display == "block") {
       menu.style.display = "none";
-      help.style.display = "none";
     }
     else {
       menu.style.display = "block";
