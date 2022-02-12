@@ -30,7 +30,7 @@ function initializeMenu() {
   var topMenu = document.getElementById("navbar");
   topMenu.innerHTML = "<div class='navbar'>\
     <div class='menuItem'>\
-        Home&#9662\
+        Site&#9662\
         <div class='dropdown'>\
             <div style='height:0.25em;'></div>\
             <div class='ddItem'><a href='index.html'>Home</a></div>\
