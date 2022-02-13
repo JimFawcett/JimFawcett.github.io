@@ -31,6 +31,8 @@ function initializeMenu() {
         <a href='indexCs.html'>C#&nbsp;Track&nbsp;Summary&nbsp;&nbsp;</a>\
         <a href='javascript:;' class='undefined' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;first&nbsp;bite&nbsp;</a>\
         <a href='https://dotnetfiddle.net/' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a>\
+        <a href='indexWebDev.html'>WebDev&nbsp;Summary&nbsp;</a>\
+        <a href='javascript:;' class='undefined' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;first&nbsp;bite&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:smallest;'>&nbsp;</div>\
       </div>\
     </div>\
