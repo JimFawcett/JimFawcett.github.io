@@ -13,34 +13,35 @@ function initHelp() {
 
 
 storyHlpMenu.helpMenu = function() {
-  //alert('helpMenu');
   var hlpMenu = document.getElementById("hlp");
-  hlpMenu.innerHTML = '<table>\
+  hlpMenu.innerHTML = '<table id="keys">\
     <tr>\
-      <td style="padding-right:5px;" onclick="storyHlpMenu.toggleTOC()">Esc</td>\
+      <td class="key" onclick="storyHlpMenu.toggleTOC()">Esc</td>\
       <td>toggle menus</td>\
     </tr>\
     <tr>\
-      <td onclick="storyHlpMenu.closeTOC()">C</td>\
-      <td>close menus</td>\
+      <td class="key" onclick="location.reload()">R</td><td style="position:relative; z-index:1000;">Refresh</td>\
     </tr>\
     <tr>\
-      <td onclick="location.reload()">R</td><td>Refresh</td>\
+      <td class="key" onclick="storyHlpMenu.next()">N</td><td>Next Page</td>\
     </tr>\
     <tr>\
-      <td onclick="storyHlpMenu.next()">N</td><td>Next Bite</td>\
+      <td class="key" onclick="storyHlpMenu.prev()">P</td><td>Prev Page</td>\
     </tr>\
     <tr>\
-      <td onclick="storyHlpMenu.prev()">P</td><td>Prev Bite</td>\
+      <td class="key" onclick="storyHlpMenu.top()">T</td><td>scroll to top</td>\
     </tr>\
     <tr>\
-      <td onclick="storyHlpMenu.top()">T</td><td>scroll to top</td>\
+      <td class="key" onclick="storyHlpMenu.bottom()">E</td><td>scroll to bottom</td>\
     </tr>\
     <tr>\
-      <td onclick="storyHlpMenu.bottom()">B</td><td>scroll to bottom</td>\
+      <td class="key" onclick="storyHlpMenu.home()">H</td><td>Home</td>\
     </tr>\
     <tr>\
-      <td onclick="storyHlpMenu.help()">H</td><td>Help</td>\
+      <td class="key" onclick="storyHlpMenu.siteMap()">S</td><td>SiteMap</td>\
+    </tr>\
+    <tr>\
+      <td class="key" onclick="javascript:;">K</td><td>show this</td>\
     </tr>\
   </table>';
 }
@@ -48,17 +49,11 @@ storyHlpMenu.helpMenu = function() {
 storyHlpMenu.prev = function () {
   var prv = document.getElementById("Prev");
   prv.click();
-  // if(isDefined(prv)) {
-  //   prv.click();
-  // }
 }
 
 storyHlpMenu.next = function () {
   var nxt = document.getElementById("Next");
   nxt.click();
-  // if(isDefined(nxt)) {
-  //   nxt.click();
-  // }
 }
 storyHlpMenu.chaps = function () {
   var menu = document.getElementById("pages");
@@ -73,8 +68,8 @@ storyHlpMenu.chaps = function () {
 storyHlpMenu.sects = function () {
   var menu = document.getElementById("sections");
   if (isDefined(menu)) {
-    if (menu.style.display !== "block")
-      menu.style.display = "block";
+    if (menu.style.display !== "flex")
+      menu.style.display = "flex";
     else
       menu.style.display = "none";
   }
@@ -84,30 +79,42 @@ storyHlpMenu.sects = function () {
 storyHlpMenu.toggleTOC = function () {
   storyHlpMenu.chaps();
   storyHlpMenu.sects();
+  var keys = document.getElementById("hlp");
+  if (isDefined(keys)) {
+    keys.style.display = "none";
+  }
+  var mod = document.getElementById("about");
+  if (isDefined(mod)) {
+    mod.style.display = "none";
+  }
 };
 
-storyHlpMenu.closeTOC = function () {
-  // let chaps = document.getElementById("chaps");
-  // chaps.style.display = "none";
-  // let sects = document.getElementById("sects");
-  // sects.style.display = "none";
-  let toc = document.getElementById("toc");
-  toc.style.display = "none";
-};
-
-//storyHlpMenu.scrollTo(id) {
-//  location.id = "#" + id;
-//}
+//storyHlpMenu.closeTOC = function () {
+//  // let chaps = document.getElementById("chaps");
+//  // chaps.style.display = "none";
+//  // let sects = document.getElementById("sects");
+//  // sects.style.display = "none";
+//  let toc = document.getElementById("toc");
+//  toc.style.display = "none";
+//};
 
 storyHlpMenu.top = function () {
   window.location = "#top";
 }
 
 storyHlpMenu.bottom = function () {
-  window.scrollTo(0, 100000);
+  location.hash = "#bottom";
 }
 
-storyHlpMenu.help = function () {
+storyHlpMenu.home = function () {
+  window.location = "index.html";
+}
+
+storyHlpMenu.siteMap = function () {
+  window.location = "SiteMap.html";
+}
+
+storyHlpMenu.keys = function () {
   var help = document.getElementById("hlp");
   if (isDefined(help)) {
     if (help.style.display !== "block")
@@ -136,12 +143,21 @@ function keyAction(keyEvent) {
       else
         menu.style.display = "none";
     }
+    var keys = document.getElementById("hlp");
+    if (isDefined(keys)) {
+      keys.style.display = "none";
+    }
+    var mod = document.getElementById("about");
+    if (isDefined(mod)) {
+      mod.style.display = "none";
+    }
   }
   if (key === 'R') {
     location.reload();
   }
-  //if (key === 'S')
+  //if (key === 'S') {
   //  toggleSwipeEvents();
+  //}
   if (key === 'T') {
     location.hash = "#top";
   }
@@ -168,7 +184,13 @@ function keyAction(keyEvent) {
     window.history.back();
   }
   if (key === 'H') {
+    window.location.href = "index.html";
+  }
+  if (key === 'S') {
     window.location.href = "SiteMap.html";
+  }
+  if (key === 'K') {
+    storyHlpMenu.keys();
     //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
 };

@@ -21,6 +21,7 @@ function initialize() {
   initializeMenu();
   initializePages();
   initializeNextPrev();
+  storyHlpMenu.helpMenu();
 }
 
 /* create top menu */
@@ -296,6 +297,7 @@ function initializeNextPrev() {
   }
 }
 
+function initializePages() { }
 /* provide click functionality for menu buttons */
 
 var bottomMenu = new Object();
@@ -312,6 +314,10 @@ bottomMenu.top = function () {
 
 bottomMenu.bottom = function () {
   location.hash = "#bottom";
+}
+
+bottomMenu.home = function () {
+  window.location.assign("index.html");
 }
 
 bottomMenu.siteMap = function () {
@@ -340,16 +346,7 @@ bottomMenu.sections = function () {
 }
 
 bottomMenu.keys = function () {
-  var help = document.getElementById("hlp");
-  if (isDefined(help)) {
-    if (help.style.display == "block") {
-      help.style.display = "none";
-    }
-    else {
-      help.style.display = "block";
-      bottomMenu.showHelp();
-    }
-  }
+  storyHlpMenu.keys();
 }
 
 bottomMenu.toggleMenus = function () {
@@ -371,37 +368,44 @@ bottomMenu.about = function () {
   }
 }
 
-bottomMenu.showHelp = function () {
-  var helpMenu = document.getElementById("hlp");
-  helpMenu.style.display = "block";
-  helpMenu.innerHTML = '<table>\
-    <tr>\
-      <td style="cursor:pointer;" class="helpItem" onclick="storyMenu.toggleTOC()">Esc</td>\
-      <td>toggle&nbsp;menus</td>\
-    </tr>\
-    <tr>\
-      <td style="cursor:pointer;" class="helpItem" onclick="location.reload()">R</td><td>Refresh</td>\
-    </tr>\
-    <tr>\
-      <td style="cursor:pointer;" class="helpItem" onclick="bottomMenu.next()">N</td><td>Next Bite</td>\
-    </tr>\
-    <tr>\
-      <td style="cursor:pointer;" class="helpItem" onclick="bottomMenu.prev()">P</td><td>Prev Bite</td>\
-    </tr>\
-    <tr>\
-      <td style="cursor:pointer;" class="helpItem" onclick="history.back()">B</td><td>Back</td>\
-    </tr>\
-    <tr>\
-      <td style="cursor:pointer;" class="helpItem" onclick="bottomMenu.top()">T</td><td>scroll&nbsp;to&nbsp;top</td>\
-    </tr>\
-    <tr>\
-      <td style="cursor:pointer;" class="helpItem" onclick="bottomMenu.bottom()">E</td><td>scroll&nbsp;to&nbsp;end</td>\
-    </tr>\
-    <tr>\
-      <td style="cursor:pointer;" class="helpItem" onclick="bottomMenu.siteMap()">H</td><td>SiteMap</td>\
-    </tr>\
-  </table>';
-}
+//bottomMenu.showHelp = function () {
+//  var helpMenu = document.getElementById("hlp");
+//  helpMenu.style.display = "block";
+//  alert('PageFrame');
+//  helpMenu.innerHTML = '<table>\
+//    <tr>\
+//      <td style="cursor:pointer;" class="helpItem" onclick="bottomMenu.toggleMenus()">Esc</td>\
+//      <td>toggle&nbsp;menus</td>\
+//    </tr>\
+//    <tr>\
+//      <td style="cursor:pointer;" class="helpItem" onclick="location.reload()">R</td><td>Refresh</td>\
+//    </tr>\
+//    <tr>\
+//      <td style="cursor:pointer;" class="helpItem" onclick="bottomMenu.next()">N</td><td>Next Bite</td>\
+//    </tr>\
+//    <tr>\
+//      <td style="cursor:pointer;" class="helpItem" onclick="bottomMenu.prev()">P</td><td>Prev Bite</td>\
+//    </tr>\
+//    <tr>\
+//      <td style="cursor:pointer;" class="helpItem" onclick="history.back()">B</td><td>Back</td>\
+//    </tr>\
+//    <tr>\
+//      <td style="cursor:pointer;" class="helpItem" onclick="bottomMenu.top()">T</td><td>scroll&nbsp;to&nbsp;top</td>\
+//    </tr>\
+//    <tr>\
+//      <td style="cursor:pointer;" class="helpItem" onclick="bottomMenu.bottom()">E</td><td>scroll&nbsp;to&nbsp;end</td>\
+//    </tr>\
+//    <tr>\
+//      <td style="cursor:pointer;" class="helpItem" onclick="bottomMenu.home()">H</td><td>Home</td>\
+//    </tr>\
+//    <tr>\
+//      <td style="cursor:pointer;" class="helpItem" onclick="bottomMenu.siteMap()">S</td><td>SiteMap</td>\
+//    </tr>\
+//    <tr>\
+//      <td style="cursor:pointer;" class="helpItem" onclick="bottomMenu.showHelp()">K</td><td>Show this</td>\
+//    </tr>\
+//  </table>';
+//}
 // listen for keyboard events:
 // - key actions are defined in ScriptsPageFrameKeyboard.js
 
