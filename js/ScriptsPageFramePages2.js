@@ -6,13 +6,15 @@
 function initializePages() {
 
   var pagesMenu = document.getElementById("pages");
+  var pgbtn = document.getElementById("pgbtn");
   if (isDefined(pagesMenu)) {
+    pgbtn.style.display = "flex";
     pagesMenu.innerHTML = "<div style='height:0.5em;'>&nbsp;</div>\
           <div class='ddItem'><a href='PageFrame1.html'>PageFrame1</a></div>\
           <div class='ddItem'><a href='PageFrame2.html'>PageFrame2&nbsp;</a></div>\
           <div class='ddItem'><a href='PageFrame3.html'>PageFrame3</a></div>\
           <div class='ddItem'><a href='PageFrame4.html'>PageFrame4</a></div>\
-          <div class='ddItem'><a href='PageFrameTest.html'>PageFrameTest&nbsp;</a></div>\
+          <div class='ddItem'><a href='PageFrameTest.html'>PageFrameTest</a>&nbsp;&nbsp;&nbsp;</div>\
           <div class='undef ddItem'><a href='javascript:;'>Page #4</a></div>\
           <div class='undef ddItem'><a href='javascript:;'>Page #5</a></div>\
           <div class='undef ddItem'><a href='javascript:;'>Page #6</a></div>\
@@ -72,5 +74,9 @@ function initializePages() {
           <div>&nbsp;</div>\
           <div>&nbsp;</div>\
           <div>&nbsp;</div>";
+  }
+  else {
+    var pgbtn = document.getElementById("pgbtn");
+    pgbtn.style.display = "none";
   }
 }
