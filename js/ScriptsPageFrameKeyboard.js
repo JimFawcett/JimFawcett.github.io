@@ -41,7 +41,10 @@ storyHlpMenu.helpMenu = function() {
       <td class="key" onclick="storyHlpMenu.siteMap()">S</td><td>SiteMap</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="javascript:;">K</td><td>show this</td>\
+      <td class="key" onclick="javascript:;">K</td><td>keys</td>\
+    </tr>\
+    <tr>\
+      <td class="key" onclick="storyHlpMenu.about()">A</td><td>about</td>\
     </tr>\
   </table>';
 }
@@ -124,6 +127,20 @@ storyHlpMenu.keys = function () {
   }
 }
 
+storyHlpMenu.about = function () {
+  var date = document.getElementById("modified").innerText;
+  var menu = document.getElementById("about");
+  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021" + "<br />" + "Page last modified: " + date;
+  if (isDefined(menu)) {
+    if (menu.style.display == "block") {
+      menu.style.display = "none";
+    }
+    else {
+      menu.style.display = "block";
+    }
+  }
+}
+
 function keyAction(keyEvent) {
   keystate = 'down';
   var key = String.fromCharCode(keyEvent.which);
@@ -191,6 +208,10 @@ function keyAction(keyEvent) {
   }
   if (key === 'K') {
     storyHlpMenu.keys();
+    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
+  }
+  if (key === 'A') {
+    storyHlpMenu.about();
     //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
 };
