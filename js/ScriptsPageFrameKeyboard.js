@@ -1,8 +1,8 @@
-/////////////////////////////////////////////////////////////////////////////
-// ScriptsFlexMenuKeyboard.js - defines behaviors for selected key presses //
-//                                                                         //
-// Jim Fawcett, 19 Jan 2022                                               //
-/////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+// ScriptsPageFrameKeyboard.js - defines behaviors for selected key presses //
+//                                                                          //
+// Jim Fawcett, 19 Jan 2022                                                 //
+//////////////////////////////////////////////////////////////////////////////
 
 var HelpWin
 var storyHlpMenu = new Object();
@@ -48,6 +48,9 @@ storyHlpMenu.helpMenu = function() {
     </tr>\
     <tr>\
       <td class="key" onclick="storyHlpMenu.about()">A</td><td>about</td>\
+    </tr>\
+    <tr>\
+      <td colspan=2><div style="height:0.25em;">&nbsp;</div></td>\
     </tr>\
   </table>';
 }
