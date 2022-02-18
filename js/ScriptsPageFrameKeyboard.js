@@ -20,7 +20,7 @@ storyHlpMenu.helpMenu = function() {
       <td>toggle menus</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="location.reload()">R</td><td style="position:relative; z-index:1000;">Refresh</td>\
+      <td class="key" onclick="location.reload()">R</td><td>Refresh</td>\
     </tr>\
     <tr>\
       <td class="key" onclick="storyHlpMenu.next()">N</td><td>Next Page</td>\
@@ -117,8 +117,8 @@ storyHlpMenu.siteMap = function () {
 storyHlpMenu.keys = function () {
   var help = document.getElementById("hlp");
   if (isDefined(help)) {
-    if (help.style.display !== "block")
-      help.style.display = "block";
+    if (help.style.display !== "flex")
+      help.style.display = "flex";
     else
       help.style.display = "none";
   }
