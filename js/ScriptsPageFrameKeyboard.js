@@ -32,6 +32,9 @@ storyHlpMenu.helpMenu = function() {
       <td class="key" onclick="storyHlpMenu.prev()">P</td><td>Prev Page</td>\
     </tr>\
     <tr>\
+      <td class="key" onclick="window.history.back()">B</td><td>Back</td>\
+    </tr>\
+    <tr>\
       <td class="key" onclick="storyHlpMenu.top()">T</td><td>scroll to top</td>\
     </tr>\
     <tr>\
