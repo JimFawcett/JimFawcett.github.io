@@ -119,11 +119,11 @@ storyHlpMenu.bottom = function () {
 }
 
 storyHlpMenu.home = function () {
-  window.location = "index.html";
+  window.location = "../../index.html";
 }
 
 storyHlpMenu.siteMap = function () {
-  window.location = "SiteMap.html";
+  window.location = "../../SiteMap.html";
 }
 
 storyHlpMenu.keys = function () {
@@ -210,10 +210,10 @@ function keyAction(keyEvent) {
     window.history.back();
   }
   if (key === 'H') {
-    window.location.href = "index.html";
+    window.location.href = "../../index.html";
   }
   if (key === 'S') {
-    window.location.href = "SiteMap.html";
+    window.location.href = "../../SiteMap.html";
   }
   if (key === 'K') {
     storyHlpMenu.keys();
