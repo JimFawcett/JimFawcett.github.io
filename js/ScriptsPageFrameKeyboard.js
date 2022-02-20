@@ -53,9 +53,32 @@ storyHlpMenu.helpMenu = function() {
       <td class="key" onclick="storyHlpMenu.about()">A</td><td>about</td>\
     </tr>\
     <tr>\
+      <td class="key" onclick="storyHlpMenu.incrZoomScreen()">out</td><td>Zoom out</td>\
+    </tr>\
+    <tr>\
+      <td class="key" onclick="storyHlpMenu.normZoomScreen()">norm</td><td>def zoom</td>\
+    </tr>\
+    <tr>\
+      <td class="key" onclick="storyHlpMenu.decrZoomScreen()">in</td><td>Zoom in</td>\
+    </tr>\
+    <tr>\
       <td colspan=2><div style="height:0.25em;">&nbsp;</div></td>\
     </tr>\
   </table>';
+}
+
+storyHlpMenu.incrZoomScreen = function () {
+  /*alert("-Zoom");*/
+  //document.body.style.zoom = "120%";
+  document.body.style.fontSize = "22px";
+}
+storyHlpMenu.normZoomScreen = function () {
+  /*alert("-Zoom");*/
+  document.body.style.fontSize = "18px";
+}
+storyHlpMenu.decrZoomScreen = function () {
+  /*alert("-Zoom");*/
+  document.body.style.fontSize = "14px";
 }
 
 storyHlpMenu.prev = function () {
