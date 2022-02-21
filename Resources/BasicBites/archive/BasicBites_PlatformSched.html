@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<!--
+  BasicBites_Intro.html
+--->
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="keywords" content="Rust, Introduction" />
+    <meta name="Author" content="Jim Fawcett" />
+    <meta name="Author" content="James Fawcett" />
+    <title>Basic Bites PlatformSched</title>
+    <link rel="stylesheet" href="css/BiteStyles.css" />
+    <link rel="stylesheet" href="css/StylesWebComponents.css" />
+    <script src="js/ScriptsWebComponents.js"></script>
+    <script src="js/BasicBiteScripts.js"></script>
+    <script src="js/BiteTables.js"></script>
+    <script src="js/ScriptsKeyboard.js"></script>
+  </head>
+  <body id="github" onload="initBites()">
+    <div class="top-banner">
+      <span id="hctr">Platform and Code Basics</span>
+      <span class="top-center">Platform Scheduling </span>
+    </div>
+    <next-prev>
+      <a href="../../index.html" style="color:#fefefa;">Home</a>&nbsp;
+      <a id="repo" href="../../BasicBiteByByte.html">Repo</a> 
+      <a id="Prev" href="BasicBites_PlatformMemory.html">prev</a> 
+      <a id="Next" href="BasicBites_PlatformIO.html">next</a>
+    </next-prev>
+
+    <toc-b id="toc">
+      <div id="bottom-menu" style="display:flex; flex-direction:row">
+      </div>
+        <up-b id="chaps">
+        </up-b>
+          <rt-b id="sects">
+        <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#starting">Starting</a>, 
+        <a href="#contents">Contents</a>, <a href="#refs">References</a>
+      </rt-b>
+    </toc-b>
+    <div id="hlp" style="display:none;">
+    </div>
+   
+    <h2>BasicBites - Work Scheduling</h2>
+    <t-b>
+      Modern processors have several cores, perhaps two or four.  Code in each core can create and manage seperate 
+      threads of execution.  When a process starts, its processing is assigned to a core, and is loaded with
+      a single main thread running.  The code of that program can create additional threads to work on
+      some partition of the program&apos;s activities.
+    </t-b>
+    <photosizer-block src="pictures/Scheduling.png" width="500" class="photoSizerBlock right" style="margin-top:0;">
+      <span style="
+        display: inline-block;
+        font-weight: bold;
+        font-family: 'Comic Sans MS, Tahoma';
+        background-color: #ddd;
+        width: 100%;
+        padding: 5px 0px;"
+      >
+          Figure 1. Windows Thread Scheduling
+      </span>
+    </photosizer-block>
+    <t-b>
+      Windows schedules threads, not processes.  A process is simply a container for resources shared by all the threads
+      running in that process.  Figure 1. illustrates that: each thread has an associated Thread Context Block (TCB) and each
+      TCB holds a pointer to a shared Process Context Block (PCB) that keeps track of the process resources.
+    </t-b>
+    <t-b>
+      When a thread is created it has an assigned priority.  Its TCB is placed in a &quot;ready to run&quot; queue of TCBs with the same priority.
+      Windows supports seven priorities, three of which are shown in Figure 1.
+    </t-b>
+    <t-b>
+      The Windows scheduler uses a preemptive First Come, First Served strategy.  It starts a new thread by going to the highest 
+      priority queue with one or more TCBs, dequeues the
+      TCB at the end and creates a thread using the TCB contents.  The thread is assigned a quantum or time-slice that 
+      determines the maximum time it can run before being suspended.  The quanta value is determined by its thread&apos;s
+      priority - higher priorities get larger quanta, and so, run longer.
+    </t-b>
+    <t-b>
+      A lower priority queue gets serviced only if all higher priority queues are empty.  For that reason, it is entirely
+      possible, though unlikely, that a low priority thread never runs.  Windows is not a &quot;Fair&quot; operating system.
+    </t-b>
+    <t-b>
+      When a running thread&apos;s time-slice expires it is placed at the end of the queue for its priority and waits for
+      service by the scheduler.  There are three other reasons for a thread to stop: it may block waiting for a resource
+      held by another thread, e.g. an IO device or file, it may be suspended by another thread making a call to suspend it
+      using the thread API, or it may abort due to an unhandled exception.
+    </t-b>
+    <t-b>
+      When a blocked thread becomes unblocked, as signaled by the resource on which it waits, it is placed back on the
+      queue for its priority and waits to be serviced.  When a suspended thread is released by another thread, it too is
+      placed on its ready to run queue.
+    </t-b>
+    <t-b>
+      Linux and MacOS use essentially the same strategies with some amendments.  Lunix, for example maintains two stacks of
+      prioritized queues: active and expired.  These schedulers behave in a manner similar to Windows, but schedule
+      processes instead of threads.  Unlike Windows, Linux threads are simply child processes that share the same virtual address space
+      as their parent process.
+    </t-b>
+    <h3>Consequences:</h3>
+    <t-b>
+      The good: Windows thread average processing rates depend on a, possibly program defined, priority.  Each core works most often
+      on the most important threads.  Blocked or suspended threads use almost no processor resources.  Each thread has access to a
+      set of shared process resources.
+    </t-b>
+    <t-b>
+      The bad: low priority threads may never run.  A high priority thread may be blocked waiting for a resource held by a lower
+      priority thread. Each thread has start-up latency that depends on its priority and the number of threads ahead of it in
+      its ready to run queue and the number of waiting threads with higher priority. A fraction of a core&apos;s execution is
+      spent on thread context switching.  If a large number of threads are running on a core, its average useful work performed may
+      become very low.
+    </t-b>
+    <h3>References:</h3>
+    <t-b>
+      <ol class="indent tight">
+        <li>
+          <a href="https://www.cs.columbia.edu/~smb/classes/s06-4118/l13.pdf">Linux Scheduler (pdf)</a>
+        </li>
+        <li>
+          <a href="https://docs.microsoft.com/en-us/windows/win32/procthread/scheduling">Windows Scheduler</a>
+        </li>
+      </ol>
+    </t-b>
+  </body>
+</html>

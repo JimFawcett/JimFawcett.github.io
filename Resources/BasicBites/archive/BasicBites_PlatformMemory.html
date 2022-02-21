@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+<!--
+  BasicBites_Intro.html
+--->
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="keywords" content="Rust, Introduction" />
+    <meta name="Author" content="Jim Fawcett" />
+    <meta name="Author" content="James Fawcett" />
+    <title>Basic Bites PlatformMemory</title>
+    <link rel="stylesheet" href="css/BiteStyles.css" />
+    <link rel="stylesheet" href="css/StylesWebComponents.css" />
+    <script src="js/ScriptsWebComponents.js"></script>
+    <script src="js/BasicBiteScripts.js"></script>
+    <script src="js/BiteTables.js"></script>
+    <script src="js/ScriptsKeyboard.js"></script>
+  </head>
+  <body id="github" onload="initBites()">
+    <div class="top-banner">
+      <span id="hctr">Platform and Code Basics</span>
+      <span class="top-center">Platform Memory</span>
+    </div>
+    <next-prev>
+      <a href="../../index.html" style="color:#fefefa;">Home</a>&nbsp;
+      <a id="repo" href="../../BasicBiteByByte.html">Repo</a> 
+      <a id="Prev" href="BasicBites_Platform.html">prev</a> 
+      <a id="Next" href="BasicBites_PlatformSched.html">next</a>
+    </next-prev>
+
+    <toc-b id="toc">
+      <div id="bottom-menu" style="display:flex; flex-direction:row">
+      </div>
+        <up-b id="chaps">
+        </up-b>
+          <rt-b id="sects">
+        <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#starting">Starting</a>, 
+        <a href="#contents">Contents</a>, <a href="#refs">References</a>
+      </rt-b>
+    </toc-b>
+    <div id="hlp" style="display:none;">
+    </div>
+   
+    <h2>BasicBites - Platform Memory</h2>
+    <t-b>
+      Programs that run on a modern operating system are given a view into platfrom memory that appears to be
+      linear, but in fact is not.  The operating system needs to support multiple concurrent users and a large
+      number of active programs, often requiring much more than the available random access memory (RAM).
+    </t-b>
+    <photosizer-block src="pictures/MemoryMapping.png" width="400" class="photoSizerBlock right" style="margin-top:0;">
+      <span style="
+        display: inline-block;
+        font-weight: bold;
+        font-family: 'Comic Sans MS, Tahoma';
+        background-color: #ddd;
+        width: 100%;
+        padding: 5px 0px;"
+      >
+          Figure 1. Virtual Memory Structure
+      </span>
+    </photosizer-block>
+    <t-b>
+      It does that by using blocks for memory contents that can be swapped out to a Page Table, implemented as a 
+      memory-mapped file, and to other memory-mapped files holding control and contents for Disk Files and other Devices.
+    </t-b>
+    <t-b>
+      Figure 1. shows a structure for memory-mapping.  There is a Virtual Address Space provided as a view into memory
+      for each running program.  Program binaries are broken into 512 or 1024 sized blocks and loaded into physical
+      memory and the page table, based on availability of physical memory.  When a process starts, its binary code is
+      mapped into physical memory on an available memory page basis.  Any blocks that have no available space are mapped
+      into the page table.
+    </t-b>
+    <t-b>
+      Two processes may share the same block of physical RAM in order to share its contents.  That must be protected
+      from writers clashing with readers by using system-wide synchronization constructs like named mutexes.
+    </t-b>
+    <t-b>
+      As new processes start, the OS may map some of the pages of a running process into the page table, allowing a
+      newly created process to use them for its binary.  Each OS has its own algorithms for deciding when a block of
+      physical RAM should have its contents written to the page file and when it should be swapped back in.  This
+      swapping process is also used for large files and devices.  
+    </t-b>
+    <t-b>
+      The event of initiating a page swap is called a page fault.
+      A page fault will occur, for example, when code in an active page attempts to reference a page that has been
+      swapped out to the page table.
+      The rate of page faults has a significant impact on process performance.
+    </t-b>
+    <t-b>
+      Page mapping is supported by a symbiosis of OS and hardware processing.
+    </t-b>
+    <h3>Consequences:</h3>
+    <t-b>
+      The good: virtual memory systems accomodate many users and many platform processes that should be loaded and become
+      active when an individual logs in, if a needed process is not already running.
+    </t-b>
+    <t-b>
+      The bad: when a program binary is very large it is much more likely to be subject to page faults when the OS
+      needs to give memory to other programs.  Page fault processing takes a significant amount of time compared to program
+      processing and may cause very large decreases in program performance.
+    </t-b>
+  </body>
+</html>
