@@ -34,23 +34,23 @@ function initializeMenu() {
         Site&#9662\
         <div class='dropdown'>\
             <div style='height:0.25em;'></div>\
-            <div class='ddItem'><a href='../../index.html'>Home</a></div>\
-            <div class='ddItem'><a href='../../SiteMap.html'>SiteMap</a></div>\
+            <div class='ddItem'><a href='index.html'>Home</a></div>\
+            <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
               <summary>About&nbsp;Site&nbsp;&nbsp;&nbsp;</summary>\
               <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a href='../../JimFawcett.html'>Jim Fawcett</a></div>\
-              <div class='ddItem ddDetails'><a href='../../Interesting.html'>Interesting&nbsp;things&nbsp;&nbsp;</a></div>\
-              <div class='ddItem ddDetails'><a href='../../Friends.html'>Friends&nbsp;&amp;&nbsp;Collaborators</a></div>\
-              <div class='ddItem ddDetails'><a href='../../Help.html'>Help</a></div>\
-              <div class='ddItem ddDetails'><a href='../../SitePlans.html'>Site Plans</a></div>\
+              <div class='ddItem ddDetails'><a href='JimFawcett.html'>Jim Fawcett</a></div>\
+              <div class='ddItem ddDetails'><a href='Interesting.html'>Interesting&nbsp;things&nbsp;&nbsp;</a></div>\
+              <div class='ddItem ddDetails'><a href='Friends.html'>Friends&nbsp;&amp;&nbsp;Collaborators</a></div>\
+              <div class='ddItem ddDetails'><a href='Help.html'>Help</a></div>\
+              <div class='ddItem ddDetails'><a href='SitePlans.html'>Site Plans</a></div>\
               <div class='ddItem ddDetails'><a href='#' onclick='togglenavKeys()'>Toggle Nav Keys</a></div>\
               <div class='ddItem ddDetails'><a href='#' onclick='toggleSwipeEvents()'>Toggle Swipe Events</a></div>\
-              <div class='ddItem ddDetails'><a href='../../SiteDesign.html'>Site Design</a></div>\
-              <div class='ddItem ddDetails'><a href='../../BookDesignCourse.html'>Design Course</a></div>\
-              <div class='ddItem ddDetails'><a class='border' href='../../index.html'>L1 Site Home</a></div>\
-              <div class='ddItem ddDetails'><a class='border' href='../../RsRepositories.html'>L2&nbsp;Repository&nbsp;webpage</a></div>\
-              <div class='ddItem ddDetails'><a class='border' href='../../RustBiteByByte.html'>L3&nbsp;Rust&nbsp;Bites</a></div>\
+              <div class='ddItem ddDetails'><a href='SiteDesign.html'>Site Design</a></div>\
+              <div class='ddItem ddDetails'><a href='BookDesignCourse.html'>Design Course</a></div>\
+              <div class='ddItem ddDetails'><a class='border' href='index.html'>L1 Site Home</a></div>\
+              <div class='ddItem ddDetails'><a class='border' href='RsRepositories.html'>L2&nbsp;Repository&nbsp;webpage</a></div>\
+              <div class='ddItem ddDetails'><a class='border' href='RustBiteByByte.html'>L3&nbsp;Rust&nbsp;Bites</a></div>\
               <div class='ddItem ddDetails'><a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a></div>\
               <div style='height:1em;'></div>\
             </div>\
