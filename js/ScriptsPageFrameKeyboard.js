@@ -72,7 +72,7 @@ storyHlpMenu.normZoomScreen = function () {
 }
 storyHlpMenu.decrZoomScreen = function () {
   /*alert("-Zoom");*/
-  document.body.style.fontSize = "14px";
+  document.body.style.fontSize = "10px";
 }
 
 storyHlpMenu.prev = function () {
