@@ -1,0 +1,332 @@
+﻿<!DOCTYPE html>
+<!--
+  BasicBites_Intro.html
+--->
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="keywords" content="Rust, Introduction" />
+    <meta name="Author" content="Jim Fawcett" />
+    <meta name="Author" content="James Fawcett" />
+    <title>Basic Bites Functions</title>
+    <link rel="stylesheet" href="css/BiteStyles.css" />
+    <link rel="stylesheet" href="css/StylesWebComponents.css" />
+    <script src="js/ScriptsWebComponents.js"></script>
+    <script src="js/BasicBiteScripts.js"></script>
+    <script src="js/BiteTables.js"></script>
+    <script src="js/ScriptsKeyboard.js"></script>
+    <style>
+      #github table {
+        border-collapse:collapse;
+        border-spacing:0px;
+      }
+      #github td {
+        padding:2px 5px;
+      }
+      #github .border {
+        border:1px solid black;
+      }
+      #github .padcode {
+        padding:5px 10px;
+      }
+    </style>
+  </head>
+  <body id="github" onload="initBites()">
+    <div class="top-banner">
+      <span id="hctr">Platform and Code Basics</span>
+      <span class="top-center">Program Functions</span>
+    </div>
+    <next-prev>
+      <a href="../../index.html" style="color:#fefefa;">Home</a>&nbsp;
+      <a id="repo" href="../../BasicBiteByByte.html">Repo</a> 
+      <a id="Prev" href="BasicBites_ProgTypes.html">prev</a> 
+      <a id="Next" href="BasicBites_ProgSafety.html">next</a>
+    </next-prev>
+
+    <toc-b id="toc">
+      <div id="bottom-menu" style="display:flex; flex-direction:row">
+      </div>
+        <up-b id="chaps">
+        </up-b>
+          <rt-b id="sects">
+        <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#starting">Starting</a>, 
+        <a href="#contents">Contents</a>, <a href="#refs">References</a>
+      </rt-b>
+    </toc-b>
+    <div id="hlp" style="display:none;">
+    </div>
+   
+    <h2>BasicBites - Functions</h2>
+    <t-b>
+      Software source code is structured with functions, structs and classes, libraries, executables, and projects.
+      Functions, the lowest of these levels, are named code blocks with input arguments and often a returned value.
+      <div class="indent pad10">
+        <span class="lightgray codesnip">f(args) -> returnVal { ... }</span>
+      </div>
+    </t-b>
+    <h4>Function Types</h4>
+    <t-b>
+      In this section we use the term function for callable code blocks that are not attached to a type, e.g.,
+      struct or class.  To make that usage clear we may refer to them as unbound or free functions.
+    </t-b>
+    <t-b>
+      <ul>
+        <li>
+          <strong>Free Functions:</strong>
+          <t-b>
+            Free functions are found in native code, e.g., C, C++, and Rust, but not in managed code, e.g., 
+            C# and Java. Arguments are passed by value or reference.
+          </t-b>
+          <t-b>
+            When passed by value, Copy types are copied onto the function&apos;s stack frame while Move types are
+            moved into the stack frame.
+            <div class="indent pad10">
+              <table>
+                <tr>
+                  <td><span class="codesnip codebg">auto f(T t) -> T {...}</span></td><td></td>
+                  <td>/* C++ */</td>
+                </tr>
+                <tr>
+                  <td><span class="codesnip codebg">fn f(t:T) -> T {...}</span></td><td></td>
+                  <td>/* Rust */</td>
+                </tr>
+              </table>
+            </div>
+            Pass by value has no side-effects.  Should f mutate its copy the caller won&apos;t
+            see the change.
+          </t-b>
+          <t-b style="margin-top:0px;">
+            Arguments can also be passed by reference using either language references or pointers. 
+            <div class="indent pad10">
+              <table>
+                <tr>
+                  <td class="codesnip codebg">auto f(T&amp; t) -> T {...}</td><td></td>
+                  <td>/* pass by C++ reference */</td>
+                </tr>
+                <tr>
+                  <td class="codesnip codebg">fn f(t:&mut T) -> T {...}</td><td></td>
+                  <td>/* pass by Rust reference */</td>
+                </tr>
+                <tr>
+                  <td class="codesnip codebg">auto f(T* t) -> T {...}</td><td></td>
+                  <td>/* pass by C++ pointer */</td>
+                </tr>
+                <tr>
+                  <td class="codesnip codebg">fn f(t:*mut t) -> T {...}</td><td></td>
+                  <td>/* pass by unsafe Rust pointer */</td>
+                </tr>
+              </table>
+            </div>
+            Since a reference to the caller&apos;s instance is copied to the stackframe, the caller will
+            see a mutation of its instance effected by f.
+          </t-b>
+          <t-b>
+            If the function is required to change the passed object, not just its value, the only way
+            the caller will see that is if the function passes a reference by reference.  for native
+            code that function uses the signature shown below:
+            <div class="indent pad10">
+              <table>
+                <tr>
+                  <td class="codesnip codebg">auto f(T** t) -> T {...}</td><td></td>
+                  <td>/* pass by C++ pointer to pointer */</td>
+                </tr>
+                <tr>
+                  <td class="codesnip codebg">fn f(t:T**) -> T {...}</td><td></td>
+                  <td>/* pass by unsafe Rust pointer to pointer */</td>
+                </tr>
+              </table>
+            </div>
+            Note that you cannot use C++ or Rust references because their bindings are fixed once initialized, 
+            so the object can&apos;t be changed.
+          </t-b>
+        </li>
+        <li>
+          <strong>Methods:</strong>
+          <t-b>
+            Methods are functions that are bound to a type, like struct or class.  They are found in both
+            native and managed code, e.g., C++, Rust, and C#.
+          </t-b>
+          <t-b>
+            The code, below, illustrates only pass by value, but pass by reference works with
+            essentially the same syntax, except for the parameter types.
+            <div class="indent pad10">
+              <div style="height:1rem;"></div>
+              <table>
+                <tr>
+                  <td class="codesnip codebg padcode border">
+                    class X {<br />
+                      &nbsp;&nbsp;auto f(T t);<br />
+                      &nbsp;&nbsp;...<br />
+                    };<br />
+                  </td><td>&nbsp;&nbsp;</td>
+                  <td class="codesnip codebg padcode border" style="vertical-align:top;">X::f(T t) {...}</td>
+                  <td>&nbsp;&nbsp;</td><td>/* C++ method */</td>
+                </tr>
+                <tr>
+                  <td><div sytle="height:0.25rem;">&nbsp;</div></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td class="codesnip codebg padcode border">
+                    struct X {<br />
+                      &nbsp;&nbsp;...<br />
+                    };<br />
+                  </td><td>&nbsp;&nbsp;</td>
+                  <td class="codesnip codebg padcode border">
+                    impl X {<br />
+                    &nbsp;&nbsp;pub f(t:T) {...}<br />
+                    }
+                  </td>  
+                  <td>&nbsp;&nbsp;</td><td>/* Rust method */</td>
+                </tr>
+                <tr>
+                  <td><div>&nbsp;</div></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td class="codesnip codebg padcode border">
+                    class X {<br />
+                      &nbsp;&nbsp;f(T t) {...}<br />
+                      &nbsp;&nbsp;...<br />
+                    };<br />
+                  </td><td>&nbsp;&nbsp;</td>
+                  <td>&nbsp;&nbsp;</td><td>&nbsp;&nbsp;</td><td>/* C# method */</td>
+                </tr>
+                <tr>
+                  <td><div sytle="height:0.25rem;">&nbsp;</div></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </table>
+            </div>
+          </t-b>
+          <photosizer-block src="pictures/PassArgs.png" width="400" class="photoSizerBlock right" style="margin-top:0;">
+            <span style="
+              display: inline-block;
+              font-weight: bold;
+              font-family: 'Comic Sans MS, Tahoma';
+              background-color: #ddd;
+              width: 100%;
+              padding: 5px 0px;"
+            >
+                Figure 1. Managed Parameter Passing
+            </span>
+          </photosizer-block>
+          <t-b>
+            Figure 1. illustrates parameter passing for C#.  The ideas are like those discussed at the
+            beginning of Free Functions for C++ and Rust. Here we emphasize that both value types and 
+            reference types can be passed by both value and reference. The semantics for those four
+            cases are all different.
+          </t-b>
+          <t-b>
+            In Figure 1., v represents an instance of a C# value type, int, double, ... and r represents
+            an instance of a reference type, e.g., user-defined class.
+            <div class="indent pad10">
+              <table>
+                <tr>
+                  <td><span class="codesnip codebg">f(V v) {...}</span></td><td></td>
+                  <td>/* pass value type by value */</td>
+                </tr>
+                <tr>
+                  <td><span class="codesnip codebg">f(ref V v) {...}</span></td><td></td>
+                  <td>/* pass value type by reference */</td>
+                </tr>
+                <tr>
+                  <td><span class="codesnip codebg">f(R r) {...}</span></td><td></td>
+                  <td>/* pass reference type by value */</td>
+                </tr>
+                <tr>
+                  <td><span class="codesnip codebg">f(ref R r) {...}</span></td><td></td>
+                  <td>/* pass reference type by reference */</td>
+                </tr>
+              </table>
+            </div>
+            Pass by value has no side-effects.  Should f mutate its copy the caller won&apos;t
+            see the change.  Pass by non-const reference allows the method to mutate caller&apos;s
+            instance through the passed reference.
+          </t-b>
+          <t-b>
+            C++ and Rust also fit this model.  The diagram is the same for those native languages though
+            the bits of code syntax shown on the diagram are different.  Also, for C++ and Rust, the
+            objects may reside on the stack of the caller instead of the heap.
+          </t-b>
+        </li>
+        <li>
+          <strong>Lambdas:</strong>
+          <t-b>
+            Lambdas are anonomous code blocks with passed arguments and return values. They are defined
+            locally inside functions, near the site where they are used.  In addition they capture 
+            any data that is defined in the local block before their definition and used in their bodies.
+          </t-b>
+          <t-b>
+            A little detective work shows that a lambda compiles into an anonymous compiler-defined type.
+            The lambda&apos;s code block becomes a method of that type and local data become data members of 
+            of the new type.
+          </t-b>
+          <t-b>
+            That has important implications, e.g., a lambda can be passed into, or returned by, another function.
+            So lambdas are first class objects that can be used like objects defined explicitly by a program.
+          </t-b>
+          <t-b>
+            Definitions of lambdas look like this:
+            <div style="height:0.5rem;"></div>
+            <div class="indent pad10">
+              <table>
+                <tr>
+                  <td class="codesnip codebg">
+                    auto lam = [s1](const std::string& s2) {<br />
+                    &nbsp;&nbsp;std::cout << "\n  " << s1 << " of " << s2;<br />
+                    };<br />
+                    /* s1 is a local string instance captured by value */
+                  </td>
+                  <td>&nbsp;&nbsp;</td>
+                  <td>/* C++ lambda definition */</td>
+                </tr>
+                <tr><td><div style="height:1.0rem;">&nbsp;</div></td></tr>
+                <tr>
+                  <td class="codesnip codebg">
+                    let mut add = |t: &i32| -> i32 { sum += t; sum };<br />
+                    /* sum is a local integer that is captured by value */
+                  </td>
+                  <td>&nbsp;&nbsp;</td>
+                  <td>/* Rust lambda definition */</td>
+                </tr>
+                <tr><td><div style="height:1.0rem;">&nbsp;</div></td></tr>
+                <tr>
+                  <td class="codesnip codebg">
+                    Func&lt;int, int, bool&gt; testForEquality = (x, y) => { x == y; };<br />
+                    /* Func is a standard .net delegate */
+                  </td>
+                  <td>&nbsp;&nbsp;</td>
+                  <td>/* C# lambda definition */</td>
+                </tr>
+              </table>
+            </div>
+          </t-b>
+        </li>
+      </ul>
+    </t-b>
+    <h4>Sample Code:</h4>
+    <div class="indent">
+    <t-b>
+      You will find code that illustrates how functions and parameter passing works here:
+      <ul>
+        <li>
+          <a href="https://github.com/JimFawcett/BasicBites/tree/master/CppFuncts">CppFuncts</a>
+        </li>
+        <li>
+          <a href="https://github.com/JimFawcett/BasicBites/tree/master/RustFuncts">RustFuncts</a>
+        </li>
+        <li>
+          <a href="https://github.com/JimFawcett/BasicBites/tree/master/CsFuncts">CsFuncts</a>
+        </li>
+      </ul>
+    </t-b>
+    </div>
+  </body>
+</html>
