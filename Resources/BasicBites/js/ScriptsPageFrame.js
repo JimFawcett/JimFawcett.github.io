@@ -24,6 +24,9 @@ function initialize() {
   storyHlpMenu.helpMenu();
 }
 
+function goHome() {
+  window.location.href = "../../index.html";
+}
 /* create top menu */
 
 function initializeMenu() {
@@ -31,7 +34,7 @@ function initializeMenu() {
   var topMenu = document.getElementById("navbar");
   topMenu.innerHTML = "<div class='navbar'>\
     <div class='menuItem'>\
-        Site&#9662\
+        <div onclick='goHome()'>Site&#9662</div>\
         <div class='dropdown'>\
             <div style='height:0.25em;'></div>\
             <div class='ddItem'><a href='../../index.html'>Home</a></div>\
