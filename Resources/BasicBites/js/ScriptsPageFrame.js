@@ -27,6 +27,8 @@ function initialize() {
 function goHome() {
   window.location.href = "../../index.html";
 }
+//<div onclick='goHome()'>Site&#9662</div>\
+
 /* create top menu */
 
 function initializeMenu() {
@@ -34,7 +36,7 @@ function initializeMenu() {
   var topMenu = document.getElementById("navbar");
   topMenu.innerHTML = "<div class='navbar'>\
     <div class='menuItem'>\
-        <div onclick='goHome()'>Site&#9662</div>\
+        <div>Site&#9662</div>\
         <div class='dropdown'>\
             <div style='height:0.25em;'></div>\
             <div class='ddItem'><a href='../../index.html'>Home</a></div>\
@@ -358,9 +360,16 @@ bottomMenu.toggleMenus = function () {
 }
 
 bottomMenu.about = function () {
-  var date = document.getElementById("modified").innerText;
+  var page = document.getElementById("page");
+  var date = document.getElementById("modified");
   var menu = document.getElementById("about");
-  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021" + "<br />" + "Page last modified: " + date;
+  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021";
+  if (isDefined(page)) {
+    menu.innerHTML += "<br />" + page.innerText;
+  }
+  if (isDefined(date)) {
+    menu.innerHTML += "<br />" + "Page last modified: " + date.innerText;
+  }
   if (isDefined(menu)) {
     if (menu.style.display == "block") {
       menu.style.display = "none";

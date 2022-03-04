@@ -246,9 +246,16 @@ bottomMenu.toggleMenus = function () {
 }
 
 bottomMenu.about = function () {
-  var date = document.getElementById("modified").innerText;
+  var page = document.getElementById("page");
+  var date = document.getElementById("modified");
   var menu = document.getElementById("about");
-  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021" + "<br />" + "Page last modified: " + date;
+  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021";
+  if (isDefined(page)) {
+    menu.innerHTML += "<br />" + page.innerText;
+  }
+  if (isDefined(date)) {
+    menu.innerHTML += "<br />" + "Page last modified: " + date.innerText;
+  }
   if (isDefined(menu)) {
     if (menu.style.display == "block") {
       menu.style.display = "none";
