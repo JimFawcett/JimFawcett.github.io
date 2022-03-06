@@ -63,9 +63,7 @@ function initializeMenu() {
         <div class='dropdown'>\
             <div class='ddLabel darkItem'>Code Tracks</div>\
             <div class='ddItem'><a href='indexBasic.html'>Basics&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
-            <div class='ddItem'><a href='Resources/BasicBites/BasicBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;first&nbsp;bite&nbsp;</a ></div>\
-            <div class='ddItem'><a href='indexDesign.html'>Design&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
-            <div class='ddItem'><a href='Resources/DesignBites/DesignBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;first&nbsp;bite&nbsp;</a ></div>\
+            <div class='ddItem'><a href='Resources/BasicBites/BasicBites_Platform.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;first&nbsp;bite&nbsp;</a ></div>\
             <div class='ddItem'><a href='indexCpp.html'>C++ Track&nbsp;Summary&nbsp;</a></div>\
             <div class='ddItem'><a href='Resources/CppBites/CppBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;first&nbsp;bite&nbsp;</a ></div>\
             <div class='ddItem'><a href='https://www.w3schools.com/cpp/trycpp.asp?filename=demo_compiler' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a></div>\
@@ -77,6 +75,9 @@ function initializeMenu() {
             <div class='ddItem'><a href='https://dotnetfiddle.net/' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a></div>\
             <div class='ddItem'><a href='indexWebDev.html'>WebDev&nbsp;Summary&nbsp;</a></div>\
             <div class='ddItem'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;first&nbsp;bite&nbsp;</a ></div>\
+            <div class='ddItem'><a href='indexDesign.html'>Design&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
+            <div class='ddItem'><a href='Resources/DesignBites/DesignBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;first&nbsp;bite&nbsp;</a ></div>\
+            <div style='height:2em;'></div>\
             <div style='height:2em;'></div>\
         </div>\
     </div>\
