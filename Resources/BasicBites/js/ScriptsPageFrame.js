@@ -69,6 +69,8 @@ function initializeMenu() {
             <div class='ddLabel darkItem'>Code Tracks</div>\
             <div class='ddItem'><a href='../../indexBasic.html'>Basics&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
             <div class='ddItem'><a href='BasicBites_Platform.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;first&nbsp;bite&nbsp;</a ></div>\
+            <div class='ddItem'><a href='../../indexDesign.html'>Design&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
+            <div class='ddItem'><a href='../DesignBites/DesignBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;first&nbsp;bite&nbsp;</a ></div>\
             <div class='ddItem'><a href='../../indexCpp.html'>C++ Track&nbsp;Summary&nbsp;</a></div>\
             <div class='ddItem'><a href='../CppBites/CppBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;first&nbsp;bite&nbsp;</a ></div>\
             <div class='ddItem'><a href='https://www.w3schools.com/cpp/trycpp.asp?filename=demo_compiler' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a></div>\
