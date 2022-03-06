@@ -23,6 +23,18 @@ storyHlpMenu.helpMenu = function() {
       <td>toggle&nbsp;menus</td>\
     </tr>\
     <tr>\
+      <td class="key" onclick="storyHlpMenu.incrZoomScreen()">I</td>\
+      <td>increase font 22px</td>\
+    </tr>\
+    <tr>\
+      <td class="key" onclick="storyHlpMenu.normZoomScreen()">U</td>\
+      <td>usual font 18px</td>\
+    </tr>\
+    <tr>\
+      <td class="key" onclick="storyHlpMenu.decrZoomScreen()">D</td>\
+      <td>decrease font 12px</td>\
+    </tr>\
+    <tr>\
       <td class="key" onclick="location.reload()">R</td><td>Refresh</td>\
     </tr>\
     <tr>\
@@ -41,7 +53,7 @@ storyHlpMenu.helpMenu = function() {
       <td class="key" onclick="storyHlpMenu.top()">T</td><td>scroll&nbsp;to&nbsp;top</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.bottom()">E</td><td>scroll&nbsp;to&nbsp;bottom</td>\
+      <td class="key" onclick="storyHlpMenu.bottom()">E</td><td>scroll&nbsp;to&nbsp;end</td>\
     </tr>\
     <tr>\
       <td class="key" onclick="storyHlpMenu.home()">H</td><td>Home</td>\
@@ -72,7 +84,7 @@ storyHlpMenu.normZoomScreen = function () {
 }
 storyHlpMenu.decrZoomScreen = function () {
   /*alert("-Zoom");*/
-  document.body.style.fontSize = "10px";
+  document.body.style.fontSize = "12px";
 }
 
 storyHlpMenu.prev = function () {
@@ -136,11 +148,11 @@ storyHlpMenu.bottom = function () {
 }
 
 storyHlpMenu.home = function () {
-  window.location = "../../index.html";
+  window.location = "index.html";
 }
 
 storyHlpMenu.siteMap = function () {
-  window.location = "../../SiteMap.html";
+  window.location = "SiteMap.html";
 }
 
 storyHlpMenu.keys = function () {
@@ -227,10 +239,10 @@ function keyAction(keyEvent) {
     window.history.back();
   }
   if (key === 'H') {
-    window.location.href = "../../index.html";
+    window.location.href = "index.html";
   }
   if (key === 'S') {
-    window.location.href = "../../SiteMap.html";
+    window.location.href = "SiteMap.html";
   }
   if (key === 'K') {
     storyHlpMenu.keys();
@@ -238,6 +250,18 @@ function keyAction(keyEvent) {
   }
   if (key === 'A') {
     storyHlpMenu.about();
+    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
+  }
+  if (key === 'I') {
+    storyHlpMenu.incrZoomScreen();
+    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
+  }
+  if (key === 'U') {
+    storyHlpMenu.normZoomScreen();
+    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
+  }
+  if (key === 'D') {
+    storyHlpMenu.decrZoomScreen();
     //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
 };

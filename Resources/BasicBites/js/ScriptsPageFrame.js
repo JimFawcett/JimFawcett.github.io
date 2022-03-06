@@ -41,6 +41,8 @@ function initializeMenu() {
             <div style='height:0.25em;'></div>\
             <div class='ddItem'><a href='../../index.html'>Home</a></div>\
             <div class='ddItem'><a href='../../SiteMap.html'>SiteMap</a></div>\
+            <div class='ddItem'><a href='../../SiteDemo.html'>SiteDemo</a></div>\
+            <div class='ddItem'><a href='../../SiteDesign.html'>SiteDesign</a></div>\
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
               <summary>About&nbsp;Site&nbsp;&nbsp;&nbsp;</summary>\
               <div style='margin-left:1.0em;'>\
@@ -51,7 +53,6 @@ function initializeMenu() {
               <div class='ddItem ddDetails'><a href='../../SitePlans.html'>Site Plans</a></div>\
               <div class='ddItem ddDetails'><a href='#' onclick='togglenavKeys()'>Toggle Nav Keys</a></div>\
               <div class='ddItem ddDetails'><a href='#' onclick='toggleSwipeEvents()'>Toggle Swipe Events</a></div>\
-              <div class='ddItem ddDetails'><a href='../../SiteDesign.html'>Site Design</a></div>\
               <div class='ddItem ddDetails'><a href='../../BookDesignCourse.html'>Design Course</a></div>\
               <div class='ddItem ddDetails'><a class='border' href='../../index.html'>L1 Site Home</a></div>\
               <div class='ddItem ddDetails'><a class='border' href='../../RsRepositories.html'>L2&nbsp;Repository&nbsp;webpage</a></div>\
