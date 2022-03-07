@@ -1,0 +1,320 @@
+﻿<!DOCTYPE html>
+<html id="top">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="keywords" content="Rust, Introduction" />
+    <meta name="Author" content="Jim Fawcett" />
+    <meta name="Author" content="James Fawcett" />
+    <title>DesignBites BasicStructure</title>
+    <link rel="stylesheet" href="css/BiteStyles.css" />
+    <link rel="stylesheet" href="css/StylesWebComponents.css" />
+    <script src="js/BiteScripts.js"></script>
+    <script src="js/ScriptsKeyboard.js"></script>
+    <script src="js/ScriptsWebComponents.js"></script>
+    <style>
+      #github pros-cons {
+        display:flex;
+      }
+      #github pros-cons > div {
+        /*border: 1px solid black;*/
+        padding: 0rem 0.5rem;
+      }
+      #github pros-cons > div > h4 {
+        margin: 0rem 0.25rem;
+      }
+      #github pros-cons > div > ol {
+        margin:0rem;
+      }
+      #github pros-cons > div > ol > li {
+        margin: 0.25rem;
+      }
+      #github explain-block {
+        margin-top: 1.0rem;
+        margin-bottom: 0.95rem;
+        padding: 0rem 0.5rem 0.5rem 0.5rem;
+        border: 1px solid black;
+      }
+      #github explain-block > h4 {
+        margin-top:0.5rem;
+      }
+    </style>
+  </head>
+  <body id="github" onload="initBites()">
+    <div class="top-banner">
+      <span id="hctr">Design Bites</span>
+      <span class="top-center">Basic Structure</span>
+      <!-- <a class="top-right" href="../../RustBiteByByte.html">RustBiteByByte.html</a> -->
+    </div>
+    <next-prev>
+      <a href="../../index.html" style="color:#fefefa;">Home</a>&nbsp;
+      <a id="repo" href="../../DesignBites.html">Repo</a> 
+      <a id="Prev" href="DesignBites_Structure.html">prev</a> 
+      <a id="Next" href="DesignBites_StructureFactored.html">next</a>
+    </next-prev>
+
+    <toc-b id="toc">
+      <div id="bottom-menu" style="display:flex; flex-direction:row">
+      </div>
+        <up-b id="chaps">
+        </up-b>
+          <rt-b id="sects">
+        <a href="#top">Top</a>, <a href="#intro">Introduction</a>, <a href="#structure">Structure</a>, 
+        <a href="#epilogue">Epilogue</a>
+      </rt-b>
+    </toc-b>
+    <div id="hlp" style="display:none;">
+    </div>
+    <h1>Design Bite - Basic Structure</h1>
+    <hr />
+    <a id="intro"></a>
+    <div style="height:0.75rem;"></div>
+    <h3>1.0 Introduction</h3>
+    <div class="indent">
+      <t-b>
+        This DesignBite sequence was inspired by BuildOn project <a href="../BuildOn/Step0.html">TextFinder</a>.
+        As that project is designed and implemented, a number of design decisions are made, consciously or unconsciously.
+        Each of these pages addresses one answer to questions about structure.
+      </t-b>
+      <t-b>
+        To make discussion pragmatic and concrete, we implement a program that evaluates the number of lines
+        in text files.  Processing is quite simple so it allows us to see how each
+        structure alternative is implemented.
+      </t-b>
+      <t-b>
+        We consider both package structure and logical structure, e.g., the functions and structs used to order
+        design and implementation.  In this Basic Structure page, all code is implemented in a single package and
+        a single struct provides all of the organization for processing.
+      </t-b>
+    </div>
+    <a id="structure"></a>
+    <div style="height:0.25rem;"></div>
+    <h3>2. Application Structure - Basic</h3>
+    <div class="indent">
+      <t-b>
+        This structure is monolithic, e.g., all code is packaged in a single file and there is only one struct
+        used to implement processing, e.g., counting lines of code in files specified on the command line.
+      </t-b>
+    </div>
+    <div style="width:calc(100vw - 9rem);">
+      <div style="display:flex;">
+        <photosizer-block src="pictures/Design1.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
+          <span style="
+            display: inline-block;
+            font-weight: bold;
+            font-family: 'Comic Sans MS, Tahoma';
+            background-color: #ddd;
+            width: 100%;
+            padding: 5px 0px;
+          ">
+            Figure 2. Basic Pkg Structure
+          </span>
+        </photosizer-block>
+        <explain-block>
+          <h4>Basic Monolithic Structure</h4>
+          <t-b>
+            Program&apos;s operations - read input, process data, output information - are implemented in 
+            a single package.
+          </t-b>
+          <t-b>
+            <hr />
+            <pros-cons>
+              <div>
+                <h4>Pros:</h4>
+                <ol>
+                  <li>Simple, easy to create</li>
+                  <li>Only one piece to track</li>
+                </ol>
+              </div>
+              <div>
+                <h4>Cons:</h4>
+                <ol>
+                  <li>Everything is compiled for any changes</li>
+                  <li>As content grows becomes hard to understand and test</li>
+                </ol>
+              </div>
+            </pros-cons>
+          </t-b>
+        </explain-block>
+      </div>
+    </div>
+    <div style="height:0.5rem;"></div>
+    <hr />
+    <div style="height:0.5rem;"></div>
+    <div class="indent">
+      <defn-OuterBlock>
+        <defn-block>
+          <defn-head>Source</defn-head>
+          <defn-code>
+/////////////////////////////////////////////////////////////
+// basic_structure::main.rs                                //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 07 Mar 2021  //
+/////////////////////////////////////////////////////////////
+/*
+  BasicStructure
+  - Demonstrates simplest form of structure: everything, e.g.,
+    input, computation, and output, in one package.
+  - It counts the number of lines in a file specified on the
+    command line.
+*/
+#![allow(dead_code)]
+use std::fs::*;
+use std::io::{Read, Error, ErrorKind};
+
+/*-- part of input processing --*/
+fn open_file_for_read(file_name:&amp;str) 
+     -&gt;Result&lt;File, std::io::Error&gt; {
+    let rfile = OpenOptions::new()
+               .read(true)
+               .open(file_name);
+    rfile
+}
+/*-- part of compute processing --*/
+fn read_file_to_string(f:&amp;mut File) 
+     -&gt; Result&lt;String, std::io::Error&gt; {
+  let mut contents = String::new();
+  let bytes_rslt = f.read_to_string(&amp;mut contents);
+  if bytes_rslt.is_ok() {
+    Ok(contents)
+  }
+  else {
+      Err(Error::new(ErrorKind::Other, "read error"))
+  }
+}
+
+#[derive(Debug)]
+struct Basic {
+    name: String,
+    file: Option&lt;File&gt;,
+    lines: usize,
+}
+impl Basic {
+    fn new() -&gt; Basic {
+        Basic {
+            name: String::new(),
+            file: None,
+            lines: 0,
+        }
+    }
+    /*-----------------------------------------------------
+      Input processing
+    */
+    fn parse_cmdln() -&gt; Vec&lt;String&gt; {
+        let cl_iter = std::env::args().into_iter();
+        let args: Vec&lt;String&gt; = cl_iter.skip(1).collect();
+        args
+    }
+    fn show_cmdln(args: &amp;Vec&lt;String&gt;)  {
+        if args.len() == 0 {
+            return;
+        }
+        print!("\n  {}", args[0]);
+        for arg in &amp;args[1..] {
+            print!(", {}", arg);
+        }
+    }
+    fn input(&amp;mut self, name: &amp;str) {
+        self.name = name.to_string();
+        let rslt = open_file_for_read(name);
+        if let Ok(file) = rslt {
+            self.file = Option::Some(file);
+        }
+        else {
+            print!("\n  can't open file {:?}", name);
+        }
+    }
+    /*-----------------------------------------------------
+      Compute processing
+    */
+    fn compute(&amp;mut self) {
+        if let Some(file) = &amp;mut self.file {
+            let rslt = read_file_to_string(file);
+            if let Ok(contents) = rslt {
+                self.lines = 1;
+                for ch in contents.chars() {
+                    if ch == '\n' {
+                        self.lines += 1;
+                    }
+                }
+            }
+        }
+    }
+    /*-----------------------------------------------------
+      Output processing
+    */
+    fn output(&amp;self) {
+        print!("\n  {:4} lines in {:?}", self.lines, self.name);
+    }
+}
+/*---------------------------------------------------------
+  Executive processing
+*/
+fn main() {
+
+    print!("\n  -- counting lines in files --\n");
+
+    let mut basic = Basic::new();
+    let args = Basic::parse_cmdln();
+
+    for name in args {
+        basic.input(&amp;name);
+        basic.compute();
+        basic.output();
+    }
+
+    println!("\n\n  That's all Folks!\n\n");
+}
+          </defn-code>
+        </defn-block>
+        <defn-block>
+          <defn-head>Output</defn-head>
+          <defn-code>
+cargo run -q ./src/main.rs cargo.toml                    
+
+  -- counting lines in files --
+
+   120 lines in "./src/main.rs"
+    10 lines in "cargo.toml"
+
+  That's all Folks!
+
+          </defn-code>
+          <defn-head class="defnBorderTop">cargo.toml</defn-head>
+          <defn-code>
+[package]
+name = "basic_structure"
+version = "0.1.0"
+authors = ["James W. Fawcett <jfawcett@twcny.rr.com>"]
+edition = "2018"
+
+# See more keys ...
+
+[dependencies]
+
+          </defn-code>
+        </defn-block>
+      </defn-OuterBlock>
+    </div>
+    <div style="height:0.5rem;"></div>
+    <a id="epilogue"></a>
+    <div style="height:0.75rem;"></div>
+    <hr />
+    <h3>3. Epilogue</h3>
+    <div class="indent">
+      <t-b>
+        The fourh design alternatives considered here:
+        <ol class="tight">
+          <li><a href="DesignBites_StructureBasic.html">Monolithic Structure</a></li>
+          <li><a href="DesignBites_StructureFactored.html">Factored Structure</a></li>
+          <li><a href="DesignBites_StructureDataFlow.html">DataFlow Structure</a></li>
+          <li><a href="DesignBites_StructureTypeErase.html">TypeErase Structure</a></li>
+          <li><a href="DesignBites_StructurePlugIn.html">PlugIn Structure</a></li>
+        </ol>
+        are progressively more flexible, eventually resulting in reusable components, but also increasingly
+        complex.  Where you settle in these alternatives is determined by design context.  Is this a 
+        one-of-a-kind project that you want to finish quickly or is it
+        heading for production code that will be maintained by more than one developer?
+      </t-b>
+    </div>
+  </body>
+</html>
