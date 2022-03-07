@@ -148,11 +148,11 @@ storyHlpMenu.bottom = function () {
 }
 
 storyHlpMenu.home = function () {
-  window.location = "index.html";
+  window.location = "../../index.html";
 }
 
 storyHlpMenu.siteMap = function () {
-  window.location = "SiteMap.html";
+  window.location = "../../SiteMap.html";
 }
 
 storyHlpMenu.keys = function () {
