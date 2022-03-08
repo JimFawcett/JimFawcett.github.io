@@ -23,18 +23,6 @@ storyHlpMenu.helpMenu = function() {
       <td>toggle&nbsp;menus</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.incrZoomScreen()">I</td>\
-      <td>increase font 22px</td>\
-    </tr>\
-    <tr>\
-      <td class="key" onclick="storyHlpMenu.normZoomScreen()">U</td>\
-      <td>usual font 18px</td>\
-    </tr>\
-    <tr>\
-      <td class="key" onclick="storyHlpMenu.decrZoomScreen()">D</td>\
-      <td>decrease font 12px</td>\
-    </tr>\
-    <tr>\
       <td class="key" onclick="location.reload()">R</td><td>Refresh</td>\
     </tr>\
     <tr>\
@@ -66,6 +54,18 @@ storyHlpMenu.helpMenu = function() {
     </tr>\
     <tr>\
       <td class="key" onclick="storyHlpMenu.about()">A</td><td>about</td>\
+    </tr>\
+    <tr>\
+      <td class="key" onclick="storyHlpMenu.incrZoomScreen()">I</td>\
+      <td>increase font 22px</td>\
+    </tr>\
+    <tr>\
+      <td class="key" onclick="storyHlpMenu.normZoomScreen()">U</td>\
+      <td>usual font 18px</td>\
+    </tr>\
+    <tr>\
+      <td class="key" onclick="storyHlpMenu.decrZoomScreen()">D</td>\
+      <td>decrease font 12px</td>\
     </tr>\
     <tr>\
       <td colspan=2><div style="height:0.25em;">&nbsp;</div></td>\
