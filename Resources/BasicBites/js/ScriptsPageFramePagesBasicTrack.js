@@ -1,5 +1,5 @@
 /*
- * ScriptsPageFramePages.js
+ * ScriptsPageFramePagesBasicTrack.js
  */
 
 function initializePages() {
@@ -26,11 +26,11 @@ function initializePages() {
           <menu-elem class='ddItems pageElem undefined'>&nbsp;&nbsp;<a href='javascript:;'>Lifetime</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'>&nbsp;&nbsp;<a href='javascript:;'>Resource&nbsp;Mgmt</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'>&nbsp;&nbsp;<a href='javascript:;'>Ownership</a></menu-elem>\
-          <menu-elem class='ddItems pageElem undefined'><a href='javascript:;'>Summary</a></menu-elem>\
+          <menu-elem class='undefined' style='margin-left:0.5em;'>Summary</menu-elem>\
           <menu-elem class='ddItems pageElem undefined'>&nbsp;&nbsp;<a href='javascript:;'>Native</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'>&nbsp;&nbsp;<a href='javascript:;'>Managed</a></menu-elem>\
-          <menu-elem>&nbsp;</div>\
-          <menu-elem>&nbsp;</div>";
+          <menu-elem>&nbsp;</menu-elem>\
+          <menu-elem>&nbsp;</menu-elem>";
   }
   else {
     var pgbtn = document.getElementById("pgbtn");
