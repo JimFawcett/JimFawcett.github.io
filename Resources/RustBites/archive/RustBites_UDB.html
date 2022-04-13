@@ -1,0 +1,230 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="keywords" content="Rust, Introduction" />
+    <meta name="Author" content="Jim Fawcett" />
+    <meta name="Author" content="James Fawcett" />
+    <title>RustBites Undef</title>
+    <link rel="stylesheet" href="css/BiteStyles.css" />
+    <script src="js/BiteScripts.js"></script>
+    <script src="js/ScriptsKeyboard.js"></script>
+  </head>
+  <body id="github" onload="initBites()">
+    <div class="top-banner">
+      <span id="hctr">Consuming Rust Bite by Byte</span>
+      <div style="position:relative; left:calc(100vw - 15rem);">
+        <span class="top-center">Undefined Behavior</span>
+      </div>
+  </div>
+  <next-prev>
+    <a href="../../index.html" style="color:#fefefa;">Home</a>&nbsp;
+    <a id="repo" href="../../RustBiteByByte.html">Repo</a> 
+    <a id="Prev" href="RustBites_Safety.html">prev</a> 
+    <a id="Next" href="RustBites_Data.html">next</a>
+  </next-prev>
+
+      <toc-b id="toc">
+        <div id="bottom-menu" style="display:flex; flex-direction:row">
+        </div>
+          <up-b id="chaps">
+          </up-b>
+            <rt-b id="sects">
+          <a href="#top">Top</a>, <a href="#conclusions">Conclusions</a>
+        </rt-b>
+      </toc-b>
+      <div id="hlp" style="display:none;">
+       </div>
+   
+       <bb-55>
+        <h1>Rust Bite - Undefined Behavior</h1>
+          <hr>
+          <t-b>
+            Well defined behavior means, in the Rust world, two things:
+            <div class="indent pad5">
+              <table>
+                <tr>
+                  <td>-</td><td><strong>Memory&nbsp;safety:&nbsp;&nbsp;</strong></td>
+                  <td>There is no way for code to access memory that it does not own.</td>
+                </tr>
+                <tr>
+                  <td>-</td><td><strong>Data&nbsp;race&nbsp;safety:&nbsp;&nbsp;</strong></td>
+                  <td>
+                    In a multi-threaded environment, all data shared between threads,
+                    can only be accessed by one thread at a time.
+                  </td>
+                </tr>
+              </table>
+            </div>
+            Undefined behavior is the absence of either or both of these.
+          </t-b>
+          <t-b>
+            Preventing undefined behavior provides excellent support for preventing attacks and
+            unreliable behavior.  Rust implements that support primarily by enforcing 
+            <a href="RustBites_Ownrs.html">Ownership policies</a> at compile-time through static code analysis.
+          </t-b>
+          <t-b>
+            Static code analysis is conservative.  The Rust compiler will reject any code for which it cannot
+            guarantee its ownership policies have been satisfied.  Most correct code will pass static analysis,
+            but there are a few cases, most often in multi-threaded designs,  
+            that static analysis cannot effectively handle, and so correct code may be rejected by the compiler.
+            We will show examples of this in a subsequent Bite.
+          </t-b>
+          <t-b>
+            Rust provides a mechanism, called <a href="RustBites_Safety.html#intmut">interior mutability</a>, 
+            that defers enforcment to run-time. That allows correct code that can&apos;t satisfy static analysis,
+            to build, but has an impact on performance due to run-time ownership checks.  Should any code fail
+            its run-time checks the program will panic, shutting down without allowing access to unowned memory
+            or corrupting data with data races. 
+          </t-b>
+          <t-b>
+            Fortunately, most code does not require this deferred checking.  Run-time checking is clever and
+            not very expensive, but avoiding use of interior mutability where feasible, avoids that cost. 
+            <a id="ex_udb"></a>
+          </t-b>
+          <t-b>
+            <h3>1. Examples of undefined behavior:</h3>
+            <div class="indent">
+              <t-b>
+                Here, we will demonstrate undefined behavior with C++ code, then discuss the same code
+                written in Rust.
+              </t-b>
+              <t-b>
+                It is fairly easy, using C++, to program access to unowned memory.  That is done in the dropdown below by:
+                <div class="pad-bottom5" style="margin-left:-1.5em;">
+                  <ul class="tight">
+                    <li>
+                      Creating a std::vector&lt;int&gt;
+                    </li>
+                    <li>
+                      Filling it to capacity
+                    </li>
+                    <li>
+                      making a reference to one of its elements
+                    </li>
+                    <li>
+                      pushing back another element in the vector.
+                    </li>
+                  </ul>
+                </div>
+                That last addition forces the vector to allocate new memory to make room for the latest element
+                and then copies everything from the original location to the new location.  But that leaves the reference
+                observing memory that is no longer owned by the vector.  Code in the dropdown illustrates
+                this with a fragment of C++ code.
+              </t-b>
+              <details>
+                <summary class="darkItem">C++ Ref Unowned Memory&nbsp;&nbsp;</summary>
+                <table>
+                  <tr>
+                    <td><img src="CodeSamples/UndefBehavior/CppRefUnownedMemory.jpg" style="width:calc(100vw - 12rem);"></td>
+                  </tr>
+                </table>
+              </details>
+            <t-b>
+              Observe that the reference reads memory not owned by any program instance and returns its value.
+              That means that the program could continue computing with invalid data.  Observe further That
+              the process exits normally, as if nothing unexpected happened.
+            </t-b>
+            <t-b>
+              In the next dropdown you will see another way that C++ code can access unowned memory.  It does That
+              by indexing an array, but failing to stop at the last element.
+            </t-b>
+            <details>
+              <summary class="darkItem">C++ Index out of Bounds&nbsp;&nbsp;</summary>
+              <table>
+                <tr>
+                  <td><img src="CodeSamples/UndefBehavior/CppIndexOutOfBounds.jpg" style="width:calc(100vw - 12rem);"></td>
+                </tr>
+              </table>
+            </details>
+              <t-b>
+                The code in this example indexes past the end of an array, and returns a value from unowned memory.
+                As before, program flow continues so invalid data could become part of the processing of the 
+                program.  And, the program exits normally, as if nothing unexpected happened.
+              </t-b>
+              <t-b>
+                In fairness to C++ both these code fragments are not idiomatic C++.  In the first example, accepted 
+                convention would have the program use an iterator rather than a reference.  That would cause an
+                iterator invalidation exception to be thrown before memory could be accessed.  In the second example,
+                convention would have the program use a range-based for loop, avoiding out of bounds indexing.
+              </t-b>
+              <t-b>
+                So C++ is memory safe by convention, and that works very well.  However, when building large programs
+                - perhaps several hundred thousand lines of code - it is possible that a few lapses of good practice happen,
+                allowing unsafe memory access, and those few may be very hard to find.
+              </t-b>
+              <t-b>
+                In contrast, Rust is memory safe by construction, using data ownership policies to prevent unsafe memory 
+                operations.
+                We illustrate that by duplicating the same process flow used in the previous two examples of C++ code.
+              </t-b>
+              <t-b>
+                In the first dropdown, below, we set up the same processing used in the first example above and show
+                that it fails to compile.
+              </t-b>
+            <details>
+              <summary class="darkItem">Rust Attempt to Ref Unowned Memory&nbsp;&nbsp;</summary>
+              <table>
+                <tr>
+                  <td><img src="CodeSamples/UndefBehavior/RustRefUnownedMemory.jpg" style="width:calc(100vw - 12rem);"></td>
+                </tr>
+              </table>
+            </details>
+              <t-b>
+                As in the first C++ example, the Rust code, above, creates a vector, fills it to capacity, and makes a reference 
+                to one of its items.  Now, an attempt to mutate the vector by adding another element fails to
+                compile.
+              </t-b>
+              <t-b>
+                That action violates Rust <a href="RustBites_Ownrs.html">ownership</a> policy, and the compiler does 
+                an excellent job of pointing
+                out what the problem is, and exactly where it occurs.  Compiler error messages are very well crafted
+                in Rust.  That makes software development significantly more productive than it would otherwise
+                be.
+              </t-b>
+              <t-b>
+                Rust code in the last dropdown replicates the index out of bounds processing of the second C++ example.
+                In this case, we don't generate a compile error, but when an attempt to access unowned memory beyond 
+                the array happens, the program never gets access to that memory.  Instead, a panic occurs that starts
+                an orderly shutdown of the process.
+              </t-b>
+            </bb-55>
+            <details>
+              <summary class="darkItem">Rust Index out of Bounds&nbsp;&nbsp;</summary>
+              <table>
+                <tr>
+                  <td><img src="CodeSamples/UndefBehavior/RustIndexOutOfBounds.jpg" style="width:calc(100vw - 12rem);"></td>
+                </tr>
+              </table>
+            </details>
+              <t-b>
+                Program output shows that a panic occurs before the code can access unowned memory, causing termination
+                rather than a normal exit.
+              </t-b>
+            
+              <h3><a id="conclusions"></a>2. Conclusions:</h3>
+              <div class="indent">
+                <t-b>
+                  Rust code is memory safe by construction.  Access to unowned memory is not possible due to the ownership
+                  policies enforced by the language.  This has the advantage that attempts to use memory-unsafe operations
+                  result in compile-time failures.  We will see in a later Bite that there are situations where ownership
+                  checking needs to be deferred to run-time.  That happens most often in multi-threaded code. We address those
+                  cases in the <a href="RustBites_Safety.html#intmut">interior mutation</a> section of the Safety Bite.
+                </t-b>
+                <t-b>
+                  <under-construction>
+                    C++ is memory safe by convention.  Rust is memory safe by construction.
+                  </under-construction>
+                </t-b>
+                <t-b>
+                  Construction means that violations can not happen in compileable code.
+                  Convention means that violations won&apos;t happen as long as the conventions are followed.
+                </t-b>
+              </div>
+              <h3><a id="refs"></a>3. References:</h3>
+              <t-b class="indent">
+                <a href="../../RustErrorHandling.html">Code for Examples - in CppUndefinedBehavior</a>
+              </t-b>
+       <div style="height:5em;"></div>
+  </body>
+</html>
