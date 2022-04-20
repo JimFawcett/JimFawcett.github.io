@@ -239,10 +239,10 @@ function keyAction(keyEvent) {
     window.history.back();
   }
   if (key === 'H') {
-    window.location.href = "index.html";
+    storyHlpMenu.home();
   }
   if (key === 'S') {
-    window.location.href = "SiteMap.html";
+    storyHlpMenu.siteMap();
   }
   if (key === 'K') {
     storyHlpMenu.keys();
