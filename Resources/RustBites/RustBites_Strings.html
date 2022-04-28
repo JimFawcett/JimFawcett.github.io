@@ -1,468 +1,573 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
-    <meta name="keywords" content="Rust, Introduction" />
-    <meta name="Author" content="Jim Fawcett" />
-    <meta name="Author" content="James Fawcett" />
-    <title>RustBites Strings</title>
-    <link rel="stylesheet" href="css/BiteStyles.css" />
-    <link rel="stylesheet" href="css/BiteTables.css" />
-    <link rel="stylesheet" href="css/StylesWebComponents.css" />
-    <script src="js/ScriptsWebComponents.js"></script>
-    <script src="js/BiteScripts.js"></script>
-    <script src="js/ScriptsKeyboard.js"></script>
-  </head>
-  <body id="github" onload="initBites()">
-    <div class="top-banner">
-      <span id="hctr">Consuming Rust Bite by Byte</span>
-      <span class="top-center">Strings</span>
-    </div>
-    <next-prev>
-      <a href="../../index.html" style="color:#fefefa;">Home</a>&nbsp;
-      <a id="repo" href="../../RustBiteByByte.html">Repo</a> 
-      <a id="Prev" href="RustBites_Facts.html">prev</a> 
-      <a id="Next" href="RustBites_DataStr.html">next</a>
-    </next-prev>
+<!--
+  BasicBites_UDB.html
+-->
+<head>
+  <title>RustBite Strings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/StylesPageFrameDefaults.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameStructure.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameMenus.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameThemeRust.css" />
+  <link rel="stylesheet" href="css/StylesWebComponents.css" />
+  <script src="js/ScriptsWebComponents.js"></script>
+  <script src="js/ScriptsPageFrame.js"></script>
+  <script src="js/ScriptsPageFramePagesRustTrack.js"></script>
+  <script src="js/ScriptsPageFrameKeyboard.js"></script>
+  <style>
+    #github table {
+      max-width: 90%;
+      border: 1px solid black;
+    }
 
-    <toc-b id="toc">
-      <div id="bottom-menu" style="display:flex; flex-direction:row">
-      </div>
-        <up-b id="chaps">
-        </up-b>
-          <rt-b id="sects">
-        <a href="#top">Top</a>, <a href="#str">str</a>, <a href="#string">String</a>, 
-        <a href="#formats">Formats</a>, <a href="#iteration">Iteration</a>, <a href="#othertypes">OtherTypes</a>
-      </rt-b>
-    </toc-b>
-    <div id="hlp" style="display:none;">
-    </div>
-  
-  <h1>Rust Bite - Strings</h1>
-  <t-b>
-    <hr class="spread" />
-  </t-b>
-  <t-b>
-    The two main string types in Rust, <c-s>String</c-s> and <c-s>str</c-s> are unlike std::string provided
-    by either C++ or C#.  Rust strings hold utf-8 characters with sizes from 1 to 4 bytes.  That allows instances
-    to hold non-ASCII characters like greek and arabic letters. 
-  </t-b>
-  <t-b>
-    This is powerful, but comes with costs:
-    <div class="indents pad5">
-      <ul class="tight" style="margin-left:0rem;">
-        <li>Rust strings cannot be indexed as characters</li>
-        <li>Accessing a character at a knnown location is linear time</li>
-        <li>
-          Converting between Rust strings and those of the platform are more complex than for some other languages.
-        </li>
-      </ul>
-    </div>
-    <a id="str"></a>
-    <div style="height:0.5rem;"></div>
-  </t-b>
-  <h3>1. str - literal string</h3>
-  <div class="indent">
-    <t-b>
-      The std::string library provides the copy type <c-s>str</c-s> to represent literal strings stored in the stack
-      or static memory.
-      <div class="indent pad5">
-        <c-s>let s = "a string";</c-s>
-      </div>
-      The <c-s>"a string"</c-s> is a string slice of type <c-s>&str</c-s>.
-      It is a contiguous collection of UTF-8 characters, compiled into some
-      location in stack memory or static memory with the code that uses it, as shown in Figure 1.
-    </t-b>
-    <t-b>
-      <h4>Table 1. - str member functions:</h4>
-      <div style="width:calc(100vw-9em);">
-        <table style="max-width:calc(100vw-9em);">
-          <tr>
-            <th>member function</th><th>description</th>
-          </tr>
-          <tr>
-            <td><c-s>const fn as_bytes(&self) -> &[u8]</c-s></td>
-            <td>Converts a string slice to a byte slice</td>
-          </tr>
-          <tr>
-            <td><c-s>const fn as_bytes(&self) -> &[u8]</c-s></td>
-            <td>Converts a string slice to a byte slice</td>
-          </tr>
-          <tr>
-            <td><c-s>pub fn bytes(&self) -> Bytes<'_></c-s></td>
-            <td>An iterator over bytes of a string slice</td>
-          </tr>
-          <tr>
-            <td><c-s>pub fn chars(&self) -> Chars<'_></c-s></td>
-            <td>Returns iterator over chars of a string slice</td>
-          </tr>
-          <tr>
-            <td><c-s>pub fn char_indices(&self) -> CharIndices<'_></c-s></td>
-            <td>Returns iterator over chars of a string slice, and their positions</td>
-          </tr>
-          <tr>
-            <td><c-s>pub fn contains<'a, P>(&'a self, pat: P) -> bool</c-s></td>
-            <td>Returns true if pattern P matches sub-slice of this string slice</td>
-          </tr>
-          <tr>
-            <td><c-s>pub fn find<'a, P>(&'a self, pat: P) -> Option<usize></c-s></td>
-            <td>
-              Returns byte index of first character of this string slice that matches pattern P.
-              Returns None if the pattern doesn't match.
-            </td>
-          </tr>
-          <tr>
-            <td><c-s>pub fn is_ascii(&self) -> bool</c-s></td>
-            <td>Checks if all characters in this string are within ASCII range</td>
-          </tr>
-          <tr>
-            <td><c-s>pub fn is_char_boundary(&self, index: usize) -> bool</c-s></td>
-            <td>Checks that index-th byte is first byte in UTF-8 code point sequence or end of the string</td>
-          </tr>
-          <tr>
-            <td><c-s>pub const fn is_empty(&self) -> bool</c-s></td>
-            <td>Returns true if self has length of zero bytes</td>
-          </tr>
-          <tr>
-            <td><c-s>pub const fn len(&self) -> usize</c-s></td>
-            <td>This length is in bytes, not chars or graphemes</td>
-          </tr>
-          <tr>
-            <td><c-s>pub fn lines(&self) -> Lines<'_></c-s></td>
-            <td>
-              An iterator over the lines of a string, as string slices
-            </td>
-          </tr>
-          <tr>
-            <td><c-s>pub fn make_ascii_lowercase(&mut self)</c-s></td>
-            <td>Converts this string to its ASCII lower case equivalent in-place</td>
-          </tr>
-          <tr>
-            <td><c-s>pub fn make_ascii_uppercase(&mut self)</c-s></td>
-            <td>Converts this string to its ASCII upper case equivalent in-place</td>
-          </tr>
-          <tr>
-            <td><c-s>pub fn parse<F>(&self) -> Result<F, <F as FromStr>::Err></c-s></td>
-            <td>Parses this string slice into another type</td>
-          </tr>
-          <tr>
-            <td class="no-wrap"><c-s>pub fn repeat(&self, n: usize) -> String</c-s></td>
-            <td>Creates a new String by repeating a string n times</td>
-          </tr>
-          <tr>
-            <td><c-s>pub fn replace<'a, P>(&'a self, from: P, to: &str) -> String</c-s></td>
-            <td>Replaces all matches of pattern P with another string</td>
-          </tr>
-          <tr>
-            <td><c-s>pub fn split<'a, P>(&'a self, pat: P) -> Split<'a, P></c-s></td>
-            <td>An iterator over substrings of this string slice, separated by characters matched by a pattern</td>
-          </tr>
-          <tr>
-            <td><c-s>pub fn trim(&self) -> &str</c-s></td>
-            <td>Returns a string slice with leading and trailing whitespace removed</td>
-          </tr>
-          <tr>
-            <td>More methods ...</td>
-            <td><a href="https://doc.rust-lang.org/std/primitive.str.html">std::string::String</a></td>
-          </tr>
-        </table>
-        </div>
-    </t-b>
-    <div>
-      <details>
-        <summary class="darkItem">Basic str operations</summary>
-        <defn-OuterBlock>
-          <defn-block>
-            <defn-head>str Demonstration</defn-head>
-            <defn-code>
+      #github table.invis {
+        width: 90%;
+        border: none;
+      }
+
+      #github table tr {
+        border: 1px solid var(--dark);
+      }
+
+        #github table tr.invis {
+          border: none;
+        }
+
+        #github table tr th {
+          color: var(--dark);
+          background-color: var(--menu);
+        }
+
+          #github table tr th.invis {
+            border: none;
+          }
+
+        #github table tr td {
+          color: var(--dark);
+          background-color: var(--light);
+        }
+
+          #github table tr td.invis {
+            border: none;
+          }
+
+      #github table a:link {
+        color: var(--dark);
+        background-color: transparent;
+      }
+
+      #github table a:visited {
+        color: var(--dark);
+        background-color: transparent;
+      }
+
+      #github table a:hover {
+        color: var(--dark);
+        background-color: transparent;
+      }
+
+      #github table a:active {
+        color: var(--dark);
+        background-color: transparent;
+      }
+
+    #github hr.dotted {
+      border: none;
+      border-top: 2px dashed var(--dark);
+      color: var(--light);
+      background-color: var(--light);
+      height: 1px;
+      width: 55em;
+      margin-top: 0.5em;
+      margin-bottom: 1.5em;
+    }
+  </style>
+  <style>
+    #github .topborder {
+      border-top: 1px solid #363636;
+    }
+
+    #github th.num {
+      width: 3em;
+      text-align: right;
+      padding-right: 1.0em;
+    }
+
+    #github td.num {
+      width: 3em;
+      text-align: right;
+      padding-right: 1.0em;
+    }
+
+    #github th.elem {
+      padding-right: 2.0em;
+      white-space: nowrap;
+    }
+
+    #github td.elem {
+      padding-right: 2.0em;
+      white-space: nowrap;
+    }
+
+    t-b {
+      display: block;
+      margin-top: 0.75rem;
+      margin-bottom: 0.75rem;
+      max-width: 55rem;
+    }
+    #github td > hr {
+      margin-top:0.25em;
+      margin-bottom:0.25em;
+    }
+  </style>
+</head>
+<body id="github" onload="initialize()">
+
+  <a id="Next" href="RustBites_DataStr.html">Next</a>
+  <a id="Prev" href="RustBites_Facts.html">Prev</a>
+
+  <page-frame>
+    <frame-header>
+      <nav id="navbar"></nav>
+    </frame-header>
+    <main>
+      <div id="about">about</div>
+      <div id="modified">04/28/2022</div>
+      <div id="page">RustBites - Strings</div>
+      <div id="hlp"></div>
+      <a id="top"></a>
+      <content>
+        <header>
+          <hgroup id="pagetitle">
+            <h1>Rust Bite - Strings</h1>
+            <h3 id="subtitle" class="indents">literals, Strings, formats, iteration</h3>
+          </hgroup>
+        </header>
+        <t-b>
+          The two main string types in Rust, <c-s>String</c-s> and <c-s>str</c-s> are unlike std::string provided
+          by either C++ or C#.  Rust strings hold utf-8 characters with sizes from 1 to 4 bytes.  That allows instances
+          to hold non-ASCII characters like greek and arabic letters.
+        </t-b>
+        <t-b>
+          This is powerful, but comes with costs:
+          <div class="indent pad5">
+            <ul class="tight" style="margin-left:1em;">
+              <li>Rust strings cannot be indexed as characters</li>
+              <li>Accessing a character at a known location is linear time</li>
+              <li>
+                Converting between Rust strings and those of the platform are more complex than for some other languages.
+              </li>
+            </ul>
+          </div>
+          <!--<div style="height:0.5rem;"></div>-->
+        </t-b>
+        <a id="str"></a>
+        <h2>1. str - literal string</h2>
+        <div class="indent">
+          <t-b>
+            The std::string library provides the copy type <c-s>str</c-s> to represent literal strings stored in the stack
+            or static memory.
+            <div class="indent pad5">
+              <c-s>let s = "a string";</c-s>
+            </div>
+            The <c-s>"a string"</c-s> is a string slice of type <c-s>&str</c-s>.
+            It is a contiguous collection of UTF-8 characters, compiled into some
+            location in stack memory or static memory with the code that uses it, as shown in Figure 1.
+          </t-b>
+          <div style="height:0.25em">&nbsp;</div>
+          <t-b>
+            <h3>Table 1. - str member functions:</h3>
+            <div style="width:calc(100vw-9em);">
+              <table style="max-width:calc(100vw-9em);">
+                <tr>
+                  <th>member function</th>
+                  <th>description</th>
+                </tr>
+                <tr>
+                  <td><c-s>const fn as_bytes(&self) -> &[u8]</c-s></td>
+                  <td>Converts a string slice to a byte slice</td>
+                </tr>
+                <tr>
+                  <td><c-s>const fn as_bytes(&self) -> &[u8]</c-s></td>
+                  <td>Converts a string slice to a byte slice</td>
+                </tr>
+                <tr>
+                  <td><c-s>pub fn bytes(&self) -> Bytes<'_></c-s></td>
+                  <td>An iterator over bytes of a string slice</td>
+                </tr>
+                <tr>
+                  <td><c-s>pub fn chars(&self) -> Chars<'_></c-s></td>
+                  <td>Returns iterator over chars of a string slice</td>
+                </tr>
+                <tr>
+                  <td><c-s>pub fn char_indices(&self) -> CharIndices<'_></c-s></td>
+                  <td>Returns iterator over chars of a string slice, and their positions</td>
+                </tr>
+                <tr>
+                  <td><c-s>pub fn contains<'a, P>(&'a self, pat: P) -> bool</c-s></td>
+                  <td>Returns true if pattern P matches sub-slice of this string slice</td>
+                </tr>
+                <tr>
+                  <td><c-s>pub fn find<'a, P>(&'a self, pat: P) -> Option<usize></c-s></td>
+                  <td>
+                    Returns byte index of first character of this string slice that matches pattern P.
+                    Returns None if the pattern doesn't match.
+                  </td>
+                </tr>
+                <tr>
+                  <td><c-s>pub fn is_ascii(&self) -> bool</c-s></td>
+                  <td>Checks if all characters in this string are within ASCII range</td>
+                </tr>
+                <tr>
+                  <td><c-s>pub fn is_char_boundary(&self, index: usize) -> bool</c-s></td>
+                  <td>Checks that index-th byte is first byte in UTF-8 code point sequence or end of the string</td>
+                </tr>
+                <tr>
+                  <td><c-s>pub const fn is_empty(&self) -> bool</c-s></td>
+                  <td>Returns true if self has length of zero bytes</td>
+                </tr>
+                <tr>
+                  <td><c-s>pub const fn len(&self) -> usize</c-s></td>
+                  <td>This length is in bytes, not chars or graphemes</td>
+                </tr>
+                <tr>
+                  <td><c-s>pub fn lines(&self) -> Lines<'_></c-s></td>
+                  <td>
+                    An iterator over the lines of a string, as string slices
+                  </td>
+                </tr>
+                <tr>
+                  <td><c-s>pub fn make_ascii_lowercase(&mut self)</c-s></td>
+                  <td>Converts this string to its ASCII lower case equivalent in-place</td>
+                </tr>
+                <tr>
+                  <td><c-s>pub fn make_ascii_uppercase(&mut self)</c-s></td>
+                  <td>Converts this string to its ASCII upper case equivalent in-place</td>
+                </tr>
+                <tr>
+                  <td><c-s>pub fn parse<F>(&self) -> Result<F, <F as FromStr>::Err></c-s></td>
+                  <td>Parses this string slice into another type</td>
+                </tr>
+                <tr>
+                  <td class="no-wrap"><c-s>pub fn repeat(&self, n: usize) -> String</c-s></td>
+                  <td>Creates a new String by repeating a string n times</td>
+                </tr>
+                <tr>
+                  <td><c-s>pub fn replace<'a, P>(&'a self, from: P, to: &str) -> String</c-s></td>
+                  <td>Replaces all matches of pattern P with another string</td>
+                </tr>
+                <tr>
+                  <td><c-s>pub fn split<'a, P>(&'a self, pat: P) -> Split<'a, P></c-s></td>
+                  <td>An iterator over substrings of this string slice, separated by characters matched by a pattern</td>
+                </tr>
+                <tr>
+                  <td><c-s>pub fn trim(&self) -> &str</c-s></td>
+                  <td>Returns a string slice with leading and trailing whitespace removed</td>
+                </tr>
+                <tr>
+                  <td>More methods ...</td>
+                  <td><a href="https://doc.rust-lang.org/std/primitive.str.html">std::string::String</a></td>
+                </tr>
+              </table>
+            </div>
+          </t-b>
+          <div>
+            <details>
+              <summary class="darkItem">Basic str operations</summary>
+              <defn-OuterBlock>
+                <defn-block>
+                  <defn-head>str Demonstration</defn-head>
+                  <defn-code>
 // Basic str demo
 
 fn main() {
-    let s = "a literal string";
-    print!("\n  -- chars --\n  ");
-    for ch in s.chars() {
-        print!("{} ", ch);
-    }
-    print!("\n  -- char_indices --");
-    for item in s.char_indices() {
-        print!("\n  {:?} ", item);
-    }
-    print!("\n  -- find --");
-    let ch = 't';
-    if let Some(indx) = s.find(ch) {
-        print!(
-          "\n  found \'{}\' at index {} in {:?}", 
-          ch, indx, s
-        );
-    }
-    else {
-        print!(
-          "\n  did not find \'{}\' in {:?}", 
-          ch, s
-        );
-    }
-    print!("\n  -- demonstrate copy, t = s --");
-    let t = s;
-    let addr_t = &t;
-    let addr_s = &s;
-    print!("\n  address of s = {:p}", addr_s);
-    print!("\n  address of t = {:p}", addr_t);
+  let s = "a literal string";
+  print!("\n  -- chars --\n  ");
+  for ch in s.chars() {
+    print!("{} ", ch);
+  }
+  print!("\n  -- char_indices --");
+  for item in s.char_indices() {
+    print!("\n  {:?} ", item);
+  }
+  print!("\n  -- find --");
+  let ch = 't';
+  if let Some(indx) = s.find(ch) {
+    print!(
+      "\n  found \'{}\' at index {} in {:?}",
+      ch, indx, s
+    );
+  }
+  else {
+    print!(
+      "\n  did not find \'{}\' in {:?}",
+      ch, s
+    );
+  }
+  print!("\n  -- demonstrate copy, t = s --");
+  let t = s;
+  let addr_t = &t;
+  let addr_s = &s;
+  print!("\n  address of s = {:p}", addr_s);
+  print!("\n  address of t = {:p}", addr_t);
 }
 
-            </defn-code>
-          </defn-block>
-          <defn-block>
-            <defn-head>Output</defn-head>
-            <defn-code>
-  -- chars --
-  a   l i t e r a l   s t r i n g 
-  -- char_indices --
-  (0, 'a') 
-  (1, ' ') 
-  (2, 'l') 
-  (3, 'i') 
-  (4, 't') 
-  (5, 'e') 
-  (6, 'r') 
-  (7, 'a') 
-  (8, 'l') 
-  (9, ' ') 
-  (10, 's') 
-  (11, 't') 
-  (12, 'r') 
-  (13, 'i') 
-  (14, 'n') 
-  (15, 'g') 
-  -- find --
-  found 't' at index 4 in 
-              "a literal string"
-  -- demonstrate copy, t = s --
-  address of s = 0x7ffffd0b7180
-  address of t = 0x7ffffd0b7458
+                  </defn-code>
+                </defn-block>
+                <defn-block>
+                  <defn-head>Output</defn-head>
+                  <defn-code>
+-- chars --
+a   l i t e r a l   s t r i n g
+-- char_indices --
+(0, 'a')
+(1, ' ')
+(2, 'l')
+(3, 'i')
+(4, 't')
+(5, 'e')
+(6, 'r')
+(7, 'a')
+(8, 'l')
+(9, ' ')
+(10, 's')
+(11, 't')
+(12, 'r')
+(13, 'i')
+(14, 'n')
+(15, 'g')
+-- find --
+found 't' at index 4 in
+"a literal string"
+-- demonstrate copy, t = s --
+address of s = 0x7ffffd0b7180
+address of t = 0x7ffffd0b7458
 
-            </defn-code>
-          </defn-block>
-        </defn-OuterBlock>
-      </details>
-    </div>
-    <t-b class="indents">
-      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=502138ddcc631b699b8bb9813ca00462">
-        code in playground
-      </a>
-      <a id="string"></a>
-      <div style="height:0.5rem;"></div>
-    </t-b>
-  </div>
-  <h3>2. String</h3>
-  <div class="indent">
-    <t-b>
-      The std::string library provides the main Rust string.
-      <div class="indent pad5">
-        <c-s>let s = String::from("a string");</c-s>
-      </div>
-      The <c-s>"a string"</c-s> is a string slice of type <c-s>&str</c-s>.
-      It is a contiguous collection of UTF-8 characters, loaded into some location in heap memory, 
-      as shown in Figure 2, below.  
-    </t-b>
-    <t-b>
-      Each member of the <c-s>String</c-s> class consists of a control block in the stack 
-      holding a pointer to its string slice in the heap.  See
-      <a href="RustBites_Data.html#traits">RustBites_Data</a> for details. 
-    </t-b>
-    <t-b>
-      The <c-s>str</c-s> type satisfies the <c-s>Copy</c-s> trait. 
-      The statement <c-s>let t = "some string contents";</c-s> uses 
-      <c-s>memcpy</c-s> to copy bytes of the literal string into <c-s>t</c-s>&apos;s location.
-    </t-b>
-    <div class="indent">
-      <div style="width:calc(100vw - 12rem);">
-        <div class="lefts">
-          <photosizer-block src="../../Pictures/StrCopy.jpg" width="400" class="photoSizerBlock left" style="margin-top:0;">
-            <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;
-        ">
-              Figure 1. Str Copy
-            </span>
-          </photosizer-block>
-      </div>
-    </div>
-    <div style="height:0.5rem; clear:both;"></div>
-    <t-b style="margin-left:-1.5rem;">
-      The <c-s>String</c-s> type moves instead of copying. You can, however, explicitly invoke its clone() method.
-      The statement:
-      <div class="indent pad5">
-        <c-s>let t:String = s;</c-s> 
-      </div>
-      results in transfer of ownership of s&apos;s character resources to <c-s>t</c-s>.  
-      That invalidates <c-s>s</c-s>, as shown in Figure 2.
-    </t-b>
-      <div style="width:calc(100vw - 12rem);">
-        <div class="left">
-          <photosizer-block src="../../Pictures/StringMove.jpg" width="400" class="photoSizerBlock clear left" style="margin-top:0;">
-            <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;
-        ">
-              Figure 2. String Move
-            </span>
-          </photosizer-block>
-          <!-- <div style="width:calc(100vw - 12rem);"> -->
-          <photosizer-block src="../../Pictures/StringClone.jpg" width="400" class="photoSizerBlock left" style="margin-top:0;">
-            <span style="
-          display: inline-block;
-          font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
-          background-color: #ddd;
-          width: 100%;
-          padding: 5px 0px;
-        ">
-              Figure 3. String Clone
-            </span>
-          </photosizer-block>
+                  </defn-code>
+                </defn-block>
+              </defn-OuterBlock>
+            </details>
+          </div>
+          <t-b class="indents">
+            <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=502138ddcc631b699b8bb9813ca00462">
+              code in playground
+            </a>
+            <div style="height:0.5rem;"></div>
+          </t-b>
         </div>
-      </div>
-    </div>
-    <div style="clear:both;"></div>
-    <div style="height:0.5rem; clear:both;"></div>
-    <t-b>
-      <c-s>String</c-s> satisfies the <c-s>Clone</c-s> trait. So, you can explicitly invoke its clone() method.
-      The statement:
-      <div class="indent pad5">
-        <c-s>let t:String = s.clone();</c-s> 
-      </div>
-      results in copying <c-s>s</c-s>&apos;s character resources to <c-s>t</c-s>.  
-      So <c-s>s</c-s> remains valid, as shown in Figure 3.
-    </t-b>
-    <div style="height:0.25rem;"></div>
-    <t-b>
-      <h4>Table 2. - String member functions:</h4>
-      <div style="width:calc(100vw-9em);">
-        <table style="max-width:calc(100vw-9em);">
-          <tr>
-            <th>member function</th><th>description</th>
-          </tr>
-          <tr>
-            <td><c-s>new() -> String</c-s></td>
-            <td>Create new empty String</td>
-          </tr>
-          <tr>
-            <td><c-s>from(s: &str) -> String</c-s></td>
-            <td>Creates string from string slice</td>
-          </tr>
-          <tr>
-            <td><c-s>as_str(&self) -> &str</c-s></td>
-            <td>Returns string slice</td>
-          </tr>
-          <tr>
-            <td><c-s>push_str(&mut self, s: &str)</c-s></td>
-            <td>Appends chars from s</td>
-          </tr>
-          <tr>
-            <td><c-s>push(&mut self, ch: char)</c-s></td>
-            <td>Appends ch</td>
-          </tr>
-          <tr>
-            <td><c-s>remove(&mut self, n: usize) -> char</c-s></td>
-            <td>Removes char at index n</td>
-          </tr>
-          <tr>
-            <td><c-s>insert(&mut self, n: usize, ch: char)</c-s></td>
-            <td>inserts ch at location n</td>
-          </tr>
-          <tr>
-            <td><c-s>insert_str(&mut self, n: usize, s: &str)</c-s></td>
-            <td>Inserts contents of s at location n</td>
-          </tr>
-          <tr>
-            <td><c-s>len(&self) -> usize</c-s></td>
-            <td>
-              Returns length of string in bytes, not chars!<br />
-              They are the same only for ASCII characters.
-            </td>
-          </tr>
-          <tr>
-            <td><c-s>is_empty(&self) -> bool</c-s></td>
-            <td>Returns true if len() == 0, else false</td>
-          </tr>
-          <tr>
-            <td><c-s>clear(&mut self)</c-s></td>
-            <td>Removes all bytes</td>
-          </tr>
-          <tr>
-            <td class="no-wrap"><c-s>from_utf8(vec: Vec&lt;u8&gt; -> REsult&lt;String, FromUtf8Error&gt;</c-s></td>
-            <td>Converts vector of bytes to String.  Returns error if invalid UTF-8</td>
-          </tr>
-          <tr>
-            <td><c-s>into_bytes(self) -> Vec&lt;u8&gt;</c-s></td>
-            <td>Convert to Vec of bytes</td>
-          </tr>
-          <tr>
-            <td><c-s>as_bytes(&self) -> &[u8]</c-s></td>
-            <td>Returns byte slice</td>
-          </tr>
-          <tr>
-            <td><c-s>is_char_boundary(&self, n: usize) -> bool</c-s></td>
-            <td>Is this byte the start of a new UTF-8 character?</td>
-          </tr>
-          <tr>
-            <td>More methods ...</td>
-            <td><a href="https://doc.rust-lang.org/std/string/struct.String.html">std::string::String</a></td>
-          </tr>
-        </table>
-        </div>
-    </t-b>
-    <t-b>
-      <div style="height:0.5rem;"></div>
-      <div>
-        <details>
-          <summary class="darkItem">String Examples:</summary>
-          <s-halfEm></s-halfEm>
-          <defn-outerBlock>
-            <defn-block>
-              <defn-head>demo_string</defn-head>
-              <defn-code>
+        <a id="string"></a>
+        <h2>2. String</h2>
+        <div class="indent">
+          <t-b>
+            The std::string library provides the main Rust string.
+            <div class="indent pad5">
+              <c-s>let s = String::from("a string");</c-s>
+            </div>
+            The <c-s>"a string"</c-s> is a string slice of type <c-s>&str</c-s>.
+            It is a contiguous collection of UTF-8 characters, loaded into some location in heap memory,
+            as shown in Figure 2, below.
+          </t-b>
+          <t-b>
+            Each member of the <c-s>String</c-s> class consists of a control block in the stack
+            holding a pointer to its string slice in the heap.  See
+            <a href="RustBites_Data.html#traits">RustBites_Data</a> for details.
+          </t-b>
+          <t-b>
+            The <c-s>str</c-s> type satisfies the <c-s>Copy</c-s> trait.
+            The statement <c-s>let t = "some string contents";</c-s> uses
+            <c-s>memcpy</c-s> to copy bytes of the literal string into <c-s>t</c-s>&apos;s location.
+          </t-b>
+          <div class="indent">
+            <div style="width:calc(100vw - 12rem);">
+              <div class="lefts">
+                <photosizer-block src="../../Pictures/StrCopy.jpg" width="400" class="photoSizerBlock left" style="margin-top:0;">
+                  <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS, Tahoma';
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;
+        ">
+                    Figure 1. Str Copy
+                  </span>
+                </photosizer-block>
+              </div>
+            </div>
+            <div style="height:0.5rem; clear:both;"></div>
+            <t-b style="margin-left:-1.5rem;">
+              The <c-s>String</c-s> type moves instead of copying. You can, however, explicitly invoke its clone() method.
+              The statement:
+              <div class="indent pad5">
+                <c-s>let t:String = s;</c-s>
+              </div>
+              results in transfer of ownership of s&apos;s character resources to <c-s>t</c-s>.
+              That invalidates <c-s>s</c-s>, as shown in Figure 2.
+            </t-b>
+            <div style="width:calc(100vw - 12rem);">
+              <div class="left">
+                <photosizer-block src="../../Pictures/StringMove.jpg" width="400" class="photoSizerBlock clear left" style="margin-top:0;">
+                  <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS, Tahoma';
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;
+        ">
+                    Figure 2. String Move
+                  </span>
+                </photosizer-block>
+                <!-- <div style="width:calc(100vw - 12rem);"> -->
+                <photosizer-block src="../../Pictures/StringClone.jpg" width="400" class="photoSizerBlock left" style="margin-top:0;">
+                  <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS, Tahoma';
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;
+        ">
+                    Figure 3. String Clone
+                  </span>
+                </photosizer-block>
+              </div>
+            </div>
+          </div>
+          <div style="clear:both;"></div>
+          <div style="height:0.5rem; clear:both;"></div>
+          <t-b>
+            <c-s>String</c-s> satisfies the <c-s>Clone</c-s> trait. So, you can explicitly invoke its clone() method.
+            The statement:
+            <div class="indent pad5">
+              <c-s>let t:String = s.clone();</c-s>
+            </div>
+            results in copying <c-s>s</c-s>&apos;s character resources to <c-s>t</c-s>.
+            So <c-s>s</c-s> remains valid, as shown in Figure 3.
+          </t-b>
+          <div style="height:0.25rem;"></div>
+          <t-b>
+            <h4>Table 2. - String member functions:</h4>
+            <div style="width:calc(100vw-9em);">
+              <table style="max-width:calc(100vw-9em);">
+                <tr>
+                  <th>member function</th>
+                  <th>description</th>
+                </tr>
+                <tr>
+                  <td><c-s>new() -> String</c-s></td>
+                  <td>Create new empty String</td>
+                </tr>
+                <tr>
+                  <td><c-s>from(s: &str) -> String</c-s></td>
+                  <td>Creates string from string slice</td>
+                </tr>
+                <tr>
+                  <td><c-s>as_str(&self) -> &str</c-s></td>
+                  <td>Returns string slice</td>
+                </tr>
+                <tr>
+                  <td><c-s>push_str(&mut self, s: &str)</c-s></td>
+                  <td>Appends chars from s</td>
+                </tr>
+                <tr>
+                  <td><c-s>push(&mut self, ch: char)</c-s></td>
+                  <td>Appends ch</td>
+                </tr>
+                <tr>
+                  <td><c-s>remove(&mut self, n: usize) -> char</c-s></td>
+                  <td>Removes char at index n</td>
+                </tr>
+                <tr>
+                  <td><c-s>insert(&mut self, n: usize, ch: char)</c-s></td>
+                  <td>inserts ch at location n</td>
+                </tr>
+                <tr>
+                  <td><c-s>insert_str(&mut self, n: usize, s: &str)</c-s></td>
+                  <td>Inserts contents of s at location n</td>
+                </tr>
+                <tr>
+                  <td><c-s>len(&self) -> usize</c-s></td>
+                  <td>
+                    Returns length of string in bytes, not chars!<br />
+                    They are the same only for ASCII characters.
+                  </td>
+                </tr>
+                <tr>
+                  <td><c-s>is_empty(&self) -> bool</c-s></td>
+                  <td>Returns true if len() == 0, else false</td>
+                </tr>
+                <tr>
+                  <td><c-s>clear(&mut self)</c-s></td>
+                  <td>Removes all bytes</td>
+                </tr>
+                <tr>
+                  <td class="no-wrap"><c-s>from_utf8(vec: Vec&lt;u8&gt; -> REsult&lt;String, FromUtf8Error&gt;</c-s></td>
+                  <td>Converts vector of bytes to String.  Returns error if invalid UTF-8</td>
+                </tr>
+                <tr>
+                  <td><c-s>into_bytes(self) -> Vec&lt;u8&gt;</c-s></td>
+                  <td>Convert to Vec of bytes</td>
+                </tr>
+                <tr>
+                  <td><c-s>as_bytes(&self) -> &[u8]</c-s></td>
+                  <td>Returns byte slice</td>
+                </tr>
+                <tr>
+                  <td><c-s>is_char_boundary(&self, n: usize) -> bool</c-s></td>
+                  <td>Is this byte the start of a new UTF-8 character?</td>
+                </tr>
+                <tr>
+                  <td>More methods ...</td>
+                  <td><a href="https://doc.rust-lang.org/std/string/struct.String.html">std::string::String</a></td>
+                </tr>
+              </table>
+            </div>
+          </t-b>
+          <t-b>
+            <div style="height:0.5rem;"></div>
+            <div>
+              <details>
+                <summary class="darkItem">String Examples:</summary>
+                <s-halfEm></s-halfEm>
+                <defn-outerBlock>
+                  <defn-block>
+                    <defn-head>demo_string</defn-head>
+                    <defn-code>
 use core::fmt::Debug;
 
 /*-------------------------------------------------
-  Show slice as stack of rows with span elements
-  in row
-  - nice illustration of Iterator methods
+Show slice as stack of rows with span elements
+in row
+- nice illustration of Iterator methods
 */
 fn show_fold&lt;T:Debug&gt;(t:&[T], span:usize) {
-    let times = 1 + t.len()/span;
-    let iter = t.iter();
-    print!("\n  ");
-    for _i in 0..times {
-        for bt in iter.clone()
-            .skip(_i * span).take(span) {
-            print!("{:5?} ", bt);
-        }
-        if _i &lt; times - 1 {
-            print!("\n  ");
-        }
+  let times = 1 + t.len()/span;
+  let iter = t.iter();
+  print!("\n  ");
+  for _i in 0..times {
+    for bt in iter.clone()
+    .skip(_i * span).take(span) {
+      print!("{:5?} ", bt);
     }
+    if _i &lt; times - 1 {
+      print!("\n  ");
+    }
+  }
 }
 
 fn get_type&lt;T&gt;(_t:&T) -&gt; &str {
-    std::any::type_name::&lt;T&gt;()
+  std::any::type_name::&lt;T&gt;()
 }
 
 fn show_type_value&lt;T: Debug&gt;(msg: &str, t: &T) {
-    print!(
-        "\n  {} type is: {}, value: {:?}", 
-        msg, get_type::&lt;T&gt;(t), t
-    );
+  print!(
+    "\n  {} type is: {}, value: {:?}",
+    msg, get_type::&lt;T&gt;(t), t
+  );
 }
- 
+
 fn main() {
   print!("\n  -- demo_string --");
   let s1 : String = String::from("a test string");
@@ -471,7 +576,7 @@ fn main() {
   let iter = s1.chars();
   print!("\n  ");
   for ch in iter {
-      print!("{} ", ch);
+    print!("{} ", ch);
   }
   print!("\n  -- extracting bytes --");
   let s1_bytes = s1.as_bytes();
@@ -479,7 +584,7 @@ fn main() {
   show_fold(&s1_bytes, 5);
   // This works too, will wrap in []
   // print!("\n  bytes are: {:?}", b"a test string");
-  
+
   print!("\n  -- extracting a slice --");
   let slc = &s1[0..6];
   show_type_value("&s1[0..6]", &slc);
@@ -488,205 +593,241 @@ fn main() {
   print!("\n  executing statement: let s2 = s1;");
   print!("\n  address of s1    = {:p}", &s1);
   print!(
-        "\n  address of s1.as_bytes()[0] = {:p}", 
-        &s1.as_bytes()[0]
+    "\n  address of s1.as_bytes()[0] = {:p}",
+    &s1.as_bytes()[0]
   );
   let s2 = s1;
   print!("\n  address of s2    = {:p}", &s2);
   print!(
-      "\n  address of s2.as_bytes()[0] = {:p}", 
-      &s2.as_bytes()[0]
+    "\n  address of s2.as_bytes()[0] = {:p}",
+    &s2.as_bytes()[0]
   );
   print!(
-      "\n  new control block, orig start of heap alloc"
+    "\n  new control block, orig start of heap alloc"
   );
 }
 
-              </defn-code>
-            </defn-block>
-            <defn-block>
-              <defn-head>Output:</defn-head>
-              <defn-code>
-  -- demo_string --
-  s1 -  type is: alloc::string::String, 
-        value: "a test string"
-  -- iterating through String characters --
-  a   t e s t   s t r i n g 
-  -- extracting bytes --
-  bytes are:
-     97    32   116   101   115 
-    116    32   115   116   114 
-    105   110   103 
-  -- extracting a slice --
-  &s1[0..6] type is: &str, value: "a test"
-  -- demonstrate move --
-  executing statement: let s2 = s1;
-  address of s1    = 0x7fff7eadf3e8
-  address of s1.as_bytes()[0] = 0x55b3a9a96b40
-  address of s2    = 0x7fff7eadf680
-  address of s2.as_bytes()[0] = 0x55b3a9a96b40
-  new control block, original start of heap alloc
-            </defn-code>
-            </defn-block>
-          </defn-outerBlock>
-        </details>
-      </div>
-    </t-b>
-  </div>
-  <t-b class="indent">
-    <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=46f6bf13eaf69fe93dd058dc4fe27252">
-      code in playground
-    </a>
-    <a id="formats"></a>
-    <div style="height:0.5rem;"></div>
-  </t-b>
-  <h3>3. String Formats</h3>
-  <div class="indent">
-    <t-b>
-      Rust provides a useful set of formatting facilities for console display:  
-      <a href="https://doc.rust-lang.org/std/fmt/">std::fmt</a>
-      and for building formatted strings, using the format! macro:
-      <a href="https://doc.rust-lang.org/std/macro.format.html">std::format</a>
-    </t-b>
-    <t-b>
-      There is a little language associated with the formatting process that 
-      is well described in the references given here.  Using that and an 
-      extensive set of attributes, also presented in the docs, you can provide
-      very well organized information on the console, instead of a lot of raw 
-      data.
-      <a id="iteration"></a>
-      <div style="height:0.5rem;"></div>
-    </t-b>
-  </div>
-  <h3>4. Iterating over Strings</h3>
-  <div class="indent">
-        <t-b>
-      Since types of <c-s>String</c-s> and <c-s>&str</c-s> contain utf-8 characters, their items may have
-      sizes that vary from 1 to 4 bytes.  So their iterators have to search for character boundaries.
-    </t-b>
-    <t-b>
-      <div class="indent">
-        <h4>Table 1. utf-8 character boundaries</h4>
-        <table>
-          <tr>
-            <th>char size</th><th>indicator</th>
-          </tr>
-          <tr>
-            <td>1 byte, e.g. ASCII</td><td>byte starts with bit 0</td>
-          </tr>
-          <tr>
-            <td>2 bytes</td><td>First byte starts with bits 110</td>
-          </tr>
-          <tr>
-            <td>3 bytes</td><td>First byte starts with bits 1110</td>
-          </tr>
-          <tr>
-            <td>4 bytes</td><td>First byte starts with bits 11110</td>
-          </tr>
-          <tr>
-            <td>not first byte</td><td>byte starts with bits 10</td>
-          </tr>
-        </table>
-      </div>
-    </t-b>
-    <t-b>
-      For that reason, instances of std::String and primitive str provide iterators:
-      <div style="height:0.25rem;"></div>
-      <ul class="tight" style="margin-left:0.0rem;">
-        <li>
-          <c-s>chars(&self) -> Chars&lt;'_&gt;</c-s>
-          <div class="indent pad5">
-            <c-s>Chars&lt;'_&gt;</c-s> implements <c-s>next(&self) -> Option&lt;char&gt;</c-s>
+                    </defn-code>
+                  </defn-block>
+                  <defn-block>
+                    <defn-head>Output:</defn-head>
+                    <defn-code>
+-- demo_string --
+s1 -  type is: alloc::string::String,
+value: "a test string"
+-- iterating through String characters --
+a   t e s t   s t r i n g
+-- extracting bytes --
+bytes are:
+97    32   116   101   115
+116    32   115   116   114
+105   110   103
+-- extracting a slice --
+&s1[0..6] type is: &str, value: "a test"
+-- demonstrate move --
+executing statement: let s2 = s1;
+address of s1    = 0x7fff7eadf3e8
+address of s1.as_bytes()[0] = 0x55b3a9a96b40
+address of s2    = 0x7fff7eadf680
+address of s2.as_bytes()[0] = 0x55b3a9a96b40
+new control block, original start of heap alloc
+                    </defn-code>
+                  </defn-block>
+                </defn-outerBlock>
+              </details>
+            </div>
+          </t-b>
+        </div>
+        <t-b class="indent">
+          <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=46f6bf13eaf69fe93dd058dc4fe27252">
+            code in playground
+          </a>
+          <div style="height:0.5rem;"></div>
+        </t-b>
+        <a id="formats"></a>
+        <h2>3. String Formats</h2>
+        <div class="indent">
+          <t-b>
+            Rust provides a useful set of formatting facilities for console display:
+            <a href="https://doc.rust-lang.org/std/fmt/">std::fmt</a>
+            and for building formatted strings, using the format! macro:
+            <a href="https://doc.rust-lang.org/std/macro.format.html">std::format</a>
+          </t-b>
+          <t-b>
+            There is a little language associated with the formatting process that
+            is well described in the std::fmt reference given above.  Using that and an
+            extensive set of attributes, also presented in the docs, you can provide
+            very well organized information on the console, instead of a lot of raw
+            data.
+            <div style="height:0.5rem;"></div>
+          </t-b>
+        </div>
+        <a id="iteration"></a>
+        <h3>4. Iterating over Strings</h3>
+        <div class="indent">
+          <t-b>
+            Since types of <c-s>String</c-s> and <c-s>&str</c-s> contain utf-8 characters, their items may have
+            sizes that vary from 1 to 4 bytes.  So their iterators have to search for character boundaries.
+          </t-b>
+          <t-b>
+            <div class="indent">
+              <h4>Table 1. utf-8 character boundaries</h4>
+              <table>
+                <tr>
+                  <th>char size</th>
+                  <th>indicator</th>
+                </tr>
+                <tr>
+                  <td>1 byte, e.g. ASCII</td>
+                  <td>byte starts with bit 0</td>
+                </tr>
+                <tr>
+                  <td>2 bytes</td>
+                  <td>First byte starts with bits 110</td>
+                </tr>
+                <tr>
+                  <td>3 bytes</td>
+                  <td>First byte starts with bits 1110</td>
+                </tr>
+                <tr>
+                  <td>4 bytes</td>
+                  <td>First byte starts with bits 11110</td>
+                </tr>
+                <tr>
+                  <td>not first byte</td>
+                  <td>byte starts with bits 10</td>
+                </tr>
+              </table>
+            </div>
+          </t-b>
+          <t-b>
+            For that reason, instances of std::String and primitive str provide iterators:
+            <div style="height:0.25rem;"></div>
+            <ul class="tight" style="margin-left:2.0em;">
+              <li>
+                <c-s>chars(&self) -> Chars&lt;'_&gt;</c-s>
+                <div class="indent pad5">
+                  <c-s>Chars&lt;'_&gt;</c-s> implements <c-s>next(&self) -> Option&lt;char&gt;</c-s>
+                </div>
+              </li>
+              <li>
+                <c-s>char_indices(&self) -> CharIndices&lt;'_&gt;</c-s>
+                <div class="indent pad5">
+                  <c-s>CharIndices&lt;'_&gt;</c-s> implements <c-s>next(&self) -> Option&lt;(usize, char)&gt;</c-s>
+                </div>
+              </li>
+              <li>
+                <c-s>bytes(&self) -> Bytes&lt;'_&gt;</c-s>
+                <div class="indent pad5">
+                  <c-s>Bytes&lt;'_&gt;</c-s> implements <c-s>next(&self) -> Option&lt;u8&gt;</c-s>
+                </div>
+              </li>
+            </ul>
+          </t-b>
+          <t-b>
+            The type <c-s>char</c-s> is not what <c-s>String</c-s> and <c-s>str</c-s> hold.  The type char consists of
+            4 bytes which can hold any of the <c-s>String</c-s> and <c-s>str</c-s> characters.  So, a Vec&lt;char&gt;
+            would be up to four times larger than a std::String with the same logical contents.
+          </t-b>
+          <t-b>
+            <div class="indent">
+              <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=ba54eaaf19da0f9b01cbb7421a7cd2ed">
+                iterating over ASCII and non-ASCII strings
+              </a><br />
+              <!--<a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=461d230d1841bcdec6d33709f66870f9">
+        revised examples
+      </a>-->
+              <div style="height:0.5rem;"></div>
+            </div>
+          </t-b>
+          <div style="height: 0.25rem;"></div>
+          <a id="othertypes"></a>
+          <h2>5. Other String Types</h2>
+          <div class="indent">
+            <t-b>
+              Rust libraries std::ffi (foreign function interface) and std::path provide four other string types:
+            </t-b>
+            <t-b>
+              <table>
+                <tr>
+                  <th>String Type</th>
+                  <th>Description</th>
+                </tr>
+                <tr>
+                  <td>
+                    <c-s>
+                      <a href="https://doc.rust-lang.org/std/ffi/struct.OsString.html">std::ffi::OsString</a>
+                    </c-s>
+                  </td>
+                  <td>
+                    Owned mutable wrapper for platform-native strings, used to make platform API calls and interoperate
+                    with &quot;C&quot; code.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <c-s>
+                      <a href="https://doc.rust-lang.org/std/ffi/struct.OsStr.html">std::ffi::OsStr</a>
+                    </c-s>
+                  </td>
+                  <td>
+                    Borrowed reference to OsString
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <c-s>
+                      <a href="https://doc.rust-lang.org/std/path/struct.PathBuf.html">std::path::PathBuf</a>
+                    </c-s>
+                  </td>
+                  <td>
+                    Owned mutable filesystem path, adds methods for interacting with the Rust filesystem
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <c-s>
+                      <a href="https://doc.rust-lang.org/std/path/struct.Path.html">std::path::Path</a>
+                    </c-s>
+                  </td>
+                  <td>
+                    Borrowed reference to PathBuf slice
+                    <div style="height:0.25rem;"></div>
+                  </td>
+                </tr>
+              </table>
+            </t-b>
           </div>
-        </li>
-        <li>
-          <c-s>char_indices(&self) -> CharIndices&lt;'_&gt;</c-s>
-          <div class="indent pad5">
-            <c-s>CharIndices&lt;'_&gt;</c-s> implements <c-s>next(&self) -> Option&lt;(usize, char)&gt;</c-s>
-          </div>
-        </li>
-        <li>
-          <c-s>bytes(&self) -> Bytes&lt;'_&gt;</c-s>
-          <div class="indent pad5">
-            <c-s>Bytes&lt;'_&gt;</c-s> implements <c-s>next(&self) -> Option&lt;u8&gt;</c-s>
-          </div>
-        </li>
-      </ul>
-    </t-b>
-    <t-b>
-      The type <c-s>char</c-s> is not what <c-s>String</c-s> and <c-s>str</c-s> hold.  The type char consists of
-      4 bytes which can hold any of the <c-s>String</c-s> and <c-s>str</c-s> characters.  So, a Vec&lt;char&gt;
-      would be up to four times larger than a std::String with the same logical contents.
-    </t-b>
-    <t-b>
-      <div class="indent">
-        <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=ba54eaaf19da0f9b01cbb7421a7cd2ed">
-          iterating over ASCII and non-ASCII strings
-        </a><br />
-        <!--<a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=461d230d1841bcdec6d33709f66870f9">
-          revised examples
-        </a>-->
-        <a id="othertypes"></a>
-        <div style="height:0.5rem;"></div>
-      </div>
-    </t-b>
-    <div style="height: 0.25rem;"></div>
-    <h3>5. Other String Types</h3>
-    <div class="indent">
-      <t-b>
-        Rust libraries std::ffi (foreign function interface) and std::path provide four other string types:
-      </t-b>
-      <t-b>
-        <table>
-          <tr>
-            <th>String Type</th><th>Description</th>
-          </tr>
-          <tr>
-            <td>
-              <c-s>
-                <a href="https://doc.rust-lang.org/std/ffi/struct.OsString.html">std::ffi::OsString</a>
-              </c-s>
-            </td>
-            <td>
-              Owned mutable wrapper for platform-native strings, used to make platform API calls and interoperate
-              with &quot;C&quot; code.
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <c-s>
-                <a href="https://doc.rust-lang.org/std/ffi/struct.OsStr.html">std::ffi::OsStr</a>
-              </c-s>
-            </td>
-            <td>
-              Borrowed reference to OsString
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <c-s>
-                <a href="https://doc.rust-lang.org/std/path/struct.PathBuf.html">std::path::PathBuf</a>
-              </c-s>
-            </td>
-            <td>
-              Owned mutable filesystem path, adds methods for interacting with the Rust filesystem
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <c-s>
-                <a href="https://doc.rust-lang.org/std/path/struct.Path.html">std::path::Path</a>
-              </c-s>
-            </td>
-            <td>
-              Borrowed reference to PathBuf slice
-              <div style="height:0.25rem;"></div>
-            </td>
-          </tr>
-        </table>
-      </t-b>
-    </div>
 
-  </div>
-  </body>
+        </div>
+      </content>
+      <a id="bottom"></a>
+      <page-TOC id="pages" style="display:none;">
+      </page-TOC>
+      <page-sections id="sections" style="display:none;">
+        <sec-elem style="width:0.0em">&nbsp;</sec-elem>
+        <menu-elem class="secElem"><a href="#bottom">bottom</a></menu-elem>
+        <menu-elem class="secElem"><a href="#othertypes">othertypes</a></menu-elem>
+        <menu-elem class="secElem"><a href="#iteration">iteration</a></menu-elem>
+        <menu-elem class="secElem"><a href="#formats">formats</a></menu-elem>
+        <menu-elem class="secElem"><a href="#string">String</a></menu-elem>
+        <menu-elem class="secElem"><a href="#str">str</a></menu-elem>
+        <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
+      </page-sections>
+    </main>
+    <frame-footer>
+      <menu-item style="width:1.0em;">&nbsp;</menu-item>
+      <menu-elem id="nextLink2" onclick="bottomMenu.next()">Next</menu-elem>
+      <menu-elem id="prevLink2" onclick="bottomMenu.prev()">Prev</menu-elem>
+      <menu-elem id="pgbtn" onclick="bottomMenu.pages()">Pages</menu-elem>
+      <menu-elem onclick="bottomMenu.sections()">Sections</menu-elem>
+      <menu-elem onclick="bottomMenu.about()">About</menu-elem>
+      <menu-elem id="kysbtn" onclick="storyHlpMenu.keys()">Keys</menu-elem>
+      <!--<menu-item style="width:1.0em;">&nbsp;</menu-item>
+      <menu-elem style="font-size:0.75em;" onclick="storyHlpMenu.decrZoomScreen()">Zout</menu-elem>
+      <menu-elem style="font-size:0.75em;" onclick="storyHlpMenu.normZoomScreen()">Zdef</menu-elem>
+      <menu-elem style="font-size:0.75em;" onclick="storyHlpMenu.incrZoomScreen()">Zin</menu-elem>-->
+    </frame-footer>
+  </page-frame>
+</body>
 </html>
