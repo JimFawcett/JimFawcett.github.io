@@ -1,210 +1,49 @@
-ib<!DOCTYPE html>
-<html>
-<!--
-  RustBites_Macros.html
--->
-<head>
-  <title>RustBite Threads</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="css/StylesPageFrameDefaults.css" />
-  <link rel="stylesheet" href="css/StylesPageFrameStructure.css" />
-  <link rel="stylesheet" href="css/StylesPageFrameMenus.css" />
-  <link rel="stylesheet" href="css/StylesPageFrameThemeRust.css" />
-  <link rel="stylesheet" href="css/StylesWebComponents.css" />
-  <script src="js/ScriptsWebComponents.js"></script>
-  <script src="js/ScriptsPageFrame.js"></script>
-  <script src="js/ScriptsPageFramePagesRustTrack.js"></script>
-  <script src="js/ScriptsPageFrameKeyboard.js"></script>
-  <style>
-    #github table {
-      max-width: 80%;
-      border: 1px solid black;
-      margin-top: 1em;
-      margin-bottom: 1.0em;
-    }
+﻿<!DOCTYPE html>
+<html id="top">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="keywords" content="Rust, Introduction" />
+    <meta name="Author" content="Jim Fawcett" />
+    <meta name="Author" content="James Fawcett" />
+    <title>RustBites Threads</title>
+    <link rel="stylesheet" href="css/BiteStyles.css" />
+    <link rel="stylesheet" href="css/BiteTables.css" />
+    <script src="js/ScriptsWebComponents.js"></script>
+    <link rel="stylesheet" href="css/StylesWebComponents.css" />
+    <script src="js/BiteScripts.js"></script>
+    <script src="js/ScriptsKeyboard.js"></script>
+    <style>
+      #github c-s { font-size:1.1rem; }
+    </style>
+  </head>
+  <body id="github" onload="initBites()">
+    <div class="top-banner">
+      <span id="hctr">Consuming Rust Bite by Byte</span>
+      <span class="top-center">Threads</span>
+    </div>
+    <next-prev>
+      <a href="../../index.html" style="color:#fefefa;">Home</a>&nbsp;
+      <a id="repo" href="../../RustBiteByByte.html">Repo</a> 
+      <a id="Prev" href="RustBites_Macros.html">prev</a> 
+      <a id="Next" href="RustBites_Synchron.html">next</a>
+    </next-prev>
 
-      #github table.flashcard {
-        width: 100%;
-        table-layout: fixed;
-        border-collapse: collapse;
-        border: 4px groove #222;
-      }
+    <toc-b id="toc">
+      <div id="bottom-menu" style="display:flex; flex-direction:row">
+      </div>
+        <up-b id="chaps">
+        </up-b>
+          <rt-b id="sects">
+            <a href="#top">Top</a>, <a href="#intermut">InterMut</a>, <a href="#threads">Threads</a>, 
+            <a href="#sharing">Sharing</a>, <a href="#thrdrslt">ThrdRslt</a>, <a href="#bq">BlkgQ</a>, 
+            <a href="#epilog">Epilog</a>
+      </rt-b>
+    </toc-b>
+    <div id="hlp" style="display:none;">
+      </div>
 
-        #github table.flashcard td {
-          padding: 0.5rem 1.5rem;
-          border: 4px groove #000;
-          /*min-width:50px;*/
-        }
-
-        #github table.flashcard li {
-          /*width:max-content;*/
-          max-width: 30rem;
-        }
-
-        #github table.flashcard td {
-          overflow: auto;
-        }
-
-        #github table.flashcard th.topic {
-          width: 12rem;
-        }
-
-        #github table.flashcard td.topic {
-          width: 10rem;
-        }
-
-        #github table.flashcard th.schema {
-          width: 20rem;
-          text-align: center;
-        }
-
-        #github table.flashcard td.schema {
-          width: 20rem;
-          text-align: center;
-        }
-
-        #github table.flashcard td img {
-          width: 100%;
-          height: auto;
-          padding: 0rem;
-        }
-
-      #github table.invis {
-        width: 90%;
-        border: none;
-      }
-
-      #github table tr {
-        border: 1px solid var(--dark);
-      }
-
-        #github table tr.invis {
-          border: none;
-        }
-
-        #github table tr th {
-          color: var(--dark);
-          background-color: var(--menu);
-        }
-
-          #github table tr th.invis {
-            border: none;
-          }
-
-        #github table tr td {
-          color: var(--dark);
-          background-color: var(--light);
-        }
-
-          #github table tr td.invis {
-            border: none;
-          }
-
-      #github table a:link {
-        color: var(--dark);
-        background-color: transparent;
-      }
-
-      #github table a:visited {
-        color: var(--dark);
-        background-color: transparent;
-      }
-
-      #github table a:hover {
-        color: var(--dark);
-        background-color: transparent;
-      }
-
-      #github table a:active {
-        color: var(--dark);
-        background-color: transparent;
-      }
-
-    #github hr.dotted {
-      border: none;
-      border-top: 2px dashed var(--dark);
-      color: var(--light);
-      background-color: var(--light);
-      height: 1px;
-      width: 55em;
-      margin-top: 0.5em;
-      margin-bottom: 1.5em;
-    }
-  </style>
-  <style>
-    #github .topborder {
-      border-top: 1px solid #363636;
-    }
-
-    #github th.num {
-      width: 3em;
-      text-align: right;
-      padding-right: 1.0em;
-    }
-
-    #github td.num {
-      width: 3em;
-      text-align: right;
-      padding-right: 1.0em;
-    }
-
-    #github th.elem {
-      padding-right: 2.0em;
-      white-space: nowrap;
-    }
-
-    #github td.elem {
-      padding-right: 2.0em;
-      white-space: nowrap;
-    }
-
-    t-b {
-      display: block;
-      margin-top: 0.75rem;
-      margin-bottom: 0.75rem;
-      max-width: 55rem;
-    }
-    #github td > hr {
-      margin-top:0.25em;
-      margin-bottom:0.25em;
-    }
-    #github c-s {
-      font-size:1.2em;
-      font-weight:normal;
-    }
-    #github h2 {
-      margin-top:1.5em;
-    }
-    #github h3 {
-      margin-top:1.0em;
-    }
-  </style>
-</head>
-<body id="github" onload="initialize()">
-
-  <a id="Next" href="RustBites_Synchron.html">Next</a>
-  <a id="Prev" href="RustBites_Macros.html">Prev</a>
-
-  <page-frame>
-    <frame-header>
-      <nav id="navbar"></nav>
-    </frame-header>
-    <main>
-      <div id="about">about</div>
-      <div id="modified">05/19/2022</div>
-      <div id="page">RustBites - Threads</div>
-      <div id="hlp"></div>
-      <a id="top"></a>
-      <content>
-        <header>
-          <hgroup id="pagetitle">
-            <h1>Rust Bite - Threads</h1>
-            <h3 id="subtitle" class="indent">spawning and using Rust threads</h3>
-          </hgroup>
-        </header>
-        <!--<div style="height:1.5em;"></div>-->
-        <a id="intro"></a>
-        <h2>1.0&nbsp;&nbsp;Introduction</h2>
+    <h2>Rust Bite - Threads</h2>
+    <hr class="spread" />
     <t-b>
       Rust guarantees data safety - it is impossible to read from or write to memory that the current program
       scope does not own.  
@@ -229,9 +68,10 @@ ib<!DOCTYPE html>
       <c-s><a href="https://doc.rust-lang.org/stable/std/cell/struct.UnsafeCell.html">UnsafeCell&lt;T&gt;</a></c-s>.
       This type wraps an unsafe block holding an instance of T.  We examine partial code for this type and two types 
       that use it and show how that enables building safe code that would otherwise fail to build.
+      <a id="intermut"></a>
     </t-b>
-    <a id="intermut"></a>
-    <h2>1.0 - Interior Mutability</h2>
+    <div style="height:0.25rem;"></div>
+    <h3>1.0 - Interior Mutability</h3>
     <t-b>
       The types that wrap <c-s>UnsafeCell&lt;T&gt;</c-s>, e.g., 
       <c-s>Cell&lt;T&gt;</c-s> and <c-s>RefCell&lt;T&gt;</c-s> provide safe interfaces that support deferring
@@ -921,9 +761,10 @@ impl&lt;T: ?Sized&gt; DerefMut for RefMut&lt;'_, T&gt; {
     <t-b>
       A Rust <c-s>Mutex&lt;T&gt;</c-s> guards data, t &epsilon; T, not regions of code.      
       The only way to access protected shared data is through its <c-s>Mutex&lt;T&gt;</c-s> or other lock.  
+      <a id="threads"></a>
     </t-b>
-    <a id="basic"></a>
-    <h2>2.0&nbsp;&nbsp;Basic Threads</h2>
+    <div style="height:0.1rem;"></div>
+    <h3>2.0 - Basic Threads:</h3>
     <t-b>
       Rust threads are represented by the <c-s>thread</c-s> type and created
       with an associated function:
@@ -1037,9 +878,10 @@ fn main() {
       <a href="https://ricardomartins.cc/2016/06/25/interior-mutability-thread-safety">
         Interior mutability in Rust, by Ricardo Martins
       </a>.
+      <a id="sharing"></a>
     </t-b>
-    <a id="sharing"></a>
-    <h2>3.0&nbsp;&nbsp;Sharing non-thread-safe Resources:</h2>
+    <div style="height:0.25rem;"></div>
+    <h3>3.0 - Sharing non-thread-safe Resources:</h3>
     <t-b>
       The previous example was relatively simple because threads only shared inherently thread-safe objects, e.g., 
       an Atomic and std::output.  The example below illustrates how non-thread-safe objects need to be handled.
@@ -1167,9 +1009,10 @@ fn main() {
       Rust has two other synchronizing constructs that are often used in threaded code: <c-s>RWLock</c-s>, a
       reader-writer lock, and <c-s>Condvar</c-s> a condition variable.  We use <c-s>Condvar</c-s> in the next
       example.
+      <a id="thrdrslt"></a>
     </t-b>
-    <a id="results"></a>
-    <h2>4.0&nbsp;&nbsp;ThreadResult</h2>
+    <div style="height:0.1rem;"></div>
+    <h3>4.0 - ThreadResult:</h3>
     <t-b>
       The C++ programming language has a <c-s>std::future</c-s> type that allows a thread to return a promise 
       to deliver a result when it&apos;s done.  Users can do work then block on the thread&apos;s future until
@@ -1355,9 +1198,10 @@ fn main() {
     </t-b>
     <t-b>
       Note that the <c-s>ThreadResult&lt;T&gt;</c-s> is generic so the thread can return a rich set of possible data.
+      <a id="bq"></a>
     </t-b>
-    <a id="bq"></a>
-    <h2>5.0&nbsp;&nbsp;BlockingQueue:</h2>
+    <div style="height:0.25rem;"></div>
+    <h3>5.0 BlockingQueue:</h3>
     <t-b>
       The last example in this Bite is an implementation of a 
       <a href="https://jimfawcett.github.io/RustBlockingQueue.html">BlockingQueue&lt;T&gt;</a>.
@@ -1565,13 +1409,14 @@ fn test() {
           </defn-block>
         </defn-OuterBlock>
       </div>
+      <a id="epilog"></a>
     </t-b>
-    <a id="epilogue"></a>
-    <h2>6.0&nbsp;&nbsp;Epilogue</h2>
+    <div style="height:0.25rem;"></div>
+    <h3>6.0 - Epilogue:</h3>
     <t-b>
       Well, this has been some journey - yeah!  Lot&apos;s of interesting things in the thread code mix.
       And, we haven&apos;t talked seriously about synchronization: 
-      <ul class="tight" style="margin-left:2.0em;">
+      <ul class="tight" style="margin-left:0.0rem;">
         <li>How does CondVar work and why do we need to use it?</li>
         <li>What does RWLock&lt;T&gt; do and when would we use it?</li>
         <li>What is a Barrier and should we care?</li>
@@ -1583,37 +1428,5 @@ fn test() {
       <a href="https://doc.rust-lang.org/std/sync/mpsc/index.html">mpsc</a>.  Both locks and channels are
       treated lightly in the <a href="../../RustStory_Libraries.html">Rust Story</a>.
     </t-b>
-    <div style="height:5em;"></div>
-    <a id="bottom"></a>
-      </content>
-      <page-TOC id="pages" style="display:none;">
-      </page-TOC>
-      <page-sections id="sections" style="display:none;">
-        <sec-elem style="width:0.0em">&nbsp;</sec-elem>
-        <menu-elem class="secElem"><a href="#bottom">bottom</a></menu-elem>
-        <menu-elem class="secElem"><a href="#epilogue">epilogue</a></menu-elem>
-        <menu-elem class="secElem"><a href="#bq">blkgQ</a></menu-elem>
-        <menu-elem class="secElem"><a href="#results">results</a></menu-elem>
-        <menu-elem class="secElem"><a href="#sharing">sharing</a></menu-elem>
-        <menu-elem class="secElem"><a href="#basic">basic</a></menu-elem>
-        <menu-elem class="secElem"><a href="#intermut">intermut</a></menu-elem>
-        <menu-elem class="secElem"><a href="#intro">intro</a></menu-elem>
-        <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
-      </page-sections>
-    </main>
-    <frame-footer>
-      <menu-item style="width:1.0em;">&nbsp;</menu-item>
-      <menu-elem id="nextLink2" onclick="bottomMenu.next()">Next</menu-elem>
-      <menu-elem id="prevLink2" onclick="bottomMenu.prev()">Prev</menu-elem>
-      <menu-elem id="pgbtn" onclick="bottomMenu.pages()">Pages</menu-elem>
-      <menu-elem onclick="bottomMenu.sections()">Sections</menu-elem>
-      <menu-elem onclick="bottomMenu.about()">About</menu-elem>
-      <menu-elem id="kysbtn" onclick="storyHlpMenu.keys()">Keys</menu-elem>
-      <!--<menu-item style="width:1.0em;">&nbsp;</menu-item>
-      <menu-elem style="font-size:0.75em;" onclick="storyHlpMenu.decrZoomScreen()">Zout</menu-elem>
-      <menu-elem style="font-size:0.75em;" onclick="storyHlpMenu.normZoomScreen()">Zdef</menu-elem>
-      <menu-elem style="font-size:0.75em;" onclick="storyHlpMenu.incrZoomScreen()">Zin</menu-elem>-->
-    </frame-footer>
-  </page-frame>
-</body>
+  </body>
 </html>
