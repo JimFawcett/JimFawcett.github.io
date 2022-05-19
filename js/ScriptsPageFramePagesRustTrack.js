@@ -41,7 +41,7 @@ function initializePages() {
           <menu-elem class='ddItems pageElem'><a href='Resources/RustBites/RustBites_Channels.html'>Channels</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='Resources/RustBites/RustBites_RegEx.html'>Regular&nbsp;Expressions</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='Resources/RustBites/RustBites_TipsAndTricks.html'>Hacks&nbsp;&amp;&nbsp;Helps</a></menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='Resources/RustBites/RustBites_Experiments.html'>Code&nbsp;Experiments</a></menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='Resources/RustBites/RustBites_CodeExperiments.html'>Code&nbsp;Experiments</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='https://github.com/JimFawcett/RustPlaygroundExamples'>Playground Examples</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='indexPage.html'>Glossary</a></menu-elem>\
           <menu-elem>&nbsp;</menu-elem>\
