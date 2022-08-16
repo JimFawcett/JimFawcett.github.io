@@ -110,6 +110,7 @@ function initializeMenu() {
       <button class='dropbutton'>Dems&#9662;</button>\
       <div class='dropdown-content noScrollX'>\
         <div class='darkItem maxWidth'>&nbsp;Demonstrations</div>\
+        <a href='CppMakeDemo.html'>C++&nbsp;Make&nbsp;Demo</a>\
         <a href='CppBasicDemos.html'>C++&nbsp;Basic&nbsp;Demos</a>\
         <a href='STR.html'>STR&nbsp;Value&nbsp;Type</a>\
         <a href='CompoundObjects.html'>CompoundObjects</a>\
