@@ -168,6 +168,7 @@ function initializeMenu() {
         Dems&#9662\
         <div class='dropdown'>\
             <div class='ddLabel darkItem'>Demonstrations</div>\
+            <div class='ddItem'><a href='CppMakeDemo.html'>C++&nbsp;Make&nbsp;Demo</a></div>\
             <div class='ddItem'><a href='CppBasicDemos.html'>C++&nbsp;Basic&nbsp;Demos</a></div>\
             <div class='ddItem'><a href='STR.html'>STR&nbsp;Value&nbsp;Type</a></div>\
             <div class='ddItem'><a href='CompoundObjects.html'>CompoundObjects</a></div>\
