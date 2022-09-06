@@ -182,6 +182,9 @@ function initializeMenu() {
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Tests</summary>\
             <div style='margin-left:1.0em;'>\
+              <div class='ddItem ddDetails'><a href='CppBits.html'>Test C++ Bits</a></div>\
+              <div class='ddItem ddDetails'><a href='RustBits.html'>Test Rust Bits</a></div>\
+              <div class='ddItem ddDetails'><a href='CSharpBits.html'>Test C# Bits</a></div>\
               <div class='ddItem ddDetails'><a href='CompareTest.html'>Test Code Compare</a></div>\
               <div class='ddItem ddDetails'><a href='PageFrame1.html'>Test PageFrame</a></div>\
               <div class='ddItem ddDetails'><a href='TestFlexMenu.html'>Test FlexMenu</a></div>\
