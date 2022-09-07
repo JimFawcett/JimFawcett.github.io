@@ -580,6 +580,18 @@ fn main() {
                 </td>
                 <td style="vertical-align:top;">
                   <t-b>
+                    Binding means to associate some name with a region of memory that holds a value of some type.
+                    <defn-code class="lightRust" style="font-size:small;">
+let mut x:i32 = 42;
+                    </defn-code>
+                    Here, a mutable variable x is bound to the value &quot;42&quot; stored in a location defined by
+                    the compiler.  
+                    <defn-code class="lightRust" style="font-size:small;">
+let y = x - 2;
+                    </defn-code>
+                    binds the variable name y to an i32 sized location filled with the value of x - 2.
+                  </t-b>
+                  <t-b>
                     Primitive types like i32 and f64 occupy a single contiguous memory block and are copied with
                     a mem-copy operation. We say these are &quot;copy&quot; types.  Compound types
                     like arrays, tuples, and structs with all copy fields are also copy types.
@@ -589,6 +601,7 @@ fn main() {
                     block on the stack and a body of data stored in the heap.  They cannot be mem-copied in one pass
                     and so are moved.  The source&apos;s data pointer is copied into the destination control block.
                     Since Rust allows only one owner of data, the source becomes invalid.
+                    We say these are &quot;move&quot; types.
                   </t-b>
                   <div style="height:1.0em;"></div>
         <defn-head class="defnBorderTop darkRust">
@@ -638,33 +651,297 @@ cargo run -q
                 </th>
               </tr>
               <tr>
-                <td id="iter">Iteration</td>
+                <td id="iter">
+                  Iteration
+                  <hr />
+                  <t-b>
+                    Iteration is the process of stepping through a collection and, perhaps, doing something with each
+                    item encountered.
+                  </t-b>
+                  <t-b>
+                    All iterators have the same simple interface and supply the same set of adapters. That enables declarative
+                    programming for examining and modifying the collection&apos;s members.
+                  </t-b>
+                  <t-b>
+                    They have internal implementations
+                    that use knowledge of how their collection is structured.
+                  </t-b>
+                </td>
                 <td style="vertical-align:top;">
                   <defn-code class="lightRust" style="font-size:small;">
-// HelloWorld::main.rs
+/*-- Iteration --------------------------------*/
+/*
+  Rust std::String
+  ----------------
+  Rust std::String is a container of utf8 chars 
+  with no null terminator.
+  - utf8 characters may consist of 1 up to 4 
+    bytes, so String instances can not be indexed.
+    Character boundaries are defined by specific
+    byte sequences, used by String's chars() 
+    iterator to return characters.
+*/
+
+fn string_iteration() {
+    let test_string = 
+        String::from("a test string");
+    /* chars() returns iter over utf8 chars */
+    let mut iter = test_string.chars();  
+    print!(
+        "\n  utf8 characters from {:?}:\n  ", 
+        &test_string
+    );
+
+    loop {
+        /*-- iter.next returns std::Option<char> --*/
+        let opt = iter.next();
+        if opt == None {
+            break;
+        }
+        /*-- unwrap char from Some(char) --*/
+        print!("{} ",opt.unwrap()); 
+    }
+
+    let ls = test_string.as_str();
+    print!("\n  test_string: {:?}", ls);
+    println!();
+}
+
+fn idomatic_string_iteration() {
+    let test_string = 
+      String::from("another test string");
+    print!(
+      "\n  idiomatic utf8 chars from {:?}:\n  ", 
+      &test_string
+    );
+
+    for ch in test_string.chars() {
+        /*-- option handling implicit here --*/
+        print!("{} ",ch);
+    }
+    /*-- nth(i) returns Option --*/
+    let i = 1;
+    let rslt = &test_string.chars().nth(i);
+    if let Some(ch) = rslt {
+      print!(
+          "\n  at index {} char of {:?} is {}",
+          i, test_string, ch
+      );
+    }
+    else {
+      print!("\n  index {} out of range", i);
+    }
+    let ls = test_string.as_str();
+    print!("\n  test_string: {:?}", ls);
+    println!();
+}
+/*-----------------------------------------------
+  demonstrate chars(), is_alphabetic, is_..., 
+  for_each, filter, and collect
+
+  There are many iterator adapters.  These are
+  some of the most often used.
+*/
+fn string_adapters() {
+    let ls = "abc123";
+
+    /*-- are all chars alphabetic --*/
+    print!(
+        "\n  {:?} is alphabetic   {}", ls,  
+        ls.chars().all(|c| {c.is_alphabetic()})
+    );
+
+    /*-- are all chars alphanumeric? --*/
+    print!(
+        "\n  {:?} is alphanumeric {}", ls, 
+        ls.chars().all(|c| {c.is_alphanumeric()})
+    );
+
+    /*-- are all chars numeric? --*/
+    print!(
+        "\n  {:?} is numeric      {}", ls, 
+        ls.chars().all(|c| {c.is_numeric()})
+    );
+
+    /*-- are all chars ascii? --*/
+    print!(
+        "\n  {:?} is ascii        {}", ls, 
+        ls.chars().all(|c| {c.is_ascii()})
+    );
+    
+    /*-- display chars from str slice --*/
+    let (min, max) = (2usize, 4usize);
+    if min <= 
+          ls.len() && 
+          max <= ls.len() && 
+          min <= max {
+        let slice = &ls[min..max];
+        print!(
+          "\n  3rd and 4th chars of {:?} are: ", 
+          ls
+        );
+        slice.chars()
+             .for_each(|c| print!("{}", c));
+    }
+    else {
+        print!(
+          "\n  invalid {} and {} for {}",
+          min, max, ls
+        )
+    }
+
+    /*-- from numeric chars in source, ls --*/
+    print!(
+        "\n  numeric chars of {:?} are: {:?}", ls,
+        ls.chars()
+          .filter(|c| c.is_numeric())
+          .collect::<String>()
+    );
+    println!();
+}
+/*
+  Rust byte arrays
+  ----------------
+  Rust arrays have sizes that must be determined at 
+  compile-time, even those created on the heap.
+
+  Rust Vectors have sizes that can be determined at 
+  run-time, and they will readily give access to 
+  their internal heap-based arrays by taking slices.
+
+  This is perfectly data-safe, because:
+  - slices have a len() function
+  - even if you index past the end of the array, 
+    you can't read or write that memory, because a 
+    panic occurs immediately.
+*/
+fn define_and_iterate_byte_array() {
+    let ba: [u8;5] = [1,2,3,4,5];  
+    // size is determined at compile-time, even for
+    // arrays created on the heap (unlike C++)
+    let max = ba.len();
+    print!("\n  bytes from byte array:\n  [");
+    /*-- display all but last --*/
+    for i in 0..max-1 {
+        print!("{}, ", ba[i]);
+    }
+    /*-- display last char --*/
+    print!("{}]", ba[max-1]);
+}
+
+fn idiomatic_define_and_iterate_byte_array() {
+    let v: Vec<u8> = vec![5,4,3,2,1];
+    let ba: &[u8] = &v[..];  
+    /*-------------------------------------------
+      type of slice of Vector<u8> is 
+      byte slice: &[u8]
+      - slices implement len() function
+      - &v[..] slice of all elements of v
+      - &v[m..n] slice of elements m up to,
+        but not including n 
+      - Length of slice &v[..] determined by 
+        length of v, which can be determined at 
+        run-time.
+    */
+    print!("\n  idiomatic bytes from byte array:");
+    print!(
+      "\n  length of byte slice: {}", 
+      ba.len()
+    );
+    let max = ba.len();
+    /*-- print all but the last --*/
+    print!("\n  [");
+    for item in ba.iter().take(max-1) {
+        print!("{}, ", item);
+    }
+    /*-- print last one without trailing comma --*/
+    print!("{}]", ba[max - 1]);
+
+    print!(
+      "\n  printing array with implicit iteration:"
+    );
+    print!("\n  {:?}", ba);
+}
 
 fn main() {
-    println!("Hello, world!");
+    print!("\n  -- demonstrate iteration --\n");
+
+    print!("\n  -- string iteration --");
+    string_iteration();
+    idomatic_string_iteration();
+    print!("\n  -- string iteration adapters --");
+    string_adapters();
+    print!("\n\n  -- byte array iteration --");
+    define_and_iterate_byte_array();
+    idiomatic_define_and_iterate_byte_array();
+
+    print!("\n\n  That's all Folks!\n");
 }
                   </defn-code>
                 </td>
                 <td>
+                  <t-b>
+                    Rust supplies the usual looping constructs for and loop.  
+                  </t-b>
+                  <t-b>
+                    It is flexible enough to iterate over a wide variety of
+                    types that own data collections with different structures.  It does this by supporting iterators in its
+                    loop and for blocks. 
+                  </t-b>
+                  <t-b>
+                    An iterator is a machine, provided by the collection, smart enough to step through the
+                    collection&apos;s members.
+                  </t-b>
+                  <defn-code class="lightRust" style="font-size:small;">
+  -- demonstrate iteration --
+
+  -- string iteration --
+  utf8 characters from "a test string":
+  a   t e s t   s t r i n g
+  test_string: "a test string"
+
+  idiomatic utf8 chars from "another test string":        
+  a n o t h e r   t e s t   s t r i n g
+  at index 1 char of "another test string" is n
+  test_string: "another test string"
+
+  -- string iteration adapters --
+  "abc123" is alphabetic   false
+  "abc123" is alphanumeric true
+  "abc123" is numeric      false
+  "abc123" is ascii        true
+  third and fourth chars of "abc123" are: c1
+  numeric chars of "abc123" are: "123"
+
+
+  -- byte array iteration --
+  bytes from byte array:
+  [1, 2, 3, 4, 5]
+  idiomatic bytes from byte array:
+  length of byte slice: 5
+  [5, 4, 3, 2, 1]
+  printing array with implicit iteration:
+  [5, 4, 3, 2, 1]
+
+  That's all Folks!
+
+                  </defn-code>
                 </td>
               </tr>
               <tr>
                 <th>
                   <div class="bottombutton left lightRust">
-                    <a class="bottomlink" href="index.html">&larr; C++ iteration</a>
+                    <a class="bottomlink" href="CppBits.html#iter">&larr; C++ iteration</a>
                   </div>
                 </th>
                 <th>
                   <div class="bottombutton center lightRust">
-                    <a class="bottomlink" href="javascript:;">Execute code in Rust Playground</a>
+                    <a class="bottomlink" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=3cc4ae4ef6069d73a8e795c6b1c0b738">Execute code in Rust Playground</a>
                   </div>
                 </th>
                 <th>
                   <div class="bottombutton right lightRust">
-                    <a class="bottomlink" href="index.html">C# iteration &rarr;</a>
+                    <a class="bottomlink" href="CSharpBits.html#iter">C# iteration &rarr;</a>
                   </div>
                 </th>
               </tr>
