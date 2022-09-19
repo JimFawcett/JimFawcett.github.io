@@ -145,6 +145,7 @@ function initializeMenu() {
             <div class='ddLabel darkItem'>Demonstrations</div>\
             <div class='ddItem'><a href='BasicBiteByByte.html'>Basic Bites</a></div>\
             <div class='ddItem'><a href='DesignBites.html'>Design Bites</a></div>\
+            <div class='ddItem'><a href='CodeBits.html'>Code Bits</a></div>\
             <div class='ddItem'><a href='IdiomsAndPatterns.html'>Idioms&nbsp;and&nbsp;Patterns</a></div>\
             <div style='height:2em;'></div>\
         </div>\
