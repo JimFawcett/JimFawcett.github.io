@@ -91,7 +91,7 @@ function initializeMenu() {
             <div class='ddItem'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;WebDev&nbsp;CodeRepo&nbsp;</a ></div>\
             <div class='ddItem'><a href='../../indexDesign.html'>Design&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
             <div class='ddItem'><a href='../DesignBites/DesignBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Design&nbsp;Bites&nbsp;</a ></div>\
-            <div style='height:2em;'></div>\
+            <div style='height:4em;'>&nbsp;</div>\
         </div>\
     </div>\
     <div class='menuItem'>\
