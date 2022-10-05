@@ -125,6 +125,14 @@ function initializeMenu() {
                 <div style='height:0.25em;'></div>\
               </div>\
             </details>\
+            <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+              <summary>Deployment&nbsp;&nbsp;</summary>\
+              <div style='margin-left:1.0em;'>\
+                <div class='ddItem ddDetails'><a href='indexDeployment.html'>&nbsp;&nbsp;Deployment&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
+                <div class='ddItem ddDetails undef'><a href='Javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Deploy&nbsp;Bites&nbsp;</a ></div>\
+                <div style='height:0.25em;'></div>\
+              </div>\
+            </details>\
             <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
