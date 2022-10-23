@@ -1,0 +1,2458 @@
+<!DOCTYPE html>
+<html>
+<!--
+  CppStory_Classes.html
+-->
+<head>
+  <title>C++ Story Classes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/StylesPageFrameDefaults.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameStructure.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameMenus.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameThemeBlue.css" />
+  <link rel="stylesheet" href="css/StylesWebComponents.css" />
+  <script src="js/ScriptsWebComponents.js"></script>
+  <script src="js/ScriptsPageFrame.js"></script>
+  <script src="js/ScriptsPageFramePagesCppStory.js"></script>
+  <script src="js/ScriptsPageFrameKeyboard.js"></script>
+  <style>
+    summary {
+      padding: 3px 0px 5px 0px;
+    }
+
+
+    .gray {
+      background-color: #ddd;
+    }
+
+    .spread {
+      margin: 1em;
+    }
+
+    .tightSpread {
+      margin: 0.5em;
+    }
+    #github #pagetitle {
+      background-color: #002147;
+      color: #fafaff;
+    }
+
+    #github #title {
+      background-color: #002147;
+      color: #fafaff;
+    }
+
+    #github #subtitle {
+      background-color: #002147;
+      color: #fafaff;
+    }
+
+    #github a.repoLink {
+      background-color: #002147;
+      color: #fafaff;
+    }
+
+    #github a.repoLink:link {
+      background-color: #002147;
+      color: #fafaff;
+    }
+    #github c-s {
+      font-size:small;
+    }
+    #github defn-code {
+      font-size:small;
+    }
+    #github .codeStyle {
+      font-family:Consolas;
+      font-size:small;
+      font-weight:bold;
+    }
+    #github h3 {
+      margin-top: 1.0em;
+      margin-bottom: 1.0em;
+    }
+    #github h4 {
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+    }
+    #github .normal {
+      font-weight:normal;
+      font-size:small;
+    }
+    #github .spreadup {
+      margin-top:1em;
+    }
+    #github defn-block {
+      max-width: 50em;
+    }
+  </style>
+</head>
+<body id="github" onload="initialize()">
+
+  <a id="Next" href="CppStory_Templates.html">N</a>
+  <a id="Prev" href="CppStory_Classes.html">P</a>
+
+  <page-frame>
+    <frame-header>
+      <nav id="navbar"></nav>
+    </frame-header>
+    <main>
+      <div id="about">about</div>
+      <div id="modified">10/22/2022</div>
+      <div id="page">C++ Story Class Relationships</div>
+      <div id="hlp"></div>
+      <a id="top"></a>
+      <content>
+
+  <header>
+    <hgroup id="pagetitle">
+      <a class="repoLink" href="https://github.com/JimFawcett/CppStory">CppStory</a>
+      <h1 id="title">Chapter #6 - C++ Class Relationships</h1>
+      <h3 id="subtitle">inheritance, composition, aggregation, using</h3>
+    </hgroup>
+  </header>
+
+
+  <h3 id="prologue">6.0  Prologue</h3>
+    <t-b class="indents">
+    Object-oriented design and implementation consists of constructing classes and binding them together
+    with class relationships.  There are five relations: inheritance, composition, aggregation, using, and friendship.
+    Of these, all but the last are found in many implementations of C++ programs.
+    </t-b>
+    <details class="indent">
+      <summary class="labelStyle darkItem">Quick Starter Example - class extensions via inheritance</summary>
+      <s-halfEm></s-halfEm>
+    <div>
+    <t-b>
+      C++ class inheritance has two very useful features:
+      <ol class="tight indent">
+        <li>
+          It supports building flexible code by allowing base class pointers to bind to
+          derived class instances. So a function that accepts a base pointer can accept
+          derived instances through that pointer.
+        </li>
+        <li>
+          Occasionally we use inheritance just to use the base class implementation in a derived class. 
+          That&apos;s what we do in this example.
+        </li>
+      </ol>
+      <t-b>
+        Here, we extend the std::string class to add new features, e.g.:
+      </t-b>
+      <t-b class="indent">
+        <c-s>class stringEx : public std::string, private StrUtils { ... }</c-s>
+      </t-b>
+      <t-b>
+      <c-s>stringEx</c-s> derives publically from <c-s>std::string</c-s> to inherit its public
+      interface.  It derives privately from <c-s>StrUtils</c-s> to hide the interface of that struct
+      while using its methods internally.
+      </t-b>
+    </t-b>
+    <div style="height:0.25em;"></div>
+    <t-b>
+      <defn-outerBlock class="indents">
+      <defn-block>
+        <defn-head>Code: Inheriting from std::string</defn-head>
+        <defn-code>
+struct StrUtils {
+
+  /*-----------------------------------------
+     remove whitespace from front and back 
+     of string argument
+     - does not remove newlines
+  */
+  std::string trim(const std::string& toTrim)
+  {
+    if (toTrim.size() == 0)
+      return toTrim;
+    std::string temp;
+    std::locale loc;
+    typename 
+      std::string::const_iterator iter = 
+      toTrim.begin();
+    while (
+      isspace(*iter, loc) && *iter != '\n'
+    )
+    {
+      if (++iter == toTrim.end())
+      {
+        break;
+      }
+    }
+    for (; iter != toTrim.end(); ++iter)
+    {
+      temp += *iter;
+    }
+    typename 
+      std::string::reverse_iterator riter;
+    size_t pos = temp.size();
+    for (
+      riter = temp.rbegin(); 
+      riter != temp.rend(); 
+      ++riter
+    )
+    {
+      --pos;
+      if (
+        !isspace(*riter, loc) 
+        || *riter == '\n'
+      )
+      {
+        break;
+      }
+    }
+    if (0 <= pos && pos < temp.size())
+      temp.erase(++pos);
+    return temp;
+  }
+  /*-----------------------------------------
+    split sentinel separated strings into a 
+    vector of trimmed strings
+  */
+  template <typename T>
+  std::vector<std::string> split(
+    const std::string& toSplit, 
+    T splitOn = ','
+  )
+  {
+    std::vector<std::string> splits;
+    std::string temp;
+    typename 
+      std::string::const_iterator iter;
+    for (
+      iter = toSplit.begin(); 
+      iter != toSplit.end(); 
+      ++iter
+    )
+    {
+      if (*iter != splitOn)
+      {
+        temp += *iter;
+      }
+      else
+      {
+        splits.push_back(trim(temp));
+        temp.clear();
+      }
+    }
+    if (temp.length() > 0)
+      splits.push_back(trim(temp));
+    return splits;
+  }
+};
+/*-------------------------------------------
+   super string
+*/
+<span class="notice">class stringEx : 
+  public std::string, private StrUtils {</span>
+public:
+  stringEx() {}
+  stringEx(const std::string& str) 
+    : std::string(str) {}
+  stringEx(const char* pStr) 
+    : std::string(pStr) {}
+  std::string trim() {
+    StrUtils::trim(*this);
+  }
+  std::vector<std::string> 
+    splits(char splitOn = ',') {
+    return StrUtils::split(*this, splitOn);
+  }
+};
+/*--- show collection of string splits ----*/
+
+void showSplits(
+  const std::vector<std::string>& splits, 
+  std::ostream& out = std::cout
+)
+{
+  out << "\n";
+  for (auto item : splits)
+  {
+    if (item == "\n")
+      out << "\n--" << "newline";
+    else
+      out << "\n--" << item;
+  }
+  out << "\n";
+}
+        </defn-code>
+      </defn-block>
+      <defn-block>
+        <defn-head>Using Code</defn-head>
+        <defn-code>
+using Splits = std::vector<std::string>;
+
+int main() {
+  displayDemo("-- SuperString demo --\n");
+  std::string arg = "one, ";
+  arg += "this is two, ";
+  arg += "and finally three";
+  stringEx superStr{ arg };
+  std::cout 
+    << "\n  superStr has the value: " 
+    << superStr;
+  Splits splits = superStr.splits();
+  std::cout << "\n  superStr splits are:";
+  for (auto split : splits) {
+    std::cout << "\n    " << split;
+  }
+  putline(2);
+}
+        </defn-code>
+        <defn-head class="defnBorderTop">Output</defn-head>
+        <defn-code>
+-- SuperString demo --
+
+superStr has the value: 
+  one, this is two, and finally three
+
+superStr splits are:
+  one
+  this is two
+  and finally three
+        </defn-code>
+      </defn-block>
+      </defn-outerBlock>
+    </t-b>
+    <t-b>
+      C++ has two facilities that are very useful for building flexible code:
+      <span class="notice">inheritance</span> and <span class="notice">templates</span>.
+      We discuss inheritance and the other class relationships in this chapter. Templates 
+      come in Chapter 6.
+    </t-b>
+    <t-b style="padding-bottom:0px;">
+      <defn-block class="indents" style="width:30em;">
+        <defn-head>Conclusion:</defn-head>
+        <defn-body>
+          Its relatively easy to incorporate functionality from the standard C++ libraries
+          in our own classes. That ability makes us significantly more productive.  We just
+          have to know how and when to use it. Cheers!
+        </defn-body>
+      </defn-block>
+    </t-b>
+      </div>
+    </details>
+    <t-b>
+      This example constructs a <c-s>StringEx</c-s> class by inheriting publically from <c-s>std::string</c-s>
+      and privately from a string utilities class.  The effect is to provide all of the facilities of the
+      <c-s>std::string</c-s> to <c-s>StringEx</c-s> along with extensions provided by the utilities.
+    </t-b>
+    <t-b>
+      The effect is similar to <c-s>C#</c-s> extension methods, but implemented in a different way. It would
+      be easy to continue extensions by inheriting from additional base classes.  That is often referred to
+      as use of &quot;mixin&quot; classes.  We will talk in more detail about them in Chapter 7.
+    </t-b>
+    <h3 id="defclassrel">6.1  Defining Class Relationships</h3>
+    <div style="width:calc(100vw - 6rem);">
+      <div style="width:0em; float:right">&nbsp;</div>
+      <photosizer-block src="Pictures/ClassRelationships.JPG" width="500" class="photoSizerBlock right">
+        <span style="font-family:'Comic Sans MS', Tahoma;">
+          Fig 1. Class Relationships
+        </span>
+      </photosizer-block>
+    </div>
+    <t-b class="indents">
+    It is surprising, that virtually all domain models can be represented by classes using these four relationships.
+    <ol class="tight">
+      <li>
+        <strong>Inheritance:</strong>
+        <div>
+          Models an &quot;is-a&quot; relationship, e.g., a derived class is a specialization of its base.
+          The base class is always an inner part of the derived - it resides within the memory footprint
+          of the derived class.
+        </div>
+      </li>
+      <li>
+        <strong>Composition:</strong>
+        <div>
+          Represents a strong &quot;part-of&quot; relationship.  The composer always contains its composed parts.
+          They have the same life-times, and the parts reside within the memory footprint of the composer.
+        </div>
+      </li>
+      <li>
+        <strong>Aggregation:</strong>
+        <div>
+          Represents a weaker &quot;part-of&quot; relationship.  The aggregator holds a reference to the
+          aggregated, e.g., usually a pointer to an instance of the aggregated, created by the aggregator,
+          in the native heap.  They do not have the same life-times, and the parts reside outside the memory
+          footprint of their aggregator.
+        </div>
+      </li>
+      <li>
+        <strong>Using:</strong>
+        <div>
+          This is a non-owning relationship.  The user holds a reference to the
+          used, e.g., a pointer to an instance of the used, passed as an argument of a user method.
+          The used lifetime is independent of the user, but for correctness, it must be concurrent
+          with the user's access.  Used resides outside the memory footprint of the user. 
+        </div>
+      </li>
+    </ol>
+    </t-b>
+    <div class="clear"></div>
+
+    <h3 id="objlo">6.2  Object Layout</h3>
+    <div style="width:calc(100vw - 6rem);">
+      <!--<div style="width:0em; float:right">&nbsp;</div>-->
+      <photosizer-block src="Pictures/ObjectRelationships.JPG" width="500" class="photoSizerBlock right">
+        <span style="font-family:'Comic Sans MS', Tahoma;">
+          Fig 2. Object Layout
+        </span>
+      </photosizer-block>
+    </div>
+    <t-b class="indents">
+    In Fig 2. we show a compound object, defined by the classes B, C, D, and U. The corresponding objects
+    are shown in the bottom
+    half of the Figure.  They are shown using two dimensions for clarity of presentations, but are actually 
+    simply segments in a section of the process&apos;s virtual address space.
+    </t-b>
+    <t-b>
+    There are several things to note about the object layout:
+      <i-b>
+        <ol class="tight">
+          <li>
+            class B composes C with the result that C lies inside the memory footprint of B.
+          </li>
+          <li>
+            class D derives publically from B and B&apos;s memory footprint lies entirely inside that of D.
+          </li>
+          <li>
+            D uses an instance of class U so U&apos;s footprint is disjoint from that of D.
+          </li>
+          <li>
+            Client aggregates an instance of D and their footprints are disjoint.
+          </li>
+          <li>
+            A friend class has access to D&apos;s private members but the footprints of friend and D are disjoint.
+          </li>
+          <li>
+            The bumps on the top of the objects represent their public member functions. D shares all the member
+            functions of B (unaffected by access specification) but may also declare new public functions.
+          </li>
+        </ol>
+      </i-b>    </t-b>
+    <t-b>
+      Consequences of this object structure are:
+    </t-b>
+    <t-b class="indent">
+      <ol class="tight">
+        <li>
+          When <c-s>D</c-s>&apos;s constructor is called, it must construct its inner <c-s>B</c-s>, usually by
+          explicitly invoking a <c-s>B</c-s> constructor in its initialization sequence - more about that later.
+        </li>
+        <li>
+          When <c-s>B</c-s> is constructed by <c-s>D</c-s> its first action is to construct its inner <c-s>C</c-s>,
+          usually in its initialization sequence.
+        </li>
+        <li>
+          <c-s>D</c-s>&apos;s construction is independent of the lifetime of <c-s>u &epsilon; U</c-s>. That means
+          that our design must insure that <c-s>u</c-s> is in a valid state when <c-s>D</c-s> invokes its methods.
+        </li>
+      </ol>
+    </t-b>
+    <div class="clear"></div>
+
+    <h3 id="compobj">6.3  Compound Object Layout</h3>
+    <t-b class="indents">
+    Demonstration code in the details dropdown, below, has the same structure as shown in Fig 2.  Each
+    class instance displays its memory footprint on the console when its say() method is called.
+    </t-b>
+    <details class="indent">
+      <summary class="labelStyle darkItem">Demo - Class Layout</summary>
+      <div>
+      <defn-outerBlock>
+        <defn-block>
+          <defn-head>Class Layout Code</defn-head>
+          <defn-code style="font-size:0.9rem;">
+/////////////////////////////////////////////
+// Used class is used by Derived, shows 
+// its statistics
+
+class Used
+{
+public:
+  Used(const std::string& msg) : msg_(msg)
+  {
+    std::cout << 
+      "\n  Used(const std::string&) called";
+  }
+  ~Used() { 
+    std::cout << "\n  ~Used() called"; 
+  }
+  void say()
+  {
+    std::cout << "\n\n  Used::say()";
+    showStatistics(this);
+    showString("Used", msg_);
+  }
+private:
+  std::string msg_;
+};
+/////////////////////////////////////////////
+// Composed class is a data member of Base, 
+// shows its statistics
+
+class Composed
+{
+public:
+  Composed(const std::string& msg) : msg_(msg)
+  {
+    std::cout << 
+      "\n  Composed(const std::string&) called";
+  }
+  ~Composed() { 
+    std::cout << "\n  ~Composed() called"; 
+  }
+  void say()
+  {
+    std::cout << "\n\n  Composed::say()";
+    showStatistics(this);
+    showString("Composed", msg_);
+  }
+private:
+  std::string msg_;
+};
+/////////////////////////////////////////////
+// Base class holds Composed and displays 
+// its layout statistics
+
+class Base
+{
+public:
+  Base(const std::string& msg) : composed_(msg)
+  {
+    std::cout << 
+      "\n  Base(const std::string&) called";
+  }
+
+  // If you remove virtual qualifier on ~Base() 
+  // only Base destructor is called in main if 
+  // created on heap.
+
+  virtual ~Base()
+  {
+    std::cout << "\n  ~Base() called";
+  }
+  virtual void say()
+  {
+    std::cout << "\n\n  Base::say()";
+    showStatistics(this);
+    std::cout << 
+      "\n\n  Base invoking Composed::say(): ";
+    composed_.say();
+  }
+protected:
+  Composed composed_;
+};
+/////////////////////////////////////////////
+// Derived inherits from Base and displays 
+// its layout statistics.
+
+class Derived : public Base
+{
+public:
+  Derived(const std::string& msg) : Base(msg)
+  {
+    std::cout << 
+      "\n  Derived(const std::string&) called";
+  }
+  ~Derived() { 
+    std::cout << "\n  ~Derived() called"; 
+  }
+  virtual void say(Used& used)
+  {
+    std::cout << "\n\n  Derived::say()";
+    showStatistics(this);
+
+    std::cout << 
+      "\n\n  Derived calling Base::say(): ";
+    Base::say();
+    std::cout << std::endl;
+
+    std::cout << 
+      "\n\n  Derived calling Used::say(): ";
+    used.say();
+    std::cout << std::endl;
+  }
+private:
+};
+          </defn-code>
+        </defn-block>
+        <defn-block>
+          <defn-head>Using Code:</defn-head>
+          <defn-code style="font-size:0.9rem;">
+std::string arg = 
+  "string entered as constructor argument";
+std::cout << "\n    \"" << arg << "\"";
+std::cout << "\n  It's object size is " 
+          << sizeof(arg) << " bytes";
+std::cout << "\n  It contains " 
+          << arg.size() << " characters\n";
+
+std::cout << 
+  "\n  creating used object on stack";
+std::cout << 
+  "\n -------------------------------";
+Used u(arg);
+u.say();
+
+std::cout << std::endl;
+
+std::cout << 
+  "\n  creating base object on stack";
+std::cout << 
+  "\n -------------------------------";
+Base b(arg);
+b.say();
+
+std::cout << std::endl;
+
+/////////////////////////////////////////////
+// Works same whether Derived created on 
+// stack or heap, but you will notice 
+// differences in the region of memory occupied
+  
+std::cout << 
+  "\n  creating derived object on stack";
+std::cout << 
+  "\n ----------------------------------";
+Derived d(arg);
+d.say(u);
+
+std::cout << 
+  "\n  creating derived object on heap";
+std::cout << 
+  "\n ---------------------------------";
+Base* pB = new Derived(arg);
+pB->say();
+delete pB;
+          </defn-code>
+          <defn-head class="defnBorderTop">
+            Output:
+          </defn-head>
+          <defn-code style="font-size:0.9rem;">
+creating derived object on stack
+----------------------------------
+Composed(const std::string&) called
+Base(const std::string&) called
+Derived(const std::string&) called
+
+Derived::say()
+class Derived
+my size is: 32 bytes -- holds Base and Composed
+my starting address is 6420740 (0x61F904)
+my ending address is   6420772 (0x61F924)
+
+Derived calling Base::say():
+
+Base::say()
+class Derived
+my size is: 32 bytes -- holds string and ptr to vtbl
+my starting address is 6420740 (0x61F904)
+my ending address is   6420772 (0x61F924)
+
+Base invoking my Composed::say():
+
+Composed::say()
+class Composed
+my size is: 28 bytes -- holds string
+my starting address is 6420744 (0x61F908)
+my ending address is   6420772 (0x61F924)
+"This Composed string entered as ctor argument" 
+has 54 characters
+
+Derived calling Used::say():
+
+Used::say()
+class Used
+my size is: 28 bytes
+my starting address is 6420820 (0x61F954)
+my ending address is   6420848 (0x61F970)
+"This Used string entered as constructor argument" 
+has 50 characters
+
+creating derived object on heap
+---------------------------------
+Composed(const std::string&) called
+Base(const std::string&) called
+Derived(const std::string&) called
+
+Base::say()
+class Derived
+my size is: 32 bytes 
+  -- holds string and ptr to vtbl
+my starting address is 12524472 (0xBF1BB8)
+my ending address is   12524504 (0xBF1BD8)
+
+Base invoking my Composed::say():
+
+Composed::say()
+class Composed
+my size is: 28 bytes -- holds string
+my starting address is 12524476 (0xBF1BBC)
+my ending address is   12524504 (0xBF1BD8)
+"This Composed string entered as ctor arg" 
+has 54 characters
+          </defn-code>
+        </defn-block>
+      </defn-outerBlock>
+      </div>
+    </details>
+    <spacer-10></spacer-10>
+    <t-b class="indents">
+    Looking at the demonstration output we see instance memory start and end points as shown in Table&nbsp;1.
+    This data is consistant with the layout properties shown in Fig.&nbsp;1. This inclusion of bases and members
+    is a fundamental part of the object model for C++ value types.
+    </t-b>
+
+    <h4 class="indents">Table 1. - Memory Footprints of Class Layout Instances</h4>
+    <table class="indents pad10" style="font-size:0.9rem;">
+      <tr>
+        <th class="darkItem">class</th>
+        <th class="darkItem">start</th>
+        <th class="darkItem">end</th>
+        <th class="darkItem">size</th>
+        <th class="darkItem">parts</th>
+      </tr>
+      <tr>
+        <td><c-s>Derived</c-s></td><td>2096532 (0x1FFD94)</td><td>2096564 (0x1FFDB4)</td><td>32 bytes</td>
+        <td><c-s>Base</c-s> (32 bytes - including slot for VFPT pointer)</td>
+      </tr>
+      <tr>
+        <td><c-s>Base</c-s></td><td>2096532 (0x1FFD94)</td><td>2096564 (0x1FFDB4)</td><td>32 bytes</td>
+        <td><c-s>Composed</c-s> (28 bytes) + VFPT pointer</td>
+      </tr>
+      <tr>
+        <td><c-s>Composed</c-s></td><td>2096536 (0x1FFD98)</td><td>2096564 (0x1FFDB4)</td><td>28 bytes</td>
+        <td><c-s>std::string</c-s> (28 bytes)</td>
+      </tr>
+      <tr>
+        <td>Used</td><td>2096612 (0x1FFDE4)</td><td>2096640 (0x1FFE00)</td><td>28 bytes</td>
+        <td><c-s>std::string</c-s> (28 bytes)</td>
+      </tr>
+    </table>
+    <spacer-15></spacer-15>
+    <t-b class="indents">
+    The <c-s>Composed</c-s> class instance holds a <c-s>std::string</c-s> which has a size of 28 bytes.
+    The <c-s>Base</c-s> instance holds a composed instance plus a Virtual Function Pointer Table (VFPT) pointer
+    which is 4 bytes.
+    The <c-s>Derived</c-s> instance holds its inner <c-s>Base</c-s> instance plus its VFPT pointer, placed
+    in the slot its inner <c-s>Base</c-s> provides.
+    <spacer-15></spacer-15>
+    If you look at the code you will see that each including class has constructors with initialization
+    sequences.  Here&apos;s code snippets that show them. When the <c-s>Derived</c-s> class is constructed
+    it calls the <c-s>Base</c-s> constructor for its inner <c-s>Base</c-s> part in its initialization sequence.  
+    When the <c-s>Base</c-s> inner instance is constructed it calls the <c-s>Composed</c-s> constructor on
+    its inner composed part.  Similarly, the <c-s>Composed</c-s> part constructs its inner <c-s>std::string</c-s>.
+    </t-b>
+    <spacer-15></spacer-15>
+    <defn-block class="indents">
+      <defn-head>
+        Constructor Initialization Sequences
+      </defn-head>
+      <defn-code>
+  Derived(const std::string& msg) : Base(msg)
+  {
+    std::cout << "\n  Derived(const std::string&) called";
+  }
+
+  Base(const std::string& msg) : composed_(msg)
+  {
+    std::cout << "\n  Base(const std::string&) called";
+  }
+
+  Composed(const std::string& msg) : msg_(msg)
+  {
+    std::cout << "\n  Composed(const std::string&) called";
+  }
+      </defn-code>
+    </defn-block>
+    <spacer-25></spacer-25>
+    <t-b class="indents">
+    We didn&apos;t have to implement copy constructors, copy assignment operators, and destructors because
+    the compiler generated value methods are correct.  The <c-s>Composed</c-s> data member of <c-s>Base</c-s>
+    is a <c-s>std::string</c-s> which has the value methods.  And the <c-s>Base</c-s> from which <c-s>Derived</c-s>
+    inherits has correct compiler generated value methods.
+    <spacer-15></spacer-15>
+    We did implement destructors for each class to announce when each instance was destroyed.  Otherwise, we
+    could have allowed the compiler to generate those too.
+    </t-b>
+        
+    <h3 id="inherit">6.4  Inheritance, Run-Time Polymorphism, and Virtual Dispatching</h3>
+    Inheritance relationships afford a very powerful sharing and reuse mechanism through substitution.
+    <t-b>
+      For any Base-Derived relationship:
+      <i-b class="pad10">
+        <c-s>class Derived : public Base { ... };</c-s>
+      </i-b>
+      Derived class instances have the properties:
+      <s-10px></s-10px>
+      <i-b>
+        <ol class="tight">
+          <li>
+            Any Derived instance can be bound to a Base pointer:
+            <t-b>
+              <defn-block class="pad10-15 indent">
+                <c-s>
+                  Derived d;<br />
+                  Base* pBase = &amp;d;
+                </c-s>
+              </defn-block>
+            </t-b>
+          </li>
+          <li>
+            Any virtual function in the Base class can be redefined in the Derived class:
+            <t-b>
+              <defn-block class="pad10-15 indent">
+<c-b>class Base {
+public:
+virtual void f() { ... };
+...
+};
+
+class Derived : public Base {
+public:
+void f() override { ... }
+...
+};
+</c-b>
+              </defn-block>
+            </t-b>
+          </li>
+          <li>
+            When dispatching calls:
+            <t-b>
+              <defn-block class="pad10 indent">
+                <defn-body>
+                  If <c-s>pBase</c-s> is bound to a Base instance, <c-s>pBase->f()</c-s> calls <c-s>Base::f()</c-s><br />
+                  If <c-s>pBase</c-s> is bound to a Derived instance, <c-s>pBase->f()</c-s> calls <c-s>Derived::f()</c-s>
+                </defn-body>
+              </defn-block>
+          </li>
+        </ol>
+      </i-b>
+    </t-b>
+    Now, suppose that we define a function:
+    <t-b>
+      <c-b>  void g(pBase* ptr) {
+    ptr->f();
+  }</c-b>
+    </t-b>
+    <t-b>
+      If <c-s>ptr</c-s> is bound to a <c-s>Base</c-s> instance then <c-s>Base::f()</c-s> is called.
+      If <c-s>ptr</c-s> is bound to a <c-s>Derived</c-s> instance, then <c-s>Derived::f()</c-s> is called.
+    </t-b>
+    <t-b>
+      So <c-s>g(pBase* ptr)</c-s> invokes functions based on the type of the object reference, not the
+      static type of ptr.  Function <c-s>g</c-s> doesn&apos;t need to know anything about the Base class
+      hierarchy.  It only needs to know the public interface of the <c-s>Base</c-s> class.
+    </t-b>
+    <t-b>
+      At any time, if we add a new class derived from <c-s>Base</c-s>, then <c-s>g</c-s>, with no changes,
+      will process it correctly. This is a very important behavior. So important that it has been given
+      a name: Liskov Substitution.
+    </t-b>
+    <s-5px></s-5px>
+    <div style="max-width:45rem;">
+      <defn-block>
+        <defn-head>
+          <span class="notice">Liskov Substitution</span>
+        </defn-head>
+        <defn-body>
+          Barbara Liskov authored a paper &quot;Data Abstraction&quot; in which she provided
+          a useful model for polymorphism, which I&apos;ve paraphrased in a way appropriate for C++:
+          <indent-block class="pad10">
+            Functions that accept pointers or C++ references statically typed to some base class must be able
+            to use objects of classes derived from the base through those pointers or references without any
+            knowledge specialized to the derived classes.
+          </indent-block>
+          <t-b>
+            That means that within the function any method invocation made through the base pointer will
+            invoke that method based on the type of the derived class instance bound to that pointer.
+          </t-b>
+        </defn-body>
+      </defn-block>
+    </div>
+    <div style="height:0.5em;"></div>
+    <h4 id="vfpt">6.4.1  Virtual Dispatching via Virtual Function Pointer Table</h4>
+    <div style="width:calc(100vw - 6rem);">
+    <photosizer-block src="Pictures/Polymorphism.jpg" width="500" class="photoSizerBlock right clear">
+      <span style="font-family:'Comic Sans MS', Tahoma;">
+        Fig 3. Virtual Function Pointer Tables
+      </span>
+    </photosizer-block>
+    </div>
+    <t-b>
+      Virtual function dispatching, as described above, is implemented with 
+      <span class="notice">virtual function pointer tables</span>.  Each class with one or more virtual methods
+      has an associated Virtual Function Pointer Table (VFPT) and each instance of that class contains a pointer,
+      <c-s>pVtbl</c-s>, pointing to its VFPT.
+    </t-b>
+    <t-b>
+      In Fig 3., we&apos;ve shown a class hierarchy with base class <c-s>B</c-s> and derived class <c-s>D</c-s>.
+      Comparing the class declarations we see that:
+      <i-b>
+        <ol class="tight">
+          <li>
+            <c-s>D</c-s> does not override <c-s>B::mf1</c-s>, so its virtual function pointer,
+            <c-s>pMf1</c-s>, binds to <c-s>B::mf1</c-s>
+          </li>
+          <li>
+            <c-s>D</c-s> does override <c-s>B::mf2</c-s>, so its virtual function pointer,
+            <c-s>pMf2</c-s>, binds to <c-s>D::mf2</c-s>
+          </li>
+          <li>
+            <c-s>D</c-s> adds a new virtual function, <c-s>mf3</c-s>.  This function cannot be invoked
+            from a <c-s>B*</c-s> pointer, because it is not part of the public <c-s>B</c-s> interface.
+          </li>
+          <li>
+            <c-s>D</c-s> overrides the <span class="notice">private</span> method <c-s>B::name</c-s>.
+            That function is called only by the non-virtual <c-s>B::who</c-s>.  Since that function is
+            public, but non-virtual, <c-s>D</c-s> inherits <c-s>who</c-s>, so clients of <c-s>D</c-s>
+            can call it, but <c-s>D</c-s> should not change it (because it&apos;s non-virtual).
+          </li>
+          <li>
+            Remember that a derived class holds an image of its base within its memory footprint.
+            We see that here, as the <c-s>D</c-s> image holds <c-s>B</c-s>&apos;s virtual function table
+            pointer slot, which it uses to hold a pointer to its own VFPT, and <c-s>B::name</c-s>.
+            To that it adds its own member data: <c-s>D::name</c-s>.
+          </li>
+        </ol>
+      </i-b>      <s-10px></s-10px>
+      The details dropdown, below, presents code for this demonstration and its output.
+    </t-b>
+    <div class="clear">
+      <details>
+        <summary class="labelStyle darkItem">
+          <span>Polymorphism Demo</span>
+        </summary>
+        <defn-outerBlock>
+          <defn-block>
+            <defn-head>
+              Demo Code
+            </defn-head>
+            <defn-code class="defnBorderTop">
+  class B {
+  public:
+    B(const std::string& name);
+    virtual ~B() {}
+    virtual void mf1();
+    virtual void mf2();
+    void who();
+  private:
+    virtual std::string name();
+    std::string name_;
+  };
+
+  B::B(const std::string& name) : name_(name) {}
+
+  void B::mf1() {
+    std::cout << "\n  B::mf1() invoked";
+  }
+
+  void B::mf2() {
+    std::cout << "\n  B::mf2() invoked";
+  }
+
+  std::string B::name() { return name_; }
+
+  void B::who() { 
+    std::cout << "\n  who returns name " << this->name(); 
+  }
+
+  class D : public B {
+  public:
+    D(const std::string& name);
+    virtual ~D() {}
+    virtual void mf2() override;
+    virtual void mf3();
+  private:
+    virtual std::string name() override;
+    std::string name_;
+  };
+
+  D::D(const std::string& name) : B("B"), name_(name) {}
+
+  void D::mf2() {
+    std::cout << "\n  D::mf2() invoked";
+  }
+
+  void D::mf3() {
+    std::cout << "\n  D::mf3() invoked";
+  }
+
+  std::string D::name() { return name_; }
+                    </defn-code>
+                  </defn-block>
+                  <defn-block>
+                    <defn-head style="border-bottom:2px solid darkred;">
+                      Using Code
+                    </defn-head>
+                    <defn-code>
+  displayDemo("--- polymorphism demo ---");
+
+  displayDemo("\n  create B and invoke its methods");
+  B b{ "B" };
+  b.who();
+  b.mf1();
+  b.mf2();
+
+  displayDemo("\n  create D and invoke its methods");
+  D d{ "D" };
+  d.who();
+  d.mf1();
+  d.mf2();
+  d.mf3();
+
+  displayDemo(
+    "\n  create B* pB = &b, and invoke methods"
+  );
+  B* pB = &b;
+  pB->who();
+  pB->mf1();
+  pB->mf2();
+
+  displayDemo(
+    "\n  create B* pB = &d, and invoke methods"
+  );
+  pB = &d;
+  pB->who();
+  pB->mf1();
+  pB->mf2();
+  //pB->mf3();  
+  //won't compile: mf2 not in base interface
+
+  D* pD = dynamic_cast<D*>(pB);
+  if (pD)
+    pD->mf3();
+
+                    </defn-code>
+                    <defn-head>
+                      <span class="notice">Output</span>
+                    </defn-head>
+                    <defn-code>
+  --- polymorphism demo ---
+
+  create B and invoke its methods
+  who returns name B
+  B::mf1() invoked
+  B::mf2() invoked
+
+  create D and invoke its methods
+  who returns name D
+  B::mf1() invoked
+  D::mf2() invoked
+  D::mf3() invoked
+
+  create B* pB = &b, and invoke methods
+  who returns name B
+  B::mf1() invoked
+  B::mf2() invoked
+
+  create B* pB = &d, and invoke methods
+  who returns name D
+  B::mf1() invoked
+  D::mf2() invoked
+  D::mf3() invoked
+                    </defn-code>
+                  </defn-block>
+                </defn-outerBlock>
+      </details>
+    </div>
+    
+    <h3 id="person">6.5  Example - Person Class Hierarchy</h3>
+    <t-b>
+      You may recall, from Chapter1 - Survey, the Person class hierarchy, used for a quick look at class relationships.
+      Figure 4. shows the diagram we used there. The example isn&apos;t very useful for professional code, but it makes
+      a nice example of the class relationships. All of them, with the exception of friendship, are used
+      here to build an effective model for a software developement project organization.
+    </t-b>
+    <div style="width:calc(100vw - 6rem);">
+      <photosizer-block src="Pictures/PersonClassHierarchy.JPG" width="400"
+                        class="photoSizerBlock right"
+                        style="position:relative; top:2rem;">
+        <span style="font-family:'Comic Sans MS', Tahoma;">
+          Fig 4. Person Class Hierarchy
+        </span>
+      </photosizer-block>
+    </div>
+    <t-b>
+      The classes are:
+      <ul class="tight">
+        <li>
+          <n-s>IPerson:</n-s>
+          <tt-b>
+            An interface for the Person class.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>Person:</n-s> derives from IPerson
+          <tt-b>
+            Class that provides attributes: name, occupation, and age for all the other 
+            concrete classes.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>ISW_Eng:</n-s>
+          <tt-b>
+            Interface for all people who develop software.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>SW-Eng:</n-s> derives from Person and ISW_Eng
+          <tt-b>
+            Abstract class that shares select code and a Person reference with all software engineer classes.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>Dev:</n-s> derives from SW_Eng and uses Baseline
+          <tt-b>
+            Class that represents software developers - those who focus on building and verifying software
+            components.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>TestLead:</n-s> derives from Dev and uses Baseline
+          <tt-b>
+            Class for people who lead software development teams and also develop software.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>ProgMgr:</n-s> derives from SW_Eng and aggregates Project
+          <tt-b>
+            Represents people who manage software development product teams. 
+          </tt-b>
+        </li>
+        <li>
+          <n-s>Project:</n-s> composes Budget and aggregates Baseline
+          <tt-b>
+            Collection of Project Manager, TeamLeads, Devs that also includes Budget and Baseline.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>Budget:</n-s>
+          <tt-b>
+            Class holding original budget, current budget, projected empty date.
+          </tt-b>
+        </li>
+        <li>
+          <n-s>BaseLine:</n-s>
+          <tt-b>
+            Class holding collections of code modules and documents.
+          </tt-b>
+        </li>
+      </ul>
+    </t-b>
+    <t-b>
+      Inheritance provides an &quot;is-a&quot; relationship, so <c-s>dev &epsilon; Dev</c-s> and 
+      <c-s>projMgr &epsilon; ProjMgr</c-s>
+      are <c-s>SW_Engs</c-s>, and a <c-s>teamLead &epsilon; TeamLead</c-s> is a <c-s>Dev</c-s>.
+      Aggregation provides a temporary owner relationship, so <c-s>projMgr &epsilon; ProjMgr</c-s> owns, 
+      temporarily the <c-s>project &epsilon; Project</c-s> instance.
+      Some time later that manager will own another <c-s>Project</c-s>. Composition is a permanent owner 
+      relationship. <c-s>Projects</c-s> always have a <c-s>budget &epsilon; Budget</c-s>, but only temporarily 
+      have a <c-s>baseline &epsilon; Baseline</c-s>. When a project starts it has no code and no documents.
+    </t-b>
+    <t-b>
+      <n-s>Notice</n-s> how effectively these four relationships model the workings of a software development
+      organization.
+    </t-b>
+        <div style="height:0.25em;"></div>
+    <t-b>
+      <div style="width:calc(100vw - 12em);">
+        <div>
+      <defn-block class="right" style="margin-left:2em;">
+        <defn-head>
+          Liskov Substitution at work:
+        </defn-head>
+        <defn-code>
+  using ProjectName = std::string;
+  using TeamName = std::string;
+  using Team = std::pair&lt;TeamName, std::vector&lt;SW_Eng*&gt;&gt;
+  using ProjectStaff = std::vector&lt;Team&gt;
+  using Project = std::tuple&lt;ProjectName, ProjMgr, ProjectStaff&gt;
+
+ --------------------------------------------------------------------
+  // defined in SW_Eng
+  // pPer_ is a pointer to the SW_Eng inner Person
+
+  std::string SW_Eng::nameAndTitle() {
+    return pPer_->name() + ", " + pPer_->occupation();
+  }
+ --------------------------------------------------------------------
+
+  void showTeam(Team&amp; team) {
+    std::cout &lt;&lt; "\n  Team " &lt;&lt; team.first;
+    for (auto pSweng : team.second)
+      std::cout &lt;&lt; "\n    " &lt;&lt; pSweng-&gt;nameAndTitle();
+  }
+  void showProject(Project&amp; prj) {
+    auto [prjName, prjMgr, staff] = prj;
+    std::cout &lt;&lt; "\n  " &lt;&lt; prjName;
+    std::cout &lt;&lt; "\n  " &lt;&lt; prjMgr.nameAndTitle();
+    for (auto team : staff) {
+      showTeam(team);
+    }
+  }
+        </defn-code>
+      </defn-block>
+        </div>
+
+      </div>
+    </t-b>
+    <div style="padding-right:2em;">
+    <t-b>
+      <div style="padding-right:2em;"></div>
+      In the block at right we show a code fragment taken from the PeopleHierarchy example, below.
+      There are using declarations for ProjectName, TeamName, Team, ProjectStaff, and Project.
+    </t-b>
+    <t-b>
+      The <s-c>showTeam</s-c> function is passed a std::tuple representing team name and a vector
+      of pointers to the abstract <c-s>SW_Eng</c-s> class. The range-based for is extracting individual pointers
+      to each of the team members, as <c-s>SW_Eng</c-s>s.  The simplicity of this function comes from
+      Liskov Substitution.  <c-s>pSweng->nameAndTitle()</c-s> calls that function as if called by each
+      of the appropriate types, e.g., <c-s>TeamLead</c-s> and <c-s>Dev</c-s>.
+    </t-b>
+    <t-b>
+      Using inheritance with Liskov Substitution is one very useful way of building flexible code.
+      If we chose to add another <c-s>SW_Eng</c-s>, say <c-s>QA</c-s>, nothing would change in any of
+      the other code because it is ignorant of the specialized types we are using, e.g., look at
+      <c-s>showTeam</c-s> and <c-s>showProject</c-s> again.
+    </t-b>
+    </div>
+    <div style="height:1em" class="clear"></div>
+    <t-d>
+      All of the code for this example is contained in the details dropdown, below. The example is
+      worth a significant amount of your time to understand how it does what it does. If you go to
+      the <a href="CppStoryRepo.html">CppStory Repository</a> and download that code, you can look
+      at the example below and simultaneously look at and run the repository code.
+    </t-d>
+        <details>
+          <summary class="darkItem">People Hierachy Code Example</summary>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>
+                Person Interface and Header Code
+              </defn-head>
+              <defn-code>
+
+              </defn-code>
+              <defn-head class="defnBorderTop">
+                SW_Eng Interface and Header
+              </defn-head>
+              <defn-code>
+
+              </defn-code>
+              <defn-head class="defnBorderTop">
+                Dev Header
+              </defn-head>
+              <defn-code>
+
+              </defn-code>
+              <defn-head class="defnBorderTop">
+                TeamLead Header
+              </defn-head>
+              <defn-code>
+
+              </defn-code>
+              <defn-head class="defnBorderTop">
+                ProjMgr Header
+              </defn-head>
+              <defn-code>
+
+              </defn-code>
+              <defn-head class="defnBorderTop">
+                Using Code
+              </defn-head>
+              <defn-code>
+
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>
+                Person Implementation Code
+              </defn-head>
+              <defn-code>
+
+              </defn-code>
+              <defn-head class="defnBorderTop">
+                SW_Eng Implementation
+              </defn-head>
+              <defn-code>
+
+              </defn-code>
+              <defn-head class="defnBorderTop">
+                Dev Implementation
+              </defn-head>
+              <defn-code>
+
+              </defn-code>
+              <defn-head class="defnBorderTop">
+                TeamLead Implementation
+              </defn-head>
+              <defn-code>
+
+              </defn-code>
+              <defn-head class="defnBorderTop">
+                ProjMgr Implementation
+              </defn-head>
+              <defn-code>
+
+              </defn-code>
+              <defn-head class="defnBorderTop">
+                Output
+              </defn-head>
+              <defn-code>
+
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+    <div tabindex="2" class="autoX" style="margin:0px; padding:0px; ">
+      <details>
+        <summary class="labelStyle darkItem">People Hierarchy Code Example</summary>
+        <s-1Em></s-1Em>
+        <table class="tdefn">
+          <tr>
+            <th class="tdefn">Person Interface and Header Code</th>
+            <th class="tdefn">Person Implementation Code</th>
+          </tr>
+          <tr>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-code style="width:100%;">
+/////////////////////////////////////////////////////////////
+// IPerson.h - declares interface for inner person         //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include <string>
+#include <memory>
+
+namespace Chap4 {
+
+  struct IPerson {
+    using Name = std::string;
+    using Occupation = std::string;
+    using Age = int;
+    using Stats = std::tuple<Name, Occupation, Age>;
+
+    virtual ~IPerson() {}
+    virtual Stats stats() const = 0;
+    virtual void stats(const Stats& sts) = 0;
+    virtual Name name() const = 0;
+    virtual Occupation occupation() const = 0;
+    virtual void occupation(const Occupation& occup) = 0;
+    virtual Age age() const = 0;
+    virtual void age(const Age& ag) = 0;
+    virtual bool isValid() const = 0;
+  };
+
+  std::unique_ptr<IPerson> createPerson(const IPerson::Stats& stats);
+}
+
+/////////////////////////////////////////////////////////////
+// Person.h - defines inner person attributes              //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "IPerson.h"
+
+namespace Chap4 {
+
+  class Person : public IPerson {
+  public:
+    virtual ~Person();
+    Person();
+    Person(const Stats& sts);
+    virtual Stats stats() const;
+    virtual void stats(const Stats& sts);
+    virtual Name name() const;
+    virtual Occupation occupation() const;
+    virtual void occupation(const Occupation& occup);
+    virtual Age age() const;
+    virtual void age(const Age& ag);
+    virtual bool isValid() const;
+  private:
+    Stats personStats;
+  };
+}
+
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// Person.cpp - defines inner person attributes            //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "IPerson.h"
+#include <tuple>
+#include <string>
+#include <iostream>
+#include "Person.h"
+
+namespace Chap4 {
+
+  Person::Person() {}
+
+  Person::Person(const Stats& sts) {
+    personStats = sts;
+  }
+
+  Person::~Person() {
+  }
+  Person::Stats Person::stats() const {
+    return personStats;
+  }
+
+  void Person::stats(const Stats& sts) {
+    personStats = sts;
+  }
+
+  Person::Name Person::name() const {
+    return std::get<0>(personStats);
+  }
+
+  Person::Occupation Person::occupation() const {
+    return std::get<1>(personStats);
+  }
+
+  void Person::occupation(const Occupation& occup) {
+    std::get<1>(personStats) = occup;
+  }
+
+  Person::Age Person::age() const {
+    return std::get<2>(personStats);
+  }
+
+  void Person::age(const Age& ag) {
+    std::get<2>(personStats) = ag;
+  }
+
+  bool Person::isValid() const {
+    return name() != "" && age() >= 0;
+  }
+
+  std::unique_ptr<IPerson> createPerson(const IPerson::Stats& stats) {             
+    return std::move(std::make_unique<Person>(*new Person(stats)));
+  }
+
+  template<typename P>
+  void displayPerson(const P& person)
+  {
+    std::cout << "\n  " << person.name() << ", " 
+              << person.age() << ", " << person.occupation();
+  }
+
+  template<typename P>
+  void displayInvalid(const P& person) {
+    std::cout << "\n  " << person.name() << " has invalid data";
+  }
+
+  template<typename P>
+  void checkedDisplay(const P& person) {
+    displayPerson(person);
+    if (!person.isValid())
+      displayInvalid(person);
+  }
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+          </tr>
+          <tr>
+            <th class="tdefn">SW_Eng Interface and Header</th>
+            <th class="tdefn">SW_Eng Implementation</th>
+          </tr>
+          <tr>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// ISW_Eng.h - defines interface for all SW Eng's          //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "IPerson.h"
+
+namespace Chap4 {
+
+  struct ISW_Eng {
+    virtual ~ISW_Eng() {}
+    virtual void doWork() = 0;
+    virtual void attendMeeting() = 0;
+    virtual IPerson* person() = 0;
+  };
+}
+
+/////////////////////////////////////////////////////////////
+// SW_Eng.h - defines attributes for all SW Eng's          //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "Person.h"
+#include "ISW_Eng.h"
+#include <string>
+#include <memory>
+
+namespace Chap4 {
+
+  class SW_Eng : public ISW_Eng, public Person {
+  public:
+    SW_Eng() {}
+    SW_Eng(IPerson::Stats stats);
+    virtual ~SW_Eng() {}
+    virtual void doWork() = 0;
+    virtual void attendMeeting() = 0;
+    virtual IPerson* person();
+    std::string nameAndTitle();
+  protected:
+    void getCoffee();
+    void checkEmail();
+    void developSoftware();
+    void reviewTeamActivities();
+    void performanceAppraisals();
+    void introductions(const std::string& name);
+    void presentStatus(const std::string& progress);
+    void assignActionItems();
+    IPerson* pPer_ = nullptr;
+  };
+}                </tdefn-code>
+              </tdefn-block>
+            </td>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// SW_Eng.cpp - defines attributes for all SW Eng's        //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "SW_Eng.h"
+#include "Person.h"
+#include <iostream>
+#include <string>
+
+namespace Chap4 {
+
+  /*--- initialize inner person ---*/
+
+  SW_Eng::SW_Eng(IPerson::Stats stats) {
+    Person::stats(stats);
+    pPer_ = person();
+  }
+
+  /*--- return inner person ---*/
+
+  IPerson* SW_Eng::person() {
+    return dynamic_cast<IPerson*>(this);
+  }
+
+  std::string SW_Eng::nameAndTitle() {
+    return pPer_->name() + ", " + pPer_->occupation();
+  }
+
+  void SW_Eng::getCoffee() {
+    std::cout << "\n    go to cafetria for coffee, chat with friends";
+  }
+
+  void SW_Eng::checkEmail() {
+    std::cout << "\n    open mail server and slog through messages";
+  }
+
+  void SW_Eng::developSoftware() {
+    std::cout << "\n    pull current work from repository";
+    std::cout << "\n    chase bugs";
+    std::cout << "\n    design new module";
+    std::cout << "\n    start module implementation";
+    std::cout << "\n    push current work to repository";
+  }
+
+  void SW_Eng::reviewTeamActivities() {
+    std::cout << "\n    review current work status";
+    std::cout << "\n    review each individual's accomplishments";
+  }
+
+  void SW_Eng::performanceAppraisals() {
+    std::cout << "\n    summarize and record individual accomplishments"; 
+    std::cout << "\n    summarize areas needing improvement";
+    std::cout << "\n    summarize contributions to the team";
+  }
+
+  void SW_Eng::introductions(const std::string& name) {
+    std::cout << "\n    Hi everyone, my name is " << name 
+              << " and I'm pleased to see you all";
+  }
+  void SW_Eng::presentStatus(const std::string& progress) {
+    std::cout << "\n    I'm happy to report that " << progress;
+  }
+  void SW_Eng::assignActionItems() {
+    std::cout << "\n    I will post action items for each of you "
+              << "before the end of the day";
+  }
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+          </tr>
+          <tr>
+            <th class="tdefn">Dev Header</th>
+            <th class="tdefn">Dev Implementation</th>
+          </tr>
+          <tr>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// Dev.h - defines attributes for developer                //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "SW_Eng.h"
+#include <iostream>
+
+namespace Chap4 {
+
+  class Dev : public SW_Eng {
+  public:
+    Dev(IPerson::Stats stats);
+    virtual void doWork();
+    virtual void attendMeeting();
+  private:
+    //IPerson* pPer_;
+  };
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// Dev.cpp - defines attributes for developer              //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "Dev.h"
+
+namespace Chap4 {
+
+  Dev::Dev(IPerson::Stats stats) : SW_Eng(stats) {
+  }
+
+  void Dev::doWork() {
+    std::cout << "\n  " << pPer_->name() << " starting work";
+    getCoffee();
+    checkEmail();
+    developSoftware();
+    std::cout << std::endl;
+  }
+
+  void Dev::attendMeeting() {
+
+    std::cout << "\n  " << pPer_->name() << " attending meeting";         
+    introductions(pPer_->name());
+    presentStatus(
+      "I've completed 90% of my assigned tasks for this sprint"
+    );
+    std::cout << std::endl;
+  }
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+          </tr>
+          <tr>
+            <th class="tdefn">TeamLead Header</th>
+            <th class="tdefn">TeamLead Implementation</th>
+          </tr>
+          <tr>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// TeamLead.h - defines attributes for Team Leaders        //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "Dev.h"
+#include <iostream>
+
+namespace Chap4 {
+
+  class TeamLead : public Dev {
+  public:
+    TeamLead(IPerson::Stats stats);
+    virtual void doWork();
+    virtual void attendMeeting();
+  private:
+    //IPerson* pPer_;
+  };
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// TeamLead.cpp - defines attributes for Team Leaders      //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "TeamLead.h"
+
+namespace Chap4 {
+
+  TeamLead::TeamLead(IPerson::Stats stats) : Dev(stats) {
+  }
+
+  void TeamLead::doWork() {
+    std::cout << "\n  " << nameAndTitle() << ", starting work";
+    getCoffee();
+    checkEmail();
+    reviewTeamActivities();
+    developSoftware();
+    std::cout << std::endl;
+  }
+
+  void TeamLead::attendMeeting() {
+
+    std::cout << "\n  " << nameAndTitle() << ", attending meeting";
+    introductions(pPer_->name());
+    presentStatus(
+      "our team has completed 95% of our assigned stories for this sprint"
+    );
+    std::cout << std::endl;
+  }
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+          </tr>
+          <tr>
+            <th class="tdefn">ProjMgr Header</th>
+            <th class="tdefn">ProjMgr Implementation</th>
+          </tr>
+          <tr>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// ProjMgr.h - defines attributes for Project Managers     //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "SW_Eng.h"
+#include <iostream>
+
+namespace Chap4 {
+
+  class ProjMgr : public SW_Eng {
+  public:
+    ProjMgr(IPerson::Stats stats);
+    virtual void doWork();
+    virtual void attendMeeting();
+  private:
+    //IPerson* pPer_;
+  };
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// ProjMgr.cpp - defines attributes for Project Managers   //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#include "ProjMgr.h"
+
+namespace Chap4 {
+
+  ProjMgr::ProjMgr(IPerson::Stats stats) : SW_Eng(stats) {
+  }
+
+  void ProjMgr::doWork() {
+    std::cout << "\n  " << nameAndTitle() << ", starting work";
+    getCoffee();
+    checkEmail();
+    reviewTeamActivities();
+    performanceAppraisals();
+    std::cout << std::endl;
+  }
+
+  void ProjMgr::attendMeeting() {
+
+    std::cout << "\n  " << nameAndTitle() << ", attending meeting";
+    introductions(pPer_->name());
+    presentStatus(
+      "My teams have completed 85% of their assigned work for this sprint"
+    );
+    std::cout << "\n  Take customer golfing - make sure he wins";
+    std::cout << std::endl;
+  }
+}
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+          </tr>
+          <tr>
+            <th class="tdefn">Using Code</th>
+            <th class="tdefn">Output</th>
+          </tr>
+          <tr>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-code>
+/////////////////////////////////////////////////////////////
+// TestPeopleHierarchy.cpp - demonstrates hierarchy        //
+//                                                         //
+// Jim Fawcett, Teaching Professor Emeritus, Syracuse Univ //
+/////////////////////////////////////////////////////////////
+
+#ifdef TEST_HIERARCHY
+
+#include <vector>
+#include "SW_Eng.h"
+#include "Dev.h"
+#include "TeamLead.h"
+#include "ProjMgr.h"
+
+namespace Chap4 {
+
+  using ProjectName = std::string;
+  using TeamName = std::string;
+  using Team = std::pair&lt;TeamName, std::vector&lt;SW_Eng*&gt;&gt;
+  using ProjectStaff = std::vector&lt;Team&gt;
+  using Project = std::tuple&lt;ProjectName, ProjMgr, ProjectStaff&gt;
+
+  void showTeam(Team&amp; team) {
+    std::cout &lt;&lt; "\n  Team " &lt;&lt; team.first;
+    for (auto pSweng : team.second)
+      std::cout &lt;&lt; "\n    " &lt;&lt; pSweng-&gt;nameAndTitle();
+  }
+  void showProject(Project&amp; prj) {
+    auto [prjName, prjMgr, staff] = prj;
+    std::cout &lt;&lt; "\n  " &lt;&lt; prjName;
+    std::cout &lt;&lt; "\n  " &lt;&lt; prjMgr.nameAndTitle();
+    for (auto team : staff) {
+      showTeam(team);
+    }
+  }
+}
+
+int main() {
+  using namespace Chap4;
+
+  ProjMgr Devin({ "Devin", "Project Manager", 45 });
+
+  TeamLead Jill({ "Jill", "Team Lead & Web dev", 32 });
+  Dev Jack({ "Jack", "UI dev", 28 });
+  Dev Zhang({ "Zhang", "System dev", 37 });
+  Dev Charley({ "Charley", "QA dev", 27 });
+  Team FrontEnd{ "FrontEnd", { &Jill, &Jack, &Zhang, &Charley } };
+
+  TeamLead Tom({ "Tom", "Team Lead & Backend Dev", 38 });
+  Dev Ming({ "Ming", "Comm dev", 26 });
+  Dev Sonal({ "Sonal", "Server dev", 27 });
+  Team BackEnd{ "BackEnd", { &Tom, &Ming, &Sonal } };
+
+  Project ProductX{ "ProductX", Devin, { FrontEnd, BackEnd } };
+
+  showProject(ProductX);
+  std::cout &lt;&lt; std::endl;
+
+  std::cout &lt;&lt; "\n  Team " &lt;&lt; FrontEnd.first &lt;&lt; " at work";
+  for (auto pDev : FrontEnd.second) {
+    pDev-&gt;doWork();
+    pDev-&gt;attendMeeting();
+  }
+  std::cout &lt;&lt; std::endl;
+
+  std::cout &lt;&lt; "\n  Project Manager " &lt;&lt; Devin.nameAndTitle() 
+            &lt;&lt; " at work";
+  Devin.doWork();
+  Devin.attendMeeting();
+
+  std::cout &lt;&lt; "\n\n";
+}
+
+#endif
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-code>
+  ProductX
+  Devin, Project Manager
+  Team FrontEnd
+    Jill, Team Lead & Web dev
+    Jack, UI dev
+    Zhang, System dev
+    Charley, QA dev
+  Team BackEnd
+    Tom, Team Lead & Backend Dev
+    Ming, Comm dev
+    Sonal, Server dev
+
+  Team FrontEnd at work
+  Jill, Team Lead & Web dev, starting work
+    go to cafetria for coffee, chat with friends
+    open mail server and slog through messages
+    review current work status
+    review each individual's accomplishments
+    pull current work from repository
+    chase bugs
+    design new module
+    start module implementation
+    push current work to repository
+
+  Jill, Team Lead & Web dev, attending meeting
+    Hi everyone, my name is Jill and I'm pleased to see you all
+    I'm happy to report that our team has completed 95% of our 
+    assigned stories for this sprint
+
+  Jack starting work
+    go to cafetria for coffee, chat with friends
+    open mail server and slog through messages
+    pull current work from repository
+    chase bugs
+    design new module
+    start module implementation
+    push current work to repository
+
+  Jack attending meeting
+    Hi everyone, my name is Jack and I'm pleased to see you all
+    I'm happy to report that I've completed 90% of my assigned 
+    tasks for this sprint
+
+  Zhang starting work
+    go to cafetria for coffee, chat with friends
+    open mail server and slog through messages
+    pull current work from repository
+    chase bugs
+    design new module
+    start module implementation
+    push current work to repository
+
+  Zhang attending meeting
+    Hi everyone, my name is Zhang and I'm pleased to see you all
+    I'm happy to report that I've completed 90% of my assigned 
+    tasks for this sprint
+
+  Charley starting work
+    go to cafetria for coffee, chat with friends
+    open mail server and slog through messages
+    pull current work from repository
+    chase bugs
+    design new module
+    start module implementation
+    push current work to repository
+
+  Charley attending meeting
+    Hi everyone, my name is Charley and I'm pleased to see you all
+    I'm happy to report that I've completed 90% of my assigned 
+    tasks for this sprint
+
+
+  Project Manager Devin, Project Manager at work
+  Devin, Project Manager, starting work
+    go to cafetria for coffee, chat with friends
+    open mail server and slog through messages
+    review current work status
+    review each individual's accomplishments
+    summarize and record individual accomplishments
+    summarize areas needing improvement
+    summarize contributions to the team
+
+  Devin, Project Manager, attending meeting
+    Hi everyone, my name is Devin and I'm pleased to see you all
+    I'm happy to report that My teams have completed 85% of their 
+    assigned work for this sprint
+  Take customer golfing - make sure he wins
+                </tdefn-code>
+              </tdefn-block>
+            </td>
+          </tr>
+        </table>
+      </details>
+    </div>
+    <t-d>
+      In the next section we will look at inheritance hierarchies from working code for
+      a <c-s>Parser</c-s> used for static code analysis.
+    </t-d>
+
+    <a id="Parser"></a>
+    <hr class="spread clear" />
+    <num-cont>
+      <num-item1>6.6</num-item1><num-item4>Example - CppParser:</num-item4>
+    </num-cont>
+    <div style="width:calc(100vw - 12rem);">
+      <photosizer-block src="Pictures/ParserStaticStructure.png" width="500"
+                        class="photoSizerBlock right"
+                        style="position:relative; top:-1rem;">
+        <span style="font-family:'Comic Sans MS, Tahoma';">
+          Fig 5. Rule-based Parser
+        </span>
+      </photosizer-block>
+    </div>
+    <t-b>
+      Parsing is the process of discovering and classifying the parts of some complex thing.  Our interests 
+      are in parsing computer languages and particularly C, C++, Java, and C#.
+      In this context parsing is the process of some form of syntactic analysis, which may be based on a 
+      formal reduction using some representation like 
+      <a href="http://en.wikipedia.org/wiki/BNF_grammar">BNF</a>,
+      or using an Ad-Hoc process.  
+    </t-b>
+    <t-b>
+      There are a lot of reasons you may wish to parse source code beyond compiling it's text.  For example:
+      <i-b>
+        <ul class="tight">
+          <li>
+            Building code analysis tools
+          </li>
+          <li>
+            Searching for content in or ownership of code files
+          </li>
+          <li>
+            Evaluating code metrics
+          </li>
+          <li>
+            Compiling &quot;little embedded languages&quot;
+          </li>
+        </ul>
+      </i-b>    </t-b>
+    <t-b>
+      Several years ago I built a protype to illustrate some design ideas for one of my graduate classes 
+      and to serve as help for a code analysis project that I wanted to assign to them.  The parser had 
+      to be simple enough and easy enough to use for students to understand it and incorporate successfully 
+      into their projects in a week or two and still get the project assignment turned in on time.
+    </t-b>
+    <t-b>
+      <indent-block class="defnBorder pad10-15" style="width:max-content;">
+        All code for Parser is provided in <a href="CppParser.html">CppParser repository</a>.
+      </indent-block>
+    </t-b>
+    <t-b>
+      Parser uses an ad-hoc rule-based structure, based on the Strategy Pattern<sup>1</sup>.  Parser holds a container
+      of <c-s>IRule</c-s> pointers that are bound to derived rules. While running it collects a token sequence,
+      called a semi-expression, from the scanner and passes that to each rule in turn. It continues that process
+      until there are no more token collections to extract from the scanner. Really simple - Parser doesn&apos;t
+      know anything about the input token sequences and doesn&apos;t know how rules will use them.  It is simply
+      a traffic cop that gives rules what they need to do their job.
+    </t-b>
+    <div>
+      <details>
+        <summary class="labelStyle darkItem">Selected Parser Code</summary>
+        <s-1em></s-1em>
+        <div class="autoX viewWidth">
+        <table class="tdefn">
+          <tr>
+            <th class="tdefn">Parser Code</th>
+            <th class="tdefn">Tokenizer Code</th>
+          </tr>
+          <tr>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-code>
+class IBuilder
+{
+public:
+  virtual ~IBuilder() {}
+  virtual Parser* Build() = 0;
+};
+
+///////////////////////////////////////////////
+// abstract base class for parsing actions
+//   - when a rule succeeds, it invokes any 
+//     registered action
+
+class IAction
+{
+public:
+  virtual ~IAction() {}
+  virtual void doAction(
+    const Scanner::ITokCollection* pTc
+  ) = 0;
+};
+
+///////////////////////////////////////////////
+// abstract base class for parser language 
+// construct detections
+//   - rules are registered with parser for use
+
+class IRule
+{
+public:
+  static const bool Continue = true;
+  static const bool Stop = false;
+  virtual ~IRule() {}
+  void addAction(IAction* pAction);
+  void doActions(const Scanner::ITokCollection* pTc);
+  virtual bool doTest(
+    const Scanner::ITokCollection* pTc
+  ) = 0;
+protected:
+  std::vector&lt;IAction*&gt; actions;
+};
+
+class Parser
+{
+public:
+  Parser(Scanner::ITokCollection* pTokCollection);
+  ~Parser();
+  void addRule(IRule* pRule);
+  bool parse();
+  bool next();
+private:
+  Scanner::ITokCollection* pTokColl;
+  std::vector&lt;IRule*&gt; rules;
+};
+
+//----&lt; parse SemiExp by applying all rules to it &gt;--------
+
+bool Parser::parse()
+{
+  for (size_t i = 0; i&lt;rules.size(); ++i)
+  {
+    std::string debug = pTokColl-&gt;show();
+
+    bool doWhat = rules[i]-&gt;doTest(pTokColl);
+    if (doWhat == IRule::Stop)
+      break;
+  }
+  return true;
+}
+              </tdefn-code>
+              </tdefn-block>
+            </td>
+            <td class="tdefn">
+              <tdefn-block>
+                <tdefn-code>
+  class ConsumeState;    // private worker class
+  struct Context;        // private shared data storage
+
+  class Toker
+  {
+  public:
+    Toker();
+    Toker(const Toker&) = delete;
+    ~Toker();
+    Toker& operator=(const Toker&) = delete;
+    bool attach(std::istream* pIn);
+    std::string getTok();
+    bool canRead();
+    void returnComments(bool doReturnComments = true);
+    bool isComment(const std::string& tok);
+    size_t currentLineCount();
+    void setSpecialTokens(
+      const std::string& commaSeparatedString
+    );
+  private:
+    ConsumeState* pConsumer;
+    Context* _pContext;
+  };
+
+  class ConsumeState
+  {
+    friend class Toker;
+  public:
+    using Token = std::string;
+    ConsumeState();
+    ConsumeState(const ConsumeState&) = delete;
+    ConsumeState& operator=(
+      const ConsumeState&
+    ) = delete;
+    virtual ~ConsumeState();
+    void attach(std::istream* pIn);
+    virtual void eatChars() = 0;
+    void consumeChars() {
+      _pContext-&gt;_pState-&gt;eatChars();
+      _pContext-&gt;_pState = nextState();
+    }
+    bool canRead() { return _pContext-&gt;_pIn-&gt;good(); }
+    std::string getTok() { return _pContext-&gt;token; }
+    bool hasTok() { return _pContext-&gt;token.size() &gt; 0; }
+    ConsumeState* nextState();
+    void returnComments(bool doReturnComments = false);
+    size_t currentLineCount();
+    void setSpecialTokens(
+      const std::string& commaSeparatedString
+    );
+    void setContext(Context* pContext);
+  protected:
+    Context* _pContext;
+    bool collectChar();
+    bool isOneCharToken(Token tok);
+    bool isTwoCharToken(Token tok);
+    Token makeString(int ch);
+  };
+
+  struct Context
+  {
+    Context();
+    ~Context();
+    std::string token;
+    std::istream* _pIn;
+    std::vector&lt;std::string&gt; _oneCharTokens =
+    {
+      "\n", "&lt;", "&gt;", "{", "}", "[", "]", "(", ")", 
+      ":", ";", " = ", " + ", " - ", "*", ".", ",", "@"
+    };
+    std::vector&lt;std::string&gt; _twoCharTokens =
+    {
+      "&lt;&lt;", "&gt;&gt;", "::", "++", "--", "==", "+=", "-=",
+      "*=", "/="
+    };
+    int prevChar;
+    int currChar;
+    bool _doReturnComments;
+    bool inCSharpString = false;
+    size_t _lineCount;
+    ConsumeState* _pState;
+    ConsumeState* _pEatCppComment;
+    ConsumeState* _pEatCComment;
+    ConsumeState* _pEatWhitespace;
+    ConsumeState* _pEatPunctuator;
+    ConsumeState* _pEatAlphanum;
+    ConsumeState* _pEatSpecialCharacters;
+    ConsumeState* _pEatDQString;
+    ConsumeState* _pEatSQString;
+    ConsumeState* _pEatRawCppString;
+    ConsumeState* _pEatRawCSharpString;
+  };
+              </tdefn-code>
+              </tdefn-block>
+            </td>
+          </tr>
+        </table>
+        </div>
+      </details>
+    </div>
+    <t-b>
+      Each rule is a grammar construct detector.  Its job is to check whether a semi-expression matches its
+      rule.  Each rule holds a collection of actions derived from IAction. When a rule matches it simply invokes
+      each of its actions with the matching semi-expression. This is an example of the Command Pattern<sup>1</sup>. 
+      Rules are ignorant of what the actions do and know nothing about the Parser. Each action operates on the 
+      the passed semi-expression and uses the results to change the state of the Repository, often building an
+      abstract syntax tree. Actions don&apos;t know anything about the rules that invoke them.  The only thing
+      they need to know is the structure of the Repository&apos;s state.
+    </t-b>
+    <t-b>
+      There are quite a few parts in this design: perhaps a dozen rules, each with one or more actions, a
+      Tokenizer, and semi-expression handler. These parts are created and owned by configParser which
+      derives from IBuilder.  This is an example of the Builder Pattern<sup>1</sup>.
+    </t-b>
+    <t-b>
+      Finally, the Tokenizer is based on the State Pattern<sup>1</sup>. Its job is to extract words from a
+      stream, but there are many special cases.  Toker returns quoted strings and comments as single tokens.
+      It has to classify characters as alphanumeric, white-space, and punctuators. A few of the punctuators
+      are returned as single character tokens because of their significance to the language, e.g., semi-colons,
+      &quot;;&quot;, braces, &quot;{&quot; and &quot;}&quot;.
+    </t-b>
+    <t-b>
+      Tokenizer states all derive from an abstract <c-s>ConsumeState</c-s>.  Each state represents a specialized
+      form of consuming characters from the input stream, e.g., <c-s>EatAlphanum</c-s>, <c-s>EatWhitespace</c-s>,
+      <c-s>EatPunctuator</c-s>, <c-s>EatCppComment</c-s>. There are ten derived consumption states, each of which
+      has to take care of handling characters in a specialized way.  The State Pattern helps us divide and 
+      conquer a lot of special processing rules.
+    </t-b>
+    <t-b>
+      <span class="notice">We are looking at this example because it has such a rich use of inheritance 
+      hierarchies:</span>
+      <c-s>Rule</c-s>s, <c-s>Action</c-s>s, and <c-s>Tokenizer</c-s> states. Their use makes this design
+      very flexible.  We can add new rules to <c-s>Parser</c-s>, new actions to <c-s>Rule</c-s>s, and 
+      new States to <c-s>Tokenizer</c-s>
+      without any affect on the rest of the <c-s>Parser</c-s> code.
+    </t-b>
+    <t-b>
+      This <c-s>Parser</c-s> has been used in several Doctoral research projects and by many of my 
+      graduate classes for a variety of projects.  We've found it to be an effective facility for learning 
+      language structure in the classroom and building research tools in the lab.
+    </t-b>
+    <hr class="spreadup" />
+    <ol class="tight footnote">
+      <li>
+        The patterns cited above are all discussed in &quot;
+        <a href="https://www.amazon.com/Design-Patterns-Elements-Reusable-Object-Oriented/dp/0201633612/ref=asc_df_0201633612/?tag=hyprod-20&linkCode=df0&hvadid=312280575053&hvpos=1o1&hvnetw=g&hvrand=14653694618610455937&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9005090&hvtargid=pla-395340045790&psc=1">
+          Design Patterns, Elements of Reusable Object Oriented Software
+        </a>&quot; and many web tutorials and blogs.
+      </li>
+    </ol>
+    <a id="epilog"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>6.7</num-item1><num-item4>Epilogue:</num-item4>
+    </num-cont>
+    <t-b>
+      Each of the class relationships has a particular mission:
+      <indent-block>
+        <ol class="tight indent">
+          <li>
+            <strong>Inheritance:</strong><br />
+            Provides a specialization of some base type.  If we pass pointers to, or references of, a base instance to a function,
+            the function can accept pointers or references bound to any class that derives from that base.  This makes using code very
+            flexible.  If we need to add a new derived class the function won&apos;t be modified in any way.
+          </li>
+          <li>
+            <strong>Composition:</strong><br />
+            Allows us to factor some complex processing into a class with composed members, each of which, handle some small
+            cohesive part of the computation.  That simplifies building, debugging, testing, and enhances reading comprehension.
+          </li>
+          <li>
+            <strong>Aggregation:</strong><br />
+            Has the same utility as composition for aggregates that need to be constructed dynamically, perhaps because we
+            don&apos;t have enough information to initialize at compile time, or perhaps we may elect not to create them
+            because the execution path hasn&apos;t needed them. To do so, we pay a performance penalty for the dynamic
+            memory allocation.
+          </li>
+          <li>
+            <strong>Using:</strong><br />
+            Allows a class to use facilities that it does not own, perhaps because they are shared or must be created by
+            another entity that has the information needed to create.
+          </li>
+          <li>
+            <strong>Friend:</strong><br />
+            We try not to use friendship because it increases the scope of class encapsulation.  There are times when 
+            there is no other alternative.  For example, the friend may not be a candidate, for technical reasons, to be a class 
+            member, but its functionality is needed in the current program.
+          </li>
+        </ol>
+        <t-b>
+          There are two powerful ways of writing flexible code. One uses dynamic polymorphism via class inheritance heirarchies,
+          as we have demonstrated in this chapter.  The other uses static polymorphism with templates, as we will see in the 
+          next chapter.
+        </t-b>
+      </indent-block>
+    </t-b>
+    <a id="exer"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>6.8</num-item1><num-item4>Class Relationships - Programming Exercises:</num-item4>
+    </num-cont>
+      <indent-blocks>
+    <span style="font-size:large;">Programming exercises: C++ Basic Syntax:</span>
+    <div style="width:80%">
+      <ol>
+        <li>
+          Write code for a <code-span>WidgetUser</code-span> class that holds a <code-span>Widget* ptr</code-span>
+          to a <code-span>Widget</code-span> instance on the native heap. Please provide void, copy construction,
+          move construction, copy assignment, move assignment, and destructor methods for this class.
+          <hr />
+          You may assume that <code-span>Widget</code-span> instances have correct copy, move, and destruction
+          semantics.  You don&apos;t need to provide any specific functionality for Widgets.  Consider using
+          annunciating constructors to show that WidgeUser is properly managing its Widget.
+        </li>
+        <li>
+          Write code for a class that composes a fundamental type and an STL container (if doesn&apos;t really matter which).
+          Show, by careful testing, that the class can correctly allow the compiler to generate its default and copy
+          constructors, assignment operator, and destructor. Now replace the composition with aggregation where the fundamental
+          and STL container types are referenced by pointers to the native heap. Show that incorrect operations occur
+          if you don&apos;t provide the copy, assignment, and destruction operations.  Now add those operations and
+          show that class operations are valid again.  Finally, prevent the compiler from generating those methods
+          using =delete. Note that you will have to provide a destructor (why is that?).
+          <hr />
+          Doing this exercise carefully is the best way I know of for you to learn how to handle compiler generated
+          methods.
+        </li>
+        <li>
+          Write all the code for a program that counts the number of directories rooted at
+          some specified path.  That will require you to use an executive package and packages
+          DirExplorerN and FileSystem.
+          <hr />
+          DirExplorerN is one of the projects in the <a href="../../FileManager.html">FileManager Repository</a>,
+          and FileSystem is in the <a href="../../FileSystem.html">FileSystem</a> Repository.
+        </li>
+        <li>
+          Repeat the first exercise, but now evaluate the size of the root path, e.g., the size of all
+          files that belong to any of the directories on the specified path.
+          <hr />
+          Don&apos;t forget to include the sizes of all the files in the root directory.
+        </li>
+        <li>
+          Modify code in the <a href="TextFinder.html">TextFinder</a> repository so you display N lines
+          of code surrounding the matched text.
+          <hr />
+          This will require you to cache the last N/2 lines of code while searching, and look ahead
+          N/2 lines when you find a match. A ciruclar buffer is one way to implement that caching.  See
+          Exercise 4:1 for an exercise to build a template circular buffer.  You won&apos;t need
+          templates for this buffer.
+        </li>
+      </ol>
+    </div>
+  </indent-blocks>
+
+
+    <a id="refs"></a>
+    <hr class="spread" />
+    <num-cont>
+      <num-item1>6.9</num-item1><num-item4>References:</num-item4>
+    </num-cont>
+    <indent-block>
+      <a href="cpppatterns.com">cpppatterns.com</a><br />
+      <a href="https://www.fluentcpp.com/posts/">Posts on Fluent C++</a><br />
+      <a href="https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms">C++ Idioms</a><br />
+      <a href="https://www.youtube.com/playlist?list=PLs3KjaCtOwSZ2tbuV1hx8Xz-rFZTan2J1">C++ weekly videos</a><br /> 
+    </indent-block>
+
+    <spacer-25 class="clear"></spacer-25>
+      </content>
+      <a id="bottom"></a>
+      <page-TOC id="pages" style="display:none;">
+      </page-TOC>
+      <page-sections id="sections" style="display:none;">
+        <sec-elem style="width:0.0em">&nbsp;</sec-elem>
+        <menu-elem class="secElem"><a href="#bottom">bot</a></menu-elem>
+        <menu-elem class="secElem"><a href="#refs">refs</a></menu-elem>
+        <menu-elem class="secElem"><a href="#exer">exer</a></menu-elem>
+        <menu-elem class="secElem"><a href="#epilogue">epil</a></menu-elem>
+        <menu-elem class="secElem"><a href="#classexmp">classexmp</a></menu-elem>
+        <menu-elem class="secElem"><a href="#genmeth">genmeth</a></menu-elem>
+        <menu-elem class="secElem"><a href="#anatexam">anatexam</a></menu-elem>
+        <menu-elem class="secElem"><a href="#RAII">RAII</a></menu-elem>
+        <menu-elem class="secElem"><a href="#valtype">valtype</a></menu-elem>
+        <menu-elem class="secElem"><a href="#ptexam">ptexam</a></menu-elem>
+        <menu-elem class="secElem"><a href="#ptclass">ptclass</a></menu-elem>
+        <menu-elem class="secElem"><a href="#method">methods</a></menu-elem>
+        <menu-elem class="secElem"><a href="#basiccl">basiccl</a></menu-elem>
+        <menu-elem class="secElem"><a href="#prologue">prol</a></menu-elem>
+        <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
+      </page-sections>
+    </main>
+    <frame-footer>
+      <menu-item style="width:1.0em;">&nbsp;</menu-item>
+      <menu-elem id="nextLink2" onclick="bottomMenu.next()">Next</menu-elem>
+      <menu-elem id="prevLink2" onclick="bottomMenu.prev()">Prev</menu-elem>
+      <menu-elem id="pgbtn" onclick="bottomMenu.pages()">Pages</menu-elem>
+      <menu-elem onclick="bottomMenu.sections()">Sections</menu-elem>
+      <menu-elem onclick="bottomMenu.about()">About</menu-elem>
+      <menu-elem id="kysbtn" onclick="storyHlpMenu.keys()">Keys</menu-elem>
+      <!--<menu-item style="width:1.0em;">&nbsp;</menu-item>
+      <menu-elem style="font-size:0.75em;" onclick="storyHlpMenu.decrZoomScreen()">Zout</menu-elem>
+      <menu-elem style="font-size:0.75em;" onclick="storyHlpMenu.normZoomScreen()">Zdef</menu-elem>
+      <menu-elem style="font-size:0.75em;" onclick="storyHlpMenu.incrZoomScreen()">Zin</menu-elem>-->
+    </frame-footer>
+  </page-frame>
+</body>
+</html>
