@@ -10,7 +10,8 @@ function initializePages() {
     pgbtn.style.display = "flex";
     pagesMenu.innerHTML = "<menu-elem class='ddItems pageElem undefined'><a href='../../CppBiteByByte.html'>Cpp&nbsp;Bites&nbsp;Repo&nbsp;</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='../../indexCpp.html'>Cpp&nbsp;Track&nbsp;Summary</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='CppBites_Intro.html'>Introduction</a></menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='CppBites_WhatIsCpp.html'>What is C++?</a></menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='CppBites_Intro.html'>Survey</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Model</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Memory</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Types</a></menu-elem>\
