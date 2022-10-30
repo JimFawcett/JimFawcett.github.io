@@ -13,8 +13,8 @@ function initializePages() {
           <menu-elem class='ddItems pageElem'><a href='RustBites_Intro.html'>Introduction</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_GettingStarted.html'>Starting</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_Tooling.html'>Tooling</a></menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='RustBites_Safety.html'>Safety</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_UDB.html'>Undef behavior</a></menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='RustBites_Safety.html'>Safety</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_Data.html'>Data&nbsp;Operations</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_FlashCards.html'>FlashCards</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_Facts.html'>Facts</a></menu-elem>\
