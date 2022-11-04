@@ -695,7 +695,7 @@ move construction: vector<int>:
                 </th>
                 <th style="border-top:2px solid var(--light);">
                   <div class="bottombutton lightBlue" style="margin:auto;">
-                    <a href="# https://onlinegdb.com/vcU7BOzfQ">Execute C++ Iter code</a>
+                    <a href="https://godbolt.org/z/6ce1znf4j">Execute C++ Iter code</a>
                   </div>
                 </th>
                 <th style="border-top:2px solid var(--light);">
@@ -705,7 +705,305 @@ move construction: vector<int>:
                 </th>
               </tr>
               <tr>
-                <td>Iteration</td><td></td><td></td>
+                <td>
+                  Iteration
+                  <hr />
+                  <t-b>
+                    This demo iterates over strings, string views, arrays, and array views.  C++20 views are
+                    similar to Rust slices.
+                  </t-b>
+                  <t-b>
+                    The demos use std::iterator and range-based for loops.
+                  </t-b>
+                  <hr />
+                  <t-b>
+                    This code needs to be compiled for C++20. The gcc option is <c-s>--std=c++20</c-s>.
+                  </t-b>
+                </td>
+                <td>
+                  <defn-code class="lightBlue" style="font-size:small">
+#include&lt;string>
+#include&lt;ranges>
+#include&lt;iostream>
+#include &lt;locale>
+#include &lt;algorithm>
+#include &lt;string_view>
+#include &lt;typeinfo>
+#include &lt;iterator>
+#include &lt;vector>
+
+/*-- helper function --*/
+void putln(size_t num = 1) {
+  for(size_t i=0; i&lt;num; ++i)
+    std::cout &lt;&lt; "\n";
+}
+/*-- basic string iteration demos --*/
+void string_iteration() {
+    std::string test_string = "a test string";
+    std::cout &lt;&lt; "\n  ascii characters from " 
+              &lt;&lt; test_string &lt;&lt; "\n  ";
+
+    std::string::iterator iter = 
+      test_string.begin();
+    while(iter != test_string.end()) {
+      char ch = *iter;
+      std::cout &lt;&lt; ch &lt;&lt; " ";
+      if(iter == test_string.end())
+        break;
+      ++iter;
+    }
+    std::cout &lt;&lt; "\n  test_string: " 
+              &lt;&lt; test_string;
+    putln();
+}
+/*-- idiomatic string iteration demos --*/
+void idomatic_string_iteration() {
+  std::string test_string = 
+    "another test string";
+  std::cout 
+    &lt;&lt; "\n  idiomatic ascii chars from:\n  "
+    &lt;&lt; test_string &lt;&lt; "\n  ";
+
+  for(auto ch : test_string) {
+    std::cout &lt;&lt; ch &lt;&lt; " ";
+  }
+  putln();
+  char ch2 = test_string[1];
+  std::cout &lt;&lt; "\n  2nd character of " 
+            &lt;&lt; test_string 
+            &lt;&lt; " is " &lt;&lt; ch2;
+  std::cout &lt;&lt; "\n  test_string: " 
+            &lt;&lt; test_string;
+  putln();
+}
+
+/*-----------------------------------------------
+  demonstrate all_of(...), is_alphabetic, is_..., 
+  ranges, and string_view.
+*/
+/*-- helper function show collection items --*/
+template&lt;typename C>
+void put_coll(
+  C& coll, const std::string& prefix = ""
+) {
+  std::cout &lt;&lt; prefix;
+  for(auto item : coll) {
+    std::cout &lt;&lt; item;
+  }
+}
+/*-- helper function, displays test results --*/
+void test(
+  bool pred, 
+  const std::string& src, 
+  const std::string& category
+) {
+  if(pred)
+  {
+    std::cout &lt;&lt; "\n  " &lt;&lt; src 
+              &lt;&lt; " is " &lt;&lt; category;
+  }
+  else {
+    std::cout &lt;&lt; "\n  " &lt;&lt; src 
+              &lt;&lt; " is not " &lt;&lt; category;
+  }
+}
+/*-- demonstrate string adapter functions --*/
+void string_adapters() {
+  std::string ls = "abc123";
+
+  /*-- are all chars alphbetic --*/
+
+  auto is_alpha = 
+    [](char ch) -> bool { 
+      return std::isalpha(ch); 
+    };
+  test(
+    std::all_of(ls.begin(), ls.end(), is_alpha),
+    ls, "alphabetic"
+  );
+  /*-- are all chars alphanumeric --*/
+
+  auto is_alnum = [](char ch) -> bool
+                  { return std::isalnum(ch); };
+  test(
+    std::all_of(ls.begin(), ls.end(), is_alnum),
+    ls, "alphanumeric"
+  );
+  /*-- are all chars ascii --*/
+
+  auto is_ascii = [](char ch) -> bool 
+    { 
+        return 0 &lt;= ch && ch &lt; 128; 
+    };
+  test(
+    std::all_of(ls.begin(), ls.end(), is_ascii),
+    ls, "ascii"
+  );
+  /*-- are all chars numeric --*/
+
+  auto is_num = [](char ch) -> bool 
+                { return std::isdigit(ch); };
+  test(
+    std::all_of(ls.begin(), ls.end(), is_num),
+    ls, "numeric"
+  );
+  putln();
+
+  /*-- using range::view with pipe --*/
+  auto r = ls | std::views::filter(is_num);
+  put_coll(r,"\n  r is ");
+  /*-- 
+    numeric if numeric range, r, is same size as ls 
+  --*/
+  test(
+    std::distance(r.begin(), r.end()) == ls.size(),
+    ls, "numeric"
+  );
+  putln();
+
+  /*-- display chars from str slice --*/
+  ls = "abc123";
+  /*-- non-owning view --*/
+  std::string_view slice{ ls };
+  slice.remove_prefix(2);
+  slice.remove_suffix(2);
+  std::cout &lt;&lt; "\n  third and fourth chars of " 
+            &lt;&lt; ls &lt;&lt; " are " 
+            &lt;&lt; slice;
+  put_coll(slice, "\n  slice is ");
+  std::cout &lt;&lt; "\n  ls is still " &lt;&lt; ls;
+  putln();
+
+  /*---------------------------------------------
+     Form string from numeric chars in source, ls.
+     Uses std::range adapter std::view.
+  */
+  auto results = ls | std::views::filter(is_num);
+  std::cout &lt;&lt; "\n  numeric chars of " 
+            &lt;&lt; ls &lt;&lt; " are ";
+  for(auto r:results) {
+    std::cout &lt;&lt; r;
+  }
+  put_coll(results, "\n  ");
+
+  /*---------------------------------------------
+    The results item has a very ugly type.
+    Uncomment lines below to see it.
+    That means that std::cout &lt;&lt; results;
+    will fail to compile.
+  */
+  // std::cout &lt;&lt; typeid(results).name();
+  
+  putln();
+}
+
+/*-----------------------------------------------
+  Define and iterate through byte array
+*/
+using byte = short int;
+using Iter = byte*;
+
+void define_and_iterate_byte_array() {
+  byte ba[] = { 1, 2, 3, 4, 5 };
+  std::cout &lt;&lt; "\n  ";
+  for(
+    Iter it=std::begin(ba); 
+    it != std::end(ba); 
+    ++it
+  )
+    std::cout &lt;&lt; *it &lt;&lt; " ";
+  putln();
+}
+void idiomatic_define_and_iterate_byte_array() {
+  short int ba[] = { 1, 2, 3, 4, 5 };
+  std::cout &lt;&lt; "\n  ";
+  for(auto i : ba) {
+    std::cout &lt;&lt; i &lt;&lt; " ";
+  }
+  put_coll(ba, "\n  ");
+  putln();
+
+  std::cout &lt;&lt; "\n  [";
+  auto temp = ba | std::views::take(4);
+  for(auto i : temp) {
+    std::cout &lt;&lt; i &lt;&lt; ", ";
+  }
+  auto iter = std::end(ba);
+  auto last = *(--iter);
+  std::cout &lt;&lt; last &lt;&lt; "]";
+}
+
+int main() {
+    std::cout 
+        &lt;&lt; "\n  -- demonstrate iteration --\n";
+
+    std::cout &lt;&lt; "\n  -- string iteration --";
+    string_iteration();
+    idomatic_string_iteration();
+    std::cout 
+        &lt;&lt; "\n  -- string iteration adapters --";
+    string_adapters();
+    std::cout 
+        &lt;&lt; "\n\n  -- byte array iteration --";
+    define_and_iterate_byte_array();
+    std::cout 
+         &lt;&lt; "\n  -- idiomatic byte array iter'n --";
+    idiomatic_define_and_iterate_byte_array();
+
+    std::cout &lt;&lt; "\n\n  That's all Folks!\n\n";
+}
+                  </defn-code>
+                </td>
+                <td>
+                  Unlike Rust, which uses utf8 characters that range in size from 1 to 4 bytes,
+                  C++ characters are 1 byte for std::char and 2 bytes for std::w_char.  Since it has
+                  fixed size characters, iteration over strings use the same processes
+                  as for arrays and vectors.
+                  <defn-code class="lightBlue" style="font-size:small;">
+  -- demonstrate iteration --
+
+  -- string iteration --
+  ascii characters from a test string
+  a   t e s t   s t r i n g 
+  test_string: a test string
+
+  idiomatic ascii chars from:
+  another test string
+  a n o t h e r   t e s t   s t r i n g 
+
+  2nd character of another test string is n
+  test_string: another test string
+
+  -- string iteration adapters --
+  abc123 is not alphabetic
+  abc123 is alphanumeric
+  abc123 is ascii
+  abc123 is not numeric
+
+  r is 123
+  abc123 is not numeric
+
+  third and fourth chars of abc123 are c1
+  slice is c1
+  ls is still abc123
+
+  numeric chars of abc123 are 123
+  123
+
+
+  -- byte array iteration --
+  1 2 3 4 5 
+
+  -- idiomatic byte array iter'n --
+  1 2 3 4 5 
+  12345
+
+  [1, 2, 3, 4, 5]
+
+  That's all Folks!
+
+                  </defn-code>
+                </td>
               </tr>
               <tr id="datastr">
                 <th style="border-top:2px solid var(--light);">
