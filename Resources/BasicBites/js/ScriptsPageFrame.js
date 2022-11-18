@@ -145,36 +145,6 @@ function initializeMenu() {
         </div>\
     </div>\
     <div class='menuItem'>\
-        Tracks&#9662\
-        <div class='dropdown'>\
-            <div class='ddLabel darkItem'>Code Tracks</div>\
-            <div class='ddItem'><a href='../../indexBasic.html'>Basics&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
-            <div class='ddItem'><a href='BasicBites_Platform.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Basics&nbsp;Bites&nbsp;</a ></div>\
-            <div class='ddItem'><a href='../../indexCpp.html'>C++ Track&nbsp;Summary&nbsp;</a></div>\
-            <div class='ddItem'><a href='../../CppStoryRepo.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C++&nbsp;Story&nbsp;</a ></div>\
-            <div class='ddItem'><a href='../CppBites/CppBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C++&nbsp;Bites&nbsp;</a ></div>\
-            <div class='ddItem'><a href='../../CppRepositories.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C++&nbsp;CodeRepo&nbsp;</a ></div>\
-            <div class='ddItem'><a href='https://www.w3schools.com/cpp/trycpp.asp?filename=demo_compiler' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a></div>\
-            <div class='ddItem'><a href='../../indexRust.html'>Rust Track&nbsp;Summary&nbsp;</a></div>\
-            <div class='ddItem'><a href='../../RustStoryRepo.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Rust&nbsp;Story&nbsp;</a ></div>\
-            <div class='ddItem'><a href='../RustBites/RustBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Rust&nbsp;Bites&nbsp;</a ></div>\
-            <div class='ddItem'><a href='../../RsRepositories.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Rust&nbsp;CodeRepo&nbsp;</a ></div>\
-            <div class='ddItem'><a href='https://play.rust-lang.org/' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a></div>\
-            <div class='ddItem'><a href='../../indexCs.html'>C#&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
-            <div class='ddItem'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C#&nbsp;Story&nbsp;</a ></div>\
-            <div class='ddItem'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C#&nbsp;Bites&nbsp;</a ></div>\
-            <div class='ddItem'><a href='../../CsRepositories.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C#&nbsp;CodeRepo&nbsp;</a ></div>\
-            <div class='ddItem'><a href='https://dotnetfiddle.net/' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a></div>\
-            <div class='ddItem'><a href='../../indexWebDev.html'>WebDev&nbsp;Summary&nbsp;</a></div>\
-            <div class='ddItem'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;WebDev&nbsp;Story&nbsp;</a ></div>\
-            <div class='ddItem'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;WebDev&nbsp;Bites&nbsp;</a ></div>\
-            <div class='ddItem'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;WebDev&nbsp;CodeRepo&nbsp;</a ></div>\
-            <div class='ddItem'><a href='../../indexDesign.html'>Design&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
-            <div class='ddItem'><a href='../DesignBites/DesignBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Design&nbsp;Bites&nbsp;</a ></div>\
-            <div style='height:4em;'>&nbsp;</div>\
-        </div>\
-    </div>\
-    <div class='menuItem'>\
         Repos&#9662\
         <div class='dropdown'>\
             <div class='ddLabel darkItem'>Repositories</div>\
