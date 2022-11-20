@@ -63,6 +63,7 @@ function initializeMenu() {
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
               <summary>Basics</summary>\
               <div style='margin-left:1.0em;'>\
+                <div class='ddItem ddDetails'><a href='BasicBiteByByte.html'>&nbsp;&nbsp;Basics&nbsp;Repository&nbsp;</a></div>\
                 <div class='ddItem ddDetails'><a href='indexBasic.html'>&nbsp;&nbsp;Basics&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
                 <div class='ddItem ddDetails'><a href='Resources/BasicBites/BasicBites_Platform.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Basic&nbsp;Bites&nbsp;</a ></div>\
                 <div style='height:0.25em;'></div>\
@@ -71,6 +72,7 @@ function initializeMenu() {
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
               <summary>C++</summary>\
               <div style='margin-left:1.0em;'>\
+                <div class='ddItem ddDetails'><a href='indexCpp.html'>&nbsp;&nbsp;C++ Track&nbsp;Summary&nbsp;</a></div>\
                 <div class='ddItem ddDetails'><a href='indexCpp.html'>&nbsp;&nbsp;C++ Track&nbsp;Summary&nbsp;</a></div>\
                 <div class='ddItem ddDetails'><a href='CppStoryRepo.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C++&nbsp;Story&nbsp;</a ></div>\
                 <div class='ddItem ddDetails'><a href='Resources/CppBites/CppBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C++&nbsp;bites&nbsp;</a ></div>\
