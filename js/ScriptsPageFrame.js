@@ -63,49 +63,52 @@ function initializeMenu() {
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
               <summary>Basics</summary>\
               <div style='margin-left:1.0em;'>\
-                <div class='ddItem ddDetails'><a href='BasicBiteByByte.html'>&nbsp;&nbsp;Basics&nbsp;Repository&nbsp;</a></div>\
+                <div class='ddItem ddDetails undefined'><a href='Javascript:;'>&nbsp;&nbsp;Basics&nbsp;Repositories</a></div>\
                 <div class='ddItem ddDetails'><a href='indexBasic.html'>&nbsp;&nbsp;Basics&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails'><a href='Resources/BasicBites/BasicBites_Platform.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Basic&nbsp;Bites&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a href='BasicBiteByByte.html'>&nbsp;&nbsp;Basics&nbsp;BiteByByte&nbsp;</a></div>\
+                <div class='ddItem ddDetails'><a href='Resources/BasicBites/BasicBites_Platform.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;Basic&nbsp;Bites&nbsp;</a ></div>\
                 <div style='height:0.25em;'></div>\
               </div>\
             </details>\
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
               <summary>C++</summary>\
               <div style='margin-left:1.0em;'>\
+                <div class='ddItem ddDetails'><a href='CppRepositories.html'>&nbsp;&nbsp;C++&nbsp;Repositories&nbsp;</a></div>\
                 <div class='ddItem ddDetails'><a href='indexCpp.html'>&nbsp;&nbsp;C++ Track&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails'><a href='indexCpp.html'>&nbsp;&nbsp;C++ Track&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails'><a href='CppStoryRepo.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C++&nbsp;Story&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='Resources/CppBites/CppBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C++&nbsp;bites&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='CppBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C++&nbsp;bits&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='CppRepositories.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C++&nbsp;CodeRepo&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='CodeBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;CodeBitsRepo&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='https://www.w3schools.com/cpp/trycpp.asp?filename=demo_compiler' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a></div>\
+                <div class='ddItem ddDetails'><a href='CppStoryRepo.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;C++&nbsp;Story&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a href='CppBiteByByte.html'>&nbsp;&nbsp;C++ BiteByByte&nbsp;</a></div>\
+                <div class='ddItem ddDetails'><a href='Resources/CppBites/CppBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;C++&nbsp;bites&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a href='CppBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;C++&nbsp;bits&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a href='CodeBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;CodeBitsRepo&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a href='https://godbolt.org/z/qPYxr311z' style='font-size:0.9em;'>&nbsp;&nbsp;online&nbsp;compiler&nbsp;</a></div>\
                 <div style='height:0.25em;'></div>\
               </div>\
             </details>\
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
               <summary>Rust</summary>\
               <div style='margin-left:1.0em;'>\
+                <div class='ddItem ddDetails'><a href='RsRepositories.html'>&nbsp;&nbsp;Rust&nbsp;Repositories&nbsp;</a></div>\
                 <div class='ddItem ddDetails'><a href='indexRust.html'>&nbsp;&nbsp;Rust Track&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails'><a href='RustStoryRepo.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Rust&nbsp;Story&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='Resources/RustBites/RustBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Rust&nbsp;Bites&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='RustBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Rust&nbsp;Bits&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='RsRepositories.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Rust&nbsp;CodeRepo&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='CodeBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;CodeBitsRepo&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='https://play.rust-lang.org/' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a></div>\
+                <div class='ddItem ddDetails'><a href='RustStoryRepo.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;Rust&nbsp;Story&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a href='RustBiteByByte.html'>&nbsp;&nbsp;Rust&nbsp;BiteByByte&nbsp;</a></div>\
+                <div class='ddItem ddDetails'><a href='Resources/RustBites/RustBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;Rust&nbsp;Bites&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a href='RustBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;Rust&nbsp;Bits&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a href='CodeBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;CodeBitsRepo&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a href='https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=cbe1fb68db9723693c56de5d978c79fe' style='font-size:0.9em;'>&nbsp;&nbsp;online&nbsp;compiler&nbsp;</a></div>\
                 <div style='height:0.25em;'></div>\
               </div>\
             </details>\
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
               <summary>C#</summary>\
               <div style='margin-left:1.0em;'>\
+                <div class='ddItem ddDetails'><a href='CsRepositories.html'>&nbsp;&nbsp;C#&nbsp;Repositories&nbsp;</a></div>\
                 <div class='ddItem ddDetails'><a href='indexCs.html'>&nbsp;&nbsp;C#&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C#&nbsp;Story&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C#&nbsp;Bites&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='CSharpBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C#&nbsp;Bits&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='CsRepositories.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C#&nbsp;CodeRepo&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='CodeBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;CodeBitsRepo&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='https://dotnetfiddle.net/' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a></div>\
+                <div class='ddItem ddDetails'><a class='undefined' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;C#&nbsp;Story&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a class='undefined' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;C#&nbsp;BiteByByte&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a class='undefined' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;C#&nbsp;Bites&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a href='CSharpBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;C#&nbsp;Bits&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a href='CodeBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;CodeBitsRepo&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a href='https://dotnetfiddle.net/Mov07X' style='font-size:0.9em;'>&nbsp;&nbsp;online&nbsp;compiler&nbsp;</a></div>\
                 <div style='height:0.25em;'></div>\
               </div>\
             </details>\
@@ -113,9 +116,9 @@ function initializeMenu() {
               <summary>WebDev</summary>\
               <div style='margin-left:1.0em;'>\
                 <div class='ddItem ddDetails'><a href='indexWebDev.html'>&nbsp;&nbsp;WebDev&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;WebDev&nbsp;Story&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;WebDev&nbsp;Bites&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;WebDev&nbsp;CodeRepo&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a class='undefined' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;WebDev&nbsp;Story&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a class='undefined' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;WebDev&nbsp;Bites&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a class='undefined' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;WebDev&nbsp;CodeRepo&nbsp;</a ></div>\
                 <div style='height:0.25em;'></div>\
               </div>\
             </details>\
@@ -123,7 +126,7 @@ function initializeMenu() {
               <summary>Design</summary>\
               <div style='margin-left:1.0em;'>\
                 <div class='ddItem ddDetails'><a href='indexDesign.html'>&nbsp;&nbsp;Design&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails'><a href='Resources/DesignBites/DesignBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Design&nbsp;Bites&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a href='Resources/DesignBites/DesignBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;Design&nbsp;Bites&nbsp;</a ></div>\
                 <div style='height:0.25em;'></div>\
               </div>\
             </details>\
@@ -131,7 +134,7 @@ function initializeMenu() {
               <summary>Deployment&nbsp;&nbsp;</summary>\
               <div style='margin-left:1.0em;'>\
                 <div class='ddItem ddDetails'><a href='indexDeployment.html'>&nbsp;&nbsp;Deployment&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails'><a href='Resources/DeploymentBites/DeployBites_Git.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Deploy&nbsp;Bites&nbsp;</a ></div>\
+                <div class='ddItem ddDetails'><a href='Resources/DeploymentBites/DeployBites_Git.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;Deploy&nbsp;Bites&nbsp;</a ></div>\
                 <div style='height:0.25em;'></div>\
               </div>\
             </details>\
