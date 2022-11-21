@@ -1,5 +1,5 @@
 /*
- * ScriptsPageFrame.js
+ * ScriptsPageFrame.js for BasicBites
  * - Builds top menu so only one place to change for adding or removing link
  * - Builds bottom Pages menu since all pages in thread have same sibling pages
  * - Builds About popup, used by all pages
