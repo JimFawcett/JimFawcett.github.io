@@ -31,7 +31,8 @@ function goHome() {
 }
 
 function getHelp() {
-  window.open("Help.html", "help", "popup=1, height=700, width=600");
+  //window.open("Help.html", "help", "popup=1, height=700, width=600");
+  window.open("Help.html", "target=_blank");
 }
 
 function initializeMenu() {
