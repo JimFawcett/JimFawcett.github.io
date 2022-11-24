@@ -27,8 +27,7 @@ function initialize() {
 /* create top menu */
 
 function goHome() {
-  window.open("Help.html", "target=_blank");
-  //window.location.href = "index.html";
+  window.location.href = "index.html";
 }
 
 function getHelp() {
