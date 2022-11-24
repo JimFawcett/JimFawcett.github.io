@@ -27,12 +27,13 @@ function initialize() {
 /* create top menu */
 
 function goHome() {
-  window.location.href = "index.html";
+  window.open("Help.html", "target=_blank");
+  //window.location.href = "index.html";
 }
 
 function getHelp() {
   //window.open("Help.html", "help", "popup=1, height=700, width=600");
-  window.open("Help.html", "target=_blank");
+  window.open("Help.html", "_blank");
 }
 
 function initializeMenu() {
