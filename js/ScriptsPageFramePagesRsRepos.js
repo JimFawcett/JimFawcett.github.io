@@ -26,9 +26,6 @@ function initializePages() {
           <menu-elem class='ddItems pageElem'><a href='RustErrorHandling.html'>Error&nbsp;Handling</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustModels.html'>Rust&nbsp;Models&nbsp;</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustLibraryDemos.html'>Library&nbsp;Demos</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='RustStoryRepo.html'>Rust&nbsp;Story&nbsp;</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='RustBiteByByte.html'>Rust&nbsp;Bites&nbsp;</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='IdiomsAndPatterns.html'>Idioms&nbsp;and&nbsp;Patts</a>&nbsp;</menu-elem>\
           <menu-elem>&nbsp;</menu-elem>\
           <menu-elem>&nbsp;</menu-elem>";
   }

@@ -99,9 +99,6 @@ function initializeMenu() {
         <a href='RustErrorHandling.html'>Rust&nbsp;Error&nbsp;Handling&nbsp;</a>\
         <a href='RustModels.html'>Rust&nbsp;Models&nbsp;</a>\
         <a href='RustLibraryDemos.html'>Rust&nbsp;Librarys&nbsp;Demos&nbsp;</a>\
-        <a href='RustStoryRepo.html'>Rust&nbsp;Story&nbsp;</a>\
-        <a href='RustBiteByByte.html'>Rust&nbsp;Bite&nbsp;by&nbsp;Byte&nbsp;</a>\
-        <a href='IdiomsAndPatterns.html'>Rust&nbsp;Idioms&nbsp;and&nbsp;Patterns&nbsp;</a>\
         <div style='padding:0px 10px; margin:0px; font-size:small;'>&nbsp;</div>\
       </div>\
     </div>\
