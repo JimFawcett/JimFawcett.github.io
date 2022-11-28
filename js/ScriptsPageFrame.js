@@ -38,7 +38,7 @@ function getHelp() {
 function initializeMenu() {
 
   var topMenu = document.getElementById("navbar");
-  topMenu.innerHTML = "<div class='navbar'>\
+  topMenu.innerHTML = "<div style='position: relative;' class='navbar'>\
     <div class='menuItem'>\
         Site&#9662\
         <div class='dropdown'>\
