@@ -68,9 +68,8 @@ function initializeMenu() {
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
               <summary>Basics</summary>\
               <div style='margin-left:1.0em;'>\
-                <div class='ddItem ddDetails undefined'><a href='Javascript:;'>&nbsp;&nbsp;Basics&nbsp;Repositories</a></div>\
                 <div class='ddItem ddDetails'><a href='indexBasic.html'>&nbsp;&nbsp;Basics&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails'><a href='BasicBiteByByte.html'>&nbsp;&nbsp;Basics&nbsp;Bites&nbsp;</a></div>\
+                <div class='ddItem ddDetails'><a href='BasicBiteByByte.html'>&nbsp;&nbsp;-&nbsp;Basics&nbsp;Bites&nbsp;</a></div>\
                 <div style='height:0.25em;'></div>\
               </div>\
             </details>\
