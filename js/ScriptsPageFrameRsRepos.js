@@ -186,7 +186,6 @@ function initializeMenu() {
             <div class='ddItem'><a href='RustDirNav.html'>DirNav</a></div>\
             <div class='ddItem'><a href='RustComm.html'>Comm Prototype</a></div>\
             <div class='ddItem'><a href='RustCommWithThreadPool.html'>Comm Prototype with TP&nbsp;</a></div>\
-            <div class='ddItem'><a href='RustCommExperiments.html'>Comm Experiments&nbsp;</a></div>\
             <div class='ddItem'><a href='RustStringConversions.html'>String&nbsp;Conv&nbsp;</a>\</div>\
             <div style='height:2em;'></div>\
         </div>\
