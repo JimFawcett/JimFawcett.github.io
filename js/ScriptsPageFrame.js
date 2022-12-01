@@ -428,7 +428,7 @@ bottomMenu.about = function () {
   var page = document.getElementById("page");
   var date = document.getElementById("modified");
   var menu = document.getElementById("about");
-  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021";
+  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2022";
   if (isDefined(page)) {
     menu.innerHTML += "<br />" + page.innerText;
   }
@@ -436,7 +436,7 @@ bottomMenu.about = function () {
     menu.innerHTML += "<br />" + "Page last modified: " + date.innerText;
   }
   if (isDefined(menu)) {
-    if (menu.style.display == "block") {
+    if (menu.style.display === "block") {
       menu.style.display = "none";
     }
     else {
