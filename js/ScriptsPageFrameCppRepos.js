@@ -197,9 +197,9 @@ function initializeMenu() {
         <div class='dropdown'>\
             <div class='ddLabel darkItem'>Libraries</div>\
             <div class='ddItem'><a href='FileSystem.html'>FileSystem-Windows</a></div>\
-            <div class='ddItem'><a class='disable' href='FileSystem.html'>FileSystem-Linux</a></div>\
+            <div class='ddItem'><a class='undefined' href='Javascript:;'>FileSystem-Linux</a></div>\
             <div class='ddItem'><a href='Sockets.html'>Sockets-Windows</a></div>\
-            <div class='ddItem'><a class='disable' href='Sockets.html'>Sockets-Linux</a></div>\
+            <div class='ddItem'><a class='undefined' href='Javascript:;'>Sockets-Linux</a></div>\
             <div class='ddItem'><a href='XmlDocument.html'>XmlDocument</a></div>\
             <div class='ddItem'><a href='CppGraph.html'>CppGraph</a></div>\
             <div style='height:2em;'></div>\
