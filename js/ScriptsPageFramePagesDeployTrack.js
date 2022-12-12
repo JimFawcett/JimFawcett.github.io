@@ -12,6 +12,7 @@ function initializePages() {
           <menu-elem class='ddItems pageElem'><a href='indexDeployment.html'>Deployment&nbsp;Track&nbsp;Summary</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='Resources/DeploymentBites/DeployBites_Git.html'>git</a></menu-elem>\
           <menu-elem class='ddItems pageElem undef'><a href='# Resources/DeploymentBites/DeployBites_Github.html'>github</a></menu-elem>\
+          <menu-elem class='ddItems pageElem undef'><a href='# Resources/DeploymentBites/DeployBites_PowerShell.html'>PowerShell</a></menu-elem>\
           <menu-elem class='ddItems pageElem undef'><a href='# Resources/DeploymentBites/DeployBites_Containers.html'>Containers</a></menu-elem>\
           <menu-elem class='ddItems pageElem undef'><a href='# Resources/DeploymentBites/DeployBites_Cloud.html'>Cloud</a></menu-elem>\
           <menu-elem class='ddItems pageElem undef'><a href='# Resources/DeploymentBites/DeployBites_PWA.html'>PWA</a></menu-elem>\
