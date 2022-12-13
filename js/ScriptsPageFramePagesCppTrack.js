@@ -11,6 +11,7 @@ function initializePages() {
     pagesMenu.innerHTML = "<menu-elem class='ddItems pageElem undefined'><a href='CppBiteByByte.html'>Cpp&nbsp;Bites&nbsp;Repo&nbsp;</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='indexCpp.html'>Cpp&nbsp;Track&nbsp;Summary</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='Resources/CppBites/CppBites_Intro.html'>Introduction</a></menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='Resources/CppBites/CppBites_Survey.html'>Survey</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Model</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Memory</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Types</a></menu-elem>\

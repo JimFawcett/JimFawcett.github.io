@@ -62,81 +62,15 @@ function initializeMenu() {
     <div class='menuItem'>\
         Tracks&#9662\
         <div class='dropdown'>\
-            <div class='ddLabel darkItem'>Code Tracks</div>\
-            <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-              <summary>Basics</summary>\
-              <div style='margin-left:1.0em;'>\
-                <div class='ddItem ddDetails'><a href='indexBasic.html'>&nbsp;&nbsp;Basics&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails'><a href='Resources/BasicBites/BasicBites_Platform.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Basic&nbsp;Bites&nbsp;</a ></div>\
-                <div style='height:0.25em;'></div>\
-              </div>\
-            </details>\
-            <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-              <summary>C++</summary>\
-              <div style='margin-left:1.0em;'>\
-                <div class='ddItem ddDetails'><a href='indexCpp.html'>&nbsp;&nbsp;C++ Track&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails'><a href='CppStoryRepo.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C++&nbsp;Story&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='Resources/CppBites/CppBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C++&nbsp;bites&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='CppBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C++&nbsp;bits&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='CppRepositories.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C++&nbsp;CodeRepo&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='CodeBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;CodeBitsRepo&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='https://www.w3schools.com/cpp/trycpp.asp?filename=demo_compiler' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a></div>\
-                <div style='height:0.25em;'></div>\
-              </div>\
-            </details>\
-            <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-              <summary>Rust</summary>\
-              <div style='margin-left:1.0em;'>\
-                <div class='ddItem ddDetails'><a href='indexRust.html'>&nbsp;&nbsp;Rust Track&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails'><a href='RustStoryRepo.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Rust&nbsp;Story&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='Resources/RustBites/RustBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Rust&nbsp;Bites&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='RustBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Rust&nbsp;Bits&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='RsRepositories.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Rust&nbsp;CodeRepo&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='CodeBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;CodeBitsRepo&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='https://play.rust-lang.org/' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a></div>\
-                <div style='height:0.25em;'></div>\
-              </div>\
-            </details>\
-            <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-              <summary>C#</summary>\
-              <div style='margin-left:1.0em;'>\
-                <div class='ddItem ddDetails'><a href='indexCs.html'>&nbsp;&nbsp;C#&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C#&nbsp;Story&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C#&nbsp;Bites&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='CSharpBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C#&nbsp;Bits&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='CsRepositories.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;C#&nbsp;CodeRepo&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='CodeBits.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;CodeBitsRepo&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a href='https://dotnetfiddle.net/' style='font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;online&nbsp;compiler&nbsp;</a></div>\
-                <div style='height:0.25em;'></div>\
-              </div>\
-            </details>\
-            <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-              <summary>WebDev</summary>\
-              <div style='margin-left:1.0em;'>\
-                <div class='ddItem ddDetails'><a href='indexWebDev.html'>&nbsp;&nbsp;WebDev&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;WebDev&nbsp;Story&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;WebDev&nbsp;Bites&nbsp;</a ></div>\
-                <div class='ddItem ddDetails'><a class='undef' href='javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;WebDev&nbsp;CodeRepo&nbsp;</a ></div>\
-                <div style='height:0.25em;'></div>\
-              </div>\
-            </details>\
-            <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-              <summary>Design</summary>\
-              <div style='margin-left:1.0em;'>\
-                <div class='ddItem ddDetails'><a href='indexDesign.html'>&nbsp;&nbsp;Design&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails'><a href='Resources/DesignBites/DesignBites_Intro.html' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Design&nbsp;Bites&nbsp;</a ></div>\
-                <div style='height:0.25em;'></div>\
-              </div>\
-            </details>\
-            <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-              <summary>Deployment&nbsp;&nbsp;</summary>\
-              <div style='margin-left:1.0em;'>\
-                <div class='ddItem ddDetails'><a href='indexDeployment.html'>&nbsp;&nbsp;Deployment&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
-                <div class='ddItem ddDetails undef'><a href='Javascript:;' style = 'font-size:0.9em;'>&nbsp;&nbsp;-&nbsp;Deploy&nbsp;Bites&nbsp;</a ></div>\
-                <div style='height:0.25em;'></div>\
-              </div>\
-            </details>\
-            <div style='height:2em;'>&nbsp;</div>\
+          <div class='ddLabel darkItem'>Code Tracks</div>\
+          <div class='ddItem'><a href='indexBasic.html'>&nbsp;Basics</a>&nbsp;</div>\
+          <div class='ddItem'><a href='indexCpp.html'>&nbsp;C++</a>&nbsp;</div>\
+          <div class='ddItem'><a href='indexRust.html'>&nbsp;Rust</a>&nbsp;</div>\
+          <div class='ddItem'><a href='indexCs.html'>&nbsp;C#</a>&nbsp;</div>\
+          <div class='ddItem'><a href='indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>\
+          <div class='ddItem'><a href='indexDesign.html'>&nbsp;Design</a>&nbsp;</div>\
+          <div class='ddItem'><a href='indexDeployment.html'>&nbsp;Deployment</a>&nbsp;</div>\
+          <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
     <div class='menuItem'>\

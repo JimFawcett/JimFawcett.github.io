@@ -186,6 +186,7 @@ function initializeMenu() {
             </div>\
           </details>\
           <div class='ddItem'><a href='personalComputerSecurity.html'>Personal&nbsp;Computer&nbsp;Security&nbsp;</a></div>\
+          <div class='ddItem'><a href='Interesting.html'>Interesting</a></div>\
           <div class='ddItem'><a href='TechnicalLinks.html'>Technical Links</a></div>\
           <div class='ddItem'><a href='https://github.com/joshnh/Git-Commands'>git commands</a></div>\
           <div class='ddItem'><a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a></div>\
