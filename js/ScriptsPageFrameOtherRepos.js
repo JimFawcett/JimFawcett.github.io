@@ -67,6 +67,7 @@ function initializeMenu() {
           <div class='ddItem'><a href='indexCpp.html'>&nbsp;C++</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexRust.html'>&nbsp;Rust</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexCs.html'>&nbsp;C#</a>&nbsp;</div>\
+          <div class='ddItem'><a href='BitsRepo.html'>&nbsp;Bits</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexDesign.html'>&nbsp;Design</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexDeployment.html'>&nbsp;Deployment</a>&nbsp;</div>\
@@ -131,8 +132,8 @@ function initializeMenu() {
             <div class='ddLabel darkItem'>Demonstrations</div>\
             <div class='ddItem'><a href='BasicBiteByByte.html'>Basic Bites</a></div>\
             <div class='ddItem'><a href='DesignBites.html'>Design Bites</a></div>\
-            <div class='ddItem'><a href='CodeBits.html'>Code Bits</a></div>\
-            <div class='ddItem'><a href='IdiomsAndPatterns.html'>Idioms&nbsp;and&nbsp;Patterns</a></div>\
+            <div class='ddItem'><a href='BitsRepo.html'>Code Bits</a></div>\
+            <div class='ddItem'><a href='IdiomsAndPatterns.html'>Idioms&nbsp;and&nbsp;Patterns&nbsp;(depricated)</a>&nbsp;</div>\
             <div style='height:2em;'></div>\
         </div>\
     </div>\

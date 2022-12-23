@@ -9,6 +9,7 @@ function loadCppCodeLeft() {
 function loadCppCodeRight() {
   loadCppCode("coderight");
 }
+/*-- implemented in Bits page --*/
 //function loadCppCode(id) {
 //  let codecont = document.getElementById(id);
 //  codecont.innerHTML = "C++ Code"
@@ -19,6 +20,7 @@ function loadCppOutLeft() {
 function loadCppOutRight() {
   loadCppOut("outright");
 }
+/*-- implemented in Bits page --*/
 //function loadCppOut(id) {
 //  let codecont = document.getElementById(id);
 //  codecont.innerHTML = "C++ Output"
@@ -29,6 +31,7 @@ function loadCppBldLeft() {
 function loadCppBldRight() {
   loadCppBld("bldright");
 }
+/*-- implemented in Bits page --*/
 //function loadCppBld(id) {
 //  let codecont = document.getElementById(id);
 //  codecont.innerHTML = "C++ Build"
@@ -51,6 +54,7 @@ function loadCsCodeLeft() {
 function loadCsCodeRight() {
   loadCsCode("coderight");
 }
+/*-- implemented in Bits page --*/
 //function loadCsCode(id) {
 //  let codecont = document.getElementById(id);
 //  codecont.innerHTML = "C# Code"
@@ -61,6 +65,7 @@ function loadCsOutLeft() {
 function loadCsOutRight() {
   loadCsOut("outright");
 }
+/*-- implemented in Bits page --*/
 //function loadCsOut(id) {
 //  let codecont = document.getElementById(id);
 //  codecont.innerHTML = "C# Output"
@@ -71,6 +76,7 @@ function loadCsBldLeft() {
 function loadCsBldRight() {
   loadCsBld("bldright");
 }
+/*-- implemented in Bits page --*/
 //function loadCsBld(id) {
 //  let codecont = document.getElementById(id);
 //  codecont.innerHTML = "C# Build"
@@ -93,6 +99,7 @@ function loadRsCodeLeft() {
 function loadRsCodeRight() {
   loadRsCode("coderight");
 }
+/*-- implemented in Bits page --*/
 //function loadRsCode(id) {
 //  let codecont = document.getElementById(id);
 //  codecont.innerHTML = "Rust Code"
@@ -103,6 +110,7 @@ function loadRsOutLeft() {
 function loadRsOutRight() {
   loadRsOut("outright");
 }
+/*-- implemented in Bits page --*/
 //function loadRsOut(id) {
 //  let codecont = document.getElementById(id);
 //  codecont.innerHTML = "Rust Output"
@@ -113,6 +121,7 @@ function loadRsBldLeft() {
 function loadRsBldRight() {
   loadRsBld("bldright");
 }
+/*-- implemented in Bits page --*/
 //function loadRsBld(id) {
 //  let codecont = document.getElementById(id);
 //  codecont.innerHTML = "Rust Build"
