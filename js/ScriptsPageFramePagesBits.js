@@ -8,8 +8,8 @@ function initializePages() {
   var pgbtn = document.getElementById("pgbtn");
   if (isDefined(pagesMenu)) {
     pgbtn.style.display = "flex";
-    pagesMenu.innerHTML = "<menu-elem class='ddItems pageElem'><a href='Bits_Hello.html'>Hello&nbsp;World</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='Javascript:;'>Hello&nbsp;Objects</a>&nbsp;</menu-elem>\
+    pagesMenu.innerHTML = "<menu-elem class='ddItems pageElem'><a href='Bits_Tooling.html'>Tooling</a>&nbsp;</menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='Bits_Hello.html'>Hello&nbsp;World</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='Javascript:;'>Hello&nbsp;Objects</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='Javascript:;'>Hello&nbsp;Data</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='Javascript:;'>Data&nbsp;Structures</a>&nbsp;</menu-elem>\
