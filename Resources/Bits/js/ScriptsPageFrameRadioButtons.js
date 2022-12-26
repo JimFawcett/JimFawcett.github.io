@@ -136,3 +136,93 @@ function loadRsRight() {
   loadRsOutRight();
   loadRsBldRight();
 }
+/*-- Load Python Code, Output, Build --*/
+function loadPyCodeLeft() {
+  loadPyCode("codeleft");
+}
+function loadPyCodeRight() {
+  loadPyCode("coderight");
+}
+/*-- implemented in Bits page --*/
+//function loadPyCode(id) {
+//  let codecont = document.getElementById(id);
+//  codecont.innerHTML = "Rust Code"
+//}
+function loadPyOutLeft() {
+  loadPyOut("outleft");
+}
+function loadPyOutRight() {
+  loadPyOut("outright");
+}
+/*-- implemented in Bits page --*/
+//function loadPyOut(id) {
+//  let codecont = document.getElementById(id);
+//  codecont.innerHTML = "Rust Output"
+//}
+function loadPyBldLeft() {
+  loadPyBld("bldleft");
+}
+function loadPyBldRight() {
+  loadPyBld("bldright");
+}
+/*-- implemented in Bits page --*/
+//function loadPyBld(id) {
+//  let codecont = document.getElementById(id);
+//  codecont.innerHTML = "Rust Build"
+//}
+function loadPyLeft() {
+  loadPyCodeLeft();
+  loadPyOutLeft();
+  loadPyBldLeft()
+}
+function loadPyRight() {
+  loadPyCodeRight();
+  loadPyOutRight();
+  loadPyBldRight();
+}
+
+
+/*-- Load  Javascript Code, Output, Build --*/
+function loadJsCodeLeft() {
+  loadJsCode("codeleft");
+}
+function loadJsCodeRight() {
+  loadJsCode("coderight");
+}
+/*-- implemented in Bits page --*/
+//function loadJsCode(id) {
+//  let codecont = document.getElementById(id);
+//  codecont.innerHTML = "Rust Code"
+//}
+function loadJsOutLeft() {
+  loadJsOut("outleft");
+}
+function loadJsOutRight() {
+  loadJsOut("outright");
+}
+/*-- implemented in Bits page --*/
+//function loadJsOut(id) {
+//  let codecont = document.getElementById(id);
+//  codecont.innerHTML = "Rust Output"
+//}
+function loadJsBldLeft() {
+  loadJsBld("bldleft");
+}
+function loadJsBldRight() {
+  loadJsBld("bldright");
+}
+/*-- implemented in Bits page --*/
+//function loadJsBld(id) {
+//  let codecont = document.getElementById(id);
+//  codecont.innerHTML = "Rust Build"
+//}
+function loadJsLeft() {
+  loadJsCodeLeft();
+  loadJsOutLeft();
+  loadJsBldLeft()
+}
+function loadJsRight() {
+  loadJsCodeRight();
+  loadJsOutRight();
+  loadJsBldRight();
+}
