@@ -221,8 +221,27 @@ int main() {\n\
     show(*t5, TS(*t5)); // contents can be copied\n\
     std::cout &lt;&lt; std::endl;\n\
 }\n\
-</pre>\n\
-</div>";
+</pre></div>\
+      <div style='white-space:normal; margin-left:2em;'>\
+        <details>\
+          <summary class='darkItem' style='margin-left:-2em;'>Code Notes</summary>\
+          <ol class='tight' style='margin-left:0em;'>\
+            <li>\
+              show function is designed to display type and calling name of its\
+              first argument and its value and size.\
+            </li>\
+            <li>\
+              At the call site its second argument is a string representation of\
+              the calling name, created using the # operator for macro arguments.\
+            </li>\
+            <li>\
+              <c-s>template&lt;typename T&gt;</c-s>\n\
+              <c-s>void show(T t, const std::string &ts)</c-s> is generic on the type T\
+            </li>\
+          </ol >\
+        </details >\n\
+      </div >\
+";
     }
 
     function loadCppOut(id) {
@@ -373,6 +392,11 @@ fn main() {\n\
     let t1a:f64 = 42.0;\n\
     show(t1a, stringify!(t1a));\n\
       \n\
+    /*-- create mutable reference --*/\n\
+    let t1b:&mut f64 = &mut t1a;\n\
+    *t1b = 84.0;\n\
+    show(t1b, stringify!(t1b));\n\
+      \n\
     /*-- values live in heap when wrapped with box --*/\n\
     let t2 = Box::new(3.14159f64);\n\
     show(t2.clone(), stringify!(t2));\n\
@@ -418,9 +442,12 @@ fn main() {\n\
             <li>\
               <c-s>show&lt;T: Debug&gt;(T:t, n:&str)</c-s> is generic on the type T\
               with the bound that T must satisfy the Debug trait.\
+            </li>\
+            <li>\
+              The Debug trait provides a simple formatting using {:?} in print macro.\
               <div style='height:0.75em;'></div>\
             </li>\
-          </ol>\
+          </ol >\
         </details >\n\
       </div >\
 ";
@@ -439,6 +466,9 @@ value: 42, size: 8\n\
       \n\
 f64, t1a\n\
 value: 42.0, size: 8\n\
+      \n\
+&mut f64, t1b\n\
+value: 84.0, size: 8\n\
       \n\
 alloc::boxed::Box&lt;f64&gt;, t2\n\
 value: 3.14159, size: 8\n\
@@ -656,11 +686,12 @@ engine.\n\
           Spanish.
         </t-b>
         <t-b>
-          The examples below show how to use primitive and library defined types for the languages we use 
-          frequently. Later Bits will look at creation and use of user-defined types.
+          The examples below show how to use primitive and library defined types with emphasis on
+          binding names to values, copy and move operations, and references. Later Bits will look at 
+          creation and use of user-defined types.
         </t-b>
         <details>
-          <summary class="darkItem">Demo Notes</summary>
+          <summary class="darkItem">Demo Notes&nbsp;&nbsp;</summary>
           All of the languages covered in this demonstration have type categories shown in the table below.
           The purpose of this demonstration is to show how type categories affect the code we produce.
           <table style="width:calc(100% - 0em); margin-top:1em;">
@@ -673,6 +704,7 @@ engine.\n\
               <td>
                 Type storage is a contiguous block of memory, e.g., primitive types and aggregates
                 of primitive types. Copy occurs implicitly for definition, assignment, and pass by value.
+                Copy is effected with a simple memcopy operation.
               </td>
               <td>C++, Rust, and C#</td>
             </tr>
@@ -718,7 +750,7 @@ engine.\n\
                   const pointers.
                 </t-b>
                 <t-b>
-                  Rust references are defined with <c-s>T&amp; t = u;</c-s> or <c-s>T mut&amp; t = u;</c-s>.
+                  Rust references are defined with <c-s>t2:T = &amp;t1;</c-s> or <c-s>t2:T = mut&amp; t2</c-s>.
                   In rust, the scope of allowed operations with references is significanly narrower
                   than C++ to enable memory saftey and freedom from race conditions.
                 </t-b>
@@ -732,7 +764,29 @@ engine.\n\
                 </t-b>
               </td>
             </tr>
+            <tr>
+              <td>Binding: All&nbsp;Categories</td>
+              <td>
+                Binding associates a name with a value stored in some location.
+              </td>
+              <td>
+                <t-b style="margin-top:0em;">
+                  C++ binds with expressions like <c-s>double d = 3.1415927;</c-s> or 
+                  <c-s>auto&nbsp;d&nbsp;=&nbsp;3.1415927;</c-s>.
+                </t-b>
+                <t-b style="margin-top:0em;">
+                  Rust binds with expressions like <c-s>let d = 3.1415927;</c-s>.
+                </t-b>
+                <t-b style="margin-top:0em;">
+                  Python binds with expressions like <c-s>d = 3.1415927;</c-s>.
+                </t-b>
+                <t-b style="margin-top:0em;">
+                  JavaScript binds with expressions like <c-s>let d = 3.1415927;</c-s>.
+                </t-b>
+              </td>
+            </tr>
           </table>
+          <div style="height:0.75em;"></div>
         </details>
         <div style="height:0.75em;"></div>
         <code-container id="compare">
