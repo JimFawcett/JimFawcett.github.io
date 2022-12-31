@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html>
+<!--
+  Bits_Data.html
+-->
+<head>
+  <title>Bits_Data</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/StylesPhoto.css" />
+  <link rel="stylesheet" href="css/StylesSizerComp.css" />
+  <!-- PageFrame infrastructure -->
+  <link rel="stylesheet" href="css/StylesPageFrameDefaults.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameStructure.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameMenus.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameThemeDefault.css" />
+  <link rel="stylesheet" href="css/StylesWebComponents.css" />
+  <script src="js/ScriptsWebComponents.js"></script>
+  <!--<script src="js/ScriptsPageFrameDefaults.js"></script>-->
+  <script src="js/ScriptsPageFrame.js"></script>
+  <script src="js/ScriptsPageFramePagesBits.js"></script>
+  <script src="js/ScriptsPageFrameKeyboard.js"></script>
+  <script src="js/ScriptsPageFrameRadioButtons.js"></script>
+  <!-- No need for Pages script for pages with no next or prev pages -->
+  <!--<script src="js/ScriptsPageFramePages.js"></script>-->
+  <style>
+    #github .note {
+      border: 1px solid var(--dark);
+      padding:0.75em 1.5em;
+      margin-top:1.25em;
+      margin-bottom:1.25em;
+      background-color: var(--light);
+      color: var(--dark);
+      max-width:50em;
+    }
+    #github h2 {
+      margin-top: 0.75em;
+    }
+    #github notes-container {
+      display: grid;
+      grid-template-columns: 0.45fr 1fr;
+      grid-gap: 0px;
+      margin: 10px 10px;
+      padding: 0px;
+      border: 1px solid black;
+    }
+
+
+    #github note-link {
+      grid-column: 1;
+      margin: 0px;
+      padding: 0.75em 1.5em;
+      border: 1px solid var(--dark);
+    }
+
+    #github note-text {
+      grid-column: 2;
+      margin: 0px;
+      padding: 0.75em 1.5em;
+      border: 1px solid var(--dark);
+    }
+
+    #github .headerRow {
+      margin: 0px;
+      padding: 7px 20px;
+      border: 1px solid var(--dark);
+      color:var(--dark);
+      background-color:var(--atten);
+    }
+
+    #github note-link.headerRow:link {
+      margin: 0px;
+      padding: 7px 20px;
+      color: var(--dark);
+      background-color: var(--atten);
+      border: 1px solid var(--dark);
+    }
+
+    #github .SummaryRow {
+      margin: 0px;
+      padding: 7px 20px;
+      border: 1px solid var(--dark);
+      color: var(--dark);
+      background-color: #ccc;
+    }
+
+    #github .topicRow {
+      margin: 0px;
+      padding: 0.5em 1.5em;
+    }
+
+    #github .topicLink {
+      /*border-right: none;*/
+    }
+
+    #github #pagetitle {
+      border:2px double var(--dark);
+    }
+    #github form {
+      border:none;
+      padding:0.5em 1em;
+    }
+    #github form span {
+      padding:0em 0.5em;
+    }
+    #github code-container {
+      display: flex;
+      position:relative;
+      width:calc(100%);
+      flex-direction: row;
+      justify-content: space-between;
+      /*border-top: 1px solid var(--dark);*/
+    }
+    #github code-banner {
+      display: block;
+      border: 2px solid var(--dark);
+      border-top:none;
+      border-bottom:none;
+      padding: 0.25em 1em;
+      font-family: 'Comic Sans MS', Tahoma;
+      width: calc(100% + 0.5em);
+      background-color: var(--atten);
+    }
+    #github code-display {
+      display: block;
+      border: 2px solid var(--dark);
+      white-space: pre;
+      padding: 0.75em 1em;
+      font-family: Consolas, monospace;
+      font-size:0.9em;
+      width: calc(50% - 0.5em);
+      overflow-x: auto;
+      /*height:20em;*/
+    }
+    #github label {
+      margin-right:1em;
+    }
+    #github fieldset {
+      border:none;
+    }
+    #github #exeRight, #exeLeft {
+      padding:0.05em 0.5em;
+      font-family:'Comic Sans MS', Tahoma;
+    }
+    #github .hide {
+      display:none;
+    }
+  </style>
+  <script>
+    /*-- Load Cpp Code, Output, Build --*/
+    function loadCppCode(id) {
+      let codecont = document.getElementById(id);
+      codecont.innerHTML = "<div class='code'>\n\
+<pre>// Cpp_Data.cpp\n\
+\n\
+#include &lt;iostream&gt;  // std::cout\n\
+#include &lt;typeinfo&gt;  // typeid\n\
+#include &lt;memory&gt;    // std::unique_ptr\n\
+#include &lt;utility&gt;   // move()\n\
+\n\
+/*\n\
+  Static Data Types:\n\
+    byte, bool, int, char, char16_t, char32_t, wchar_t\n\
+    float, double\n\
+    array, pointer, reference\n\
+    struct, class, enum class, using\n\
+  Qualifiers:\n\
+    short, long, const\n\
+\n\
+  Operations:\n\
+    Primitive types can all be copied.\n\
+    Most library and user-defined types can be copied,\n\
+    moved, and deleted by providing member constructors\n\
+    and destructor. Often compiler generation works well.\n\
+    For classes with pointer members developers must\n\
+    provide them.\n\
+      \n\
+  Processing:\n\
+    All types are static, operations run as native code,\n\
+    and no garbage collection is needed. Resources are\n\
+    returned at end of declr scope.\n\
+*/\n\
+/*-- macro turns name into string --*/\n\
+#define STRINGIFY_(x) #x     // # is a macro stringizer\n\
+#define TS(x) STRINGIFY_(x)  // operator\n\
+      \n\
+template&lt;typename T&gt;\n\
+void show(T t, const std::string &ts) {\n\
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; typeid(t).name();  // show type\n\
+  std::cout &lt;&lt; &quot;, &quot; &lt;&lt; ts;                  // show name at call site\n\
+  std::cout &lt;&lt; &quot;&#92;n  value: &quot; &lt;&lt; t;          // show value\n\
+  std::cout &lt;&lt; &quot;,  size:  &quot; &lt;&lt; sizeof(t);   // show size on stack\n\
+  std::cout &lt;&lt; &quot;&#92;n&quot;;\n\
+}\n\
+int main() {\n\
+    std::cout &lt;&lt; &quot;&#92;n  Demonstrate C++ types:&quot;;\n\
+    std::cout &lt;&lt; &quot;&#92;n ------------------------&quot;;\n\
+    /*-- values live in stack frame --*/\n\
+    int t1 = int{3};\n\
+    show(t1, TS(t1));\n\
+    long long int t1a = 3;\n\
+    show(t1a, TS(t1a));\n\
+    // double t1 = 3.1415927; // not allowed to redefine type of t1\n\
+      \n\
+    /*-- values live in heap when using new --*/\n\
+    double* t2 = new double{3.14159};\n\
+    show(t2, TS(t2));\n\
+    show(*t2, TS(*t2));\n\
+    delete(t2);\n\
+      \n\
+    /*-- control block lives in stack, char data live in heap --*/\n\
+    auto t3 = std::string(&quot;Hello Data&quot;);  // move ctor - rhs is temp\n\
+    show(t3, TS(t3));\n\
+      \n\
+    auto& t4 = t3;      // reference\n\
+    show(t4, TS(t4));\n\
+      \n\
+    /*-- unique_ptr can not be copied but move allowed --*/\n\
+    auto t5 = std::unique_ptr&lt;int&gt;(new int{-3});\n\
+    show(std::move(t5), TS(t5));  // unique_ptr can't be copied so move\n\
+    t5 = std::unique_ptr&lt;int&gt;(new int{-3});\n\
+    show(*t5, TS(*t5)); // contents can be copied\n\
+    std::cout &lt;&lt; std::endl;\n\
+}\n\
+</pre>\n\
+</div>";
+    }
+
+    function loadCppOut(id) {
+      let codecont = document.getElementById(id);
+      codecont.innerHTML = "<pre>\
+  Demonstrate C++ types:\n\
+ ------------------------\n\
+  int, t1\n\
+  value: 3,  size:  4\n\
+      \n\
+  __int64, t1a\n\
+  value: 3,  size:  8\n\
+      \n\
+  double * __ptr64, t2\n\
+  value: 000001E8347573B0,  size:  8\n\
+      \n\
+  double, *t2\n\
+  value: 3.14159,  size:  8\n\
+      \n\
+  class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >, t3\n\
+  value: Hello Data,  size:  40\n\
+      \n\
+  class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >, t4\n\
+  value: Hello Data,  size:  40\n\
+      \n\
+  class std::unique_ptr<int,struct std::default_delete<int> >, t5\n\
+  value: 000001E8347465D0,  size:  8\n\
+      \n\
+  int, *t5\n\
+  value: -3,  size:  4\n\
+      \n\
+C:\github\JimFawcett\Bits\Cpp\Cpp_Data\build\n\
+></pre>";
+    }
+
+    function loadCppBld(id) {
+      let codecont = document.getElementById(id);
+      codecont.innerHTML = "<div class='code'>\
+<pre style='overflow-x:auto;'>\n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build\n\
+> cmake --build .     \n\
+MSBuild version 17.4.0+18d5aef85 for .NET Framework\n\
+  Cpp_Data.cpp\n\
+  Cpp_Data.vcxproj -> C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build&#92;Debug&#92;Cpp_Data.exe\n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build\n\
+      \n\
+</pre>\
+</div>\
+";
+    }
+    /*-- Load C# Code, Output, Build --*/
+    function loadCsCode(id) {
+      let codecont = document.getElementById(id);
+      codecont.innerHTML = "<pre>\
+using System;\n\
+\n\
+namespace HelloWorld\n\
+{\n\
+  public class Program\n\
+  {\n\
+    public static void Main(string[] args)\n\
+    {\n\
+      Console.WriteLine(&quot;Hello C# World&quot;);\n\
+    }\n\
+  }\n\
+}\n\
+</pre > "
+    }
+    function loadCsOut(id) {
+      let codecont = document.getElementById(id);
+      codecont.innerHTML = "Hello C# World"
+    }
+    function loadCsBld(id) {
+      let codecont = document.getElementById(id);
+      codecont.innerHTML = "<pre>\n\
+> dotnet run\n\
+Hello C# World\n\
+C:&#92;github&#92;JimFawcett&#92;bits&#92;CSharp&#92;Cs_Hello\n\
+></pre>"
+    }
+
+    /*-- Load Rust Code, Output, Build --*/
+    function loadRsCode(id) {
+      let codecont = document.getElementById(id);
+      codecont.innerHTML = "<div class='code'>\
+<pre>\
+#![allow(unused_mut)]\n\
+/* rust_hello_data::main.rs */\n\
+/*\n\
+  Static Data Types:\n\
+    bool, char\n\
+    i8, i16, i32, i64, i128, isize\n\
+    u8, u16, u32, u64, u128, usize\n\
+    f32, f64\n\
+    (), reference\n\
+    array, tuple\n\
+    struct, enum, use\n\
+  Qualifiers:\n\
+    mutable, const\n\
+      \n\
+  Operations:\n\
+    Primitive types can all be copied.\n\
+    Most library and user-defined types can be moved,\n\
+    cloned, but only aggregates with all copyable members\n\
+    can be copied.\n\
+      \n\
+  Processing:\n\
+    All types are static, operations run as native code,\n\
+    and no garbage collection is needed. Resources are\n\
+    returned at end of declr scope.\n\
+*/\n\
+use std::fmt::Debug;\n\
+/*\n\
+  First argument is passed by value, second passed\n\
+  by reference. Non-copy types supplied to the first\n\
+  argument will be moved.\n\
+*/\n\
+fn show&lt;T: Debug&gt;(t:T, n:&str) {\n\
+  let typename = std::any::type_name::&lt;T&gt;();\n\
+  println!(&quot;&#92;n{}, {}&quot;,typename, n);\n\
+  println!(&quot;value: {:?}, size: {}&quot;, t, std::mem::size_of::&lt;T&gt;());\n\
+}\n\
+      \n\
+fn main() {\n\
+    print!(\n\
+      &quot;&#92;n Demonstrate Rust types&#92;n&#92;\n\
+       ------------------------&quot;\n\
+    );\n\
+    /*\n\
+      Primitive data types: i32, f64, ... occupy contiguous\n\
+      regions of memory, so they satisfy the copy trait.\n\
+      \n\
+      Library types like String have a control block in stack\n\
+      and data in heap. So they do not satisfy the copy trait.\n\
+      They can be cloned, but that requires an explicit call\n\
+      to clone().\n\
+    */\n\
+      \n\
+    /*-- values live in stack frame --*/\n\
+    let mut t1 :i32 = 42;\n\
+    show(t1, stringify!(t1));\n\
+    let t1a:i64 = 42;\n\
+    show(t1a, stringify!(t1a));\n\
+    /*\n\
+      Below is not type redefinition, it is shadowing,\n\
+      e.g., a new variable that hides the older t1a.\n\
+    */\n\
+    let t1a:f64 = 42.0;\n\
+    show(t1a, stringify!(t1a));\n\
+      \n\
+    /*-- values live in heap when wrapped with box --*/\n\
+    let t2 = Box::new(3.14159f64);\n\
+    show(t2.clone(), stringify!(t2));\n\
+    show(*t2, stringify!(*t2));\n\
+      \n\
+    let s1 = std::mem::size_of::&lt;Box&lt;i8&gt;&gt;();\n\
+    let s2 = std::mem::size_of::&lt;Box&lt;i64&gt;&gt;();\n\
+    println!(&quot;&#92;nsize_of::&lt;Box&lt;i8&gt;&gt;() = {}&quot;, s1);\n\
+    println!(&quot;size_of::&lt;Box&lt;i64&gt;&gt;() = {}&quot;, s2);\n\
+      \n\
+    /*--\n\
+      Control block lives on stack, char data live in heap.\n\
+      Passing by value or assignment transfers ownership\n\
+      from source to destination.  That is termed a move.\n\
+    --*/\n\
+    let t3:String = String::from(&quot;Hello Data&quot;);  // temp moved\n\
+    show(t3.clone(), stringify!(t3.clone()));    // moves t3s clone\n\
+      \n\
+    let t4 = &t3;  // reference to still valid t3\n\
+    show(t4, stringify!(t4));\n\
+      \n\
+    let t5 = [1, 2, 3, 4, 5];  // copy type\n\
+    show(t5, stringify!(t5));\n\
+    let mut txt = String::from(&quot;&#92;nt5 was copied into show(...)&quot;);\n\
+    txt += &quot;, see:&#92;nt5 = &quot;;\n\
+    println!(&quot;{}{:?} is still valid&quot;, txt, t5);\n\
+      \n\
+    println!(&quot;&#92;n&#92;nThat's all Folks!!&#92;n&#92;n&quot;);\n\
+}\n\
+      \n\
+</pre></div>\
+";
+    }
+
+    function loadRsOut(id) {
+      let codecont = document.getElementById(id);
+      codecont.innerHTML = "<pre>\
+ Demonstrate Rust types\n\
+------------------------\n\
+i32, t1\n\
+value: 42, size: 4\n\
+      \n\
+i64, t1a\n\
+value: 42, size: 8\n\
+      \n\
+f64, t1a\n\
+value: 42.0, size: 8\n\
+      \n\
+alloc::boxed::Box&lt;f64&gt;, t2\n\
+value: 3.14159, size: 8\n\
+      \n\
+f64, * t2\n\
+value: 3.14159, size: 8\n\
+      \n\
+size_of::&lt;Box&lt;i8&gt;&gt;() = 8\n\
+size_of::&lt;Box&lt;i64&gt;&gt;() = 8\n\
+\n\
+alloc::string::String, t3.clone()\n\
+value: &quot;Hello Data&quot;, size: 24\n\
+    \n\
+&alloc::string::String, t4\n\
+value: &quot;Hello Data&quot;, size: 8\n\
+    \n\
+[i32; 5], t5\n\
+value: [1, 2, 3, 4, 5], size: 20\n\
+    \n\
+t5 was copied into show(...), see:\n\
+t5 = [1, 2, 3, 4, 5] is still valid\n\
+    \n\
+    \n\
+That's all Folks!!\n\
+    \n\
+</pre>";
+    }
+
+    function loadRsBld(id) {
+      let codecont = document.getElementById(id);
+      codecont.innerHTML = "<pre>\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;rust&#92;rust_hello_data\n\
+> cargo run\n\
+   Compiling rust_hello_data v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;rust&#92;rust_hello_data)\n\
+    Finished dev [unoptimized + debuginfo] target(s) in 0.32s\n\
+     Running `target&#92;debug&#92;rust_hello_data.exe`\n\
+        ...\n\n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;rust&#92;rust_hello_data\n\
+>      </pre>";
+    }
+    /*-- Load Python Code, Output, Build --*/
+    function loadPyCode(id) {
+      let codecont = document.getElementById(id);
+      codecont.innerHTML = "<div class='code'>\
+<pre>\
+# HelloWorld::Py_Hello.py\n\
+\n\
+print(&quot;Hello Python World&quot;)\n\
+</pre>\
+</div>\
+";
+    }
+
+    function loadPyOut(id) {
+      let codecont = document.getElementById(id);
+      codecont.innerHTML = "<pre>\n\
+Hello Python World\n\
+</pre>";
+    }
+
+    function loadPyBld(id) {
+      let codecont = document.getElementById(id);
+      codecont.innerHTML = "<pre>\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Hello\n\
+> python Py_Hello.py\n\
+Hello Python World\n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Hello\n\
+>\
+      </pre>";
+    }
+    /*-- Load Javascript Code, Output, Build --*/
+    function loadJsCode(id) {
+      let codecont = document.getElementById(id);
+      codecont.innerHTML = "<div class='code'>\
+<pre>\
+&lt;!DOCTYPE html>\n\
+&lt;html>\n\
+&lt;!-- Js_Hello.html -->\n\
+&lt;head>\n\
+  &lt;script>\n\
+    function hello() {\n\
+      document.getElementById(&quot;hello&quot;).innerHTML =\n\
+        &quot;&lt;h2>Hello JavaScript World&lt;/h2>&quot;;\n\
+    }\n\
+  &lt;/script&gt;\n\
+  &lt;style&gt;\n\
+    body {\n\
+      font-family:'Comic Sans MS', Tahoma;\n\
+      padding:2em;\n\
+    }\n\
+  &lt;/style&gt;\n\
+&lt;/head&gt;\n\
+&lt;body&gt;\n\
+  &lt;div id=&quot;hello&quot;&gt;&lt;/div&gt;\n\
+  &lt;script&gt;\n\
+    hello();\n\
+  &lt;/script>\n\
+&lt;/body&gt;\n\
+&lt;/html&gt;\n\
+</pre>\
+</div>\
+";
+    }
+
+    function loadJsOut(id) {
+      let codecont = document.getElementById(id);
+      codecont.innerHTML = "<pre>\
+Hello JavaScript world\
+</pre>";
+    }
+
+    function loadJsBld(id) {
+      let codecont = document.getElementById(id);
+      codecont.innerHTML = "<pre>\
+Source html, script, and styles are loaded,\n\
+parsed and rendered by browser&apos;s execution\n\
+engine.\n\
+      </pre>";
+    }
+    function remoteLeft() {
+      let cp = document.getElementById("Cp1");
+      if (cp.checked) {
+        window.open('https://godbolt.org/z/f5x1W8Exx', '_blank');
+      }
+      let cs = document.getElementById("Cs1");
+      if (cs.checked) {
+        window.open('https://dotnetfiddle.net/bC8bMw', '_blank');
+      }
+      let rs = document.getElementById("Rs1");
+      if (rs.checked) {
+        window.open(
+          'https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=f5e3b787372121a8136002ae0b425877',
+          '_blank'
+        )
+      }
+      let py = document.getElementById("Py1");
+      if (py.checked) {
+        window.open(
+          'https://godbolt.org/z/zx1Kx5WWG',
+          '_blank'
+        )
+      }
+      let js = document.getElementById("Js1");
+      if (js.checked) {
+        window.open(
+          'Js_Hello.html',
+          '_blank'
+        )
+      }
+    }
+    function remoteRight() {
+      let cp = document.getElementById("Cp2");
+      if (cp.checked) {
+        window.open('https://godbolt.org/z/f5x1W8Exx', '_blank');
+      }
+      let cs = document.getElementById("Cs2");
+      if (cs.checked) {
+        window.open('https://dotnetfiddle.net/bC8bMw', '_blank');
+      }
+      let rs = document.getElementById("Rs2");
+      if (rs.checked) {
+        window.open(
+          'https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=f5e3b787372121a8136002ae0b425877',
+          '_blank'
+        )
+      }
+      let py = document.getElementById("Py2");
+      if (py.checked) {
+        window.open(
+          'https://godbolt.org/z/zx1Kx5WWG',
+          '_blank'
+        )
+      }
+      let js = document.getElementById("Js2");
+      if (js.checked) {
+        window.open(
+          'Js_Hello.html',
+          '_blank'
+        )
+      }
+    }
+  </script>
+</head>
+<body id="github" onload="initialize()">
+
+  <!--<a id="Next" href="index.html">Next</a>
+  <a id="Prev" href="SiteDesign.html">Prev</a>-->
+
+  <page-frame>
+    <frame-header>
+      <nav id="navbar"></nav>
+    </frame-header>
+    <main>
+      <div id="about">about</div>
+      <div id="page">Bits Data</div>
+      <div id="modified">12/30/2022</div>
+      <div id="hlp"></div>
+      <a id="top"></a>
+      <content>
+      <a id="Next" href="Bits_Data.html">Next</a>
+      <a id="Prev" href="Bits_Hello.html">Prev</a>
+
+        <header>
+          <hgroup id="pagetitle">
+            <!--<a class="repoLink" href="https://github.com/JimFawcett">github Repositories</a>-->
+            <h1 id="title">Bits_Data</h1>
+            <h3 id="subtitle" class="indent">
+              code, output, and build for C++, Rust, C#, Python, and JavaScript on Windows, macOS, and Linux
+            </h3>
+          </hgroup>
+        </header>
+        <t-b>
+          These pages support comparison of fragments of code in several different
+          languages, much as you might compare a sentence of English with one in Spanish to help you learn
+          Spanish.
+        </t-b>
+        <t-b>
+          Hello world is the traditional first step with a new language.  This page shows how to
+          write, build, and execute that in the languages, C++, Rust, C#, Python, and JavaScript. All build 
+          methods used here work on Windows, macOS, and Linux.
+        </t-b>
+        <t-b>
+          C++, Rust, and C# are statically typed languages.  Python and JavaScript are dynamically typed.
+          A lot of the things we will be looking at in these Bits will focus on issues that are a consequence
+          of static typing, and so C++, Rust, and C# will get most of our attention.
+        </t-b>
+        <t-b>
+          Python and especially JavaScript are important for prototyping and web design. The WebDev track
+          will look at how JavaScript and Cascading Style Sheets are used to build artifacts that are  used
+          in this site to make it effective for presenting technical content. 
+          <!--We will provide basics in later Bits
+          to provide background for the WebDev track.-->
+        </t-b>
+        <!--<t-b style="padding:15px 25px;">
+          "There are two ways of constructing a software design; one way is to make it so simple that there 
+          are obviously no deficiences, and the other way is to make it so complicated that there are no 
+          obvious deficiencies. The first method is far more difficult."
+          <br />
+          - C.A.R.Hoare
+        </t-b>-->
+        <code-container id="compare">
+          <div style="width:calc(50% - 1em);">
+              <!--<fieldset left>-->
+            <form id="left" name="left">
+              <input type="radio" id="Cp1" name="lang1" value="1" onclick="loadCppLeft()" />
+              <label for="Cp1">C++</label>
+              <input type="radio" id="Rs1" name="lang1" value="3" onclick="loadRsLeft()" />
+              <label for="Rs1">Rust</label>
+              <input type="radio" id="Cs1" name="lang1" value="2" onclick="loadCsLeft()"/>
+              <label for="Cs1">C#&nbsp;</label>
+              <input type="radio" id="Py1" name="lang1" value="4" onclick="loadPyLeft()" />
+              <label for="Py1">Python</label>
+              <input type="radio" id="Js1" name="lang1" value="5" onclick="loadJsLeft()" />
+              <label for="Js1">JavaScript</label>
+              <div style="height:0.5em;"></div>
+              <input type="button" id="exeLeft" value="RemoteExecute" onclick="remoteLeft()"/>
+            </form>
+            <code-banner style="border-top:2px solid var(--dark);">
+              Source Code
+            </code-banner>
+          </div>
+          <div style="width:calc(50% - 1em); position:relative; left:-0.5em;">
+            <!--<fieldset right>-->
+            <form id="right" name="right">
+              <input type="radio" id="Cp2" name="lang2" value="4" onclick="loadCppRight()" />
+              <label for="Cp2">C++</label>
+              <input type="radio" id="Rs2" name="lang2" value="6" onclick="loadRsRight()"/>
+              <label for="Rs2">Rust</label>
+              <input type="radio" id="Cs2" name="lang2" value="5" onclick="loadCsRight()"/>
+              <label for="Cs2">C#</label>
+              <input type="radio" id="Py2" name="lang2" value="4" onclick="loadPyRight()" />
+              <label for="Py2">Python</label>
+              <input type="radio" id="Js2" name="lang2" value="5" onclick="loadJsRight()" />
+              <label for="Js2">JavaScript</label><br />
+              <div style="height:0.5em;"></div>
+              <input type="button" id="exeRight" value="RemoteExecute" onclick="remoteRight()"/>
+            </form>
+            <code-banner style="border-top:2px solid var(--dark);">
+              Source Code
+            </code-banner>
+          </div>
+        </code-container>
+
+        <code-container>
+          <code-display id="codeleft">x = y
+s = t;
+s = t;
+s = t;
+s = t;
+s = t;
+s = t;
+s = t;
+s = t;
+s = t;
+s = t;
+          </code-display>
+          <code-display id="coderight">
+x = y
+s = t;
+          </code-display>
+        </code-container>
+        <!--<div style="height:1.5em;"></div>-->
+        <code-container>
+          <div style="width:calc(50% - 1em);">
+            <code-banner>
+              Code Output
+            </code-banner>
+          </div>
+          <div style="width:calc(50% - 1em); position:relative; left:-0.5em;">
+            <code-banner>
+              Code Output
+            </code-banner>
+          </div>
+        </code-container>
+        <!--<div style="height:0.25em;"></div>-->
+        <code-container>
+          <code-display id="outleft">x = y
+s = t;
+s = t;
+s = t;
+s = t;
+s = t;
+s = t;
+          </code-display>
+          <code-display id="outright">
+x = y
+s = t;
+          </code-display>
+        </code-container>
+        <!--<div style="height:1.5em;"></div>-->
+        <code-container>
+          <div style="width:calc(50% - 1em);">
+            <code-banner>
+              Build
+            </code-banner>
+          </div>
+          <div style="width:calc(50% - 1em); position:relative; left:-0.5em;">
+            <code-banner>
+              Build
+            </code-banner>
+          </div>
+        </code-container>
+        <!--<div style="height:0.25em;"></div>-->
+        <code-container>
+          <code-display id="bldleft">x = y
+s = t;
+s = t;
+s = t;
+          </code-display>
+          <code-display id="bldright">
+x = y
+s = t;
+          </code-display>
+        </code-container>
+        <t-b>
+          <h3 id="notes">Notes</h3>
+          <ul>
+            <li>
+              Rust is built with the Cargo tool: package manager, builder, executer, and more.
+              Cargo is part of the Rust ecosystem available when you 
+              <a href="https://www.rust-lang.org/tools/install">install Rust</a>.
+            </li>
+            <li>
+              C++ is built with the CMake tool: a third party make tool. Here is a 
+              <a href="../../CppMakeDemo.html">Demo</a>. You can <a href="https://cmake.org/">download CMake</a>
+              free of charge.
+            </li>
+            <li>
+              C# code is built with the dotnet command line package manager, builder, and executer.
+              For simple console applications dotnet builds a stripped down source that gets
+              wrapped with needed boilerplate when built. I chose to provide the boiler plate.
+              The dotnet CLI is part of the Visual Studio infrastructure you can 
+              <a href="https://visualstudio.microsoft.com/vs/community/">download here</a>.
+            </li>
+            <li>
+              Python is built and executed with the Python interpreter using &quot;python filename.py&quot;
+              You can download Python <a href="https://www.python.org/downloads/">here</a>.
+            </li>
+            <li>
+              All you need for Javascript development is a text editor and browser. The major browsers,
+              Firefox, Chrome, Edge, ... all have tools for inspecting and debugging JavaScript.
+            </li>
+          </ul>
+        </t-b>
+        <div style="height:10em;"></div>
+      </content>
+      <a id="bottom"></a>
+      <page-TOC id="pages" style="display:none;">
+      </page-TOC>
+      <page-sections id="sections" style="display:none;">
+        <menu-elem style="width:0.0em">&nbsp;</menu-elem>
+        <menu-elem class="secElem"><a href="#bottom">bottom</a></menu-elem>
+        <menu-elem class="secElem"><a href="#notes">notes</a></menu-elem>
+        <menu-elem class="secElem"><a href="#compare">compare</a></menu-elem>
+        <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
+      </page-sections>
+    </main>
+    <frame-footer>
+      <menu-item style="width:1.0em;">&nbsp;</menu-item>
+      <menu-elem id="nextLink2" onclick="bottomMenu.next()">Next</menu-elem>
+      <menu-elem id="prevLink2" onclick="bottomMenu.prev()">Prev</menu-elem>
+      <menu-elem id="pgbtn" onclick="bottomMenu.pages()">Pages</menu-elem>
+      <menu-elem onclick="bottomMenu.sections()">Sections</menu-elem>
+      <menu-elem onclick="bottomMenu.about()">About</menu-elem>
+      <menu-elem id="kysbtn" onclick="storyHlpMenu.keys()">Keys</menu-elem>
+      <!--<menu-item style="width:1.0em;">&nbsp;</menu-item>
+      <menu-elem style="font-size:0.75em;" onclick="storyHlpMenu.decrZoomScreen()">Zout</menu-elem>
+      <menu-elem style="font-size:0.75em;" onclick="storyHlpMenu.normZoomScreen()">Zdef</menu-elem>
+      <menu-elem style="font-size:0.75em;" onclick="storyHlpMenu.incrZoomScreen()">Zin</menu-elem>-->
+    </frame-footer>
+  </page-frame>
+  <script>
+    var cb1 = document.getElementById("Rs1");
+    cb1.checked = true;
+    loadRsLeft();
+    var cb2 = document.getElementById("Cp2");
+    cb2.checked = true;
+    loadCppRight();
+  </script>
+</body>
+</html>
