@@ -298,30 +298,232 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build\n\
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\
 using System;\n\
-\n\
-namespace HelloWorld\n\
+#pragma warning disable CS8602\n\
+// https://stackoverflow.com/questions/8173239/c-getting-size-of-a-value-type-variable-at-runtime/8173293#8173293\n\
+//\n\
+using System;\n\
+using System.Reflection;\n\
+using System.Reflection.Emit;\n\
+      \n\
+namespace HelloData\n\
 {\n\
-  public class Program\n\
-  {\n\
-    public static void Main(string[] args)\n\
+  /*-- Utils uses advanced relection --*/\n\
+  // https://stackoverflow.com/questions/8173239/c-getting-size-of-a-value-type-variable-at-runtime/8173293#8173293\n\
+  public static class Utils {\n\
+    public static int GetManagedSize(Type type)\n\
     {\n\
-      Console.WriteLine(&quot;Hello C# World&quot;);\n\
+      // all this just to invoke one opcode with no arguments!\n\
+      var method = new DynamicMethod(\n\
+        &quot;GetManagedSizeImpl&quot;, typeof(uint), new Type[0],\n\
+        typeof(TypeExtensions), false\n\
+      );\n\
+      \n\
+      ILGenerator gen = method.GetILGenerator();\n\
+      gen.Emit(OpCodes.Sizeof, type);\n\
+      gen.Emit(OpCodes.Ret);\n\
+      \n\
+      var func = (Func&lt;uint&gt;)method.CreateDelegate(typeof(Func&lt;uint&gt;));\n\
+      return checked((int)func());\n\
+    }\n\
+  }\n\
+  /*-- type used for type demo example --*/\n\
+  public struct T4\n\
+  {\n\
+    public T4() {}\n\
+    public int I { get; set; } = 0;\n\
+    public double D { get; set; } = 1.0;\n\
+    public char C { get; set; }  = 'a';\n\
+  }\n\
+  /*-- type demonstration --*/\n\
+  class Program\n\
+  {\n\
+    /*-- simple reflection --*/\n\
+    public void showType&lt;T&gt;(T t, String s)\n\
+    {\n\
+      Type tt = t.GetType();\n\
+      Console.WriteLine(&quot;{0}, {1}&quot;,tt.Name, s);\n\
+      int size = Utils.GetManagedSize(tt);\n\
+      Console.WriteLine(&quot;value: {0}, size: {1}&quot;, t, size);\n\
+    }\n\
+    public void showIdent&lt;T&gt;(T t, String n) {\n\
+      int id = t.GetHashCode();\n\
+      Console.WriteLine(&quot;{0}, {1}&quot;, n, id);\n\
+    }\n\
+    /*-- more advanced reflection --*/\n\
+    // https://stackoverflow.com/questions/7613782/iterating-through-struct-members\n\
+    public void iterate&lt;T&gt;(T t) where T:new() {\n\
+      Console.WriteLine(&quot;fields:&quot;);\n\
+      foreach(\n\
+        var field in typeof(T).GetFields(\n\
+          BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public\n\
+        )\n\
+      ) {\n\
+        Console.WriteLine(\n\
+          &quot;  {0} = {1}&quot;, field.Name, field.GetValue(t)\n\
+        );\n\
+      }\n\
+      Console.WriteLine(&quot;methods:&quot;);\n\
+      foreach(\n\
+        var method in typeof(T).GetMethods(\n\
+          BindingFlags.Instance | BindingFlags.Public\n\
+        )\n\
+      ) {\n\
+        Console.WriteLine(\n\
+          &quot;  {0}&quot;, method.Name\n\
+        );\n\
+      }\n\
+    }\n\
+    public static void print(String s) {\n\
+      Console.WriteLine(s);\n\
+    }\n\
+    public static void separator() {\n\
+      Console.WriteLine(&quot;----------&quot;);\n\
+    }\n\
+    static void Main(string[] args)\n\
+    {\n\
+      Console.WriteLine(&quot; Demonstrate C# types&quot;);\n\
+      Console.WriteLine(&quot;----------------------&quot;);\n\
+      Program p = new Program();\n\
+      double t1 = 3.5;\n\
+      p.showIdent(t1, &quot;t1&quot;);\n\
+      p.showType(t1, &quot;t1&quot;);\n\
+      p.iterate(t1);\n\
+\n\
+      // reference behavior - copy on write\n\
+      separator();\n\
+      String t2 = &quot;a string&quot;;\n\
+      p.showIdent(t2, &quot;t2&quot;);\n\
+      p.showType(t2, &quot;t2&quot;);\n\
+\n\
+      print(&quot;&#92;nt3 = t2&#92;n&quot;);\n\
+      String t3 = t2;\n\
+      p.showIdent(t3, &quot;t3&quot;);\n\
+      p.showType(t3, &quot;t3&quot;);\n\
+\n\
+      print(&quot;&#92;nt3 = &#92;&quot;another string&#92;&quot;&#92;n&quot;);\n\
+      t3 = &quot;another string&quot;;\n\
+      p.showIdent(t2, &quot;t2&quot;);\n\
+      p.showIdent(t3, &quot;t3&quot;);\n\
+      p.showType(t3, &quot;t3&quot;);\n\
+\n\
+      separator();\n\
+      Object obj = new Object();\n\
+      p.showIdent(obj, &quot;obj&quot;);\n\
+      p.showType(obj, &quot;obj&quot;);\n\
+      p.iterate(obj);\n\
+      print(&quot;&quot;);\n\
+      T4 t4 = new T4();\n\
+      t4.I = 3;\n\
+      t4.D = 3.1415927;\n\
+      t4.C = 'z';\n\
+      p.showIdent(t4, &quot;t4&quot;);\n\
+      p.showType(t4, &quot;t4&quot;);\n\
+      p.iterate(t4);\n\
+\n\
+      Console.WriteLine(&quot;&#92;nThat's all Folks!&#92;n&quot;);\n\
     }\n\
   }\n\
 }\n\
-</pre > "
+\n\
+</pre>"
     }
     function loadCsOut(id) {
       let codecont = document.getElementById(id);
-      codecont.innerHTML = "Hello C# World"
+      codecont.innerHTML = "<pre>\n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
+&gt; dotnet run\n\
+ Demonstrate C# types\n\
+----------------------\n\
+t1, 1074528256\n\
+Double, t1\n\
+value: 3.5, size: 8\n\
+fields:\n\
+  m_value = 3.5\n\
+methods:\n\
+  CompareTo\n\
+  CompareTo\n\
+  Equals\n\
+  Equals\n\
+  GetHashCode\n\
+  ToString\n\
+  ToString\n\
+  ToString\n\
+  ToString\n\
+  TryFormat\n\
+  GetTypeCode\n\
+  GetType\n\
+----------\n\
+t2, -1596041648\n\
+String, t2\n\
+value: a string, size: 8\n\
+\n\
+t3 = t2\n\
+\n\
+t3, -1596041648\n\
+String, t3\n\
+value: a string, size: 8\n\
+\n\
+t3 = &quot;another string&quot;\n\
+\n\
+t2, -1596041648\n\
+t3, 1723840830\n\
+String, t3\n\
+value: another string, size: 8\n\
+----------\n\
+obj, 58225482\n\
+Object, obj\n\
+value: System.Object, size: 8\n\
+fields:\n\
+methods:\n\
+  GetType\n\
+  ToString\n\
+  Equals\n\
+  GetHashCode\n\
+\n\
+t4, -1813067718\n\
+T4, t4\n\
+value: HelloData.T4, size: 24\n\
+fields:\n\
+  &lt;I&gt;k__BackingField = 3\n\
+  &lt;D&gt;k__BackingField = 3.1415927\n\
+  &lt;C&gt;k__BackingField = z\n\
+methods:\n\
+  get_I\n\
+  set_I\n\
+  get_D\n\
+  set_D\n\
+  get_C\n\
+  set_C\n\
+  Equals\n\
+  GetHashCode\n\
+  ToString\n\
+  GetType\n\
+\n\
+That's all Folks!\n\
+\n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
+&gt;\n\
+</pre>"
     }
     function loadCsBld(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\n\
-> dotnet run\n\
-Hello C# World\n\
-C:&#92;github&#92;JimFawcett&#92;bits&#92;CSharp&#92;Cs_Hello\n\
-></pre>"
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
+&gt; dotnet build\n\
+MSBuild version 17.4.0+18d5aef85 for .NET\n\
+  Determining projects to restore...\n\
+  All projects are up-to-date for restore.\n\
+  Cs_Hello -&gt; C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data&#92;bin&#92;De\n\
+  bug&#92;net7.0&#92;Cs_Hello.dll\n\
+\n\
+Build succeeded.\n\
+    0 Warning(s)\n\
+    0 Error(s)\n\
+\n\
+Time Elapsed 00:00:01.69\n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
+&gt;\n\
+</pre>"
     }
 
     /*-- Load Rust Code, Output, Build --*/
@@ -513,21 +715,170 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;rust&#92;rust_hello_data\n\
     /*-- Load Python Code, Output, Build --*/
     function loadPyCode(id) {
       let codecont = document.getElementById(id);
-      codecont.innerHTML = "<div class='code'>\
-<pre>\
-# HelloWorld::Py_Hello.py\n\
+      codecont.innerHTML = "<div class='code'>\n\
+<pre>\n\
+# Python/Py_Data::Py_Data.py\n\
+# \n\
+# Python Dynamic Data Types\n\
+#   int, float, complex\n\
+#   bytes, bytearray, memoryview\n\
+#   list, tuple, range\n\
+#   dict, set, frozenset\n\
+#   bool\n\
+#   str\n\
+#   NoneType\n\
 \n\
-print(&quot;Hello Python World&quot;)\n\
-</pre>\
-</div>\
+import sys\n\
+def showType(t, n) :\n\
+    print(type(t), n)\n\
+    print(&quot;value: &quot;, t, ', size: ', sys.getsizeof(t))\n\
+\n\
+def showIdent(t, n) :\n\
+    print(n, t, id(t))\n\
+\n\
+def separate() :\n\
+    print(&quot;------&quot;)\n\
+\n\
+def execute() : \n\
+    print(&quot; Demonstrate Python Types&quot;)\n\
+    print(&quot;--------------------------&quot;)\n\
+    # types\n\
+    t1 = 42\n\
+    showType(t1, &quot;t1&quot;)\n\
+    t1 = 3.14159         #dynamic type t1 redefined\n\
+    showType(t1, &quot;t1&quot;)\n\
+    t1 = [1, 2, 3, 4]    #dynamic type t1 redefined\n\
+    showType(t1, &quot;t1&quot;)\n\
+\n\
+    # reference behavior - copy on write\n\
+    separate()\n\
+    print(&quot;t2 = t1&quot;)\n\
+    t2 = t1\n\
+    showIdent(t1,&quot;t1&quot;)\n\
+    showIdent(t2,&quot;t2&quot;)\n\
+    print(&quot;&#92;nt2 = 3.33333&quot;)\n\
+    t2 = 3.33333\n\
+    showIdent(t1,&quot;t1&quot;)\n\
+    showIdent(t2,&quot;t2&quot;)\n\
+\n\
+    # reference behavior - copy on write\n\
+    separate()\n\
+    print(&quot;t2 += -1.0&quot;)\n\
+    t2 += -1.0\n\
+    showIdent(t1,&quot;t1&quot;)\n\
+    showType(t1, &quot;t1&quot;)\n\
+    showIdent(t2,&quot;t2&quot;)\n\
+    showType(t2, &quot;t2&quot;)\n\
+\n\
+    # reference behavior - copy on write\n\
+    separate()\n\
+    t3 = [1, &quot;one&quot;]\n\
+    showIdent(t3, &quot;t3&quot;)\n\
+    print(&quot;t4 = t3&quot;)\n\
+    t4 = t3\n\
+    showIdent(t3, &quot;t3&quot;)\n\
+    showType(t3,&quot;t3&quot;)\n\
+    showIdent(t4, &quot;t4&quot;)\n\
+    showType(t4,&quot;t4&quot;)\n\
+    \n\
+    # reference behavior - no copy on write\n\
+    separate()\n\
+    print(&quot;t3.append('b')&quot;)\n\
+    t3.append('b')\n\
+    showIdent(t3, &quot;t3&quot;)\n\
+    showType(t3,&quot;t3&quot;)\n\
+    showIdent(t4, &quot;t4&quot;)\n\
+    showType(t4,&quot;t4&quot;)\n\
+\n\
+    # reference behavior - child copy on write\n\
+    separate()\n\
+    t5 = (1, 2, 3)\n\
+    t6 = [1, t5, &quot;weird&quot;]\n\
+    showIdent(t5, &quot;t5&quot;)\n\
+    showIdent(t6, &quot;t6&quot;)\n\
+    t5 = 1 + 1j\n\
+    showIdent(t5, &quot;t5&quot;)\n\
+    showIdent(t6, &quot;t6&quot;)\n\
+    \n\
+    # reference behavior - iterate over children\n\
+    separate()\n\
+    print(&quot;iterate over t6&quot;)\n\
+    for i in t6:\n\
+        showIdent(i, &quot;elem&quot;)\n\
+    # print(dir(t6))\n\
+      \n\
+    print(&quot;&#92;nThat's all folks!&#92;n&quot;)\n\
+execute()\n\
+\n\
+</pre>\n\
+</div>\n\
 ";
     }
 
     function loadPyOut(id) {
       let codecont = document.getElementById(id);
-      codecont.innerHTML = "<pre>\n\
-Hello Python World\n\
-</pre>";
+      codecont.innerHTML = "<div class='code'>\n\
+<pre>\n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
+&gt; python .&#92;Py_Data.py\n\
+ Demonstrate Python Types\n\
+--------------------------\n\
+&lt;class 'int'&gt; t1\n\
+value:  42 , size:  28\n\
+&lt;class 'float'&gt; t1\n\
+value:  3.14159 , size:  24\n\
+&lt;class 'list'&gt; t1\n\
+value:  [1, 2, 3, 4] , size:  88\n\
+------\n\
+t2 = t1\n\
+t1 [1, 2, 3, 4] 1581050570752\n\
+t2 [1, 2, 3, 4] 1581050570752\n\
+\n\
+t2 = 3.33333\n\
+t1 [1, 2, 3, 4] 1581050570752\n\
+t2 3.33333 1581050207984\n\
+------\n\
+t2 += -1.0\n\
+t1 [1, 2, 3, 4] 1581050570752\n\
+&lt;class 'list'&gt; t1\n\
+value:  [1, 2, 3, 4] , size:  88\n\
+t2 2.33333 1581050209360\n\
+&lt;class 'float'&gt; t2\n\
+value:  2.33333 , size:  24\n\
+------\n\
+t3 [1, 'one'] 1581050507840\n\
+t4 = t3\n\
+t3 [1, 'one'] 1581050507840\n\
+&lt;class 'list'&gt; t3\n\
+value:  [1, 'one'] , size:  72\n\
+t4 [1, 'one'] 1581050507840\n\
+&lt;class 'list'&gt; t4\n\
+value:  [1, 'one'] , size:  72\n\
+------\n\
+t3.append('b')\n\
+t3 [1, 'one', 'b'] 1581050507840\n\
+&lt;class 'list'&gt; t3\n\
+value:  [1, 'one', 'b'] , size:  120\n\
+t4 [1, 'one', 'b'] 1581050507840\n\
+&lt;class 'list'&gt; t4\n\
+value:  [1, 'one', 'b'] , size:  120\n\
+------\n\
+t5 (1, 2, 3) 1581050830144\n\
+t6 [1, (1, 2, 3), 'weird'] 1581050835264\n\
+t5 (1+1j) 1581050208048\n\
+t6 [1, (1, 2, 3), 'weird'] 1581050835264\n\
+------\n\
+iterate over t6\n\
+elem 1 1581049184496\n\
+elem (1, 2, 3) 1581050830144\n\
+elem weird 1581050834288\n\
+\n\
+That's all folks!\n\
+\n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
+&gt;\n\
+</pre>\n\
+</div>";
     }
 
     function loadPyBld(id) {
