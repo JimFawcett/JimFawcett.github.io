@@ -149,8 +149,26 @@
     /*-- Load Cpp Code, Output, Build --*/
     function loadCppCode(id) {
       let codecont = document.getElementById(id);
-      codecont.innerHTML = "<div class='code'>\n\
-<pre>// Cpp_Data.cpp\n\
+      codecont.innerHTML = "<div style='white-space:normal; margin-left:2em;'>\
+<details>\
+  <summary class='darkItem' style='margin-left:-2em;'>Code Notes</summary>\
+  <ol class='tight' style='margin-left:0em;'>\
+    <li>\
+      show function is designed to display type and calling name of its\
+      first argument and its value and size.\
+    </li>\
+    <li>\
+      At the call site its second argument is a string representation of\
+      the calling name, created using the # operator for macro arguments.\
+    </li>\
+    <li>\
+      <c-s>template&lt;typename T&gt;</c-s>\n\
+      <c-s>void show(T t, const std::string &ts)</c-s> is generic on the type T\
+    </li>\
+  </ol >\
+</details >\n\
+</div >\
+<pre><div class=&quot;code&quot;>// Cpp_Data.cpp\n\
 \n\
 #include &lt;iostream&gt;  // std::cout\n\
 #include &lt;typeinfo&gt;  // typeid\n\
@@ -222,26 +240,7 @@ int main() {\n\
     /*-- unique_ptr releases its heap storage when it goes out of scope --*/\n\n\
     std::cout &lt;&lt; std::endl;\n\
 }\n\
-</pre></div>\
-      <div style='white-space:normal; margin-left:2em;'>\
-        <details>\
-          <summary class='darkItem' style='margin-left:-2em;'>Code Notes</summary>\
-          <ol class='tight' style='margin-left:0em;'>\
-            <li>\
-              show function is designed to display type and calling name of its\
-              first argument and its value and size.\
-            </li>\
-            <li>\
-              At the call site its second argument is a string representation of\
-              the calling name, created using the # operator for macro arguments.\
-            </li>\
-            <li>\
-              <c-s>template&lt;typename T&gt;</c-s>\n\
-              <c-s>void show(T t, const std::string &ts)</c-s> is generic on the type T\
-            </li>\
-          </ol >\
-        </details >\n\
-      </div >\
+</div></pre>\
 ";
     }
 
@@ -296,62 +295,172 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build\n\
     /*-- Load C# Code, Output, Build --*/
     function loadCsCode(id) {
       let codecont = document.getElementById(id);
-      codecont.innerHTML = "<pre>\
-using System;\n\
-#pragma warning disable CS8602\n\
-// https://stackoverflow.com/questions/8173239/c-getting-size-of-a-value-type-variable-at-runtime/8173293#8173293\n\
-//\n\
+      codecont.innerHTML = "<pre>\n\
+/* Cs_Data::Cs_Data.cs */\n\
+/*\n\
+  Static Data Types:\n\
+    value types => assignment copies value\n\
+    --------------------------------------\n\
+      sbyte, byte, short, int, long, ushort, uint, ulong\n\
+      float, double\n\
+      decimal, char, bool\n\
+      struct\n\
+    Reference types => assignment copies reference\n\
+    ----------------------------------------------\n\
+      object, string, class\n\
+*/\n\
 using System;\n\
 using System.Reflection;\n\
 using System.Reflection.Emit;\n\
-      \n\
+\n\
 namespace HelloData\n\
 {\n\
-  /*-- Utils uses advanced relection --*/\n\
-  // https://stackoverflow.com/questions/8173239/c-getting-size-of-a-value-type-variable-at-runtime/8173293#8173293\n\
-  public static class Utils {\n\
-    public static int GetManagedSize(Type type)\n\
-    {\n\
-      // all this just to invoke one opcode with no arguments!\n\
-      var method = new DynamicMethod(\n\
-        &quot;GetManagedSizeImpl&quot;, typeof(uint), new Type[0],\n\
-        typeof(TypeExtensions), false\n\
-      );\n\
-      \n\
-      ILGenerator gen = method.GetILGenerator();\n\
-      gen.Emit(OpCodes.Sizeof, type);\n\
-      gen.Emit(OpCodes.Ret);\n\
-      \n\
-      var func = (Func&lt;uint&gt;)method.CreateDelegate(typeof(Func&lt;uint&gt;));\n\
-      return checked((int)func());\n\
-    }\n\
-  }\n\
-  /*-- type used for type demo example --*/\n\
-  public struct T4\n\
-  {\n\
-    public T4() {}\n\
+  /*-- \n\
+    Svt is a value type used for type demo example.\n\
+    It consists of three public properties.\n\
+  --*/\n\
+  public struct Svt   // value type with value type members\n\
+  { \n\
+    public Svt() {}\n\
     public int I { get; set; } = 0;\n\
     public double D { get; set; } = 1.0;\n\
     public char C { get; set; }  = 'a';\n\
+    public void printSelf(string name) {\n\
+      Console.Write(&quot;{0}  {{ I:{1}, D:{2}, C:{3} }}&#92;n&quot;, name, I, D, C);\n\
+    }\n\
+  }\n\
+  /*-- \n\
+    Crt is a reference type used for type demo example.\n\
+    It consists of three public properties.\n\
+  --*/\n\
+  public class Crt   // reference type with a reference type member\n\
+  { \n\
+    public Crt() {}\n\
+    public int I { get; set; } = 0;\n\
+    public double D { get; set; } = 1.0;\n\
+    public string S { get; set; }  = &quot;a string&quot;;\n\
+    public void printSelf(string name) {\n\
+      Console.Write(&quot;{0}  {{ I:{1}, D:{2}, S:{3} }}&#92;n&quot;, name, I, D, S);\n\
+    }\n\
   }\n\
   /*-- type demonstration --*/\n\
   class Program\n\
   {\n\
-    /*-- simple reflection --*/\n\
-    public void showType&lt;T&gt;(T t, String s)\n\
+    /*-- demonstration begins here --*/\n\
+    static void Main(string[] args)\n\
     {\n\
+      print(&quot; Demonstrate C# types&quot;);\n\
+      label(&quot;int - value type&quot;);\n\
+      showOp(&quot;int t1 = 42&quot;);\n\
+      int t1 = 42;\n\
+      showType(t1, &quot;t1&quot;);\n\
+      iterate(t1);\n\
+      print();\n\
+      showOp(&quot;int t1a = t1&quot;);\n\
+      int t1a = t1;\n\
+      isSameObj(t1a, &quot;t1a&quot;, t1, &quot;t1&quot;);\n\
+\n\
+      // reference behavior - copy on write\n\
+      label(&quot;string - reference type&quot;);\n\
+      showOp(&quot;string t2 = &#92;&quot;a string&#92;&quot;&quot;);\n\
+      string t2 = &quot;a string&quot;;\n\
+      showType(t2, &quot;t2&quot;);\n\
+      showNote(&quot;string has many methods - uncomment next line to see them&quot;);\n\
+      //iterate(t2);\n\
+      showOp(&quot;string t3 = t2&quot;);\n\
+      string t3 = t2;\n\
+      showType(t3, &quot;t3&quot;);\n\
+      isSameObj(t3,&quot;t3&quot;,t2,&quot;t2&quot;);\n\
+\n\
+      showOp(&quot;t3 += &#92;&quot; is here&#92;&quot;&quot;);\n\
+      t3 += &quot; is here&quot;;\n\
+      showType(t3, &quot;t3&quot;);\n\
+      isSameObj(t3,&quot;t3&quot;,t2,&quot;t2&quot;);\n\
+      \n\
+      label(&quot;Object - base reference type&quot;);\n\
+      showOp(&quot;Object obj1 - new Object()&quot;);\n\
+      Object obj1 = new Object();\n\
+      // showIdent(obj, &quot;obj&quot;);\n\
+      showType(obj1, &quot;obj&quot;);\n\
+      iterate(obj1);\n\
+      showOp(&quot;Object obj2 = obj1&quot;);\n\
+      Object obj2 = obj1;\n\
+      isSameObj(obj2, &quot;obj2&quot;, obj1, &quot;obj1&quot;);\n\
+\n\
+      label(&quot;Svt Struct value type&quot;);\n\
+      showOp(&quot;Svt t4 = new Svt()&quot;);\n\
+      Svt t4 = new Svt();\n\
+      t4.I = 3;\n\
+      t4.D = 3.1415927;\n\
+      t4.C = 'z';\n\
+      t4.printSelf(&quot;t4&quot;);\n\
+      showType(t4, &quot;t4&quot;);\n\
+      showNote(&quot;value type: size of object in stackframe&quot;);\n\
+      iterate(t4);\n\
+\n\
+      showOp(&quot;Svt t4a = t4&quot;);\n\
+      Svt t4a = t4;\n\
+      t4a.printSelf(&quot;t4a&quot;);\n\
+      t4.printSelf(&quot;t4&quot;);\n\
+      isSameObj(t4a,&quot;t4a&quot;,t4,&quot;t4&quot;);\n\
+      showType(t4a, &quot;t4a&quot;);\n\
+\n\
+      showOp(&quot;t4a.C = 'q'&quot;);\n\
+      t4a.C = 'q';\n\
+      t4a.printSelf(&quot;t4a&quot;);\n\
+      t4.printSelf(&quot;t4&quot;);\n\
+      isSameObj(t4, &quot;t4&quot;, t4a, &quot;t4a&quot;);\n\
+\n\
+      label(&quot;Crt - ref type with ref member&quot;);\n\
+      showOp(&quot;Crt t5 = new Crt()&quot;);\n\
+      Crt t5 = new Crt();\n\
+      t5.S = &quot;SomeString&quot;;\n\
+      t5.printSelf(&quot;t5&quot;);\n\
+      showType(t5, &quot;t5&quot;);\n\
+      showNote(&quot;ref type: size of handle to object in heap&quot;);\n\
+\n\
+      showOp(&quot;Crt t5a = t5&quot;);\n\
+      Crt t5a = t5;\n\
+      t5a.printSelf(&quot;t5a&quot;);\n\
+      isSameObj(t5a, &quot;t5a&quot;, t5, &quot;t5&quot;);\n\
+      isSameObj(t5a.S, &quot;t5a.S&quot;, t5.S, &quot;t5.S&quot;);\n\
+\n\
+      showOp(&quot;t5a.S = &#92;&quot;new string&#92;&quot;&quot;);\n\
+      t5a.S = &quot;new string&quot;;\n\
+      t5a.printSelf(&quot;t5a&quot;);\n\
+      t5a.printSelf(&quot;t5&quot;);\n\
+      isSameObj(t5a, &quot;t5a&quot;, t5, &quot;t5&quot;);\n\
+      isSameObj(t5a.S, &quot;t5a.S&quot;, t5.S, &quot;t5.S&quot;);\n\
+      showNote(&quot;source t5 was altered!&quot;);\n\
+      Console.WriteLine(&quot;&#92;nThat's all Folks!&#92;n&quot;);\n\
+    }\n\
+    /*-- simple reflection --*/\n\
+    public static void showType&lt;T&gt;(T t, String s)\n\
+    {\n\
+      #pragma warning disable CS8602  // possibly null reference warning\n\
       Type tt = t.GetType();\n\
       Console.WriteLine(&quot;{0}, {1}&quot;,tt.Name, s);\n\
       int size = Utils.GetManagedSize(tt);\n\
       Console.WriteLine(&quot;value: {0}, size: {1}&quot;, t, size);\n\
     }\n\
-    public void showIdent&lt;T&gt;(T t, String n) {\n\
+    /*-- beware, two distinct objects may have same hashcode --*/\n\
+    public static void showIdent&lt;T&gt;(T t, String n) {\n\
       int id = t.GetHashCode();\n\
       Console.WriteLine(&quot;{0}, {1}&quot;, n, id);\n\
     }\n\
-    /*-- more advanced reflection --*/\n\
+    public static void isSameObj&lt;T&gt;(T t1, String n1, T t2, String n2) {\n\
+      if(ReferenceEquals(t1, t2)) {\n\
+        Console.WriteLine(&quot;{0} is same object as {1}&quot;, n1, n2);\n\
+      }\n\
+      else {\n\
+        Console.WriteLine(&quot;{0} is not same object as {1}&quot;, n1, n2);\n\
+      }\n\
+    }\n\
+    public static void showOp(string op) {\n\
+      Console.WriteLine(&quot;--- {0} ---&quot;, op);\n\
+    }\n\
     // https://stackoverflow.com/questions/7613782/iterating-through-struct-members\n\
-    public void iterate&lt;T&gt;(T t) where T:new() {\n\
+    public static void iterate&lt;T&gt;(T t) /*where T:new()*/ {\n\
       Console.WriteLine(&quot;fields:&quot;);\n\
       foreach(\n\
         var field in typeof(T).GetFields(\n\
@@ -373,59 +482,50 @@ namespace HelloData\n\
         );\n\
       }\n\
     }\n\
-    public static void print(String s) {\n\
+    public static void print(String s = &quot;&quot;) {\n\
       Console.WriteLine(s);\n\
     }\n\
-    public static void separator() {\n\
-      Console.WriteLine(&quot;----------&quot;);\n\
+    public static void label(string s) {\n\
+      Console.WriteLine(\n\
+        &quot;&#92;n---------------&#92;n  {0}&#92;n---------------&quot;, s\n\
+      );\n\
     }\n\
-    static void Main(string[] args)\n\
+    public static void showNote(string s) {\n\
+      Console.WriteLine(&quot;--- Note: ---&#92;n  {0}&quot;, s);\n\
+    }\n\
+  }\n\
+  /*-- \n\
+    Utils uses advanced relection \n\
+    - This is function returns the size of value types and handles\n\
+      which is part of discovering how things work.\n\
+      It is placed here because it uses advanced techniques that\n\
+      will eventually be covered elsewhere in this site.  Knowing\n\
+      how it works is not essential for the things we are examining\n\
+      in this demo.\n\
+  --*/\n\
+  // https://stackoverflow.com/questions/8173239/c-getting-size-of-a-value-type-variable-at-runtime/8173293#8173293\n\
+  public static class Utils {\n\
+    /*-- more advanced reflection --*/\n\
+    // https://stackoverflow.com/questions/7613782/iterating-through-struct-members\n\
+    public static int GetManagedSize(Type type)\n\
     {\n\
-      Console.WriteLine(&quot; Demonstrate C# types&quot;);\n\
-      Console.WriteLine(&quot;----------------------&quot;);\n\
-      Program p = new Program();\n\
-      double t1 = 3.5;\n\
-      p.showIdent(t1, &quot;t1&quot;);\n\
-      p.showType(t1, &quot;t1&quot;);\n\
-      p.iterate(t1);\n\
+      // all this just to invoke one opcode with no arguments!\n\
+      var method = new DynamicMethod(\n\
+        &quot;GetManagedSizeImpl&quot;, typeof(uint), new Type[0], \n\
+        typeof(TypeExtensions), false\n\
+      );\n\
 \n\
-      // reference behavior - copy on write\n\
-      separator();\n\
-      String t2 = &quot;a string&quot;;\n\
-      p.showIdent(t2, &quot;t2&quot;);\n\
-      p.showType(t2, &quot;t2&quot;);\n\
+      ILGenerator gen = method.GetILGenerator();\n\
+      gen.Emit(OpCodes.Sizeof, type);\n\
+      gen.Emit(OpCodes.Ret);\n\
 \n\
-      print(&quot;&#92;nt3 = t2&#92;n&quot;);\n\
-      String t3 = t2;\n\
-      p.showIdent(t3, &quot;t3&quot;);\n\
-      p.showType(t3, &quot;t3&quot;);\n\
-\n\
-      print(&quot;&#92;nt3 = &#92;&quot;another string&#92;&quot;&#92;n&quot;);\n\
-      t3 = &quot;another string&quot;;\n\
-      p.showIdent(t2, &quot;t2&quot;);\n\
-      p.showIdent(t3, &quot;t3&quot;);\n\
-      p.showType(t3, &quot;t3&quot;);\n\
-\n\
-      separator();\n\
-      Object obj = new Object();\n\
-      p.showIdent(obj, &quot;obj&quot;);\n\
-      p.showType(obj, &quot;obj&quot;);\n\
-      p.iterate(obj);\n\
-      print(&quot;&quot;);\n\
-      T4 t4 = new T4();\n\
-      t4.I = 3;\n\
-      t4.D = 3.1415927;\n\
-      t4.C = 'z';\n\
-      p.showIdent(t4, &quot;t4&quot;);\n\
-      p.showType(t4, &quot;t4&quot;);\n\
-      p.iterate(t4);\n\
-\n\
-      Console.WriteLine(&quot;&#92;nThat's all Folks!&#92;n&quot;);\n\
+      var func = (Func&lt;uint&gt;)method.CreateDelegate(typeof(Func&lt;uint&gt;));\n\
+      return checked((int)func());\n\
     }\n\
   }\n\
 }\n\
-\n\
-</pre>"
+</pre>\n\
+"
     }
     function loadCsOut(id) {
       let codecont = document.getElementById(id);
@@ -433,12 +533,15 @@ namespace HelloData\n\
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
 &gt; dotnet run\n\
  Demonstrate C# types\n\
-----------------------\n\
-t1, 1074528256\n\
-Double, t1\n\
-value: 3.5, size: 8\n\
+\n\
+---------------\n\
+  int - value type\n\
+---------------\n\
+--- int t1 = 42 ---\n\
+Int32, t1\n\
+value: 42, size: 4\n\
 fields:\n\
-  m_value = 3.5\n\
+  m_value = 42\n\
 methods:\n\
   CompareTo\n\
   CompareTo\n\
@@ -452,25 +555,31 @@ methods:\n\
   TryFormat\n\
   GetTypeCode\n\
   GetType\n\
-----------\n\
-t2, -1596041648\n\
+\n\
+--- int t1a = t1 ---\n\
+t1a is not same object as t1\n\
+\n\
+---------------\n\
+  string - reference type\n\
+---------------\n\
+--- string t2 = &quot;a string&quot; ---\n\
 String, t2\n\
 value: a string, size: 8\n\
-\n\
-t3 = t2\n\
-\n\
-t3, -1596041648\n\
+--- Note: ---\n\
+  string has many methods - uncomment next line to see them\n\
+--- string t3 = t2 ---\n\
 String, t3\n\
 value: a string, size: 8\n\
-\n\
-t3 = &quot;another string&quot;\n\
-\n\
-t2, -1596041648\n\
-t3, 1723840830\n\
+t3 is same object as t2\n\
+--- t3 += &quot; is here&quot; ---\n\
 String, t3\n\
-value: another string, size: 8\n\
-----------\n\
-obj, 58225482\n\
+value: a string is here, size: 8\n\
+t3 is not same object as t2\n\
+\n\
+---------------\n\
+  Object - base reference type\n\
+---------------\n\
+--- Object obj1 - new Object() ---\n\
 Object, obj\n\
 value: System.Object, size: 8\n\
 fields:\n\
@@ -479,10 +588,18 @@ methods:\n\
   ToString\n\
   Equals\n\
   GetHashCode\n\
+--- Object obj2 = obj1 ---\n\
+obj2 is same object as obj1\n\
 \n\
-t4, -1813067718\n\
-T4, t4\n\
-value: HelloData.T4, size: 24\n\
+---------------\n\
+  Svt Struct value type\n\
+---------------\n\
+--- Svt t4 = new Svt() ---\n\
+t4  { I:3, D:3.1415927, C:z }\n\
+Svt, t4\n\
+value: HelloData.Svt, size: 24\n\
+--- Note: ---\n\
+  value type: size of object in stackframe\n\
 fields:\n\
   &lt;I&gt;k__BackingField = 3\n\
   &lt;D&gt;k__BackingField = 3.1415927\n\
@@ -494,16 +611,49 @@ methods:\n\
   set_D\n\
   get_C\n\
   set_C\n\
+  printSelf\n\
   Equals\n\
   GetHashCode\n\
   ToString\n\
   GetType\n\
+--- Svt t4a = t4 ---\n\
+t4a  { I:3, D:3.1415927, C:z }\n\
+t4  { I:3, D:3.1415927, C:z }\n\
+t4a is not same object as t4\n\
+Svt, t4a\n\
+value: HelloData.Svt, size: 24\n\
+--- t4a.C = 'q' ---\n\
+t4a  { I:3, D:3.1415927, C:q }\n\
+t4  { I:3, D:3.1415927, C:z }\n\
+t4 is not same object as t4a\n\
+\n\
+---------------\n\
+  Crt - ref type with ref member\n\
+---------------\n\
+--- Crt t5 = new Crt() ---\n\
+t5  { I:0, D:1, S:SomeString }\n\
+Crt, t5\n\
+value: HelloData.Crt, size: 8\n\
+--- Note: ---\n\
+  ref type: size of handle to object in heap\n\
+--- Crt t5a = t5 ---\n\
+t5a  { I:0, D:1, S:SomeString }\n\
+t5a is same object as t5\n\
+t5a.S is same object as t5.S\n\
+--- t5a.S = &quot;new string&quot; ---\n\
+t5a  { I:0, D:1, S:new string }\n\
+t5  { I:0, D:1, S:new string }\n\
+t5a is same object as t5\n\
+t5a.S is same object as t5.S\n\
+--- Note: ---\n\
+  source t5 was altered!\n\
 \n\
 That's all Folks!\n\
 \n\
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
 &gt;\n\
-</pre>"
+</pre>\n\
+"
     }
     function loadCsBld(id) {
       let codecont = document.getElementById(id);
