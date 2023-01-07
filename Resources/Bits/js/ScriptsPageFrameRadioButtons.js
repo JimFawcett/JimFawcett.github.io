@@ -40,11 +40,13 @@ function loadCppLeft() {
   loadCppCodeLeft();
   loadCppOutLeft();
   loadCppBldLeft()
+  localStorage.setItem("left", "Cp1");
 }
 function loadCppRight() {
   loadCppCodeRight();
   loadCppOutRight();
   loadCppBldRight();
+  localStorage.setItem("right", "Cp2");
 }
 
 /*-- Load C# Code, Output, Build --*/
@@ -85,11 +87,13 @@ function loadCsLeft() {
   loadCsCodeLeft();
   loadCsOutLeft();
   loadCsBldLeft()
+  localStorage.setItem("left", "Cs1");
 }
 function loadCsRight() {
   loadCsCodeRight();
   loadCsOutRight();
   loadCsBldRight();
+  localStorage.setItem("right", "Cs2");
 }
 
 /*-- Load Rust Code, Output, Build --*/
@@ -130,11 +134,13 @@ function loadRsLeft() {
   loadRsCodeLeft();
   loadRsOutLeft();
   loadRsBldLeft()
+  localStorage.setItem("left", "Rs1");
 }
 function loadRsRight() {
   loadRsCodeRight();
   loadRsOutRight();
   loadRsBldRight();
+  localStorage.setItem("right", "Rs2");
 }
 /*-- Load Python Code, Output, Build --*/
 function loadPyCodeLeft() {
@@ -174,11 +180,13 @@ function loadPyLeft() {
   loadPyCodeLeft();
   loadPyOutLeft();
   loadPyBldLeft()
+  localStorage.setItem("left", "Py1");
 }
 function loadPyRight() {
   loadPyCodeRight();
   loadPyOutRight();
   loadPyBldRight();
+  localStorage.setItem("right", "Py2");
 }
 
 
@@ -220,9 +228,78 @@ function loadJsLeft() {
   loadJsCodeLeft();
   loadJsOutLeft();
   loadJsBldLeft()
+  localStorage.setItem("left", "Js1");
 }
 function loadJsRight() {
   loadJsCodeRight();
   loadJsOutRight();
   loadJsBldRight();
+  localStorage.setItem("right", "Js2");
+}
+
+function setChecks() {
+  //localStorage.clear();
+  if (localStorage == undefined || localStorage.length == 0) {
+    document.getElementById("Cp1").checked = true;
+    document.getElementById("Rs2").checked = true;
+    localStorage.setItem("left", "Cp1");
+    localStorage.setItem("right", "Rs1");
+    return;
+  }
+  let idl = localStorage.getItem("left");
+  let rbl = document.getElementById(idl);
+  if (rbl.checked == false || rbl.checked == undefined) {
+    rbl.click();
+    //  cbl.dispatchEvent(new Event('change'));
+  }
+  let idr = localStorage.getItem("right");
+  let rbr = document.getElementById(idr);
+  if (rbr.checked == false || rbr.checked == undefined) {
+    rbr.click();
+  }
+}
+
+function startLeft() {
+  let cp = document.getElementById("Cp1");
+  if (cp.checked) {
+    loadCppLeft();
+  }
+  let cs = document.getElementById("Cs1");
+  if (cs.checked) {
+    loadCsLeft();
+  }
+  let rs = document.getElementById("Rs1");
+  if (rs.checked) {
+    loadRsLeft();
+  }
+  let py = document.getElementById("Py1");
+  if (py.checked) {
+    loadPyLeft();
+  }
+  let js = document.getElementById("Js1");
+  if (js.checked) {
+    loadJsLeft();
+  }
+}
+function startRight() {
+  let cp = document.getElementById("Cp2");
+  if (cp.checked) {
+    loadCppRight();
+  }
+  let cs = document.getElementById("Cs2");
+  if (cs.checked) {
+    loadCsRight();
+  }
+  let rs = document.getElementById("Rs2");
+  if (rs.checked) {
+    loadRsRight();
+  }
+  let py = document.getElementById("Py2");
+  if (py.checked) {
+    loadPyRight();
+  }
+  let js = document.getElementById("Js2");
+  if (js.checked) {
+    loadJsRight();
+  }
 }
