@@ -250,7 +250,7 @@ function setChecks() {
   let rbl = document.getElementById(idl);
   if (rbl.checked == false || rbl.checked == undefined) {
     rbl.click();
-    //  cbl.dispatchEvent(new Event('change'));
+    //  rbl.dispatchEvent(new Event('change'));
   }
   let idr = localStorage.getItem("right");
   let rbr = document.getElementById(idr);
