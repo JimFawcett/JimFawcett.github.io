@@ -2,12 +2,38 @@
  * ScriptsPageFrameRadioButtons.js
  */
 
+function noChecked() {
+  let no = localStorage.getItem("right");
+  if (no === "No2") {
+    return true;
+  }
+}
+function hideLower() {
+  let outlabel = document.getElementById("outlabel");
+  outlabel.style.display = "none";
+  let outcontent = document.getElementById("outcontent");
+  outcontent.style.display = "none";
+  let bldlabel = document.getElementById("bldlabel");
+  bldlabel.style.display = "none";
+  let bldcontent = document.getElementById("bldcontent");
+  bldcontent.style.display = "none";
+}
+function showLower() {
+  let outlabel = document.getElementById("outlabel");
+  outlabel.style.display = "table-row";
+  let outcontent = document.getElementById("outcontent");
+  outcontent.style.display = "table-row";
+  let bldlabel = document.getElementById("bldlabel");
+  bldlabel.style.display = "table-row";
+  let bldcontent = document.getElementById("bldcontent");
+  bldcontent.style.display = "table-row";
+}
 /*-- Load Cpp Code, Output, Build --*/
 function loadCppCodeLeft() {
-  loadCppCode("codeleft");
+  loadCppCode("left1");
 }
 function loadCppCodeRight() {
-  loadCppCode("coderight");
+  loadCppCode("right1");
 }
 /*-- implemented in Bits page --*/
 //function loadCppCode(id) {
@@ -15,10 +41,10 @@ function loadCppCodeRight() {
 //  codecont.innerHTML = "C++ Code"
 //}
 function loadCppOutLeft() {
-  loadCppOut("outleft");
+  loadCppOut("left2");
 }
 function loadCppOutRight() {
-  loadCppOut("outright");
+  loadCppOut("right2");
 }
 /*-- implemented in Bits page --*/
 //function loadCppOut(id) {
@@ -26,10 +52,10 @@ function loadCppOutRight() {
 //  codecont.innerHTML = "C++ Output"
 //}
 function loadCppBldLeft() {
-  loadCppBld("bldleft");
+  loadCppBld("left3");
 }
 function loadCppBldRight() {
-  loadCppBld("bldright");
+  loadCppBld("right3");
 }
 /*-- implemented in Bits page --*/
 //function loadCppBld(id) {
@@ -41,20 +67,33 @@ function loadCppLeft() {
   loadCppOutLeft();
   loadCppBldLeft()
   localStorage.setItem("left", "Cp1");
+  if (noChecked()) {
+    load1();
+  }
+  else {
+    showLower();
+  }
 }
 function loadCppRight() {
   loadCppCodeRight();
   loadCppOutRight();
   loadCppBldRight();
   localStorage.setItem("right", "Cp2");
+  document.getElementById("exeRight").style.display = "inline";
+  if (noChecked()) {
+    load1();
+  }
+  else {
+    showLower();
+  }
 }
 
 /*-- Load C# Code, Output, Build --*/
 function loadCsCodeLeft() {
-  loadCsCode("codeleft");
+  loadCsCode("left1");
 }
 function loadCsCodeRight() {
-  loadCsCode("coderight");
+  loadCsCode("right1");
 }
 /*-- implemented in Bits page --*/
 //function loadCsCode(id) {
@@ -62,10 +101,10 @@ function loadCsCodeRight() {
 //  codecont.innerHTML = "C# Code"
 //}
 function loadCsOutLeft() {
-  loadCsOut("outleft");
+  loadCsOut("left2");
 }
 function loadCsOutRight() {
-  loadCsOut("outright");
+  loadCsOut("right2");
 }
 /*-- implemented in Bits page --*/
 //function loadCsOut(id) {
@@ -73,10 +112,10 @@ function loadCsOutRight() {
 //  codecont.innerHTML = "C# Output"
 //}
 function loadCsBldLeft() {
-  loadCsBld("bldleft");
+  loadCsBld("left3");
 }
 function loadCsBldRight() {
-  loadCsBld("bldright");
+  loadCsBld("right3");
 }
 /*-- implemented in Bits page --*/
 //function loadCsBld(id) {
@@ -88,20 +127,33 @@ function loadCsLeft() {
   loadCsOutLeft();
   loadCsBldLeft()
   localStorage.setItem("left", "Cs1");
+  if (noChecked()) {
+    load1();
+  }
+  else {
+    showLower();
+  }
 }
 function loadCsRight() {
   loadCsCodeRight();
   loadCsOutRight();
   loadCsBldRight();
   localStorage.setItem("right", "Cs2");
+  document.getElementById("exeRight").style.display = "inline";
+  if (noChecked()) {
+    load1();
+  }
+  else {
+    showLower();
+  }
 }
 
 /*-- Load Rust Code, Output, Build --*/
 function loadRsCodeLeft() {
-  loadRsCode("codeleft");
+  loadRsCode("left1");
 }
 function loadRsCodeRight() {
-  loadRsCode("coderight");
+  loadRsCode("right1");
 }
 /*-- implemented in Bits page --*/
 //function loadRsCode(id) {
@@ -109,10 +161,10 @@ function loadRsCodeRight() {
 //  codecont.innerHTML = "Rust Code"
 //}
 function loadRsOutLeft() {
-  loadRsOut("outleft");
+  loadRsOut("left2");
 }
 function loadRsOutRight() {
-  loadRsOut("outright");
+  loadRsOut("right2");
 }
 /*-- implemented in Bits page --*/
 //function loadRsOut(id) {
@@ -120,10 +172,10 @@ function loadRsOutRight() {
 //  codecont.innerHTML = "Rust Output"
 //}
 function loadRsBldLeft() {
-  loadRsBld("bldleft");
+  loadRsBld("left3");
 }
 function loadRsBldRight() {
-  loadRsBld("bldright");
+  loadRsBld("right3");
 }
 /*-- implemented in Bits page --*/
 //function loadRsBld(id) {
@@ -135,19 +187,32 @@ function loadRsLeft() {
   loadRsOutLeft();
   loadRsBldLeft()
   localStorage.setItem("left", "Rs1");
+  if (noChecked()) {
+    load1();
+  }
+  else {
+    showLower();
+  }
 }
 function loadRsRight() {
   loadRsCodeRight();
   loadRsOutRight();
   loadRsBldRight();
   localStorage.setItem("right", "Rs2");
+  document.getElementById("exeRight").style.display = "inline";
+  if (noChecked()) {
+    load1();
+  }
+  else {
+    showLower();
+  }
 }
 /*-- Load Python Code, Output, Build --*/
 function loadPyCodeLeft() {
-  loadPyCode("codeleft");
+  loadPyCode("left1");
 }
 function loadPyCodeRight() {
-  loadPyCode("coderight");
+  loadPyCode("right1");
 }
 /*-- implemented in Bits page --*/
 //function loadPyCode(id) {
@@ -155,10 +220,10 @@ function loadPyCodeRight() {
 //  codecont.innerHTML = "Rust Code"
 //}
 function loadPyOutLeft() {
-  loadPyOut("outleft");
+  loadPyOut("left2");
 }
 function loadPyOutRight() {
-  loadPyOut("outright");
+  loadPyOut("right2");
 }
 /*-- implemented in Bits page --*/
 //function loadPyOut(id) {
@@ -166,10 +231,10 @@ function loadPyOutRight() {
 //  codecont.innerHTML = "Rust Output"
 //}
 function loadPyBldLeft() {
-  loadPyBld("bldleft");
+  loadPyBld("left3");
 }
 function loadPyBldRight() {
-  loadPyBld("bldright");
+  loadPyBld("right3");
 }
 /*-- implemented in Bits page --*/
 //function loadPyBld(id) {
@@ -181,21 +246,34 @@ function loadPyLeft() {
   loadPyOutLeft();
   loadPyBldLeft()
   localStorage.setItem("left", "Py1");
+  if (noChecked()) {
+    load1();
+  }
+  else {
+    showLower();
+  }
 }
 function loadPyRight() {
   loadPyCodeRight();
   loadPyOutRight();
   loadPyBldRight();
   localStorage.setItem("right", "Py2");
+  document.getElementById("exeRight").style.display = "inline";
+  if (noChecked()) {
+    load1();
+  }
+  else {
+    showLower();
+  }
 }
 
 
 /*-- Load  Javascript Code, Output, Build --*/
 function loadJsCodeLeft() {
-  loadJsCode("codeleft");
+  loadJsCode("left1");
 }
 function loadJsCodeRight() {
-  loadJsCode("coderight");
+  loadJsCode("right1");
 }
 /*-- implemented in Bits page --*/
 //function loadJsCode(id) {
@@ -203,10 +281,10 @@ function loadJsCodeRight() {
 //  codecont.innerHTML = "Rust Code"
 //}
 function loadJsOutLeft() {
-  loadJsOut("outleft");
+  loadJsOut("left2");
 }
 function loadJsOutRight() {
-  loadJsOut("outright");
+  loadJsOut("right2");
 }
 /*-- implemented in Bits page --*/
 //function loadJsOut(id) {
@@ -214,10 +292,10 @@ function loadJsOutRight() {
 //  codecont.innerHTML = "Rust Output"
 //}
 function loadJsBldLeft() {
-  loadJsBld("bldleft");
+  loadJsBld("left3");
 }
 function loadJsBldRight() {
-  loadJsBld("bldright");
+  loadJsBld("right3");
 }
 /*-- implemented in Bits page --*/
 //function loadJsBld(id) {
@@ -229,12 +307,50 @@ function loadJsLeft() {
   loadJsOutLeft();
   loadJsBldLeft()
   localStorage.setItem("left", "Js1");
+  if (noChecked()) {
+    load1();
+  }
+  else {
+    showLower();
+  }
 }
 function loadJsRight() {
   loadJsCodeRight();
   loadJsOutRight();
   loadJsBldRight();
   localStorage.setItem("right", "Js2");
+  document.getElementById("exeRight").style.display = "inline";
+  if (noChecked()) {
+    load1();
+  }
+  else {
+    showLower();
+  }
+}
+function load1() {
+  localStorage.setItem("right", "No2");
+  document.getElementById("exeRight").style.display = "none";
+  let left = localStorage.getItem("left");
+  switch (left) {
+    case "Cp1":
+      loadCppOut("right1");
+      break;
+    case "Cs1":
+      loadCsOut("right1");
+      break;
+    case "Rs1":
+      loadRsOut("right1");
+      break;
+    case "Py1":
+      loadPyOut("right1");
+      break;
+    case "Js1":
+      loadJsOut("right1");
+      break;
+    default:
+      alert("load1 failed");
+  }
+  hideLower();
 }
 
 function setChecks() {
@@ -260,26 +376,37 @@ function setChecks() {
 }
 
 function startLeft() {
+  //let nor = null;
+
   let cp = document.getElementById("Cp1");
   if (cp.checked) {
     loadCppLeft();
+  //  nor = cp;
   }
   let cs = document.getElementById("Cs1");
   if (cs.checked) {
     loadCsLeft();
+  //  nor = cs;
   }
   let rs = document.getElementById("Rs1");
   if (rs.checked) {
     loadRsLeft();
+  //  nor = rs;
   }
   let py = document.getElementById("Py1");
   if (py.checked) {
     loadPyLeft();
+  //  nor = py;
   }
   let js = document.getElementById("Js1");
   if (js.checked) {
     loadJsLeft();
+  //  nor = js;
   }
+//  let no = document.getElementById("No2");
+//  if (no.checked) {
+
+//  }
 }
 function startRight() {
   let cp = document.getElementById("Cp2");
@@ -301,5 +428,9 @@ function startRight() {
   let js = document.getElementById("Js2");
   if (js.checked) {
     loadJsRight();
+  }
+  let no = document.getElementById("No2");
+  if (no.checked) {
+    load1();
   }
 }
