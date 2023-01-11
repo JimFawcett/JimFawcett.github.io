@@ -2,6 +2,37 @@
  * ScriptsPageFrameRadioButtons.js
  */
 
+var hinc = 0;
+//var gleft = document.getElementById("lb");
+//gleft.
+
+function movel() {
+  hinc = -30;
+  let left = document.getElementById("lb");
+  let cs = window.getComputedStyle(left);
+  let width = cs.getPropertyValue("width");
+  let nwidth = parseInt(width);
+  left.style.width = nwidth + hinc + "px";
+}
+
+function movec() {
+  let ruler = document.getElementById("ruler");
+  let cs = window.getComputedStyle(ruler);
+  let width = cs.getPropertyValue("width");
+  let nwidth = parseInt(width);
+  let left = document.getElementById("lb");
+  left.style.width = nwidth + "px";
+}
+
+function mover() {
+  hinc = 30;
+  let left = document.getElementById("lb");
+  let cs = window.getComputedStyle(left);
+  let width = cs.getPropertyValue("width");
+  let nwidth = parseInt(width);
+  left.style.width = nwidth + hinc + "px";
+}
+
 function noChecked() {
   let no = localStorage.getItem("right");
   if (no === "No2") {
