@@ -30,7 +30,7 @@ function goHome() {
 
 function getHelp() {
   //window.open("Help.html", "help", "popup=1, height=700, width=600");
-  window.open("../../Help.html", "_blank");
+  window.open("Help.html", "_blank");
 }
 
 
@@ -181,7 +181,8 @@ function initializeMenu() {
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Tests</summary>\
             <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a href='Bits_Hello.html'>Test Bits UI</a></div>\
+              <div class='ddItem ddDetails'><a href='../Bits/Bits_DataTest.html'>New Test Bits UI</a></div>\
+              <div class='ddItem ddDetails'><a href='../Bits/Bits_Hello.html'>Test Bits UI</a></div>\
               <div class='ddItem ddDetails'><a href='../../PageFrame1.html'>Test PageFrame</a></div>\
               <div class='ddItem ddDetails'><a href='../../TestFlexMenu.html'>Test FlexMenu</a></div>\
               <div class='ddItem ddDetails'><a href='../../WebComponentTests.html'>UI Widget Tests</a></div>\

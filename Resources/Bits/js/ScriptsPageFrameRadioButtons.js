@@ -48,6 +48,8 @@ function hideLower() {
   bldlabel.style.display = "none";
   let bldcontent = document.getElementById("bldcontent");
   bldcontent.style.display = "none";
+  let label = document.getElementById("rb");
+  label.innerHTML = "Output";
 }
 function showLower() {
   let outlabel = document.getElementById("outlabel");
@@ -58,6 +60,8 @@ function showLower() {
   bldlabel.style.display = "table-row";
   let bldcontent = document.getElementById("bldcontent");
   bldcontent.style.display = "table-row";
+  let label = document.getElementById("rb");
+  label.innerHTML = "Source Code";
 }
 /*-- Load Cpp Code, Output, Build --*/
 function loadCppCodeLeft() {

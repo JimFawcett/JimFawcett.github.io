@@ -173,7 +173,7 @@ function initializeMenu() {
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Tests</summary>\
             <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a href='Resources/Bits/Bits_Hello.html'>Test Bits UI</a></div>\
+              <div class='ddItem ddDetails'><a href='Resources/Bits/Bits_DataTest.html'>New Test Bits UI</a></div>\
               <div class='ddItem ddDetails'><a href='Resources/Bits/Bits_Hello.html'>Test Bits UI</a></div>\
               <div class='ddItem ddDetails'><a href='CppBits.html'>Test C++ Bits</a></div>\
               <div class='ddItem ddDetails'><a href='RustBits.html'>Test Rust Bits</a></div>\
