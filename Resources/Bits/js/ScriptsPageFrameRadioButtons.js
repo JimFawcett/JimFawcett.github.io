@@ -60,7 +60,7 @@ function showLower() {
   bldlabel.style.display = "table-row";
   let bldcontent = document.getElementById("bldcontent");
   bldcontent.style.display = "table-row";
-  let label = document.getElementById("rb");
+  let label = document.getElementById("rbt");
   label.innerHTML = "Source Code";
 }
 /*-- Load Cpp Code, Output, Build --*/
