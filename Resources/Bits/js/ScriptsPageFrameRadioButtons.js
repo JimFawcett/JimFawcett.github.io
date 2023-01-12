@@ -48,8 +48,10 @@ function hideLower() {
   bldlabel.style.display = "none";
   let bldcontent = document.getElementById("bldcontent");
   bldcontent.style.display = "none";
-  let label = document.getElementById("rb");
+  let label = document.getElementById("rbt");
   label.innerHTML = "Output";
+  let remex = document.getElementById("exeRight");
+  remex.style.display = "none";
 }
 function showLower() {
   let outlabel = document.getElementById("outlabel");
@@ -62,6 +64,8 @@ function showLower() {
   bldcontent.style.display = "table-row";
   let label = document.getElementById("rbt");
   label.innerHTML = "Source Code";
+  let remex = document.getElementById("exeRight");
+  remex.style.display = "inline";
 }
 /*-- Load Cpp Code, Output, Build --*/
 function loadCppCodeLeft() {
@@ -114,7 +118,7 @@ function loadCppRight() {
   loadCppOutRight();
   loadCppBldRight();
   localStorage.setItem("right", "Cp2");
-  document.getElementById("exeRight").style.display = "inline";
+  //document.getElementById("exeRight").style.display = "inline";
   if (noChecked()) {
     load1();
   }
@@ -174,7 +178,7 @@ function loadCsRight() {
   loadCsOutRight();
   loadCsBldRight();
   localStorage.setItem("right", "Cs2");
-  document.getElementById("exeRight").style.display = "inline";
+  //document.getElementById("exeRight").style.display = "inline";
   if (noChecked()) {
     load1();
   }
@@ -234,7 +238,7 @@ function loadRsRight() {
   loadRsOutRight();
   loadRsBldRight();
   localStorage.setItem("right", "Rs2");
-  document.getElementById("exeRight").style.display = "inline";
+  //document.getElementById("exeRight").style.display = "inline";
   if (noChecked()) {
     load1();
   }
@@ -293,7 +297,7 @@ function loadPyRight() {
   loadPyOutRight();
   loadPyBldRight();
   localStorage.setItem("right", "Py2");
-  document.getElementById("exeRight").style.display = "inline";
+  //document.getElementById("exeRight").style.display = "inline";
   if (noChecked()) {
     load1();
   }
@@ -354,7 +358,7 @@ function loadJsRight() {
   loadJsOutRight();
   loadJsBldRight();
   localStorage.setItem("right", "Js2");
-  document.getElementById("exeRight").style.display = "inline";
+  //document.getElementById("exeRight").style.display = "inline";
   if (noChecked()) {
     load1();
   }
@@ -364,7 +368,7 @@ function loadJsRight() {
 }
 function load1() {
   localStorage.setItem("right", "No2");
-  document.getElementById("exeRight").style.display = "none";
+  //document.getElementById("exeRight").style.display = "none";
   let left = localStorage.getItem("left");
   switch (left) {
     case "Cp1":
