@@ -22,6 +22,7 @@ function movec() {
   let nwidth = parseInt(width);
   let left = document.getElementById("lb");
   left.style.width = nwidth + "px";
+  window.location.href = "#compare";
 }
 
 function mover() {
