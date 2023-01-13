@@ -415,7 +415,7 @@ function load1() {
 
 function setChecks() {
   //localStorage.clear();
-  if (localStorage == undefined || localStorage.length == 0) {
+  if (localStorage == undefined || localStorage.length < 2) {
     document.getElementById("Cp1").checked = true;
     document.getElementById("Rs2").checked = true;
     localStorage.setItem("left", "Cp1");
