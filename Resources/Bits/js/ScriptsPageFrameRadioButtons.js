@@ -62,16 +62,20 @@ function showLower() {
   bldlabel.style.display = "table-row";
   let bldcontent = document.getElementById("bldcontent");
   bldcontent.style.display = "table-row";
-  let label = document.getElementById("rbt");
-  label.innerHTML = "Source Code";
+  //let label = document.getElementById("rbt");
+  //label.innerHTML = "Source Code";
   let remex = document.getElementById("exeRight");
   remex.style.display = "inline";
 }
 /*-- Load Cpp Code, Output, Build --*/
 function loadCppCodeLeft() {
+  let llab = document.getElementById("lbt");
+  llab.innerHTML = "C++ Source Code";
   loadCppCode("left1");
 }
 function loadCppCodeRight() {
+  let rlab = document.getElementById("rbt");
+  rlab.innerHTML = "C++ Source Code";
   loadCppCode("right1");
 }
 /*-- implemented in Bits page --*/
@@ -129,9 +133,13 @@ function loadCppRight() {
 
 /*-- Load C# Code, Output, Build --*/
 function loadCsCodeLeft() {
+  let llab = document.getElementById("lbt");
+  llab.innerHTML = "C# Source Code";
   loadCsCode("left1");
 }
 function loadCsCodeRight() {
+  let llab = document.getElementById("rbt");
+  llab.innerHTML = "C# Source Code";
   loadCsCode("right1");
 }
 /*-- implemented in Bits page --*/
@@ -189,9 +197,13 @@ function loadCsRight() {
 
 /*-- Load Rust Code, Output, Build --*/
 function loadRsCodeLeft() {
+  let llab = document.getElementById("lbt");
+  llab.innerHTML = "Rust Source Code";
   loadRsCode("left1");
 }
 function loadRsCodeRight() {
+  let llab = document.getElementById("rbt");
+  llab.innerHTML = "Rust Source Code";
   loadRsCode("right1");
 }
 /*-- implemented in Bits page --*/
@@ -248,9 +260,13 @@ function loadRsRight() {
 }
 /*-- Load Python Code, Output, Build --*/
 function loadPyCodeLeft() {
+  let llab = document.getElementById("lbt");
+  llab.innerHTML = "Python Source Code";
   loadPyCode("left1");
 }
 function loadPyCodeRight() {
+  let llab = document.getElementById("rbt");
+  llab.innerHTML = "Python Source Code";
   loadPyCode("right1");
 }
 /*-- implemented in Bits page --*/
@@ -309,9 +325,13 @@ function loadPyRight() {
 
 /*-- Load  Javascript Code, Output, Build --*/
 function loadJsCodeLeft() {
+  let llab = document.getElementById("lbt");
+  llab.innerHTML = "JavaScript Source Code";
   loadJsCode("left1");
 }
 function loadJsCodeRight() {
+  let llab = document.getElementById("rbt");
+  llab.innerHTML = "JavaScript Source Code";
   loadJsCode("right1");
 }
 /*-- implemented in Bits page --*/

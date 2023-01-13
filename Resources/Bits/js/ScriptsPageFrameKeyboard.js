@@ -11,7 +11,6 @@ function initHelp() {
   storyHlpMenu.helpMenu();
 }
 
-
 storyHlpMenu.helpMenu = function() {
   var hlpMenu = document.getElementById("hlp");
   hlpMenu.innerHTML = '<table id="keys">\
@@ -56,6 +55,10 @@ storyHlpMenu.helpMenu = function() {
       <td class="key" onclick="storyHlpMenu.about()">A</td><td>about</td>\
     </tr>\
     <tr>\
+      <td class="key" onclick="storyHlpMenu.viewCode()">C</td>\
+      <td>CodeView</td>\
+    </tr>\
+    <tr>\
       <td class="key" onclick="storyHlpMenu.incrZoomScreen()">I</td>\
       <td>increase font 22px</td>\
     </tr>\
@@ -71,6 +74,10 @@ storyHlpMenu.helpMenu = function() {
       <td colspan=2><div style="height:0.25em;">&nbsp;</div></td>\
     </tr>\
   </table>';
+}
+
+storyHlpMenu.viewCode = function viewCode() {
+  location.href = "#compare";
 }
 
 storyHlpMenu.incrZoomScreen = function () {
@@ -250,6 +257,10 @@ function keyAction(keyEvent) {
   }
   if (key === 'A') {
     storyHlpMenu.about();
+    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
+  }
+  if (key === 'C') {
+    storyHlpMenu.viewCode();
     //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
   if (key === 'I') {
