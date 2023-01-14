@@ -267,14 +267,6 @@
       first argument and its value and size.\
     </li>\
     <li>\
-      At the call site its second argument is a string representation of\
-      the calling name, created using the # operator for macro arguments.\
-    </li>\
-    <li>\
-      There is no advantage using the macro over just passing in a string,\n\
-      but was done to demonstrate a simple macro process.\
-    </li>\
-    <li>\
       <c-s>template&lt;typename T&gt;</c-s>\n\
       <c-s>void show(T t, const std::string &ts)</c-s> is generic on the type T\
     </li>\
@@ -297,113 +289,147 @@
     array, pointer, reference\n\
     struct, class, enum class, using\n\
   Qualifiers:\n\
-    short, long, const\n\
+    short, long, const, unsigned\n\
 \n\
   Operations:\n\
     Primitive types can all be copied.\n\
-    Most library and user-defined types can be copied,\n\
-    moved, and deleted by providing member constructors\n\
-    and destructor. Often compiler generation works well.\n\
-    For classes with pointer members developers must\n\
-    provide them.\n\
-      \n\
+    Most library and user-defined types can be copied, moved, and deleted\n\
+    by providing member constructors and destructor.  Often compiler \n\
+    generation works well, but for classes with pointer members developers \n\
+    must provide them.\n\
+\n\
   Processing:\n\
-    All types are static, operations run as native code,\n\
-    and no garbage collection is needed. Resources are\n\
-    returned at end of declr scope.\n\
+    All types are static, operations run as native code, and no garbage\n\
+    collection is needed. Resources are returned at end of declr scope.\n\
 */\n\
-/*-- macro turns name into string --*/\n\
-#define STRINGIFY_(x) #x     // # is a macro stringizer\n\
-#define TS(x) STRINGIFY_(x)  // operator\n\
-      \n\
+/* C++ requires declaration before use */\n\
 template&lt;typename T&gt;\n\
-void show(T t, const std::string &ts) {\n\
-  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; typeid(t).name();  // show type\n\
-  std::cout &lt;&lt; &quot;, &quot; &lt;&lt; ts;                  // show name at call site\n\
+void showType(T t, const std::string &nm);\n\
+void print(const std::string& txt = &quot;&quot;);\n\
+void println(const std::string& txt = &quot;&quot;);\n\
+\n\
+int main() {\n\
+    print(&quot; Demonstrate C++ types&quot;);\n\
+    println(&quot;-----------------------&quot;);\n\
+    /*-- values live in stack frame --*/\n\
+    println(&quot;-- initialize from literals --&quot;);\n\
+    int t1 = int{3}; \n\
+    showType(t1, &quot;t1&quot;);\n\
+    long long int t1a = 3;\n\
+    showType(t1a, &quot;t1a&quot;);\n\
+\n\
+    println(&quot;-- copy construct --&quot;);\n\
+    auto t1b = t1a;\n\
+    showType(t1b, &quot;t1b&quot;);\n\
+    // double t1 = 3.1415927; // not allowed to redefine type of t1\n\
+    \n\
+    /*-- values live in heap when using new --*/\n\
+    println(&quot;-- store in heap --&quot;);\n\
+    double* t2 = new double{3.14159};\n\
+    showType(t2, &quot;t2&quot;);\n\
+    showType(*t2, &quot;*t2&quot;);\n\
+    delete(t2);  // see unique_ptr, below\n\
+    \n\
+    /*-- control block lives in stack, char data live in heap --*/\n\
+    println(&quot;-- string: control block in stack, data in heap --&quot;);\n\
+    auto t3 = std::string(&quot;Hello Data&quot;);  // move ctor - rhs is temp\n\
+    showType(t3, &quot;t3&quot;);\n\
+    println(&quot;-- C++ reference --&quot;);\n\
+    auto& t4 = t3;      // create reference, no copy or move\n\
+    showType(t4, &quot;t4&quot;);\n\
+    \n\
+    /*-- unique_ptr may not be copied but move allowed --*/\n\
+    println(&quot;-- unique_ptr owns data --&quot;);\n\
+    auto t5 = std::unique_ptr&lt;int&gt;(new int{-3});\n\
+    showType(std::move(t5), &quot;t5&quot;);  // unique_ptr can't be copied so move\n\
+    t5 = std::unique_ptr&lt;int&gt;(new int{-3});\n\
+    showType(*t5, &quot;*t5&quot;); // contents can be copied\n\
+    println(&quot;-- t5 deleted when unique_ptr leaves scope&quot;);\n\
+    std::cout &lt;&lt; std::endl;\n\
+}\n\
+\n\
+template&lt;typename T&gt;\n\
+void showType(T t, const std::string &nm) {\n\
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; nm;                // show name at call site\n\
+  std::cout &lt;&lt; &quot;: type: &quot; &lt;&lt; typeid(t).name();  // show type\n\
   std::cout &lt;&lt; &quot;&#92;n  value: &quot; &lt;&lt; t;          // show value\n\
   std::cout &lt;&lt; &quot;,  size:  &quot; &lt;&lt; sizeof(t);   // show size on stack\n\
   std::cout &lt;&lt; &quot;&#92;n&quot;;\n\
 }\n\
-int main() {\n\
-    std::cout &lt;&lt; &quot;&#92;n  Demonstrate C++ types:&quot;;\n\
-    std::cout &lt;&lt; &quot;&#92;n ------------------------&quot;;\n\
-    /*-- values live in stack frame --*/\n\
-    int t1 = int{3};\n\
-    show(t1, TS(t1));\n\
-    long long int t1a = 3;\n\
-    show(t1a, TS(t1a));\n\
-    // double t1 = 3.1415927; // not allowed to redefine type of t1\n\
-      \n\
-    /*-- values live in heap when using new --*/\n\
-    double* t2 = new double{3.14159};\n\
-    show(t2, TS(t2));\n\
-    show(*t2, TS(*t2));\n\
-    delete(t2);\n\
-      \n\
-    /*-- control block lives in stack, char data live in heap --*/\n\
-    auto t3 = std::string(&quot;Hello Data&quot;);  // move ctor - rhs is temp\n\
-    show(t3, TS(t3));\n\
-      \n\
-    auto& t4 = t3;      // reference\n\
-    show(t4, TS(t4));\n\
-      \n\
-    /*-- unique_ptr can not be copied but move allowed --*/\n\
-    auto t5 = std::unique_ptr&lt;int&gt;(new int{-3});\n\
-    show(std::move(t5), TS(t5));  // unique_ptr can't be copied so move\n\
-    t5 = std::unique_ptr&lt;int&gt;(new int{-3});\n\
-    show(*t5, TS(*t5)); // contents can be copied\n\
-    /*-- unique_ptr releases its heap storage when it goes out of scope --*/\n\n\
-    std::cout &lt;&lt; std::endl;\n\
+void print(const std::string& txt = &quot;&quot;) {\n\
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt;\n\
 }\n\
-</div></pre>\
+void println(const std::string& txt = &quot;&quot;) {\n\
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt &lt;&lt; &quot;&#92;n&quot;;\n\
+}\n\</div></pre>\
 ";
     }
 
     function loadCppOut(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\
-  Demonstrate C++ types:\n\
- ------------------------\n\
-  int, t1\n\
+   Demonstrate C++ types\n\
+  -----------------------\n\
+\n\
+  -- initialize from literals --\n\
+\n\
+  t1: type: int\n\
   value: 3,  size:  4\n\
-      \n\
-  __int64, t1a\n\
+\n\
+  t1a: type: __int64\n\
   value: 3,  size:  8\n\
-      \n\
-  double * __ptr64, t2\n\
-  value: 000001E8347573B0,  size:  8\n\
-      \n\
-  double, *t2\n\
+\n\
+  -- copy construct --\n\
+\n\
+  t1b: type: __int64\n\
+  value: 3,  size:  8\n\
+\n\
+  -- store in heap --\n\
+\n\
+  t2: type: double * __ptr64\n\
+  value: 0000029E1568AE70,  size:  8\n\
+\n\
+  *t2: type: double\n\
   value: 3.14159,  size:  8\n\
-      \n\
-  class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >, t3\n\
+\n\
+  -- string: control block in stack, data in heap --\n\
+\n\
+  t3: type: class std::basic_string&lt;char,struct std::char_traits&lt;char&gt;,class std::allocator&lt;char&gt; &gt;\n\
   value: Hello Data,  size:  40\n\
-      \n\
-  class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >, t4\n\
+\n\
+  -- C++ reference --\n\
+\n\
+  t4: type: class std::basic_string&lt;char,struct std::char_traits&lt;char&gt;,class std::allocator&lt;char&gt; &gt;\n\
   value: Hello Data,  size:  40\n\
-      \n\
-  class std::unique_ptr<int,struct std::default_delete<int> >, t5\n\
-  value: 000001E8347465D0,  size:  8\n\
-      \n\
-  int, *t5\n\
+\n\
+  -- unique_ptr owns data --\n\
+\n\
+  t5: type: class std::unique_ptr&lt;int,struct std::default_delete&lt;int&gt; &gt;\n\
+  value: 0000029E15676B10,  size:  8\n\
+\n\
+  *t5: type: int\n\
   value: -3,  size:  4\n\
-      \n\
-C:\github\JimFawcett\Bits\Cpp\Cpp_Data\build\n\
-></pre>";
+\n\
+  -- t5 deleted when unique_ptr leaves scope\n\
+\n\
+\n\></pre>";
     }
 
     function loadCppBld(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<div class='code'>\
 <pre style='overflow-x:auto;'>\n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build\n\
-> cmake --build .     \n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;cpp&#92;Cpp_Data&#92;build\n\
+&gt; cmake --build .     \n\
 MSBuild version 17.4.0+18d5aef85 for .NET Framework\n\
-  Cpp_Data.cpp\n\
-  Cpp_Data.vcxproj -> C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build&#92;Debug&#92;Cpp_Data.exe\n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build\n\
-      \n\
-</pre>\
+  Cpp_Data.vcxproj -&gt; C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build&#92;Debug&#92;Cpp_Data.e\n\
+  xe\n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;cpp&#92;Cpp_Data&#92;build\n\
+&gt; ./debug/Cpp_Data.exe\n\
+\n\
+   Demonstrate C++ types\n\
+  -----------------------\n\
+\n\</pre>\
 </div>\
 ";
     }
