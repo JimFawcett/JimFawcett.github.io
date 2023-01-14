@@ -889,17 +889,14 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
               first argument and its value and size.\
             </li>\
             <li>\
-              At the call site its second argument is a string representation of\
-              the calling name, created using the stringify! macro. There is no\
-              advantage over passing in a literal string.  This was done to demonstrate\
-              use of stringify! macro.  All Rust macros end with the ! character.\
-            </li>\
-            <li>\
               <c-s>show&lt;T: Debug&gt;(T:t, n:&str)</c-s> is generic on the type T\
               with the bound that T must satisfy the Debug trait.\
             </li>\
             <li>\
               The Debug trait provides a simple formatting using {:?} in print macro.\
+            </li>\
+            <li>\
+              Macros end with &quot;!&quot; character.  The macro println! is an example.\
               <div style='height:0.75em;'></div>\
             </li>\
           </ol >\
@@ -907,6 +904,9 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
       </div >\
 <pre>\
 #![allow(unused_mut)]\n\
+#![allow(clippy::approx_constant)]\n\
+\n\
+use std::fmt::Debug;\n\
 /* rust_hello_data::main.rs */\n\
 /*\n\
   Static Data Types:\n\
@@ -919,92 +919,103 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
     struct, enum, use\n\
   Qualifiers:\n\
     mutable, const\n\
-      \n\
+\n\
   Operations:\n\
     Primitive types can all be copied.\n\
     Most library and user-defined types can be moved,\n\
     cloned, but only aggregates with all copyable members\n\
     can be copied.\n\
-      \n\
+\n\
   Processing:\n\
     All types are static, operations run as native code,\n\
     and no garbage collection is needed. Resources are\n\
     returned at end of declr scope.\n\
 */\n\
-use std::fmt::Debug;\n\
 /*\n\
   First argument is passed by value, second passed\n\
   by reference. Non-copy types supplied to the first\n\
   argument will be moved.\n\
 */\n\
-fn show&lt;T: Debug&gt;(t:T, n:&str) {\n\
-  let typename = std::any::type_name::&lt;T&gt;();\n\
-  println!(&quot;&#92;n{}, {}&quot;,typename, n);\n\
-  println!(&quot;value: {:?}, size: {}&quot;, t, std::mem::size_of::&lt;T&gt;());\n\
-}\n\
-      \n\
 fn main() {\n\
-    print!(\n\
-      &quot;&#92;n Demonstrate Rust types&#92;n&#92;\n\
+    println!(\n\
+        &quot;&#92;n Demonstrate Rust types&#92;n&#92;\n\
        ------------------------&quot;\n\
     );\n\
     /*\n\
       Primitive data types: i32, f64, ... occupy contiguous\n\
       regions of memory, so they satisfy the copy trait.\n\
-      \n\
+\n\
       Library types like String have a control block in stack\n\
       and data in heap. So they do not satisfy the copy trait.\n\
       They can be cloned, but that requires an explicit call\n\
       to clone().\n\
     */\n\
-      \n\
+\n\
     /*-- values live in stack frame --*/\n\
-    let mut t1 :i32 = 42;\n\
-    show(t1, stringify!(t1));\n\
-    let t1a:i64 = 42;\n\
-    show(t1a, stringify!(t1a));\n\
+    println!(&quot;&#92;n  -- initialize on stack from literals --&quot;);\n\
+    let mut t1: i32 = 42;\n\
+    show_type(t1, &quot;t1&quot;);\n\
+    let t1a = 42i64;      // alternate declaration\n\
+    show_type(t1a, &quot;t1a&quot;);\n\
     /*\n\
       Below is not type redefinition, it is shadowing,\n\
       e.g., a new variable that hides the older t1a.\n\
     */\n\
-    let t1a:f64 = 42.0;\n\
-    show(t1a, stringify!(t1a));\n\
-      \n\
+    let mut t1a: f64 = 42.0;\n\
+    show_type(t1a, &quot;t1a&quot;);\n\
+\n\
     /*-- create mutable reference --*/\n\
-    let t1b:&mut f64 = &mut t1a;\n\
+    let t1b: &mut f64 = &mut t1a;  // requires t1a to be mutable\n\
     *t1b = 84.0;\n\
-    show(t1b, stringify!(t1b));\n\
-      \n\
+    show_type(t1b, &quot;t1b&quot;);\n\
+\n\
     /*-- values live in heap when wrapped with box --*/\n\
-    let t2 = Box::new(3.14159f64);  // 3.14159f64 value specified to be f64\n\
-    show(t2.clone(), stringify!(t2));\n\
-    show(*t2, stringify!(*t2));\n\
-    /*-- Box releases heap storage when it goes out of scope --*/\n\n\
+    println!(&quot;&#92;n  -- initialize on heap --&quot;);\n\
+    let t2 = Box::new(3.14159f64); // 3.14159f64 is value specified to be f64\n\
+    show_type(*t2, &quot;*t2&quot;);\n\
+    show_type(t2, &quot;t2&quot;);    // moves t2, use t2.clone() to avoid move\n\
+    // print!(&quot;{}&quot;, &t2.to_string());  // error - t2 moved\n\
+    /*-- Box releases its heap storage when it goes out of scope --*/\n\
+\n\
+    println!(&quot;&#92;n  -- size_of measures size of handle to heap element --&quot;);\n\
     let s1 = std::mem::size_of::&lt;Box&lt;i8&gt;&gt;();\n\
     let s2 = std::mem::size_of::&lt;Box&lt;i64&gt;&gt;();\n\
     println!(&quot;&#92;nsize_of::&lt;Box&lt;i8&gt;&gt;() = {}&quot;, s1);\n\
     println!(&quot;size_of::&lt;Box&lt;i64&gt;&gt;() = {}&quot;, s2);\n\
-      \n\
+\n\
     /*--\n\
-      Control block lives on stack, char data live in heap.\n\
-      Passing by value or assignment transfers ownership\n\
-      from source to destination.  That is termed a move.\n\
+      String control block lives on stack, char data live in heap.\n\
+      Passing by value or assignment transfers ownership from\n\
+      source to destination.  That is termed a move.\n\
     --*/\n\
-    let t3:String = String::from(&quot;Hello Data&quot;);  // temp moved\n\
-    show(t3.clone(), stringify!(t3.clone()));    // moves t3s clone\n\
-      \n\
-    let t4 = &t3;  // reference to still valid t3\n\
-    show(t4, stringify!(t4));\n\
-      \n\
-    let t5 = [1, 2, 3, 4, 5];  // copy type\n\
-    show(t5, stringify!(t5));\n\
-    let mut txt = String::from(&quot;&#92;nt5 was copied into show(...)&quot;);\n\
+    println!(&quot;&#92;n  -- use clone to avoid src move --&quot;);\n\
+    let t3: String = String::from(&quot;Hello Data&quot;); // temp moved\n\
+    show_type(t3.clone(), &quot;t3.clone()&quot;); // moves t3s clone, not t3\n\
+\n\
+    let t4 = &t3; // reference to still valid t3\n\
+    show_type(t4, &quot;t4&quot;);\n\
+\n\
+    println!(&quot;&#92;n  -- array of copy type elements is copy --&quot;);\n\
+    let t5 = [1, 2, 3, 4, 5]; // copy type\n\
+    show_type(t5, &quot;t5&quot;);\n\
+    let mut txt = String::from(&quot;&#92;nt5 was copied into show_type(...)&quot;);\n\
     txt += &quot;, see:&#92;nt5 = &quot;;\n\
     println!(&quot;{}{:?} is still valid&quot;, txt, t5);\n\
-      \n\
+\n\
     println!(&quot;&#92;n&#92;nThat's all Folks!!&#92;n&#92;n&quot;);\n\
 }\n\
-</pre></div>\
+/*\n\
+  show_type is generic function with Debug bound.\n\
+  Using format {:?} requires Debug.\n\
+*/\n\
+fn show_type&lt;T: Debug&gt;(t: T, nm: &str) {\n\
+  let typename = std::any::type_name::&lt;T&gt;();\n\
+  println!(&quot;&#92;n{}, {}&quot;, nm, typename);\n\
+  println!(&quot;value: {:?}, size: {}&quot;, t, std::mem::size_of::&lt;T&gt;());\n\
+}\n\
+\n\
+\n\
+<</pre></div>\
 ";
     }
 
@@ -1013,56 +1024,68 @@ fn main() {\n\
       codecont.innerHTML = "<pre>\
  Demonstrate Rust types\n\
 ------------------------\n\
-i32, t1\n\
+\n\
+  -- initialize on stack from literals --\n\
+\n\
+t1, i32\n\
 value: 42, size: 4\n\
-      \n\
-i64, t1a\n\
+\n\
+t1a, i64\n\
 value: 42, size: 8\n\
-      \n\
-f64, t1a\n\
+\n\
+t1a, f64\n\
 value: 42.0, size: 8\n\
-      \n\
-&mut f64, t1b\n\
+\n\
+t1b, &mut f64\n\
 value: 84.0, size: 8\n\
-      \n\
-alloc::boxed::Box&lt;f64&gt;, t2\n\
+\n\
+  -- initialize on heap --\n\
+\n\
+*t2, f64\n\
 value: 3.14159, size: 8\n\
-      \n\
-f64, * t2\n\
+\n\
+t2, alloc::boxed::Box&lt;f64&gt;\n\
 value: 3.14159, size: 8\n\
-      \n\
+\n\
+  -- size_of measures size of handle to heap element --\n\
+\n\
 size_of::&lt;Box&lt;i8&gt;&gt;() = 8\n\
 size_of::&lt;Box&lt;i64&gt;&gt;() = 8\n\
 \n\
-alloc::string::String, t3.clone()\n\
+  -- use clone to avoid src move --\n\
+\n\
+t3.clone(), alloc::string::String\n\
 value: &quot;Hello Data&quot;, size: 24\n\
-    \n\
-&alloc::string::String, t4\n\
+\n\
+t4, &alloc::string::String\n\
 value: &quot;Hello Data&quot;, size: 8\n\
-    \n\
-[i32; 5], t5\n\
+\n\
+  -- array of copy type elements is copy --\n\
+\n\
+t5, [i32; 5]\n\
 value: [1, 2, 3, 4, 5], size: 20\n\
-    \n\
-t5 was copied into show(...), see:\n\
+\n\
+t5 was copied into show_type(...), see:\n\
 t5 = [1, 2, 3, 4, 5] is still valid\n\
-    \n\
-    \n\
+\n\
+\n\
 That's all Folks!!\n\
-    \n\
+\n\
+\n\
 </pre>";
     }
 
     function loadRsBld(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;rust&#92;rust_hello_data\n\
-> cargo run\n\
-   Compiling rust_hello_data v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;rust&#92;rust_hello_data)\n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_data\n\
+&gt; cargo run\n\
+   Compiling rust_hello_data v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_data)\n\
     Finished dev [unoptimized + debuginfo] target(s) in 0.32s\n\
      Running `target&#92;debug&#92;rust_hello_data.exe`\n\
-        ...\n\n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;rust&#92;rust_hello_data\n\
->      </pre>";
+\n\
+\n\
+></pre>";
     }
     /*-- Load Python Code, Output, Build --*/
     function loadPyCode(id) {
