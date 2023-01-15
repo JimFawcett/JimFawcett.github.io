@@ -446,7 +446,11 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;cpp&#92;Cpp_Data&#92;build\n\
       struct, and class\
     </li>\
     <li>\
-      It explores instance sharing and copy on write.\
+      All implementation code is required to be placed inline within the class method\
+      declarations.\
+    </li>\
+    <li>\
+      This code explores instance sharing and copy on write.\
     </li>\
     <li>\
       It enumerates members of value and reference types.\
@@ -457,7 +461,8 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;cpp&#92;Cpp_Data&#92;build\n\
     </li>\
     <li>\
       Some of the analysis methods require reflection. The method\
-      int GetManagedSize(Type type) requires advanced reflection techniques.\
+      int GetManagedSize(Type type), at the bottom of the code listing, requires\
+      advanced reflection techniques.\
     </li>\
   </ol >\
   <div style=&quot;height: 3em;&quot;>&nbsp;</div>\
@@ -465,23 +470,26 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;cpp&#92;Cpp_Data&#92;build\n\
 </div >\
 </div>\
 <pre>\n\
+using System;\n\
+using System.Reflection;\n\
+using System.Reflection.Emit;\n\
+\n\
 /* Cs_Data::Cs_Data.cs */\n\
 /*\n\
   Static Data Types:\n\
-    value types => assignment copies value\n\
+    value types =&gt; assignment copies value\n\
     --------------------------------------\n\
       sbyte, byte, short, int, long, ushort, uint, ulong\n\
       float, double\n\
       decimal, char, bool\n\
       struct\n\
-    Reference types => assignment copies reference\n\
+    Reference types =&gt; assignment copies reference\n\
     ----------------------------------------------\n\
       object, string, class\n\
 */\n\
-using System;\n\
-using System.Reflection;\n\
-using System.Reflection.Emit;\n\
-\n\
+//#pragma warning disable CS8602  // possibly null reference warning\n\
+// https://stackoverflow.com/questions/8173239/c-getting-size-of-a-value-type-variable-at-runtime/8173293#8173293\n\
+// \n\
 namespace HelloData\n\
 {\n\
   /*-- \n\
@@ -523,9 +531,10 @@ namespace HelloData\n\
       showOp(&quot;int t1 = 42&quot;);\n\
       int t1 = 42;\n\
       showType(t1, &quot;t1&quot;);\n\
+      showOp(&quot;interate over val type members using reflection&quot;);\n\
       iterate(t1);\n\
       print();\n\
-      showOp(&quot;int t1a = t1&quot;);\n\
+      showOp(&quot;int t1a = t1 : copy of value type&quot;);\n\
       int t1a = t1;\n\
       isSameObj(t1a, &quot;t1a&quot;, t1, &quot;t1&quot;);\n\
 \n\
@@ -536,12 +545,12 @@ namespace HelloData\n\
       showType(t2, &quot;t2&quot;);\n\
       showNote(&quot;string has many methods - uncomment next line to see them&quot;);\n\
       //iterate(t2);\n\
-      showOp(&quot;string t3 = t2&quot;);\n\
+      showOp(&quot;string t3 = t2 : copy handle of ref type&quot;);\n\
       string t3 = t2;\n\
       showType(t3, &quot;t3&quot;);\n\
       isSameObj(t3,&quot;t3&quot;,t2,&quot;t2&quot;);\n\
 \n\
-      showOp(&quot;t3 += &#92;&quot; is here&#92;&quot;&quot;);\n\
+      showOp(&quot;t3 += &#92;&quot; is here&#92;&quot; : copy on write&quot;);\n\
       t3 += &quot; is here&quot;;\n\
       showType(t3, &quot;t3&quot;);\n\
       isSameObj(t3,&quot;t3&quot;,t2,&quot;t2&quot;);\n\
@@ -551,6 +560,7 @@ namespace HelloData\n\
       Object obj1 = new Object();\n\
       // showIdent(obj, &quot;obj&quot;);\n\
       showType(obj1, &quot;obj&quot;);\n\
+      showOp(&quot;interate over ref type members using reflection&quot;);\n\
       iterate(obj1);\n\
       showOp(&quot;Object obj2 = obj1&quot;);\n\
       Object obj2 = obj1;\n\
@@ -565,9 +575,10 @@ namespace HelloData\n\
       t4.printSelf(&quot;t4&quot;);\n\
       showType(t4, &quot;t4&quot;);\n\
       showNote(&quot;value type: size of object in stackframe&quot;);\n\
+      showOp(&quot;iterate over ref type members using reflection&quot;);\n\
       iterate(t4);\n\
 \n\
-      showOp(&quot;Svt t4a = t4&quot;);\n\
+      showOp(&quot;Svt t4a = t4 : copy of val type&quot;);\n\
       Svt t4a = t4;\n\
       t4a.printSelf(&quot;t4a&quot;);\n\
       t4.printSelf(&quot;t4&quot;);\n\
@@ -588,13 +599,13 @@ namespace HelloData\n\
       showType(t5, &quot;t5&quot;);\n\
       showNote(&quot;ref type: size of handle to object in heap&quot;);\n\
 \n\
-      showOp(&quot;Crt t5a = t5&quot;);\n\
+      showOp(&quot;Crt t5a = t5 : copy handle of ref type&quot;);\n\
       Crt t5a = t5;\n\
       t5a.printSelf(&quot;t5a&quot;);\n\
       isSameObj(t5a, &quot;t5a&quot;, t5, &quot;t5&quot;);\n\
       isSameObj(t5a.S, &quot;t5a.S&quot;, t5.S, &quot;t5.S&quot;);\n\
 \n\
-      showOp(&quot;t5a.S = &#92;&quot;new string&#92;&quot;&quot;);\n\
+      showOp(&quot;t5a.S = &#92;&quot;new string&#92;&quot; : no copy on write&quot;);\n\
       t5a.S = &quot;new string&quot;;\n\
       t5a.printSelf(&quot;t5a&quot;);\n\
       t5a.printSelf(&quot;t5&quot;);\n\
@@ -603,15 +614,12 @@ namespace HelloData\n\
       showNote(&quot;source t5 was altered!&quot;);\n\
       Console.WriteLine(&quot;&#92;nThat's all Folks!&#92;n&quot;);\n\
     }\n\
-    /*--\n\
-      Analysis function: void showType&lt;T&gt; shows type name,\n\
-      calling argument name, value, and size, using simple reflection.\n\
-    --*/\n\
-    public static void showType&lt;T&gt;(T t, String s)\n\
+    /*-- simple reflection --*/\n\
+    public static void showType&lt;T&gt;(T t, String nm)\n\
     {\n\
       #pragma warning disable CS8602  // possibly null reference warning\n\
       Type tt = t.GetType();\n\
-      Console.WriteLine(&quot;{0}, {1}&quot;,tt.Name, s);\n\
+      Console.WriteLine(&quot;{0}, {1}&quot;, nm, tt.Name);\n\
       int size = Utils.GetManagedSize(tt);\n\
       Console.WriteLine(&quot;value: {0}, size: {1}&quot;, t, size);\n\
     }\n\
@@ -620,10 +628,6 @@ namespace HelloData\n\
       int id = t.GetHashCode();\n\
       Console.WriteLine(&quot;{0}, {1}&quot;, n, id);\n\
     }\n\
-    /*--\n\
-      Analysis function: void isSameObj&lt;T&gt; shows whether two,\n\
-      references point to the same instance.\n\
-    --*/\n\
     public static void isSameObj&lt;T&gt;(T t1, String n1, T t2, String n2) {\n\
       if(ReferenceEquals(t1, t2)) {\n\
         Console.WriteLine(&quot;{0} is same object as {1}&quot;, n1, n2);\n\
@@ -632,16 +636,9 @@ namespace HelloData\n\
         Console.WriteLine(&quot;{0} is not same object as {1}&quot;, n1, n2);\n\
       }\n\
     }\n\
-    /*--\n\
-      Display function: void showOp; prints a formatted string to,\n\
-      indicate an operation was executed with one or more instances.\n\
-    --*/\n\
     public static void showOp(string op) {\n\
       Console.WriteLine(&quot;--- {0} ---&quot;, op);\n\
     }\n\
-    /*--\n\
-      Display function enumerates members of struct or class.\n\
-    --*/\n\
     // https://stackoverflow.com/questions/7613782/iterating-through-struct-members\n\
     public static void iterate&lt;T&gt;(T t) /*where T:new()*/ {\n\
       Console.WriteLine(&quot;fields:&quot;);\n\
@@ -665,31 +662,23 @@ namespace HelloData\n\
         );\n\
       }\n\
     }\n\
-    /*--\n\
-      Display function is shorthand for Console.WriteLine\n\
-    --*/\n\
     public static void print(String s = &quot;&quot;) {\n\
       Console.WriteLine(s);\n\
     }\n\
-    /*--\n\
-      Display function prints a formatted string label.\n\
-    --*/\n\
     public static void label(string s) {\n\
       Console.WriteLine(\n\
         &quot;&#92;n---------------&#92;n  {0}&#92;n---------------&quot;, s\n\
       );\n\
     }\n\
-    /*--\n\
-      Display function prints a formatted string note.\n\
-    --*/\n\
     public static void showNote(string s) {\n\
       Console.WriteLine(&quot;--- Note: ---&#92;n  {0}&quot;, s);\n\
     }\n\
   }\n\
   /*-- \n\
     Utils uses advanced relection \n\
-    - This is function returns the size of value types and handles\n\
-      which is part of discovering how things work.\n\
+    - GetMangedSize(Type type) is function that returns the size of \n\
+      value types and handles.\n\
+      It is used to help discover how things work.\n\
       It is placed here because it uses advanced techniques that\n\
       will eventually be covered elsewhere in this site.  Knowing\n\
       how it works is not essential for the things we are examining\n\
@@ -716,22 +705,20 @@ namespace HelloData\n\
     }\n\
   }\n\
 }\n\
-</pre>\n\
+\n\></pre>\n\
 "
     }
     function loadCsOut(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
-&gt; dotnet run\n\
  Demonstrate C# types\n\
-\n\
 ---------------\n\
   int - value type\n\
 ---------------\n\
 --- int t1 = 42 ---\n\
-Int32, t1\n\
+t1, Int32\n\
 value: 42, size: 4\n\
+--- interate over val type members using reflection ---\n\
 fields:\n\
   m_value = 42\n\
 methods:\n\
@@ -748,23 +735,23 @@ methods:\n\
   GetTypeCode\n\
   GetType\n\
 \n\
---- int t1a = t1 ---\n\
+--- int t1a = t1 : copy of value type ---\n\
 t1a is not same object as t1\n\
 \n\
 ---------------\n\
   string - reference type\n\
 ---------------\n\
 --- string t2 = &quot;a string&quot; ---\n\
-String, t2\n\
+t2, String\n\
 value: a string, size: 8\n\
 --- Note: ---\n\
   string has many methods - uncomment next line to see them\n\
---- string t3 = t2 ---\n\
-String, t3\n\
+--- string t3 = t2 : copy handle of ref type ---\n\
+t3, String\n\
 value: a string, size: 8\n\
 t3 is same object as t2\n\
---- t3 += &quot; is here&quot; ---\n\
-String, t3\n\
+--- t3 += &quot; is here&quot; : copy on write ---\n\
+t3, String\n\
 value: a string is here, size: 8\n\
 t3 is not same object as t2\n\
 \n\
@@ -772,8 +759,9 @@ t3 is not same object as t2\n\
   Object - base reference type\n\
 ---------------\n\
 --- Object obj1 - new Object() ---\n\
-Object, obj\n\
+obj, Object\n\
 value: System.Object, size: 8\n\
+--- interate over ref type members using reflection ---\n\
 fields:\n\
 methods:\n\
   GetType\n\
@@ -788,10 +776,11 @@ obj2 is same object as obj1\n\
 ---------------\n\
 --- Svt t4 = new Svt() ---\n\
 t4  { I:3, D:3.1415927, C:z }\n\
-Svt, t4\n\
+t4, Svt\n\
 value: HelloData.Svt, size: 24\n\
 --- Note: ---\n\
   value type: size of object in stackframe\n\
+--- iterate over ref type members using reflection ---\n\
 fields:\n\
   &lt;I&gt;k__BackingField = 3\n\
   &lt;D&gt;k__BackingField = 3.1415927\n\
@@ -808,11 +797,11 @@ methods:\n\
   GetHashCode\n\
   ToString\n\
   GetType\n\
---- Svt t4a = t4 ---\n\
+--- Svt t4a = t4 : copy of val type ---\n\
 t4a  { I:3, D:3.1415927, C:z }\n\
 t4  { I:3, D:3.1415927, C:z }\n\
 t4a is not same object as t4\n\
-Svt, t4a\n\
+t4a, Svt\n\
 value: HelloData.Svt, size: 24\n\
 --- t4a.C = 'q' ---\n\
 t4a  { I:3, D:3.1415927, C:q }\n\
@@ -824,15 +813,15 @@ t4 is not same object as t4a\n\
 ---------------\n\
 --- Crt t5 = new Crt() ---\n\
 t5  { I:0, D:1, S:SomeString }\n\
-Crt, t5\n\
+t5, Crt\n\
 value: HelloData.Crt, size: 8\n\
 --- Note: ---\n\
   ref type: size of handle to object in heap\n\
---- Crt t5a = t5 ---\n\
+--- Crt t5a = t5 : copy handle of ref type ---\n\
 t5a  { I:0, D:1, S:SomeString }\n\
 t5a is same object as t5\n\
 t5a.S is same object as t5.S\n\
---- t5a.S = &quot;new string&quot; ---\n\
+--- t5a.S = &quot;new string&quot; : no copy on write ---\n\
 t5a  { I:0, D:1, S:new string }\n\
 t5  { I:0, D:1, S:new string }\n\
 t5a is same object as t5\n\
@@ -841,10 +830,7 @@ t5a.S is same object as t5.S\n\
   source t5 was altered!\n\
 \n\
 That's all Folks!\n\
-\n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
-&gt;\n\
-</pre>\n\
+\n\</pre>\n\
 "
     }
     function loadCsBld(id) {
@@ -1303,32 +1289,179 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
     /*-- Load Javascript Code, Output, Build --*/
     function loadJsCode(id) {
       let codecont = document.getElementById(id);
-      codecont.innerHTML = "<div class='code'>\
+      codecont.innerHTML = "<div style='white-space:normal; margin-left:2em;'>\
+<details>\
+  <summary class='darkItem' style='margin-left:-2em;'>Code Notes&nbsp;&nbsp;</summary>\
+  <ol class='tight' style='margin-left:0em;'>\
+    <li>\
+      This code is a not so simple demonstrations of numbers, strings, and arrays.\
+    </li>\
+    <li>\
+      All JavaScript types are reference types with values stored in heap.\
+    </li>\
+    <li>\
+      showType function is designed to display type and calling name of its\n\
+      first argument and its value and size.\
+    </li>\
+    <li>\
+      Note that the display functions are simple but the analysis function sizeof(object)\n\
+      requires recursive iteration through the members and decendents of object.\
+    </li>\
+    <li>\
+      JavaScript does not have generics. It is dynamically typed, so\n\
+      everything is already generic.\
+    </li>\
+  </ol >\
+  <div style=&quot;height: 3em;&quot;>&nbsp;</div>\
+</details >\
+</div >\
+<div class='code'>\
 <pre>\
-&lt;!DOCTYPE html>\n\
-&lt;html>\n\
-&lt;!-- Js_Hello.html -->\n\
-&lt;head>\n\
-  &lt;script>\n\
-    function hello() {\n\
-      document.getElementById(&quot;hello&quot;).innerHTML =\n\
-        &quot;&lt;h2>Hello JavaScript World&lt;/h2>&quot;;\n\
+&lt;!DOCTYPE html&gt;\n\
+&lt;html&gt;\n\
+&lt;!-- \n\
+  Js_Data.html \n\
+--&gt;\n\
+&lt;head&gt;\n\
+  &lt;script&gt;\n\
+    var nl = &quot;&lt;br /&gt;&quot;;\n\
+    var nil = &quot;&quot;;\n\
+\n\
+    /* Demonstration starts here */\n\
+    function heading() {\n\
+            document.getElementById(&quot;data&quot;).innerHTML = &quot;&lt;h2&gt;Javascript Data&lt;/h2&gt;&quot;;\n\
+    }\n\
+    function execute() {\n\
+      showNote(&quot;Demo numbers&quot;)\n\
+      println(&quot;-- let t1 = 42 --&quot;);\n\
+      let t1 = 42;\n\
+      showType(t1, &quot;t1&quot;);\n\
+      println(nil);\n\
+      println(&quot;-- let t2 = t1 --&quot;);\n\
+      let t2 = t1;\n\
+      isSameObject(t2, &quot;t2&quot;, t1, &quot;t1&quot;);\n\
+      println(nil);\n\
+      println(&quot;-- let t2 = 3.1415927 -- : copy on write&quot;);\n\
+      t2 = 3.1415927;\n\
+      isSameObject(t2, &quot;t2&quot;, t1, &quot;t1&quot;);\n\
+      print(nl);\n\
+      showType(t1, &quot;t1&quot;);\n\
+      showType(t2, &quot;t2&quot;);\n\
+      println(nil);\n\
+      \n\
+      showNote(&quot;Demo strings&quot;);\n\
+      println(&quot;-- let t3 = &#92;&quot;a string&#92;&quot; --&quot;);\n\
+      let t3 = &quot;a string&quot;;\n\
+      showType(t3, &quot;t3&quot;);\n\
+      print(nl);\n\
+      println(&quot;-- let t4 = t3 --&quot;);\n\
+      let t4 = t3;\n\
+      isSameObject(t4, &quot;t4&quot;, t3, &quot;t3&quot;);\n\
+      println(nil);\n\
+      showType(t3, &quot;t3&quot;);\n\
+      showType(t4, &quot;t4&quot;);\n\
+      print(nl);\n\
+      println(&quot;-- t4 += &quot; + &quot;&#92;&quot; and another string&#92;&quot; -- : copy on write&quot;);\n\
+      t4 += &quot; and another string&quot;;\n\
+      isSameObject(t4, &quot;t4&quot;, t3, &quot;t3&quot;);\n\
+      println(nil);\n\
+      showType(t3, &quot;t3&quot;);\n\
+      showType(t4, &quot;t4&quot;);\n\
+      print(nl);\n\
+      \n\
+      showNote(&quot;Demo arrays&quot;);\n\
+      println(&quot;--- t5 = [1, 2, 3] ---&quot;);\n\
+      let t5 = [1, 2, 3];\n\
+      showType(t5, &quot;t5&quot;);\n\
+      print(nl);\n\
+      println(&quot;--- let t6 = t5 ---&quot;);\n\
+      let t6 = t5;\n\
+      isSameObject(t6, &quot;t6&quot;, t5, &quot;t5&quot;);\n\
+      println(nil);\n\
+      showType(t5, &quot;t5&quot;);\n\
+      showType(t6, &quot;t6&quot;);\n\
+      print(nl);\n\
+      println(&quot;--- t6[1] = -2 --- : no copy on write&quot;);\n\
+      t6[1] = -2;\n\
+      isSameObject(t6, &quot;t6&quot;, t5, &quot;t5&quot;);\n\
+      println(nil);\n\
+      showType(t5, &quot;t5&quot;);\n\
+      showType(t6, &quot;t6&quot;);\n\
+      showNote(&quot;Source t5 modified!&quot;)\n\
+    }\n\
+    /* display functions */\n\
+    function print(str) {\n\
+      document.write(str);\n\
+    }\n\
+    function println(str) {\n\
+      document.write(str + &quot;&lt;br /&gt;&quot;);\n\
+    }\n\
+    function showNote(text) {\n\
+      println(&quot;-------------------------&quot;);\n\
+      println(text);\n\
+      println(&quot;-------------------------&quot;);\n\
+    }\n\
+    /* Analysis functions */\n\
+    function showType(t, nm) {\n\
+      println(nm + &quot;, &quot; + typeof t);\n\
+      print(&quot;size: &quot; + sizeof(t) + &quot;, value: &quot; + t);\n\
+      println(nil);\n\
+    }\n\
+    function isSameObject(o1, nm1, o2, nm2) {\n\
+      if (o1 === o2) {\n\
+        println(nm1 + &quot; is same object as &quot; + nm2)\n\
+      }\n\
+      else {\n\
+        println(nm1 + &quot; is not same object as &quot; + nm2)\n\
+      }\n\
+    }\n\
+    // <a href='https://gist.github.com/pgpbpadilla/10344038'>github pgpbpadilla</a>\n\
+    function sizeof(object) {\n\
+      var objectList = [],\n\
+        stack = [ object ],\n\
+        bytes = 0,\n\
+        value,\n\
+        i;\n\
+\n\
+      while (stack.length) {\n\
+        value = stack.pop();\n\
+\n\
+        if (typeof value === 'boolean') {\n\
+          bytes += 4;\n\
+        } else if (typeof value === 'string') {\n\
+          bytes += value.length * 2;\n\
+        } else if (typeof value === 'number') {\n\
+          bytes += 8;\n\
+        } else if (typeof value === 'object'\n\
+            && objectList.indexOf(value) === -1) {\n\
+          objectList.push(value);\n\
+\n\
+          for (i in value) {\n\
+            if (value.hasOwnProperty(i)) {\n\
+              stack.push(value[i]);\n\
+            }\n\
+          }\n\
+        }\n\
+      }\n\
+      return bytes;\n\
     }\n\
   &lt;/script&gt;\n\
   &lt;style&gt;\n\
     body {\n\
       font-family:'Comic Sans MS', Tahoma;\n\
       padding:2em;\n\
-    }\n\
+    } \n\
   &lt;/style&gt;\n\
 &lt;/head&gt;\n\
 &lt;body&gt;\n\
-  &lt;div id=&quot;hello&quot;&gt;&lt;/div&gt;\n\
+  &lt;div id=&quot;data&quot;&gt;&lt;/div&gt;\n\
   &lt;script&gt;\n\
-    hello();\n\
-  &lt;/script>\n\
+    heading();\n\
+    execute();\n\
+  &lt;/script&gt;\n\
 &lt;/body&gt;\n\
 &lt;/html&gt;\n\
+\n\
 </pre>\
 </div>\
 ";
@@ -1337,17 +1470,82 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
     function loadJsOut(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\
-Hello JavaScript world\
+Javascript Data\n\
+-------------------------\n\
+Demo numbers\n\
+-------------------------\n\
+-- let t1 = 42 --\n\
+t1, number\n\
+size: 8, value: 42\n\
+\n\
+-- let t2 = t1 --\n\
+t2 is same object as t1\n\
+\n\
+-- let t2 = 3.1415927 -- : copy on write\n\
+t2 is not same object as t1\n\
+\n\
+t1, number\n\
+size: 8, value: 42\n\
+t2, number\n\
+size: 8, value: 3.1415927\n\
+\n\
+-------------------------\n\
+Demo strings\n\
+-------------------------\n\
+-- let t3 = &quot;a string&quot; --\n\
+t3, string\n\
+size: 16, value: a string\n\
+\n\
+-- let t4 = t3 --\n\
+t4 is same object as t3\n\
+\n\
+t3, string\n\
+size: 16, value: a string\n\
+t4, string\n\
+size: 16, value: a string\n\
+\n\
+-- t4 += &quot; and another string&quot; -- : copy on write\n\
+t4 is not same object as t3\n\
+\n\
+t3, string\n\
+size: 16, value: a string\n\
+t4, string\n\
+size: 54, value: a string and another string\n\
+\n\
+-------------------------\n\
+Demo arrays\n\
+-------------------------\n\
+--- t5 = [1, 2, 3] ---\n\
+t5, object\n\
+size: 24, value: 1,2,3\n\
+\n\
+--- let t6 = t5 ---\n\
+t6 is same object as t5\n\
+\n\
+t5, object\n\
+size: 24, value: 1,2,3\n\
+t6, object\n\
+size: 24, value: 1,2,3\n\
+\n\
+--- t6[1] = -2 --- : no copy on write\n\
+t6 is same object as t5\n\
+\n\
+t5, object\n\
+size: 24, value: 1,-2,3\n\
+t6, object\n\
+size: 24, value: 1,-2,3\n\
+-------------------------\n\
+Source t5 modified!\n\
+-------------------------\n\
 </pre>";
     }
 
     function loadJsBld(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\
-Source html, script, and styles are loaded,\n\
-parsed and rendered by browser&apos;s execution\n\
-engine.\n\
-      </pre>";
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;JavaScript&#92;Js_Data\n\
+&gt; start firefox C:&#92;github&#92;JimFawcett&#92;Bits&#92;JavaScript&#92;Js_Data&#92;Js_Data.html\n\
+\n\      </pre>";
     }
     //function load1() {
 
@@ -1378,7 +1576,7 @@ engine.\n\
       let js = document.getElementById("Js1");
       if (js.checked) {
         window.open(
-          'Js_Hello.html',
+          'Js_Data.html',
           '_blank'
         )
       }
