@@ -1111,7 +1111,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_data\n\
       C++, Rust, and especially C#\
     </li>\
     <li>\
-      Python does not have a generics. It is dynamically typed, so\n\
+      Python does not have generics. It is dynamically typed, so\n\
       everything is already generic.\
     </li>\
   </ol >\
@@ -1119,6 +1119,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_data\n\
 </details >\
 </div >\
 <pre>\n\
+import sys\n\
 # Python/Py_Data::Py_Data.py\n\
 # \n\
 # Python Dynamic Data Types\n\
@@ -1130,21 +1131,21 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_data\n\
 #   str\n\
 #   NoneType\n\
 \n\
-import sys\n\
+# Python requires definition before use ordering\n\
+#  - no link phase to find definitions\n\
+\n\
 def showType(t, n) :\n\
-    print(type(t), n)\n\
-    print(&quot;value: &quot;, t, ', size: ', sys.getsizeof(t))\n\
+    print(n, type(t))\n\
+    print(&quot;value: &quot;, t, ', size: ', sys.getsizeof(t), &quot;&#92;n&quot;)\n\
 \n\
 def showIdent(t, n) :\n\
     print(n, t, id(t))\n\
-\n\
-def separate() :\n\
-    print(&quot;------&quot;)\n\
 \n\
 def execute() : \n\
     print(&quot; Demonstrate Python Types&quot;)\n\
     print(&quot;--------------------------&quot;)\n\
     # types\n\
+    print(&quot;&#92;n  -- instances of all types reside in managed heap --&#92;n&quot;)\n\
     t1 = 42\n\
     showType(t1, &quot;t1&quot;)\n\
     t1 = 3.14159         #dynamic type t1 redefined\n\
@@ -1153,19 +1154,17 @@ def execute() : \n\
     showType(t1, &quot;t1&quot;)\n\
 \n\
     # reference behavior - copy on write\n\
-    separate()\n\
-    print(&quot;t2 = t1&quot;)\n\
+    print(&quot;-- t2 = t1 --&quot;)\n\
     t2 = t1\n\
     showIdent(t1,&quot;t1&quot;)\n\
     showIdent(t2,&quot;t2&quot;)\n\
-    print(&quot;&#92;nt2 = 3.33333&quot;)\n\
+    print(&quot;&#92;n-- t2 = 3.33333 : copy on write --&quot;)\n\
     t2 = 3.33333\n\
     showIdent(t1,&quot;t1&quot;)\n\
     showIdent(t2,&quot;t2&quot;)\n\
 \n\
     # reference behavior - copy on write\n\
-    separate()\n\
-    print(&quot;t2 += -1.0&quot;)\n\
+    print(&quot;&#92;n-- t2 += -1.0 : copy on write --&quot;)\n\
     t2 += -1.0\n\
     showIdent(t1,&quot;t1&quot;)\n\
     showType(t1, &quot;t1&quot;)\n\
@@ -1173,10 +1172,10 @@ def execute() : \n\
     showType(t2, &quot;t2&quot;)\n\
 \n\
     # reference behavior - copy on write\n\
-    separate()\n\
+    print(&quot;-- t3 = [1, &#92;&quot;one&#92;&quot;] --&quot;)\n\
     t3 = [1, &quot;one&quot;]\n\
     showIdent(t3, &quot;t3&quot;)\n\
-    print(&quot;t4 = t3&quot;)\n\
+    print(&quot;-- t4 = t3 --&quot;)\n\
     t4 = t3\n\
     showIdent(t3, &quot;t3&quot;)\n\
     showType(t3,&quot;t3&quot;)\n\
@@ -1184,8 +1183,7 @@ def execute() : \n\
     showType(t4,&quot;t4&quot;)\n\
     \n\
     # reference behavior - no copy on write\n\
-    separate()\n\
-    print(&quot;t3.append('b')&quot;)\n\
+    print(&quot;-- t3.append('b') : no copy on write --&quot;)\n\
     t3.append('b')\n\
     showIdent(t3, &quot;t3&quot;)\n\
     showType(t3,&quot;t3&quot;)\n\
@@ -1193,18 +1191,19 @@ def execute() : \n\
     showType(t4,&quot;t4&quot;)\n\
 \n\
     # reference behavior - child copy on write\n\
-    separate()\n\
+    print(&quot;-- t5 = (1, 2, 3) --&quot;)\n\
     t5 = (1, 2, 3)\n\
-    t6 = [1, t5, &quot;weird&quot;]\n\
     showIdent(t5, &quot;t5&quot;)\n\
+    print(&quot;-- t6 = [1, t5, &#92;&quot;weird&#92;&quot;] --&quot;)\n\
+    t6 = [1, t5, &quot;weird&quot;]\n\
     showIdent(t6, &quot;t6&quot;)\n\
+    print(&quot;-- t5 = 1 + 1j : copy on write --&quot;)\n\
     t5 = 1 + 1j\n\
     showIdent(t5, &quot;t5&quot;)\n\
     showIdent(t6, &quot;t6&quot;)\n\
     \n\
     # reference behavior - iterate over children\n\
-    separate()\n\
-    print(&quot;iterate over t6&quot;)\n\
+    print(&quot;&#92;n-- iterate over t6 --&quot;)\n\
     for i in t6:\n\
         showIdent(i, &quot;elem&quot;)\n\
     # print(dir(t6))\n\
@@ -1212,7 +1211,7 @@ def execute() : \n\
     print(&quot;&#92;nThat's all folks!&#92;n&quot;)\n\
 execute()\n\
 \n\
-</pre>\n\
+\n\</pre>\n\
 </div>\n\
 ";
     }
@@ -1221,65 +1220,73 @@ execute()\n\
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<div class='code'>\n\
 <pre>\n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
-&gt; python .&#92;Py_Data.py\n\
  Demonstrate Python Types\n\
 --------------------------\n\
-&lt;class 'int'&gt; t1\n\
-value:  42 , size:  28\n\
-&lt;class 'float'&gt; t1\n\
-value:  3.14159 , size:  24\n\
-&lt;class 'list'&gt; t1\n\
-value:  [1, 2, 3, 4] , size:  88\n\
-------\n\
-t2 = t1\n\
-t1 [1, 2, 3, 4] 1581050570752\n\
-t2 [1, 2, 3, 4] 1581050570752\n\
 \n\
-t2 = 3.33333\n\
-t1 [1, 2, 3, 4] 1581050570752\n\
-t2 3.33333 1581050207984\n\
-------\n\
-t2 += -1.0\n\
-t1 [1, 2, 3, 4] 1581050570752\n\
-&lt;class 'list'&gt; t1\n\
+  -- instances of all types reside in managed heap --\n\
+\n\
+t1 &lt;class 'int'&gt;\n\
+value:  42 , size:  28\n\
+\n\
+t1 &lt;class 'float'&gt;\n\
+value:  3.14159 , size:  24\n\
+\n\
+t1 &lt;class 'list'&gt;\n\
 value:  [1, 2, 3, 4] , size:  88\n\
-t2 2.33333 1581050209360\n\
-&lt;class 'float'&gt; t2\n\
+\n\
+-- t2 = t1 --\n\
+t1 [1, 2, 3, 4] 1362362625728\n\
+t2 [1, 2, 3, 4] 1362362625728\n\
+\n\
+-- t2 = 3.33333 : copy on write --\n\
+t1 [1, 2, 3, 4] 1362362625728\n\
+t2 3.33333 1362360114928\n\
+\n\
+-- t2 += -1.0 : copy on write --\n\
+t1 [1, 2, 3, 4] 1362362625728\n\
+t1 &lt;class 'list'&gt;\n\
+value:  [1, 2, 3, 4] , size:  88\n\
+\n\
+t2 2.33333 1362360116208\n\
+t2 &lt;class 'float'&gt;\n\
 value:  2.33333 , size:  24\n\
-------\n\
-t3 [1, 'one'] 1581050507840\n\
-t4 = t3\n\
-t3 [1, 'one'] 1581050507840\n\
-&lt;class 'list'&gt; t3\n\
+\n\
+-- t3 = [1, &quot;one&quot;] --\n\
+t3 [1, 'one'] 1362362643072\n\
+-- t4 = t3 --\n\
+t3 [1, 'one'] 1362362643072\n\
+t3 &lt;class 'list'&gt;\n\
 value:  [1, 'one'] , size:  72\n\
-t4 [1, 'one'] 1581050507840\n\
-&lt;class 'list'&gt; t4\n\
+\n\
+t4 [1, 'one'] 1362362643072\n\
+t4 &lt;class 'list'&gt;\n\
 value:  [1, 'one'] , size:  72\n\
-------\n\
-t3.append('b')\n\
-t3 [1, 'one', 'b'] 1581050507840\n\
-&lt;class 'list'&gt; t3\n\
+\n\
+-- t3.append('b') : no copy on write --\n\
+t3 [1, 'one', 'b'] 1362362643072\n\
+t3 &lt;class 'list'&gt;\n\
 value:  [1, 'one', 'b'] , size:  120\n\
-t4 [1, 'one', 'b'] 1581050507840\n\
-&lt;class 'list'&gt; t4\n\
+\n\
+t4 [1, 'one', 'b'] 1362362643072\n\
+t4 &lt;class 'list'&gt;\n\
 value:  [1, 'one', 'b'] , size:  120\n\
-------\n\
-t5 (1, 2, 3) 1581050830144\n\
-t6 [1, (1, 2, 3), 'weird'] 1581050835264\n\
-t5 (1+1j) 1581050208048\n\
-t6 [1, (1, 2, 3), 'weird'] 1581050835264\n\
-------\n\
-iterate over t6\n\
-elem 1 1581049184496\n\
-elem (1, 2, 3) 1581050830144\n\
-elem weird 1581050834288\n\
+\n\
+-- t5 = (1, 2, 3) --\n\
+t5 (1, 2, 3) 1362362965248\n\
+-- t6 = [1, t5, &quot;weird&quot;] --\n\
+t6 [1, (1, 2, 3), 'weird'] 1362362969856\n\
+-- t5 = 1 + 1j : copy on write --\n\
+t5 (1+1j) 1362360114992\n\
+t6 [1, (1, 2, 3), 'weird'] 1362362969856\n\
+\n\
+-- iterate over t6 --\n\
+elem 1 1362359091440\n\
+elem (1, 2, 3) 1362362965248\n\
+elem weird 1362362969136\n\
 \n\
 That's all folks!\n\
 \n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
-&gt;\n\
-</pre>\n\
+\n\</pre>\n\
 </div>";
     }
 
