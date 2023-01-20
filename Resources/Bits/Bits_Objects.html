@@ -647,20 +647,290 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build\n\
         </details >\n\
       </div >\
 <pre>\
-</pre></div>\
+use std::fmt::*;\n\
+use std::default::*;\n\
+\n\
+// CreateObject::main.rs\n\
+\n\
+/*-------------------------------------\n\
+  - Declare Point1 struct, like a C++ class\n\
+  - Request compiler implement traits Debug & Clone\n\
+*/\n\
+#[derive(Debug, Clone)]\n\
+pub struct Point1 {\n\
+    x:i32,\n\
+    y:i32,\n\
+    z:i32\n\
+}\n\
+/*-- implement functions new and name --*/\n\
+impl Point1 {\n\
+  pub fn new() \n\
+        -&gt; Point1 {\n\
+      Point1 {\n\
+          x:0, y:0, z:0\n\
+      }\n\
+  }\n\
+  /* \n\
+    For simple types like this it would be reasonable to \n\
+    make x, y, z public and remove the getter and setter\n\
+    functions. \n\
+  */\n\
+  pub fn get_x(&self) -&gt; &i32 {\n\
+    &self.x\n\
+  }\n\
+  pub fn get_y(&self) -&gt; &i32 {\n\
+    &self.y\n\
+  }\n\
+  pub fn get_z(&self) -&gt; &i32 {\n\
+    &self.z\n\
+  }\n\
+  pub fn set_x(&mut self, x:i32) {\n\
+    self.x = x\n\
+  }\n\
+  pub fn set_y(&mut self, y:i32) {\n\
+    self.y = y\n\
+  }\n\
+  pub fn set_z(&mut self, z:i32) {\n\
+    self.z = z\n\
+  }\n\
+  pub fn show(&self) {\n\
+    print!(&quot;Point1 {{ &quot;);\n\
+    print!(&quot;{0}, &quot;, self.x);\n\
+    print!(&quot;{0}, &quot;, self.y);\n\
+    print!(&quot;{0} }}&quot;, self.z);\n\
+  }\n\
+}\n\
+\n\
+/*-------------------------------------\n\
+  - Declare Point2&lt;T&gt; struct, like a C++ template class\n\
+  - Request compiler implement traits Debug & Clone\n\
+*/\n\
+#[derive(Debug, Clone)]\n\
+pub struct Point2&lt;T&gt; where T:Debug, T:Default, T:Clone {\n\
+  coor: Vec&lt;T&gt;,\n\
+}\n\
+impl&lt;T&gt; Point2&lt;T&gt; where T:Debug, T:Default, T:Clone {\n\
+  pub fn new(n:usize) \n\
+        -&gt; Point2&lt;T&gt; {\n\
+      Point2::&lt;T&gt; {\n\
+          coor : vec![T::default(); n],\n\
+      }\n\
+  }\n\
+  pub fn init(mut self, coord: Vec&lt;T&gt;) -&gt; Point2&lt;T&gt; {\n\
+    self.coor = coord;\n\
+    self\n\
+  }\n\
+  pub fn len(&self) -&gt; usize {\n\
+    self.coor.len()\n\
+  }\n\
+  /* acts as both get_coor() and set_coor(vec![1, 2, 3]) */\n\
+  pub fn coors(&mut self) -&gt; &mut Vec&lt;T&gt; {\n\
+    return &mut self.coor;\n\
+  }\n\
+  pub fn show(&self, width:usize, left:usize) {\n\
+    print!(&quot;Point2&lt;T&gt; {{ &quot;);\n\
+    show_fold(&self.coor, width, left);\n\
+    print!(&quot;}}&quot;)\n\
+  }\n\
+}\n\
+/*-- Demo object instances in action --*/\n\
+fn main() {\n\
+    print!(\n\
+      &quot;&#92;n -- demonstrate object creation --&#92;n&quot;\n\
+    );\n\
+    show_note(&quot;std::library objects&quot;);\n\
+\n\
+    print!(&quot;&#92;n--- let mut s1 = {}.to_string() ---&quot;, &quot;&#92;&quot;a string&#92;&quot;&quot;);\n\
+    let mut s1 = &quot;a string&quot;.to_string();\n\
+    print!(&quot;&#92;n--- {} ---&quot;, &quot;show_type(&s1, &#92;&quot;&s1&#92;&quot;)&quot;);\n\
+    show_type(&s1, &quot;&s1&quot;);\n\
+    print!(&quot;&#92;n--- {} ---&quot;, &quot;s1.push_str(&#92;&quot; and more&#92;&quot;);&quot;);\n\
+    s1.push_str(&quot; and more&quot;);\n\
+    show_type(&s1, &quot;&s1&quot;);\n\
+\n\
+    print!(&quot;&#92;n--- let mut v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1]; ---&quot;);\n\
+    let mut v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1];\n\
+    show_type(&v, &quot;&v&quot;);\n\
+    print!(&quot;&#92;n--- v.push(42); ---&quot;);\n\
+    v.push(42);\n\
+    show_type(&v, &quot;&v&quot;);    \n\
+\n\
+    show_note(&quot;instances of user-defined types&quot;);\n\
+    \n\
+    print!(&quot;&#92;n--- let mut p1 = Point1::new() ---&#92;n&quot;);\n\
+    let mut p1 = Point1::new();\n\
+    p1.show();\n\
+    println!();\n\
+    p1.set_x(42);\n\
+    p1.set_y(-3);\n\
+    p1.set_z(2);\n\
+    p1.show();\n\
+    show_type(p1.clone(), &quot;p1&quot;);\n\
+    print!(&quot;&#92;n--- let p1a = p1.clone() ---&#92;n&quot;);\n\
+    let p1a = p1.clone();\n\
+    p1a.show();\n\
+\n\
+    let mut p2 = Point2::&lt;f64&gt;::new(10);\n\
+    print!(&quot;&#92;n&#92;n--- show_type(p2a.clone(), &#92;&quot;p2a&#92;&quot;) ---&quot;);\n\
+    show_type(p2.clone(), &quot;p2&quot;);\n\
+    p2.coors()[2] = 3.1415;\n\
+    show_type(p2.clone(), &quot;p2&quot;);\n\
+\n\
+    let p2a = Point2::&lt;i32&gt;::new(1).init(vec![0,1,2,3,4,4,3,2,1,0]);\n\
+    print!(&quot;&#92;n--- show_type(p2a.clone(), &#92;&quot;p2a&#92;&quot;) ---&quot;);\n\
+    show_type(p2a.clone(), &quot;p2a&quot;);\n\
+    print!(&quot;&#92;n{}&quot;, &quot;&#92;&quot;--- p2a.len() ---&#92;&quot;&quot;);\n\
+    print!(&quot;&#92;nsize of p2a = {:?}&quot;, p2a.len());\n\
+    print!(&quot;&#92;n&#92;n--- p2a.show(8,2) ---&#92;n&quot;);\n\
+    p2a.show(8,2);\n\
+    println!();\n\
+\n\
+    let v = vec![\n\
+      0i32, -1, 2, -3, 4, -5, 6, -7, 8, -9, 10, -11, 12, -13, 14\n\
+    ];\n\
+    \n\
+    print!(&quot;{}&quot;, &quot;&#92;n--- show_type(&v, &#92;&quot;&v&#92;&quot;) ---&quot;);\n\
+    show_type(&v, &quot;&v&quot;);\n\
+    print!(&quot;&#92;n--- show_fold(&v, 5, 2) ---&quot;);\n\
+    show_fold(&v, 5, 2);\n\
+\n\
+    print!(&quot;&#92;n&#92;n  That's all Folks!&#92;n&#92;n&quot;);\n\
+}\n\
+/*\n\
+  Show facts about a type's elements, e.g., name, type, \n\
+  value, and size.\n\
+  show_type is generic function with Debug bound.\n\
+  Using format &quot;{:?} requires Debug.&quot;\n\
+*/\n\
+fn show_type&lt;T: std::fmt::Debug&gt;(t: T, nm: &str) {\n\
+  let typename = std::any::type_name::&lt;T&gt;();\n\
+  println!(&quot;&#92;ncall name: {:?}, type: {:?}&quot;, nm, typename);\n\
+  println!(&quot;value: {:?}, size: {}&quot;, t, std::mem::size_of::&lt;T&gt;());\n\
+}\n\
+/* indent print out by &quot;left&quot; spaces */\n\
+fn print_offset(left:usize) {\n\
+  for _i in 0..left {\n\
+    print!(&quot; &quot;);\n\
+  }\n\
+}\n\
+/* fold a vector slice into rows of w elements */\n\
+fn show_fold&lt;T:Debug&gt;(d:&Vec&lt;T&gt;, w:usize, left:usize) {\n\
+  print!(&quot;&#92;n&quot;);\n\
+  print_offset(left);\n\
+  for _i in 1..=d.len() {\n\
+    if _i &lt; d.len() {\n\
+      print!(&quot;{:?}, &quot;, d[_i - 1]);\n\
+    }\n\
+    else {\n\
+      print!(&quot;{:?}&quot;, d[_i - 1]);\n\
+      print!(&quot;&#92;n&quot;);\n\
+      break;\n\
+    }\n\
+    if _i % w == 0  && _i != 0 && _i != w - 1 {\n\
+      print!(&quot;&#92;n&quot;);\n\
+      print_offset(left);\n\
+    }\n\
+  }\n\
+}\n\
+/* show string wrapped with dotted lines above and below */\n\
+fn show_note(note:&str) {\n\
+  print!(&quot;&#92;n-------------------------&#92;n&quot;);\n\
+  print!(&quot;{}&quot;, note);\n\
+  print!(&quot;&#92;n-------------------------&#92;n&quot;);\n\
+}\n\
+\n\
+\n\\n\\n\</pre></div>\
 ";
     }
 
     function loadRsOut(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\
-</pre>";
+ -- demonstrate object creation --\n\
+\n\
+-------------------------\n\
+std::library objects\n\
+-------------------------\n\
+\n\
+--- let mut s1 = &quot;a string&quot;.to_string() ---\n\
+--- show_type(&s1, &quot;&s1&quot;) ---\n\
+call name: &quot;&s1&quot;, type: &quot;&alloc::string::String&quot;\n\
+value: &quot;a string&quot;, size: 8\n\
+\n\
+--- s1.push_str(&quot; and more&quot;); ---\n\
+call name: &quot;&s1&quot;, type: &quot;&alloc::string::String&quot;\n\
+value: &quot;a string and more&quot;, size: 8\n\
+\n\
+--- let mut v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1]; ---\n\
+call name: &quot;&v&quot;, type: &quot;&alloc::vec::Vec&lt;i32&gt;&quot;\n\
+value: [1, 2, 3, 2, 1], size: 8\n\
+\n\
+--- v.push(42); ---\n\
+call name: &quot;&v&quot;, type: &quot;&alloc::vec::Vec&lt;i32&gt;&quot;\n\
+value: [1, 2, 3, 2, 1, 42], size: 8\n\
+\n\
+-------------------------\n\
+instances of user-defined types\n\
+-------------------------\n\
+\n\
+--- let mut p1 = Point1::new() ---\n\
+Point1 { 0, 0, 0 }\n\
+Point1 { 42, -3, 2 }\n\
+call name: &quot;p1&quot;, type: &quot;rust_hello_objects::Point1&quot;\n\
+value: Point1 { x: 42, y: -3, z: 2 }, size: 12\n\
+\n\
+--- let p1a = p1.clone() ---\n\
+Point1 { 42, -3, 2 }\n\
+\n\
+--- show_type(p2a.clone(), &quot;p2a&quot;) ---\n\
+call name: &quot;p2&quot;, type: &quot;rust_hello_objects::Point2&lt;f64&gt;&quot;\n\
+value: Point2 { coor: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] }, size: 24\n\
+\n\
+call name: &quot;p2&quot;, type: &quot;rust_hello_objects::Point2&lt;f64&gt;&quot;\n\
+value: Point2 { coor: [0.0, 0.0, 3.1415, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] }, size: 24\n\
+\n\
+--- show_type(p2a.clone(), &quot;p2a&quot;) ---\n\
+call name: &quot;p2a&quot;, type: &quot;rust_hello_objects::Point2&lt;i32&gt;&quot;\n\
+value: Point2 { coor: [0, 1, 2, 3, 4, 4, 3, 2, 1, 0] }, size: 24\n\
+\n\
+&quot;--- p2a.len() ---&quot;\n\
+size of p2a = 10\n\
+\n\
+--- p2a.show(8,2) ---\n\
+Point2&lt;T&gt; {\n\
+  0, 1, 2, 3, 4, 4, 3, 2,\n\
+  1, 0\n\
+}\n\
+\n\
+--- show_type(&v, &quot;&v&quot;) ---\n\
+call name: &quot;&v&quot;, type: &quot;&alloc::vec::Vec&lt;i32&gt;&quot;\n\
+value: [0, -1, 2, -3, 4, -5, 6, -7, 8, -9, 10, -11, 12, -13, 14], size: 8      \n\
+\n\
+--- show_fold(&v, 5, 2) ---\n\
+  0, -1, 2, -3, 4,\n\
+  -5, 6, -7, 8, -9,\n\
+  10, -11, 12, -13, 14\n\
+\n\
+\n\
+  That's all Folks!\n\
+\n\
+\n\</pre>";
     }
 
     function loadRsBld(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\
-</pre>";
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects\n\
+&gt; cargo clean\n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects\n\
+&gt; cargo run  \n\
+   Compiling rust_hello_objects v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects)\n\
+    Finished dev [unoptimized + debuginfo] target(s) in 0.41s                  \n\
+     Running `target&#92;debug&#92;rust_hello_objects.exe`\n\
+\n\
+ -- demonstrate object creation --\n\
+\n\
+\n\</pre>";
     }
     /*-- Load Python Code, Output, Build --*/
     function loadPyCode(id) {
