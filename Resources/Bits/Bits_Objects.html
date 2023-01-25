@@ -671,19 +671,759 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build\n\
 </div >\
 </div>\
 <pre>\n\
-</pre>\n\
+using System;\n\
+using System.Reflection;\n\
+using System.Reflection.Emit;\n\
+using System.Collections;\n\
+using System.Collections.Generic;   // IEnumerable&lt;T&gt;, List&lt;T&gt;\n\
+using System.Linq;                  // IEnumerable&lt;T&gt;.ToArray\n\
+using System.Text;                  // StringBuilder\n\
+\n\
+/*\n\
+  Cs_Objects::Cs_Objects.cs\n\
+  ----------------------\n\
+  Demonstrates creation and assignment of objects as well as a few\n\
+  peeks at other operations on objects.\n\
+*/\n\
+/*\n\
+  Static Data Types:\n\
+    value types =&gt; assignment copies value\n\
+    --------------------------------------\n\
+      sbyte, byte, short, int, long, ushort, uint, ulong\n\
+      float, double\n\
+      decimal, char, bool\n\
+      struct\n\
+    Reference types =&gt; assignment copies reference\n\
+    ----------------------------------------------\n\
+      object, string, class\n\
+    ----------------------------------------------\n\
+      strings are immutable, so any change requires copy on write.\n\
+      That simulates value behavior.\n\
+*/\n\
+namespace CSharpObjects\n\
+{\n\
+  /*----------------------------------------------------------------------\n\
+    IShow allows analysis functions to operate on instances of any class \n\
+    that implements it. See ShowTypeShowable&lt;T&gt;(T t, ...), below.\n\
+  */\n\
+  interface IShow {\n\
+    void Show();              // show instance state as rows of elements\n\
+    int Length { get; }       // total number of elements\n\
+    int Width { get; set; }   // number of elements per row\n\
+    int Left { get; set; }    // offset from terminal Left\n\
+  }\n\
+  /*-----------------------------------------------------------------------\n\
+    Point1 is a basic point class with three integer coordinates.\n\
+    - It is a reference type because it's instances are created\n\
+      from a class\n\
+    - That affects the way assignments work - see demo near the\n\
+      end of main.\n\
+  */\n\
+  public class Point1 : IShow  // value type with value type members\n\
+  { \n\
+    public Point1() {\n\
+      /* \n\
+        doesn't need to do anything because its properties have\n\
+        default values\n\
+      */\n\
+    }\n\
+    public int x { get; set; } = 0;\n\
+    public int y { get; set; } = 0;\n\
+    public int z { get; set; } = 0;\n\
+    public int Length { get; } = 3;\n\
+    public int Width { get; set; } = 3;\n\
+    public int Left { get; set; } = 2;\n\
+    /* translates IShow::show to needs of class */\n\
+    public void Show() {\n\
+      PrintSelf(&quot;Point1&quot;);\n\
+    }\n\
+    /* Display Point1 structure and state */\n\
+    public void PrintSelf(string name) {\n\
+      string ofstr = Program.Indent(Left);\n\
+      Console.WriteLine(\n\
+        &quot;{4}{0}  {{ x:{1}, y:{2}, z:{3} }}&quot;, name, x, y, z, ofstr\n\
+      );\n\
+    }\n\
+  }\n\
+  /*----------------------------------------------------------------------\n\
+    Point2&lt;T&gt; is a generalization of Point1 \n\
+     - holds any finite number of generic coordinates\n\
+     - coordinates are held in a List&lt;T&gt;\n\
+     - implements IEnumerable&lt;T&gt; so it can be indexed and iterated\n\
+     - it is a reference type because it is implemented with a class.\n\
+       its List&lt;T&gt; is also a reference type\n\
+  */\n\
+  public class Point2&lt;T&gt; : IEnumerable&lt;T&gt; , IShow {\n\
+    /*--------------------------------------------------------------------\n\
+      Constructs a point with N coordinates each with default value\n\
+    */\n\
+    public Point2(int N) {\n\
+      coor = new List&lt;T&gt;();\n\
+      for(int i = 0; i&lt;N; ++i) {\n\
+        T? test = default(T);\n\
+        if(test != null) {\n\
+          coor.Add(test);\n\
+        }\n\
+      }\n\
+    }\n\
+    /* translates IShow::show() for needs of Point2 class */\n\
+    public void Show() {\n\
+      PrintSelf(&quot;Point2&lt;T&gt;&quot;);\n\
+    }\n\
+    /*\n\
+      Displays structure and state of N-dimensional point.\n\
+      - state is a set of rows of coordinate data\n\
+      - property Width specifies number of elements in each row\n\
+      - property Left specifies offset of row from terminal Left edge\n\
+    */\n\
+    public void PrintSelf(string name) {\n\
+      Console.Write(Program.Indent(Left));\n\
+      Console.Write(&quot;{0} {{&#92;n{1}&quot;, name, Program.Indent(Left + 2));\n\
+      for(int i=0; i&lt;coor.Count; ++i) {\n\
+        Console.Write(&quot;{0}&quot;, coor[i]);\n\
+        if(i &lt; coor.Count - 1) {\n\
+          Program.print(&quot;, &quot;);\n\
+        }\n\
+        if((i+1) % Width == 0 && i != coor.Count - 1) {\n\
+          Console.Write(&quot;&#92;n&quot;);\n\
+          Console.Write(Program.Indent(Left + 2));\n\
+        }\n\
+      }\n\
+      Console.Write(&quot;&#92;n }&#92;n&quot;);\n\
+    }\n\
+    /* The three functions below support indexing and iterating */\n\
+    public T this[int index] {\n\
+      get { return coor[index]; }\n\
+      set { coor.Insert(index, value); }\n\
+    }\n\
+    public IEnumerator&lt;T&gt; GetEnumerator() {\n\
+      return coor.GetEnumerator();\n\
+    }\n\
+    IEnumerator IEnumerable.GetEnumerator() {\n\
+      return this.GetEnumerator();\n\
+    }\n\
+    public List&lt;T&gt; coor { get; set; }\n\
+    public int Length { get { return coor.Count; } }\n\
+    public int Width { get; set; } = 5;   // default row size\n\
+    public int Left { get; set; } = 2;    // default offsett\n\
+  }\n\
+  /* \n\
+    Demonstration composite value type.\n\
+    - St is a value type because it is implemented with\n\
+      a struct and all its data members are value types. \n\
+  */\n\
+  public struct St { \n\
+    public St(int ai, double bi, char ci) {\n\
+      a=ai; b=bi; c=ci;\n\
+    }\n\
+    public void Show(string name) {\n\
+      Console.WriteLine(\n\
+        &quot;  {0} {{ a:{1}, b:{2}, c:{3} }}&quot;, name, a, b, c \n\
+      );\n\
+    }\n\
+    /*\n\
+     These data members are public instead of public properties.\n\
+     - we don't need that ceremony because St is simply a data\n\
+       aggregator. It doesn't have any significant behavior.\n\
+    */\n\
+    public int a; \n\
+    public double b; \n\
+    public char c; \n\
+  }\n\
+\n\
+  /*-- Object demonstration begins here --*/\n\
+\n\
+  class Program\n\
+  {\n\
+    const string nl = &quot;&#92;n&quot;;\n\
+\n\
+    static void Main(string[] args)\n\
+    {\n\
+      ShowLabel(&quot; Demonstrate C# objects&quot;);\n\
+\n\
+      ShowNote(\n\
+        &quot;Examples of creation and display of Primitive Types&#92;n&quot;\n\
+        + &quot;- displays type information using ShowTypeScalar&quot;\n\
+      );\n\
+      short s = 123;\n\
+      ShowTypeScalar(s, &quot;s&quot;, nl);\n\
+      long l = 12345;\n\
+      ShowTypeScalar(l, &quot;l&quot;, nl);\n\
+      float f = 3.1415927f;\n\
+      ShowTypeScalar(f, &quot;f&quot;, nl);\n\
+      double d = 3.1415927;\n\
+      ShowTypeScalar(d, &quot;d&quot;, nl);\n\
+      ShowNote(\n\
+        &quot;ShowTypeScalar doesn't expect child elements&#92;n&quot; +\n\
+        &quot;so does not return a useful value for an array.&quot;\n\
+      );\n\
+      int[] arr = new int[]{ 4, 3, 2, 1, 0, -1};\n\
+      ShowTypeScalar(arr, &quot;arr&quot;);\n\
+      ShowNote(\n\
+        &quot;ShowTypeEnum does expect child elements so returns&#92;n&quot; +\n\
+        &quot;an appropriate state, e.g., list of values of array.&quot;\n\
+      );\n\
+      ShowTypeEnum(arr, &quot;arr&quot;, 10, nl);\n\
+      ShowNote(\n\
+        &quot;Examples of creation and display of Library Types&#92;n&quot; + \n\
+        &quot;- uses ShowTypeScalar for String&#92;n&quot; +\n\
+        &quot;- uses ShowTypeEnum for List&lt;double&gt;&#92;n&quot; +\n\
+        &quot;- size is the size of reference, not instance&quot;\n\
+      );\n\
+      string aString = &quot;a string&quot;;  // hides construction\n\
+      ShowTypeScalar(aString, &quot;aString&quot;, nl);\n\
+      List&lt;double&gt; aList = \n\
+        new List&lt;double&gt;{ 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0 };\n\
+      ShowTypeEnum(aList, &quot;aList&quot;, 5, nl);\n\
+\n\
+      ShowNote(\n\
+        &quot;Examples of user-defined types:&#92;n&quot; + \n\
+        &quot;- Point1, a point with x,y,z coordinates&#92;n&quot; +\n\
+        &quot;- Point2, a point with N generic coordinates&quot;\n\
+      );\n\
+      Point1 p1 = new Point1();\n\
+      p1.x = 3;\n\
+      p1.y = -42;\n\
+      p1.z = 1;\n\
+      ShowOp(&quot;ShowTypeShowable(p1, &#92;&quot;p1&#92;&quot;)&quot;);\n\
+      ShowTypeShowable(p1, &quot;p1&quot;, nl);\n\
+\n\
+      ShowNote(\n\
+        &quot;Point2&lt;T&gt; is both Enumerable and Showable. That is,&#92;n&quot; +\n\
+        &quot;it implements both IEnumerable&lt;T&gt; and IShow.&#92;n&quot; +\n\
+        &quot;- so both ShowTypeEnum and ShowTypeShowable work&quot;\n\
+      );\n\
+      Point2&lt;double&gt; p2 = new Point2&lt;double&gt;(7);\n\
+      p2.coor = new List&lt;double&gt; {\n\
+        1.5, 2.0, 3.5, 4.0, 5.5, 6.0, 7.5\n\
+      };\n\
+      ShowOp(&quot;ShowTypeShowable(p2, &#92;&quot;p2&#92;&quot;)&quot;);\n\
+      p2.Width = 6;\n\
+      ShowTypeShowable(p2, &quot;p2&quot;);\n\
+\n\
+      ShowOp(&quot;ShowTypeEnum(p2, &#92;&quot;p2&#92;&quot;)&quot;);\n\
+      ShowTypeEnum&lt;double&gt;(p2, &quot;p2&quot;, p2.Width);\n\
+\n\
+      ShowLabel(\n\
+        &quot;Differences between value and reference types&quot;\n\
+      );\n\
+      ShowNote(\n\
+        &quot;Assignment of reference types assigns their references,&#92;n&quot; +\n\
+        &quot;creating two references to the same instance in managed&#92;n&quot; +\n\
+        &quot;heap, so variables are coupled through single instance.&quot;\n\
+      );\n\
+      ShowOp(&quot;Point1 val1 = new Point1(), then initialize&quot;);\n\
+      Point1 val1 = new Point1();\n\
+      val1.x = 1;\n\
+      val1.y = 2;\n\
+      val1.y = 3;\n\
+      ShowLabeledObject(val1, &quot;val1&quot;);\n\
+      ShowOp(&quot;Point1 val2 = val1&quot;);\n\
+      Point1 val2 = val1;\n\
+      ShowLabeledObject(val2, &quot;val2&quot;);\n\
+      IsSameObj(val2, &quot;val2&quot;, val1, &quot;val1&quot;);\n\
+      ShowOp(&quot;val2.z = 42;&quot;);\n\
+      val2.z = 42;\n\
+      IsSameObj(val2, &quot;val2&quot;, val1, &quot;val1&quot;);\n\
+      ShowLabeledObject(val2, &quot;val2&quot;);\n\
+      ShowLabeledObject(val1, &quot;val1&quot;);\n\
+      ShowNote(\n\
+        &quot;Note! Source of assignment, val1, changed when val2 changed.&#92;n&quot; +\n\
+        &quot;Point1 is ref type, so assignment just assigns references.&quot;\n\
+      );\n\
+      println();\n\
+\n\
+      ShowNote(\n\
+        &quot;Value types can be independently assigned and copied.&quot;\n\
+      );\n\
+      ShowOp(&quot;var s1 = new St(1, -0.5, 'z');&quot;);\n\
+      var s1 = new St(1, -0.5, 'z');\n\
+      ShowOp(&quot;var s2 = s1&quot;);\n\
+      var s2 = s1;\n\
+      IsSameObj(s2, &quot;s2&quot;, s1, &quot;s1&quot;);\n\
+      s2.Show(&quot;s2&quot;);\n\
+      s1.Show(&quot;s1&quot;);\n\
+      ShowOp(&quot;s2.c = 'q'&quot;);\n\
+      s2.c = 'q';\n\
+      s2.Show(&quot;s2&quot;);\n\
+      s1.Show(&quot;s1&quot;);\n\
+      ShowNote(\n\
+        &quot;Change in destination, s2, did not alter source, s1.&#92;n&quot; +\n\
+        &quot;Assignment of value types creates independent objects.&quot;\n\
+      );\n\
+      ShowLabel(\n\
+        &quot;Instances of string are reference types, but simulate&#92;n&quot; +\n\
+        &quot;some value behaviors.  String objects are immutable.&#92;n&quot; +\n\
+        &quot;To modify an instance, a new string is created with&#92;n&quot; +\n\
+        &quot;copies of the source string characters inclucing any&#92;n&quot; +\n\
+        &quot;modifications.  This is called copy on write.&quot;\n\
+      );\n\
+      var str1 = &quot;An immutable string&quot;;\n\
+      var str2 = str1;\n\
+      IsSameObj(str2, &quot;str2&quot;, str1, &quot;str1&quot;);\n\
+      DisplayLabeledObject&lt;string&gt;(str1, &quot;str1&quot;);\n\
+      DisplayLabeledObject(str2, &quot;str2&quot;);\n\
+      str2 = str2.Remove(0,3);\n\
+      IsSameObj(str2, &quot;str2&quot;, str1, &quot;str1&quot;);\n\
+      DisplayLabeledObject(str1, &quot;str1&quot;);\n\
+      DisplayLabeledObject(str2, &quot;str2&quot;);\n\
+      ShowNote(\n\
+        &quot;There is no way for change in str2 to affect str1.&quot;\n\
+      );\n\
+\n\
+      // ShowLabel(&quot;Test code for functions used above&quot;);\n\
+      // print(&quot;--- double[] to folded CSV ---&quot;);\n\
+      // int[] arr2 = { 0,1,2,3,4,5,6,7,8 };\n\
+      // string tmp = FoldArray(arr2, 3, 2);\n\
+      // Console.WriteLine(&quot;&#92;n{0}&quot;,tmp);\n\
+\n\
+      // ShowLabel(&quot;Alternate function for generating CSVs&quot;);\n\
+      // print(&quot;--- coor to folded CSV ---&quot;);\n\
+      // double[] arr3 = p2.coor.ToArray();\n\
+      // tmp = FoldArray(arr3, 4, 2);\n\
+      // Console.WriteLine(&quot;&#92;n{0}&quot;,tmp);\n\
+\n\
+      // string tmp1 = ToCSV&lt;double&gt;(p2.coor);\n\
+      // string tmp2 = ToCSV(p2.coor);  // demo that type inference works here\n\
+      // ShowTypeScalar(tmp2, &quot;tmp2&quot;);\n\
+\n\
+      Console.WriteLine(&quot;&#92;nThat's all Folks!&#92;n&quot;);\n\
+    }\n\
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\
+        cut here\n\
+\n\
+        The functions below are used for analysis and display. They\n\
+        have varying complexities. It is not essential to understand \n\
+        them in order to follow the demonstrations above.  We will \n\
+        look at them in some detail in Bits_Functions. \n\
+    */\n\
+    /*--------------------------------------------------------------------\n\
+      Display information about the type of any scalar type.\n\
+      - scalar types are those with a single value like:\n\
+        int, double, string, ...\n\
+      - This function directly uses only simple reflection\n\
+    */\n\
+    public static void ShowTypeScalar&lt;T&gt;(T t, string nm, string suffix = &quot;&quot;)\n\
+    {\n\
+      Type? tt = t!.GetType();\n\
+      int size = 0;\n\
+      if(tt != null) {\n\
+        Console.WriteLine(&quot;{0}, {1}&quot;, nm, tt.Name);\n\
+        size = Utils.GetManagedSize(tt);\n\
+      }\n\
+      Console.WriteLine(&quot;value: {0}, size: {1}{2}&quot;, t, size, suffix);\n\
+    }\n\
+    /*--------------------------------------------------------------------\n\
+      Show type information about any type that implements the IShow\n\
+      interface\n\
+    */\n\
+    public static void ShowTypeShowable&lt;T&gt;(T t, string nm, string suffix=&quot;&quot;)\n\
+      where T:IShow\n\
+    {\n\
+      Type tt = t.GetType();\n\
+      Console.WriteLine(&quot;{0}, {1}&quot;, nm, tt.Name);\n\
+      int size = Utils.GetManagedSize(tt);\n\
+      Console.WriteLine(&quot;value:&quot;);\n\
+      t.Show();  // guaranteed availability by IShow implementation\n\
+      Console.WriteLine(&quot;size: {0}{1}&quot;, size, suffix);\n\
+    }\n\
+    /*--------------------------------------------------------------------\n\
+      Provides name of caller, nm, as label for IShow() information.\n\
+      - works for all Showable instances\n\
+    */\n\
+    public static void ShowLabeledObject&lt;T&gt;(T t, string nm) where T:IShow {\n\
+      Console.Write(nm);\n\
+      t.Show();\n\
+    }\n\
+    /*--------------------------------------------------------------------\n\
+      Provides name of caller, nm, as label for value.\n\
+      - works for all T with ToString.\n\
+    */\n\
+    public static void DisplayLabeledObject&lt;T&gt;(T t, string nm) {\n\
+      Console.WriteLine(&quot;{0}: {1}&quot;, nm, t!.ToString());\n\
+    }\n\
+    /*--------------------------------------------------------------------\n\
+      Show type information for any type that implements IEnumerable&lt;T&gt; \n\
+      interface.\n\
+    */\n\
+    public static void ShowTypeEnum&lt;T&gt; (\n\
+      IEnumerable&lt;T&gt; t, string nm, int w = 5, string suffix = &quot;&quot;\n\
+    )\n\
+    {\n\
+      Type tt = t.GetType();\n\
+      Console.WriteLine(&quot;{0}, {1}&quot;, nm, tt.Name);\n\
+      int size = Utils.GetManagedSize(tt);\n\
+      string tnm = tt.Name;\n\
+      if(tnm.Length &gt; 1) {\n\
+        tnm = tnm.Remove(tnm.Length - 2) + &quot;&lt;T&gt;&quot;;\n\
+      }\n\
+      Console.WriteLine(&quot;value:&#92;n{0}{1} {{&quot;, &quot;  &quot;, tnm);\n\
+      /* \n\
+        beautify value list into rows of w elements \n\
+        indented by 4 spaces\n\
+      */\n\
+      string tmp = FoldArray(t.ToArray(), w, 4);\n\
+      Console.Write(tmp);\n\
+      Console.WriteLine(&quot;&#92;n  }&quot;);\n\
+      Console.WriteLine(&quot;size: {0}{1}&quot;, size, suffix);\n\
+    }\n\
+    /*--------------------------------------------------------------------\n\
+      create string of count spaces, used to offset output \n\
+    */\n\
+    public static string Indent(int count) {\n\
+      StringBuilder sb = new StringBuilder();\n\
+      sb.Append(' ', count);\n\
+      return sb.ToString();\n\
+    }\n\
+    /*--------------------------------------------------------------------\n\
+      Truncate string to length of N, but only\n\
+      if its length is greater than N\n\
+    */\n\
+    string truncate(int N, string bigStr) {\n\
+      if(bigStr.Length &lt;= N) {\n\
+        return bigStr;\n\
+      }\n\
+      StringBuilder sb =  new StringBuilder();\n\
+      sb.Append(bigStr);\n\
+      sb.Length = N;  // move back pointer to desired length\n\
+      return sb.ToString();\n\
+    }\n\
+    /*-------------------------------------------------------------------- \n\
+      fold array elements into rows of w elements \n\
+    */\n\
+    public static string FoldArray&lt;T&gt;(T[] arr, int w, int Left) {\n\
+      StringBuilder tmp = new StringBuilder();\n\
+      tmp.Append(Indent(Left));\n\
+      for(int i=0; i&lt; arr.Length; ++i) {\n\
+        tmp.Append(arr[i]!.ToString());\n\
+        tmp.Append(&quot;, &quot;);\n\
+        if((i+1) % w == 0 && i != arr.Length - 1) {\n\
+          tmp.Append(&quot;&#92;n&quot;);\n\
+          tmp.Append(Indent(Left));\n\
+        }\n\
+      }\n\
+      if(tmp.Length &gt; 1) {\n\
+        tmp.Length -= 2;  // don't return last comma and space\n\
+      }\n\
+      return tmp.ToString();\n\
+    }\n\
+    /*--------------------------------------------------------------------\n\
+      do t1 and t2 share the same address?\n\
+    */\n\
+    public static void IsSameObj&lt;T&gt;(\n\
+      T t1, String n1, T t2, String n2, string suffix = &quot;&quot;\n\
+    ) {\n\
+      if(ReferenceEquals(t1, t2)) {\n\
+        Console.WriteLine(\n\
+          &quot;{0} is same object as {1}{2}&quot;, n1, n2, suffix\n\
+        );\n\
+      }\n\
+      else {\n\
+        Console.WriteLine(\n\
+          &quot;{0} is not same object as {1}{2}&quot;, n1, n2, suffix);\n\
+      }\n\
+    }\n\
+    /*--------------------------------------------------------------------\n\
+      Beware, two distinct objects may have same hashcode.\n\
+      Not used in this demo for that reason.\n\
+    */\n\
+    public static void showIdent&lt;T&gt;(T t, String n, string suffix = &quot;&quot;) {\n\
+      int id = t!.GetHashCode();\n\
+      Console.WriteLine(&quot;{0}, {1}{2}&quot;, n, id, suffix);\n\
+    }\n\
+    /*--------------------------------------------------------------------\n\
+      Display function call or operation to help turn output data \n\
+      into information \n\
+    */\n\
+    public static void ShowOp(string op, string suffix = &quot;&quot;) {\n\
+      Console.WriteLine(&quot;--- {0} ---{1}&quot;, op, suffix);\n\
+    }\n\
+    public static void print(String s = &quot;&quot;) {\n\
+      Console.Write(s);\n\
+    }\n\
+    public static void println(String s = &quot;&quot;) {\n\
+      Console.WriteLine(s);\n\
+    }\n\
+    /*--------------------------------------------------------------------\n\
+      Emphasize text with borders\n\
+    */\n\
+    public static void ShowNote(string s, string suffix = &quot;&quot;) {\n\
+      Console.WriteLine(\n\
+        &quot;--------------------------------------------------&quot;\n\
+      );\n\
+      Console.WriteLine(&quot;{0}&quot;, s);  \n\
+      Console.WriteLine(\n\
+        &quot;--------------------------------------------------{0}&quot;, suffix\n\
+      );\n\
+    }\n\
+    /*--------------------------------------------------------------------\n\
+      Surround note with empty lines\n\
+    */\n\
+    public static void ShowLabel(string s) {\n\
+      Console.WriteLine();\n\
+      ShowNote(s);\n\
+      Console.WriteLine();\n\
+    }\n\
+    /*\n\
+      Show fields and methods for either reference or value types using reflection\n\
+    */\n\
+    // https://stackoverflow.com/questions/7613782/iterating-through-struct-members\n\
+    public static void iterate&lt;T&gt;(T t) /*where T:new()*/ {\n\
+      Console.WriteLine(&quot;fields:&quot;);\n\
+      foreach(\n\
+        var field in typeof(T).GetFields(\n\
+          BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public\n\
+        )\n\
+      ) {\n\
+        Console.WriteLine(\n\
+          &quot;  {0} = {1}&quot;, field.Name, field.GetValue(t)\n\
+        );\n\
+      }\n\
+      Console.WriteLine(&quot;methods:&quot;);\n\
+      foreach(\n\
+        var method in typeof(T).GetMethods(\n\
+          BindingFlags.Instance | BindingFlags.Public\n\
+        )\n\
+      ) {\n\
+        Console.WriteLine(\n\
+          &quot;  {0}&quot;, method.Name\n\
+        );\n\
+      }\n\
+    }\n\
+    /*--------------------------------------------------------------------\n\
+      Build string of comma separated values from Enumerable collection\n\
+      - no longer used here, but will be useful so kept\n\
+    */\n\
+    // https://stackoverflow.com/questions/330493/join-collection-of-objects-into-comma-separated-string\n\
+    public static string ToCSV&lt;T&gt;(IEnumerable&lt;T&gt; coll) {\n\
+      StringBuilder sb = new StringBuilder();\n\
+      foreach(T elem in coll) {\n\
+        sb.Append(elem!.ToString()).Append(&quot;, &quot;);\n\
+      }\n\
+      return sb.ToString(0, sb.Length - 2);\n\
+    }\n\
+    /*--------------------------------------------------------------------\n\
+      Returns value of T for IEnumerable&lt;T&gt; at runtime.  Needed for some functions\n\
+      that operate on generic collections.\n\
+      - at this time, not used in this demo\n\
+    */\n\
+    // https://www.codeproject.com/Tips/5267157/How-To-Get-A-Collection-Element-Type-Using-Reflect\n\
+    public static Type? GetTypeOfCollection(Object coll) {\n\
+      Type type = (coll).GetType();\n\
+      var etype = typeof(IEnumerable&lt;&gt;);\n\
+      foreach (var bt in type.GetInterfaces()) {\n\
+        if (bt.IsGenericType && bt.GetGenericTypeDefinition() == etype) {\n\
+          return (bt.GetGenericArguments()[0]);\n\
+        }\n\
+      }\n\
+      return null;\n\
+    }\n\
+  }\n\
+  /*\n\
+    Utils uses advanced relection \n\
+    - GetMangedSize(Type type) is function that returns the size of \n\
+      value types and handles, used to help discover how things work.\n\
+      It is placed here because it uses advanced techniques that\n\
+      will eventually be covered elsewhere in this site.  Knowing\n\
+      how it works is not essential for the things we are examining\n\
+      in this demo.\n\
+  */\n\
+  // https://stackoverflow.com/questions/8173239/c-getting-size-of-a-value-type-variable-at-runtime/8173293#8173293\n\
+  public static class Utils {\n\
+    /*-- more advanced reflection --*/\n\
+    // https://stackoverflow.com/questions/7613782/iterating-through-struct-members\n\
+    public static int GetManagedSize(Type type)\n\
+    {\n\
+      // all this just to invoke one opcode with no arguments!\n\
+      var method = new DynamicMethod(\n\
+        &quot;GetManagedSizeImpl&quot;, typeof(uint), new Type[0], \n\
+        typeof(TypeExtensions), false\n\
+      );\n\
+\n\
+      ILGenerator gen = method.GetILGenerator();\n\
+      gen.Emit(OpCodes.Sizeof, type);\n\
+      gen.Emit(OpCodes.Ret);\n\
+\n\
+      var func = (Func&lt;uint&gt;)method.CreateDelegate(typeof(Func&lt;uint&gt;));\n\
+      return checked((int)func());\n\
+    }\n\
+  }\n\
+}\n\
+\n\</pre>\n\
 "
     }
     function loadCsOut(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\n\
-</pre>\n\
+--------------------------------------------------\n\
+ Demonstrate C# objects\n\
+--------------------------------------------------\n\
+\n\
+--------------------------------------------------\n\
+Examples of creation and display of Primitive Types\n\
+- displays type information using ShowTypeScalar\n\
+--------------------------------------------------\n\
+s, Int16\n\
+value: 123, size: 2\n\
+\n\
+l, Int64\n\
+value: 12345, size: 8\n\
+\n\
+f, Single\n\
+value: 3.1415927, size: 4\n\
+\n\
+d, Double\n\
+value: 3.1415927, size: 8\n\
+\n\
+--------------------------------------------------\n\
+ShowTypeScalar doesn't expect child elements\n\
+so does not return a useful value for an array.\n\
+--------------------------------------------------\n\
+arr, Int32[]\n\
+value: System.Int32[], size: 8\n\
+--------------------------------------------------\n\
+ShowTypeEnum does expect child elements so returns\n\
+an appropriate state, e.g., list of values of array.\n\
+--------------------------------------------------\n\
+arr, Int32[]\n\
+value:\n\
+  Int32&lt;T&gt; {\n\
+    4, 3, 2, 1, 0, -1\n\
+  }\n\
+size: 8\n\
+\n\
+--------------------------------------------------\n\
+Examples of creation and display of Library Types\n\
+- uses ShowTypeScalar for String\n\
+- uses ShowTypeEnum for List&lt;double&gt;\n\
+- size is the size of reference, not instance\n\
+--------------------------------------------------\n\
+aString, String\n\
+value: a string, size: 8\n\
+\n\
+aList, List`1\n\
+value:\n\
+  List&lt;T&gt; {\n\
+    1, 1.5, 2, 2.5, 3,\n\
+    3.5, 4\n\
+  }\n\
+size: 8\n\
+\n\
+--------------------------------------------------\n\
+Examples of user-defined types:\n\
+- Point1, a point with x,y,z coordinates\n\
+- Point2, a point with N generic coordinates\n\
+--------------------------------------------------\n\
+--- ShowTypeShowable(p1, &quot;p1&quot;) ---\n\
+p1, Point1\n\
+value:\n\
+  Point1  { x:3, y:-42, z:1 }\n\
+size: 8\n\
+\n\
+--------------------------------------------------\n\
+Point2&lt;T&gt; is both Enumerable and Showable. That is,\n\
+it implements both IEnumerable&lt;T&gt; and IShow.\n\
+- so both ShowTypeEnum and ShowTypeShowable work\n\
+--------------------------------------------------\n\
+--- ShowTypeShowable(p2, &quot;p2&quot;) ---\n\
+p2, Point2`1\n\
+value:\n\
+  Point2&lt;T&gt; {\n\
+    1.5, 2, 3.5, 4, 5.5, 6,\n\
+    7.5\n\
+ }\n\
+size: 8\n\
+--- ShowTypeEnum(p2, &quot;p2&quot;) ---\n\
+p2, Point2`1\n\
+value:\n\
+  Point2&lt;T&gt; {\n\
+    1.5, 2, 3.5, 4, 5.5, 6,\n\
+    7.5\n\
+  }\n\
+size: 8\n\
+\n\
+--------------------------------------------------\n\
+Differences between value and reference types\n\
+--------------------------------------------------\n\
+\n\
+--------------------------------------------------\n\
+Assignment of reference types assigns their references,\n\
+creating two references to the same instance in managed\n\
+heap, so variables are coupled through single instance.\n\
+--------------------------------------------------\n\
+--- Point1 val1 = new Point1(), then initialize ---\n\
+val1  Point1  { x:1, y:3, z:0 }\n\
+--- Point1 val2 = val1 ---\n\
+val2  Point1  { x:1, y:3, z:0 }\n\
+val2 is same object as val1\n\
+--- val2.z = 42; ---\n\
+val2 is same object as val1\n\
+val2  Point1  { x:1, y:3, z:42 }\n\
+val1  Point1  { x:1, y:3, z:42 }\n\
+--------------------------------------------------\n\
+Note! Source of assignment, val1, changed when val2 changed.\n\
+Point1 is ref type, so assignment just assigns references.\n\
+--------------------------------------------------\n\
+\n\
+--------------------------------------------------\n\
+Value types can be independently assigned and copied.\n\
+--------------------------------------------------\n\
+--- var s1 = new St(1, -0.5, 'z'); ---\n\
+--- var s2 = s1 ---\n\
+s2 is not same object as s1\n\
+  s2 { a:1, b:-0.5, c:z }\n\
+  s1 { a:1, b:-0.5, c:z }\n\
+--- s2.c = 'q' ---\n\
+  s2 { a:1, b:-0.5, c:q }\n\
+  s1 { a:1, b:-0.5, c:z }\n\
+--------------------------------------------------\n\
+Change in destination, s2, did not alter source, s1.\n\
+Assignment of value types creates independent objects.\n\
+--------------------------------------------------\n\
+\n\
+--------------------------------------------------\n\
+Instances of string are reference types, but simulate\n\
+some value behaviors.  String objects are immutable.\n\
+To modify an instance, a new string is created with\n\
+copies of the source string characters inclucing any\n\
+modifications.  This is called copy on write.\n\
+--------------------------------------------------\n\
+\n\
+str2 is same object as str1\n\
+str1: An immutable string\n\
+str2: An immutable string\n\
+str2 is not same object as str1\n\
+str1: An immutable string\n\
+str2: immutable string\n\
+--------------------------------------------------\n\
+There is no way for change in str2 to affect str1.\n\
+--------------------------------------------------\n\
+\n\
+That's all Folks!\n\
+\n\
+\n\</pre>\n\
 "
     }
     function loadCsBld(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre style='overflow-x:auto;'>\n\
-\n\</pre>"
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects\n\
+&gt; dotnet build\n\
+MSBuild version 17.4.0+18d5aef85 for .NET\n\
+  Determining projects to restore...\n\
+  All projects are up-to-date for restore.\n\
+  Cs_Objects -&gt; C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects&#92;bin&#92;Debug&#92;\n\
+  net7.0&#92;Cs_Objects.dll\n\
+\n\
+Build succeeded.\n\
+    0 Warning(s)\n\
+    0 Error(s)\n\
+\n\
+Time Elapsed 00:00:00.63\n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects\n\
+&gt; \n\
+\n\
+</pre>"
     }
 
     /*-- Load Rust Code, Output, Build --*/
