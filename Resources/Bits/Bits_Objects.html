@@ -643,8 +643,8 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build\n\
   <summary class='darkItem' style='margin-left:-2em;'>Code Notes&nbsp;&nbsp;</summary>\
   <ol class='tight' style='margin-left:0em;'>\
     <li>\
-      This code is a not so simple demonstration of basic types: int, double, string,\n\
-      struct, and class\
+      This code is a demonstration of the creation and use of instances of C# Value\n\
+      and Reference types.\
     </li>\
     <li>\
       All implementation code is required to be placed inline within the class method\
@@ -652,9 +652,6 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build\n\
     </li>\
     <li>\
       This code explores instance sharing and copy on write.\
-    </li>\
-    <li>\
-      It enumerates members of value and reference types.\
     </li>\
     <li>\
       show function is designed to display type and calling name of its\
@@ -695,7 +692,7 @@ using System.Text;                  // StringBuilder\n\
       struct\n\
     Reference types =&gt; assignment copies reference\n\
     ----------------------------------------------\n\
-      object, string, class\n\
+      object, string, array, class\n\
     ----------------------------------------------\n\
       strings are immutable, so any change requires copy on write.\n\
       That simulates value behavior.\n\
@@ -707,7 +704,7 @@ namespace CSharpObjects\n\
     that implements it. See ShowTypeShowable&lt;T&gt;(T t, ...), below.\n\
   */\n\
   interface IShow {\n\
-    void Show();              // show instance state as rows of elements\n\
+    void Show(string name);   // show instance state as rows of elements\n\
     int Length { get; }       // total number of elements\n\
     int Width { get; set; }   // number of elements per row\n\
     int Left { get; set; }    // offset from terminal Left\n\
@@ -719,7 +716,7 @@ namespace CSharpObjects\n\
     - That affects the way assignments work - see demo near the\n\
       end of main.\n\
   */\n\
-  public class Point1 : IShow  // value type with value type members\n\
+  public class Point1 : IShow  // reference type with value type members\n\
   { \n\
     public Point1() {\n\
       /* \n\
@@ -734,8 +731,8 @@ namespace CSharpObjects\n\
     public int Width { get; set; } = 3;\n\
     public int Left { get; set; } = 2;\n\
     /* translates IShow::show to needs of class */\n\
-    public void Show() {\n\
-      PrintSelf(&quot;Point1&quot;);\n\
+    public void Show(string name) {\n\
+      PrintSelf(name);\n\
     }\n\
     /* Display Point1 structure and state */\n\
     public void PrintSelf(string name) {\n\
@@ -767,8 +764,8 @@ namespace CSharpObjects\n\
       }\n\
     }\n\
     /* translates IShow::show() for needs of Point2 class */\n\
-    public void Show() {\n\
-      PrintSelf(&quot;Point2&lt;T&gt;&quot;);\n\
+    public void Show(string name) {\n\
+      PrintSelf(name);\n\
     }\n\
     /*\n\
       Displays structure and state of N-dimensional point.\n\
@@ -789,7 +786,8 @@ namespace CSharpObjects\n\
           Console.Write(Program.Indent(Left + 2));\n\
         }\n\
       }\n\
-      Console.Write(&quot;&#92;n }&#92;n&quot;);\n\
+      Console.Write(&quot;&#92;n{0}&quot;, Program.Indent(Left));\n\
+      Console.WriteLine(&quot;}&quot;);\n\
     }\n\
     /* The three functions below support indexing and iterating */\n\
     public T this[int index] {\n\
@@ -805,7 +803,16 @@ namespace CSharpObjects\n\
     public List&lt;T&gt; coor { get; set; }\n\
     public int Length { get { return coor.Count; } }\n\
     public int Width { get; set; } = 5;   // default row size\n\
-    public int Left { get; set; } = 2;    // default offsett\n\
+    public int Left { get; set; } = 2;    // default offset\n\
+    /* initializers */\n\
+    public Point2&lt;T&gt; width(int w) {\n\
+      this.Width = w;\n\
+      return this;\n\
+    } \n\
+    public Point2&lt;T&gt; left(int l) {\n\
+      this.Left = l;\n\
+      return this;\n\
+    } \n\
   }\n\
   /* \n\
     Demonstration composite value type.\n\
@@ -842,8 +849,7 @@ namespace CSharpObjects\n\
       ShowLabel(&quot; Demonstrate C# objects&quot;);\n\
 \n\
       ShowNote(\n\
-        &quot;Examples of creation and display of Primitive Types&#92;n&quot;\n\
-        + &quot;- displays type information using ShowTypeScalar&quot;\n\
+        &quot;Examples of creation and display of Primitive Types&quot;\n\
       );\n\
       short s = 123;\n\
       ShowTypeScalar(s, &quot;s&quot;, nl);\n\
@@ -853,29 +859,30 @@ namespace CSharpObjects\n\
       ShowTypeScalar(f, &quot;f&quot;, nl);\n\
       double d = 3.1415927;\n\
       ShowTypeScalar(d, &quot;d&quot;, nl);\n\
-      ShowNote(\n\
-        &quot;ShowTypeScalar doesn't expect child elements&#92;n&quot; +\n\
-        &quot;so does not return a useful value for an array.&quot;\n\
-      );\n\
       int[] arr = new int[]{ 4, 3, 2, 1, 0, -1};\n\
-      ShowTypeScalar(arr, &quot;arr&quot;);\n\
-      ShowNote(\n\
-        &quot;ShowTypeEnum does expect child elements so returns&#92;n&quot; +\n\
-        &quot;an appropriate state, e.g., list of values of array.&quot;\n\
-      );\n\
       ShowTypeEnum(arr, &quot;arr&quot;, 10, nl);\n\
+\n\
       ShowNote(\n\
         &quot;Examples of creation and display of Library Types&#92;n&quot; + \n\
-        &quot;- uses ShowTypeScalar for String&#92;n&quot; +\n\
-        &quot;- uses ShowTypeEnum for List&lt;double&gt;&#92;n&quot; +\n\
         &quot;- size is the size of reference, not instance&quot;\n\
       );\n\
       string aString = &quot;a string&quot;;  // hides construction\n\
       ShowTypeScalar(aString, &quot;aString&quot;, nl);\n\
+\n\
+      string another = new string(&quot;another string&quot;);\n\
+      ShowTypeScalar(another, &quot;another&quot;, nl);\n\
+\n\
       List&lt;double&gt; aList = \n\
         new List&lt;double&gt;{ 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0 };\n\
+    \n\
       ShowTypeEnum(aList, &quot;aList&quot;, 5, nl);\n\
 \n\
+      var d1 = new Dictionary&lt;int, string&gt;\n\
+      {\n\
+        { 0, &quot;zero&quot;}, {1, &quot;one&quot;}, {2, &quot;two&quot;}\n\
+      };\n\
+      ShowTypeEnum(d1, &quot;d1&quot;, 5, nl);\n\
+  \n\
       ShowNote(\n\
         &quot;Examples of user-defined types:&#92;n&quot; + \n\
         &quot;- Point1, a point with x,y,z coordinates&#92;n&quot; +\n\
@@ -899,10 +906,17 @@ namespace CSharpObjects\n\
       };\n\
       ShowOp(&quot;ShowTypeShowable(p2, &#92;&quot;p2&#92;&quot;)&quot;);\n\
       p2.Width = 6;\n\
-      ShowTypeShowable(p2, &quot;p2&quot;);\n\
+      ShowTypeShowable(p2, &quot;p2&quot;, nl);\n\
 \n\
       ShowOp(&quot;ShowTypeEnum(p2, &#92;&quot;p2&#92;&quot;)&quot;);\n\
-      ShowTypeEnum&lt;double&gt;(p2, &quot;p2&quot;, p2.Width);\n\
+      ShowTypeEnum&lt;double&gt;(p2, &quot;p2&quot;, p2.Width, nl);\n\
+\n\
+      ShowOp(&quot;ShowTypeShowable(p3, &#92;&quot;p3&#92;&quot;)&quot;);\n\
+      Point2&lt;int&gt; p3 = new Point2&lt;int&gt;(7);\n\
+      p3.left(4).width(7);\n\
+      ShowOp(&quot;set left(4) and width(7)&quot;);\n\
+      p3.coor = new List&lt;int&gt;{1, 2, 3, 4, 5, 6, 7};\n\
+      ShowTypeShowable(p3, &quot;p3&quot;, nl);\n\
 \n\
       ShowLabel(\n\
         &quot;Differences between value and reference types&quot;\n\
@@ -997,6 +1011,24 @@ namespace CSharpObjects\n\
         them in order to follow the demonstrations above.  We will \n\
         look at them in some detail in Bits_Functions. \n\
     */\n\
+    public static void ShowType&lt;T&gt;(T t, string nm) {\n\
+      Type tt = t!.GetType();\n\
+      string tnm = tt.Name;\n\
+      if(tt.IsGenericType) {\n\
+        if(tnm.Length &gt; 1) {\n\
+          tnm = tnm.Remove(tnm.Length - 2) + &quot;&lt;T&gt;&quot;;\n\
+        }\n\
+      }\n\
+      Console.Write(&quot;{0}: {1}, &quot;, nm, tnm);\n\
+      int size = Utils.GetManagedSize(tt);\n\
+      Console.Write(&quot;size: {0}, &quot;, size);\n\
+      if (tt.IsValueType) {\n\
+        Console.WriteLine(&quot;value type&quot;);\n\
+      }\n\
+      else {\n\
+        Console.WriteLine(&quot;reference type&quot;);\n\
+      }\n\
+    }\n\
     /*--------------------------------------------------------------------\n\
       Display information about the type of any scalar type.\n\
       - scalar types are those with a single value like:\n\
@@ -1005,13 +1037,14 @@ namespace CSharpObjects\n\
     */\n\
     public static void ShowTypeScalar&lt;T&gt;(T t, string nm, string suffix = &quot;&quot;)\n\
     {\n\
-      Type? tt = t!.GetType();\n\
-      int size = 0;\n\
-      if(tt != null) {\n\
-        Console.WriteLine(&quot;{0}, {1}&quot;, nm, tt.Name);\n\
-        size = Utils.GetManagedSize(tt);\n\
-      }\n\
-      Console.WriteLine(&quot;value: {0}, size: {1}{2}&quot;, t, size, suffix);\n\
+      // Type? tt = t!.GetType();\n\
+      // int size = 0;\n\
+      // if(tt != null) {\n\
+      //   Console.WriteLine(&quot;{0}, {1}&quot;, nm, tt.Name);\n\
+      //   size = Utils.GetManagedSize(tt);\n\
+      // }\n\
+      ShowType(t, nm);\n\
+      Console.WriteLine(&quot;value: &#92;&quot;{0}&#92;&quot;{1}&quot;, t, suffix);\n\
     }\n\
     /*--------------------------------------------------------------------\n\
       Show type information about any type that implements the IShow\n\
@@ -1020,12 +1053,14 @@ namespace CSharpObjects\n\
     public static void ShowTypeShowable&lt;T&gt;(T t, string nm, string suffix=&quot;&quot;)\n\
       where T:IShow\n\
     {\n\
-      Type tt = t.GetType();\n\
-      Console.WriteLine(&quot;{0}, {1}&quot;, nm, tt.Name);\n\
-      int size = Utils.GetManagedSize(tt);\n\
+      ShowType(t, nm);\n\
+      // Type tt = t.GetType();\n\
+      // Console.WriteLine(&quot;{0}, {1}&quot;, nm, tt.Name);\n\
+      // int size = Utils.GetManagedSize(tt);\n\
       Console.WriteLine(&quot;value:&quot;);\n\
-      t.Show();  // guaranteed availability by IShow implementation\n\
-      Console.WriteLine(&quot;size: {0}{1}&quot;, size, suffix);\n\
+      t.Show(nm);  // guaranteed availability by IShow implementation\n\
+      // Console.WriteLine(&quot;size: {0}{1}&quot;, size, suffix);\n\
+      Console.Write(suffix);\n\
     }\n\
     /*--------------------------------------------------------------------\n\
       Provides name of caller, nm, as label for IShow() information.\n\
@@ -1033,7 +1068,7 @@ namespace CSharpObjects\n\
     */\n\
     public static void ShowLabeledObject&lt;T&gt;(T t, string nm) where T:IShow {\n\
       Console.Write(nm);\n\
-      t.Show();\n\
+      t.Show(nm);\n\
     }\n\
     /*--------------------------------------------------------------------\n\
       Provides name of caller, nm, as label for value.\n\
@@ -1050,14 +1085,8 @@ namespace CSharpObjects\n\
       IEnumerable&lt;T&gt; t, string nm, int w = 5, string suffix = &quot;&quot;\n\
     )\n\
     {\n\
-      Type tt = t.GetType();\n\
-      Console.WriteLine(&quot;{0}, {1}&quot;, nm, tt.Name);\n\
-      int size = Utils.GetManagedSize(tt);\n\
-      string tnm = tt.Name;\n\
-      if(tnm.Length &gt; 1) {\n\
-        tnm = tnm.Remove(tnm.Length - 2) + &quot;&lt;T&gt;&quot;;\n\
-      }\n\
-      Console.WriteLine(&quot;value:&#92;n{0}{1} {{&quot;, &quot;  &quot;, tnm);\n\
+      ShowType(t, nm);\n\
+      Console.WriteLine(&quot;value:&#92;n{0}{1} {{&quot;, &quot;  &quot;, nm);\n\
       /* \n\
         beautify value list into rows of w elements \n\
         indented by 4 spaces\n\
@@ -1065,7 +1094,7 @@ namespace CSharpObjects\n\
       string tmp = FoldArray(t.ToArray(), w, 4);\n\
       Console.Write(tmp);\n\
       Console.WriteLine(&quot;&#92;n  }&quot;);\n\
-      Console.WriteLine(&quot;size: {0}{1}&quot;, size, suffix);\n\
+      Console.Write(suffix);\n\
     }\n\
     /*--------------------------------------------------------------------\n\
       create string of count spaces, used to offset output \n\
@@ -1248,66 +1277,59 @@ namespace CSharpObjects\n\
       return checked((int)func());\n\
     }\n\
   }\n\
-}\n\
-\n\</pre>\n\
+}\n\\n\</pre>\n\
 "
     }
     function loadCsOut(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\n\
---------------------------------------------------\n\
+ --------------------------------------------------\n\
  Demonstrate C# objects\n\
 --------------------------------------------------\n\
 \n\
 --------------------------------------------------\n\
 Examples of creation and display of Primitive Types\n\
-- displays type information using ShowTypeScalar\n\
 --------------------------------------------------\n\
-s, Int16\n\
-value: 123, size: 2\n\
+s: Int16, size: 2, value type\n\
+value: &quot;123&quot;\n\
 \n\
-l, Int64\n\
-value: 12345, size: 8\n\
+l: Int64, size: 8, value type\n\
+value: &quot;12345&quot;\n\
 \n\
-f, Single\n\
-value: 3.1415927, size: 4\n\
+f: Single, size: 4, value type\n\
+value: &quot;3.1415927&quot;\n\
 \n\
-d, Double\n\
-value: 3.1415927, size: 8\n\
+d: Double, size: 8, value type\n\
+value: &quot;3.1415927&quot;\n\
 \n\
---------------------------------------------------\n\
-ShowTypeScalar doesn't expect child elements\n\
-so does not return a useful value for an array.\n\
---------------------------------------------------\n\
-arr, Int32[]\n\
-value: System.Int32[], size: 8\n\
---------------------------------------------------\n\
-ShowTypeEnum does expect child elements so returns\n\
-an appropriate state, e.g., list of values of array.\n\
---------------------------------------------------\n\
-arr, Int32[]\n\
+arr: Int32[], size: 8, reference type\n\
 value:\n\
-  Int32&lt;T&gt; {\n\
+  arr {\n\
     4, 3, 2, 1, 0, -1\n\
   }\n\
-size: 8\n\
 \n\
 --------------------------------------------------\n\
 Examples of creation and display of Library Types\n\
-- uses ShowTypeScalar for String\n\
-- uses ShowTypeEnum for List&lt;double&gt;\n\
 - size is the size of reference, not instance\n\
 --------------------------------------------------\n\
-aString, String\n\
-value: a string, size: 8\n\
+aString: String, size: 8, reference type\n\
+value: &quot;a string&quot;\n\
 \n\
-aList, List`1\n\
+another: String, size: 8, reference type\n\
+value: &quot;another string&quot;\n\
+\n\
+aList: List&lt;T&gt;, size: 8, reference type\n\
 value:\n\
-  List&lt;T&gt; {\n\
+  aList {\n\
     1, 1.5, 2, 2.5, 3,\n\
     3.5, 4\n\
   }\n\
-size: 8\n\
+\n\
+d1: Dictionary&lt;T&gt;, size: 8, reference type\n\
+value:\n\
+  d1 {\n\
+    [0, zero], [1, one], [2, two]\n\
+  }\n\
 \n\
 --------------------------------------------------\n\
 Examples of user-defined types:\n\
@@ -1315,10 +1337,9 @@ Examples of user-defined types:\n\
 - Point2, a point with N generic coordinates\n\
 --------------------------------------------------\n\
 --- ShowTypeShowable(p1, &quot;p1&quot;) ---\n\
-p1, Point1\n\
+p1: Point1, size: 8, reference type\n\
 value:\n\
-  Point1  { x:3, y:-42, z:1 }\n\
-size: 8\n\
+  p1  { x:3, y:-42, z:1 }\n\
 \n\
 --------------------------------------------------\n\
 Point2&lt;T&gt; is both Enumerable and Showable. That is,\n\
@@ -1326,21 +1347,29 @@ it implements both IEnumerable&lt;T&gt; and IShow.\n\
 - so both ShowTypeEnum and ShowTypeShowable work\n\
 --------------------------------------------------\n\
 --- ShowTypeShowable(p2, &quot;p2&quot;) ---\n\
-p2, Point2`1\n\
+p2: Point2&lt;T&gt;, size: 8, reference type\n\
 value:\n\
-  Point2&lt;T&gt; {\n\
-    1.5, 2, 3.5, 4, 5.5, 6,\n\
-    7.5\n\
- }\n\
-size: 8\n\
---- ShowTypeEnum(p2, &quot;p2&quot;) ---\n\
-p2, Point2`1\n\
-value:\n\
-  Point2&lt;T&gt; {\n\
+  p2 {\n\
     1.5, 2, 3.5, 4, 5.5, 6,\n\
     7.5\n\
   }\n\
-size: 8\n\
+\n\
+--- ShowTypeEnum(p2, &quot;p2&quot;) ---\n\
+p2: Point2&lt;T&gt;, size: 8, reference type\n\
+value:\n\
+  p2 {\n\
+    1.5, 2, 3.5, 4, 5.5, 6,\n\
+    7.5\n\
+  }\n\
+\n\
+--- ShowTypeShowable(p3, &quot;p3&quot;) ---\n\
+--- set left(4) and width(7) ---\n\
+p3: Point2&lt;T&gt;, size: 8, reference type\n\
+value:\n\
+    p3 {\n\
+      1, 2, 3, 4, 5, 6, 7\n\
+    }\n\
+\n\
 \n\
 --------------------------------------------------\n\
 Differences between value and reference types\n\
@@ -1352,14 +1381,14 @@ creating two references to the same instance in managed\n\
 heap, so variables are coupled through single instance.\n\
 --------------------------------------------------\n\
 --- Point1 val1 = new Point1(), then initialize ---\n\
-val1  Point1  { x:1, y:3, z:0 }\n\
+val1  val1  { x:1, y:3, z:0 }\n\
 --- Point1 val2 = val1 ---\n\
-val2  Point1  { x:1, y:3, z:0 }\n\
+val2  val2  { x:1, y:3, z:0 }\n\
 val2 is same object as val1\n\
 --- val2.z = 42; ---\n\
 val2 is same object as val1\n\
-val2  Point1  { x:1, y:3, z:42 }\n\
-val1  Point1  { x:1, y:3, z:42 }\n\
+val2  val2  { x:1, y:3, z:42 }\n\
+val1  val1  { x:1, y:3, z:42 }\n\
 --------------------------------------------------\n\
 Note! Source of assignment, val1, changed when val2 changed.\n\
 Point1 is ref type, so assignment just assigns references.\n\
@@ -1412,8 +1441,8 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects\n\
 MSBuild version 17.4.0+18d5aef85 for .NET\n\
   Determining projects to restore...\n\
   All projects are up-to-date for restore.\n\
-  Cs_Objects -&gt; C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects&#92;bin&#92;Debug&#92;\n\
-  net7.0&#92;Cs_Objects.dll\n\
+  Cs_Objects -&gt; C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects&#92;bin&#92;Debug&#92;net7.0\n\
+  &#92;Cs_Objects.dll\n\
 \n\
 Build succeeded.\n\
     0 Warning(s)\n\
@@ -1421,7 +1450,6 @@ Build succeeded.\n\
 \n\
 Time Elapsed 00:00:00.63\n\
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects\n\
-&gt; \n\
 \n\
 </pre>"
     }
@@ -1858,7 +1886,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
       }
       let cs = document.getElementById("Cs1");
       if (cs.checked) {
-        window.open('https://godbolt.org/z/Pbxj6rb6d', '_blank');
+        window.open('https://godbolt.org/z/Pc89d8c3T', '_blank');
       }
       let rs = document.getElementById("Rs1");
       if (rs.checked) {
@@ -1889,7 +1917,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
       }
       let cs = document.getElementById("Cs2");
       if (cs.checked) {
-        window.open('https://godbolt.org/z/Pbxj6rb6d', '_blank');
+        window.open('https://godbolt.org/z/Pc89d8c3T', '_blank');
       }
       let rs = document.getElementById("Rs2");
       if (rs.checked) {
