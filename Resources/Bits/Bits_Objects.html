@@ -1783,15 +1783,15 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects\n\
   <summary class='darkItem' style='margin-left:-2em;'>Code Notes&nbsp;&nbsp;</summary>\
   <ol class='tight' style='margin-left:0em;'>\
     <li>\
-      This code is a simple demonstration of basic types: int, float,\n\
-      complex, and list.\n\
+      This code is a simple demonstration of Python types string, list, complex,\n\
+      and also user defined type Point1 and their instances.\
     </li>\
     <li>\
       All Python types are reference types with values stored in heap.\
     </li>\
     <li>\
-      showType function is designed to display type and calling name of its\n\
-      first argument and its value and size.\
+      showType functions are designed to display type and calling name of\n\
+      first argument and value and size.\
     </li>\
     <li>\
       Note that the display and analysis functions are simpler than those for\n\
@@ -1806,7 +1806,181 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects\n\
 </details >\
 </div >\
 <pre>\n\
-</pre>\n\
+import sys\n\
+# Python/Py_Objects::Py_Objects.py\n\
+# \n\
+# Python Dynamic Data Types\n\
+#   int, float, complex\n\
+#   bytes, bytearray, memoryview\n\
+#   list, tuple, range\n\
+#   dict, set, frozenset\n\
+#   bool\n\
+#   str\n\
+#   NoneType\n\
+\n\
+# Python requires definition before use ordering\n\
+#  - no link phase to find definitions\n\
+import copy\n\
+nl = &quot;&#92;n&quot;\n\
+\n\
+# show name, type, value, and size of a Python instance\n\
+def showType(t, nm, suffix = &quot;&quot;) :\n\
+    print(nm, type(t), &quot;dynamic&quot;)\n\
+    print(&quot;value: &quot;, t, ', size: ', sys.getsizeof(t), suffix)\n\
+\n\
+# same as showType except uses class method to show value\n\
+def showTypeShowable(t, nm, suffix = &quot;&quot;):\n\
+    print(nm, type(t), &quot;dynamic&quot;)\n\
+    t.show(nm)\n\
+\n\
+# show Python id, unique for each instance\n\
+def showIdent(t, n, suffix = &quot;&quot;) :\n\
+    print(n, t, id(t), suffix)\n\
+\n\
+# show emphasized note\n\
+def showNote(text, suffix = &quot;&quot;) :\n\
+    print(&quot;-------------------------&quot;)\n\
+    print(text)\n\
+    print(&quot;-------------------------&quot;, suffix)\n\
+\n\
+# show delineated string to announce a program operation\n\
+def showOp(text):\n\
+    print(&quot;--- {} ---&quot;.format(text))\n\
+\n\
+# point class with three coordinates\n\
+class Point1:\n\
+    x = 0;\n\
+    y = 0;\n\
+    z = 0;\n\
+\n\
+    # supports constructor notation\n\
+    def __init__(self) -&gt; None:\n\
+        pass\n\
+    \n\
+    # show named value of Point1 instance\n\
+    def show(self, name) :\n\
+        print(&quot;{} {{ &quot;.format(name), end='')\n\
+        print(&quot; x:{}, y:{}, z:{}&quot;.format(self.x, self.y, self.z), end='');\n\
+        print(&quot; }&quot;);\n\
+\n\
+# Demonstration starts here\n\
+def execute() : \n\
+    print(&quot; Demonstrate Python Objects&quot;)\n\
+    print(&quot;----------------------------&quot;)\n\
+\n\
+    showNote(   \n\
+        &quot;All Python types are reference-based&#92;n&quot;&#92;\n\
+        &quot;with values in the managed heap. That&#92;n&quot;&#92;\n\
+        &quot;has consequences we explore in this demo.&quot;\n\
+    )\n\
+\n\
+    s1 = &quot;a string&quot;\n\
+    showType(s1, &quot;s1&quot;)\n\
+    showOp(&quot;s2 = s1&quot;)\n\
+    s2 = s1\n\
+    showIdent(s1, &quot;s1&quot;)\n\
+    showIdent(s2, &quot;s2&quot;)\n\
+    #print(&quot;s2 = {}&quot;.format(s2))\n\
+    showOp(&quot;s2 += &#92;&quot; and more&#92;&quot;&quot;)\n\
+    s2 += &quot; and more&quot;\n\
+    showIdent(s2, &quot;s2&quot;)\n\
+    showIdent(s1, &quot;s1&quot;)\n\
+    # print(&quot;s2 = {}&quot;.format(s2))\n\
+    # print(&quot;s1 = {}&quot;.format(s1))\n\
+    showNote(   \n\
+        &quot;Assignment, in Python, assignes references not&#92;n&quot;&#92;\n\
+        &quot;values.  So s1 and s2 share same heap instance&#92;n&quot;&#92;\n\
+        &quot;But strings are immutable. So when a change is&#92;n&quot;&#92;\n\
+        &quot;made to one, that creates a new instance without&#92;n&quot;&#92;\n\
+        &quot;changing the original.&quot;\n\
+    )\n\
+    print()\n\
+\n\
+    l1 = [&quot;you&quot;, &quot;me&quot;, &quot;them&quot;, &quot;us&quot;]\n\
+    showType(l1, &quot;l1&quot;, nl)\n\
+\n\
+    print(&quot;l1 = &quot;, l1)\n\
+    showOp(&quot;l2 = l1&quot;)\n\
+    l2 = l1\n\
+    showOp('l2.append(&quot;everyone&quot;)')\n\
+    l2.append(&quot;everyone&quot;)\n\
+    print(&quot;l2 = &quot;, l2)\n\
+    print(&quot;l1 = &quot;, l1)\n\
+    showOp('l2[1] = &quot;myself&quot;')\n\
+    l2[1] = &quot;myself&quot;\n\
+    print(&quot;l2 = &quot;, l2)\n\
+    print(&quot;l1 = &quot;, l1)\n\
+    showNote(   \n\
+        &quot;Assignment, in Python, assignes references&#92;n&quot;&#92;\n\
+        &quot;not values.  So changes to target affect the&#92;n&quot;&#92;\n\
+        &quot;source.  &#92;&quot;caveat emptor&#92;&quot;&quot;\n\
+    )\n\
+    print()\n\
+\n\
+    showOp(&quot;p1a = Point1()&quot;)\n\
+    p1a = Point1()\n\
+    showOp(&quot;showTypeShowable(p1a, &#92;&quot;p1a&#92;&quot;, nl)&quot;)\n\
+    showTypeShowable(p1a, &quot;p1a&quot;, nl)\n\
+    p1a.x = 2\n\
+    p1a.y = -3.5\n\
+    p1a.z = -42\n\
+    p1a.show(&quot;p1a&quot;)\n\
+\n\
+    showOp(&quot;p1b = p1a&quot;)\n\
+    p1b = p1a\n\
+    p1b.show(&quot;p1b&quot;)\n\
+\n\
+    showOp(&quot;p1b.y = 13&quot;)\n\
+    p1b.y = 13\n\
+    p1b.show(&quot;p1b&quot;)\n\
+    p1a.show(&quot;p1a&quot;)\n\
+    showNote(\n\
+        &quot;Reference assigned, not value.&#92;nSo change&quot;&#92;\n\
+        &quot; in P1b changed source p1a.&quot;\n\
+    )\n\
+    print()\n\
+\n\
+    showOp(&quot;p1c = copy.deepcopy(p1b)&quot;)\n\
+    p1c = copy.deepcopy(p1b)\n\
+    p1c.show(&quot;p1c&quot;);\n\
+    p1b.show(&quot;p1b&quot;)\n\
+    showOp(&quot;p1c.z = 12&quot;)\n\
+    p1c.z = 12\n\
+    p1c.show(&quot;p1c&quot;)\n\
+    p1b.show(&quot;p1b&quot;)\n\
+    showNote(\n\
+        &quot;p1c.z reference assigned, not value. But no&#92;n&quot;&#92;\n\
+        &quot;change in p1b since p1c is deep clone of p1b.&quot;\n\
+    )\n\
+    print()\n\
+\n\
+    # # reference behavior - new child object\n\
+    print(&quot;-- t5 = (1, 2, 3) --&quot;)\n\
+    t5 = (1, 2, 3)\n\
+    showIdent(t5, &quot;t5&quot;)\n\
+    print(&quot;-- t6 = [1, t5, &#92;&quot;weird&#92;&quot;] --&quot;)\n\
+    t6 = [1, t5, &quot;weird&quot;]\n\
+    showIdent(t6, &quot;t6&quot;)\n\
+    showType(t6, &quot;t6&quot;)\n\
+    print(&quot;-- t5 = 1 + 1j : new object --&quot;)\n\
+    t5 = 1 + 1j\n\
+    showIdent(t5, &quot;t5&quot;)\n\
+    showIdent(t6, &quot;t6&quot;)\n\
+    showNote(&quot;new object for t5, t6 not affected&quot;, nl)\n\
+    \n\
+    # # reference behavior - iterate over children\n\
+    print(&quot;-- iterate over t6 children --&quot;)\n\
+    for i in t6:\n\
+        showIdent(i, &quot;elem&quot;)\n\
+\n\
+    print(&quot;&#92;n-- iterate over t6 methods --&quot;)\n\
+    print(dir(t6))\n\
+      \n\
+    print(&quot;&#92;nThat's all folks!&#92;n&quot;)\n\
+\n\
+execute()\n\
+\n\
+\n\</pre>\n\
 </div>\n\
 ";
     }
@@ -1815,7 +1989,104 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects\n\
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<div class='code'>\n\
 <pre>\n\
-</pre>\n\
+ Demonstrate Python Objects\n\
+----------------------------\n\
+-------------------------\n\
+All Python types are reference-based\n\
+with values in the managed heap. That\n\
+has consequences we explore in this demo.\n\
+-------------------------\n\
+s1 &lt;class 'str'&gt; dynamic\n\
+value:  a string , size:  57\n\
+--- s2 = s1 ---\n\
+s1 a string 2624089302960\n\
+s2 a string 2624089302960\n\
+--- s2 += &quot; and more&quot; ---\n\
+s2 a string and more 2624089315152\n\
+s1 a string 2624089302960\n\
+-------------------------\n\
+Assignment, in Python, assignes references not\n\
+values.  So s1 and s2 share same heap instance\n\
+But strings are immutable. So when a change is\n\
+made to one, that creates a new instance without\n\
+changing the original.\n\
+-------------------------\n\
+\n\
+l1 &lt;class 'list'&gt; dynamic\n\
+value:  ['you', 'me', 'them', 'us'] , size:  88\n\
+\n\
+l1 =  ['you', 'me', 'them', 'us']\n\
+--- l2 = l1 ---\n\
+--- l2.append(&quot;everyone&quot;) ---\n\
+l2 =  ['you', 'me', 'them', 'us', 'everyone']\n\
+l1 =  ['you', 'me', 'them', 'us', 'everyone']\n\
+--- l2[1] = &quot;myself&quot; ---\n\
+l2 =  ['you', 'myself', 'them', 'us', 'everyone']\n\
+l1 =  ['you', 'myself', 'them', 'us', 'everyone']\n\
+-------------------------\n\
+Assignment, in Python, assignes references\n\
+not values.  So changes to target affect the\n\
+source.  &quot;caveat emptor&quot;\n\
+-------------------------\n\
+\n\
+--- p1a = Point1() ---\n\
+--- showTypeShowable(p1a, &quot;p1a&quot;, nl) ---\n\
+p1a &lt;class '__main__.Point1'&gt; dynamic\n\
+p1a {  x:0, y:0, z:0 }\n\
+p1a {  x:2, y:-3.5, z:-42 }\n\
+--- p1b = p1a ---\n\
+p1b {  x:2, y:-3.5, z:-42 }\n\
+--- p1b.y = 13 ---\n\
+p1b {  x:2, y:13, z:-42 }\n\
+p1a {  x:2, y:13, z:-42 }\n\
+-------------------------\n\
+Reference assigned, not value.\n\
+So change in P1b changed source p1a.\n\
+-------------------------\n\
+\n\
+--- p1c = copy.deepcopy(p1b) ---\n\
+p1c {  x:2, y:13, z:-42 }\n\
+p1b {  x:2, y:13, z:-42 }\n\
+--- p1c.z = 12 ---\n\
+p1c {  x:2, y:13, z:12 }\n\
+p1b {  x:2, y:13, z:-42 }\n\
+-------------------------\n\
+p1c.z reference assigned, not value. But no\n\
+change in p1b since p1c is deep clone of p1b.\n\
+-------------------------\n\
+\n\
+-- t5 = (1, 2, 3) --\n\
+t5 (1, 2, 3) 2624089300224\n\
+-- t6 = [1, t5, &quot;weird&quot;] --\n\
+t6 [1, (1, 2, 3), 'weird'] 2624089307328\n\
+t6 &lt;class 'list'&gt; dynamic\n\
+value:  [1, (1, 2, 3), 'weird'] , size:  80\n\
+-- t5 = 1 + 1j : new object --\n\
+t5 (1+1j) 2624086515600\n\
+t6 [1, (1, 2, 3), 'weird'] 2624089307328\n\
+-------------------------\n\
+new object for t5, t6 not affected\n\
+-------------------------\n\
+\n\
+-- iterate over t6 children --\n\
+elem 1 2624085491952\n\
+elem (1, 2, 3) 2624089300224\n\
+elem weird 2624089306288\n\
+\n\
+-- iterate over t6 methods --\n\
+['__add__', '__class__', '__class_getitem__', '__contains__', \n\
+'__delattr__', '__delitem__', '__dir__', '__doc__', '__eq__', \n\
+'__format__', '__ge__', '__getattribute__', '__getitem__', '__gt__', \n\
+'__hash__', '__iadd__', '__imul__', '__init__', '__init_subclass__', \n\
+'__iter__', '__le__', '__len__', '__lt__', '__mul__', '__ne__', \n\
+'__new__', '__reduce__', '__reduce_ex__', '__repr__', '__reversed__', \n\
+'__rmul__', '__setattr__', '__setitem__', '__sizeof__', '__str__', \n\
+'__subclasshook__', 'append', 'clear', 'copy', 'count', 'extend', \n\
+'index', 'insert', 'pop', 'remove', 'reverse', 'sort']\n\
+\n\
+That's all folks!\n\
+\n\
+\n\</pre>\n\
 </div>";
     }
 
@@ -1898,7 +2169,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
       let py = document.getElementById("Py1");
       if (py.checked) {
         window.open(
-          'https://godbolt.org/z/bj8Wc7oxb',
+          'https://godbolt.org/z/Y531MqoPT',
           '_blank'
         )
       }
@@ -1929,7 +2200,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
       let py = document.getElementById("Py2");
       if (py.checked) {
         window.open(
-          'https://godbolt.org/z/7noK4Yvvd',
+          'https://godbolt.org/z/Y531MqoPT',
           '_blank'
         )
       }
