@@ -203,8 +203,8 @@
   <summary class='darkItem' style='margin-left:-2em;'>Code Notes&nbsp;&nbsp;</summary>\
   <ol class='tight' style='margin-left:0em;'>\
     <li>\
-      This code is a relatively simple demonstration of classes and objects. It uses classes\n\
-      std::string, std::vector<T>, Point1, and Point2&lt;T&gt; to show class anatomy and uses.\
+      This code is a demonstration of classes and objects. It uses classes std::string,\n\
+      std::vector<T>, Point1, and Point2&lt;T&gt; to show class anatomy and uses.\
     </li>\
     <li>\
       It illustrates stack and heap based storage.\
@@ -229,6 +229,7 @@
 #include &lt;memory&gt;    // std::unique_ptr\n\
 #include &lt;utility&gt;   // move()\n\
 #include &lt;vector&gt;    // vector class\n\
+#include &lt;sstream&gt;   // stringstream\n\
 \n\
 /*\n\
   This demo uses the std::string and std::vector&lt;T&gt; classes\n\
@@ -236,11 +237,11 @@
   illustrate how objects are defined and instantiated.\n\
 \n\
   Operations:\n\
-    All the classes discussed here provide:\n\
-      T t2 = t1        // copy construction\n\
-      T t3 = move(t1)  // move construction\n\
-      t1 = t2          // copy assignment\n\
-      t3 = move(t2)    // move assignment\n\
+    All the classes discussed here provide operations for:\n\
+      T t2 = t1          // copy construction\n\
+      T t3 = temporary   // move construction\n\
+      t1 = t2            // copy assignment\n\
+      t3 = temporary     // move assignment\n\
 \n\
     All instances return their resources when they go out of\n\
     scope by implicitly calling their destructor.\n\
@@ -258,21 +259,37 @@
 */\n\
 \n\
 const std::string nl = &quot;&#92;n&quot;;\n\
+/*-------------------------------------------------------------------\n\
+  Mutable globals are a common source of bugs.  We try not\n\
+  to use them, but will use DisplayParams here to control how\n\
+  the insertion operator sends std::vector to standard output.\n\
+*/\n\
+struct displayParams {\n\
+  size_t left = 4;    // number of spaces to indent\n\
+  size_t width = 7;   // width of display row\n\
+  size_t trunc = 55;  // replace text after trunc with ...\n\
+} DisplayParams;\n\
 \n\
-/* Display and analysis functions are defined at the end */\n\
-/* but C++ requires declaration before use.              */\n\
+/*------------------------------------------------------------------- \n\
+  Display and analysis functions are defined at the end\n\
+  but C++ requires declaration before use.\n\
+*/\n\
 template&lt;typename T&gt;\n\
 void showType(T t, const std::string &nm, const std::string& suffix = &quot;&quot;);\n\
 void showNote(const std::string& txt, const std::string& suffix = &quot;&quot;);\n\
+void showOp(const std::string& opstr, const std::string& suffix = &quot;&quot;);\n\
 void print(const std::string& txt = &quot;&quot;);\n\
 void println(const std::string& txt = &quot;&quot;);\n\
 std::string truncate(size_t N, const char* pStr);\n\
+std::string indent(size_t n);\n\
+template&lt;typename T&gt;\n\
+std::string fold(std::vector&lt;T&gt;& v, size_t left, size_t width);\n\
 \n\
 /* alias type name - pU&lt;T&gt; is the same type as std::unique_ptr&lt;T&gt; */\n\
 template&lt;typename T&gt;\n\
 using pU = std::unique_ptr&lt;T&gt;;\n\
 \n\
-/*\n\
+/*-------------------------------------------------------------------\n\
   Point1 class represents a point in an integral 3-Dimensional\n\
   lattice. Simple enough for illustration, but still useful.\n\
 \n\
@@ -316,8 +333,8 @@ std::ostream& operator&lt;&lt;(std::ostream& out, Point1& t1) {\n\
   return out;\n\
 }\n\
 \n\
-/*\n\
-  Point2<T> class represents a point in an n-Dimensional hyperspace.\n\
+/*-------------------------------------------------------------------\n\
+  Point2&lt;T&gt; class represents a point in an n-Dimensional hyperspace.\n\
   It is more flexible than Point1 by using a template to support\n\
   a variety of coordinate types, and by using a vector to hold\n\
   any finite number of coordinates.\n\
@@ -337,81 +354,97 @@ public:\n\
   ~Point2() = default;                            // dtor\n\
   void show();\n\
   std::vector&lt;T&gt;& coords() { return coord; }\n\
+  size_t& left() { return _left; }\n\
+  size_t& width() { return _width; }\n\
 private:\n\
   std::vector&lt;T&gt; coord;\n\
+  size_t _left = 2;   // default display indent\n\
+  size_t _width = 7;  // default display row width\n\
 };\n\
-\n\
+/*-----------------------------------------------\n\
+  Point2&lt;T&gt; constructor with size \n\
+*/\n\
 template&lt;typename T&gt;\n\
 Point2&lt;T&gt;::Point2(size_t N) {\n\
   for(size_t i=0; i&lt;N; i++) {\n\
     coord.push_back(T{0});\n\
   }\n\
 }\n\
+/*-----------------------------------------------\n\
+  Pointt2&lt;T&gt; display function \n\
+*/\n\
 template&lt;typename T&gt;\n\
 void Point2&lt;T&gt;::show() {\n\
-  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; &quot;Point2&quot;;\n\
-  std::cout &lt;&lt; &quot; { &quot;;\n\
-  for(size_t i=0; i&lt;coord.size(); ++i) {\n\
-    std::cout &lt;&lt; coord[i];\n\
-    if(i &lt; coord.size() - 1) {\n\
-      std::cout &lt;&lt; &quot;, &quot;;\n\
-    }\n\
-  }\n\
-  std::cout &lt;&lt; &quot; }&quot;;\n\
+  std::cout &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(_left) &lt;&lt; &quot;Point2&lt;T&gt;&quot;;\n\
+  std::cout &lt;&lt; &quot; {&#92;n&quot;;\n\
+  std::cout &lt;&lt; fold(coord, _left + 2, _width);\n\
+  std::cout &lt;&lt; indent(_left) &lt;&lt; &quot;}&quot;;\n\
 }\n\
-/* required for showType(T t, const std::string& nm) */\n\
+/*-----------------------------------------------\n\
+  Overload operator&lt;&lt; required for \n\
+  showType(Point2&lt;T&gt; t, const std::string& nm) \n\
+*/\n\
 template&lt;typename T&gt;\n\
 std::ostream& operator&lt;&lt;(std::ostream& out, Point2&lt;T&gt;& t2) {\n\
-  out &lt;&lt; &quot;Point2&quot;;\n\
-  out &lt;&lt; &quot; { &quot;;\n\
-  for(size_t i=0; i &lt; t2.coords().size(); ++i) {\n\
-    std::cout &lt;&lt; t2.coords()[i];\n\
-    if(i &lt; t2.coords().size() - 1) {\n\
-      std::cout &lt;&lt; &quot;, &quot;;\n\
-    }\n\
-  }\n\
-  std::cout &lt;&lt; &quot; }&quot;;  \n\
+  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(t2.left()) &lt;&lt; &quot;Point2&lt;T&gt;&quot;;\n\
+  out &lt;&lt; &quot; {&#92;n&quot;;\n\
+  out &lt;&lt; fold(t2.coords(), t2.left() + 2, t2.width());\n\
+  out &lt;&lt; indent(t2.left()) &lt;&lt; &quot;}&quot;;\n\
   return out;\n\
 }\n\
-/* required for showType(T t, const std::vector&lt;T&gt;& nm) */\n\
+/*-----------------------------------------------\n\
+  Overload operator&lt;&lt; required for \n\
+  showType(std::vector&lt;T&gt; v, const std::vector&lt;T&gt;& nm) \n\
+*/\n\
 template&lt;typename T&gt;\n\
 std::ostream& operator&lt;&lt;(std::ostream& out, std::vector&lt;T&gt;& v) {\n\
-  out &lt;&lt; &quot;vector&quot;;\n\
-  out &lt;&lt; &quot; { &quot;;\n\
-  for(size_t i=0; i &lt; v.size(); ++i) {\n\
-    std::cout &lt;&lt; v[i];\n\
-    if(i &lt; v.size() - 1) {\n\
-      std::cout &lt;&lt; &quot;, &quot;;\n\
-    }\n\
-  }\n\
-  std::cout &lt;&lt; &quot; }&quot;;  \n\
+  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(DisplayParams.left) &lt;&lt; &quot;vector&quot;;\n\
+  out &lt;&lt; &quot; {&#92;n&quot;;\n\
+  out &lt;&lt; fold(v, DisplayParams.left + 2, DisplayParams.width);\n\
+  out &lt;&lt; indent(DisplayParams.left) &lt;&lt; &quot;}&quot;;\n\
   return out;\n\
 }\n\
-/* Demonstration starts here */\n\
-\n\
+/*-------------------------------------------------------------------\n\
+  Demonstration starts here \n\
+*/\n\
 int main() {\n\
     print(&quot;Demonstrate C++ Objects&#92;n&quot;);\n\
-\n\
-    showNote(&quot;stack based instances&quot;);\n\
 \n\
     showNote(&quot;std library types string and vector&lt;T&gt;&quot;);\n\
 \n\
     /* standard type std::string */\n\
-    print(&quot;--- auto str = std::string(&#92;&quot;&#92;&#92;&#92;&quot;Wile E. Coyote&#92;&#92;&#92;&quot;&#92;&quot;); ---&quot;);\n\
+    print(\n\
+      &quot;--- auto str = std::string(&#92;&quot;&#92;&#92;&#92;&quot;Wile E. Coyote&#92;&#92;&#92;&quot;&#92;&quot;); ---&quot;\n\
+    );\n\
     auto str = std::string(&quot;&#92;&quot;Wile E. Coyote&#92;&quot;&quot;);\n\
     auto out = std::string(&quot;contents of str = &quot;) + str;\n\
-    print(out);\n\
+    println(out);\n\
     print(&quot;--- showType(str, &#92;&quot;str&#92;&quot;); ---&quot;);\n\
     showType(str, &quot;str&quot;);\n\
 \n\
-    print(&quot;&#92;n  --- auto vec = std::vector&lt;double&gt;{ 3.5, 3, 2.5, 2 }; ---&quot;);\n\
+    print(\n\
+      &quot;&#92;n  --- auto vec = std::vector&lt;double&gt;{ 3.5, 3, 2.5, 2 }; ---&quot;\n\
+    );\n\
     auto vec = std::vector&lt;double&gt;{ 3.5, 3, 2.5, 2 };\n\
     print(&quot;--- showType(vec, &#92;&quot;vec&#92;&quot;); ---&quot;);\n\
     showType(vec, &quot;vec&quot;);\n\
     print(&quot;--- vec[2] = -2.5; ---&quot;);\n\
     vec[2] = -2.5;\n\
-    print(&quot;--- showType(vec, &#92;&quot;vec&#92;&quot;); ---&quot;);\n\
-    showType(vec, &quot;vec&quot;, nl);    \n\
+    std::cout &lt;&lt; vec;\n\
+    showOp(&quot;auto vec2 = vec&quot;);\n\
+    auto vec2 = vec;\n\
+    std::cout &lt;&lt; vec2;\n\
+    showOp(&quot;vec2[0] = 42;&quot;);\n\
+    vec2[0] = 42;\n\
+    std::cout &lt;&lt; &quot;&#92;n  vec2: &quot; &lt;&lt; vec2;\n\
+    std::cout &lt;&lt; &quot;&#92;n  vec: &quot; &lt;&lt; vec;\n\
+    showNote(\n\
+      &quot;Copy construction, auto vec2 = vec, creates independent instance.&#92;n  &quot;\n\
+      &quot;So changing target vec2 has no affect on source vec.&quot;, nl\n\
+    );\n\
+\n\
+    // print(&quot;--- showType(vec, &#92;&quot;vec&#92;&quot;); ---&quot;);\n\
+    // showType(vec, &quot;vec&quot;, nl);    \n\
 \n\
     showNote(&quot;user-defined types Point1 and Point2&lt;T&gt;&quot;);\n\
     print(&quot;--- Point1 p1; ---&quot;);\n\
@@ -423,23 +456,30 @@ int main() {\n\
     p1.show();\n\
     print(&quot;--- showType(p1, &#92;&quot;p1&#92;&quot;, nl) ---&quot;);\n\
     showType(p1, &quot;p1&quot;, nl);\n\
-    std::cout &lt;&lt; &quot;  --- p1.xCoor() returns value &quot; &lt;&lt; p1.xCoor() &lt;&lt; &quot; ---&#92;n&quot;;\n\
+    std::cout &lt;&lt; &quot;  p1.xCoor() returns value &quot; \n\
+              &lt;&lt; p1.xCoor() &lt;&lt; &quot;&#92;n&quot;;\n\
 \n\
     print(&quot;--- Point2&lt;double&gt; p2(5) ---&quot;);\n\
     Point2&lt;double&gt; p2(5);\n\
     p2.show();\n\
-    print(&quot;--- p2.coords() = std::vector&lt;double&gt;{ 1.0, -2.0, 3.0, 4.5, -42.0 } ---&quot;);\n\
+    print(\n\
+      &quot;--- p2.coords() = std::vector&lt;double&gt;&quot;\n\
+      &quot;{ 1.0, -2.0, 3.0, 4.5, -42.0 } ---&quot;\n\
+    );\n\
     p2.coords() = std::vector&lt;double&gt;{1.0, -2.0, 3.0, 4.5, -42.0 };\n\
     p2.show();\n\
     print(&quot;--- showType(p2, &#92;&quot;p2&#92;&quot;, nl); ---&quot;);\n\
     showType(p2, &quot;p2&quot;, nl);\n\
     std::cout &lt;&lt; &quot;  p2.coords()[2] = &quot; &lt;&lt; p2.coords()[2] &lt;&lt; &quot;&#92;n&quot;;\n\
     \n\
-    showNote(&quot;heap-based instances&quot;);\n\
-\n\
     /* standard library type std::string */\n\
     /* uses alias pU for std::unique_ptr, defined above */\n\
-    print(&quot;&#92;n  --- pU&lt;std::string&gt; pStr(new std::string(&#92;&quot;&#92;&#92;&#92;&quot;Road Runner&#92;&#92;&#92;&quot;&#92;&quot;) ---&quot;);\n\
+    showNote(&quot;heap-based string instance&quot;);\n\
+  \n\
+    print(\n\
+      &quot;&#92;n  --- pU&lt;std::string&gt; &quot;\n\
+      &quot;pStr(new std::string(&#92;&quot;&#92;&#92;&#92;&quot;Road Runner&#92;&#92;&#92;&quot;&#92;&quot;) ---&quot;\n\
+    );\n\
     pU&lt;std::string&gt; pStr(new std::string(&quot;&#92;&quot;Road Runner&#92;&quot;&quot;));\n\
     std::cout &lt;&lt; &quot;&#92;n  pStr contents = &quot; &lt;&lt; *pStr;\n\
     print(&quot;--- showType(*pStr, &#92;&quot;*pStr&#92;&quot;) ---&quot;);\n\
@@ -448,12 +488,19 @@ int main() {\n\
     print(&quot;--- showType(move(pStr), &#92;&quot;pStr&#92;&quot;) ---&quot;);\n\
     showType(move(pStr), &quot;pStr&quot;, nl);\n\
 \n\
-    /* standard library type std::vector&lt;T&gt; */\n\
-    print(&quot;--- pU&lt;std::vector&lt;double&gt;&gt; pVec(new std::vector&lt;double&gt;{ 1.5, 2.5, 3.5 });&quot;);\n\
-    pU&lt;std::vector&lt;double&gt;&gt; pVec(new std::vector&lt;double&gt;{ 1.5, 2.5, 3.5 });\n\
-    showType(*pVec, &quot;*pVec&quot;);\n\
+ /* standard library type std::vector&lt;T&gt; */\n\
+    showNote(&quot;heap-based vector instance&quot;);\n\
+    print(\n\
+      &quot;--- pU&lt;std::vector&lt;double&gt;&gt; &quot;\n\
+      &quot;pVec(new std::vector&lt;double&gt;{ 1.5, 2.5, 3.5 });&quot;\n\
+    );\n\
+    pU&lt;std::vector&lt;double&gt;&gt; pVec(\n\
+      new std::vector&lt;double&gt;{ 1.5, 2.5, 3.5 }\n\
+    );\n\
+    showType(*pVec, &quot;*pVec&quot;, nl);\n\
 \n\
     /* custom types */\n\
+    showNote(&quot;heap-based Point1 instance&quot;);\n\
     print(&quot;&#92;n  --- pU&lt;Point1&gt; pPoint1(new Point1()) ---&quot;);\n\
     pU&lt;Point1&gt; pPoint1(new Point1());\n\
     print(&quot;--- pPoint1-&gt;show() ---&quot;);\n\
@@ -466,32 +513,80 @@ int main() {\n\
     print(&quot;--- showType(*pPoint1, &#92;&quot;*pPoint1&#92;&quot;); ---&quot;);\n\
     showType(*pPoint1, &quot;*pPoint1&quot;);\n\
     print(&quot;--- showType(std::move(pPoint1), &#92;&quot;pPoint1&#92;&quot;); ---&quot;);\n\
-    showType(std::move(pPoint1), &quot;pPoint1&quot;);\n\
+    showType(std::move(pPoint1), &quot;pPoint1&quot;, nl);\n\
     /* pPoint1 moved, so invalid */\n\
 \n\
-    print(&quot;&#92;n  --- pU&lt;Point2&lt;double&gt;&gt; pPoint2(new Point2&lt;double&gt;(4)) ---&quot;);\n\
+    showNote(&quot;heap-based Point2&lt;T&gt; instance&quot;);\n\
+    print(\n\
+      &quot;&#92;n  --- pU&lt;Point2&lt;double&gt;&gt; pPoint2(new Point2&lt;double&gt;(4)) ---&quot;\n\
+    );\n\
     pU&lt;Point2&lt;double&gt;&gt; pPoint2(new Point2&lt;double&gt;(4));\n\
     print(&quot;--- pPoint2-&gt;show() ---&quot;);\n\
     pPoint2-&gt;show();\n\
-    print(&quot;--- pPoint2-&gt;coords() = std::vector&lt;double&gt;{ 1.0, 3.5, -2.0, 42.0 }; ---&quot;);\n\
+    print(\n\
+      &quot;--- pPoint2-&gt;coords() = std::vector&lt;double&gt;&quot;\n\
+      &quot;{ 1.0, 3.5, -2.0, 42.0 }; ---&quot;\n\
+    );\n\
     pPoint2-&gt;coords() = std::vector&lt;double&gt;{ 1.0, 3.5, -2.0, 42.0 };\n\
     pPoint2-&gt;show();\n\
-    std::cout &lt;&lt; &quot;&#92;n  value of pPoint2-&gt;coords()[1] is &quot; &lt;&lt; pPoint2-&gt;coords()[1];\n\
+    std::cout &lt;&lt; &quot;&#92;n  value of pPoint2-&gt;coords()[1] is &quot; \n\
+              &lt;&lt; pPoint2-&gt;coords()[1];\n\
     print(&quot;--- showType(*pPoint2, &#92;&quot;*pPoint2&#92;&quot;); ---&quot;);\n\
     showType(*pPoint2, &quot;*pPoint2&quot;);\n\
     print(&quot;--- showType(std::move(pPoint2), &#92;&quot;pPoint2&#92;&quot;); ---&quot;);\n\
     showType(std::move(pPoint2), &quot;pPoint2&quot;);\n\
     /* pPoint2 moved, so invalid */\n\
 \n\
+    print();\n\
+    showNote(&quot;Test and demonstrate formatting functions&quot;);\n\
+    println(&quot;&#92;n--- demonstrate Point2 show() ---&quot;);\n\
+    print(&quot;default indent = 4 and width = 7:&quot;);\n\
+    Point2&lt;int&gt; p2a(15);\n\
+    p2a.show();\n\
+    size_t saveLeft = p2a.left();\n\
+    size_t saveWidth = p2a.width();\n\
+    print(&quot;&#92;n  indent = 6, width = 12:&quot;);\n\
+    p2a.left() = 6;\n\
+    p2a.width() = 12;\n\
+    p2a.show();\n\
+\n\
+    println(\n\
+      &quot;&#92;n--- demonstrate operator&lt;&lt; &quot;\n\
+      &quot;overload for Point2 ---&quot;\n\
+    );\n\
+    p2a.left() = saveLeft;\n\
+    p2a.width() = saveWidth;\n\
+    print(&quot;default indent = 4 and width = 7:&quot;);\n\
+    std::cout &lt;&lt; p2a;\n\
+    print(&quot;&#92;n  indent = 6, width = 12:&quot;);\n\
+    p2a.left() = 6;\n\
+    p2a.width() = 12;\n\
+    std::cout &lt;&lt; p2a;\n\
+\n\
+    println(\n\
+      &quot;&#92;n--- demonstrate operator&lt;&lt; &quot;\n\
+      &quot;overload for vector ---&quot;\n\
+    );\n\
+    auto vtest = std::vector&lt;int&gt;{1, 2, 3, 4, 5, 6, 7, 8, 9 };\n\
+    print(&quot;default indent = 4 and width = 7:&quot;);\n\
+    std::cout &lt;&lt; vtest;\n\
+    DisplayParams.left = 2;\n\
+    DisplayParams.width = 5;\n\
+    print(&quot;indent = 2, width = 5:&quot;);\n\
+    std::cout &lt;&lt; vtest;\n\
+\n\
     print(&quot;&#92;n&#92;n  That's all Folks!&#92;n&#92;n&quot;);\n\
 }\n\
-\n\
+/*-------------------------------------------------------------------\n\
+  Display and Analysis function definitions\n\
+*/\n\
 template&lt;typename T&gt;\n\
-void showType(T t, const std::string &nm, const std::string& suffix) {\n\
-  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; nm;                // show name at call site\n\
-  std::cout &lt;&lt; &quot; type: &quot; &lt;&lt; truncate(60,typeid(t).name());  // show type\n\
+void showType(T t, const std::string &callname, const std::string& suffix) {\n\
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; callname;          // show name at call site\n\
+  std::cout &lt;&lt; &quot; type: &quot; \n\
+            &lt;&lt; truncate(DisplayParams.trunc,typeid(t).name());  // show type\n\
   std::cout &lt;&lt; &quot;&#92;n  value: &quot; &lt;&lt; t;          // show value\n\
-  std::cout &lt;&lt; &quot;,  size:  &quot; &lt;&lt; sizeof(t);   // show size on stack\n\
+  std::cout &lt;&lt; &quot;&#92;n  size:  &quot; &lt;&lt; sizeof(t);  // show size on stack\n\
   std::cout &lt;&lt; suffix;\n\
 }\n\
 void showNote(const std::string& txt, const std::string& suffix) {\n\
@@ -499,6 +594,9 @@ void showNote(const std::string& txt, const std::string& suffix) {\n\
   print(txt);\n\
   print(&quot;-------------------------&quot;);\n\
   std::cout &lt;&lt; suffix;\n\
+}\n\
+void showOp(const std::string& opstr, const std::string& suffix) {\n\
+  std::cout &lt;&lt; &quot;&#92;n  --- &quot; &lt;&lt; opstr &lt;&lt; &quot; ---&quot; &lt;&lt; suffix;\n\
 }\n\
 std::string truncate(size_t N, const char* pStr) {\n\
   std::string temp(pStr);\n\
@@ -508,12 +606,34 @@ std::string truncate(size_t N, const char* pStr) {\n\
   }\n\
   return temp;\n\
 }\n\
+std::string indent(size_t n) {\n\
+  return std::string(n, ' ');\n\
+}\n\
+template&lt;typename T&gt;\n\
+std::string fold(std::vector&lt;T&gt;& v, size_t left, size_t width) {\n\
+  std::stringstream out(&quot;&#92;n&quot;);\n\
+  out &lt;&lt; indent(left);\n\
+  for(int i=0; i&lt;v.size(); ++i) {\n\
+    if((i % width) == 0 && i != 0 && i != width - 1) {\n\
+      out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left);\n\
+    }\n\
+    if(i &lt; v.size() - 1) {\n\
+      out &lt;&lt; v[i] &lt;&lt; &quot;, &quot;;\n\
+    }\n\
+    else {\n\
+      out &lt;&lt; v[i] &lt;&lt; &quot;&#92;n&quot;;\n\
+      break;\n\
+    }\n\
+  }\n\
+  return out.str();\n\
+}\n\
 void print(const std::string& txt) {\n\
   std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt;\n\
 }\n\
 void println(const std::string& txt) {\n\
   std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt &lt;&lt; &quot;&#92;n&quot;;\n\
-}\n\</div></pre>\
+}\n\
+\n\</div></pre>\
 ";
     }
 
@@ -523,25 +643,45 @@ void println(const std::string& txt) {\n\
   Demonstrate C++ Objects\n\
 \n\
   -------------------------\n\
-  stack based instances\n\
-  -------------------------\n\
-  -------------------------\n\
   std library types string and vector&lt;T&gt;\n\
   -------------------------\n\
   --- auto str = std::string(&quot;&#92;&quot;Wile E. Coyote&#92;&quot;&quot;); ---\n\
   contents of str = &quot;Wile E. Coyote&quot;\n\
+\n\
   --- showType(str, &quot;str&quot;); ---\n\
-  str type: class std::basic_string&lt;char,struct std::char_traits&lt;char&gt;,c...\n\
-  value: &quot;Wile E. Coyote&quot;,  size:  40\n\
+  str type: class std::basic_string&lt;char,struct std::char_traits&lt;ch...\n\
+  value: &quot;Wile E. Coyote&quot;\n\
+  size:  40\n\
 \n\
   --- auto vec = std::vector&lt;double&gt;{ 3.5, 3, 2.5, 2 }; ---\n\
   --- showType(vec, &quot;vec&quot;); ---\n\
   vec type: class std::vector&lt;double,class std::allocator&lt;double&gt; &gt;\n\
-  value: vector { 3.5, 3, 2.5, 2 },  size:  32\n\
+  value:\n\
+    vector {\n\
+      3.5, 3, 2.5, 2\n\
+    }\n\
+  size:  32\n\
   --- vec[2] = -2.5; ---\n\
-  --- showType(vec, &quot;vec&quot;); ---\n\
-  vec type: class std::vector&lt;double,class std::allocator&lt;double&gt; &gt;\n\
-  value: vector { 3.5, 3, -2.5, 2 },  size:  32\n\
+    vector {\n\
+      3.5, 3, -2.5, 2\n\
+    }\n\
+  --- auto vec2 = vec ---\n\
+    vector {\n\
+      3.5, 3, -2.5, 2\n\
+    }\n\
+  --- vec2[0] = 42; ---\n\
+  vec2:\n\
+    vector {\n\
+      42, 3, -2.5, 2\n\
+    }\n\
+  vec:\n\
+    vector {\n\
+      3.5, 3, -2.5, 2\n\
+    }\n\
+  -------------------------\n\
+  Copy construction, auto vec2 = vec, creates independent instance.\n\
+  So changing target vec2 has no affect on source vec.\n\
+  -------------------------\n\
 \n\
   -------------------------\n\
   user-defined types Point1 and Point2&lt;T&gt;\n\
@@ -552,34 +692,56 @@ void println(const std::string& txt) {\n\
   Point1 { 42, 0, -3 }\n\
   --- showType(p1, &quot;p1&quot;, nl) ---\n\
   p1 type: class Point1\n\
-  value: Point1 { 42, 0, -3 },  size:  12\n\
-  --- p1.xCoor() returns value 42 ---\n\
+  value: Point1 { 42, 0, -3 }\n\
+  size:  12\n\
+  p1.xCoor() returns value 42\n\
 \n\
   --- Point2&lt;double&gt; p2(5) ---\n\
-  Point2 { 0, 0, 0, 0, 0 }\n\
+  Point2&lt;T&gt; {\n\
+    0, 0, 0, 0, 0\n\
+  }\n\
   --- p2.coords() = std::vector&lt;double&gt;{ 1.0, -2.0, 3.0, 4.5, -42.0 } ---\n\
-  Point2 { 1, -2, 3, 4.5, -42 }\n\
+  Point2&lt;T&gt; {\n\
+    1, -2, 3, 4.5, -42\n\
+  }\n\
   --- showType(p2, &quot;p2&quot;, nl); ---\n\
   p2 type: class Point2&lt;double&gt;\n\
-  value: Point2 { 1, -2, 3, 4.5, -42 },  size:  32\n\
+  value:\n\
+  Point2&lt;T&gt; {\n\
+    1, -2, 3, 4.5, -42\n\
+  }\n\
+  size:  48\n\
   p2.coords()[2] = 3\n\
 \n\
   -------------------------\n\
-  heap-based instances\n\
+  heap-based string instance\n\
   -------------------------\n\
 \n\
   --- pU&lt;std::string&gt; pStr(new std::string(&quot;&#92;&quot;Road Runner&#92;&quot;&quot;) ---\n\
   pStr contents = &quot;Road Runner&quot;\n\
   --- showType(*pStr, &quot;*pStr&quot;) ---\n\
-  *pStr type: class std::basic_string&lt;char,struct std::char_traits&lt;char&gt;,c...\n\
-  value: &quot;Road Runner&quot;,  size:  40\n\
+  *pStr type: class std::basic_string&lt;char,struct std::char_traits&lt;ch...\n\
+  value: &quot;Road Runner&quot;\n\
+  size:  40\n\
   --- showType(move(pStr), &quot;pStr&quot;) ---\n\
-  pStr type: class std::unique_ptr&lt;class std::basic_string&lt;char,struct st...\n\
-  value: 00000184A447E920,  size:  8\n\
+  pStr type: class std::unique_ptr&lt;class std::basic_string&lt;char,stru...\n\
+  value: 000001EB94E0E6B0\n\
+  size:  8\n\
 \n\
-  --- pU&lt;std::vector&lt;double&gt;&gt; pVec(new std::vector&lt;double&gt;{ 1.5, 2.5, 3.5 });\n\
+  -------------------------\n\
+  heap-based vector instance\n\
+  -------------------------\n\
+  --- pU&lt;std::vector&lt;double&gt;&gt; pVec(new std::vector&lt;double&gt;{ 1.5, 2.5, 3.5 });       \n\
   *pVec type: class std::vector&lt;double,class std::allocator&lt;double&gt; &gt;\n\
-  value: vector { 1.5, 2.5, 3.5 },  size:  32\n\
+  value:\n\
+    vector {\n\
+      1.5, 2.5, 3.5\n\
+    }\n\
+  size:  32\n\
+\n\
+  -------------------------\n\
+  heap-based Point1 instance\n\
+  -------------------------\n\
 \n\
   --- pU&lt;Point1&gt; pPoint1(new Point1()) ---\n\
   --- pPoint1-&gt;show() ---\n\
@@ -588,28 +750,90 @@ void println(const std::string& txt) {\n\
   pPoint1-&gt;zCoor() = -3\n\
   --- showType(*pPoint1, &quot;*pPoint1&quot;); ---\n\
   *pPoint1 type: class Point1\n\
-  value: Point1 { 1, 2, -3 },  size:  12\n\
+  value: Point1 { 1, 2, -3 }\n\
+  size:  12\n\
   --- showType(std::move(pPoint1), &quot;pPoint1&quot;); ---\n\
-  pPoint1 type: class std::unique_ptr&lt;class Point1,struct std::default_delet...\n\
-  value: 00000184A4479BA0,  size:  8\n\
+  pPoint1 type: class std::unique_ptr&lt;class Point1,struct std::default_...\n\
+  value: 000001EB94E11880\n\
+  size:  8\n\
+\n\
+  -------------------------\n\
+  heap-based Point2&lt;T&gt; instance\n\
+  -------------------------\n\
 \n\
   --- pU&lt;Point2&lt;double&gt;&gt; pPoint2(new Point2&lt;double&gt;(4)) ---\n\
   --- pPoint2-&gt;show() ---\n\
-  Point2 { 0, 0, 0, 0 }\n\
+  Point2&lt;T&gt; {\n\
+    0, 0, 0, 0\n\
+  }\n\
   --- pPoint2-&gt;coords() = std::vector&lt;double&gt;{ 1.0, 3.5, -2.0, 42.0 }; ---\n\
-  Point2 { 1, 3.5, -2, 42 }\n\
+  Point2&lt;T&gt; {\n\
+    1, 3.5, -2, 42\n\
+  }\n\
   value of pPoint2-&gt;coords()[1] is 3.5\n\
   --- showType(*pPoint2, &quot;*pPoint2&quot;); ---\n\
   *pPoint2 type: class Point2&lt;double&gt;\n\
-  value: Point2 { 1, 3.5, -2, 42 },  size:  32\n\
+  value:\n\
+  Point2&lt;T&gt; {\n\
+    1, 3.5, -2, 42\n\
+  }\n\
+  size:  48\n\
   --- showType(std::move(pPoint2), &quot;pPoint2&quot;); ---\n\
-  pPoint2 type: class std::unique_ptr&lt;class Point2&lt;double&gt;,struct std::defau...\n\
-  value: 00000184A4474A00,  size:  8\n\
+  pPoint2 type: class std::unique_ptr&lt;class Point2&lt;double&gt;,struct std::...\n\
+  value: 000001EB94E0E950\n\
+  size:  8\n\
+\n\
+  -------------------------\n\
+  Test and demonstrate formatting functions\n\
+  -------------------------\n\
+\n\
+--- demonstrate Point2 show() ---\n\
+\n\
+  default indent = 4 and width = 7:\n\
+  Point2&lt;T&gt; {\n\
+    0, 0, 0, 0, 0, 0, 0,\n\
+    0, 0, 0, 0, 0, 0, 0,\n\
+    0\n\
+  }\n\
+\n\
+  indent = 6, width = 12:\n\
+      Point2&lt;T&gt; {\n\
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\n\
+        0, 0, 0\n\
+      }\n\
+\n\
+--- demonstrate operator&lt;&lt; overload for Point2 ---\n\
+\n\
+  default indent = 4 and width = 7:\n\
+  Point2&lt;T&gt; {\n\
+    0, 0, 0, 0, 0, 0, 0,\n\
+    0, 0, 0, 0, 0, 0, 0,\n\
+    0\n\
+  }\n\
+\n\
+  indent = 6, width = 12:\n\
+      Point2&lt;T&gt; {\n\
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\n\
+        0, 0, 0\n\
+      }\n\
+\n\
+--- demonstrate operator&lt;&lt; overload for vector ---\n\
+\n\
+  default indent = 4 and width = 7:\n\
+    vector {\n\
+      1, 2, 3, 4, 5, 6, 7,\n\
+      8, 9\n\
+    }\n\
+  indent = 2, width = 5:\n\
+  vector {\n\
+    1, 2, 3, 4, 5,\n\
+    6, 7, 8, 9\n\
+  }\n\
 \n\
 \n\
   That's all Folks!\n\
 \n\
-></pre>";
+\n\></pre>";
     }
 
     function loadCppBld(id) {
