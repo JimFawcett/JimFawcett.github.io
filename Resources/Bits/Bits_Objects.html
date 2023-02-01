@@ -219,73 +219,63 @@
       <c-s>void showType(T t, const std::string &ts)</c-s> is generic on the type T\
     </li>\
     <li>\
-      Demonstrations in the body of main are relatively simple.  The setup before main\
-      and function definitions after main are more intricate.  We will look at them\
-      in Bits_Functions\
+      Demonstrations in the body of main are relatively simple.  The setup in file\
+      includes Analysis.h and Points.h are more intricate.  We will look at them when we\
+      cover Bits_Functions\
     </li>\
     <li>\
       You may wish to focus on the contents of main for now, and come back later after\
       looking at Bits_Functions (that doesn't exist as of 1/31/2023, but will appear soon).\
     </li>\
+    <li>\
+      These Bits use the Godbolt Compiler Explorer (GCE) for remote execution.  GCE provides\
+      options to use one of several different compilers. This particular demo failed to\
+      compile with several, but did successfully compile with x86-64 clang (thephd.dev) and\
+      several others.\
+    </li>\
+    <li>\
+      Compilation failures occurred with use of some advanced template techniques that were\
+      standardized in 2020 or will be in 2023.\
+    </li>\
   </ol >\
   <div style=&quot;height: 3em;&quot;>&nbsp;</div>\
 </details >\
 </div >\
-<pre><div class=&quot;code&quot;>\
-// Cpp_Objects.cpp\n\
-\n\
+<pre>\
+/*-------------------------------------------------------------------\n\
+  Cpp_Objects.cpp\n\
+  - depends on Points.h to provide two user-defined point classes\n\
+  - depends on Analysis.h for several display and analysis functions\n\
+*/\n\
 #include &lt;iostream&gt;     // std::cout\n\
-#include &lt;typeinfo&gt;     // typeid\n\
 #include &lt;memory&gt;       // std::unique_ptr\n\
-#include &lt;utility&gt;      // move()\n\
 #include &lt;vector&gt;       // vector&lt;T&gt; class\n\
-#include &lt;sstream&gt;      // stringstream\n\
 #include &lt;array&gt;        // array&lt;T&gt; class\n\
 #include &lt;map&gt;          // map&lt;K,V&gt; class\n\
 #include &lt;set&gt;          // set&lt;T&gt; class\n\
-#include &lt;type_traits&gt;  // is_scalar, if constexpr\n\
-/*\n\
-  This demo uses the std::string and std::vector&lt;T&gt; classes\n\
-  and two user defined classes, Point1 and Point2&lt;T&gt;, to \n\
-  illustrate how objects are defined and instantiated.\n\
-\n\
-  Operations:\n\
-    All the classes discussed here provide operations for:\n\
-      T t2 = t1          // copy construction\n\
-      T t3 = temporary   // move construction\n\
-      t1 = t2            // copy assignment\n\
-      t3 = temporary     // move assignment\n\
-\n\
-    All instances return their resources when they go out of\n\
-    scope by implicitly calling their destructor.\n\
-    Primitive types can all be copied.\n\
-\n\
-    Most library and user-defined types can be copied, moved, \n\
-    and deleted by providing member constructors and destructor.\n\
-    Often compiler generation works well, but for classes with \n\
-    pointer members developers must provide them.\n\
-\n\
-  Processing:\n\
-    All types are static, operations run as native code, and no \n\
-    garbage collection is needed. Resources are returned at end \n\
-    of their declaration scope.\n\
-*/\n\
-#pragma warning(disable: 4984)  // warns about C++17 extension\n\
-const std::string nl = &quot;&#92;n&quot;;\n\
+#include &quot;Analysis.h&quot;   // Analysis functions for this demo\n\
+</pre>\
+<details>\
+  <summary class='darkItem' style='margin-left:0em;'>Analysis.h&nbsp;&nbsp;</summary>\
+<pre><div class=& quot; code & quot;>\
 /*-------------------------------------------------------------------\n\
-  Mutable globals are a common source of bugs.  We try not\n\
-  to use them, but will use DisplayParams here to control how\n\
-  the insertion operator sends instances to standard output.\n\
+  Analysis.h\n\
+  - provides functions that analyze types, display results\n\
+    and other program defined information.\n\
+  - some of this code requires complex template operations\n\
 */\n\
-struct displayParams {\n\
-  size_t left = 2;    // number of spaces to indent\n\
-  size_t width = 7;   // width of display row\n\
-  size_t trunc = 55;  // replace text after trunc with ...\n\
-} DisplayParams;      // global object\n\
 \n\
-/*------------------------------------------------------------------- \n\
-  Display and analysis functions are defined at the end\n\
-  but C++ requires declaration before use.\n\
+#include &lt;typeinfo&gt;     // typeid\n\
+#include &lt;utility&gt;      // move()\n\
+#include &lt;sstream&gt;      // stringstream\n\
+#include &lt;type_traits&gt;  // is_scalar, if constexpr\n\
+#include &lt;iostream&gt;     // cout\n\
+#include &lt;vector&gt;       // vector\n\
+\n\
+/*-------------------------------------------------------------------\n\
+  Analysis function declarations are provided here so that\n\
+  definitions below may be placed in any order. That's\n\
+  needed because C++ requires declaration before use.\n\
 */\n\
 template&lt;typename T&gt;\n\
 void showType(T t, const std::string &nm, const std::string& suffix = &quot;&quot;);\n\
@@ -317,14 +307,232 @@ std::string format(\n\
   const T& t, const std::string& nm, const std::string& suffix = &quot;&quot;,\n\
   size_t left = 2, size_t width = 7\n\
 );\n\
+/*-------------------------------------------------------------------\n\
+  Display and Analysis functions and globals definitions\n\
+---------------------------------------------------------------------\n\
+*/\n\
+const std::string nl = &quot;&#92;n&quot;;\n\
+/*-------------------------------------------------------------------\n\
+  Mutable globals are a common source of bugs.  We try not\n\
+  to use them, but will use DisplayParams here to control how\n\
+  the insertion operator sends instances to standard output.\n\
+*/\n\
+struct displayParams {\n\
+  size_t left = 2;    // number of spaces to indent\n\
+  size_t width = 7;   // width of display row\n\
+  size_t trunc = 55;  // replace text after trunc with ...\n\
+} DisplayParams;      // global object\n\
 \n\
 /*-----------------------------------------------\n\
-  alias type name \n\
-  - pU&lt;T&gt; is the same type as std::unique_ptr&lt;T&gt; \n\
+  Overload operator&lt;&lt; required for \n\
+  showType(std::vector&lt;T&gt; v, const std::vector&lt;T&gt;& nm) \n\
 */\n\
 template&lt;typename T&gt;\n\
-using pU = std::unique_ptr&lt;T&gt;;\n\
+std::ostream& operator&lt;&lt;(std::ostream& out, std::vector&lt;T&gt;& v) {\n\
+  out &lt;&lt; format(v, &quot;vector&lt;T&gt;&quot;, &quot;&quot;, DisplayParams.left, DisplayParams.width);\n\
+  return out;\n\
+}\n\
+/*-----------------------------------------------\n\
+  Display calling name, static class, and size\n\
+*/\n\
+template&lt;typename T&gt;\n\
+void showType(T t, const std::string &callname, const std::string& suffix) {\n\
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; callname;          // show name at call site\n\
+  std::cout &lt;&lt; &quot; type: &quot; \n\
+            &lt;&lt; truncate(DisplayParams.trunc,typeid(t).name());  // show type\n\
+  std::cout &lt;&lt; &quot;&#92;n  size:  &quot; &lt;&lt; sizeof(t);  // show size on stack\n\
+  std::cout &lt;&lt; suffix;\n\
+}\n\
+/*-----------------------------------------------\n\
+  Display emphasized text\n\
+*/\n\
+inline void showNote(const std::string& txt, const std::string& suffix) {\n\
+  print(&quot;--------------------------------------------------&quot;);\n\
+  print(txt);\n\
+  print(&quot;--------------------------------------------------&quot;);\n\
+  std::cout &lt;&lt; suffix;\n\
+}\n\
+/*-----------------------------------------------\n\
+  Display emphasized line\n\
+*/\n\
+inline void showOp(const std::string& opstr, const std::string& suffix) {\n\
+  std::cout &lt;&lt; &quot;&#92;n  --- &quot; &lt;&lt; opstr &lt;&lt; &quot; ---&quot; &lt;&lt; suffix;\n\
+}\n\
+/*-----------------------------------------------\n\
+  Helper function for formatting output\n\
+  - truncates line to N chars and adds ellipsis\n\
+*/\n\
+inline std::string truncate(size_t N, const char* pStr) {\n\
+  std::string temp(pStr);\n\
+  if(temp.length() &gt; N) {\n\
+    temp.resize(N);\n\
+    return temp + &quot;...&quot;;\n\
+  }\n\
+  return temp;\n\
+}\n\
+/*-----------------------------------------------\n\
+  Helper function for formatting output\n\
+  - generates string of n blanks to offset text\n\
+*/\n\
+inline std::string indent(size_t n) {\n\
+  return std::string(n, ' ');\n\
+}\n\
+/*-----------------------------------------------\n\
+  Helper function for formatting output\n\
+  - folds lines after width elements\n\
+*/\n\
+template&lt;typename T&gt;\n\
+std::string fold(std::vector&lt;T&gt;& v, size_t left, size_t width) {\n\
+  std::stringstream out(&quot;&#92;n&quot;);\n\
+  out &lt;&lt; indent(left);\n\
+  for(int i=0; i&lt;v.size(); ++i) {\n\
+    if((i % width) == 0 && i != 0 && i != width - 1) {\n\
+      out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left);\n\
+    }\n\
+    if(i &lt; v.size() - 1) {\n\
+      out &lt;&lt; v[i] &lt;&lt; &quot;, &quot;;\n\
+    }\n\
+    else {\n\
+      out &lt;&lt; v[i] &lt;&lt; &quot;&#92;n&quot;;\n\
+      break;\n\
+    }\n\
+  }\n\
+  return out.str();\n\
+}\n\
+/*-----------------------------------------------\n\
+  Helper function for formatColl\n\
+  - defines out &lt;&lt; std::pair&lt;K,V&gt;\n\
+  - used in formatColl for associative containers\n\
+*/\n\
+template&lt;typename K, typename V&gt;\n\
+std::stringstream& operator&lt;&lt;(\n\
+  std::stringstream& out, const std::pair&lt;K,V&gt;& p\n\
+) {\n\
+  out &lt;&lt; &quot;{&quot; &lt;&lt; p.first &lt;&lt; &quot;, &quot; &lt;&lt; p.second &lt;&lt; &quot;}&quot;;\n\
+  return out;\n\
+}\n\
+/*-----------------------------------------------\n\
+  Format output for Collection types\n\
+  - any type with begin() and end() like\n\
+    all the STL containers.\n\
+*/\n\
+template&lt;typename Coll&gt;\n\
+std::string formatColl(\n\
+  const Coll& c, const std::string& nm, const std::string& suffix,\n\
+  size_t left, size_t width\n\
+) {\n\
+  std::stringstream out;\n\
+  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm &lt;&lt; &quot;: {&#92;n&quot; &lt;&lt; indent(left + 2);\n\
+  size_t i = 0;\n\
+  for(const Coll::value_type& elem : c) {\n\
+    if((i % width) == 0 && i != 0 && i != width - 1) {\n\
+      out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left + 2);\n\
+    }\n\
+    if(i &lt; c.size() - 1) {\n\
+      out &lt;&lt; elem &lt;&lt; &quot;, &quot;;\n\
+    }\n\
+    else {\n\
+      out &lt;&lt; elem &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; &quot;}&quot; &lt;&lt; suffix;\n\
+      break;\n\
+    }\n\
+    ++i;\n\
+  }\n\
+  return out.str();\n\
+}\n\
+/*-----------------------------------------------\n\
+  Format output for scalar types like primitives\n\
+*/\n\
+template&lt;typename T&gt;\n\
+std::string formatScalar(\n\
+  const T& t, const std::string& nm, const std::string& suffix,\n\
+  size_t left\n\
+) {\n\
+  std::stringstream out;\n\
+  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm &lt;&lt; &quot;: &quot; &lt;&lt; t &lt;&lt; suffix;\n\
+  return out.str();\n\
+}\n\
+/*-----------------------------------------------\n\
+  Format output for strings\n\
+  - indent and embed in quotation marks\n\
+*/\n\
+template&lt;typename T&gt;\n\
+std::string formatString(\n\
+  const T& t, const std::string& nm, const std::string& suffix,\n\
+  size_t left\n\
+) {\n\
+  std::stringstream out;\n\
+  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm &lt;&lt; &quot;: &#92;&quot;&quot; &lt;&lt; t &lt;&lt; &quot;&#92;&quot;&quot; &lt;&lt; suffix;\n\
+  return out.str();\n\
+}\n\
+/*-----------------------------------------------\n\
+  Defines is_iterable trait\n\
+  - detects STL containers and user-defined types\n\
+    that provide iteration\n\
+https://stackoverflow.com/questions/13830158/check-if-a-variable-type-is-iterable\n\
+*/\n\
+template &lt;typename T, typename = void&gt;\n\
+struct is_iterable : std::false_type {};\n\
 \n\
+// this gets used only when we can call \n\
+// std::begin() and std::end() on that type\n\
+template &lt;typename T&gt;\n\
+struct is_iterable&lt;\n\
+  T, \n\
+  std::void_t\n\
+    &lt;decltype(std::begin(std::declval&lt;T&gt;())),\n\
+     decltype(std::end(std::declval&lt;T&gt;()))&gt;\n\
+&gt; : std::true_type {};\n\
+\n\
+template &lt;typename T&gt;\n\
+constexpr bool is_iterable_v = is_iterable&lt;T&gt;::value;\n\
+\n\
+/*-----------------------------------------------\n\
+  Displays almost everything.\n\
+  - strings work better with formatString(...)\n\
+  https://www.cppstories.com/2018/03/ifconstexpr/\n\
+*/\n\
+template&lt;typename T&gt;\n\
+std::string format(\n\
+  const T& t, const std::string& nm, const std::string& suffix,\n\
+  size_t left, size_t width\n\
+) {\n\
+  if constexpr(is_iterable_v&lt;T&gt;) {\n\
+    return formatColl(t, nm, suffix, left, width);\n\
+  }\n\
+  else {\n\
+    return formatScalar(t, nm, suffix, left);\n\
+  }\n\
+}\n\
+/*-----------------------------------------------\n\
+  Display text after newline and indentation\n\
+*/\n\
+inline void print(const std::string& txt) {\n\
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt;\n\
+}\n\
+/*-----------------------------------------------\n\
+  Display text after newline and indentation\n\
+  - provides trailing newline\n\
+*/\n\
+inline void println(const std::string& txt) {\n\
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt &lt;&lt; &quot;&#92;n&quot;;\n\
+}\n\
+/*--- end of Analysis.h -------------------------------------------*/\n\n\
+</pre>\
+</details>\
+<pre>\
+#include &quot;Points.h&quot;     // Two Point class declarations\n\
+</pre>\
+<details>\
+  <summary class='darkItem' style='margin-left:0em;'>Points.h&nbsp;&nbsp;</summary>\
+<pre>\
+/*-------------------------------------------------------------------\n\
+  Points.h defines two point classes\n\
+  - Point1 represents points with three integer coordinates\n\
+  - Point2&lt;T&gt; represents points with many coordinates of\n\
+    unspecified type T\n\
+*/\n\
+#include &lt;iostream&gt;\n\
+#include &lt;vector&gt;\n\
 /*-------------------------------------------------------------------\n\
   Point1 class represents a point in an integral 3-Dimensional\n\
   lattice. Simple enough for illustration, but still useful.\n\
@@ -428,19 +636,52 @@ std::ostream& operator&lt;&lt;(std::ostream& out, Point2&lt;T&gt;& t2) {\n\
   out &lt;&lt; indent(t2.left()) &lt;&lt; &quot;}&quot;;\n\
   return out;\n\
 }\n\
+/*--- end of Points.h ---------------------------------------------*/\n\n\
+</pre>\
+</details>\
+<pre>\
+\n\
+/*\n\
+  This demo uses the std::string and std::vector &lt;T&gt; classes\n\
+  and two user defined classes, Point1 and Point2&lt;T&gt;, to \n\
+  illustrate how objects are defined and instantiated.\n\
+\n\
+  Operations:\n\
+    All the classes discussed here provide operations for:\n\
+      T t2 = t1          // copy construction\n\
+      T t3 = temporary   // move construction\n\
+      t1 = t2            // copy assignment\n\
+      t3 = temporary     // move assignment\n\
+\n\
+    All instances return their resources when they go out of\n\
+    scope by implicitly calling their destructor.\n\
+    Primitive types can all be copied.\n\
+\n\
+    Most library and user-defined types can be copied, moved, \n\
+    and deleted by providing member constructors and destructor.\n\
+    Often compiler generation works well, but for classes with \n\
+    pointer members developers must provide them.\n\
+\n\
+  Processing:\n\
+    All types are static, operations run as native code, and no \n\
+    garbage collection is needed. Resources are returned at end \n\
+    of their declaration scope.\n\
+*/\n\
+#pragma warning(disable: 4984)  // warns about C++17 extension\n\
+\n\
 /*-----------------------------------------------\n\
-  Overload operator&lt;&lt; required for \n\
-  showType(std::vector&lt;T&gt; v, const std::vector&lt;T&gt;& nm) \n\
+  alias type name \n\
+  - pU&lt;T&gt; is the same type as std::unique_ptr&lt;T&gt; \n\
+  - this just provides a shorter name\n\
 */\n\
 template&lt;typename T&gt;\n\
-std::ostream& operator&lt;&lt;(std::ostream& out, std::vector&lt;T&gt;& v) {\n\
-  out &lt;&lt; format(v, &quot;vector&lt;T&gt;&quot;, &quot;&quot;, DisplayParams.left, DisplayParams.width);\n\
-  return out;\n\
-}\n\
+using pU = std::unique_ptr&lt;T&gt;;\n\
+\n\
 /*-------------------------------------------------------------------\n\
   Demonstration starts here \n\
 */\n\
 int main() {\n\
+\n\
     print(&quot;Demonstrate C++ Objects&#92;n&quot;);\n\
 \n\
     showNote(&quot;primitive C++ types size_t and double&quot;);\n\
@@ -525,7 +766,7 @@ int main() {\n\
     showOp(&quot;showType(move(pStr), &#92;&quot;pStr&#92;&quot;)&quot;);\n\
     showType(move(pStr), &quot;pStr&quot;, nl);\n\
 \n\
- /* standard library type std::vector&lt;T&gt; */\n\
+    /* standard library type std::vector&lt;T&gt; */\n\
     showNote(&quot;heap-based vector instance&quot;);\n\
     showOp(\n\
       &quot;pU&lt;std::vector&lt;double&gt;&gt;&#92;n &quot;\n\
@@ -539,7 +780,7 @@ int main() {\n\
     std::cout &lt;&lt; &quot;&#92;n  pVec = &quot; &lt;&lt; pVec;\n\
     showType(move(pVec), &quot;move(pVec)&quot;, nl);\n\
 \n\
-    /* custom types */\n\
+    /* custom point types */\n\
     showNote(&quot;heap-based Point1 instance&quot;);\n\
     showOp(&quot;pU&lt;Point1&gt; pPoint1(new Point1())&quot;);\n\
     pU&lt;Point1&gt; pPoint1(new Point1());\n\
@@ -553,7 +794,7 @@ int main() {\n\
     showType(*pPoint1, &quot;*pPoint1&quot;);\n\
     showOp(&quot;showType(std::move(pPoint1), &#92;&quot;pPoint1&#92;&quot;);&quot;);\n\
     showType(std::move(pPoint1), &quot;pPoint1&quot;, nl);\n\
-    /* pPoint1 moved, so invalid */\n\
+    /* pPoint1 moved, so now invalid */\n\
 \n\
     showNote(&quot;heap-based Point2&lt;T&gt; instance&quot;);\n\
     showOp(&quot;pU&lt;Point2&lt;double&gt;&gt; pPoint2(new Point2&lt;double&gt;(4))&quot;);\n\
@@ -571,7 +812,7 @@ int main() {\n\
     showType(*pPoint2, &quot;*pPoint2&quot;);\n\
     print(&quot;--- showType(std::move(pPoint2), &#92;&quot;pPoint2&#92;&quot;); ---&quot;);\n\
     showType(std::move(pPoint2), &quot;pPoint2&quot;);\n\
-    /* pPoint2 moved, so invalid */\n\
+    /* pPoint2 moved, so now invalid */\n\
 \n\
     print();\n\
     showNote(&quot;Test and demonstrate formatting functions&quot;);\n\
@@ -641,200 +882,13 @@ int main() {\n\
 \n\
     print(&quot;&#92;n  That's all Folks!&#92;n&#92;n&quot;);\n\
 }\n\
-/*-------------------------------------------------------------------\n\
-  Display and Analysis function definitions\n\
----------------------------------------------------------------------\n\
-*/\n\
-/*-----------------------------------------------\n\
-  Display calling name, static class, and size\n\
-*/\n\
-template&lt;typename T&gt;\n\
-void showType(T t, const std::string &callname, const std::string& suffix) {\n\
-  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; callname;          // show name at call site\n\
-  std::cout &lt;&lt; &quot; type: &quot; \n\
-            &lt;&lt; truncate(DisplayParams.trunc,typeid(t).name());  // show type\n\
-  // std::cout &lt;&lt; &quot;&#92;n  value: &quot; &lt;&lt; t;          // show value\n\
-  std::cout &lt;&lt; &quot;&#92;n  size:  &quot; &lt;&lt; sizeof(t);  // show size on stack\n\
-  std::cout &lt;&lt; suffix;\n\
-}\n\
-/*-----------------------------------------------\n\
-  Display emphasized text\n\
-*/\n\
-void showNote(const std::string& txt, const std::string& suffix) {\n\
-  print(&quot;--------------------------------------------------&quot;);\n\
-  print(txt);\n\
-  print(&quot;--------------------------------------------------&quot;);\n\
-  std::cout &lt;&lt; suffix;\n\
-}\n\
-/*-----------------------------------------------\n\
-  Display emphasized line\n\
-*/\n\
-void showOp(const std::string& opstr, const std::string& suffix) {\n\
-  std::cout &lt;&lt; &quot;&#92;n  --- &quot; &lt;&lt; opstr &lt;&lt; &quot; ---&quot; &lt;&lt; suffix;\n\
-}\n\
-/*-----------------------------------------------\n\
-  Helper function for formatting output\n\
-  - truncates line to N chars and adds ellipsis\n\
-*/\n\
-std::string truncate(size_t N, const char* pStr) {\n\
-  std::string temp(pStr);\n\
-  if(temp.length() &gt; N) {\n\
-    temp.resize(N);\n\
-    return temp + &quot;...&quot;;\n\
-  }\n\
-  return temp;\n\
-}\n\
-/*-----------------------------------------------\n\
-  Helper function for formatting output\n\
-  - generates string of n blanks to offset text\n\
-*/\n\
-std::string indent(size_t n) {\n\
-  return std::string(n, ' ');\n\
-}\n\
-/*-----------------------------------------------\n\
-  Helper function for formatting output\n\
-  - folds lines after width elements\n\
-*/\n\
-template&lt;typename T&gt;\n\
-std::string fold(std::vector&lt;T&gt;& v, size_t left, size_t width) {\n\
-  std::stringstream out(&quot;&#92;n&quot;);\n\
-  out &lt;&lt; indent(left);\n\
-  for(int i=0; i&lt;v.size(); ++i) {\n\
-    if((i % width) == 0 && i != 0 && i != width - 1) {\n\
-      out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left);\n\
-    }\n\
-    if(i &lt; v.size() - 1) {\n\
-      out &lt;&lt; v[i] &lt;&lt; &quot;, &quot;;\n\
-    }\n\
-    else {\n\
-      out &lt;&lt; v[i] &lt;&lt; &quot;&#92;n&quot;;\n\
-      break;\n\
-    }\n\
-  }\n\
-  return out.str();\n\
-}\n\
-/*-----------------------------------------------\n\
-  Helper function for formatColl\n\
-  - defines out &lt;&lt; std::pair&lt;K,V&gt;\n\
-  - used in formatColl for associative containers\n\
-*/\n\
-template&lt;typename K, typename V&gt;\n\
-std::stringstream& operator&lt;&lt;(\n\
-  std::stringstream& out, const std::pair&lt;K,V&gt;& p\n\
-) {\n\
-  out &lt;&lt; &quot;{&quot; &lt;&lt; p.first &lt;&lt; &quot;, &quot; &lt;&lt; p.second &lt;&lt; &quot;}&quot;;\n\
-  return out;\n\
-}\n\
-/*-----------------------------------------------\n\
-  Format output for Collection types\n\
-  - any type with begin() and end() like\n\
-    all the STL containers.\n\
-*/\n\
-template&lt;typename Coll&gt;\n\
-std::string formatColl(\n\
-  const Coll& c, const std::string& nm, const std::string& suffix,\n\
-  size_t left, size_t width\n\
-) {\n\
-  std::stringstream out;\n\
-  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm &lt;&lt; &quot;: {&#92;n&quot; &lt;&lt; indent(left + 2);\n\
-  size_t i = 0;\n\
-  for(const Coll::value_type& elem : c) {\n\
-    if((i % width) == 0 && i != 0 && i != width - 1) {\n\
-      out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left + 2);\n\
-    }\n\
-    if(i &lt; c.size() - 1) {\n\
-      out &lt;&lt; elem &lt;&lt; &quot;, &quot;;\n\
-    }\n\
-    else {\n\
-      out &lt;&lt; elem &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; &quot;}&quot; &lt;&lt; suffix;\n\
-      break;\n\
-    }\n\
-    ++i;\n\
-  }\n\
-  return out.str();\n\
-}\n\
-/*-----------------------------------------------\n\
-  Format output for scalar types like primitives\n\
-*/\n\
-template&lt;typename T&gt;\n\
-std::string formatScalar(\n\
-  const T& t, const std::string& nm, const std::string& suffix,\n\
-  size_t left\n\
-) {\n\
-  std::stringstream out;\n\
-  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm &lt;&lt; &quot;: &quot; &lt;&lt; t &lt;&lt; suffix;\n\
-  return out.str();\n\
-}\n\
-/*-----------------------------------------------\n\
-  Format output for strings\n\
-  - indent and embed in quotation marks\n\
-*/\n\
-template&lt;typename T&gt;\n\
-std::string formatString(\n\
-  const T& t, const std::string& nm, const std::string& suffix,\n\
-  size_t left\n\
-) {\n\
-  std::stringstream out;\n\
-  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm &lt;&lt; &quot;: &#92;&quot;&quot; &lt;&lt; t &lt;&lt; &quot;&#92;&quot;&quot; &lt;&lt; suffix;\n\
-  return out.str();\n\
-}\n\
-/*-----------------------------------------------\n\
-  Defines is_iterable trait\n\
-  - detects STL containers and user-defined types\n\
-    that provide iteration\n\
-*/\n\
-template &lt;typename T, typename = void&gt;\n\
-struct is_iterable : std::false_type {};\n\
-\n\
-// this gets used only when we can call \n\
-// std::begin() and std::end() on that type\n\
-template &lt;typename T&gt;\n\
-struct is_iterable&lt;\n\
-  T, \n\
-  std::void_t\n\
-    &lt;decltype(std::begin(std::declval&lt;T&gt;())),\n\
-     decltype(std::end(std::declval&lt;T&gt;()))&gt;\n\
-&gt; : std::true_type {};\n\
-\n\
-template &lt;typename T&gt;\n\
-constexpr bool is_iterable_v = is_iterable&lt;T&gt;::value;\n\
-\n\
-/*-----------------------------------------------\n\
-  Displays almost everything.\n\
-  - strings work better with formatString(...)\n\
-*/\n\
-template&lt;typename T&gt;\n\
-std::string format(\n\
-  const T& t, const std::string& nm, const std::string& suffix,\n\
-  size_t left, size_t width\n\
-) {\n\
-  if constexpr(is_iterable_v&lt;T&gt;) {\n\
-    return formatColl(t, nm, suffix, left, width);\n\
-  }\n\
-  else {\n\
-    return formatScalar(t, nm, suffix, left);\n\
-  }\n\
-}\n\
-/*-----------------------------------------------\n\
-  Display text after newline and indentation\n\
-*/\n\
-void print(const std::string& txt) {\n\
-  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt;\n\
-}\n\
-/*-----------------------------------------------\n\
-  Display text after newline and indentation\n\
-  - provides trailing newline\n\
-*/\n\
-void println(const std::string& txt) {\n\
-  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt &lt;&lt; &quot;&#92;n&quot;;\n\
-}\n\
 \n\</div></pre>\
 ";
     }
 
     function loadCppOut(id) {
       let codecont = document.getElementById(id);
-      codecont.innerHTML = "<pre>\
+      codecont.innerHTML = "<pre>\n\n\
   Demonstrate C++ Objects\n\
 \n\
   --------------------------------------------------\n\
@@ -884,7 +938,7 @@ void println(const std::string& txt) {\n\
   }\n\
   --------------------------------------------------\n\
   Copy construction, auto vec2 = vec, creates independent instance.\n\
-  So changing target vec2 has no affect on source vec.\n\
+  So changing target vec2 has no affect on source vec.        \n\
   --------------------------------------------------\n\
 \n\
   --------------------------------------------------\n\
@@ -929,7 +983,7 @@ void println(const std::string& txt) {\n\
   heap-based vector instance\n\
   --------------------------------------------------\n\
   --- pU&lt;std::vector&lt;double&gt;&gt;\n\
-      pVec(new std::vector&lt;double&gt;{ 1.5, 2.5, 3.5 }); ---\n\
+      pVec(new std::vector&lt;double&gt;{ 1.5, 2.5, 3.5 }); ---     \n\
   *pVec =\n\
   vector&lt;T&gt;: {\n\
     1.5, 2.5, 3.5\n\
@@ -937,8 +991,8 @@ void println(const std::string& txt) {\n\
   *pVec type: class std::vector&lt;double,class std::allocator&lt;double&gt; &gt;\n\
   size:  32\n\
 \n\
-  pVec = 0000015806B047E0\n\
-  move(pVec) type: class std::unique_ptr&lt;class std::vector&lt;double,class st...    \n\
+  pVec = 0000025E14976860\n\
+  move(pVec) type: class std::unique_ptr&lt;class std::vector&lt;double,class st...\n\
   size:  8\n\
 \n\
   --------------------------------------------------\n\
@@ -952,13 +1006,13 @@ void println(const std::string& txt) {\n\
   *pPoint1 type: class Point1\n\
   size:  12\n\
   --- showType(std::move(pPoint1), &quot;pPoint1&quot;); ---\n\
-  pPoint1 type: class std::unique_ptr&lt;class Point1,struct std::default_...       \n\
+  pPoint1 type: class std::unique_ptr&lt;class Point1,struct std::default_...\n\
   size:  8\n\
 \n\
   --------------------------------------------------\n\
   heap-based Point2&lt;T&gt; instance\n\
   --------------------------------------------------\n\
-  --- pU&lt;Point2&lt;double&gt;&gt; pPoint2(new Point2&lt;double&gt;(4)) ---\n\
+  --- pU&lt;Point2&lt;double&gt;&gt; pPoint2(new Point2&lt;double&gt;(4)) ---   \n\
   Point2&lt;T&gt; {\n\
     0, 0, 0, 0\n\
   }\n\
@@ -972,511 +1026,11 @@ void println(const std::string& txt) {\n\
   *pPoint2 type: class Point2&lt;double&gt;\n\
   size:  48\n\
   --- showType(std::move(pPoint2), &quot;pPoint2&quot;); ---\n\
-  pPoint2 type: class std::unique_ptr&lt;class Point2&lt;double&gt;,struct std::...       \n\
+  pPoint2 type: class std::unique_ptr&lt;class Point2&lt;double&gt;,struct std::...\n\
   size:  8\n\
 \n\
   --------------------------------------------------\n\
-  Test and demonstrate formatCollting functions\n\
-  --------------------------------------------------\n\
-\n\
---- demonstrate Point2 show() ---\n\
-\n\
-  default indent = 4 and width = 7:\n\
-  Point2&lt;T&gt; {\n\
-    0, 0, 0, 0, 0, 0, 0,\n\
-    0, 0, 0, 0, 0, 0, 0,\n\
-    0\n\
-  }\n\
-\n\
-  indent = 6, width = 12:\n\
-      Point2&lt;T&gt; {\n\
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\n\
-        0, 0, 0\n\
-      }\n\
-\n\
---- demonstrate operator&lt;&lt; overload for Point2 ---\n\
-\n\
-  default indent = 4 and width = 7:\n\
-  Point2&lt;T&gt; {\n\
-    0, 0, 0, 0, 0, 0, 0,\n\
-    0, 0, 0, 0, 0, 0, 0,\n\
-    0\n\
-  }\n\
-\n\
-  indent = 6, width = 12:\n\
-      Point2&lt;T&gt; {\n\
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\n\
-        0, 0, 0\n\
-      }\n\
-\n\
---- demonstrate operator&lt;&lt; overload for vector ---\n\
-\n\
-  default indent = 4 and width = 7:\n\
-  vector&lt;T&gt;: {\n\
-    1, 2, 3, 4, 5, 6, 7,\n\
-    8, 9\n\
-  }\n\
-  indent = 2, width = 5:\n\
-  vector&lt;T&gt;: {\n\
-    1, 2, 3, 4, 5,\n\
-    6, 7, 8, 9\n\
-  }\n\
-  vtest: {\n\
-    1, 2, 3, 4, 5,\n\
-    6, 7, 8, 9\n\
-  }\n\
-\n\
-    vtest: {\n\
-      1, 2, 3, 4, 5, 6, 7,\n\
-      8, 9\n\
-    }\n\
-\n\
-  vtest: {\n\
-    1, 2, 3, 4, 5, 6, 7, 8, 9\n\
-  }\n\
-\n\
-  vtest: vector&lt;int&gt;: {\n\
-    1, 2, 3, 4, 5, 6, 7, 8, 9\n\
-  }\n\
-\n\
-  arrtest: {\n\
-    1, 2, 3, 4.5,\n\
-    -3.14159\n\
-  }\n\
-\n\
-  amap: {\n\
-    {1, one}, {2, two}, {3, three}\n\
-  }\n\
-\n\
-  aset: {\n\
-    five, four, one, three,\n\
-    two\n\
-  }\n\
-\n\
-  astring: &quot;this is a string&quot;\n\
-\n\
-  adouble: 3.14159\n\
-\n\
-  --------------------------------------------------\n\
-  Using consolidated format function\n\
-  --------------------------------------------------\n\
-  astring: {\n\
-    t, h, i, s,  , i, s,\n\
-     , a,  , s, t, r, i,\n\
-    n, g\n\
-  }\n\
-\n\
-  adouble: 3.14159\n\
-\n\
-  avec: {\n\
-    1, 2, 3, 4.5, -3.14159\n\
-  }\n\
-\n\
-  amap: {\n\
-    {1, one}, {2, two}, {3, three}\n\
-  }\n\
-\n\
-\n\
-  That's all Folks!\n\
-\n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build\n\
-&gt; debug/Cpp_Objects.exe\n\
-\n\
-  Demonstrate C++ Objects\n\
-\n\
-  --------------------------------------------------\n\
-  primitive C++ types size_t and double\n\
-  --------------------------------------------------\n\
-  size_t st = 42\n\
-  st type: unsigned __int64\n\
-  size:  8\n\
-\n\
-  double d = 3.14159\n\
-  ld type: double\n\
-  size:  8\n\
-\n\
-  --------------------------------------------------\n\
-  std library types string and vector&lt;T&gt;\n\
-  --------------------------------------------------\n\
-  contents of str = &quot;Wile E. Coyote&quot;\n\
-  --- showType(str, &quot;str&quot;); ---\n\
-  str type: class std::basic_string&lt;char,struct std::char_traits&lt;ch...\n\
-  size:  40\n\
-\n\
-  vector&lt;T&gt;: {\n\
-    3.5, 3, 2.5, 2\n\
-  }\n\
-  --- showType(vec, &quot;vec&quot;); ---\n\
-  vec type: class std::vector&lt;double,class std::allocator&lt;double&gt; &gt;\n\
-  size:  32\n\
-\n\
-  --- vec[2] = -2.5; ---\n\
-  vec:\n\
-  vector&lt;T&gt;: {\n\
-    3.5, 3, -2.5, 2\n\
-  }\n\
-  --- auto vec2 = vec : copy construction ---\n\
-  vec2:\n\
-  vector&lt;T&gt;: {\n\
-    3.5, 3, -2.5, 2\n\
-  }\n\
-  --- vec2[0] = 42; ---\n\
-  vec2:\n\
-  vector&lt;T&gt;: {\n\
-    42, 3, -2.5, 2\n\
-  }\n\
-  vec:\n\
-  vector&lt;T&gt;: {\n\
-    3.5, 3, -2.5, 2\n\
-  }\n\
-  --------------------------------------------------\n\
-  Copy construction, auto vec2 = vec, creates independent instance.\n\
-  So changing target vec2 has no affect on source vec.\n\
-  --------------------------------------------------\n\
-\n\
-  --------------------------------------------------\n\
-  user-defined types Point1 and Point2&lt;T&gt;\n\
-  --------------------------------------------------\n\
-  Point1 { 0, 0, 0 }\n\
-  Point1 { 42, 0, -3 }\n\
-  --- showType(p1, &quot;p1&quot;, nl) ---\n\
-  p1 type: class Point1\n\
-  size:  12\n\
-  p1.xCoor() returns value 42\n\
-\n\
-  Point2&lt;T&gt; {\n\
-    0, 0, 0, 0, 0\n\
-  }\n\
-  --------------------------------------------------\n\
-  p2.coords() = std::vector&lt;double&gt;{ 1.0, -2.0, 3.0, 4.5, -42.0 }\n\
-  --------------------------------------------------\n\
-  Point2&lt;T&gt; {\n\
-    1, -2, 3, 4.5, -42\n\
-  }\n\
-  --- showType(p2, &quot;p2&quot;, nl); ---\n\
-  p2 type: class Point2&lt;double&gt;\n\
-  size:  48\n\
-  p2.coords()[2] = 3\n\
-\n\
-  --------------------------------------------------\n\
-  heap-based string instance\n\
-  --------------------------------------------------\n\
-  --- pU&lt;std::string&gt; pStr(new std::string(&quot;&#92;&quot;Road Runner&#92;&quot;&quot;) ---\n\
-  pStr contents = &quot;Road Runner&quot;\n\
-\n\
-  --- showType(*pStr, &quot;*pStr&quot;) ---\n\
-  *pStr type: class std::basic_string&lt;char,struct std::char_traits&lt;ch...\n\
-  size:  40\n\
-\n\
-  --- showType(move(pStr), &quot;pStr&quot;) ---\n\
-  pStr type: class std::unique_ptr&lt;class std::basic_string&lt;char,stru...\n\
-  size:  8\n\
-\n\
-  --------------------------------------------------\n\
-  heap-based vector instance\n\
-  --------------------------------------------------\n\
-  --- pU&lt;std::vector&lt;double&gt;&gt;\n\
-      pVec(new std::vector&lt;double&gt;{ 1.5, 2.5, 3.5 }); ---\n\
-  *pVec =\n\
-  vector&lt;T&gt;: {\n\
-    1.5, 2.5, 3.5\n\
-  }\n\
-  *pVec type: class std::vector&lt;double,class std::allocator&lt;double&gt; &gt;\n\
-  size:  32\n\
-\n\
-  pVec = 0000025DCA743F10\n\
-  move(pVec) type: class std::unique_ptr&lt;class std::vector&lt;double,class st...    \n\
-  size:  8\n\
-\n\
-  --------------------------------------------------\n\
-  heap-based Point1 instance\n\
-  --------------------------------------------------\n\
-  --- pU&lt;Point1&gt; pPoint1(new Point1()) ---\n\
-  Point1 { 0, 0, 0 }\n\
-  Point1 { 1, 2, -3 }\n\
-  pPoint1-&gt;zCoor() = -3\n\
-  --- showType(*pPoint1, &quot;*pPoint1&quot;); ---\n\
-  *pPoint1 type: class Point1\n\
-  size:  12\n\
-  --- showType(std::move(pPoint1), &quot;pPoint1&quot;); ---\n\
-  pPoint1 type: class std::unique_ptr&lt;class Point1,struct std::default_...       \n\
-  size:  8\n\
-\n\
-  --------------------------------------------------\n\
-  heap-based Point2&lt;T&gt; instance\n\
-  --------------------------------------------------\n\
-  --- pU&lt;Point2&lt;double&gt;&gt; pPoint2(new Point2&lt;double&gt;(4)) ---\n\
-  Point2&lt;T&gt; {\n\
-    0, 0, 0, 0\n\
-  }\n\
-  --- pPoint2-&gt;coords() =\n\
-     std::vector&lt;double&gt;{ 1.0, 3.5, -2.0, 42.0 }; ---\n\
-  Point2&lt;T&gt; {\n\
-    1, 3.5, -2, 42\n\
-  }\n\
-  value of pPoint2-&gt;coords()[1] is 3.5\n\
-  --- showType(*pPoint2, &quot;*pPoint2&quot;); ---\n\
-  *pPoint2 type: class Point2&lt;double&gt;\n\
-  size:  48\n\
-  --- showType(std::move(pPoint2), &quot;pPoint2&quot;); ---\n\
-  pPoint2 type: class std::unique_ptr&lt;class Point2&lt;double&gt;,struct std::...       \n\
-  size:  8\n\
-\n\
-  --------------------------------------------------\n\
-  Test and demonstrate formatCollting functions\n\
-  --------------------------------------------------\n\
-\n\
---- demonstrate Point2 show() ---\n\
-\n\
-  default indent = 4 and width = 7:\n\
-  Point2&lt;T&gt; {\n\
-    0, 0, 0, 0, 0, 0, 0,\n\
-    0, 0, 0, 0, 0, 0, 0,\n\
-    0\n\
-  }\n\
-\n\
-  indent = 6, width = 12:\n\
-      Point2&lt;T&gt; {\n\
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\n\
-        0, 0, 0\n\
-      }\n\
-\n\
---- demonstrate operator&lt;&lt; overload for Point2 ---\n\
-\n\
-  default indent = 4 and width = 7:\n\
-  Point2&lt;T&gt; {\n\
-    0, 0, 0, 0, 0, 0, 0,\n\
-    0, 0, 0, 0, 0, 0, 0,\n\
-    0\n\
-  }\n\
-\n\
-  indent = 6, width = 12:\n\
-      Point2&lt;T&gt; {\n\
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\n\
-        0, 0, 0\n\
-      }\n\
-\n\
---- demonstrate operator&lt;&lt; overload for vector ---\n\
-\n\
-  default indent = 4 and width = 7:\n\
-  vector&lt;T&gt;: {\n\
-    1, 2, 3, 4, 5, 6, 7,\n\
-    8, 9\n\
-  }\n\
-  indent = 2, width = 5:\n\
-  vector&lt;T&gt;: {\n\
-    1, 2, 3, 4, 5,\n\
-    6, 7, 8, 9\n\
-  }\n\
-  vtest: {\n\
-    1, 2, 3, 4, 5,\n\
-    6, 7, 8, 9\n\
-  }\n\
-\n\
-    vtest: {\n\
-      1, 2, 3, 4, 5, 6, 7,\n\
-      8, 9\n\
-    }\n\
-\n\
-  vtest: {\n\
-    1, 2, 3, 4, 5, 6, 7, 8, 9\n\
-  }\n\
-\n\
-  vtest: vector&lt;int&gt;: {\n\
-    1, 2, 3, 4, 5, 6, 7, 8, 9\n\
-  }\n\
-\n\
-  arrtest: {\n\
-    1, 2, 3, 4.5,\n\
-    -3.14159\n\
-  }\n\
-\n\
-  amap: {\n\
-    {1, one}, {2, two}, {3, three}\n\
-  }\n\
-\n\
-  aset: {\n\
-    five, four, one, three,\n\
-    two\n\
-  }\n\
-\n\
-  astring: &quot;this is a string&quot;\n\
-\n\
-  adouble: 3.14159\n\
-\n\
-  --------------------------------------------------\n\
-  Using consolidated format function\n\
-  --------------------------------------------------\n\
-  astring: {\n\
-    t, h, i, s,  , i, s,\n\
-     , a,  , s, t, r, i,\n\
-    n, g\n\
-  }\n\
-\n\
-  adouble: 3.14159\n\
-\n\
-  avec: {\n\
-    1, 2, 3, 4.5, -3.14159\n\
-  }\n\
-\n\
-  amap: {\n\
-    {1, one}, {2, two}, {3, three}\n\
-  }\n\
-\n\
-\n\
-  That's all Folks!\n\
-\n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build\n\
-&gt; cmake --build .      \n\
-MSBuild version 17.4.0+18d5aef85 for .NET Framework\n\
-  Cpp_Objects.cpp\n\
-  Cpp_Objects.vcxproj -&gt; C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build&#92;Debug&#92;C\n\
-  pp_Objects.exe\n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build\n\
-&gt; debug/Cpp_Objects.exe\n\
-\n\
-  Demonstrate C++ Objects\n\
-\n\
-  --------------------------------------------------\n\
-  primitive C++ types size_t and double\n\
-  --------------------------------------------------\n\
-  size_t st = 42\n\
-  st type: unsigned __int64\n\
-  size:  8\n\
-\n\
-  double d = 3.14159\n\
-  ld type: double\n\
-  size:  8\n\
-\n\
-  --------------------------------------------------\n\
-  std library types string and vector&lt;T&gt;\n\
-  --------------------------------------------------\n\
-  contents of str = &quot;Wile E. Coyote&quot;\n\
-  --- showType(str, &quot;str&quot;); ---\n\
-  str type: class std::basic_string&lt;char,struct std::char_traits&lt;ch...\n\
-  size:  40\n\
-\n\
-  vector&lt;T&gt;: {\n\
-    3.5, 3, 2.5, 2\n\
-  }\n\
-  --- showType(vec, &quot;vec&quot;); ---\n\
-  vec type: class std::vector&lt;double,class std::allocator&lt;double&gt; &gt;\n\
-  size:  32\n\
-\n\
-  --- vec[2] = -2.5; ---\n\
-  vec:\n\
-  vector&lt;T&gt;: {\n\
-    3.5, 3, -2.5, 2\n\
-  }\n\
-  --- auto vec2 = vec : copy construction ---\n\
-  vec2:\n\
-  vector&lt;T&gt;: {\n\
-    3.5, 3, -2.5, 2\n\
-  }\n\
-  --- vec2[0] = 42; ---\n\
-  vec2:\n\
-  vector&lt;T&gt;: {\n\
-    42, 3, -2.5, 2\n\
-  }\n\
-  vec:\n\
-  vector&lt;T&gt;: {\n\
-    3.5, 3, -2.5, 2\n\
-  }\n\
-  --------------------------------------------------\n\
-  Copy construction, auto vec2 = vec, creates independent instance.\n\
-  So changing target vec2 has no affect on source vec.\n\
-  --------------------------------------------------\n\
-\n\
-  --------------------------------------------------\n\
-  user-defined types Point1 and Point2&lt;T&gt;\n\
-  --------------------------------------------------\n\
-  Point1 { 0, 0, 0 }\n\
-  Point1 { 42, 0, -3 }\n\
-  --- showType(p1, &quot;p1&quot;, nl) ---\n\
-  p1 type: class Point1\n\
-  size:  12\n\
-  p1.xCoor() returns value 42\n\
-\n\
-  Point2&lt;T&gt; {\n\
-    0, 0, 0, 0, 0\n\
-  }\n\
-  --------------------------------------------------\n\
-  p2.coords() = std::vector&lt;double&gt;{ 1.0, -2.0, 3.0, 4.5, -42.0 }\n\
-  --------------------------------------------------\n\
-  Point2&lt;T&gt; {\n\
-    1, -2, 3, 4.5, -42\n\
-  }\n\
-  --- showType(p2, &quot;p2&quot;, nl); ---\n\
-  p2 type: class Point2&lt;double&gt;\n\
-  size:  48\n\
-  p2.coords()[2] = 3\n\
-\n\
-  --------------------------------------------------\n\
-  heap-based string instance\n\
-  --------------------------------------------------\n\
-  --- pU&lt;std::string&gt; pStr(new std::string(&quot;&#92;&quot;Road Runner&#92;&quot;&quot;) ---\n\
-  pStr contents = &quot;Road Runner&quot;\n\
-\n\
-  --- showType(*pStr, &quot;*pStr&quot;) ---\n\
-  *pStr type: class std::basic_string&lt;char,struct std::char_traits&lt;ch...\n\
-  size:  40\n\
-\n\
-  --- showType(move(pStr), &quot;pStr&quot;) ---\n\
-  pStr type: class std::unique_ptr&lt;class std::basic_string&lt;char,stru...\n\
-  size:  8\n\
-\n\
-  --------------------------------------------------\n\
-  heap-based vector instance\n\
-  --------------------------------------------------\n\
-  --- pU&lt;std::vector&lt;double&gt;&gt;\n\
-      pVec(new std::vector&lt;double&gt;{ 1.5, 2.5, 3.5 }); ---\n\
-  *pVec =\n\
-  vector&lt;T&gt;: {\n\
-    1.5, 2.5, 3.5\n\
-  }\n\
-  *pVec type: class std::vector&lt;double,class std::allocator&lt;double&gt; &gt;\n\
-  size:  32\n\
-\n\
-  pVec = 000001DC21D84E50\n\
-  move(pVec) type: class std::unique_ptr&lt;class std::vector&lt;double,class st...    \n\
-  size:  8\n\
-\n\
-  --------------------------------------------------\n\
-  heap-based Point1 instance\n\
-  --------------------------------------------------\n\
-  --- pU&lt;Point1&gt; pPoint1(new Point1()) ---\n\
-  Point1 { 0, 0, 0 }\n\
-  Point1 { 1, 2, -3 }\n\
-  pPoint1-&gt;zCoor() = -3\n\
-  --- showType(*pPoint1, &quot;*pPoint1&quot;); ---\n\
-  *pPoint1 type: class Point1\n\
-  size:  12\n\
-  --- showType(std::move(pPoint1), &quot;pPoint1&quot;); ---\n\
-  pPoint1 type: class std::unique_ptr&lt;class Point1,struct std::default_...       \n\
-  size:  8\n\
-\n\
-  --------------------------------------------------\n\
-  heap-based Point2&lt;T&gt; instance\n\
-  --------------------------------------------------\n\
-  --- pU&lt;Point2&lt;double&gt;&gt; pPoint2(new Point2&lt;double&gt;(4)) ---\n\
-  Point2&lt;T&gt; {\n\
-    0, 0, 0, 0\n\
-  }\n\
-  --- pPoint2-&gt;coords() =\n\
-     std::vector&lt;double&gt;{ 1.0, 3.5, -2.0, 42.0 }; ---\n\
-  Point2&lt;T&gt; {\n\
-    1, 3.5, -2, 42\n\
-  }\n\
-  value of pPoint2-&gt;coords()[1] is 3.5\n\
-  --- showType(*pPoint2, &quot;*pPoint2&quot;); ---\n\
-  *pPoint2 type: class Point2&lt;double&gt;\n\
-  size:  48\n\
-  --- showType(std::move(pPoint2), &quot;pPoint2&quot;); ---\n\
-  pPoint2 type: class std::unique_ptr&lt;class Point2&lt;double&gt;,struct std::...       \n\
-  size:  8\n\
-\n\
-  --------------------------------------------------\n\
-  Test and demonstrate formatCollting functions\n\
+  Test and demonstrate formatting functions\n\
   --------------------------------------------------\n\
 \n\
 --- demonstrate Point2 show() ---\n\
@@ -3690,7 +3244,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;JavaScript&#92;Js_Objects\n\
     function remoteLeft() {
       let cp = document.getElementById("Cp1");
       if (cp.checked) {
-        window.open('https://godbolt.org/z/d7PGec1qj', '_blank');
+        window.open('https://godbolt.org/z/qKT5jrv6K', '_blank');
       }
       let cs = document.getElementById("Cs1");
       if (cs.checked) {
@@ -3721,7 +3275,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;JavaScript&#92;Js_Objects\n\
     function remoteRight() {
       let cp = document.getElementById("Cp2");
       if (cp.checked) {
-        window.open('https://godbolt.org/z/d7PGec1qj', '_blank');
+        window.open('https://godbolt.org/z/qKT5jrv6K', '_blank');
       }
       let cs = document.getElementById("Cs2");
       if (cs.checked) {
