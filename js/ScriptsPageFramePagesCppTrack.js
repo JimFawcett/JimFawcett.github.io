@@ -16,6 +16,7 @@ function initializePages() {
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Memory</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Types</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Classes</a></menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='Resources/CppBites/CppBites_STR.html'>Class&nbsp;Anatomy&nbsp;Examples&nbsp;</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Templates</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;STL</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Modern&nbsp;Model</a></menu-elem>\
