@@ -9,10 +9,12 @@ function initializePages() {
   if (isDefined(pagesMenu)) {
     pgbtn.style.display = "flex";
     pagesMenu.innerHTML = "<div class='ddLabel darkItem'>Code Bits</div>\
+          <menu-elem class='ddItems pageElem'><a href='../../BitsRepo.html'>BitsRepo</a>&nbsp;</menu-elem >\
+          <menu-elem class='ddItems pageElem'><a href='Bits_Intro.html'>Introduction</a>&nbsp;</menu-elem >\
           <menu-elem class='ddItems pageElem'><a href='Bits_Tooling.html'>Tooling</a>&nbsp;</menu-elem >\
-          <menu-elem class='ddItems pageElem'><a href='Bits_Hello.html'>Hello&nbsp;World</a>&nbsp;</menu-elem >\
-          <menu-elem class='ddItems pageElem'><a href='Bits_Data.html'>Hello&nbsp;Data</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='Bits_Objects.html'>Hello&nbsp;Objects</a>&nbsp;</menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='Bits_HelloCpp.html'>Hello&nbsp;World</a>&nbsp;</menu-elem >\
+          <menu-elem class='ddItems pageElem'><a href='Bits_DataCpp.html'>Hello&nbsp;Data</a>&nbsp;</menu-elem>\
+          <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Hello&nbsp;Objects</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Data&nbsp;Structures</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Iteration</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Functions</a>&nbsp;</menu-elem>\
