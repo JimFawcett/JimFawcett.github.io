@@ -13,8 +13,8 @@ function initializePages() {
           <menu-elem class='ddItems pageElem'><a href='Bits_Intro.html'>Introduction</a>&nbsp;</menu-elem >\
           <menu-elem class='ddItems pageElem'><a href='Bits_Tooling.html'>Tooling</a>&nbsp;</menu-elem >\
           <menu-elem class='ddItems pageElem'><a href='Bits_HelloCpp.html'>Hello&nbsp;World</a>&nbsp;</menu-elem >\
-          <menu-elem class='ddItems pageElem'><a href='Bits_DataCpp.html'>Hello&nbsp;Data</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Hello&nbsp;Objects</a>&nbsp;</menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='Bits_DataCpp.html'>Data</a>&nbsp;</menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='Bits_ObjectsCpp.html'>Objects</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Data&nbsp;Structures</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Iteration</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Functions</a>&nbsp;</menu-elem>\
