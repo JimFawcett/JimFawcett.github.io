@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<!-- 
+  Js_Objects.html 
+
+  Illustrate creation and use of JavaScript objects.
+
+  JavaScript Types.
+    Number, Bigint, Boolean, String,
+    Undefined, Null, Symbol, Object
+    - arrays are typed as objects
+    Other important library types:
+    - Date, Maps, Sets, JSON, 
+
+    All of these are reference types.
+    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures
+-->
+<head>
+    <script src="Analysis.js"></script>
+    <script>
+
+    /*--------------------------------------------------------------------
+      Used as program-wide constants for display
+    */
+    const nl = "<br />";
+    const tab = "&nbsp;&nbsp;"
+    const nil = "";
+
+    function heading() {
+	    document.getElementById("objects").innerHTML = "<h2>Javascript Objects</h2>";
+    }
+    /*--------------------------------------------------------------------
+      Demonstration starts here 
+    */
+    function execute() {
+      showNote("Demo Objects")
+
+      /*------------------------------------------------------------------
+        built in objects
+      ------------------------------------------------------------------*/
+      showNote("Built-in instances");
+      let d = 3.1415927;
+      showType(d, "d");
+      println("---");
+
+      let s = "s";
+      showType(s, "string");
+      println("---");
+      
+      let a = [1, 2, 3];
+      showType(a, "array");
+      println("---");
+      
+      let o = new Object();
+      o.elem = "some element";
+      o.say = function() { document.write("Hello" + nl)};
+      showType(o, "o");
+      o.say();
+      
+      showOp("more elaborate data");
+      let arr = [1, 'z', [1, 2, 3], true];
+      showType(arr, "arr");
+      println("---");
+
+      /* add show method to existing array */
+      println(
+        "you can add new elements to any object, including" + nl +
+        "scalar data, composite data like arrays and functions."
+      )
+      arr.show = function(nm) {
+        document.write(nm, " [ ");
+        arr.forEach(element => {
+          document.write(element, " ");
+        });
+        document.write("]" + nl);
+      }
+      showOp("arr.show(nm)");
+      arr.show("arr");
+      println(nil);
+
+      println(
+        "Here see the results of using two other analyzer methods" +nl +
+        "on the arr array:"
+      )
+      /*------------------------------------------------------------------
+        showTypeShowable uses show(...) method provided by analyzed type.
+        It works with any object that provides a show(...) method.
+      */
+      /* so now showTypeShowable can be used */
+      showOp("showTypeShowable(arr, \"arr\")");
+      showTypeShowable(arr, "arr");
+      showOp("showObject(arr, \"arr\")");
+      showObject(arr, "arr");
+      print(nl);
+
+      /*------------------------------------------------------------------
+       crafting object by hand 
+      ------------------------------------------------------------------*/
+      showNote("User-defined object literal");
+    
+      const dev = {
+        name:"Jim", 
+        job:"Retired from Syracuse University", 
+        hobby:"Developing software",
+        projects: [ 'Bits language comparisons', 'Stories', 'Bites' ]
+      }
+      showObject(dev, "dev");
+
+      /* creating show function tailored to dev objects */
+      dev.show = function(nm) {
+        document.write(nm, ": {",nl,tab,"name: ", this.name, 
+        nl, tab, "job: ", this.job, nl, tab, "hobby: ", 
+        this.hobby, nl, tab, "projects: ", this.projects,  
+        nl, "}<br />");
+      }
+      /* using 3 ways to display information about an object */
+      showOp("dev.show(\"dev\")");
+      dev.show("dev");
+      showOp("showTypeShowable(dev, \"dev\")");
+      showTypeShowable(dev, "dev");
+      showOp("showType(dev, \"dev\")");
+      showType(dev, "dev", 4, 1);
+
+      /*------------------------------------------------------------------
+        using JavaScript class 
+      ------------------------------------------------------------------*/
+      showNote("Using JavaScript class");
+
+      class Point1 {
+        constructor(x, y, z) {
+          this.x = x;
+          this.y = y;
+          this.z = z;
+        }
+        show(name) {
+          document.write(name, ": Point1 {", nl, tab);
+          document.write(this.x, ", ", this.y, ", ", this.z);
+          document.write(nl, "}", nl);
+        }
+      }
+
+      let p1 = new Point1(1, 2, 3);
+
+      showOp("showObject(p1, \"p1\")");
+      showObject(p1, "p1");
+      showOp("p1.show(\"p1\")");
+      p1.show("p1");
+      showOp("showTypeShowable(p1, \"p1\")");
+      showTypeShowable(p1, "p1");
+      showOp("showType(p1, \"p1\")");
+      showType(p1, "p1: Point1");
+      println(nil);
+
+      /*------------------------------------------------------------------
+        exploring concequences of JavaScript object model
+      */
+      showNote(
+        "Exploring consequences of JavaScript reference types:"
+      )
+      showOp("let p2 = p1");
+      let p2 = p1;
+      p2.show("p2");
+      isSameObject(p2, "p2", p1, "p1");
+      showOp("p2.z = -42");
+      p2.z = -42;
+      p2.show("p2");
+      p1.show("p1");
+      isSameObject(p2, "p2", p1, "p1");
+      showNote(
+        "All JavaScript variables are reference types. So assignments assign" + nl +
+        "references, not values. And so changing target, p2, changed source, p1"
+      )
+      print(nl);
+      /*------------------------------------------------------------------
+        Used for testing display functions
+      */
+      showNote(
+        "The displays below are used to test and demonstrate how" + nl +
+        "display and analysis functions work. Those are all defined" + nl +
+        "after the end of the execute() function."
+      )
+      showOp("p1.show(\"p1\")");
+      p1.show("p1");
+      println(nil);
+
+      showOp("showObject(p1, \"p1\")");
+      showObject(p1, "p1");
+      println(nil);
+
+      let tst = { "a":"1", "b":["2", "3"] };
+      showType(tst, "test display formatting");
+      println(nil);
+
+      showOp("let testarr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]");
+      let testarr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+      /* using default values for width=7 and left=4 */
+      showObject(testarr, "testarr");
+
+      print(nl + "That&apos;s all Folks!" + nl);
+    }
+  </script>
+  <style>
+    body {
+      font-family:'Comic Sans MS', Tahoma;
+      padding:2em;
+    } 
+  </style>
+</head>
+<body>
+  <div id="objects"></div>
+  <script>
+    heading();
+    execute();
+  </script>
+</body>
+</html>
