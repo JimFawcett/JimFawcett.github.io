@@ -99,19 +99,21 @@ function initializeMenu() {
     <div class='menuItem'>\
         Stories&#9662\
         <div class='dropdown'>\
-            <div class='ddLabel darkItem'>Stories&nbsp;&amp;&nbsp;Bites</div>\
+            <div class='ddLabel darkItem'>Stories,&nbsp;Bites,&nbsp;&amp;&nbsp;Bits&nbsp;</div>\
             <div class='ddItem'><a href='../../Stories.html'>What is a Story?</a></div>\
-            <div class='ddItem'><a href='../../BasicBiteByByte.html'>Basics Story</a></div>\
-            <div class='ddItem'><a href='../../DesignBites.html'>Design Story</a></div>\
-            <div class='ddItem'><a href='../../CppStoryRepo.html'>C++ Story</a></div>\
-            <div class='ddItem'><a href='../../RustStoryRepo.html'>Rust Story</a></div>\
-            <div class='ddItem'><a href='../../RustBiteByByte.html'>Rust&nbsp;bite&nbsp;by&nbsp;byte&nbsp;</a></div>\
+            <div class='ddItem'><a href='../../BasicBiteByByte.html'>Basics Bites</a></div>\
+            <div class='ddItem'><a href='../../DesignBites.html'>Design Bites</a></div>\
+            <div class='ddItem'><a href='../../CppStoryRepo.html'>C++&nbsp;Story</a></div>\
+            <div class='ddItem'><a href='../../CppBiteByByte.html'>C++&nbsp;Bites</a></div>\
+            <div class='ddItem'><a href='../../RustStoryRepo.html'>Rust&nbsp;Story</a></div>\
+            <div class='ddItem'><a href='../../RustBiteByByte.html'>Rust&nbsp;bites&nbsp;</a></div>\
+            <div class='ddItem'><a href='../../BitsRepo.html'>Bits&nbsp;-&nbsp;C++,Rust,C#,Python,JvScpt&nbsp;</a></div>\
             <div class='ddItem'><a href='../../BuildOn.html'>BuildOn:&nbsp;learn&nbsp;Rust&nbsp;&nbsp;</a></div>\
-            <div class='ddItem'><a href='../../IdiomsAndPatterns.html'>Idioms&nbsp;&amp;&nbsp;Patterns&nbsp;</a></div>\
+            <div class='ddItem'><a href='../../IdiomsAndPatterns.html'>Idioms&nbsp;&amp;&nbsp;Patterns:&nbsp;depricated</a></div>\
             <div class='ddItem'><a href='../../IndexPage.html'>Rust Glossary</a></div>\
             <div class='ddItem'><a href='../../InfDataLib_1.html'>Inf Data Lib - A.Zaitsev</a></div>\
             <div class='ddItem'><a href='../../MLiPS_1.html'>MLiPS - M.Corley</a></div>\
-            <div class='ddItem'><a href='../../StoryTeller_LocalStorage.html'>StoryTeller&nbsp;depricated</a></div>\
+            <div class='ddItem'><a href='../../StoryTeller_LocalStorage.html'>StoryTeller:&nbsp;depricated</a></div>\
             <div class='ddItem'><a href='../../StoryTellerDesign.html'>StoryTeller Design</a></div>\
             <div class='ddItem'><a href='../PublishingSourceCode.pdf'>Site&nbsp;Presentation</a></div>\
             <div style='height:2em;'></div>\
