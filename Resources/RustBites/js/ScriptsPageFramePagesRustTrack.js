@@ -20,7 +20,7 @@ function initializePages() {
           <menu-elem class='ddItems pageElem'><a href='RustBites_Facts.html'>Facts</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_Strings.html'>Strings</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_DataStr.html'>Data Structures</a></menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='RustBites_SmrtPtrs.html'>Smart Ptrs</a></menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='RustBites_SmartPtrs.html'>Smart Ptrs</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_LifeCycle.html'>LifeCycle</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_Ownrs.html'>Ownership</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_Traits.html'>Generics&nbsp;&amp;&nbsp;Traits</a></menu-elem>\
