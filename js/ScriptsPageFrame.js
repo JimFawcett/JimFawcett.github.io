@@ -144,6 +144,7 @@ function initializeMenu() {
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Rust</summary>\
             <div style='margin-left:1.0em;'>\
+              <div class='ddItem ddDetails'><a href='Resources/RustBites/RustBites_CodeExamples.html'>RustBites Code Examples</a></div>\
               <div class='ddItem ddDetails'><a href='https://github.com/JimFawcett/RustPlaygroundExamples'>RustPlaygroundExamples</a></div>\
               <div class='ddItem ddDetails'><a href='IndexPage.html'>Rust Glossary</a></div>\
               <div style='height:0.25em;'></div>\
