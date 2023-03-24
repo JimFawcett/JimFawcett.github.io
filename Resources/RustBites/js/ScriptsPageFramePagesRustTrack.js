@@ -11,6 +11,7 @@ function initializePages() {
     pagesMenu.innerHTML = "<menu-elem class='ddItems pageElem'><a href='../../RustBiteByByte.html'>Rust&nbsp;Bites&nbsp;Repo&nbsp;</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='../../indexRust.html'>Rust&nbsp;Track&nbsp;Summary</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_Intro.html'>Introduction</a></menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='RustBites_CodeExamples.html'>Code Examples</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_GettingStarted.html'>Starting</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_Tooling.html'>Tooling</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_UDB.html'>Undef behavior</a></menu-elem>\
