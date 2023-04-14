@@ -50,6 +50,9 @@ storyHlpMenu.helpMenu = function() {
       <td class="key" onclick="storyHlpMenu.siteMap()">S</td><td>SiteMap</td>\
     </tr>\
     <tr>\
+      <td class="key" onclick="storyHlpMenu.TOC()">C</td><td>TOC</td>\
+    </tr>\
+    <tr>\
       <td class="key" onclick="javascript:;">K</td><td>keys</td>\
     </tr>\
     <tr>\
@@ -151,6 +154,10 @@ storyHlpMenu.home = function () {
   window.location = "index.html";
 }
 
+storyHlpMenu.TOC = function () {
+  window.location = "TOC.html";
+}
+
 storyHlpMenu.siteMap = function () {
   window.location = "SiteMap.html";
 }
@@ -243,6 +250,9 @@ function keyAction(keyEvent) {
   }
   if (key === 'S') {
     window.location.href = "SiteMap.html";
+  }
+  if (key === 'C') {
+    window.location.href = "TOC.html";
   }
   if (key === 'K') {
     storyHlpMenu.keys();

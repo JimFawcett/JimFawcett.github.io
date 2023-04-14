@@ -287,25 +287,25 @@ function initializeNextPrev() {
   page.prv = document.getElementById("Prev");
   page.nxtlnk = document.getElementById("nextLink");
   page.prvlnk = document.getElementById("prevLink");
-  page.nxtlnk2 = document.getElementById("nextLink2");
-  page.prvlnk2 = document.getElementById("prevLink2");
+  //page.nxtlnk2 = document.getElementById("nextLink2");
+  //page.prvlnk2 = document.getElementById("prevLink2");
 
   if (!isDefined(page.nxt)) {
     page.nxtlnk.style.display = "none";  // button top right menu
-    page.nxtlnk2.style.display = "none";  // button bottom right menu
+    /*page.nxtlnk2.style.display = "none";  // button bottom right menu*/
   }
   else {
     page.nxtlnk.setAttribute('href', page.nxt.href);
-    page.nxtlnk2.setAttribute('href', page.nxt.href);
+    /*page.nxtlnk2.setAttribute('href', page.nxt.href);*/
   }
 
   if (page.prv === null) {
     page.prvlnk.style.display = "none";  // button top right menu
-    page.prvlnk2.style.display = "none";  // button bottom right menu
+    /*page.prvlnk2.style.display = "none";  // button bottom right menu*/
   }
   else {
     page.prvlnk.href = page.prv.href;
-    page.prvlnk2.href = page.prv.href;
+    /*page.prvlnk2.href = page.prv.href;*/
   }
 }
 

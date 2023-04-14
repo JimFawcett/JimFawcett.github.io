@@ -17,6 +17,8 @@ function initializePages() {
   }
   else {
     var pgbtn = document.getElementById("pgbtn");
-    pgbtn.style.display = "none";
+    if (isDefined(pgbtn)) {
+      pgbtn.style.display = "none";
+    }
   }
 }
