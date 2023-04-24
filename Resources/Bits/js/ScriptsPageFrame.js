@@ -21,8 +21,40 @@ function initialize() {
   initializeMenu();
   initializePages();
   initializeNextPrev();
+  //getBodyScrollTop();
   storyHlpMenu.helpMenu();
 }
+
+//function getBodyScrollTop() {
+//  console.log("get scrollTop\n");
+//  // alert("get scrollTop");
+//  let content = document.querySelector("body");
+//  let scroll = localStorage.getItem("scroll");
+//  if (isDefined(scroll)) {
+//    scrollval = parseInt(scroll, 10);
+//    content.scroll(0, scrollval);
+//    //content.scrollTop = parseInt(scroll, 10);
+//    //window.scrollBy(0,100);
+//    window.scrollTo({ top: 100, behavior: 'smooth' });
+//  }
+//  window.addEventListener("beforeunload", () => {
+//    setBodyScrollTop();
+//  })
+//}
+//function setBodyScrollTop() {
+//  //alert("setBodyScrollTop");
+//  console.log("save scrollTop\n");
+//  let content = document.querySelector("body");
+//  let scroll = content.scrollTop;
+//  console.log(scroll);
+//  scroll = "100";
+//  localStorage.setItem("scroll", scroll);
+//}
+
+//function setBodyScrollTop() {
+//  alert("save scrollTop");
+//  localStorage.setItem("body-scroll", body.scrollTop);
+//}
 
 function goHome() {
   window.location.href = "../../index.html";
