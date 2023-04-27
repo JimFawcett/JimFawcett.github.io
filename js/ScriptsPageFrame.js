@@ -21,20 +21,19 @@ function initialize() {
   initializeMenu();
   initializePages();
   initializeNextPrev();
-  //getBodyScrollTop();
   storyHlpMenu.helpMenu();
 }
 
-function getBodyScrollTop() {
-  let body = document.querySelector("body");
-  let scroll = localStorage.getItem("body-scroll");
-  if (isDefined(scroll)) {
-    body.scrollTop = parseInt(scroll, 10);
-  }
-  window.addEventListener("beforeunload", () => {
-    localStorage.setItem("body-scroll", body.scrollTop);
-  })
-}
+//function getBodyScrollTop() {
+//  let body = document.querySelector("body");
+//  let scroll = localStorage.getItem("body-scroll");
+//  if (isDefined(scroll)) {
+//    body.scrollTop = parseInt(scroll, 10);
+//  }
+//  window.addEventListener("beforeunload", () => {
+//    localStorage.setItem("body-scroll", body.scrollTop);
+//  })
+//}
 
 /* create top menu */
 
