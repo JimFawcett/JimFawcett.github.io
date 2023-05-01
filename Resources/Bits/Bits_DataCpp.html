@@ -262,7 +262,7 @@
     <main>
       <div id="about">about</div>
       <div id="page">Bits Data C++</div>
-      <div id="modified">04/24/2023</div>
+      <div id="modified">04/30/2023</div>
       <div id="hlp"></div>
       <a id="top"></a>
       <content id="content">
@@ -380,8 +380,7 @@
 
   Library Types:
     std::string, std::vector&lt;T&gt;, std::unordered_map&lt;K,V&gt;,
-    std::unique_ptr&lt;T&gt;, std::shared_ptr&lt;T&gt;,
-    and many more
+    std::unique_ptr&lt;T&gt;, std::shared_ptr&lt;T&gt;, and many more
 
   Operations:
     Primitive types can all be copied.
@@ -402,48 +401,71 @@ void showLabel(const std::string& text, size_t n = 50);
 void print(const std::string& txt = &quot;&quot;);
 void println(const std::string& txt = &quot;&quot;);
 
-void nl();
+void nl() {
+  std::cout &lt;&lt; std::endl;
+}
 
 int main() {
     showLabel(&quot; Demonstrate C++ types&quot;);
     nl();
 
-    /*-- values live in stack frame --*/
+    /*-- objects live in stack frame, may have values in heap --*/
+
     showOp(&quot;initialize from literals&quot;);
-    int t1 = int{3};
+
+    int t1{3};
     showType(t1, &quot;t1&quot;);
+
     long long int t1a = 3;
     showType(t1a, &quot;t1a&quot;);
 
+    double d{3.1415927};
+    showType(d, &quot;d&quot;);
+
+    std::string s{&quot;a literal string&quot;};  // char values in heap
+    showType(s, &quot;s&quot;);
+
     println(&quot;-- copy construct --&quot;);
+
     auto t1b = t1a;
     showType(t1b, &quot;t1b&quot;);
     // double t1 = 3.1415927; // not allowed to redefine type of t1
 
     /*-- values live in heap when using new --*/
+
     println(&quot;-- store in heap --&quot;);
-    double* t2 = new double{3.14159};
-    showType(t2, &quot;t2&quot;);
-    showType(*t2, &quot;*t2&quot;);
-    delete(t2);  // see unique_ptr, below
+
+    double* dptr = new double{3.14159};
+    showType(dptr, &quot;dptr&quot;);
+    showType(*dptr, &quot;*dptr&quot;);
+    delete(dptr);  // see unique_ptr, below
 
     /*-- control block lives in stack, char data live in heap --*/
+
     println(&quot;-- string: control block in stack, data in heap --&quot;);
-    auto t3 = std::string(&quot;Hello Data&quot;);  // move ctor - rhs is temp
-    showType(t3, &quot;t3&quot;);
+
+    auto s2 = std::string(&quot;Hello Data&quot;);  // move ctor - rhs is temp
+    showType(s2, &quot;s2&quot;);
+
     println(&quot;-- C++ reference --&quot;);
-    auto& t4 = t3;      // create reference, no copy or move
-    showType(t4, &quot;t4&quot;);
+    auto& rs2 = s2;      // create reference, no copy or move
+    showType(rs2, &quot;rs2&quot;);
 
     /*-- unique_ptr may not be copied but move allowed --*/
+
     println(&quot;-- unique_ptr owns data --&quot;);
-    auto t5 = std::unique_ptr&lt;int&gt;(new int{-3});
-    showType(std::move(t5), &quot;t5&quot;);  // unique_ptr can't be copied so move
-    t5 = std::unique_ptr&lt;int&gt;(new int{-3});
-    showType(*t5, &quot;*t5&quot;); // contents can be copied
+
+    auto ptr = std::unique_ptr&lt;int&gt;(new int{-3});
+    *ptr += 1;
+    showType(std::move(ptr), &quot;ptr&quot;);  // unique_ptr can't be copied so move
+
+    /*-- original heap value deleted when ptr assigned --*/
+
+    ptr = std::unique_ptr&lt;int&gt;(new int{-4});
+    showType(*ptr, &quot;*ptr&quot;); // contents can be copied
     nl();
 
-    showOp(&quot;t5 deleted when unique_ptr leaves scope&quot;);
+    showOp(&quot;heap data deleted when unique_ptr leaves scope&quot;);
 
     println(&quot;&#92;n  That's all Folks!&#92;n&#92;n&quot;);
 }
@@ -492,9 +514,6 @@ void print(const std::string& txt) {
 void println(const std::string& txt) {
   std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt &lt;&lt; &quot;&#92;n&quot;;
 }
-void nl() {
-  std::cout &lt;&lt; std::endl;
-}
           </pre>
           <h4 id="out">Output</h4>
           <pre class="codeSnap">
@@ -512,6 +531,12 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build
   t1a: type: __int64
   value: 3,  size:  8
 
+  d: type: double
+  value: 3.14159,  size:  8
+
+  s: type: class std::basic_string&lt;char,struct std:...
+  value: a literal string,  size:  40
+
   -- copy construct --
 
   t1b: type: __int64
@@ -519,31 +544,31 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build
 
   -- store in heap --
 
-  t2: type: double * __ptr64
-  value: 00000172B9F4EE40,  size:  8
+  dptr: type: double * __ptr64
+  value: 0000023FB0046510,  size:  8
 
-  *t2: type: double
+  *dptr: type: double
   value: 3.14159,  size:  8
 
   -- string: control block in stack, data in heap --
 
-  t3: type: class std::basic_string&lt;char,struct std:...
+  s2: type: class std::basic_string&lt;char,struct std:...
   value: Hello Data,  size:  40
 
   -- C++ reference --
 
-  t4: type: class std::basic_string&lt;char,struct std:...
+  rs2: type: class std::basic_string&lt;char,struct std:...
   value: Hello Data,  size:  40
 
   -- unique_ptr owns data --
 
-  t5: type: class std::unique_ptr&lt;int,struct std::de...
-  value: 00000172B9F46040,  size:  8
+  ptr: type: class std::unique_ptr&lt;int,struct std::de...
+  value: 0000023FB0036C70,  size:  8
 
-  *t5: type: int
-  value: -3,  size:  4
+  *ptr: type: int
+  value: -4,  size:  4
 
-  --- t5 deleted when unique_ptr leaves scope ---
+  --- heap data deleted when unique_ptr leaves scope ---
 
 
   That's all Folks!
