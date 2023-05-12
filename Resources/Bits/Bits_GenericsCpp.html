@@ -380,9 +380,10 @@
 #include &lt;set&gt;          // set&lt;T&gt; class
 #include &quot;Analysis.h&quot;   // Analysis functions for this demo
 #include &quot;PointsGen.h&quot;  // PointN&lt;T&gt; class declaration
+#include &quot;Stats.h&quot;      // Stats class declaration
 /*
   This demo uses std::basic_string&lt;char&gt; and std::vector&lt;T&gt;
-  classes and user defined class, PointN&lt;T&gt;, to
+  classes and user defined classes, Stats&lt;T&gt; and PointN&lt;T&gt;, to
   illustrate how objects are defined and instantiated.
 
   Operations:
@@ -428,6 +429,28 @@ void testFormats();
 int main() {
 
     print(&quot;Demonstrate C++ Generic Objects&#92;n&quot;);
+
+    showNote(&quot;statistics for integer types&quot;);
+    auto v1 = std::vector&lt;int&gt;{1, 2, 3, 4, 5, 6};
+    auto s1 = Stats&lt;int&gt;(v1);
+    s1.show(&quot;s1&quot;);
+    std::cout &lt;&lt; &quot;&#92;n  s1.size() = &quot; &lt;&lt; s1.size();
+    std::cout &lt;&lt; &quot;&#92;n  s1.max() = &quot; &lt;&lt; s1.max();
+    std::cout &lt;&lt; &quot;&#92;n  s1.min() = &quot; &lt;&lt; s1.min();
+    std::cout &lt;&lt; &quot;&#92;n  s1.sum() = &quot; &lt;&lt; s1.sum();
+    std::cout &lt;&lt; &quot;&#92;n  s1.avg() = &quot; &lt;&lt; s1.avg();
+    print();
+
+    showNote(&quot;statistics for float types&quot;);
+    auto v2 = std::vector&lt;double&gt;{1.0, 2.1, 3.2, 4.3, 5.4, 6.5};
+    auto s2 = Stats&lt;double&gt;(v2);
+    s2.show(&quot;s2&quot;);
+    std::cout &lt;&lt; &quot;&#92;n  s2.size() = &quot; &lt;&lt; s2.size();
+    std::cout &lt;&lt; &quot;&#92;n  s2.max() = &quot; &lt;&lt; s2.max();
+    std::cout &lt;&lt; &quot;&#92;n  s2.min() = &quot; &lt;&lt; s2.min();
+    std::cout &lt;&lt; &quot;&#92;n  s2.sum() = &quot; &lt;&lt; s2.sum();
+    std::cout &lt;&lt; &quot;&#92;n  s2.avg() = &quot; &lt;&lt; s2.avg();
+    print();
 
     showNote(&quot;std library types string and vector&lt;T&gt;&quot;);
     /* create and display std::basic_string&lt;char&gt; object */
@@ -624,6 +647,113 @@ void testFormats() {
     std::cout &lt;&lt; format(avec, &quot;avec&quot;, nl);
     std::cout &lt;&lt; format(amap, &quot;amap&quot;, nl);
 }          </pre>
+          <h4 id="stats">Source Code - Stats.h</h4>
+          <pre class="codeSnap">
+/*-------------------------------------------------------------------
+  Stats.h defines Stats&lt;T&gt; class
+  - Stats&lt;T&gt; holds a std::vector&lt;T&gt; and provides methods for
+    computing max, min, average, std-deviation of this collection
+    of unspecified type T
+*/
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;exception&gt;
+/*-------------------------------------------------------------------
+  Stats&lt;T&gt; class provides several simple computational services on
+  a vector of items who's type provides required arithmetic operations.
+*/
+template &lt;typename T&gt;
+class Stats {
+public:
+    Stats(const std::vector&lt;T&gt;& v);
+    size_t size();
+    T max();
+    T min();
+    T sum();
+    double avg();
+    void show(const std::string& name=&quot;&quot;);
+private:
+    bool check();
+    const std::vector&lt;T&gt;& items;
+};
+
+template&lt;typename T&gt;
+Stats&lt;T&gt;::Stats(const std::vector&lt;T&gt;& v) : items(v) {}
+
+template&lt;typename T&gt;
+bool Stats&lt;T&gt;::check() {
+    return items.size() &gt; 0;
+}
+template&lt;typename T&gt;
+size_t Stats&lt;T&gt;::size() {
+    if(!check()) {
+        throw &quot;Stats is empty&quot;;
+    }
+    return items.size();
+}
+template&lt;typename T&gt;
+T Stats&lt;T&gt;::max() {
+    if(!check()) {
+        throw &quot;Stats is empty&quot;;
+    }
+    auto max = items[0];
+    for( auto item : items) {
+        if (item &gt; max) {
+            max = item;
+        }
+    }
+    return max;
+}
+template&lt;typename T&gt;
+T Stats&lt;T&gt;::min() {
+    if(!check()) {
+        throw &quot;Stats is empty&quot;;
+    }
+    auto min = items[0];
+    for( auto item : items) {
+        if (item &lt; min) {
+            min = item;
+        }
+    }
+    return min;
+}
+template&lt;typename T&gt;
+T Stats&lt;T&gt;::sum() {
+    if(!check()) {
+        throw &quot;Stats is empty&quot;;
+    }
+    auto sum = T{0};
+    for( auto item : items) {
+        sum += item;
+    }
+    return sum;
+}
+template&lt;typename T&gt;
+double Stats&lt;T&gt;::avg() {
+    if(!check()) {
+        throw &quot;Stats is empty&quot;;
+    }
+    auto sum = T{0};
+    for( auto item : items) {
+        sum += item;
+    }
+    return double(sum)/double(items.size());
+}
+template&lt;typename T&gt;
+void Stats&lt;T&gt;::show(const std::string& name) {
+    if(!check()) {
+        throw &quot;Stats is empty&quot;;
+    }
+    std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; name &lt;&lt; &quot; {&#92;n    &quot;;
+    auto iter = items.begin();
+    std::cout &lt;&lt; *iter++;
+    while(iter != items.end()) {
+        std::cout &lt;&lt; &quot;, &quot; &lt;&lt; *iter++;
+        std::cout.flush();
+    }
+    std::cout &lt;&lt; &quot;&#92;n  }&#92;n&quot;;
+}
+          </pre>
           <h4 id="points">Source Code - PointsGen.h</h4>
           <pre class="codeSnap">
 /*-------------------------------------------------------------------
@@ -996,7 +1126,36 @@ inline void println(const std::string& txt) {
           </pre>
           <h4 id="out">Output</h4>
           <pre class="codeSnap">
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Generics&#92;build
+&gt; debug/cpp_generics
+
   Demonstrate C++ Generic Objects
+
+  --------------------------------------------------
+    statistics for integer types
+  --------------------------------------------------
+  s1 {
+    1, 2, 3, 4, 5, 6
+  }
+
+  s1.size() = 6
+  s1.max() = 6
+  s1.min() = 1
+  s1.sum() = 21
+  s1.avg() = 3.5
+
+  --------------------------------------------------
+    statistics for float types
+  --------------------------------------------------
+  s2 {
+    1, 2.1, 3.2, 4.3, 5.4, 6.5
+  }
+
+  s2.size() = 6
+  s2.max() = 6.5
+  s2.min() = 1
+  s2.sum() = 22.5
+  s2.avg() = 3.75
 
   --------------------------------------------------
     std library types string and vector&lt;T&gt;
@@ -1094,7 +1253,7 @@ inline void println(const std::string& txt) {
   *pVec type: class std::vector&lt;double,class std::allo...
   size:  32
 
-  pVec = 00000204DD0E2230
+  pVec = 00000206A32724E0
   move(pVec) type: class std::unique_ptr&lt;class std::vector&lt;...
   size:  8
 
@@ -1213,6 +1372,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Generics&#92;build
         <menu-elem class="secElem"><a href="#out">out</a></menu-elem>
         <menu-elem class="secElem"><a href="#analysis">anal</a></menu-elem>
         <menu-elem class="secElem"><a href="#points">pts</a></menu-elem>
+        <menu-elem class="secElem"><a href="#stats">sts</a></menu-elem>
         <menu-elem class="secElem"><a href="#source">src</a></menu-elem>
         <menu-elem class="secElem"><a href="#code">codeSnaps</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
