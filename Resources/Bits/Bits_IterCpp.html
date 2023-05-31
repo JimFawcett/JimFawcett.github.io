@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <!--
-  Bits_ObjectsCpp.html
+  Bits_Cpp.html
 -->
 <head>
-  <title>Bits_Objects C++</title>
+  <title>Bits_Iter C++</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/StylesPhoto.css" />
   <link rel="stylesheet" href="css/StylesSizerComp.css" />
@@ -248,14 +248,14 @@
 
   <script>
     function remote() {
-      window.open('https://godbolt.org/z/vrn4cP8Yn', '_blank');
+      window.open('https://godbolt.org/z/xWqqT1457', '_blank');
     }
   </script>
 </head>
 <body id="github" onload="initialize()" onunload="saveScroll()">
 
-  <a id="Next" href="Bits_ObjectsCpp.html">Next</a>
-  <a id="Prev" href="Bits_DataCpp.html">Prev</a>
+  <a id="Next" href="Bits_IterCpp.html">Next</a>
+  <a id="Prev" href="Bits_GenericCpp.html">Prev</a>
 
   <page-frame>
     <frame-header>
@@ -263,23 +263,23 @@
     </frame-header>
     <main>
       <div id="about">about</div>
-      <div id="page">Bits Objects C++</div>
-      <div id="modified">05/01/2023</div>
+      <div id="page">Bits Iter C++</div>
+      <div id="modified">05/31/2023</div>
       <div id="hlp"></div>
       <a id="top"></a>
       <content>
         <div class="rightPanelLinks">
-          <a class="darkItem" href="Bits_ObjectsCpp.html">C++</a>
-          <a href="Bits_ObjectsRust.html">Rust</a>
-          <a href="Bits_ObjectsCSharp.html">C#</a>
-          <a href="Bits_ObjectsPython.html">Python</a>
-          <a href="Bits_ObjectsJs.html">JvScrpt</a>
+          <a class="darkItem" href="Bits_IterCpp.html">C++</a>
+          <a class="undefined" href="# Bits_IterRust.html">Rust</a>
+          <a class="undefined" href="# Bits_IterCSharp.html">C#</a>
+          <a class="undefined" href="# Bits_IterPython.html">Python</a>
+          <a class="undefined" href="# Bits_IterJs.html">JvScrpt</a>
         </div>
         <header>
           <a target="_blank" class="repoLink" href="https://github.com/JimFawcett/Bits">Bits Repo Code</a>
           <a target="_blank" class="repoLink" href="../../BitsRepo.html" style="margin-right:7.5em;">Bits Repo Docs</a>
           <hgroup id="pagetitle">
-            <h1 id="title">Bits_Objects C++</h1>
+            <h1 id="title">Bits_Iter C++</h1>
             <h3 id="subtitle" class="indent">
               code, output, and build for C++ on Windows, macOS, and Linux
             </h3>
@@ -292,26 +292,17 @@
           </t-b>
           <t-b style="border:1px solid maroon; padding:0.25em 1em 0.5em 1em;">
             <h4 style="margin:0em 0em 0.25em 0em;">Synopsis:</h4>
-            This page demonstrates uses of C++ User-Defined types and their objects.
-            The purpose is to quickly acquire some familiarity with user-defined types 
-            and their implementations.
+            This page demonstrates uses of C++ iterators to walk through enumerable collections.
+            The purpose is to quickly acquire some familiarity with C++ iteration. 
             <hr class="spread" />
             <ul>
               <li>
-                C++ defines special class methods: copy and move constructors, copy and move
-                assignment operators, and other operators for indexing and comparison etc.
+                C++ Iterators are smart pointers that are provided by, and have special knowledge about the
+                structure of, C++ iterable containers.
               </li>
               <li>
-                The compiler will generate constructors and assignment operators if needed and
-                not provided by the class.  Those are correct if, and only if, the class&apos;s
-                members and bases have correct semantics for those operations.
-                For other cases, like pointer members, developers must either implement them or 
-                prohibit them. We will show how in this example.
-              </li>
-              <li>
-                Also, this is the first set of examples to partition code into several files.
-                That supports readability, may improve translation times, and makes maintenance
-                significantly easier.
+                An iterable C++ container provides <c-s>begin()</c-s> and <c-s>end()</c-s> methods which return
+                iterators pointing to the first and one past the last element of the container.
               </li>
             </ul>
             <div style="height:0.5em;"></div>
@@ -320,56 +311,58 @@
           <summary class="darkItem">Demo Notes&nbsp;&nbsp;</summary>
           <t-b><hr /></t-b>
           <t-b>
-            All of the languages covered in this demonstration support classes.  Each class provides
-            a pattern for laying out a memory footprint and defines how data within are accessed.
+            All of the languages covered in this demonstration support iteration using iterators.
           </t-b>
           <t-b>
-            Three of the languages: C++, Rust, and C# provide generics.  Each generic function or class
-            is a pattern for defining functions and classes of a specific type.  Thus a generic is a
-            pattern for making patterns.
+            C++ iterators are provided by enumerable containers and have a public interface similar
+            to, but smaller than native pointers. Any operation that moves data under an iterator,
+            like insertion, causes invalidation and any subsequent dereference operation will 
+            throw an exception.
           </t-b>
           <t-b>
-            The other two, Python and JavaScript, are dynamically typed and already support defining
-            functions and classes for multiple types, e.g., no need for generics.
+            User-defined types can also provide iterators, as show in the example code below.
+          </t-b>
+          <!--<t-b>
+            Rust iterators satisfy the Iterator Trait with a <c-s>next() -> Option&lt;T&gt;</c-s>.
+            Each call to <c-s>next()</c-s> returns the next item, if any, else None.
           </t-b>
           <t-b>
-            This demonstration illustrates use of classes and objects, which for C++, Rust, and C#,
-            are defined in a stackframe or in the heap or both. <strongs>All</strongs> data for Python and JavaScript are
-            stored in managed heaps.
+            C# iterators satisfy the IEnumerable&lt;T&gt; interface with a <c-s>bool MoveNext()</c-s>
+            and <c-s>Current</c-s> property.
           </t-b>
           <t-b>
-            A few functions in this code are generic, e.g., have type(s) to be specified by the caller
-            at compile time. The next bit explores generics in greater detail with more discussion.
-          </t-b>
+            Python iterators .
+          </t-b>-->
           <t-b><hr /></t-b>
         </details>
         <t-b>
           The examples below show how to use library and user defined types with emphasis on
-          illustrating syntax and basic operations.
+          illustrating iteration through container elements.
         </t-b>
         <div style="height:0.25em;"></div>
         <h3 id="code">1.0 CodeSnaps</h3>
         <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote()" />
         <div style="display:flex; flex-direction:column;">
-          <h4 id="source">Source Code - Bits_Objects.cpp</h4>
+          <h4 id="source">Source Code - Bits_Iter.cpp</h4>
           <pre class="codeSnap">
 /*-------------------------------------------------------------------
-  Cpp_Objects.cpp
+  Bits_Iter.cpp
+  - defines functions to iterate over collections
   - depends on Points.h to provide user-defined point class
   - depends on Analysis.h for several display and analysis functions
 */
-#include &lt;iostream&gt;     // std::cout
-#include &lt;memory&gt;       // std::unique_ptr
-#include &lt;vector&gt;       // vector&lt;T&gt; class
-#include &lt;array&gt;        // array&lt;T&gt; class
-#include &lt;map&gt;          // map&lt;K,V&gt; class
-#include &lt;set&gt;          // set&lt;T&gt; class
-#include &quot;Analysis.h&quot;   // Analysis functions for this demo
-#include &quot;Points.h&quot;     // Point4D class declaration
+#include &lt;iostream&gt;         // std::cout
+#include &lt;memory&gt;           // std::unique_ptr
+#include &lt;vector&gt;           // vector&lt;T&gt; class
+#include &lt;array&gt;            // array&lt;T&gt; class
+#include &lt;map&gt;              // map&lt;K,V&gt; class
+#include &lt;set&gt;              // set&lt;T&gt; class
+#include &quot;AnalysisIter.h&quot;   // Analysis functions
+#include &quot;PointsIter.h&quot;     // PointN&lt;T&gt; class declaration
 /*
   This demo uses the std::string and std::vector&lt;T&gt; classes
-  and a user defined class, Point4D, to illustrate how objects
-  are defined and instantiated.
+  and two user defined classes, Point1 and PointN&lt;T&gt;, to
+  illustrate how objects are defined and instantiated.
 
   Operations:
     All the classes discussed here provide operations for:
@@ -402,32 +395,104 @@
 template&lt;typename T&gt;
 using pU = std::unique_ptr&lt;T&gt;;
 
-void testFormats();  // declare function for testing formats (see below)
-
+/*-----------------------------------------------
+  forLoopVec accepts std::vector&lt;T&gt; instances
+  by constant reference.
+  - uses range-for to display PointN coordinates
+*/
+template&lt;typename T&gt;
+void forLoopVec(const std::vector&lt;T&gt;& v) {
+  std::cout &lt;&lt; &quot;&#92;n    &quot;;
+  for(auto const &item : v) {
+    std::cout &lt;&lt; item &lt;&lt; &quot; &quot;;
+  }
+}
+/*-----------------------------------------------
+  forLoopPoint accepts PointN&lt;T&gt; instances
+  by constant reference.
+  - uses range-for to display PointN coordinates
+*/
+template&lt;typename T&gt;
+void forLoopPoint(const PointN&lt;T&gt;& p) {
+    std::cout &lt;&lt; &quot;&#92;n    &quot;;
+    for(auto const &item : p) {
+      std::cout &lt;&lt; item &lt;&lt; &quot; &quot;;
+    }
+}
+/*-----------------------------------------------
+  whilerPoint accepts PointN&lt;T&gt; instances
+  by constant reference.
+  - uses iterator to display PointN coordinates
+*/
+template&lt;typename T&gt;
+void whilerPoint(const PointN&lt;T&gt;& p) {
+  auto itr = p.begin();
+  std::cout &lt;&lt; &quot;&#92;n    &quot; &lt;&lt; *itr++;
+  while (itr &lt; p.end()) {
+    std::cout &lt;&lt; &quot;, &quot; &lt;&lt; *itr++;
+  }
+}
+/*-----------------------------------------------
+  whiler is flexible function that accepts any
+  iterable container
+  - will use iterator on C.
+*/
+template&lt;typename C&gt;
+void whiler(const C& c) {
+  auto itr = c.begin();  // uses const overload
+  std::cout &lt;&lt; &quot;&#92;n    &quot; &lt;&lt; *itr++;
+  while (itr != c.end()) {
+    std::cout &lt;&lt; &quot;, &quot; &lt;&lt; *itr++;
+  }
+}
+/*-----------------------------------------------
+  whiler_guarded is flexible function that accepts
+  any container
+  - if C is iterable will use iterator on C.
+  - If non-iterable input is detected,
+    will display error msg and return.
+  - decision is made at compile time.
+  - is_iterable_v is defined in Analysis.h
+  - max is the maximum number of items
+    to show on one line
+*/
+template&lt;typename C&gt;
+void whiler_guarded(
+  const C& c, const std::string& name,
+  size_t indent = 2, size_t max = 8
+  ) {
+  if constexpr(!is_iterable_v&lt;C&gt;) {  // decision at compile-time
+    std::cout &lt;&lt; &quot;&#92;n  whiler input type is not iterable&#92;n&quot;;
+    return;
+  }
+  else {
+    std::cout &lt;&lt; formatColl(c, name, &quot;&quot;, indent, max);
+    /*
+      Analysis::formatColl uses range-based for loop to iterate
+      over collection.
+    */
+  }
+}
 /*-------------------------------------------------------------------
   Demonstration starts here
 */
+void testFormat();
+
 int main() {
 
-    print(&quot;Demonstrate C++ Objects&#92;n&quot;);
-
-    showNote(&quot;primitive C++ types size_t and double&quot;);
-    size_t st = 42;
-    std::cout &lt;&lt; &quot;&#92;n  size_t st = &quot; &lt;&lt; st;
-    showType(st, &quot;st&quot;, nl);
-
-    double d = 3.1415927;
-    std::cout &lt;&lt; &quot;&#92;n  double d = &quot; &lt;&lt; d;
-    showType(d, &quot;ld&quot;, nl);
+    print(&quot;Demonstrate C++ Iteration&#92;n&quot;);
 
     showNote(&quot;std library types string and vector&lt;T&gt;&quot;);
-
     /* create and display std::string object */
     auto str = std::string(&quot;&#92;&quot;Wile E. Coyote&#92;&quot;&quot;);
     auto out = std::string(&quot;contents of str = &quot;) + str;
     print(out);
     print(&quot;--- showType(str, &#92;&quot;str&#92;&quot;); ---&quot;);
     showType(str, &quot;str&quot;, nl);
+
+    showNote(&quot;Iterate over string&quot;);
+    whiler_guarded(out, &quot;out&quot;);
+    print();
 
     /* create and display std::vector&lt;double&gt; */
     auto vec = std::vector&lt;double&gt;{ 3.5, 3, 2.5, 2 };
@@ -452,22 +517,48 @@ int main() {
     showNote(
       &quot;Copy construction, auto vec2 = vec, creates&#92;n    &quot;
       &quot;independent instance. So changing target vec2&#92;n    &quot;
-      &quot;has no affect on source vec.&quot;, nl
+      &quot;has no affect on source vec.&quot;
     );
 
-    showNote(&quot;user-defined type Point4D&quot;);
-    Point4D p1;
-    p1.show();
-    p1.xCoor() = 42;
-    p1.zCoor() = -3.5;
-    /*- t contains time of construction -*/
-    p1.show();
+    showNote(
+      &quot;Iterate over vector&quot;
+    );
+    showOp(&quot;function using range-for taking vector&quot;);
+    forLoopVec(vec);
+    showOp(&quot;function using iterator taking iterable container&quot;);
+    whiler(vec);
     print();
 
-    print(&quot;--- showType(p1, &#92;&quot;p1&#92;&quot;, nl) ---&quot;);
+    showNote(&quot;user-defined type PointN&lt;T&gt;&quot;);
+
+    PointN&lt;double&gt; p1(5);
+    p1.show(&quot;p1&quot;);
+
+    showNote(
+      &quot;p1.coords() = std::vector&lt;double&gt;&#92;n    &quot;
+      &quot;{ 1.0, -2.0, 3.0, 4.5, -42.0 }&quot;
+    );
+    p1.coords() = std::vector&lt;double&gt;{1.0, -2.0, 3.0, 4.5, -42.0 };
+    p1.show(&quot;p1&quot;);
+    #pragma region
+    showOp(&quot;showType(p1, &#92;&quot;p1&#92;&quot;, nl);&quot;);
     showType(p1, &quot;p1&quot;, nl);
-    std::cout &lt;&lt; &quot;  p1.xCoor() returns value &quot;
-              &lt;&lt; p1.xCoor() &lt;&lt; &quot;&#92;n&quot;;
+    std::cout &lt;&lt; &quot;  p1.coords()[2] = &quot; &lt;&lt; p1.coords()[2] &lt;&lt; &quot;&#92;n&quot;;
+
+    showNote(
+      &quot;iterate over PointN&lt;T&gt;&quot;
+    );
+    showOp(&quot;function using range-for taking Point&quot;);
+    forLoopPoint(p1);
+    showOp(&quot;function using iterator taking Point&quot;);
+    whilerPoint(p1);
+    showOp(&quot;function using iterator taking iterable container&quot;);
+    whiler_guarded(p1, &quot;p1&quot;);
+    showOp(&quot;same function attempting to take non-iterable&quot;);
+    struct S { int i; };
+    auto s = S{3};
+    whiler_guarded(s, &quot;s&quot;);
+    print();
 
     showNote(&quot;heap-based string instance&quot;);
 
@@ -496,167 +587,267 @@ int main() {
     pU&lt;std::vector&lt;double&gt;&gt; pVec(
       new std::vector&lt;double&gt;{ 1.5, 2.5, 3.5 }
     );
+    print();
+    showOp(&quot;iterating over *pVec&quot;);
+    whiler_guarded(*pVec, &quot;*pVec&quot;);
+    print();
     std::cout &lt;&lt; &quot;&#92;n  *pVec = &quot; &lt;&lt; *pVec;
     showType(*pVec, &quot;*pVec&quot;, nl);
     std::cout &lt;&lt; &quot;&#92;n  pVec = &quot; &lt;&lt; pVec;
     showType(move(pVec), &quot;move(pVec)&quot;, nl);
 
-    /* custom point types */
-    showNote(&quot;heap-based Point4D instance&quot;);
-    showOp(&quot;pU&lt;Point4D&gt; pPoint4D(new Point4D())&quot;);
-    pU&lt;Point4D&gt; pPoint4D(new Point4D());
-    pPoint4D-&gt;show();
-    pPoint4D-&gt;xCoor() = 1;
-    pPoint4D-&gt;yCoor() = 2;
-    pPoint4D-&gt;zCoor() = -3;
-    pPoint4D-&gt;updateTime();
-    pPoint4D-&gt;show();
+    /* custom point type */
 
-    std::cout &lt;&lt; &quot;&#92;n  pPoint4D-&gt;zCoor() = &quot; &lt;&lt; pPoint4D-&gt;zCoor();
-    showOp(&quot;showType(*pPoint4D, &#92;&quot;*pPoint4D&#92;&quot;);&quot;);
-    showType(*pPoint4D, &quot;*pPoint4D&quot;);
-    showOp(&quot;showType(std::move(pPoint4D), &#92;&quot;pPoint4D&#92;&quot;);&quot;);
-    showType(std::move(pPoint4D), &quot;pPoint4D&quot;, nl);
-    /* pPoint4D moved, so now invalid */
+    showNote(&quot;heap-based PointN instance&quot;);
 
-//#define TEST
-#ifdef TEST
-    testFormats();
-#endif
+    showOp(&quot;pU&lt;PointN&lt;double&gt;&gt; pPointN(new PointN&lt;double&gt;(4))&quot;);
+    pU&lt;PointN&lt;double&gt;&gt; pPointN(new PointN&lt;double&gt;(4));
+    pPointN-&gt;show(&quot;*pPointN&quot;);
+
+    showOp(
+      &quot;pPointN-&gt;coords() = &#92;n&quot;
+      &quot;      std::vector&lt;double&gt;{ 1.0, 3.5, -2.0, 42.0 };&quot;
+    );
+    pPointN-&gt;coords() = std::vector&lt;double&gt;{ 1.0, 3.5, -2.0, 42.0 };
+    pPointN-&gt;show(&quot;*pPointN&quot;);
+    std::cout &lt;&lt; &quot;&#92;n  value of pPointN-&gt;coords()[1] is &quot;
+              &lt;&lt; pPointN-&gt;coords()[1];
+
+    showOp(&quot;showType(*pPointN, &#92;&quot;*pPointN&#92;&quot;);&quot;);
+    showType(*pPointN, &quot;*pPointN&quot;);
+    print();
+
+    showOp(&quot;iterating over *pPointN&quot;);
+    whiler_guarded(*pPointN, &quot;*pPointN&quot;);
+    print();
+
+    showOp(&quot;showType(std::move(pPointN), &#92;&quot;pPointN&#92;&quot;);&quot;);
+    showType(std::move(pPointN), &quot;pPointN&quot;);
+    /* pPointN moved, so now invalid */
+    print();
+
+    showNote(
+      &quot;Iterate over map, using Analysis::format&quot;
+    );
+
+    std::map&lt;std::string, int&gt; map{{&quot;zero&quot;, 0}, {&quot;one&quot;, 1}};
+    map.insert({&quot;two&quot;, 2});
+    std::cout &lt;&lt; format(map, &quot;map&quot;);
+
+    // #define TEST
+    #ifdef TEST
+    testFormat();
+    #endif
+
     print(&quot;&#92;n  That's all Folks!&#92;n&#92;n&quot;);
 }
 
-void testFormats() {
+void testFormat() {
 
-    showNote(&quot;Test and demonstrate formatting functions&quot;);
+  showNote(&quot;Test and demonstrate formatting functions&quot;);
 
-    showOp(
-      &quot;demonstrate operator&lt;&lt; overload for vector&quot;
-    );
-    auto vtest = std::vector&lt;int&gt;{1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    print(&quot;default indent = 4 and width = 7:&quot;);
-    std::cout &lt;&lt; vtest;
-    DisplayParams.left = 2;
-    DisplayParams.width = 5;
-    print(&quot;indent = 2, width = 5:&quot;);
-    std::cout &lt;&lt; vtest;
+  showOp(&quot;demonstrate PointN show()&quot;);
+  print(&quot;default indent = 4 and width = 7:&quot;);
+  PointN&lt;int&gt; p2(15);
+  p2.show(&quot;p2&quot;);
+  size_t saveLeft = p2.left();
+  size_t saveWidth = p2.width();
+  print(&quot;&#92;n  indent = 6, width = 12:&quot;);
+  p2.left() = 6;
+  p2.width() = 12;
+  p2.show(&quot;p2&quot;);
 
-    std::cout &lt;&lt; formatColl(vtest, &quot;vtest&quot;, nl, 2, 5);
-    std::cout &lt;&lt; formatColl(vtest, &quot;vtest&quot;, nl, 4, 7);
-    std::cout &lt;&lt; formatColl(vtest, &quot;vtest&quot;, nl, 2, 9);
-    std::cout &lt;&lt; formatColl(vtest, &quot;vtest: vector&lt;int&gt;&quot;, nl, 2, 10);
+  showOp(
+    &quot;demonstrate operator&lt;&lt; overload for PointN ---&quot;
+  );
+  p2.left() = saveLeft;
+  p2.width() = saveWidth;
+  print(&quot;default indent = 4 and width = 7:&quot;);
+  std::cout &lt;&lt; p2;
+  print(&quot;&#92;n  indent = 6, width = 12:&quot;);
+  p2.left() = 6;
+  p2.width() = 12;
+  std::cout &lt;&lt; p2;
 
-    std::array&lt;double, 5&gt; array = { 1, 2, 3, 4.5, -3.14159 };
-    std::cout &lt;&lt; formatColl(array, &quot;array&quot;, nl, 2, 4);
+  showOp(
+    &quot;demonstrate operator&lt;&lt; overload for vector&quot;
+  );
+  auto vtest = std::vector&lt;int&gt;{1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  print(&quot;default indent = 4 and width = 7:&quot;);
+  std::cout &lt;&lt; vtest;
+  DisplayParams.left = 2;
+  DisplayParams.width = 5;
+  print(&quot;indent = 2, width = 5:&quot;);
+  std::cout &lt;&lt; vtest;
 
-    std::map&lt;int, std::string&gt; map {
-       {1, &quot;one&quot;}, {2, &quot;two&quot;}, {3, &quot;three&quot;}
-    };
-    std::cout &lt;&lt; formatColl(map, &quot;map&quot;, nl, 2, 4);
+  std::cout &lt;&lt; formatColl(vtest, &quot;vtest&quot;, nl, 2, 5);
+  std::cout &lt;&lt; formatColl(vtest, &quot;vtest&quot;, nl, 4, 7);
+  std::cout &lt;&lt; formatColl(vtest, &quot;vtest&quot;, nl, 2, 9);
+  std::cout &lt;&lt; formatColl(vtest, &quot;vtest: vector&lt;int&gt;&quot;, nl, 2, 10);
 
-    std::set&lt;std::string&gt; set {
-      &quot;one&quot;, &quot;two&quot;, &quot;three&quot;, &quot;four&quot;, &quot;five&quot;
-    };
-    std::cout &lt;&lt; formatColl(set, &quot;set&quot;, nl, 2, 4);
+  std::array&lt;double, 5&gt; arrtest = { 1, 2, 3, 4.5, -3.14159 };
+  std::cout &lt;&lt; formatColl(arrtest, &quot;arrtest&quot;, nl, 2, 4);
 
-    std::string astring = &quot;this is a string&quot;;
-    std::cout &lt;&lt; formatString(astring, &quot;astring&quot;, nl, 2);
+  std::map&lt;int, std::string&gt; amap {
+    {1, &quot;one&quot;}, {2, &quot;two&quot;}, {3, &quot;three&quot;}
+  };
+  std::cout &lt;&lt; formatColl(amap, &quot;amap&quot;, nl, 2, 4);
 
-    double adouble { 3.1415927 };
-    std::cout &lt;&lt; formatScalar(adouble, &quot;adouble&quot;, nl);
+  std::set&lt;std::string&gt; aset {
+    &quot;one&quot;, &quot;two&quot;, &quot;three&quot;, &quot;four&quot;, &quot;five&quot;
+  };
+  std::cout &lt;&lt; formatColl(aset, &quot;aset&quot;, nl, 2, 4);
 
-    showNote(&quot;Using consolidated format function&quot;, nl);
+  std::string astring = &quot;this is a string&quot;;
+  std::cout &lt;&lt; formatString(astring, &quot;astring&quot;, nl, 2);
 
-    std::cout &lt;&lt; format(adouble, &quot;adouble&quot;, nl);
-    std::cout &lt;&lt; format(astring, &quot;astring&quot;, nl);
-    std::vector&lt;double&gt; vect{ 1, 2, 3, 4.5, -3.14159 };
-    std::cout &lt;&lt; format(vect, &quot;vect&quot;, nl);
-    std::cout &lt;&lt; format(map, &quot;map&quot;, nl);
+  double adouble { 3.1415927 };
+  std::cout &lt;&lt; formatScalar(adouble, &quot;adouble&quot;, nl);
+
+  showNote(&quot;Using consolidated format function&quot;, nl);
+
+  std::cout &lt;&lt; format(adouble, &quot;adouble&quot;, nl);
+  std::cout &lt;&lt; format(astring, &quot;astring&quot;, nl);
+  std::vector&lt;double&gt; avec{ 1, 2, 3, 4.5, -3.14159 };
+  std::cout &lt;&lt; format(avec, &quot;avec&quot;, nl);
+  std::cout &lt;&lt; format(amap, &quot;amap&quot;, nl);
 }
           </pre>
-          <h4 id="points">Source Code - Points.h</h4>
+          <h4 id="points">Source Code - PointsIter.h</h4>
           <pre class="codeSnap">
 /*-------------------------------------------------------------------
-  Points.h defines a space-time point class:
-  - Point4D represents points with three double spatial coordinates
-    and std::time_t time coordinate.
+  PointsIter.h defines point class PointN&lt;T&gt;
+  - PointN&lt;T&gt; represents points with many coordinates of
+    unspecified type T
+  - Added iterator, begin(), end()
 */
-#pragma warning(disable:4996) // warning about ctime use - see below
 #include &lt;iostream&gt;
 #include &lt;vector&gt;
-#include &lt;chrono&gt;
-#include &lt;ctime&gt;
 /*-------------------------------------------------------------------
-  Point4D class represents a point in a 4-Dimensional space-time
-  lattice. Simple enough for illustration, but still useful.
+  PointN&lt;T&gt; class represents a point in an n-Dimensional hyperspace.
+  It uses a template parameter to support a variety of coordinate
+  types, and uses a vector to hold any finite number of
+  coordinates.
 
-  It declares all of the special class methods, most with
-  default qualifiers to indicate that the compiler will
-  generate them as needed.
+  Its default constructor PointN() is declared delete so it won't
+  be provided here nor generated by the compiler.
 
-  The word ctor is an abbreviation of constructor and dtor
-  an abbreviation for destructor.
+  It provides iterators and begin() and end() members.
+  These are used for iterating over PointN&lt;T&gt;'s elements.
 */
-class Point4D {
+template&lt;typename T&gt;
+class PointN {
 public:
-  Point4D();                                        // default ctor
-  Point4D(const Point4D& pt) = default;             // copy ctor
-  Point4D(Point4D&& pt) = default;                  // move ctor
-  Point4D& operator=(const Point4D& pt) = default;  // copy assignment
-  Point4D& operator=(Point4D&& pt) = default;       // move assignment
-  ~Point4D() = default;                             // dtor
-  std::string timeToString();
-  void updateTime();
-  void show();
-  double& xCoor() { return x; }
-  double& yCoor() { return y; }
-  double& zCoor() { return z; }
-  std::time_t& tCoor() { return t; }
+  using iterator = typename std::vector&lt;T&gt;::iterator;
+  using const_iterator = typename std::vector&lt;T&gt;::const_iterator;
+  using value_type = T;
+
+  PointN() = delete;                              // default ctor
+  PointN(size_t N);
+  PointN(const PointN& pt) = default;             // copy ctor
+  PointN(PointN&& pt) = default;                  // move ctor
+  PointN& operator=(const PointN& pt) = default;  // copy assignment
+  PointN& operator=(PointN&& pt) = default;       // move assignemnt
+  ~PointN() = default;                            // dtor
+
+  iterator begin();
+  iterator end();
+  const_iterator begin() const;
+  const_iterator end() const;
+  size_t size() const;
+  T& operator[](size_t index);
+  T operator[](size_t index) const;
+
+  void push_back(T r);
+  T pop_back();
+  std::vector&lt;T&gt;& coords() { return coord; }
+
+  void show(const std::string& name);             // display contents
+  size_t& left() { return _left; };               // display indent
+  size_t& width() { return _width; };             // display width
 private:
-  double x;
-  double y;
-  double z;
-  std::time_t t;
+  std::vector&lt;T&gt; coord;
+  size_t _left = 2;   // default display indent
+  size_t _width = 7;  // default display row width
 };
-
-Point4D::Point4D() {
-  x = y = z = 0.0;
-  t = std::time(0);
+/*-----------------------------------------------
+  PointN&lt;T&gt; constructor with size
+*/
+template&lt;typename T&gt;
+PointN&lt;T&gt;::PointN(size_t N) {
+  for(size_t i=0; i&lt;N; i++) {
+    coord.push_back(T{0});
+  }
 }
-std::string Point4D::timeToString() {
-  return ctime(&t);
-  /*
-    ctime is depricated due to a thread-safety issue.
-    That's not a problem here. Compiler warning
-    recommends converting to ctime_s, which, unfortunately
-    has a different and awkward interface.
-  */
+template&lt;typename T&gt;
+size_t PointN&lt;T&gt;::size() const {
+  return coord.size();
 }
-void Point4D::updateTime() {
-  t = std::time(0);
+template&lt;typename T&gt;
+T& PointN&lt;T&gt;::operator[](size_t index) {
+  if (index &lt; 0 || coord.size() &lt;= index) {
+    throw &quot;indexing error&quot;;
+  }
+  return coord[index];
 }
-
-void Point4D::show() {
-  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; &quot;Point4D {&quot;;
-  std::cout &lt;&lt; &quot;&#92;n    &quot; &lt;&lt; x &lt;&lt; &quot;, &quot; &lt;&lt; y &lt;&lt; &quot;, &quot; &lt;&lt; z &lt;&lt; &quot;, &quot;;
-  std::cout &lt;&lt; &quot;&#92;n    &quot; &lt;&lt; timeToString();
-  std::cout &lt;&lt; &quot;  }&quot;;
+template&lt;typename T&gt;
+T PointN&lt;T&gt;::operator[](size_t index) const {
+  if (index &lt; 0 || coord.len() &lt;= index) {
+    throw &quot;indexing error&quot;;
+  }
+  return coord[index];
 }
-/* required for showType(T t, const std::string& nm) */
-std::ostream& operator&lt;&lt;(std::ostream& out, Point4D& t1) {
-  out &lt;&lt; &quot;Point4D {&quot;;
-  out &lt;&lt; &quot;    &quot; &lt;&lt; t1.xCoor() &lt;&lt; &quot;, &quot; &lt;&lt; t1.yCoor() &lt;&lt; &quot;, &quot;
-               &lt;&lt; t1.zCoor() &lt;&lt; std::endl
-               &lt;&lt; &quot;    &quot; &lt;&lt; t1.timeToString() &lt;&lt; std::endl
-               &lt;&lt; &quot;  }&quot; &lt;&lt; std::endl;
+template&lt;typename T&gt;
+typename PointN&lt;T&gt;::iterator PointN&lt;T&gt;::begin() {
+  return coord.begin();
+}
+template&lt;typename T&gt;
+typename PointN&lt;T&gt;::iterator PointN&lt;T&gt;::end() {
+  return coord.end();
+}
+template&lt;typename T&gt;
+typename PointN&lt;T&gt;::const_iterator PointN&lt;T&gt;::begin() const {
+  return coord.begin();
+}
+template&lt;typename T&gt;
+typename PointN&lt;T&gt;::const_iterator PointN&lt;T&gt;::end() const {
+  return coord.end();
+}
+template&lt;typename T&gt;
+void PointN&lt;T&gt;::push_back(T t) {
+  coord.push_back(t);
+}
+template&lt;typename T&gt;
+T PointN&lt;T&gt;::pop_back() {
+  return coord.pop_back();
+}
+/*-----------------------------------------------
+  PointtN&lt;T&gt; display function
+*/
+template&lt;typename T&gt;
+void PointN&lt;T&gt;::show(const std::string& name) {
+  std::cout &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(_left) &lt;&lt; name &lt;&lt; &quot;: &quot; &lt;&lt; &quot;PointN&lt;T&gt;&quot;;
+  std::cout &lt;&lt; &quot; {&#92;n&quot;;
+  std::cout &lt;&lt; fold(coord, _left + 2, _width);
+  std::cout &lt;&lt; indent(_left) &lt;&lt; &quot;}&quot;;
+}
+/*-----------------------------------------------
+  Overload operator&lt;&lt; required for
+  showType(PointN&lt;T&gt; t, const std::string& nm)
+*/
+template&lt;typename T&gt;
+std::ostream& operator&lt;&lt;(std::ostream& out, PointN&lt;T&gt;& t2) {
+  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(t2.left()) &lt;&lt; &quot;PointN&lt;T&gt;&quot;;
+  out &lt;&lt; &quot; {&#92;n&quot;;
+  out &lt;&lt; fold(t2.coords(), t2.left() + 2, t2.width());
+  out &lt;&lt; indent(t2.left()) &lt;&lt; &quot;}&quot;;
   return out;
 }
-
           </pre>
-          <h4 id="analysis">Source Code - Analysis.h</h4>
+          <h4 id="analysis">Source Code - AnalysisIter.h</h4>
           <pre class="codeSnap">
 /*-------------------------------------------------------------------
-  Analysis.h
+  AnalysisIter.h
   - Provides functions that analyze types, display results
     and other program defined information.
   - Some of this code requires complex template operations.
@@ -707,6 +898,10 @@ std::string format(
   const T& t, const std::string& nm, const std::string& suffix = &quot;&quot;,
   size_t left = 2, size_t width = 7
 );
+
+/* end of function declarations
+-------------------------------------------------------------------*/
+
 /*-------------------------------------------------------------------
   Display and Analysis function and globals definitions
 ---------------------------------------------------------------------
@@ -890,6 +1085,7 @@ constexpr bool is_iterable_v = is_iterable&lt;T&gt;::value;
   Displays almost everything.
   - strings work better with formatString(...)
   https://www.cppstories.com/2018/03/ifconstexpr/
+  Iteration is discussed in Bit Cpp_iter
 */
 template&lt;typename T&gt;
 std::string format(
@@ -919,21 +1115,10 @@ inline void println(const std::string& txt) {
           </pre>
           <h4 id="out">Output</h4>
           <pre class="codeSnap">
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build
-&gt; Debug/Cpp_Objects.exe
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Iter&#92;build
+&gt; debug/Cpp_Iter
 
-  Demonstrate C++ Objects
-
-  --------------------------------------------------
-    primitive C++ types size_t and double
-  --------------------------------------------------
-  size_t st = 42
-  st type: unsigned __int64
-  size:  8
-
-  double d = 3.14159
-  ld type: double
-  size:  8
+  Demonstrate C++ Iteration
 
   --------------------------------------------------
     std library types string and vector&lt;T&gt;
@@ -942,6 +1127,17 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build
   --- showType(str, &quot;str&quot;); ---
   str type: class std::basic_string&lt;char,struct std:...
   size:  40
+
+  --------------------------------------------------
+    Iterate over string
+  --------------------------------------------------
+  out: {
+    c, o, n, t, e, n, t, s,
+     , o, f,  , s, t, r,  ,
+    =,  , &quot;, W, i, l, e,  ,
+    E, .,  , C, o, y, o, t,
+    e, &quot;
+  }
 
   vector&lt;T&gt;: {
     3.5, 3, 2.5, 2
@@ -974,23 +1170,46 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build
     independent instance. So changing target vec2
     has no affect on source vec.
   --------------------------------------------------
+  --------------------------------------------------
+    Iterate over vector
+  --------------------------------------------------
+  --- function using range-for taking vector ---
+    3.5 3 -2.5 2
+  --- function using iterator taking iterable container ---
+    3.5, 3, -2.5, 2
 
   --------------------------------------------------
-    user-defined type Point4D
+    user-defined type PointN&lt;T&gt;
   --------------------------------------------------
-  Point4D {
-    0, 0, 0,
-    Mon May  1 16:04:27 2023
+  p1: PointN&lt;T&gt; {
+    0, 0, 0, 0, 0
   }
-  Point4D {
-    42, 0, -3.5,
-    Mon May  1 16:04:27 2023
+  --------------------------------------------------
+    p1.coords() = std::vector&lt;double&gt;
+    { 1.0, -2.0, 3.0, 4.5, -42.0 }
+  --------------------------------------------------
+  p1: PointN&lt;T&gt; {
+    1, -2, 3, 4.5, -42
   }
+  --- showType(p1, &quot;p1&quot;, nl); ---
+  p1 type: class PointN&lt;double&gt;
+  size:  48
+  p1.coords()[2] = 3
 
-  --- showType(p1, &quot;p1&quot;, nl) ---
-  p1 type: class Point4D
-  size:  32
-  p1.xCoor() returns value 42
+  --------------------------------------------------
+    iterate over PointN&lt;T&gt;
+  --------------------------------------------------
+  --- function using range-for taking Point ---
+    1 -2 3 4.5 -42
+  --- function using iterator taking Point ---
+    1, -2, 3, 4.5, -42
+  --- function using iterator taking iterable container ---
+  p1: {
+    1, -2, 3, 4.5, -42
+  }
+  --- same function attempting to take non-iterable ---
+  whiler input type is not iterable
+
 
   --------------------------------------------------
     heap-based string instance
@@ -1011,6 +1230,12 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build
   --------------------------------------------------
   --- pU&lt;std::vector&lt;double&gt;&gt;
       pVec(new std::vector&lt;double&gt;{ 1.5, 2.5, 3.5 }); ---
+
+  --- iterating over *pVec ---
+  *pVec: {
+    1.5, 2.5, 3.5
+  }
+
   *pVec =
   vector&lt;T&gt;: {
     1.5, 2.5, 3.5
@@ -1018,69 +1243,68 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build
   *pVec type: class std::vector&lt;double,class std::allo...
   size:  32
 
-  pVec = 000002897B682AC0
+  pVec = 000002965C6829B0
   move(pVec) type: class std::unique_ptr&lt;class std::vector&lt;...
   size:  8
 
   --------------------------------------------------
-    heap-based Point4D instance
+    heap-based PointN instance
   --------------------------------------------------
-  --- pU&lt;Point4D&gt; pPoint4D(new Point4D()) ---
-  Point4D {
-    0, 0, 0,
-    Mon May  1 16:04:27 2023
+  --- pU&lt;PointN&lt;double&gt;&gt; pPointN(new PointN&lt;double&gt;(4)) ---
+  *pPointN: PointN&lt;T&gt; {
+    0, 0, 0, 0
   }
-  Point4D {
-    1, 2, -3,
-    Mon May  1 16:04:27 2023
+  --- pPointN-&gt;coords() =
+      std::vector&lt;double&gt;{ 1.0, 3.5, -2.0, 42.0 }; ---
+  *pPointN: PointN&lt;T&gt; {
+    1, 3.5, -2, 42
   }
-  pPoint4D-&gt;zCoor() = -3
-  --- showType(*pPoint4D, &quot;*pPoint4D&quot;); ---
-  *pPoint4D type: class Point4D
-  size:  32
-  --- showType(std::move(pPoint4D), &quot;pPoint4D&quot;); ---
-  pPoint4D type: class std::unique_ptr&lt;class Point4D,stru...
+  value of pPointN-&gt;coords()[1] is 3.5
+  --- showType(*pPointN, &quot;*pPointN&quot;); ---
+  *pPointN type: class PointN&lt;double&gt;
+  size:  48
+
+  --- iterating over *pPointN ---
+  *pPointN: {
+    1, 3.5, -2, 42
+  }
+
+  --- showType(std::move(pPointN), &quot;pPointN&quot;); ---
+  pPointN type: class std::unique_ptr&lt;class PointN&lt;doubl...
   size:  8
 
+  --------------------------------------------------
+    Iterate over map, using Analysis::format
+  --------------------------------------------------
+  map: {
+    {one, 1}, {two, 2}, {zero, 0}
+  }
 
   That's all Folks!
 
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Iter&#92;build
 &gt;
           </pre>
           <h4 id="build">Build</h4>
           <pre class="codeSnap">
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Iter
+&gt; cd build
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Iter&#92;build
 &gt; cmake ..
--- Building for: Visual Studio 17 2022
 -- Selecting Windows SDK version 10.0.22000.0 to target Windows 10.0.22621.
--- The C compiler identification is MSVC 19.34.31942.0
--- The CXX compiler identification is MSVC 19.34.31942.0
--- Detecting C compiler ABI info
--- Detecting C compiler ABI info - done
--- Check for working C compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.34.31933/bin/Hostx64/x64/cl.exe - skipped
--- Detecting C compile features
--- Detecting C compile features - done
--- Detecting CXX compiler ABI info
--- Detecting CXX compiler ABI info - done
--- Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.34.31933/bin/Hostx64/x64/cl.exe - skipped
--- Detecting CXX compile features
--- Detecting CXX compile features - done
 -- Configuring done
 -- Generating done
--- Build files have been written to: C:/github/JimFawcett/Bits/Cpp/Cpp_Objects/build
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build
+-- Build files have been written to: C:/github/JimFawcett/Bits/Cpp/Cpp_Iter/build
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Iter&#92;build
 &gt; cmake --build .
-MSBuild version 17.4.1+9a89d02ff for .NET Framework
+MSBuild version 17.5.1+f6fdcf537 for .NET Framework
+
   Checking Build System
-  Building Custom Rule C:/github/JimFawcett/Bits/Cpp/Cpp_Obje
-  cts/CMakeLists.txt
-  Bits_Objects.cpp
-  Cpp_Objects.vcxproj -&gt; C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Ob
-  jects&#92;build&#92;Debug&#92;Cpp_Objects.exe
-  Building Custom Rule C:/github/JimFawcett/Bits/Cpp/Cpp_Obje
-  cts/CMakeLists.txt
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build
+  Building Custom Rule C:/github/JimFawcett/Bits/Cpp/Cpp_Iter/CMakeLists.txt
+  Cpp_Iter.vcxproj -&gt; C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Iter&#92;build&#92;Debug&#92;Cpp_Iter.ex
+  e
+  Building Custom Rule C:/github/JimFawcett/Bits/Cpp/Cpp_Iter/CMakeLists.txt
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Iter&#92;build
 &gt;
           </pre>
         </div>
@@ -1092,14 +1316,14 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build
           Then, it is easy to bring up any example, in any of the languages, in VS Code.
         </t-b>
         <t-b>
-          Here, we do that for Cpp\Cpp_Objects.
+          Here, we do that for Cpp\Cpp_Iter.
         </t-b>
-        <photosizer-block src="pictures/VS_Code_Cpp_Objects.JPG" width="800" class="photoSizerBlock left"
+        <photosizer-block src="pictures/Debug_CppIter.JPG" width="800" class="photoSizerBlock left"
           style="overflow-x:auto;"
         >
-          <span style="font-family:'Comic Sans MS';">Figure 1. VS Code IDE</span>
+          <span style="font-family:'Comic Sans MS';">Figure 1. VS Code IDE - Debug Cpp_Iter</span>
         </photosizer-block>
-        <photosizer-block src="pictures/LaunchJSON_Cpp_Objects.JPG" width="700" class="photoSizerBlock left"
+        <!--<photosizer-block src="pictures/LaunchJSON_Cpp_Objects.JPG" width="700" class="photoSizerBlock left"
           style="overflow-x:auto;"
         >
           <span style="font-family:'Comic Sans MS';">Figure 2. Launch.JSON</span>
@@ -1108,7 +1332,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build
           style="overflow-x:auto;"
         >
           <span style="font-family:'Comic Sans MS';">Figure 3. Debugging Objects</span>
-        </photosizer-block>
+        </photosizer-block>-->
         <!--<photosizer-block src="pictures/VS_Code_Cpp_Plugins.jpg" width="700" class="photoSizerBlock left">
           <span style="font-family:'Comic Sans MS';">Figure 3. C++ Plugins</span>
         </photosizer-block>-->
@@ -1118,6 +1342,14 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build
         <table class="indent">
           <tr>
             <th class="darkItem">Reference</th><th class="darkItem">Description</th>
+          </tr>
+          <tr>
+            <td>
+              <a target="_blank" href="../../CppStory_LibrarySTL.html">C++ Story: Standard Template Library</a>
+            </td>
+            <td>
+              Covers containers, iterators, and STL algorithms
+            </td>
           </tr>
           <tr>
             <td>
