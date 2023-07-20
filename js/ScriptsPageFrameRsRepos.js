@@ -137,6 +137,7 @@ function initializeMenu() {
             <div class='ddLabel darkItem'>Projects</div>\
             <div class='ddItem'><a href='BuildOn.html'>BuildOn</a></div>\
             <div class='ddItem'><a href='RustCommExperiments.html'>RustComm&nbsp;Exper&nbsp;&nbsp;</a></div>\
+            <div class='ddItem'><a href='CommCompare.html'>CommCompare&nbsp;&nbsp;</a></div>\
             <div style='height:2em;'></div>\
         </div>\
     </div>\
