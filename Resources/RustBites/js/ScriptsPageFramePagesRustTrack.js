@@ -39,7 +39,8 @@ function initializePages() {
           <menu-elem class='ddItems pageElem'><a href='RustBites_Macros.html'>Macros</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_Threads.html'>Threads</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_Synchron.html'>Synchronization</a></menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='RustBites_Channels.html'>Channels</a></menu-elem>\
+          <menu-elem class='undefined ddItems pageElem'><a href='RustBites_Channels.html'>Channels</a></menu-elem>\
+          <menu-elem class='undefined ddItems pageElem'><a href='RustBites_AsyncAwt.html'>Async</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_RegEx.html'>Regular&nbsp;Expressions</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_TipsAndTricks.html'>Hacks&nbsp;&amp;&nbsp;Helps</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBites_CodeExperiments.html'>Code&nbsp;Experiments</a></menu-elem>\
