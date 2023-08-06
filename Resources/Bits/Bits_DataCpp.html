@@ -232,6 +232,9 @@
       max-width: 60em;
       user-select: all;
     }
+    #github {
+      user-select:none;
+    }
   </style>
   <script>
     function saveScroll() {
@@ -254,7 +257,7 @@
 
   <script>
     function remote() {
-      window.open('https://godbolt.org/z/1cG1cTxd3', '_blank');
+      window.open('https://godbolt.org/z/7evPsxnMj', '_blank');
     }
   </script>
 </head>
@@ -270,7 +273,7 @@
     <main>
       <div id="about">about</div>
       <div id="page">Bits Data C++</div>
-      <div id="modified">08/05/2023</div>
+      <div id="modified">08/06/2023</div>
       <div id="hlp"></div>
       <a id="top"></a>
       <content id="content">
@@ -366,7 +369,7 @@
         <h3 id="code">1.0 CodeSnaps</h3>
         <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote()" />
         <div style="display:flex; flex-direction:column;">
-          <h4 id="source">Source Code: Bits_Data.cpp</h4>
+          <h4 id="src-BD">Source Code: Bits_Data.cpp</h4>
           <pre class="codeSnaps"><code class="language-cpp">/*---------------------------------------------------------
   Bits::Cpp::src::Cpp_Data.cpp
   - Display creation and simple use of basic types
@@ -375,7 +378,16 @@
 #include &lt;typeinfo&gt;  // typeid
 #include &lt;memory&gt;    // std::unique_ptr
 #include &lt;utility&gt;   // move()
+#include &lt;vector&gt;
+#include &lt;unordered_map&gt;
+#include &quot;Bits_DataAnalysis.h&quot;
 
+/*-----------------------------------------------
+  Note:
+  Find all Bits code, including this in
+  https://github.com/JimFawcett/Bits
+  You can clone the repo from this link.
+-----------------------------------------------*/
 /*
   Static Data Types:
     byte, bool, int, char, char16_t, char32_t, wchar_t
@@ -400,28 +412,19 @@
     All types are static, operations run as native code, and no garbage
     collection is needed. Resources are returned at end of declr scope.
 */
-/* C++ requires declaration before use */
-template&lt;typename T&gt;
-void showType(T t, const std::string &nm);
-void showOp(const std::string& text);
-void showLabel(const std::string& text, size_t n = 50);
-void print(const std::string& txt = &quot;&quot;);
-void println(const std::string& txt = &quot;&quot;);
+/*-----------------------------------------------
+  create and display values of primitive types
+  in stack frame
+*/
+void initialize_primitives_from_literals() {
 
-void nl() {
-  std::cout &lt;&lt; std::endl;
-}
-
-int main() {
-    showLabel(&quot; Demonstrate C++ types&quot;);
-    nl();
+    showLabel(&quot;initialize primitives in stack from literals&quot;);
 
     /*-- objects live in stack frame, may have values in heap --*/
 
-    showOp(&quot;initialize from literals&quot;);
-
     int t1{3};
     showType(t1, &quot;t1&quot;);
+    // double t1 = 3.1415927; // not allowed to redefine type of t1
 
     long long int t1a = 3;
     showType(t1a, &quot;t1a&quot;);
@@ -431,36 +434,46 @@ int main() {
 
     std::string s{&quot;a literal string&quot;};  // char values in heap
     showType(s, &quot;s&quot;);
+    nl();
 
-    println(&quot;-- copy construct --&quot;);
+    showOp(&quot;copy construct&quot;);
 
     auto t1b = t1a;
     showType(t1b, &quot;t1b&quot;);
-    // double t1 = 3.1415927; // not allowed to redefine type of t1
+    nl();
+}
+/*-----------------------------------------------
+  create and display values of primitive types
+  in heap
+*/
+void create_primitives_in_heap() {
+
+    showLabel(&quot;store instances of primitives in heap&quot;);
 
     /*-- values live in heap when using new --*/
-
-    println(&quot;-- store in heap --&quot;);
 
     double* dptr = new double{3.14159};
     showType(dptr, &quot;dptr&quot;);
     showType(*dptr, &quot;*dptr&quot;);
     delete(dptr);  // see unique_ptr, below
+    nl();
 
     /*-- control block lives in stack, char data live in heap --*/
 
-    println(&quot;-- string: control block in stack, data in heap --&quot;);
+    showOp(&quot;string: control block in stack, data in heap&quot;);
 
     auto s2 = std::string(&quot;Hello Data&quot;);  // move ctor - rhs is temp
     showType(s2, &quot;s2&quot;);
+    nl();
 
-    println(&quot;-- C++ reference --&quot;);
+    showOp(&quot;C++ reference&quot;);
     auto& rs2 = s2;      // create reference, no copy or move
     showType(rs2, &quot;rs2&quot;);
+    nl();
 
     /*-- unique_ptr may not be copied but move allowed --*/
 
-    println(&quot;-- unique_ptr owns data --&quot;);
+    showOp(&quot;unique_ptr owns data&quot;);
 
     auto ptr = std::unique_ptr&lt;int&gt;(new int{-3});
     *ptr += 1;
@@ -473,24 +486,56 @@ int main() {
     nl();
 
     showOp(&quot;heap data deleted when unique_ptr leaves scope&quot;);
+    nl();
+}
+/*-----------------------------------------------
+  create and display values of std lib types
+  - uses showTypeEnum for sequential containers
+  - uses showTypeAssoc for associative containers
+*/
+void demo_stdlib_types() {
+
+  showLabel(&quot;demo std library types&quot;);
+  std::vector&lt;int&gt; v { 1, 2, 3, 2, 1};
+  showTypeEnum(v, &quot;v&quot;);
+
+  std::unordered_map&lt;std::string, int&gt; m {
+    {&quot;zero&quot;, 0}, {&quot;one&quot;, 1}, {&quot;two&quot;, 2}
+  };
+  showTypeAssoc(m, &quot;m&quot;);
+}
+int main() {
+    showLabel(&quot; Demonstrate C++ types&quot;);
+    nl();
+
+    initialize_primitives_from_literals();
+    create_primitives_in_heap();
+    demo_stdlib_types();
 
     println(&quot;&#92;n  That's all Folks!&#92;n&#92;n&quot;);
-}
-/*---------------------------------------------------------
-  Truncates input string to n chars. Beware: side-effects.
-  - used in showType which may generate long type names.
+}</code></pre>
+          <h4 id="src-BDAH">Source Code: Bits_DataAnalysis.h</h4>
+          <pre>
+<code class="language-cpp">/*---------------------------------------------------------
+  Bits::Cpp::src::Cpp_DataAnalysis.h
+  - Display creation and simple use of basic types
 */
-std::string truncate(const std::string& str, size_t n = 40) {
-  std::string tmp = str;
-  if(tmp.size() &lt; n) {
-    return tmp;
-  }
-  tmp.resize(n);
-  tmp += &quot;...&quot;;
-  return tmp;
-}
-/*---------------------------------------------------------
-  Show call name, static type, value, and size
+#include &lt;iostream&gt;  // std::cout
+#include &lt;typeinfo&gt;  // typeid
+
+/*-----------------------------------------------
+  Note:
+  Find all Bits code, including this in
+  https://github.com/JimFawcett/Bits
+  You can clone the repo from this link.
+-----------------------------------------------*/
+/*-----------------------------------------------
+  truncate string to length n
+  - does nothing if string length is less than n
+*/
+std::string truncate(const std::string& str, size_t n = 40);
+/*-----------------------------------------------
+  show type and value of scalar t
 */
 template&lt;typename T&gt;
 void showType(T t, const std::string &nm) {
@@ -499,6 +544,93 @@ void showType(T t, const std::string &nm) {
   std::cout &lt;&lt; &quot;&#92;n  value: &quot; &lt;&lt; t;          // show value
   std::cout &lt;&lt; &quot;,  size:  &quot; &lt;&lt; sizeof(t);   // show size on stack
   std::cout &lt;&lt; &quot;&#92;n&quot;;
+}
+/*-----------------------------------------------
+  show type and value of sequential container t
+*/
+template&lt;typename T&gt;
+void showTypeEnum(T t, const std::string &nm) {
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; nm;                // show name at call site
+  std::cout &lt;&lt; &quot;: type: &quot; &lt;&lt; truncate(typeid(t).name());  // show type
+  std::cout &lt;&lt; &quot;&#92;n  value: {&#92;n    &quot;;
+  bool first = true;
+  for(auto &item : t) {
+    if(first) {
+      std::cout &lt;&lt; &quot;  &quot; &lt;&lt; item;
+      first = false;
+    }
+    else {
+      std::cout &lt;&lt; &quot;, &quot; &lt;&lt; item;
+    }
+  }
+  std::cout &lt;&lt; &quot;&#92;n  }&#92;n&quot;;
+  std::cout &lt;&lt; &quot;  size:  &quot; &lt;&lt; sizeof(t);   // show size on stack
+  std::cout &lt;&lt; &quot;&#92;n&quot;;
+}
+/*-----------------------------------------------
+  show type and value of associative container t
+*/
+template&lt;typename T&gt;
+void showTypeAssoc(T t, const std::string &nm) {
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; nm;                // show name at call site
+  std::cout &lt;&lt; &quot;: type: &quot; &lt;&lt; truncate(typeid(t).name());  // show type
+  std::cout &lt;&lt; &quot;&#92;n  value: {&#92;n    &quot;;
+  bool first = true;
+  for(auto &item : t) {
+    if(first) {
+      std::cout &lt;&lt; &quot;{&quot; &lt;&lt; item.first &lt;&lt; &quot;, &quot; &lt;&lt; item.second &lt;&lt; &quot;}&quot;;
+      first = false;
+    }
+    else {
+      std::cout &lt;&lt; &quot;, {&quot; &lt;&lt; item.first &lt;&lt; &quot;, &quot; &lt;&lt; item.second &lt;&lt; &quot;}&quot;;
+    }
+  }
+  std::cout &lt;&lt; &quot;&#92;n  }&#92;n&quot;;
+  std::cout &lt;&lt; &quot;  size:  &quot; &lt;&lt; sizeof(t);   // show size on stack
+  std::cout &lt;&lt; &quot;&#92;n&quot;;
+}
+/*-----------------------------------------------
+  display text in several formats
+*/
+void showOp(const std::string& text);
+void showLabel(const std::string& text, size_t n = 50);
+void print(const std::string& txt = &quot;&quot;);
+void println(const std::string& txt = &quot;&quot;);
+/*-----------------------------------------------
+  emit newline
+*/
+static void nl() {
+  std::cout &lt;&lt; std::endl;
+}            </code>
+          </pre>
+          <h4 id="src-BDAC">Source Code: Bits_DataAnalysis.cpp</h4>
+          <pre>
+<code class="language-cpp">/*---------------------------------------------------------
+  Bits::Cpp::src::Cpp_DataAnalysis.cpp
+  - Functions to analyze and display data
+*/
+#include &lt;iostream&gt;  // std::cout
+#include &lt;typeinfo&gt;  // typeid
+#include &quot;Bits_DataAnalysis.h&quot;
+
+/*-----------------------------------------------
+  Note:
+  Find all Bits code, including this in
+  https://github.com/JimFawcett/Bits
+  You can clone the repo from this link.
+-----------------------------------------------*/
+/*---------------------------------------------------------
+  Truncates input string to n chars. Beware: side-effects.
+  - used in showType which may generate long type names.
+*/
+std::string truncate(const std::string& str, size_t n) {
+  std::string tmp = str;
+  if(tmp.size() &lt; n) {
+    return tmp;
+  }
+  tmp.resize(n);
+  tmp += &quot;...&quot;;
+  return tmp;
 }
 /*---------------------------------------------------------
   Show operation text surrounded by &quot;---&quot; strings
@@ -520,16 +652,19 @@ void print(const std::string& txt) {
 }
 void println(const std::string& txt) {
   std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt &lt;&lt; &quot;&#92;n&quot;;
-}</code></pre>
+}            </code>
+          </pre>
           <h4 id="out">Output</h4>
-          <pre class="codeSnap">
+          <pre class="codeSnaps"><code class="language-shell">
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build
-&gt; ./Debug/Cpp_Data
+&gt; debug/Cpp_Data
 --------------------------------------------------
    Demonstrate C++ types
 --------------------------------------------------
 
-  --- initialize from literals ---
+--------------------------------------------------
+  initialize primitives in stack from literals
+--------------------------------------------------
 
   t1: type: int
   value: 3,  size:  4
@@ -541,59 +676,114 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build
   value: 3.14159,  size:  8
 
   s: type: class std::basic_string&lt;char,struct std:...
-  value: a literal string,  size:  40
+  value: a literal string,  size:  28
 
-  -- copy construct --
+  --- copy construct ---
 
   t1b: type: __int64
   value: 3,  size:  8
 
-  -- store in heap --
+--------------------------------------------------
+  store instances of primitives in heap
+--------------------------------------------------
 
-  dptr: type: double * __ptr64
-  value: 0000023FB0046510,  size:  8
+  dptr: type: double *
+  value: 00969950,  size:  4
 
   *dptr: type: double
   value: 3.14159,  size:  8
 
-  -- string: control block in stack, data in heap --
+  --- string: control block in stack, data in heap ---
 
   s2: type: class std::basic_string&lt;char,struct std:...
-  value: Hello Data,  size:  40
+  value: Hello Data,  size:  28
 
-  -- C++ reference --
+  --- C++ reference ---
 
   rs2: type: class std::basic_string&lt;char,struct std:...
-  value: Hello Data,  size:  40
+  value: Hello Data,  size:  28
 
-  -- unique_ptr owns data --
+  --- unique_ptr owns data ---
 
   ptr: type: class std::unique_ptr&lt;int,struct std::de...
-  value: 0000023FB0036C70,  size:  8
+  value: 00969050,  size:  4
 
   *ptr: type: int
   value: -4,  size:  4
 
   --- heap data deleted when unique_ptr leaves scope ---
 
+--------------------------------------------------
+  demo std library types
+--------------------------------------------------
+
+  v: type: class std::vector&lt;int,class std::allocat...
+  value: {
+      1, 2, 3, 2, 1
+  }
+  size:  16
+
+  m: type: class std::unordered_map&lt;class std::basi...
+  value: {
+    {zero, 0}, {one, 1}, {two, 2}
+  }
+  size:  40
 
   That's all Folks!
 
-
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build
-&gt;
-          </pre>
+&gt;          </code></pre>
           <h4 id="build">Build</h4>
-          <pre class="codeSnap">
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build
-&gt; cmake --build .
-MSBuild version 17.4.1+9a89d02ff for .NET Framework
-  Cpp_Data.vcxproj -&gt; C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_D
-  ata&#92;build&#92;Debug&#92;Cpp_Data.exe
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build
-&gt;
-          </pre>
+          <pre class="codeSnaps"><code class="language-shell">C:\github\JimFawcett\Bits\Cpp\Cpp_Data\build
+> cmake --build .
+MSBuild version 17.5.1+f6fdcf537 for .NET Framework
 
+  Bits_Data.cpp
+  Bits_DataAnalysis.cpp
+  Generating Code...
+  Cpp_Data.vcxproj -> C:\github\JimFawcett\Bits\Cpp\Cpp_Data\build\Debug\Cpp_Data.
+  exe
+C:\github\JimFawcett\Bits\Cpp\Cpp_Data\build
+</code></pre>
+        <h4 id="cmake">CMakeLists.txt</h4>
+<pre><code class="language-shell">#---------------------------------------------------
+# HelloCMake - Demonstrate building C++ with CMake
+#   - Non-hierarchal version
+#---------------------------------------------------
+
+#---------------------------------------------------
+cmake_minimum_required(VERSION 3.25)
+project(DataCMake)
+#---------------------------------------------------
+#   CppData dir
+#   -- CMakeLists.txt (this file)
+#   -- src dir
+#      -- Bits_Data.cpp
+#      -- Bits_DataAnalysis.h
+#      -- Bits_DataAnalysis.cpp
+#   -- build directory
+#      -- Debug directory
+#         -- Cpp_Data.exe
+#         -- ...
+#      -- Cpp_Data.dir directory
+#         -- Debug directory
+#            -- Bits_Data.obj
+#            -- Bits_DataAnalysis.obj
+#            -- ...
+#---------------------------------------------------
+
+set(CMake_CXX_STANDARD 20)
+
+#---------------------------------------------------
+# build Bits_Data.obj, Bits_DataAnalysis.obj
+#   in folder build/Cpp_Data.dir/debug
+#---------------------------------------------------
+set(SRC
+  src/Bits_Data.cpp src/Bits_DataAnalysis.cpp
+)
+include_directories(src)
+add_executable(Cpp_Data ${SRC})
+</code></pre>
         <h3 id="ide">2.0 VS Code View</h3>
         <t-b>
           The code for this demo is available in 
@@ -651,9 +841,12 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build
         <menu-elem class="secElem"><a href="#bottom">bottom</a></menu-elem>
         <menu-elem class="secElem"><a href="#refs">refs</a></menu-elem>
         <menu-elem class="secElem"><a href="#ide">VS Code</a></menu-elem>
+        <menu-elem class="secElem"><a href="#cmake">CMake</a></menu-elem>
         <menu-elem class="secElem"><a href="#build">bld</a></menu-elem>
         <menu-elem class="secElem"><a href="#out">out</a></menu-elem>
-        <menu-elem class="secElem"><a href="#source">src</a></menu-elem>
+        <menu-elem class="secElem"><a href="#src-BDAC">BDAnal.cpp</a></menu-elem>
+        <menu-elem class="secElem"><a href="#src-BDAH">BDAnal.h</a></menu-elem>
+        <menu-elem class="secElem"><a href="#src-BD">BitsData</a></menu-elem>
         <menu-elem class="secElem"><a href="#code">codeSnaps</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
       </page-sections>
