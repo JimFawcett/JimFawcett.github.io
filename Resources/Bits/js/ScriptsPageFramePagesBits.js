@@ -15,14 +15,8 @@ function initializePages() {
           <menu-elem class='ddItems pageElem'><a href='Bits_HelloCpp.html'>Hello&nbsp;World</a>&nbsp;</menu-elem >\
           <menu-elem class='ddItems pageElem'><a href='Bits_DataCpp.html'>Data</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='Bits_ObjectsCpp.html'>Objects</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Data&nbsp;Structures</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Iteration</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Functions</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Generic&nbsp;Functions</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Structures</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Generic&nbsp;Structures</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Dependency&nbsp;Inversion</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem undefined'><a href='Javascript:;'>Generic&nbsp;DIP</a>&nbsp;</menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='Bits_GenericCpp.html'>Generics</a>&nbsp;</menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='Bits_IterCpp.html'>Iteration</a>&nbsp;</menu-elem>\
           <menu-elem>&nbsp;</menu-elem>\
           <menu-elem>&nbsp;</menu-elem>";
   }
