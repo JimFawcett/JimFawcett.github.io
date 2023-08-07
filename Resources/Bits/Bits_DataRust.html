@@ -250,7 +250,7 @@
 
   <script>
     function remote() {
-      window.open('https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=502fba0c378b9c9e4202541c7d0751fa', '_blank');
+      window.open('https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=033c5ca2f39013bd887b9fcbf44596dd', '_blank');
     }
   </script>
 </head>
@@ -335,11 +335,15 @@
         <h3 id="code">1.0 CodeSnaps</h3>
         <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote()" />
         <div style="display:flex; flex-direction:column;">
-          <h4 id="source">Source Code</h4>
-          <pre><code class="language-rust">#![allow(unused_mut)]
+          <h4 id="source">Source Code: main.rs</h4>
+          <pre><code class="language-rust">/*---------------------------------------------------------
+ rust_data::main.rs
+ - demonstrate move, copy, and borrow for
+   primitives and selected std::library types
+---------------------------------------------------------*/
+#![allow(unused_mut)]
+#![allow(dead_code)]
 #![allow(clippy::approx_constant)]
-
-/* rust_hello_data::main.rs */
 /*
   Static Data Types:
     bool, char
@@ -351,7 +355,7 @@
   Qualifiers:
     mutable, const
 
-  Library Types:
+  Additional Library Types:
     std::String, std::Vec&lt;T&gt;, std::HashMap&lt;K,V&gt;,
     std::VecDeque&lt;T&gt;, std::BTreeSet&lt;T&gt;, std::BTreeMap&lt;K,V&gt;,
     std::LinkedList&lt;T&gt;, std::BinaryHeap&lt;T&gt;
@@ -360,201 +364,312 @@
     Primitive types can all be copied.
     Most library and user-defined types can be moved,
     cloned, but only aggregates with all copyable members
-    can be copied.
+    can be copied.  Values can only be changed if declared
+    mutable.
 
   Processing:
     All types are static, operations run as native code,
     and no garbage collection is needed. Resources are
     returned at end of declr scope.
 */
+/*-----------------------------------------------
+Note:
+Find all Bits code, including this in
+https://github.com/JimFawcett/Bits
+You can clone the repo from this link.
+-----------------------------------------------*/
+
+mod bits_data_analysis;
+use bits_data_analysis::*;
+
 use std::fmt::Debug;
 
+/*---------------------------------------------------------
+  Primitive data types: i32, f64, ... occupy contiguous
+  regions of memory, so they satisfy the copy trait.
+
+  Library types like String have a control block in stack
+  and data in heap. So they do not satisfy the copy trait.
+
+  A move type can be cloned, but that requires an explicit
+  call to clone(). Otherwise, assignment and pass by value
+  result in move which transfers ownership of heap
+  resources and invalidates the moved instance.
+
+  Any attempt to use a moved instance results in compile
+  failure.
+---------------------------------------------------------*/
+
+/*-- pass argument by value -----------------------------*/
+fn pass_by_val&lt;T:Debug&gt;(t:T) {
+  show_type(&t,&quot;T&quot;);
+  // println!(&quot;  value is {:?}&quot;, t);
+}
+/*-- pass argument by reference -------------------------*/
+fn pass_by_ref&lt;T:Debug&gt;(t:&T) {
+  show_type(&t,&quot;T&quot;);
+  // println!(&quot;  value is {:?}&quot;, t);
+}
+/*-- demonstrate variable has not been moved ------------*/
+fn verify&lt;T&gt;(_t:T) {  // can only call this if t is valid
+  /* t is valid */
+}
+/*-- demonstrate copy types -----------------------------*/
+fn demo_copy&lt;T:Debug + Copy&gt;(t:T) {
+  let tc = t;     // copy
+  pass_by_val(tc);    // pass by value - copy for copy type
+  pass_by_ref(&tc);   // pass by ref - no copy of tc
+  verify(tc);
+}
+fn execute_demo_copy() {
+  let i = 42i64;  // copy literal 42 into i
+  show_op(&quot;demo_copy for i64&quot;);
+  demo_copy(i);
+  println!(&quot;  copied i: {i:?}&#92;n&quot;);
+
+  let arr = [3.14f64, 0.5, -0.75];  // copy type
+  show_op(&quot;demo_copy for array of f64&quot;);
+  demo_copy(arr);
+  println!(&quot;  copied array arr: {arr:?}&#92;n&quot;);
+}
+/*-- demonstrate move types -----------------------------*/
+fn demo_move&lt;T:Debug + Clone&gt;(t:T) {
+  let tc = t;             // move
+  pass_by_val(tc.clone());   // pass by value - moves clone
+  pass_by_ref(&tc);          // pass by ref - no move of tc
+  verify(tc);
+}
+fn execute_demo_move() {
+  show_op(&quot;demo_move for String&quot;);
+  let s = &quot;a string&quot;.to_owned();
+  demo_move(s);
+  println!(&quot;  moved String s&quot;);
+  // Try uncommenting line below
+  // println!(&quot;  moved s: {s:?}&quot;);  // s moved, can't print
+  println!();
+
+  show_op(&quot;demo_move for Vec&quot;);
+  let v = vec![1, 2, 3];
+  demo_move(v);
+  println!(&quot;  moved Vec v&quot;);
+  // println!(&quot;  moved v: {v:?}&quot;);  // v moved, can't print
+  println!();
+
+  use std::collections::HashMap;
+  show_op(&quot;demo_move for HashMap&quot;);
+  let mut m = HashMap::&lt;&str,i32&gt;::new();
+  m.insert(&quot;zero&quot;, 0);
+  m.insert(&quot;one&quot;, 1);
+  m.insert(&quot;two&quot;, 2);
+  demo_move(m);
+  println!(&quot;  moved HashMap m&quot;);
+  // println!(&quot;  moved m: {m:?}&quot;);  // m moved, can't print
+  println!();
+}
+/*-- demonstrate mutability -----------------------------*/
+fn execute_demo_mutable() {
+  show_op(&quot;demo_mutable&quot;);
+  let mut i = 42i32;
+  print!(&quot;  original value: {i:?}&quot;);
+  i += 1;
+  println!(&quot;, changed value:  {i:?}&quot;);
+
+  let mut f = 3.14159f64;
+  print!(&quot;  original value: {f:?}&quot;);
+  f += 1.0;
+  println!(&quot;, changed value:  {f:?}&quot;);
+
+  let mut v = vec![1, 2, 3];
+  print!(&quot;  original value: {v:?}&quot;);
+  v[1] += 1;
+  println!(&quot;, changed value:  {v:?}&quot;);
+
+  use std::collections::HashMap;
+  let mut m = HashMap::&lt;&str,i32&gt;::new();
+  m.insert(&quot;zero&quot;, 0);
+  m.insert(&quot;one&quot;, 1);
+  m.insert(&quot;two&quot;, 2);
+  println!(&quot;  original value: {m:?}&quot;);
+  /* entry returns reference to value of supplied key */
+  let mut value = m.entry(&quot;one&quot;).or_insert(1);
+  *value += 1;
+  println!(&quot;  changed value:  {m:?}&#92;n&quot;);
+}
+/*-- demonstrate references -----------------------------*/
+fn execute_demo_ref() {
+  show_op(&quot;demo_ref&quot;);
+
+  let v1 = vec![1, 2, 3, 2, 1];
+  /* can use any number of immutable referenes */
+  let r1v1 = &v1;
+  println!(&quot;  r1v1: {r1v1:?}&quot;);
+  let r2v1 = &v1;
+  println!(&quot;  r2v1: {r2v1:?}&quot;);
+
+  /* can't use any number of immutable referenes */
+  let mut v2 = vec![1, 2, 3, 4, 5];
+  /* immutable borrow */
+  let r1v2 = &v2;
+  println!(&quot;  r1v2: {r1v2:?}&quot;);
+  /* mutable borrow ok if we don't use immutable borrow later */
+  let mr2v2 = &mut v2;
+  mr2v2.push(42);
+  println!(&quot;  mr2v2: {mr2v2:?}&quot;);
+  /*
+    Use of immutable borrow in println! illegal with active
+    mutable borrow.
+
+    Try uncommenting line below.
+  */
+  // println!(&quot;  r1v2: {r1v2:?}&quot;);
+}
+/*-- execute demonstrations -----------------------------*/
 fn main() {
-    println!(
-        &quot;&#92;n Demonstrate Rust types&#92;n&#92;
-       ------------------------&quot;
+    show_note(
+      &quot;Demonstrate Rust types&quot;
     );
-    /*
-      Primitive data types: i32, f64, ... occupy contiguous
-      regions of memory, so they satisfy the copy trait.
+    println!();
 
-      Library types like String have a control block in stack
-      and data in heap. So they do not satisfy the copy trait.
-
-      A move type can be cloned, but that requires an explicit
-      call to clone(). Otherwise, assignment and pass by value
-      result in move which transfers ownership of heap
-      resources and invalidates the moved instance.
-
-      Any attempt to use a moved instance results in compile
-      failure.
-    */
-
-    /*-- these values live in stack frame --*/
-
-    println!(&quot;&#92;n  -- initialize on stack from literals --&quot;);
-    let t1: i32 = 42;
-    show_type(t1, &quot;t1&quot;);
-
-    let t1a = 42i64;    // alternate declaration style
-    show_type(t1a, &quot;t1a&quot;);
-    /*
-      Below is not type redefinition, it is shadowing,
-      e.g., a new variable that hides the older t1a.
-    */
-    let mut t1a: f64 = 42.0;  // will change value later
-    show_type(t1a, &quot;t1a&quot;);
-
-    /*-- create mutable reference --*/
-
-    let t1b: &mut f64 = &mut t1a;  // requires t1a to be mutable
-    *t1b = 84.0;
-    show_type(t1b, &quot;t1b&quot;);
-
-    /*-- values live in heap when wrapped with box --*/
-
-    println!(&quot;&#92;n  -- initialize on heap --&quot;);
-
-    // 3.14159f64 below is a value specified to be f64
-    let t2 = Box::new(3.14159f64);
-    show_type(*t2, &quot;*t2&quot;);
-    show_type(t2, &quot;t2&quot;);    // moves t2, use t2.clone() to avoid move
-    // print!(&quot;{}&quot;, &t2.to_string());  // error - t2 moved
-
-    /*-- Box releases its heap storage when it goes out of scope --*/
-
-    println!(&quot;&#92;n  -- size_of measures size of handle to heap element --&quot;);
-
-    let s1 = std::mem::size_of::&lt;Box&lt;i8&gt;&gt;();
-    let s2 = std::mem::size_of::&lt;Box&lt;i64&gt;&gt;();
-    println!(&quot;&#92;nsize_of::&lt;Box&lt;i8&gt;&gt;() = {s1}&quot;);
-    println!(&quot;size_of::&lt;Box&lt;i64&gt;&gt;() = {s2}&quot;);
-
-    print!(&quot;&#92;n  -- String is collection of utf8 chars --&#92;n&quot;);
-    /*--
-      Each utf8 character may take from 1 to 4 bytes. The first
-      byte in a char sequence has bits that describe the size of
-      the character. utf8 can represent many more characters than
-      ASCII, so Rust strings can contain SanSkrit, Kangi, Arabic,
-      and emojis, as well as English.
-
-      String control block lives on stack, char data live in heap.
-      Passing by value or assignment transfers ownership from
-      source to destination.  That is a move.
-    --*/
-    let t3: String = String::from(&quot;a string&quot;); // temp moved
-    show_type(&t3, &quot;t3&quot;);
-
-    println!(&quot;&#92;n  -- use clone to avoid src move --&quot;);
-
-    show_type(t3.clone(), &quot;t3.clone()&quot;); // moves t3s clone, not t3
-
-    let t4 = &t3; // reference to still valid t3
-    show_type(t4, &quot;t4&quot;);
-
-    println!(&quot;&#92;n  -- array of copy type elements is copy --&quot;);
-
-    let t5 = [1, 2, 3, 4, 5]; // copy type
-    show_type(t5, &quot;t5&quot;);
-
-    let mut txt = String::from(&quot;&#92;nt5 was copied into show_type(...)&quot;);
-    txt += &quot;, see:&#92;nt5 = &quot;;
-    println!(&quot;{txt}{t5:?} is still valid&quot;);
-
-    println!(&quot;&#92;n  -- vec is like an extendable array --&quot;);
-
-    let mut v1 = Vec::&lt;i32&gt;::new();
-    v1.push(1);
-    v1.push(-1);
-    v1.insert(1, 4);
-    show_type(v1, &quot;&#92;&quot;v1&#92;&quot;&quot;);  // v1 moved
-
-    let v2 = vec![42, 84, 126];
-    show_type(&v2, &quot;&v2&quot;);    // v2 not moved, passed reference
-                              // size of &v2 is size of a pointer
-    show_type(v2, &quot;v2&quot;);      // v2 moved, can't be used again
+    execute_demo_copy();
+    execute_demo_move();
+    execute_demo_mutable();
+    execute_demo_ref();
 
     println!(&quot;&#92;n&#92;nThat's all Folks!!&#92;n&#92;n&quot;);
-}
-/*
-  show_type is generic function with Debug bound.
-  Using format &quot;{:?}&quot; requires Debug.
-  - mem::size_of::&lt;T&gt; measures size of T in stackframe.
-    It does not measure size of resources on heap.
+}</code></pre>
+          <h4 id="anal">Source Code: bits_data_analysis.rs</h4>
+          <pre><code class="language-rust">#![allow(unused_mut)]
+#![allow(dead_code)]
+#![allow(clippy::approx_constant)]
+
+/* rust_data::bits_data_analysis.rs */
+/*-----------------------------------------------
+Note:
+Find all Bits code, including this in
+https://github.com/JimFawcett/Bits
+You can clone the repo from this link.
+-----------------------------------------------*/
+
+use std::fmt::Debug;
+
+/*-- show_type --------------------------------------------
+  Shows compiler recognized type and data value
 */
-fn show_type&lt;T: Debug&gt;(t: T, nm: &str) {
+pub fn show_type&lt;T: Debug&gt;(t: &T, nm: &str) {
   let typename = std::any::type_name::&lt;T&gt;();
-  println!(&quot;&#92;n{nm}, {typename}&quot;);
+  print!(&quot;  {nm}, {typename}&quot;);
   println!(
-    &quot;value: {:?}, size: {}&quot;,
+    &quot;&#92;n  value: {:?}, size: {}&quot;,
     t, std::mem::size_of::&lt;T&gt;()
   );
 }
-</code></pre>
+/*---------------------------------------------------------
+  show string wrapped with long dotted lines above and below
+*/
+pub fn show_label(note: &str, n:usize) {
+  let mut line = String::new();
+  for _i in 0..n {
+    line.push('-');
+  }
+  print!(&quot;&#92;n{line}&#92;n&quot;);
+  print!(&quot;  {note}&quot;);
+  print!(&quot;&#92;n{line}&#92;n&quot;);
+}
+pub fn show_label_def(note:&str) {
+  show_label(note, 50);
+}
+/*---------------------------------------------------------
+  show string wrapped with dotted lines above and below
+*/
+pub fn show_note(note: &str) {
+  print!(&quot;&#92;n-------------------------&#92;n&quot;);
+  print!(&quot; {note}&quot;);
+  print!(&quot;&#92;n-------------------------&#92;n&quot;);
+}
+/*---------------------------------------------------------
+  show string wrapped in short lines
+*/
+pub fn show_op(opt: &str) {
+  println!(&quot;--- {opt} ---&quot;);
+}
+/*---------------------------------------------------------
+  print newline
+*/
+pub fn nl() {
+  println!();
+}            </code></pre>
           <h4 id="out">Output</h4>
-          <pre class="codeSnaps"><code class="language-shell"> Demonstrate Rust types
-------------------------
+          <pre class="codeSnaps"><code class="language-shell">C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data
+&gt; cargo run
+   Compiling rust_data v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.37s
+     Running `target&#92;debug&#92;rust_data.exe`
 
-  -- initialize on stack from literals --
+-------------------------
+ Demonstrate Rust types
+-------------------------
 
-t1, i32
-value: 42, size: 4
+--- demo_copy for i64 ---
+  T, i64
+  value: 42, size: 8
+  T, &i64
+  value: 42, size: 8
+  copied i: 42
 
-t1a, i64
-value: 42, size: 8
+--- demo_copy for array of f64 ---
+  T, [f64; 3]
+  value: [3.14, 0.5, -0.75], size: 24
+  T, &[f64; 3]
+  value: [3.14, 0.5, -0.75], size: 8
+  copied array arr: [3.14, 0.5, -0.75]
 
-t1a, f64
-value: 42.0, size: 8
+--- demo_move for String ---
+  T, alloc::string::String
+  value: &quot;a string&quot;, size: 24
+  T, &alloc::string::String
+  value: &quot;a string&quot;, size: 8
+  moved String s
 
-t1b, &mut f64
-value: 84.0, size: 8
+--- demo_move for Vec ---
+  T, alloc::vec::Vec&lt;i32&gt;
+  value: [1, 2, 3], size: 24
+  T, &alloc::vec::Vec&lt;i32&gt;
+  value: [1, 2, 3], size: 8
+  moved Vec v
 
-  -- initialize on heap --
+--- demo_move for HashMap ---
+  T, std::collections::hash::map::HashMap&lt;&str, i32&gt;
+  value: {&quot;zero&quot;: 0, &quot;one&quot;: 1, &quot;two&quot;: 2}, size: 48
+  T, &std::collections::hash::map::HashMap&lt;&str, i32&gt;
+  value: {&quot;zero&quot;: 0, &quot;one&quot;: 1, &quot;two&quot;: 2}, size: 8
+  moved HashMap m
 
-*t2, f64
-value: 3.14159, size: 8
+--- demo_mutable ---
+  original value: 42, changed value:  43
+  original value: 3.14159, changed value:  4.14159
+  original value: [1, 2, 3], changed value:  [1, 3, 3]
+  original value: {&quot;one&quot;: 1, &quot;two&quot;: 2, &quot;zero&quot;: 0}
+  changed value:  {&quot;one&quot;: 2, &quot;two&quot;: 2, &quot;zero&quot;: 0}
 
-t2, alloc::boxed::Box&lt;f64&gt;
-value: 3.14159, size: 8
-
-  -- size_of measures size of handle to heap element --
-
-size_of::&lt;Box&lt;i8&gt;&gt;() = 8
-size_of::&lt;Box&lt;i64&gt;&gt;() = 8
-
-  -- use clone to avoid src move --
-
-t3.clone(), alloc::string::String
-value: &quot;Hello Data&quot;, size: 24
-
-t4, &alloc::string::String
-value: &quot;Hello Data&quot;, size: 8
-
-  -- array of copy type elements is copy --
-
-t5, [i32; 5]
-value: [1, 2, 3, 4, 5], size: 20
-
-t5 was copied into show_type(...), see:
-t5 = [1, 2, 3, 4, 5] is still valid
-
-  -- vec is like an extendable array --
-
-&quot;v1&quot;, alloc::vec::Vec&lt;i32&gt;
-value: [1, 4, -1], size: 24
-
-&v2, &alloc::vec::Vec&lt;i32&gt;
-value: [42, 84, 126], size: 8
+--- demo_ref ---
+  r1v1: [1, 2, 3, 2, 1]
+  r2v1: [1, 2, 3, 2, 1]
+  r1v2: [1, 2, 3, 4, 5]
+  mr2v2: [1, 2, 3, 4, 5, 42]
 
 
 That's all Folks!!
-          </code></pre>
+
+
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data
+&gt;
+</code></pre>
           <h4 id="build">Build</h4>
-          <pre class="codeSnaps"><code class="language-shell">C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_data
+          <pre class="codeSnaps"><code class="language-shell">C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data
 &gt; cargo run
-   Compiling rust_hello_data v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_data)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.32s
-     Running `target&#92;debug&#92;rust_hello_data.exe`
+   Compiling rust_data v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.37s
+     Running `target&#92;debug&#92;rust_data.exe`
           </code></pre>
         </div>
         <h3 id="ide">2.0 VS Code View</h3>
@@ -616,6 +731,7 @@ That's all Folks!!
         <menu-elem class="secElem"><a href="#ide">VS Code</a></menu-elem>
         <menu-elem class="secElem"><a href="#build">bld</a></menu-elem>
         <menu-elem class="secElem"><a href="#out">out</a></menu-elem>
+        <menu-elem class="secElem"><a href="#anal">anal</a></menu-elem>
         <menu-elem class="secElem"><a href="#source">src</a></menu-elem>
         <menu-elem class="secElem"><a href="#code">codeSnaps</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
