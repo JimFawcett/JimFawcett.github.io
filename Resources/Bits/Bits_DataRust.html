@@ -250,7 +250,7 @@
 
   <script>
     function remote() {
-      window.open('https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=033c5ca2f39013bd887b9fcbf44596dd', '_blank');
+      window.open('https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=290877493480b3fbb86d5e17089bb001', '_blank');
     }
   </script>
 </head>
@@ -337,7 +337,7 @@
         <div style="display:flex; flex-direction:column;">
           <h4 id="source">Source Code: main.rs</h4>
           <pre><code class="language-rust">/*---------------------------------------------------------
- rust_data::main.rs
+ rust_data::src::main.rs
  - demonstrate move, copy, and borrow for
    primitives and selected std::library types
 ---------------------------------------------------------*/
@@ -381,6 +381,7 @@ You can clone the repo from this link.
 
 mod bits_data_analysis;
 use bits_data_analysis::*;
+use std::collections::*;
 
 use std::fmt::Debug;
 
@@ -403,16 +404,44 @@ use std::fmt::Debug;
 /*-- pass argument by value -----------------------------*/
 fn pass_by_val&lt;T:Debug&gt;(t:T) {
   show_type(&t,&quot;T&quot;);
-  // println!(&quot;  value is {:?}&quot;, t);
 }
 /*-- pass argument by reference -------------------------*/
 fn pass_by_ref&lt;T:Debug&gt;(t:&T) {
   show_type(&t,&quot;T&quot;);
-  // println!(&quot;  value is {:?}&quot;, t);
 }
 /*-- demonstrate variable has not been moved ------------*/
 fn verify&lt;T&gt;(_t:T) {  // can only call this if t is valid
   /* t is valid */
+}
+/*-- demonstrate initialization of Rust's types ---------*/
+fn create_initialize() {
+  show_note(&quot;create and initialize&quot;);
+  nl();
+
+  show_op(&quot;initialize primitives&quot;);
+  let int = 42i64;
+  show_type(&int, &quot;int&quot;);
+  let double:f64 = 3.15927;
+  show_type(&double, &quot;double&quot;);
+  let arr = [1, 2, 3];
+  show_type(&arr, &quot;arr&quot;);
+  nl();
+
+  show_op(&quot;initialize std::lib types&quot;);
+  let vec = vec![1, 2, 3, 2, 1];
+  show_type(&vec, &quot;vec&quot;);
+  let mut map = HashMap::&lt;&str,i32&gt;::new();
+  map.insert(&quot;zero&quot;, 0);
+  map.insert(&quot;one&quot;, 1);
+  map.insert(&quot;two&quot;, 2);
+  show_type(&map, &quot;map&quot;);
+  nl();
+
+  show_op(&quot;initialize user-defined type&quot;);
+  #[derive(Debug)]
+  struct Demo { name: String }
+  let udt = Demo { name: &quot;demo&quot;.to_string() };
+  show_type(&udt, &quot;udt&quot;);
 }
 /*-- demonstrate copy types -----------------------------*/
 fn demo_copy&lt;T:Debug + Copy&gt;(t:T) {
@@ -422,6 +451,9 @@ fn demo_copy&lt;T:Debug + Copy&gt;(t:T) {
   verify(tc);
 }
 fn execute_demo_copy() {
+  show_note(&quot;demonstrate copy&quot;);
+  nl();
+
   let i = 42i64;  // copy literal 42 into i
   show_op(&quot;demo_copy for i64&quot;);
   demo_copy(i);
@@ -430,7 +462,7 @@ fn execute_demo_copy() {
   let arr = [3.14f64, 0.5, -0.75];  // copy type
   show_op(&quot;demo_copy for array of f64&quot;);
   demo_copy(arr);
-  println!(&quot;  copied array arr: {arr:?}&#92;n&quot;);
+  println!(&quot;  copied array arr: {arr:?}&quot;);
 }
 /*-- demonstrate move types -----------------------------*/
 fn demo_move&lt;T:Debug + Clone&gt;(t:T) {
@@ -440,6 +472,9 @@ fn demo_move&lt;T:Debug + Clone&gt;(t:T) {
   verify(tc);
 }
 fn execute_demo_move() {
+  show_note(&quot;demonstrate move&quot;);
+  nl();
+
   show_op(&quot;demo_move for String&quot;);
   let s = &quot;a string&quot;.to_owned();
   demo_move(s);
@@ -455,7 +490,6 @@ fn execute_demo_move() {
   // println!(&quot;  moved v: {v:?}&quot;);  // v moved, can't print
   println!();
 
-  use std::collections::HashMap;
   show_op(&quot;demo_move for HashMap&quot;);
   let mut m = HashMap::&lt;&str,i32&gt;::new();
   m.insert(&quot;zero&quot;, 0);
@@ -464,11 +498,13 @@ fn execute_demo_move() {
   demo_move(m);
   println!(&quot;  moved HashMap m&quot;);
   // println!(&quot;  moved m: {m:?}&quot;);  // m moved, can't print
-  println!();
 }
 /*-- demonstrate mutability -----------------------------*/
 fn execute_demo_mutable() {
-  show_op(&quot;demo_mutable&quot;);
+  show_note(&quot;demonstrate mutability&quot;);
+  nl();
+
+  show_op(&quot;demo_mutable for primitives&quot;);
   let mut i = 42i32;
   print!(&quot;  original value: {i:?}&quot;);
   i += 1;
@@ -478,13 +514,14 @@ fn execute_demo_mutable() {
   print!(&quot;  original value: {f:?}&quot;);
   f += 1.0;
   println!(&quot;, changed value:  {f:?}&quot;);
+  nl();
 
+  show_op(&quot;demo_mutable for std::lib types&quot;);
   let mut v = vec![1, 2, 3];
   print!(&quot;  original value: {v:?}&quot;);
   v[1] += 1;
   println!(&quot;, changed value:  {v:?}&quot;);
 
-  use std::collections::HashMap;
   let mut m = HashMap::&lt;&str,i32&gt;::new();
   m.insert(&quot;zero&quot;, 0);
   m.insert(&quot;one&quot;, 1);
@@ -497,16 +534,20 @@ fn execute_demo_mutable() {
 }
 /*-- demonstrate references -----------------------------*/
 fn execute_demo_ref() {
-  show_op(&quot;demo_ref&quot;);
+  show_note(&quot;demonstrate references&quot;);
+  nl();
 
+  show_op(&quot;demo_ref immutable&quot;);
   let v1 = vec![1, 2, 3, 2, 1];
   /* can use any number of immutable referenes */
   let r1v1 = &v1;
   println!(&quot;  r1v1: {r1v1:?}&quot;);
   let r2v1 = &v1;
   println!(&quot;  r2v1: {r2v1:?}&quot;);
+  nl();
 
-  /* can't use any number of immutable referenes */
+  show_op(&quot;demo_ref mutable&quot;);
+  /* can't mutate data through shared references */
   let mut v2 = vec![1, 2, 3, 4, 5];
   /* immutable borrow */
   let r1v2 = &v2;
@@ -517,9 +558,7 @@ fn execute_demo_ref() {
   println!(&quot;  mr2v2: {mr2v2:?}&quot;);
   /*
     Use of immutable borrow in println! illegal with active
-    mutable borrow.
-
-    Try uncommenting line below.
+    mutable borrow. Try uncommenting line below.
   */
   // println!(&quot;  r1v2: {r1v2:?}&quot;);
 }
@@ -528,15 +567,16 @@ fn main() {
     show_note(
       &quot;Demonstrate Rust types&quot;
     );
-    println!();
 
+    create_initialize();
     execute_demo_copy();
     execute_demo_move();
     execute_demo_mutable();
     execute_demo_ref();
 
     println!(&quot;&#92;n&#92;nThat's all Folks!!&#92;n&#92;n&quot;);
-}</code></pre>
+}
+</code></pre>
           <h4 id="anal">Source Code: bits_data_analysis.rs</h4>
           <pre><code class="language-rust">#![allow(unused_mut)]
 #![allow(dead_code)]
@@ -597,71 +637,161 @@ pub fn show_op(opt: &str) {
 */
 pub fn nl() {
   println!();
-}            </code></pre>
+}</code></pre>
           <h4 id="out">Output</h4>
-          <pre class="codeSnaps"><code class="language-shell">C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data
-&gt; cargo run
-   Compiling rust_data v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.37s
-     Running `target&#92;debug&#92;rust_data.exe`
+          <pre class="codeSnaps"><code class="language-shell">C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build
+&gt; debug/Cpp_Data
+--------------------------------------------------
+   Demonstrate C++ types
+--------------------------------------------------
 
--------------------------
- Demonstrate Rust types
--------------------------
+--------------------------------------------------
+  initialize primitives in stack from literals
+--------------------------------------------------
+  t1: type: int
+  t1a: type: __int64
+  d: type: double
+  s: type: class std::basic_string&lt;char,struct std:...
 
---- demo_copy for i64 ---
-  T, i64
-  value: 42, size: 8
-  T, &i64
-  value: 42, size: 8
-  copied i: 42
+  --- copy construct ---
+  s2: type: class std::basic_string&lt;char,struct std:...
 
---- demo_copy for array of f64 ---
-  T, [f64; 3]
-  value: [3.14, 0.5, -0.75], size: 24
-  T, &[f64; 3]
-  value: [3.14, 0.5, -0.75], size: 8
-  copied array arr: [3.14, 0.5, -0.75]
+--------------------------------------------------
+  store instances of primitives in heap
+--------------------------------------------------
+  dptr: type: double *
+  *dptr: type: double
 
---- demo_move for String ---
-  T, alloc::string::String
-  value: &quot;a string&quot;, size: 24
-  T, &alloc::string::String
-  value: &quot;a string&quot;, size: 8
-  moved String s
+  --- string: control block in stack, data in heap ---
+  s2: type: class std::basic_string&lt;char,struct std:...
 
---- demo_move for Vec ---
-  T, alloc::vec::Vec&lt;i32&gt;
-  value: [1, 2, 3], size: 24
-  T, &alloc::vec::Vec&lt;i32&gt;
-  value: [1, 2, 3], size: 8
-  moved Vec v
+  --- C++ reference ---
+  rs2: type: class std::basic_string&lt;char,struct std:...
 
---- demo_move for HashMap ---
-  T, std::collections::hash::map::HashMap&lt;&str, i32&gt;
-  value: {&quot;zero&quot;: 0, &quot;one&quot;: 1, &quot;two&quot;: 2}, size: 48
-  T, &std::collections::hash::map::HashMap&lt;&str, i32&gt;
-  value: {&quot;zero&quot;: 0, &quot;one&quot;: 1, &quot;two&quot;: 2}, size: 8
-  moved HashMap m
+  --- unique_ptr owns data ---
+  ptr: type: class std::unique_ptr&lt;int,struct std::de...
+  *ptr: type: int
 
---- demo_mutable ---
-  original value: 42, changed value:  43
-  original value: 3.14159, changed value:  4.14159
-  original value: [1, 2, 3], changed value:  [1, 3, 3]
-  original value: {&quot;one&quot;: 1, &quot;two&quot;: 2, &quot;zero&quot;: 0}
-  changed value:  {&quot;one&quot;: 2, &quot;two&quot;: 2, &quot;zero&quot;: 0}
+  --- heap data deleted when unique_ptr leaves scope ---
 
---- demo_ref ---
-  r1v1: [1, 2, 3, 2, 1]
-  r2v1: [1, 2, 3, 2, 1]
-  r1v2: [1, 2, 3, 4, 5]
-  mr2v2: [1, 2, 3, 4, 5, 42]
+--------------------------------------------------
+  demo std library types
+--------------------------------------------------
+
+  v: type: class std::vector&lt;int,class std::allocat...
+  value: {
+      1, 2, 3, 2, 1
+  }
+  size:  16
+
+  m: type: class std::unordered_map&lt;class std::basi...
+  value: {
+    {zero, 0}, {one, 1}, {two, 2}
+  }
+
+--------------------------------------------------
+  demonstrate copy
+--------------------------------------------------
+
+  --- direct integer copy ---
+  source: 42
+  destin: 42
+
+  --- direct vector copy ---
+  source:
+  v_src: {
+    1, 2, 3, 4, 5
+  }
+  destin:
+  v_dst: {
+    1, 2, 3, 4, 5
+  }
+
+  --- copy integer ---
+  before pass_by_value: 42
+  t:T: type: int
+  after pass_by_value:  42
+
+  --- copy vector ---
+  before pass_by_value:
+  v: {
+    1, 2, 3, 2, 1
+  }
+  t:T: type: class std::vector&lt;int,class std::allocat...
+  after pass_by_value:
+  v: {
+    1, 2, 3, 2, 1
+  }
+
+  --- copy unordered_map ---
+  before pass_by_value:
+  map {
+    {zero, 0}, {one, 1}, {two, 2}
+  }
+  t:T: type: class std::unordered_map&lt;class std::basi...
+  after pass_by_value:
+  map {
+    {zero, 0}, {one, 1}, {two, 2}
+  }
+
+--------------------------------------------------
+  demonstrate copy by reference
+--------------------------------------------------
+
+  --- copy ref of integer ---
+  before pass_by_ref: 42
+  T: type: int
+  after pass_by_ref:  0
+
+  --- copy ref of vector ---
+  before pass_by_ref:
+  v: {
+    1, 2, 3, 2, 1
+  }
+  T: type: class std::vector&lt;int,class std::allocat...
+  after pass_by_ref:
+  v: {
+
+  }
+  --- copy ref of unordered_map ---
+  before pass_by_ref:
+  map {
+    {zero, 0}, {one, 1}, {two, 2}
+  }
+  T: type: class std::unordered_map&lt;class std::basi...
+  after pass_by_ref:
+  map {
+
+  }
+
+--------------------------------------------------
+  demonstrate move
+--------------------------------------------------
+
+  --- move string ---
+  s1 = &quot;a string&quot;
+  s2 = &quot; plus more&quot;
+  s = s1 + s2 =&gt; &quot;a string plus more&quot;
+
+  --- move vector ---
+  before move:
+  v: {
+    1, 2, 3, 2, 1
+  }
+  after move of v into vm:
+  vm: {
+    1, 2, 3, 2, 1
+  }
+
+  v: {
+
+  }
 
 
-That's all Folks!!
+  That's all Folks!
 
 
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build
 &gt;
 </code></pre>
           <h4 id="build">Build</h4>
