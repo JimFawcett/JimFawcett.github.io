@@ -18,6 +18,8 @@
   <script src="js/ScriptsPageFrame.js"></script>
   <script src="js/ScriptsPageFramePagesBits.js"></script>
   <script src="js/ScriptsPageFrameKeyboard.js"></script>
+  <link rel="stylesheet" href="css/prism.css" />
+  <script src="js/prism.js"></script>
   <!--<script src="js/ScriptsPageFrameNewRadioButtons.js"></script>-->
   <style>
     #github .note {
@@ -221,6 +223,16 @@
     #github hr.spread {
       margin:0.75em 0em;
     }
+    #github pre {
+      width: max-content;
+      min-width: 40em;
+      max-width: 60em;
+      user-select: all;
+    }
+
+    #github {
+      user-select: none;
+    }
   </style>
   <script>
     function saveScroll() {
@@ -248,7 +260,7 @@
 
   <script>
     function remote() {
-      window.open('https://godbolt.org/z/Mjdcahdjs', '_blank');
+      window.open('https://godbolt.org/z/9TEs864Ef', '_blank');
     }
   </script>
 </head>
@@ -346,8 +358,7 @@
         <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote()" />
         <div style="display:flex; flex-direction:column;">
           <h4 id="source">Source Code</h4>
-          <pre class="codeSnap">
-import sys
+          <pre class="codeSnaps"><code class="language-python">import sys
 # Python/Py_Data::Py_Data.py
 #
 # Python Dynamic Data Types
@@ -362,116 +373,158 @@ import sys
 # Python requires definition before use ordering
 #  - no link phase to find definitions
 
+# nl = &quot;&#92;n&quot;
+
+# def showType(t, nm, suffix = &quot;&quot;) :
+#     print(nm, type(t))
+#     print(&quot;value: &quot;, t, ', size: ', sys.getsizeof(t), suffix)
+
+# def showIdent(t, n, suffix = &quot;&quot;) :
+#     print(n, t, id(t), suffix)
+
+# def showNote(text, suffix = &quot;&quot;) :
+#     print(&quot;-------------------------&quot;)
+#     print(text)
+#     print(&quot;-------------------------&quot;, suffix)
+
+import Py_DataAnalysis
+import copy
+
+Anal = Py_DataAnalysis
+nl = Anal.nl
+
+def execute() :
+    Anal.showNote(&quot;Demonstrate Python Types&quot;)
+    # types
+    print(&quot;&#92;n  -- instances of all types reside in managed heap --&#92;n&quot;)
+    t1 = 42
+    Anal.showType(t1, &quot;t1&quot;, nl)
+    t1 = 3.14159         #dynamic type t1 redefined
+    Anal.showType(t1, &quot;t1&quot;, nl)
+    t1 = [1, 2, 3, 4]    #dynamic type t1 redefined
+    Anal.showType(t1, &quot;t1&quot;, nl)
+
+    # reference behavior - change of object
+    Anal.showOp(&quot;t2 = t1&quot;)
+    t2 = t1
+    Anal.showIdent(t1,&quot;t1&quot;)
+    Anal.showIdent(t2,&quot;t2&quot;, nl)
+
+    Anal.showOp(&quot;t2 = 3.33333 : change of object&quot;)
+    t2 = 3.33333
+    Anal.showIdent(t2,&quot;t2&quot;)
+    Anal.showType(t2,&quot;t2&quot;, nl)
+
+    # reference behavior - modify object
+    Anal.showOp(&quot;t2 += -1.0 : modify object&quot;)
+    t2 += -1.0
+    Anal.showIdent(t2,&quot;t2&quot;)
+    Anal.showType(t2, &quot;t2&quot;, nl)
+
+    # reference behavior
+    Anal.showOp(&quot;t3 = [1, &#92;&quot;one&#92;&quot;]&quot;)
+    t3 = [1, &quot;one&quot;]
+    Anal.showIdent(t3, &quot;t3&quot;)
+    Anal.showType(t3, &quot;t3&quot;, nl)
+
+    Anal.showOp(&quot;t4 = t3&quot;)
+    t4 = t3
+    Anal.showIdent(t3, &quot;t3&quot;)
+    Anal.showType(t3,&quot;t3&quot;)
+    Anal.showIdent(t4, &quot;t4&quot;)
+    Anal.showType(t4,&quot;t4&quot;)
+    Anal.showNote(
+      &quot;&quot;&quot;t3 and t4 are two distinct handles&#92;n&quot;&quot;&quot;
+      &quot;&quot;&quot;  pointing to same instance&quot;&quot;&quot;, nl
+    )
+
+    # reference behavior - no copy on write
+    Anal.showOp(&quot;t4.append('b') : no copy on write&quot;)
+    t4.append('b')
+    Anal.showIdent(t3, &quot;t3&quot;)
+    Anal.showType(t3,&quot;t3&quot;)
+    Anal.showIdent(t4, &quot;t4&quot;)
+    Anal.showType(t4,&quot;t4&quot;)
+    Anal.showNote(
+      &quot;t3 modified - same heap object,&#92;n  no copy on write&quot;, nl
+    )
+
+    # reference behavior - new child object
+    Anal.showOp(&quot;t5 = (1, 2, 3)&quot;)
+    t5 = (1, 2, 3)
+    Anal.showIdent(t5, &quot;t5&quot;)
+    Anal.showOp(&quot;t6 = [1, t5, &#92;&quot;weird&#92;&quot;]&quot;)
+    t6 = [1, t5, &quot;weird&quot;]
+    Anal.showIdent(t6, &quot;t6&quot;)
+    Anal.showType(t6, &quot;t6&quot;)
+    Anal.showOp(&quot;t5 = 1 + 1j : new object&quot;)
+    t5 = 1 + 1j
+    Anal.showIdent(t5, &quot;t5&quot;)
+    Anal.showIdent(t6, &quot;t6&quot;)
+    Anal.showNote(&quot;new object for t5, t6 not affected&quot;, nl)
+
+    # reference behavior - string copy on write
+    Anal.showOp(&quot;t7 = &#92;&quot;a string&#92;&quot;&quot;)
+    t7 = &quot;a string&quot;
+    Anal.showIdent(t7, &quot;t7&quot;)
+    Anal.showType(t7, &quot;t7&quot;)
+    Anal.showOp(&quot;t8 = t7&quot;)
+    t8 = t7
+    Anal.showIdent(t8, &quot;t8&quot;)
+    Anal.showOp(&quot;t8 += &#92;&quot; and another string&#92;&quot; : copy on write&quot;)
+    t8 += &quot; and another string&quot;
+    Anal.showIdent(t7, &quot;t7&quot;)
+    Anal.showIdent(t8, &quot;t8&quot;)
+    Anal.showType(t8, &quot;t8&quot;)
+    Anal.showNote(&quot;t7 not modified : str copy on write&quot;, nl)
+
+    # deepcopy
+    Anal.showOp(&quot;t10 = copy.deepcopy(t9)&quot;)
+    t9 = list[1, 2, 3]
+    Anal.showIdent(t9, &quot;t9&quot;)
+    t10 = copy.deepcopy(t9);
+    Anal.showIdent(t10, &quot;t10&quot;)
+    Anal.showNote(
+      &quot;two distinct handles each with&#92;n  a unique instance&quot;,
+      nl
+    )
+
+    # reference behavior - iterate over children
+    Anal.showOp(&quot;iterate over t6 children&quot;)
+    for i in t6:
+        Anal.showIdent(i, &quot;elem&quot;)
+    print();
+
+    Anal.showOp(&quot;iterate over t6 methods&quot;)
+    print(dir(t6))
+
+    print(&quot;&#92;nThat's all folks!&#92;n&quot;)
+
+execute()
+</code></pre>
+          <h4 id="anal">Source Code: Py_DataAnalysis.py</h4>
+          <pre><code class="language-python">import sys
+# Python/Py_Data::Py_DataAnalysis.py
+#
+
 nl = &quot;&#92;n&quot;
 
 def showType(t, nm, suffix = &quot;&quot;) :
     print(nm, type(t))
     print(&quot;value: &quot;, t, ', size: ', sys.getsizeof(t), suffix)
 
-def showIdent(t, n, suffix = &quot;&quot;) :
-    print(n, t, id(t), suffix)
+def showIdent(t, nm, suffix = &quot;&quot;) :
+    print(nm, t, &quot;:&quot;, id(t), suffix, sep=' ')
 
 def showNote(text, suffix = &quot;&quot;) :
-    print(&quot;-------------------------&quot;)
-    print(text)
-    print(&quot;-------------------------&quot;, suffix)
+    print(&quot;----------------------------------------&quot;)
+    print(&quot; &quot;, text)
+    print(&quot;----------------------------------------&quot;, suffix)
 
-def execute() :
-    print(&quot; Demonstrate Python Types&quot;)
-    print(&quot;--------------------------&quot;)
-    # types
-    print(&quot;&#92;n  -- instances of all types reside in managed heap --&#92;n&quot;)
-    t1 = 42
-    showType(t1, &quot;t1&quot;, nl)
-    t1 = 3.14159         #dynamic type t1 redefined
-    showType(t1, &quot;t1&quot;, nl)
-    t1 = [1, 2, 3, 4]    #dynamic type t1 redefined
-    showType(t1, &quot;t1&quot;, nl)
-
-    # reference behavior - change of object
-    print(&quot;-- t2 = t1 --&quot;)
-    t2 = t1
-    showIdent(t1,&quot;t1&quot;)
-    showIdent(t2,&quot;t2&quot;, nl)
-
-    print(&quot;&#92;n-- t2 = 3.33333 : change of object --&quot;)
-    t2 = 3.33333
-    showIdent(t2,&quot;t2&quot;)
-    showType(t2,&quot;t2&quot;, nl)
-
-    # reference behavior - modify object
-    print(&quot;-- t2 += -1.0 : modify object --&quot;)
-    t2 += -1.0
-    showIdent(t2,&quot;t2&quot;)
-    showType(t2, &quot;t2&quot;, nl)
-
-    # reference behavior
-    print(&quot;-- t3 = [1, &#92;&quot;one&#92;&quot;] --&quot;)
-    t3 = [1, &quot;one&quot;]
-    showIdent(t3, &quot;t3&quot;)
-    showType(t3, &quot;t3&quot;, nl)
-
-    print(&quot;-- t4 = t3 --&quot;)
-    t4 = t3
-    showIdent(t3, &quot;t3&quot;)
-    showType(t3,&quot;t3&quot;)
-    showIdent(t4, &quot;t4&quot;)
-    showType(t4,&quot;t4&quot;, nl)
-
-    # reference behavior - no copy on write
-    print(&quot;-- t4.append('b') : no copy on write --&quot;)
-    t4.append('b')
-    showIdent(t3, &quot;t3&quot;)
-    showType(t3,&quot;t3&quot;)
-    showIdent(t4, &quot;t4&quot;)
-    showType(t4,&quot;t4&quot;)
-    showNote(&quot;t3 modified - same heap object, no copy on write&quot;, nl)
-
-    # reference behavior - new child object
-    print(&quot;-- t5 = (1, 2, 3) --&quot;)
-    t5 = (1, 2, 3)
-    showIdent(t5, &quot;t5&quot;)
-    print(&quot;-- t6 = [1, t5, &#92;&quot;weird&#92;&quot;] --&quot;)
-    t6 = [1, t5, &quot;weird&quot;]
-    showIdent(t6, &quot;t6&quot;)
-    showType(t6, &quot;t6&quot;)
-    print(&quot;-- t5 = 1 + 1j : new object --&quot;)
-    t5 = 1 + 1j
-    showIdent(t5, &quot;t5&quot;)
-    showIdent(t6, &quot;t6&quot;)
-    showNote(&quot;new object for t5, t6 not affected&quot;, nl)
-
-    # reference behavior - string copy on write
-    print(&quot;-- t7 = &#92;&quot;a string&#92;&quot; --&quot;)
-    t7 = &quot;a string&quot;
-    showIdent(t7, &quot;t7&quot;)
-    showType(t7, &quot;t7&quot;)
-    print(&quot;-- t8 = t7 --&quot;)
-    t8 = t7
-    showIdent(t8, &quot;t8&quot;)
-    print(&quot;-- t8 += &#92;&quot; and another string&#92;&quot; : copy on write&quot;)
-    t8 += &quot; and another string&quot;
-    showIdent(t7, &quot;t7&quot;)
-    showIdent(t8, &quot;t8&quot;)
-    showType(t8, &quot;t8&quot;)
-    showNote(&quot;t7 not modified : copy on write&quot;, nl)
-
-    # reference behavior - iterate over children
-    print(&quot;-- iterate over t6 children --&quot;)
-    for i in t6:
-        showIdent(i, &quot;elem&quot;)
-
-    print(&quot;&#92;n-- iterate over t6 methods --&quot;)
-    print(dir(t6))
-
-    print(&quot;&#92;nThat's all folks!&#92;n&quot;)
-
-execute()
-
-          </pre>
+def showOp(text):
+    print(&quot;--&quot;, text, &quot;--&quot;)          </code></pre>
           <h4 id="out">Output</h4>
-          <pre class="codeSnap">
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data
+          <pre class="codeSnaps"><code class="language-python">C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data
 &gt; python Py_Data.py
  Demonstrate Python Types
 --------------------------
@@ -575,7 +628,7 @@ That's all folks!
 
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data
 &gt;
-          </pre>
+</code></pre>
           <!--<h4>Build</h4>
           <pre class="codeSnap">
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data
@@ -657,6 +710,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data
         <menu-elem class="secElem"><a href="#refs">refs</a></menu-elem>
         <menu-elem class="secElem"><a href="#ide">VS Code</a></menu-elem>
         <menu-elem class="secElem"><a href="#out">out</a></menu-elem>
+        <menu-elem class="secElem"><a href="#anal">anal</a></menu-elem>
         <menu-elem class="secElem"><a href="#source">src</a></menu-elem>
         <menu-elem class="secElem"><a href="#code">codeSnaps</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>

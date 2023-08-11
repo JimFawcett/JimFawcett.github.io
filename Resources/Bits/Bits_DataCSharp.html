@@ -18,6 +18,8 @@
   <script src="js/ScriptsPageFrame.js"></script>
   <script src="js/ScriptsPageFramePagesBits.js"></script>
   <script src="js/ScriptsPageFrameKeyboard.js"></script>
+  <link rel="stylesheet" href="css/prism.css" />
+  <script src="js/prism.js"></script>
   <!--<script src="js/ScriptsPageFrameNewRadioButtons.js"></script>-->
   <style>
     #github .note {
@@ -221,6 +223,16 @@
     #github hr.spread {
       margin:0.75em 0em;
     }
+    #github pre {
+      width: max-content;
+      min-width: 40em;
+      max-width: 60em;
+      user-select: all;
+    }
+
+    #github {
+      user-select: none;
+    }
   </style>
   <script>
     function saveScroll() {
@@ -349,13 +361,13 @@
         <h3 id="code">1.0 CodeSnaps</h3>
         <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote()" />
         <div style="display:flex; flex-direction:column;">
-          <h4 id="source">Source Code</h4>
-          <pre class="codeSnap">
-using System;
+          <h4 id="source">Source Code: Program.cs</h4>
+          <pre class="codeSnaps"><code class="language-csharp">using System;
 using System.Reflection;
 using System.Reflection.Emit;
+using Analysis;
 
-/* Cs_Data::Cs_Data.cs */
+/* Cs_Data::Program.cs */
 /*
   Static Data Types:
     value types =&gt; assignment copies value
@@ -364,7 +376,7 @@ using System.Reflection.Emit;
       float, double
       decimal, char, bool
       struct
-      Reference types =&gt; assignment copies reference
+    Reference types =&gt; assignment copies reference
     ----------------------------------------------
       object, string, class
 */
@@ -373,6 +385,7 @@ using System.Reflection.Emit;
 //
 namespace HelloData
 {
+//  using AnalysisData
   /*--
     Svt is a value type used for type demo example.
     It consists of three public properties.
@@ -383,7 +396,7 @@ namespace HelloData
     public int I { get; set; } = 0;
     public double D { get; set; } = 1.0;
     public char C { get; set; }  = 'a';
-    public void printSelf(string name) {
+    public readonly void PrintSelf(string name) {
       Console.Write(&quot;{0}  {{ I:{1}, D:{2}, C:{3} }}&#92;n&quot;, name, I, D, C);
     }
   }
@@ -397,12 +410,11 @@ namespace HelloData
     public int I { get; set; } = 0;
     public double D { get; set; } = 1.0;
     public string S { get; set; }  = &quot;a string&quot;;
-    public void printSelf(string name) {
+    public void PrintSelf(string name) {
       Console.Write(&quot;{0}  {{ I:{1}, D:{2}, S:{3} }}&#92;n&quot;, name, I, D, S);
     }
   }
   /*-- type demonstration --*/
-
 
   class Program
   {
@@ -412,117 +424,128 @@ namespace HelloData
 
     static void Main(string[] args)
     {
-      print(&quot; Demonstrate C# types&quot;);
+      Display.Print(&quot; Demonstrate C# types&quot;);
 
-      showNote(&quot;int - value type&quot;);
+      Display.ShowNote(&quot;int - value type&quot;);
 
-      showOp(&quot;int t1 = 42&quot;);
+      Display.ShowOp(&quot;int t1 = 42&quot;);
       int t1 = 42;
-      showType(t1, &quot;t1&quot;, nl);
+      Display.ShowType(t1, &quot;t1&quot;, nl);
 
-      showOp(&quot;interate over val type members using reflection&quot;);
-      iterate(t1);
-      print();
+      Display.ShowOp(&quot;interate over val type members using reflection&quot;);
+      Display.Iterate(t1);
+      Display.Print();
 
-      showOp(&quot;int t1a = t1 : copy of value type&quot;);
+      Display.ShowOp(&quot;int t1a = t1 : copy of value type&quot;);
       int t1a = t1;
-      isSameObj(t1a, &quot;t1a&quot;, t1, &quot;t1&quot;, nl);
+      Display.IsSameObj(t1a, &quot;t1a&quot;, t1, &quot;t1&quot;, nl);
 
       // reference behavior - copy on write
-      showNote(&quot;string - reference type&quot;);
+      Display.ShowNote(&quot;string - reference type&quot;);
 
-      showOp(&quot;string t2 = &#92;&quot;a string&#92;&quot;&quot;);
+      Display.ShowOp(&quot;string t2 = &#92;&quot;a string&#92;&quot;&quot;);
       string t2 = &quot;a string&quot;;
-      showType(t2, &quot;t2&quot;);
+      Display.ShowType(t2, &quot;t2&quot;);
 
-      showNote(&quot;string has many methods - uncomment next line to see them&quot;, &quot;&quot;, 60);
-      //iterate(t2);
+      Display.ShowNote(&quot;string has many methods - uncomment next line to see them&quot;, &quot;&quot;, 60);
+      //Display.Iterate(t2);
 
-      showOp(&quot;string t3 = t2 : copy handle of ref type&quot;);
+      Display.ShowOp(&quot;string t3 = t2 : copy handle of ref type&quot;);
       string t3 = t2;
-      showType(t3, &quot;t3&quot;);
-      isSameObj(t3,&quot;t3&quot;,t2,&quot;t2&quot;);
+      Display.ShowType(t3, &quot;t3&quot;);
+      Display.IsSameObj(t3,&quot;t3&quot;,t2,&quot;t2&quot;);
 
-      showOp(&quot;t3 += &#92;&quot; is here&#92;&quot; : copy on write&quot;);
+      Display.ShowOp(&quot;t3 += &#92;&quot; is here&#92;&quot; : copy on write&quot;);
       t3 += &quot; is here&quot;;
-      showType(t2, &quot;t2&quot;);
-      showType(t3, &quot;t3&quot;);
-      isSameObj(t3,&quot;t3&quot;,t2,&quot;t2&quot;);
-      showNote(&quot;t2 not modified by change in t3 due to copy on write&quot;, nl, 55);
+      Display.ShowType(t2, &quot;t2&quot;);
+      Display.ShowType(t3, &quot;t3&quot;);
+      Display.IsSameObj(t3,&quot;t3&quot;,t2,&quot;t2&quot;);
+      Display.ShowNote(&quot;t2 not modified by change in t3 due to copy on write&quot;, nl, 55);
+      Console.WriteLine();
 
-      showNote(&quot;Object - base reference type&quot;);
+      Display.ShowNote(&quot;Object - base reference type&quot;);
 
-      showOp(&quot;Object obj1 - new Object()&quot;);
+      Display.ShowOp(&quot;Object obj1 - new Object()&quot;);
       Object obj1 = new Object();
-      showType(obj1, &quot;obj&quot;);
+      Display.ShowType(obj1, &quot;obj&quot;);
 
-      showOp(&quot;interate over ref type members using reflection&quot;);
-      iterate(obj1);
-      print();
+      Display.ShowOp(&quot;interate over ref type members using reflection&quot;);
+      Display.Iterate(obj1);
+      Display.Print();
 
-      showOp(&quot;Object obj2 = obj1&quot;);
+      Display.ShowOp(&quot;Object obj2 = obj1&quot;);
       Object obj2 = obj1;
-      isSameObj(obj2, &quot;obj2&quot;, obj1, &quot;obj1&quot;, nl);
+      Display.IsSameObj(obj2, &quot;obj2&quot;, obj1, &quot;obj1&quot;, nl);
 
-      showNote(&quot;Svt Struct value type&quot;);
+      Display.ShowNote(&quot;Svt Struct value type&quot;);
 
-      showOp(&quot;Svt t4 = new Svt()&quot;);
-      Svt t4 = new Svt();
-      t4.I = 3;
-      t4.D = 3.1415927;
-      t4.C = 'z';
-      t4.printSelf(&quot;t4&quot;);
-      showType(t4, &quot;t4&quot;);
-      showNote(&quot;value type: size of object in stackframe&quot;, nl, 45);
+      Display.ShowOp(&quot;Svt t4 = new Svt()&quot;);
+      Svt t4 = new() { I=3, D=3.1415927, C='z' };
+      t4.PrintSelf(&quot;t4&quot;);
+      Display.ShowType(t4, &quot;t4&quot;);
+      Display.ShowNote(&quot;value type: size of object in stackframe&quot;, nl, 45);
 
-      /* iterate over val type members using reflection */
-      showOp(&quot;iterate over val type members using reflection&quot;);
-      iterate(t4);
-      print();
+      /* Iterate over val type members using reflection */
+      Display.ShowOp(&quot;Iterate over val type members using reflection&quot;);
+      Display.Iterate(t4);
+      Display.Print();
 
       /* copy of value type */
-      showOp(&quot;Svt t4a = t4 : copy of val type&quot;);
+      Display.ShowOp(&quot;Svt t4a = t4 : copy of val type&quot;);
       Svt t4a = t4;
-      t4a.printSelf(&quot;t4a&quot;);
-      t4.printSelf(&quot;t4&quot;);
-      isSameObj(t4a,&quot;t4a&quot;,t4,&quot;t4&quot;);
-      showType(t4a, &quot;t4a&quot;);
+      t4a.PrintSelf(&quot;t4a&quot;);
+      t4.PrintSelf(&quot;t4&quot;);
+      Display.IsSameObj(t4a,&quot;t4a&quot;,t4,&quot;t4&quot;);
+      Display.ShowType(t4a, &quot;t4a&quot;);
 
-      showOp(&quot;t4a.C = 'q'&quot;);
+      Display.ShowOp(&quot;t4a.C = 'q'&quot;);
       t4a.C = 'q';
-      t4a.printSelf(&quot;t4a&quot;);
-      t4.printSelf(&quot;t4&quot;);
-      isSameObj(t4, &quot;t4&quot;, t4a, &quot;t4a&quot;, nl);
+      t4a.PrintSelf(&quot;t4a&quot;);
+      t4.PrintSelf(&quot;t4&quot;);
+      Display.IsSameObj(t4, &quot;t4&quot;, t4a, &quot;t4a&quot;, nl);
 
-      showNote(&quot;Crt - ref type with ref member&quot;);
+      Display.ShowNote(&quot;Crt - ref type with ref member&quot;);
 
-      showOp(&quot;Crt t5 = new Crt()&quot;);
-      Crt t5 = new Crt();
-      t5.S = &quot;SomeString&quot;;
-      t5.printSelf(&quot;t5&quot;);
-      showType(t5, &quot;t5&quot;);
-      showNote(&quot;ref type: size of handle to object in heap&quot;, nl, 45);
+      Display.ShowOp(&quot;Crt t5 = new Crt()&quot;);
+      Crt t5 = new() { S = &quot;SomeString&quot; };
+      // using default values for I and D
+      t5.PrintSelf(&quot;t5&quot;);
+      Display.ShowType(t5, &quot;t5&quot;);
+      Display.ShowNote(&quot;ref type: size of handle to object in heap&quot;, nl, 45);
 
       /* copy handle of reference type */
-      showOp(&quot;Crt t5a = t5 : copy handle of ref type&quot;);
+      Display.ShowOp(&quot;Crt t5a = t5 : copy handle of ref type&quot;);
       Crt t5a = t5;
-      t5a.printSelf(&quot;t5a&quot;);
-      isSameObj(t5a, &quot;t5a&quot;, t5, &quot;t5&quot;);
-      isSameObj(t5a.S, &quot;t5a.S&quot;, t5.S, &quot;t5.S&quot;);
+      t5a.PrintSelf(&quot;t5a&quot;);
+      Display.IsSameObj(t5a, &quot;t5a&quot;, t5, &quot;t5&quot;);
+      Display.IsSameObj(t5a.S, &quot;t5a.S&quot;, t5.S, &quot;t5.S&quot;);
 
       /* literal strings are not immutable */
-      showOp(&quot;t5a.S = &#92;&quot;new literal string&#92;&quot; : no copy on write&quot;);
+      Display.ShowOp(&quot;t5a.S = &#92;&quot;new literal string&#92;&quot; : no copy on write&quot;);
       t5a.S = &quot;new string&quot;;
-      t5a.printSelf(&quot;t5a&quot;);
-      t5a.printSelf(&quot;t5&quot;);
-      isSameObj(t5a, &quot;t5a&quot;, t5, &quot;t5&quot;);
-      isSameObj(t5a.S, &quot;t5a.S&quot;, t5.S, &quot;t5.S&quot;);
-      showNote(&quot;source t5 was altered!&quot;);
+      t5a.PrintSelf(&quot;t5a&quot;);
+      t5a.PrintSelf(&quot;t5&quot;);
+      Display.IsSameObj(t5a, &quot;t5a&quot;, t5, &quot;t5&quot;);
+      Display.IsSameObj(t5a.S, &quot;t5a.S&quot;, t5.S, &quot;t5.S&quot;);
+      Display.ShowNote(&quot;source t5 was altered!&quot;);
 
       Console.WriteLine(&quot;&#92;nThat's all Folks!&#92;n&quot;);
     }
+  }
+}</code></pre>
+          <h4 id="anal">Source Code: AnalysisData.cs</h4>
+          <pre><code class="language-csharp">using System;
+using System.Reflection;
+using System.Reflection.Emit;
+
+/* Cs_Data::AnalysisData.cs */
+
+namespace Analysis
+{
+  class Display
+  {
     /*-- simple reflection --*/
-    public static void showType&lt;T&gt;(T t, String nm, string suffix = &quot;&quot;)
+    public static void ShowType&lt;T&gt;(T t, String nm, String suffix = &quot;&quot;)
     {
       #pragma warning disable CS8602  // possibly null reference warning
       Type tt = t.GetType();
@@ -535,7 +558,7 @@ namespace HelloData
       int id = t.GetHashCode();
       Console.WriteLine(&quot;{0}, {1}{2}&quot;, n, id, suffix);
     }
-    public static void isSameObj&lt;T&gt;(
+    public static void IsSameObj&lt;T&gt;(
       T t1, String n1, T t2, String n2, string suffix = &quot;&quot;
     ) {
       if(ReferenceEquals(t1, t2)) {
@@ -548,11 +571,11 @@ namespace HelloData
           &quot;{0} is not same object as {1}{2}&quot;, n1, n2, suffix);
       }
     }
-    public static void showOp(string op, string suffix = &quot;&quot;) {
+    public static void ShowOp(String op, String suffix = &quot;&quot;) {
       Console.WriteLine(&quot;--- {0} ---{1}&quot;, op, suffix);
     }
     // https://stackoverflow.com/questions/7613782/iterating-through-struct-members
-    public static void iterate&lt;T&gt;(T t) /*where T:new()*/ {
+    public static void Iterate&lt;T&gt;(T t) /*where T:new()*/ {
       Console.WriteLine(&quot;fields:&quot;);
       foreach(
         var field in typeof(T).GetFields(
@@ -574,10 +597,10 @@ namespace HelloData
         );
       }
     }
-    public static void print(String s = &quot;&quot;) {
+    public static void Print(String s = &quot;&quot;) {
       Console.WriteLine(s);
     }
-    public static void showNote(string s, string suffix = &quot;&quot;, int length = 35) {
+    public static void ShowNote(string s, string suffix = &quot;&quot;, int length = 35) {
       string line = new string('-', length);
       Console.WriteLine(line);
       Console.WriteLine(&quot;  {0}&quot;, s);
@@ -614,11 +637,9 @@ namespace HelloData
       return checked((int)func());
     }
   }
-}
-          </pre>
+}</code></pre>
           <h4 id="out">Output</h4>
-          <pre class="codeSnap">
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data
+          <pre><code class="language-shell">C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data
 &gt; dotnet run
  Demonstrate C# types
 -----------------------------------
@@ -670,6 +691,7 @@ t3 is not same object as t2
 -------------------------------------------------------
   t2 not modified by change in t3 due to copy on write
 -------------------------------------------------------
+
 -----------------------------------
   Object - base reference type
 -----------------------------------
@@ -697,7 +719,7 @@ value: HelloData.Svt, size: 24
 ---------------------------------------------
   value type: size of object in stackframe
 ---------------------------------------------
---- iterate over val type members using reflection ---
+--- Iterate over val type members using reflection ---
 fields:
   &lt;I&gt;k__BackingField = 3
   &lt;D&gt;k__BackingField = 3.1415927
@@ -709,7 +731,7 @@ methods:
   set_D
   get_C
   set_C
-  printSelf
+  PrintSelf
   Equals
   GetHashCode
   ToString
@@ -753,9 +775,9 @@ That's all Folks!
 
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data
 &gt;
-          </pre>
+</code></pre>
           <h4 id="build">Build</h4>
-          <pre class="codeSnap">
+          <pre class="codeSnaps"><code class="language-csharp">
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data
 &gt; dotnet build
 MSBuild version 17.4.1+fedecea9d for .NET
@@ -771,7 +793,7 @@ Build succeeded.
 Time Elapsed 00:00:00.79
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data
 &gt;
-          </pre>
+</code></pre>
         </div>
 
         <h3 id="ide">2.0 VS Code View</h3>
@@ -836,6 +858,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data
         <menu-elem class="secElem"><a href="#ide">VS Code</a></menu-elem>
         <menu-elem class="secElem"><a href="#build">bld</a></menu-elem>
         <menu-elem class="secElem"><a href="#out">out</a></menu-elem>
+        <menu-elem class="secElem"><a href="#anal">anal</a></menu-elem>
         <menu-elem class="secElem"><a href="#source">src</a></menu-elem>
         <menu-elem class="secElem"><a href="#code">codeSnaps</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
