@@ -347,34 +347,271 @@
             <div style="height:0.25em;"></div>
           </t-b>
         <div style="height:0.25em;"></div>
-        <h3 id="code">1.0 Initialization</h3>
+        <details>
+          <summary class="darkItem">Rust Types&nbsp;</summary>
+          <h3>Table 1.0 Rust Types</h3>
+          <table style="font-size:0.9em;">
+            <tr>
+              <th style="width:15em;">Type</th><th>Comments</th><th>Example</th>
+            </tr>
+            <tr>
+              <th colspan="3" align="left">-- Integral types ----</th>
+            </tr>
+            <tr>
+              <td><c-s>bool</c-s></td><td>values true and false</td><td><c-s>let b = true;</c-s></td>
+            </tr>
+            <tr>
+              <td>
+                <c-s>i8, i16, i32, i64, isize, u8, u16, u32, u64, usize</c-s>
+              </td>
+              <td>signed and unsigned integer types</td><td><c-s>let i = 42i8;</c-s></td>
+            </tr>
+            <tr>
+              <th colspan="3" align="left">-- Floating point types ----</th>
+            </tr>
+            <tr>
+              <td><c-s>f32, f64</c-s></td>
+              <td>values have finite precision, and may have approximate values</td>
+              <td><c-s>let f:f32 = 3.14159;</c-s></td>
+            </tr>
+            <tr>
+              <th colspan="3" align="left">-- Aggregate types ----</th>
+            </tr>
+            <tr>
+              <td><c-s>[T; N]</c-s></td><td>An array of N elements all of type <c-s>T</c-s></td><td><c-s>let arr = [1, 2, 3, 2, 1];</c-s></td>
+            </tr>
+            <tr>
+              <td><c-s>&[T]</c-s></td><td>Slice of array of elements of type <c-s>T</c-s></td><td><c-s>let arrs = &arr[1..3];</c-s></td>
+            </tr>
+            <tr>
+              <td><c-s>&str</c-s></td><td>A literal string</td><td><c-s>let sl = "literal string";</c-s></td>
+            </tr>
+            <tr>
+              <td><c-s>&str</c-s></td><td>Slice of a literal string</td><td><c-s>let slice = &sl[1..5];</c-s></td>
+            </tr>
+            <tr><td colspan="3" align="left">-- Std::library types ----</td></tr>
+            <tr>
+              <td><c-s>String</c-s></td><td>Expandable collection of utf-8 characters allocated in the heap</td>
+              <td><c-s>let strg = "a utf-8 String".to_string();</c-s></td>
+            </tr>
+            <tr>
+              <td><c-s>Vec&lt;T&gt;</c-s></td>
+              <td>Expandable generic collection of items of type <c-s>T</c-s></td>
+              <td><c-s>let v = Vec::&lt;f64&gt;::new(), v.push(1.5); ...</c-s></td>
+            </tr>
+            <tr>
+              <td><c-s>VecDeque&lt;T&gt;</c-s></td>
+              <td>Expandable double-ended generic collection of items of type <c-s>T</c-s></td>
+              <td>
+                <c-s>let vd = VecDeque::&lt;f64&gt;::new(),<br /> 
+                v.push_front(1.5); ...</c-s>
+              </td>
+            </tr>
+            <tr>
+              <td><c-s>HashMap&lt;K,V&gt;</c-s></td>
+              <td>Associative container of Key-Value pairs, held in a table of bucket lists.</td>
+              <td>
+                <c-s>let map = HashMap::&lt;&str, int&gt;::new(),<br />  
+                map.insert("zero", 0); ...</c-s>
+              </td>
+            </tr>
+          </table>
+        </details>
+        <h2 id="code">1.0 Initialization</h2>
         <t-b>
           Rust types are initialized with a let statement that binds a variable name to a memory location
           with specified value.
         </t-b>
-        <div style="float:left; <!--border:1px solid red;--> margin-left:1em; padding-right:2em;">
-          <h4 style="margin-top: 0em;">Example: primitive type initializations</h4>
+        <h3>Example: primitive type initializations</h3>
+        <div style="float:left; margin-left:1em; padding-right:2em;">
           <pre><code class="language-rust">let i = 42i8;         // data type specified
-let f:f32 = 3.14159;  // variable type specified</code></pre>
+  // size: 1 byte => 8bits
+let f:f32 = 3.14159;  // variable type specified
+  // size: 4 bytes
+let c:char = 'z';
+  // size: 4 bytes, enough to hold utf-8 character 
+let sl:&str = "a literal string";
+  // size: 16 bytes, all its characters are 1 byte
+let arr:[i32; 3] = [1, 2, 3];
+  // array size: 12 bytes
+let tp: (i32, f64, char) = (1, 2.5, 'a');
+  // tuple size: 16 bytes
+let iref: &i8 = &amp;i;
+  // size: 8 bytes, a reference to i&apos;s value
+let aref: &[i32; 3] = &arr;
+  // size: 8 bytes, a reference to arr&apos;s values
+/*--------------------------------------------
+  All sizes are space allocated in local
+  stack frame.
+*/</code></pre>
         </div>
         <t-b>
           Type specifications like i8 and f64 can be applied to the variable name or to it&apos;s initializing
-          data, as shown here. Rust can usually infer appropriate types for data, but a code developer can
-          explicitly define them.
+          data, as shown here. 
         </t-b>
         <t-b>
+          Rust can usually infer appropriate types for data, but a code developer can
+          explicitly define them.
           If the type annotations were removed in this example, Rust would infer i to be i32 and f to be f64.
         </t-b>
         <t-b>
+          The char type occupies 4 bytes of storage, large enough to hold any of the utf-8 characters.
+        </t-b>
+        <t-b>
+          The type <c-s>&str</c-s> is a reference to a fixed-size immutable literal string in stack memory. 
+          It may hold
+          any of the utf-8 characters. It&apos;s size is the sum of the actual literal character sizes.
+          For the literal string shown, all of the characters are 1 byte.
+        </t-b>
+        <t-b>
+          Arrays are fixed size sequences of values of the specified type.  They are indexable and individual
+          element values may be changed if the array has mutable type.
+        </t-b>
+        <t-b>
+          Tuples are sequences of values of heterogeneous types.  Elements are accessed via position
+          arguments, e.g., tp.1 accesses the second element, a float.
+        </t-b>
+        <t-b>
+          References like &arr are fixed pointers to the beginning of the variable&apos;s data storage. 
+        </t-b>
+        <div style="clear:both;"></div>
+        <h3>Example: Specifying locations</h3>
+        <div style="clear:both; float:left; margin-left:1em; padding-right:2em;">
+          <pre><code class="language-rust">static PI:f64 = 3.1415927;      // static memory
+// static address: &PI = 0x7ff730eb7668
+------------------------------------
+let f:f64 = 3.1415927;          // stack memory
+// stack address:   &f =   0x40a1cff8c0
+------------------------------------
+let s:&str = "3.1415927";       // stack memory
+// stack address: &str =   0x40a1cff910
+------------------------------------
+let g = box::new(3.1415927f64); // heap memory
+// heap address:   &*g =  0x1b78cc05bd0</code></pre>
+        </div>
+        <t-b>
           Variables can be bound to locations in static memory, stack memory, or heap memory.
         </t-b>
-        <div style="float:left; <!--border:1px solid red;--> margin-left:1em; padding-right:2em;">
-          <h4 style="margin-top: 0em;">Example: Specifying locations</h4>
-          <pre><code class="language-rust">static PI:f64 = 3.1415927;         // static memory
-let f:f64 = 3.1415927;  // stack memory
-let f = box<</code></pre>
-        </div>
+        <t-b>
+          Static memory is allocated at compile-time and so contents live for the duration of
+          the program. 
+        </t-b>
+        <t-b>
+          Stack memory is implicitly allocated at run-time for each function call, including main.
+          That serves as scratch-pad storage for input parameters and locally declared data. It is
+          implicitly deallocated when the thread of execution leaves it&apos;s function&apos;s scope. 
+        </t-b>
+        <t-b>
+          Heap memory is explicitly allocated with construction of a smart Box pointer. That  
+          allocation is returned when the smart pointer g goes out of scope.
+        </t-b>
         <div style="clear:both;"></div>
+        <h3>Example: Initializing standard library types</h3>
+        <div style="clear:both; float:left; margin-left:1em; padding-right:2em;">
+          <pre><code class="language-rust">let v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1];
+  // size: 24 bytes, control block holds
+  // ptr to ints on heap, length, capacity
+------------------------------------
+let st:String = "an owned string".to_string();
+  // size: 24 bytes, control block holds
+  // ptr to chars on heap, length, capacity
+------------------------------------
+let mut vecdeq = VecDeque::&lt;f64&gt;::new();
+vecdeq.push_front(1.0);
+vecdeq.push_front(1.5);
+vecdeq.push_front(2.0);
+vecdeq.push_front(1.5);
+vecdeq.push_front(1.0);
+------------------------------------
+let mut map = HashMap::<&str,i32>::new();
+map.insert("zero", 0);
+map.insert("one", 1);
+map.insert("two", 2);</code></pre>
+        </div>
+        <t-b>
+          Standard Library types are initialized with a call to new and possibly modified with
+          subsequent additions of data.
+        </t-b>
+        <t-b>
+          Here, <c-s>vec!</c-s> is a std::library macro that initializes variable <c-s>v</c-s> by 
+          creating a <c-s>Vec&lt;int&gt;</c-s>
+          and pushing the elements 1, 2, ...
+        </t-b>
+        <t-b>
+          The string, st, is initialized by converting a literal string to a
+          String type.  Strings are sequences of utf-8 characters, each of which may contain
+          from one to four bytes.  That supports representing characters from non-roman languages,
+          e.g., arabic, kanji, etc., as well as emoji&apos;s and symbols.
+        </t-b>
+        <t-b>
+          The statement <c-s>let mut vecdeq = ...</c-s>
+          creates a double ended <c-s>VecDeque</c-s> queue.  It must be declared <c-s>mut</c-s> 
+          to allow later modifications with <c-s>push-front</c-s> statements. Data is stored
+          in a circular buffer, supporting efficiently pushing data onto either front or back of the queue.
+        </t-b>
+        <t-b>
+          HashMap is an associative container with <c-s>Key:&str</c-s>, and <c-s>Value:i32</c-s>.
+          The <c-s>&str</c-s> type is a reference to a literal string like <c-s>"zero"</c-s>.
+          Key, value pairs are stored in a table of buckets which are linked lists.  Lookup
+          applies a hash function to a unique key to find the table address of the bucket holding
+          that key.  The HashMap retrieval API provides methods that use the hash to walk the
+          bucket list searching for the specified key.
+        </t-b>
+        <t-b>
+          The code block, below, displays some of the output of a demonstration program in 
+          Bits/Rust/rust_data, stored in a <a href="https://github.com/JimFawcett/Bits">Bits repository</a> 
+          for all the code used in the Bits for C++, Rust, C#, Python, and JavaScript.
+          You are invited to clone or download the repository and explore these examples using Visual Studio Code.
+        </t-b>
+        <div style="clear:both; height:0.5em;"></div>
+        <div style="float:left; margin-left:1em; padding-right:2em;">
+          <h4 style="margin-top: 0em;">Example: Output</h4>
+          <pre><code class="language-rust">--- initialize std::lib types ---
+vec, alloc::vec::Vec<i32>
+value: [1, 2, 3, 2, 1], size: 24
+st, alloc::string::String
+value: "an owned string", size: 24
+vecdeq, alloc::collections::vec_deque::VecDeque<f64>
+value: [1.0, 1.5, 2.0, 1.5, 1.0], size: 32
+map, std::collections::hash::map::HashMap<&str, i32>
+value: {"one": 1, "zero": 0, "two": 2}, size: 48</code></pre>
+        </div>
+        <div style="clear:both; height:1em;"></div>
+        <div style="float:left; margin-left:1em; padding-right:2em;">
+          <h4 style="margin-top: 0em;">Example: Code used to generate output</h4>
+          <pre><code class="language-rust">use std::fmt::Debug;
+
+/*-- show_type --------------------------------------------
+  Shows compiler recognized type and data value
+*/
+pub fn show_type&lt;T: Debug&gt;(t: &T, nm: &str) {
+  let typename = std::any::type_name::<T>();
+  print!("  {nm}, {typename}");
+  println!(
+    "\n  value: {:?}, size: {}",
+    t, std::mem::size_of::&lt;T&gt;()
+  ); 
+  // smart Debug formatting {:?} 
+  // handles both scalars and collections
+}
+          </code></pre>
+        </div>
+        <div style="clear:both; height:1em;"></div>
+        <t-b>
+          The function <c-s>show_type</c-s>, above, accepts a generic type <c-s>T</c-s>, not specified until
+          the compiler sees its argument type at the call site. It uses a function 
+          <c-s>std::any::type_name::&lt;T&gt;()</c-s> that returns a string describing
+          the argument <c-s>t</c-s>&apos;s type <c-s>T</c-s>. It also uses
+          <c-s>std::mem::size_of::&lt;T&gt;()</c-s> that
+          evaluates the size of a primitive type.  If T is a non-primative type with
+          contents on the heap, <c-s>size_of</c-s> returns the size of its control block
+          but does not count its heap allocation for stored data members.
+        </t-b>
+        <t-b>
+          We will discuss generic types and functions in more detail in a subsequent Bit.
+        </t-b>
+        <div style="clear:both;"></div>
+        <h2>2.0 Basic Data Operations</h2>
         <div style="height:2em;"></div>
         <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote()" />
         <div style="display:flex; flex-direction:column;">
