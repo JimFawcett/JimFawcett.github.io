@@ -244,6 +244,14 @@
       margin: 0.0em 1em;
       font-family: monospace;
     }
+    .focus {
+      padding:0.5em 1.0em 0.5em 1.0em;
+      /*border:1px solid red;*/
+    }
+    *.focus ul {
+      padding-top:-0.5em;
+      /*background-color:green;*/
+    }
   </style>
   <script>
     function saveScroll() {
@@ -348,7 +356,7 @@
           </t-b>
         <div style="height:0.25em;"></div>
         <details>
-          <summary class="darkItem">Rust Types&nbsp;</summary>
+          <summary class="darkItem">Rust&nbsp;Types&nbsp;Reference&nbsp;</summary>
           <h3>Table 1.0 Rust Types</h3>
           <table style="font-size:0.9em;">
             <tr>
@@ -378,21 +386,54 @@
               <th colspan="3" align="left">-- Aggregate types ----</th>
             </tr>
             <tr>
-              <td><c-s>[T; N]</c-s></td><td>An array of N elements all of type <c-s>T</c-s></td><td><c-s>let arr = [1, 2, 3, 2, 1];</c-s></td>
+              <td><c-s>[T; N]</c-s></td>
+              <td>An array of N elements all of type <c-s>T</c-s></td>
+              <td>
+                <c-s>let arr = [1, 2, 3, 2, 1];<br />let first = arr[0];</c-s>
+              </td>
             </tr>
             <tr>
-              <td><c-s>&[T]</c-s></td><td>Slice of array of elements of type <c-s>T</c-s></td><td><c-s>let arrs = &arr[1..3];</c-s></td>
+              <td><c-s>[T]</c-s></td>
+              <td>Slice of array of elements of type <c-s>T</c-s></td>
+              <td>
+                <c-s>let arrs = &arr[1..3];<br />let second = arrs[1];</c-s>
+              </td>
             </tr>
             <tr>
-              <td><c-s>&str</c-s></td><td>A literal string</td><td><c-s>let sl = "literal string";</c-s></td>
+              <td><c-s>&str</c-s></td>
+              <td>A literal string</td>
+              <td>
+                <c-s>let ls = "literal string";<br />let second = ls.chars().nth(1);</c-s>
+              </td>
             </tr>
             <tr>
-              <td><c-s>&str</c-s></td><td>Slice of a literal string</td><td><c-s>let slice = &sl[1..5];</c-s></td>
+              <td><c-s>&str</c-s></td>
+              <td>Slice of a literal string</td>
+              <td><c-s>let slice = &ls[1..5];<br /></c-s></td>
             </tr>
-            <tr><td colspan="3" align="left">-- Std::library types ----</td></tr>
+            <tr>
+              <td><c-s>Tupl</c-s></td>
+              <td>collection of heterogeneous types accessed by position</td>
+              <td>
+                <c-s>
+                  let tu = (42i32, 3.14159f64, 'z');<br />let third = tu.2;
+                </c-s>
+              </td>
+            </tr>
+            <tr><th colspan="3" align="left">-- Std::library types ----</th></tr>
             <tr>
               <td><c-s>String</c-s></td><td>Expandable collection of utf-8 characters allocated in the heap</td>
               <td><c-s>let strg = "a utf-8 String".to_string();</c-s></td>
+            </tr>
+            <tr>
+              <td><c-s>Result&lt;T,E&gt;</c-s></td>
+              <td>Result enum returns result t:T or error e:E</td>
+              <td><c-s>fn doOp1(..args) -> Result&lt;r:R, e:Err&gt;</c-s></td>
+            </tr>
+            <tr>
+              <td><c-s>Option&lt;T&gt;</c-s></td>
+              <td>Option enum holds optional value t:T or None</td>
+              <td><c-s>fn doOp2(..args) -> Option&lt;T&gt;</c-s></td>
             </tr>
             <tr>
               <td><c-s>Vec&lt;T&gt;</c-s></td>
@@ -415,9 +456,26 @@
                 map.insert("zero", 0); ...</c-s>
               </td>
             </tr>
+            <tr>
+              <td>LinkedList, BTreeMap, HashSet, BTreeSet, BinaryHeap, ...</td>
+              <td>
+                The Rust std::library defines types for threading and synchronization,<br />
+                reading and writing to streams, anonymous functions, ...
+              </td>
+              <td><a href="https://doc.rust-lang.org/std/">Crate std</a></td>
+            </tr>
+            <tr>
+              <th colspan="3" align="left">-- User-defined Types --</th>
+            </tr>
+            <tr>
+              <td>User-defined types</td>
+              <td colspan="2">These will be discussed in the next Bit.</td>
+            </tr>
           </table>
+          <div style="height:0.5em;"></div>
         </details>
-        <h2 id="code">1.0 Initialization</h2>
+        <div style="height:0.5em;"></div>
+        <h2 id="init">1.0 Initialization</h2>
         <t-b>
           Rust types are initialized with a let statement that binds a variable name to a memory location
           with specified value.
@@ -535,7 +593,18 @@ map.insert("two", 2);</code></pre>
         <t-b>
           Here, <c-s>vec!</c-s> is a std::library macro that initializes variable <c-s>v</c-s> by 
           creating a <c-s>Vec&lt;int&gt;</c-s>
-          and pushing the elements 1, 2, ...
+          and pushing the elements 1, 2, ...  
+        </t-b>
+        <t-b>
+          <c-s>Vec</c-s>s consist of a control block in stack memory
+          that holds a pointer to a resizeable array of elements in the heap, a count of the number of
+          elements currently stored, and a count of the available capacity for data.  
+        </t-b>
+        <t-b>
+          When the length
+          equals the <c-s>Vec</c-s>&apos;s capacity and a new element is pushed the <c-s>Vec</c-s>
+          allocates a new heap array of twice the size of the current capacity, copies the elements
+          to the new storage and deallocates the original heap array.
         </t-b>
         <t-b>
           The string, st, is initialized by converting a literal string to a
@@ -544,15 +613,22 @@ map.insert("two", 2);</code></pre>
           e.g., arabic, kanji, etc., as well as emoji&apos;s and symbols.
         </t-b>
         <t-b>
+          The structure of a <c-s>String</c-s> is very similar to a <c-s>Vec</c-s>. It has a control
+          block in stack memory and a collection of characters in the heap. The main difference is that
+          vectors hold elements of a fixed size, and so are indexable.  Strings hold utf-8 characters
+          which vary in size from one to four bytes.  They are not indexable, but provide an iterator,
+          <c-s>chars</c-s> that steps through the character collection.
+        </t-b>
+        <t-b>
           The statement <c-s>let mut vecdeq = ...</c-s>
           creates a double ended <c-s>VecDeque</c-s> queue.  It must be declared <c-s>mut</c-s> 
           to allow later modifications with <c-s>push-front</c-s> statements. Data is stored
-          in a circular buffer, supporting efficiently pushing data onto either front or back of the queue.
+          in a circular buffer in the heap, supporting efficiently pushing data onto either front or back of the queue.
         </t-b>
         <t-b>
-          HashMap is an associative container with <c-s>Key:&str</c-s>, and <c-s>Value:i32</c-s>.
+          <c-s>HashMap</c-s> is an associative container with, in this example, <c-s>Key:&str</c-s>, and <c-s>Value:i32</c-s>.
           The <c-s>&str</c-s> type is a reference to a literal string like <c-s>"zero"</c-s>.
-          Key, value pairs are stored in a table of buckets which are linked lists.  Lookup
+          Key-value pairs are stored in a table of buckets which are linked lists.  Lookup
           applies a hash function to a unique key to find the table address of the bucket holding
           that key.  The HashMap retrieval API provides methods that use the hash to walk the
           bucket list searching for the specified key.
@@ -604,14 +680,75 @@ pub fn show_type&lt;T: Debug&gt;(t: &T, nm: &str) {
           the argument <c-s>t</c-s>&apos;s type <c-s>T</c-s>. It also uses
           <c-s>std::mem::size_of::&lt;T&gt;()</c-s> that
           evaluates the size of a primitive type.  If T is a non-primative type with
-          contents on the heap, <c-s>size_of</c-s> returns the size of its control block
-          but does not count its heap allocation for stored data members.
+          contents on the heap, <c-s>size_of</c-s> returns the size of its control block in stack memory
+          but does not count heap allocation for its stored data members.
         </t-b>
         <t-b>
           We will discuss generic types and functions in more detail in a subsequent Bit.
         </t-b>
         <div style="clear:both;"></div>
-        <h2>2.0 Basic Data Operations</h2>
+        <h2 id="own">2.0 Safety and Ownership</h2>
+        <t-b>
+          The design of the Rust programming language and especially its type system focuses
+          on memory and data race safety. That means:
+          <div class="focus">
+            <ul style="margin-left:1em;">
+              <li>
+                Read and write operations happen only within program allocated memory.
+              </li>
+              <li>
+                References are guaranteed to refer to valid targets.
+              </li>
+              <li>
+                Threads may share data only within the confines of a lock.
+                Each thread must acquire a lock to access data and then
+                release it to enable other threads acess. 
+              </li>
+            </ul>
+          </div>
+          These properties are guaranteed by construction.  The compiler will not
+          build code that violates them.
+        </t-b>
+        <t-b>
+          Rust has a &quot;single ownership&quot; policy. Each value in memory has
+          a single owner that manages its allocation, initialization, deallocation and lifetime.
+          this means that:
+          <ul>
+            <li>
+              Binding a name to a value assigns ownership of the value to the named variable.
+              Only the owner has the authority to modify, use, or deallocate the value. No other
+              variable can access or modify the value without borrowing the priviledge to do so
+              from the owner.
+            </li>
+            <li>
+              References are used to borrow access to a variable from its owner. Rust enforces 
+              strict rules for the use of references in order to guarantee memory and thread
+              safety.
+              <div class="focus">
+                Non-mutable references can share read-only access to a value.  Mutable references
+                provide exclusive access to the value. No other references can access the value
+                until the end of the mutable reference&apos;s lifetime.  That usually occurs when
+                the mutable reference goes out of scope.
+              </div>
+            </li>
+            <li>
+              Rust types may implement the Copy trait. All primitives and aggregations of primitives
+              are &quot;copy&quot; types.  All other types are &quot;move&quot;.
+            </li>
+            <li>
+              For all move types ownership will be transferred to another variable by construction, 
+              assignment, or pass-by-value as a function argument.  Copy types 
+            </li>
+          </ul>
+        </t-b>
+        <div style="height:2em;"></div>
+        <h2 id="mutref">3.0 Mutability and References</h2>
+        <div style="height:2em;"></div>
+        <h2 id="ops">3.0 Data Operations</h2>
+
+
+
+
         <div style="height:2em;"></div>
         <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote()" />
         <div style="display:flex; flex-direction:column;">
@@ -1230,12 +1367,10 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data
         <menu-elem style="width:0.0em">&nbsp;</menu-elem>
         <menu-elem class="secElem"><a href="#bottom">bottom</a></menu-elem>
         <menu-elem class="secElem"><a href="#refs">refs</a></menu-elem>
-        <menu-elem class="secElem"><a href="#ide">VS Code</a></menu-elem>
-        <menu-elem class="secElem"><a href="#build">bld</a></menu-elem>
-        <menu-elem class="secElem"><a href="#out">out</a></menu-elem>
-        <menu-elem class="secElem"><a href="#anal">anal</a></menu-elem>
-        <menu-elem class="secElem"><a href="#source">src</a></menu-elem>
-        <menu-elem class="secElem"><a href="#code">codeSnaps</a></menu-elem>
+        <menu-elem class="secElem"><a href="#ops">ops</a></menu-elem>
+        <menu-elem class="secElem"><a href="#mutref">mutref</a></menu-elem>
+        <menu-elem class="secElem"><a href="#own">own</a></menu-elem>
+        <menu-elem class="secElem"><a href="#init">init</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
       </page-sections>
     </main>
