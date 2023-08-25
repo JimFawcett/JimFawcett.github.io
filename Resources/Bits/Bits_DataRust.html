@@ -839,7 +839,7 @@ pub fn show_type&lt;T: Debug&gt;(t: &T, nm: &str) {
           We discuss generic types and functions in more detail <a href="Bits_GenericRust.html">here</a>.
         </t-b>
         <div style="clear:both;"></div>
-        <h2 id="own">2.0 Safety and Ownership</h2>
+        <h2 id="safe">2.0 Safety and Ownership</h2>
         <t-b>
           The design of the Rust programming language and especially its type system focuses
           on memory and data race safety. That means:
@@ -861,6 +861,7 @@ pub fn show_type&lt;T: Debug&gt;(t: &T, nm: &str) {
           These properties are guaranteed by construction.  The compiler will not
           build code that violates them.
         </t-b>
+        <h3 id="own">2.1 Single Ownership Policy</h3>
         <t-b>
           To support safety Rust has a &quot;single ownership&quot; policy. Each value in memory has
           a single owner that manages its allocation, initialization, deallocation and lifetime.
@@ -872,6 +873,20 @@ pub fn show_type&lt;T: Debug&gt;(t: &T, nm: &str) {
               variable can access or modify the value without borrowing the priviledge to do so
               from the owner.
             </li>
+            <li>
+              A collection like <c-s>Vec&lt;T&gt;</c-s> owns its members. Program code can access
+              them by taking a reference:
+        <div style="float:left; margin-left:1em; padding-right:2em;">
+          <!--<h4 style="margin-top: 0em;">Example: Vector with reference to member</h4>-->
+          <pre><code class="language-rust">  let v = vec![1, 2, 3];
+  let rv = &v3[1];
+</code></pre>
+        </div>
+            </li>
+          </ul>
+          <div style="height:0.25em; clear:both;"></div>
+          <h3 id="mutref" class="clear">2.2 References</h3>
+          <ul>
             <li>
               References are used to borrow access to a variable from its owner. Rust enforces 
               strict rules for the use of references in order to guarantee memory and thread
@@ -897,47 +912,91 @@ pub fn show_type&lt;T: Debug&gt;(t: &T, nm: &str) {
           <h4 style="margin-top: 0em;">Example: Attempt to mutate collection with active reference</h4>
           <pre><code class="language-rust">  show_op("attempt to mutate Vec while immutable ref exists");
   let mut v3 = vec![1, 2, 3];
-  let r2v2 = &v3[1]; // ok to declare
+  let rv3 = &v3[1]; // ok to declare
   v3.push(4);  // v3 will reallocate if capacity is 3
-  println!("  r2v2: {r2v2:?}"); // not ok to use
+  println!("  rv3: {rv3:?}"); // not ok to use
 </code></pre>
           <h4 style="margin-top: 0em;">Example: Compiler error message</h4>
           <pre><code class="language-rust">C:\github\JimFawcett\Bits\Rust\rust_data
 > cargo run
    Compiling rust_data v0.1.0 (C:\github\JimFawcett\Bits\Rust\rust_data)
 error[E0502]: cannot borrow `v3` as mutable because it is also borrowed as immutable
-   --> src\main.rs:414:3
+   --> src\main.rs:417:3
     |
-413 |   let r2v2 = &v3[1];
-    |               -- immutable borrow occurs here
-414 |   v3.push(6);
+416 |   let rv3 = &v3[1]; // ok to declare
+    |              -- immutable borrow occurs here
+417 |   v3.push(4);  // v3 will reallocate if capacity is 3
     |   ^^^^^^^^^^ mutable borrow occurs here
-415 |   println!("  r2v2: {r2v2:?}");
-    |                     -------- immutable borrow later used here   
+418 |   println!("  rv3: {rv3:?}"); // not ok to use
+    |                     ------- immutable borrow later used here    
 
 For more information about this error, try `rustc --explain E0502`.   
 error: could not compile `rust_data` (bin "rust_data") due to previous error
 </code></pre>
         </div>
         </t-b>
+        <t-b>
               <div style=" clear:both; height:0.5em;"></div>
             </li>
+          </ul>
+          <h3 id="move">2.3 Copy and Move Operations</h3>
+          <ul>
             <li>
               Rust types may implement the Copy trait. All primitives and aggregations of primitives
               are <a target="_blank" href="../../Pictures/StrCopy.jpg">&quot;copy&quot;</a> types.  
               All other types are <a target="_blank" href="../../Pictures/StringMove.jpg">&quot;move&quot;</a>.
+                      <photosizer-block src="../../Pictures/StrCopy.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
+                        <span style="
+              display: inline-block;
+              font-weight: bold;
+              font-family: 'Comic Sans MS', Tahoma;
+              background-color: #ddd;
+              width: 100%;
+              padding: 5px 0px;
+            ">
+                          Figure 1. Str Copy
+                        </span>
+                      </photosizer-block>
             </li>
             <li>
               For all move types ownership will be transferred to another variable by construction, 
               assignment, or pass-by-value as a function argument.  A &quot;moved&quot; variable
               is invalid. Any use of that will result in a compile error.
+                      <photosizer-block src="../../Pictures/StringMove.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
+                        <span style="
+              display: inline-block;
+              font-weight: bold;
+              font-family: 'Comic Sans MS', Tahoma;
+              background-color: #ddd;
+              width: 100%;
+              padding: 5px 0px;
+            ">
+                          Figure 2. String Move
+                        </span>
+                      </photosizer-block>
             </li>
             <li>
               For all copy types, construction, assignment, and pass-by-value results in data copy
               with no transfer of ownership, so the source is still valid.
             </li>
+            <li>
+              Move types usually implement the <c-s>Clone</c-s> trait with the function <c-s>clone()</c-s>.
+              <photosizer-block src="../../Pictures/StringClone.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
+                        <span style="
+              display: inline-block;
+              font-weight: bold;
+              font-family: 'Comic Sans MS', Tahoma;
+              background-color: #ddd;
+              width: 100%;
+              padding: 5px 0px;
+            ">
+                          Figure 3. String Clone
+                        </span>
+                      </photosizer-block>
+
+            </li>
           </ul>
-        </t-b>
+</t-b>
 
 
         <!--<div style="height:2em;"></div>
@@ -1559,8 +1618,11 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data
         <menu-elem class="secElem"><a href="#bottom">bottom</a></menu-elem>
         <!--<menu-elem class="secElem"><a href="#refs">refs</a></menu-elem>
         <menu-elem class="secElem"><a href="#ops">ops</a></menu-elem>-->
+        <menu-elem class="secElem"><a href="#ref">ref</a></menu-elem>
+        <menu-elem class="secElem"><a href="#move">move</a></menu-elem>
         <menu-elem class="secElem"><a href="#mutref">mutref</a></menu-elem>
         <menu-elem class="secElem"><a href="#own">own</a></menu-elem>
+        <menu-elem class="secElem"><a href="#safe">safety</a></menu-elem>
         <menu-elem class="secElem"><a href="#init">init</a></menu-elem>
         <menu-elem class="secElem"><a href="#typesys">typesys</a></menu-elem>
         <menu-elem class="secElem"><a href="#types">types</a></menu-elem>
