@@ -252,6 +252,10 @@
       padding-top:-0.5em;
       /*background-color:green;*/
     }
+    .cat {
+      text-align:left;
+      background-color: var(--menu);
+    }
   </style>
   <script>
     function saveScroll() {
@@ -319,20 +323,26 @@
             <hr class="spread" />
             <ul>
               <li>
-                Rust provides two kinds of types: copy and move.
+                Rust provides two categories of types: copy and move. Copy types occupy a single contiguous
+                block of stack memory. Move types have control blocks in stack memory used to manage
+                resources in the heap.
               </li>
               <li>
                 Primitive types and aggregates of primitive types are copy.  Construction, assignment, and
                 pass-by-value copies the source&apos;s value to the destination.
               </li>
               <li>
-                All other types are move. Construction, assignment, and pass-by-value moves the source&apos;s
-                resources to the destination. This is a transfer of ownership and
-                makes the source invalid. Attempting to use a &quot;moved&quot; variable is a
+                All other types are move. Construction, assignment, and pass-by-value move ownership
+                of the value&apos;s heap resources to the destination.
+                This makes the source invalid. Attempting to use a &quot;moved&quot; variable is a
                 compile error.
               </li>
               <li>
                 The source and destination of copy and move operations must have exactly the same type.
+              </li>
+              <li>
+                More details about copy and move operations can be found 
+                <a href="../RustBites/RustBites_Data.html">here</a>, including diagrams and code examples.
               </li>
               <li>
                 Most move types provide clone operations that support making copies, but using
@@ -340,11 +350,18 @@
               </li>
               <li>
                 Rust supports making fixed references to either copy or move types. These may
-                refer to instances in stack memory or in the native heap.
+                refer to instances in a function&apos;s stack memory, in the native heap, 
+                or in the program&apos;s static memory.
               </li>
               <li>
                 Rust references are constrained by Rust ownership rules to support memory
-                and data race safety by construction.
+                and data race safety by construction. All values in memory have a single owner,
+                responsible for its creation, access, and deallocation.
+              </li>
+              <li>
+                Ownership can be borrowed by creating a reference. Program code may create an
+                arbitrary number of non-mutable references to some variable, but may only create
+                a single mutable reference that borrows exclusive access to the variable.
               </li>
               <li>
                 Here we begin to see significant differences between the languages, especially
@@ -355,15 +372,15 @@
             <div style="height:0.25em;"></div>
           </t-b>
         <div style="height:0.25em;"></div>
-        <details>
-          <summary class="darkItem">Rust&nbsp;Types&nbsp;Reference&nbsp;</summary>
+        <details id="types">
+          <summary class="darkItem">Rust&nbsp;Types&nbsp;</summary>
           <h3>Table 1.0 Rust Types</h3>
-          <table style="font-size:0.9em;">
+          <table style="font-size: 0.9em; max-width: 71em;">
             <tr>
               <th style="width:15em;">Type</th><th>Comments</th><th>Example</th>
             </tr>
             <tr>
-              <th colspan="3" align="left">-- Integral types ----</th>
+              <th colspan="3" class="cat">-- Integral types ----</th>
             </tr>
             <tr>
               <td><c-s>bool</c-s></td><td>values true and false</td><td><c-s>let b = true;</c-s></td>
@@ -375,7 +392,7 @@
               <td>signed and unsigned integer types</td><td><c-s>let i = 42i8;</c-s></td>
             </tr>
             <tr>
-              <th colspan="3" align="left">-- Floating point types ----</th>
+              <th colspan="3" class="cat">-- Floating point types ----</th>
             </tr>
             <tr>
               <td><c-s>f32, f64</c-s></td>
@@ -383,21 +400,7 @@
               <td><c-s>let f:f32 = 3.14159;</c-s></td>
             </tr>
             <tr>
-              <th colspan="3" align="left">-- Aggregate types ----</th>
-            </tr>
-            <tr>
-              <td><c-s>[T; N]</c-s></td>
-              <td>An array of N elements all of type <c-s>T</c-s></td>
-              <td>
-                <c-s>let arr = [1, 2, 3, 2, 1];<br />let first = arr[0];</c-s>
-              </td>
-            </tr>
-            <tr>
-              <td><c-s>[T]</c-s></td>
-              <td>Slice of array of elements of type <c-s>T</c-s></td>
-              <td>
-                <c-s>let arrs = &arr[1..3];<br />let second = arrs[1];</c-s>
-              </td>
+              <th colspan="3" class="cat">-- literal string types --</th>
             </tr>
             <tr>
               <td><c-s>&str</c-s></td>
@@ -412,6 +415,23 @@
               <td><c-s>let slice = &ls[1..5];<br /></c-s></td>
             </tr>
             <tr>
+              <th colspan="3" class="cat">-- Aggregate types ----</th>
+            </tr>
+            <tr>
+              <td><c-s>[T; N]</c-s></td>
+              <td>An array of N elements all of type <c-s>T</c-s></td>
+              <td>
+                <c-s>let arr = [1, 2, 3, 2, 1];<br />let first = arr[0];</c-s>
+              </td>
+            </tr>
+            <tr>
+              <td><c-s>&[T]</c-s></td>
+              <td>Slice of array of elements of type <c-s>T</c-s></td>
+              <td>
+                <c-s>let arrs = &arr[1..3];<br />let second = arrs[1];</c-s>
+              </td>
+            </tr>
+            <tr>
               <td><c-s>Tupl</c-s></td>
               <td>collection of heterogeneous types accessed by position</td>
               <td>
@@ -420,20 +440,20 @@
                 </c-s>
               </td>
             </tr>
-            <tr><th colspan="3" align="left">-- Std::library types ----</th></tr>
-            <tr>
-              <td><c-s>String</c-s></td><td>Expandable collection of utf-8 characters allocated in the heap</td>
-              <td><c-s>let strg = "a utf-8 String".to_string();</c-s></td>
-            </tr>
             <tr>
               <td><c-s>Result&lt;T,E&gt;</c-s></td>
-              <td>Result enum returns result t:T or error e:E</td>
+              <td>Result enum holds result <c-s>Ok(t:T)</c-s> or <c-s>Err(e:E)</c-s></td>
               <td><c-s>fn doOp1(..args) -> Result&lt;r:R, e:Err&gt;</c-s></td>
             </tr>
             <tr>
               <td><c-s>Option&lt;T&gt;</c-s></td>
-              <td>Option enum holds optional value t:T or None</td>
+              <td>Option enum holds optional value <c-s>Some(t:T)</c-s> or <c-s>None</c-s></td>
               <td><c-s>fn doOp2(..args) -> Option&lt;T&gt;</c-s></td>
+            </tr>
+            <tr><th colspan="3" class="cat">-- Std::library types ----</th></tr>
+            <tr>
+              <td><c-s>String</c-s></td><td>Expandable collection of utf-8 characters allocated in the heap</td>
+              <td><c-s>let strg = "a utf-8 String".to_string();</c-s></td>
             </tr>
             <tr>
               <td><c-s>Vec&lt;T&gt;</c-s></td>
@@ -465,14 +485,146 @@
               <td><a href="https://doc.rust-lang.org/std/">Crate std</a></td>
             </tr>
             <tr>
-              <th colspan="3" align="left">-- User-defined Types --</th>
+              <th colspan="3" class="cat">-- User-defined Types --</th>
             </tr>
             <tr>
               <td>User-defined types</td>
-              <td colspan="2">These will be discussed in the next Bit.</td>
+              <td colspan="2">Based on structs and enums, these will be discussed in the next Bit.</td>
             </tr>
           </table>
           <div style="height:0.5em;"></div>
+        </details>
+        <div style="height:0.5em;"></div>
+        <details id="typesys">
+          <summary class="darkItem">Rust Type System</summary>
+          <h3>Table 2. Rust Copy and Move Operations</h3>
+          <table style="font-size:0.9em; max-width:65em;">
+            <colgroup>
+              <col span="1" style="width:12%;" />
+              <col span="1" style="width:12%;" />
+              <col span="1" style="width:38%;" />
+              <col span="1" style="width:38%;" />
+            </colgroup>
+            <tr>
+              <th>Operation</th><th>Example</th>
+              <th><a target="_blank" href="../../Pictures/StrCopy.jpg">Copy type</a></th>
+              <th><a target="_blank" href="../../Pictures/StringMove.jpg">Move type</a></th>
+            </tr>
+            <tr>
+              <td>Construction</td>
+              <td><c-s>let t:T = u:T</c-s></td>
+              <td><c-s>u</c-s>&apos;s value is copied to <c-s>t</c-s>,<br /><c-s>u</c-s> is still valid</td>
+              <td><c-s>u</c-s>&apos;s value is moved to <c-s>t</c-s>,<br /><c-s>u</c-s> now invalid</td>
+            </tr>
+            <tr>
+              <td>Assignment</td>
+              <td><c-s>t:T = u:T</c-s></td>
+              <td><c-s>u</c-s>&apos;s value is copied to <c-s>t</c-s>,<br /><c-s>u</c-s> is still valid</td>
+              <td><c-s>u</c-s>&apos;s value is moved to <c-s>t</c-s>,<br /><c-s>u</c-s> now invalid</td>
+            </tr>
+            <tr>
+              <td>Pass-by-value</td>
+              <td><c-s>fn doOp(t:T)</c-s></td>
+              <td><c-s>t</c-s>&apos;s value is copied to doOp stack frame,<br /><c-s>t</c-s> is still valid</td>
+              <td><c-s>t</c-s>&apos;s value is moved to doOp stack frame,<br /><c-s>t</c-s> is now invalid</td>
+            </tr>
+          </table>
+
+          <h3>Table 3. Rust Copy and Move Types</h3>
+          <table style="font-size:0.9em; max-width:65em;">
+            <colgroup>
+              <col span="1" style="width:20%;" />
+              <col span="1" style="width:45%;" />
+              <col span="1" style="width:35%;" />
+            </colgroup>
+            <tr>
+              <th>Property</th><th>Members</th><th style="max-width:7em;">Notes</th>
+            </tr>
+            <tr>
+              <td>Primitive types</td>
+              <td>integers, floats, literal strings</td>
+              <td>These are all copy types</td>
+            </tr>
+            <tr>
+              <td>Aggregate types</td>
+              <td>arrays, slices of arrays, tuples, Result&lt;T,E&gt;, Option&lt;T&gt;</td>
+              <td>These are copy types if their members are copy, otherwise they are move types</td>
+            </tr>
+            <tr>
+              <td>std::library collection types</td>
+              <td>String, Vec&lt;T&gt;, VecDeque&lt;T&gt;, HashMap&lt;K,V&gt;, ...</td>
+              <td>These are all move types</td>
+            </tr>
+          </table>
+          <t-b>
+            <h3>Table 4. Rust Type System Attributes</h3>
+          </t-b>
+          <table  style="font-size:0.9em; max-width:65em;">
+            <tr>
+              <td>Static typing</td>
+              <td>
+                All types are known at compile time and are fixed throughout program execution.
+              </td>
+            </tr>
+            <tr>
+              <td>Inference</td>
+              <td>
+                Compiler infers types in expressions if not explicitly annotated.
+                Occasionally inference fails and explicit annotation is required.
+              </td>
+            </tr>
+            <tr>
+              <td>Strong typing</td>
+              <td>
+                Types are exhaustively checked and there are very few implicit conversions.
+                <ul class="tight">
+                  <li>Numeric and boolean literals coerce to their correspoinding type, e.g., 42 to i32.</li>
+                  <li>Variables without type annotations are coerced to their minimal types</li>
+                  <li>Values can be coerced to a more specific type of same or larger size.</li>
+                  <li>
+                    Smart pointers like Box, Rc, Arc, ... implement the DeRef trait, supplying a method
+                    deref() that returns a reference to their inner values. Applying * to these types
+                    automatically calls deref() to return an inner reference.
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>Algebraic data types</td>
+              <td>
+                Types created using enums and structs. Unlike other languages, Rust enums can
+                hold named discriminants with associated data of arbitrary type. That combined with Rust&apos;s
+                matching operations simplify state and error handling.<br />
+                Examples: <c-s>Result&lt;T,E&gt; { Ok(T), Err(E), }, Option&lt;T&gt; { Some(T), None, }</c-s><br />
+                Matching:<pre><c-s>    match result {
+       Ok(value) => { // do something with value },
+       Err(error) => { // do something with error }
+    }
+</c-s></pre>
+              </td>
+            </tr>
+            <tr>
+              <td>Generics</td>
+              <td>
+                Generics provide types and functions with unspecified parameters, 
+                supporting code reuse and abstraction 
+                over types. Generic parameters are specified at the call site, often bound by constraints,
+                e.g., <c-s>fn doOp&lt;T:Debug, Clone&gt;(t:T)</c-s>.<br />
+                The function <c-s>doOp</c-s> compiles only if <c-s>T</c-s> satisfies its named trait bounds
+                <c-s>Debug</c-s> supporting use of format <c-s>{:?}</c-s> and 
+                <c-s>Clone</c-s> supporting explicit copy with <c-s>clone()</c-s>.
+              </td>
+            </tr>
+            <tr>
+              <td>Traits</td>
+              <td>
+                Traits are similar to Java and C# interfaces. They defined shared behavior that types can 
+                implement, supporting abstraction over behavior. Traits define behavior by declaring trait
+                specific functions. A trait may, but need not, define its function&apos;s contents.
+                Generics and Traits are covered <a href="Bits_GenericRust.html">here</a>.
+              </td>
+            </tr>
+          </table>
         </details>
         <div style="height:0.5em;"></div>
         <h2 id="init">1.0 Initialization</h2>
@@ -684,7 +836,7 @@ pub fn show_type&lt;T: Debug&gt;(t: &T, nm: &str) {
           but does not count heap allocation for its stored data members.
         </t-b>
         <t-b>
-          We will discuss generic types and functions in more detail in a subsequent Bit.
+          We discuss generic types and functions in more detail <a href="Bits_GenericRust.html">here</a>.
         </t-b>
         <div style="clear:both;"></div>
         <h2 id="own">2.0 Safety and Ownership</h2>
@@ -710,7 +862,7 @@ pub fn show_type&lt;T: Debug&gt;(t: &T, nm: &str) {
           build code that violates them.
         </t-b>
         <t-b>
-          Rust has a &quot;single ownership&quot; policy. Each value in memory has
+          To support safety Rust has a &quot;single ownership&quot; policy. Each value in memory has
           a single owner that manages its allocation, initialization, deallocation and lifetime.
           this means that:
           <ul>
@@ -725,31 +877,70 @@ pub fn show_type&lt;T: Debug&gt;(t: &T, nm: &str) {
               strict rules for the use of references in order to guarantee memory and thread
               safety.
               <div class="focus">
-                Non-mutable references can share read-only access to a value.  Mutable references
-                provide exclusive access to the value. No other references can access the value
-                until the end of the mutable reference&apos;s lifetime.  That usually occurs when
-                the mutable reference goes out of scope.
+                <t-b style="margin-top:0em;">
+                  Non-mutable references can share read-only access to a value.  Multiple
+                  shared references to a single owned value are valid.
+                </t-b>
+                <t-b>
+                  Mutable references, often called exclusive references,
+                  provide exclusive access to the value. No other references can access the value
+                  until the end of the mutable reference&apos;s lifetime.  That usually occurs when
+                  the mutable reference goes out of scope.
+                </t-b>
+                This is a strong constraint that may occasionally affect the way programs are designed.
+                No shared mutability ensures that references to a collection, like <c-s>Vec&lt;T&gt;</c-s>,
+                don&apos;t dangle when
+                the collection reallocates its resource memory to provide more capacity.
               </div>
+        <t-b>
+        <div style="float:left; margin-left:1em; padding-right:2em;">
+          <h4 style="margin-top: 0em;">Example: Attempt to mutate collection with active reference</h4>
+          <pre><code class="language-rust">  show_op("attempt to mutate Vec while immutable ref exists");
+  let mut v3 = vec![1, 2, 3];
+  let r2v2 = &v3[1]; // ok to declare
+  v3.push(4);  // v3 will reallocate if capacity is 3
+  println!("  r2v2: {r2v2:?}"); // not ok to use
+</code></pre>
+          <h4 style="margin-top: 0em;">Example: Compiler error message</h4>
+          <pre><code class="language-rust">C:\github\JimFawcett\Bits\Rust\rust_data
+> cargo run
+   Compiling rust_data v0.1.0 (C:\github\JimFawcett\Bits\Rust\rust_data)
+error[E0502]: cannot borrow `v3` as mutable because it is also borrowed as immutable
+   --> src\main.rs:414:3
+    |
+413 |   let r2v2 = &v3[1];
+    |               -- immutable borrow occurs here
+414 |   v3.push(6);
+    |   ^^^^^^^^^^ mutable borrow occurs here
+415 |   println!("  r2v2: {r2v2:?}");
+    |                     -------- immutable borrow later used here   
+
+For more information about this error, try `rustc --explain E0502`.   
+error: could not compile `rust_data` (bin "rust_data") due to previous error
+</code></pre>
+        </div>
+        </t-b>
+              <div style=" clear:both; height:0.5em;"></div>
             </li>
             <li>
               Rust types may implement the Copy trait. All primitives and aggregations of primitives
-              are &quot;copy&quot; types.  All other types are &quot;move&quot;.
+              are <a target="_blank" href="../../Pictures/StrCopy.jpg">&quot;copy&quot;</a> types.  
+              All other types are <a target="_blank" href="../../Pictures/StringMove.jpg">&quot;move&quot;</a>.
             </li>
             <li>
               For all move types ownership will be transferred to another variable by construction, 
-              assignment, or pass-by-value as a function argument.  Copy types 
+              assignment, or pass-by-value as a function argument.  A &quot;moved&quot; variable
+              is invalid. Any use of that will result in a compile error.
+            </li>
+            <li>
+              For all copy types, construction, assignment, and pass-by-value results in data copy
+              with no transfer of ownership, so the source is still valid.
             </li>
           </ul>
         </t-b>
-        <div style="height:2em;"></div>
-        <h2 id="mutref">3.0 Mutability and References</h2>
-        <div style="height:2em;"></div>
-        <h2 id="ops">3.0 Data Operations</h2>
 
 
-
-
-        <div style="height:2em;"></div>
+        <!--<div style="height:2em;"></div>
         <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote()" />
         <div style="display:flex; flex-direction:column;">
           <h4 id="source">Source Code: main.rs</h4>
@@ -1330,12 +1521,12 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data
           style="overflow-x:auto;"
         >
           <span style="font-family:'Comic Sans MS';">Figure 2. Launch.JSON</span>
-        </photosizer-block>
+        </photosizer-block>-->
         <!--<photosizer-block src="pictures/VS_Code_Cpp_Plugins.jpg" width="700" class="photoSizerBlock left">
           <span style="font-family:'Comic Sans MS';">Figure 3. C++ Plugins</span>
         </photosizer-block>-->
 
-        <div style="height:0.75em;" class="clear"></div>
+        <!--<div style="height:0.75em;" class="clear"></div>
         <h3 id="refs">3.0 References</h3>
         <table class="indent">
           <tr>
@@ -1358,7 +1549,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data
             </td>
           </tr>
         </table>
-        <div style="height:10em;"></div>
+        <div style="height:10em;"></div>-->
       </content>
       <a id="bottom"></a>
       <page-TOC id="pages" style="display:none;">
@@ -1366,11 +1557,13 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data
       <page-sections id="sections" style="display:flex;">
         <menu-elem style="width:0.0em">&nbsp;</menu-elem>
         <menu-elem class="secElem"><a href="#bottom">bottom</a></menu-elem>
-        <menu-elem class="secElem"><a href="#refs">refs</a></menu-elem>
-        <menu-elem class="secElem"><a href="#ops">ops</a></menu-elem>
+        <!--<menu-elem class="secElem"><a href="#refs">refs</a></menu-elem>
+        <menu-elem class="secElem"><a href="#ops">ops</a></menu-elem>-->
         <menu-elem class="secElem"><a href="#mutref">mutref</a></menu-elem>
         <menu-elem class="secElem"><a href="#own">own</a></menu-elem>
         <menu-elem class="secElem"><a href="#init">init</a></menu-elem>
+        <menu-elem class="secElem"><a href="#typesys">typesys</a></menu-elem>
+        <menu-elem class="secElem"><a href="#types">types</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
       </page-sections>
     </main>
