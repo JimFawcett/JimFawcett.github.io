@@ -945,6 +945,14 @@ error: could not compile `rust_data` (bin "rust_data") due to previous error
               Some Rust types implement the Copy trait. All primitives and aggregations of primitives
               are <a target="_blank" href="../../Pictures/StrCopy.jpg">&quot;copy&quot;</a> types.  
               All other types are <a target="_blank" href="../../Pictures/StringMove.jpg">&quot;move&quot;</a>.
+            </li>
+            <li>
+              For all copy types, construction, assignment, and pass-by-value results in data copy
+              with no transfer of ownership, so the source is still valid.
+              <div style="height:0.75em;"></div>
+              The <c-s>str</c-s> type represents a constant literal string in memory. All <c-s>str</c-s>&apos;s
+              are accessed by a reference, <c-s>&str</c-s>. Both <c-s>str</c-s> and <c-s>&</c-s> are copy.
+              So copying an <c-s>&str</c-s> results in a second reference pointing to the original address.
                       <photosizer-block src="../../Pictures/StrCopy.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
                         <span style="
               display: inline-block;
@@ -957,10 +965,32 @@ error: could not compile `rust_data` (bin "rust_data") due to previous error
                           Figure 1. Str Copy
                         </span>
                       </photosizer-block>
-            </li>
-            <li>
-              For all copy types, construction, assignment, and pass-by-value results in data copy
-              with no transfer of ownership, so the source is still valid.
+              <div style="height:1.0em;"></div>
+              <div style="float:left; margin-left:0em; padding-right:2em;">
+          <h4 style="margin-top: 0em;">Example: &str copy</h4>
+          <pre><code class="language-rust">  let lstrs = "literal string";  // copy type
+  let lstrd = lstrs;
+  println!("  source: {lstrs:?}, address: {:p}", lstrs);
+  println!("  destin: {lstrd:?}, address: {:p}", lstrd);
+  nl();
+  println!("  Note: a literal string is a fixed value in memory.
+  All access occurs through a reference, so copies just copy
+  the reference. Both variables point to the same address." 
+  );</code></pre>
+        </div>
+        <div style="height:1.0em; clear:both;"></div>
+        <div style="float:left; margin-left:0em; padding-right:2em;">
+          <h4 style="margin-top: 0em;">Example: Results of &str copy</h4>
+          <pre><code class="language-rust">--- direct copy &str ---
+  source: "literal string", address: 0x7ff7e742b590
+  destin: "literal string", address: 0x7ff7e742b590
+
+  Note: a literal string is a fixed value in memory.
+  All access occurs through a reference, so copies just copy
+  the reference. Both variables point to the same address.
+</code></pre>
+          </div>
+              <div style="height:1.0em; clear:both;"></div>
             </li>
             <li>
               For all move types ownership will be transferred to another variable by construction, 
@@ -979,7 +1009,7 @@ error: could not compile `rust_data` (bin "rust_data") due to previous error
                         </span>
                       </photosizer-block>
               <t-b>
-        <div style="float:left; margin-left:1em; padding-right:2em;">
+        <div style="float:left; margin-left:0em; padding-right:2em;">
           <h4 style="margin-top: 0em;">Example: String Move</h4>
           <pre><code class="language-rust">let s = String::from("a string");
 let addrvec = &s;
@@ -992,7 +1022,7 @@ let addrvec = &t;
 let addrzero = std::ptr::addr_of!(t.as_bytes()[0]);
 println!("address of t: {:p}", addrvec);
 println!("address of first byte of t&apos;s char buffer: {:p}\n", addrzero);</code></pre>
-
+        </div>
         <div style="float:left; margin-left:0em; padding-right:2em;">
           <h4 style="margin-top: 0em;">Example: Results of String Move</h4>
           <pre><code class="language-rust">--- demo_move for String ---
@@ -1012,6 +1042,7 @@ but now, s is invalid
           <div style="clear:both; height:1em;"></div>
         </div>
               </t-b>
+              <div style="clear:both;"></div>
             </li>
             <li>
               Move types usually implement the <c-s>Clone</c-s> trait with the function <c-s>clone()</c-s>.
@@ -1027,7 +1058,39 @@ but now, s is invalid
                           Figure 3. String Clone
                         </span>
                       </photosizer-block>
+              <div style="clear:both; height:1.0em;"></div>
+        <div style="float:left; margin-left:0em; padding-right:2em;">
+          <h4 style="margin-top: 0em;">Example: String Clone</h4>
+          <pre><code class="language-rust">let s_src = String::from("a string");
+let s_src_addr = &s_src;
+let s_src_bufaddr = std::ptr::addr_of!(s_src.as_bytes()[0]);
+println!("  s_src: {:?}, address: {:p}", s_src, s_src_addr);
+println!("  s_src_bufaddr: {:p}", s_src_bufaddr);
+let s_cln = s_src.clone();
+let s_cln_addr = &s_cln;
+let s_cln_bufaddr = std::ptr::addr_of!(s_cln.as_bytes()[0]);
+println!("  s_cln: {:?}, address: {:p}", s_cln, s_cln_addr);
+println!("  s_cln_bufaddr: {:p}", s_cln_bufaddr);
+nl();
+println!("  Note: s_src and s_cln have different addresses
+and their buffers have different addresses.
+So they are unique entities.");
+</code></pre>
+          </div>
+              <div style="clear:both; height:1em;"></div>
+        <div style="float:left; margin-left:0em; padding-right:2em;">
+          <h4 style="margin-top: 0em;">Example: Results of String Clone</h4>
+          <pre><code class="language-rust">--- string clone ---
+s_src: "a string", address: 0x7610d0f390
+s_src_bufaddr: 0x229473682f0
+s_cln: "a string", address: 0x7610d0f448
+s_cln_bufaddr: 0x22947375d00
 
+Note: s_src and s_cln have different addresses
+and their buffers have different addresses.
+So they are unique entities.
+</code></pre>
+          </div>
             </li>
           </ul>
 </t-b>
