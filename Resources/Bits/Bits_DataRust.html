@@ -942,7 +942,7 @@ error: could not compile `rust_data` (bin "rust_data") due to previous error
           <h3 id="move">2.3 Copy and Move Operations</h3>
           <ul>
             <li>
-              Rust types may implement the Copy trait. All primitives and aggregations of primitives
+              Some Rust types implement the Copy trait. All primitives and aggregations of primitives
               are <a target="_blank" href="../../Pictures/StrCopy.jpg">&quot;copy&quot;</a> types.  
               All other types are <a target="_blank" href="../../Pictures/StringMove.jpg">&quot;move&quot;</a>.
                       <photosizer-block src="../../Pictures/StrCopy.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
@@ -957,6 +957,10 @@ error: could not compile `rust_data` (bin "rust_data") due to previous error
                           Figure 1. Str Copy
                         </span>
                       </photosizer-block>
+            </li>
+            <li>
+              For all copy types, construction, assignment, and pass-by-value results in data copy
+              with no transfer of ownership, so the source is still valid.
             </li>
             <li>
               For all move types ownership will be transferred to another variable by construction, 
@@ -974,10 +978,40 @@ error: could not compile `rust_data` (bin "rust_data") due to previous error
                           Figure 2. String Move
                         </span>
                       </photosizer-block>
-            </li>
-            <li>
-              For all copy types, construction, assignment, and pass-by-value results in data copy
-              with no transfer of ownership, so the source is still valid.
+              <t-b>
+        <div style="float:left; margin-left:1em; padding-right:2em;">
+          <h4 style="margin-top: 0em;">Example: String Move</h4>
+          <pre><code class="language-rust">let s = String::from("a string");
+let addrvec = &s;
+let addrzero = std::ptr::addr_of!(s.as_bytes()[0]);
+println!("address of s: {:p}", addrvec);
+println!("address of first byte of s&apos;s char buffer: {:p}\n", addrzero);
+
+let t = s;  // move
+let addrvec = &t;
+let addrzero = std::ptr::addr_of!(t.as_bytes()[0]);
+println!("address of t: {:p}", addrvec);
+println!("address of first byte of t&apos;s char buffer: {:p}\n", addrzero);</code></pre>
+
+        <div style="float:left; margin-left:0em; padding-right:2em;">
+          <h4 style="margin-top: 0em;">Example: Results of String Move</h4>
+          <pre><code class="language-rust">--- demo_move for String ---
+
+--- let s = String::from("a string") ---
+address of s: 0x25758ff558
+address of first byte of s&apos;s char buffer: 0x1725ee5dcd0
+
+--- let t:String = s; // move ---
+address of t: 0x25758ff600
+address of first byte of t&apos;s char buffer: 0x1725ee5dcd0
+
+Note: s and t are unique objects
+that share same buffer
+but now, s is invalid
+</code></pre>
+          <div style="clear:both; height:1em;"></div>
+        </div>
+              </t-b>
             </li>
             <li>
               Move types usually implement the <c-s>Clone</c-s> trait with the function <c-s>clone()</c-s>.
