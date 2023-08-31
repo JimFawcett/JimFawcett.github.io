@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <!--
-  Bits_DataRust.html
+  Bits_DataRustContent.html
 -->
 <head>
   <title>Bits_Data Rust</title>
@@ -258,17 +258,42 @@
     }
   </style>
   <script>
+    function setScroll() {
+      let main = document.querySelector("#main");
+      const scrollPosition = main.scrollTop;
+      //alert(scrollPosition);
+      localStorage.setItem('scrollPositionRust', scrollPosition);
+      let scroller = document.getElementById("scrollY")
+      scroller.innerHTML = scrollPosition;
+    }
+    function gotoLastScroll() {
+      //alert("gotoLastScroll");
+      let main = document.querySelector("#main");
+      const scrollPosition = localStorage.getItem('scrollPositionRust');
+      if (scrollPosition) {
+        main.scrollTo(0, scrollPosition);
+      }
+      //alert(saved);
+      main.addEventListener('scroll', setScroll);
+    }
     function saveScroll() {
-      let main = document.querySelector("main");
-      localStorage.setItem("DataRust", main.scrollTop);
+      //let main = document.querySelector("#main");
+      //localStorage.setItem("DataRust", main.scrollTop);
+      //console.log(main.scrollTop);
     }
     function getScroll() {
-      let scroll = localStorage.getItem("DataRust");
-      if (scroll) {
-        scrollTop = parseInt(scroll, 10);
-        let main = document.querySelector("main");
-        main.scrollTop = scrollTop;
-      }
+      //let scroll = localStorage.getItem("DataRust");
+      //if (scroll) {
+      //  scrollTop = parseInt(scroll, 10);
+      //  let main = document.querySelector("#main");
+      //  main.scrollTop = scrollTop;
+      //  console.log(main.scrollTop);
+    //  }
+    }
+    function load() {
+      //alert('load');
+      initialize();
+      gotoLastScroll();
     }
   </script>
 
@@ -278,7 +303,7 @@
     }
   </script>
 </head>
-<body id="github" onload="initialize()" onbeforeunload="saveScroll()">
+<body id="github" onload="load()">
 
   <a id="Next" href="Bits_ObjectsRust.html">Next</a>
   <a id="Prev" href="Bits_HelloRust.html">Prev</a>
@@ -287,7 +312,7 @@
     <frame-header>
       <nav id="navbar"></nav>
     </frame-header>
-    <main>
+    <main id="main">
       <div id="about">about</div>
       <div id="page">Bits Data Rust</div>
       <div id="modified">08/30/2023</div>
@@ -296,10 +321,13 @@
       <content id="content">
         <div class="rightPanelLinks">
           <a href="Bits_DataCpp.html">C++</a>
-          <a class="darkItem" href="Bits_DataRust.html">Rust</a>
+          <a class="darkItem" href="Bits_DataRustContent.html">Rust</a>
           <a href="Bits_DataCSharp.html">C#</a>
           <a href="Bits_DataPython.html">Python</a>
-          <a href="Bits_DataJs.html">JvScrpt</a>
+          <a href="Bits_DataJs.html" onclick="saveScroll()">JvScrpt</a>
+        </div>
+        <div id="scrollY" style="position:fixed; top:3em; right:0em; width:16em; height:3em; border:1px solid red;">
+
         </div>
         <header>
           <a target="_blank" class="repoLink" href="https://github.com/JimFawcett/Bits">Bits Repo Code</a>
@@ -360,7 +388,7 @@
                 refer to instances in a function&apos;s stack memory, in the native heap, 
                 or in the program&apos;s static memory.
               </li>
-              <li>
+              <li style="border: 1px solid var(--dark); padding:0.25em;">
                 Rust references are constrained by Rust ownership rules to support memory
                 and data race safety by construction. All values in memory have a single owner,
                 responsible for its creation, access, and deallocation.
@@ -1160,616 +1188,7 @@ So they are unique entities.
         </t-b>
 
 
-        <!--<div style="height:2em;"></div>
-        <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote()" />
-        <div style="display:flex; flex-direction:column;">
-          <h4 id="source">Source Code: main.rs</h4>
-          <pre><code class="language-rust">/*---------------------------------------------------------
- rust_data::src::main.rs
- - demonstrate move, copy, and borrow for
-   primitives and selected std::library types
----------------------------------------------------------*/
-#![allow(unused_mut)]
-#![allow(dead_code)]
-#![allow(clippy::approx_constant)]
-/*
-  Static Data Types:
-    bool, char
-    i8, i16, i32, i64, i128, isize
-    u8, u16, u32, u64, u128, usize
-    f32, f64
-    (), reference
-    array, tuple, struct, enum
-  Qualifiers:
-    mutable, const
-
-  Additional Library Types:
-    std::String, std::Vec&lt;T&gt;, std::HashMap&lt;K,V&gt;,
-    std::VecDeque&lt;T&gt;, std::BTreeSet&lt;T&gt;, std::BTreeMap&lt;K,V&gt;,
-    std::LinkedList&lt;T&gt;, std::BinaryHeap&lt;T&gt;
-
-  Operations:
-    Primitive types can all be copied.
-    Most library and user-defined types can be moved,
-    cloned, but only aggregates with all copyable members
-    can be copied.  Values can only be changed if declared
-    mutable.
-
-  Processing:
-    All types are static, operations run as native code,
-    and no garbage collection is needed. Resources are
-    returned at end of declr scope.
-*/
-/*-----------------------------------------------
-Note:
-Find all Bits code, including this in
-https://github.com/JimFawcett/Bits
-You can clone the repo from this link.
------------------------------------------------*/
-
-mod bits_data_analysis;
-use bits_data_analysis::*;
-use std::collections::*;
-
-use std::fmt::Debug;
-
-/*---------------------------------------------------------
-  Primitive data types: i32, f64, ... occupy contiguous
-  regions of memory, so they satisfy the Copy trait.
-
-  Library types like String have a control block in stack
-  and data in heap. So they do not satisfy the Copy trait.
-
-  A move type can be cloned, but that requires an explicit
-  call to clone(). Otherwise, assignment and pass by value
-  result in move which transfers ownership of heap
-  resources and invalidates the moved instance.
-
-  Any attempt to use a moved instance results in compile
-  failure.
----------------------------------------------------------*/
-
-/*---------------------------------------------------------
-  Demonstrate initialization of Rust's types
-*/
-fn create_initialize() {
-  show_note(&quot;create and initialize&quot;);
-  nl();
-
-  show_op(&quot;initialize primitives&quot;);
-  let int = 42i64;
-  show_type(&int, &quot;int&quot;);
-  let double:f64 = 3.15927;
-  show_type(&double, &quot;double&quot;);
-  let arr = [1, 2, 3];
-  show_type(&arr, &quot;arr&quot;);
-  nl();
-
-  show_op(&quot;initialize std::lib types&quot;);
-  let vec = vec![1, 2, 3, 2, 1];
-  show_type(&vec, &quot;vec&quot;);
-  let mut map = HashMap::&lt;&str,i32&gt;::new();
-  map.insert(&quot;zero&quot;, 0);
-  map.insert(&quot;one&quot;, 1);
-  map.insert(&quot;two&quot;, 2);
-  show_type(&map, &quot;map&quot;);
-  nl();
-
-  show_op(&quot;initialize user-defined type&quot;);
-  #[derive(Debug)]
-  struct Demo { name: String }
-  let udt = Demo { name: &quot;demo&quot;.to_string() };
-  show_type(&udt, &quot;udt&quot;);
-}
-
-/*---------------------------------------------------------
-  pass argument by value
-  - t is destination of move operation on caller's
-    argument
-  - t mutated in function to demonstrate that there
-    are no side effects from calling this function
-*/
-fn pass_by_val&lt;T:Debug + Default&gt;(mut t:T) {
-  show_type(&t,&quot;T&quot;);
-  t = T::default();
-  println!(&quot;  value mutated internally to {:?}&quot;, t);
-  // no side effect since t was copied or moved
-}
-/*---------------------------------------------------------
-  pass argument by reference
-  - t is reference to caller's argument
-  - t mutated in function to demonstrate that there
-    are side effects from calling this function
-*/
-fn pass_by_ref&lt;T:Debug + Default&gt;(t:&mut T) {
-  show_type(&t,&quot;T&quot;);
-  *t = T::default();
-  println!(&quot;  value mutated internally to {:?}&quot;, t);
-  // has side effects since t is ref to caller's value
-}
-/*-- demonstrate variable has not been moved ------------*/
-fn verify&lt;T&gt;(_t:T) {  // can only call this if t is valid
-  /* t is valid */
-}
-
-/*-- demonstrate copy types -------------------------------
-  Primitives and arrays of primitives are Copy types so
-  construction, assignment, and pass-by-value result in
-  copying entire source to destination.
-
-  Most non-primitive types are not Copy, but provide a
-  clone() function to make copies explicitly.
-*/
-fn demo_copy() {
-  show_note(&quot;demonstrate copy and pass-by-value&quot;);
-  nl();
-
-  show_op(&quot;direct integer copy&quot;);
-  let i_src = 42i64;  // copy literal 42 into i
-  let i_dst = i_src;
-  println!(&quot;  source: {i_src:?}&quot;);
-  println!(&quot;  destin: {i_dst:?}&quot;);
-  nl();
-
-  show_op(&quot;direct copy of array of f64&quot;);
-  let arr_src = [3.14f64, 0.5, -0.75];  // copy type
-  let arr_dst = arr_src;
-  println!(&quot;  source: {arr_src:?}&quot;);
-  println!(&quot;  destin: {arr_dst:?}&quot;);
-  nl();
-
-  show_op(&quot;direct vector clone&quot;);
-  let v_src = vec![1, 2, 3, 2, 1];
-  let v_dst = v_src.clone();
-  // let v_dst = v_src;  moves v_src resources to v_dst
-  // does not copy
-  println!(&quot;  source: {v_src:?}&quot;);
-  println!(&quot;  destin: {v_dst:?}&quot;);
-  nl();
-
-  show_op(&quot;pass-by-value copies integer&quot;);
-  pass_by_val(i_src);
-  nl();
-
-  show_op(&quot;pass-by-value moves vector&quot;);
-  pass_by_val(v_src);
-  // println!(&quot;{:?}&quot;, v_src); fails to compile, v_scr moved
-
-}
-
-/*-- demonstrate references -------------------------------
-  Illustrates  side affects of passing by reference
-  - function pass_by_ref(&t) mutates t to illustrate
-    that caller sees this change.
-*/
-fn demo_pass_by_ref() {
-  show_label(&quot;demonstrate pass-by-reference&quot;, 50);
-
-  show_label(&quot;these demos have side effects&quot;, 35);
-  nl();
-
-  show_op(&quot;pass integer reference&quot;);
-  let mut i = 42i64;
-  println!(&quot;  before pass_by_ref: {i:?}&quot;);
-  pass_by_ref(&mut i);
-  println!(&quot;  after pass_by_ref: {i:?}&quot;);
-  nl();
-
-  show_op(&quot;pass reference to vector&quot;);
-  let mut v = vec![1, 2, 3, 4, 5];
-  println!(&quot;  before pass_by_ref: {v:?}&quot;);
-  pass_by_ref(&mut v);
-  println!(&quot;  after pass_by_ref: {v:?}&quot;);
-  nl();
-
-  show_op(&quot;pass reference to HashMap&quot;);
-  let mut m = HashMap::&lt;&str, i32&gt;::new();
-  m.insert(&quot;zero&quot;, 0);
-  m.insert(&quot;one&quot;, 1);
-  m.insert(&quot;two&quot;, 2);
-  println!(&quot;  before pass_by_ref: {m:?}&quot;);
-  pass_by_ref(&mut m);
-  println!(&quot;  after pass_by_ref: {m:?}&quot;);
-}
-
-/*-- demonstrate move types -------------------------------
-  Construction, assignment, and pass-by-value all result
-  in moving the source resources to the destination.
-
-  That is fast, usually only a few bytes are copied.
-
-  This demo shows that move source and destination are
-  unique, but source and destination share same heap buffer.
-*/
-fn show_addresses&lt;'a, T:Debug + AsRef&lt;[u8]&gt;&gt;(t:&T, nm:&str) {
-  println!(&quot;  {}: {:?}&quot;, nm, t);  // show value of t
-  let addr_t = std::ptr::addr_of!(*t);
-  println!(&quot;  static address of {}: {:?}&quot;, nm, addr_t);
-  let byte_ref = t.as_ref();
-  let addr_res = std::ptr::addr_of!(byte_ref[0]);
-  println!(&quot;  heap address of {}'s buffer: {:?}&quot;, nm, addr_res);
-}
-fn demo_move() {
-  show_note(&quot;demonstrate move&quot;);
-  nl();
-
-  show_op(&quot;demo_move for String&quot;);
-  let s = String::from(&quot;a string&quot;);
-  show_addresses(&s, &quot;s&quot;);
-  let addrzero = std::ptr::addr_of!(s.as_bytes()[0]);
-  println!(&quot;  check - address of first byte of chars: {:?}&quot;, addrzero);
-
-  let t = s;  // move
-  show_op(&quot;let t:String = s; // move&quot;);
-  show_addresses(&t, &quot;t&quot;);
-  nl();
-
-  println!(&quot;  Note: s and t are unique objects&quot;);
-  println!(&quot;  that share same buffer&quot;);
-  println!(&quot;  but now, s is invalid&quot;);
-  nl();
-
-  show_op(&quot;demo_move for Vec&quot;);
-  let u = vec![1, 2, 3, 2, 1];
-  show_addresses(&u, &quot;u&quot;);
-  let addrzero = std::ptr::addr_of!(u[0]);
-  println!(&quot;  check - address of u[0]: {:?}&quot;, addrzero);
-
-  show_op(&quot;let v:Vec&lt;u8&gt; = u; // move&quot;);
-  let v = u;  // move
-  show_addresses(&v, &quot;v&quot;);
-}
-
-/*---------------------------------------------------------
-  Demonstrate mutability
-*/
-fn demo_mutable() {
-  show_note(&quot;demonstrate mutability&quot;);
-  nl();
-
-  show_op(&quot;demo_mutable for primitives&quot;);
-  let mut i = 42i32;
-  print!(&quot;  original value: {i:?}&quot;);
-  i += 1;
-  println!(&quot;, changed value:  {i:?}&quot;);
-
-  let mut f = 3.14159f64;
-  print!(&quot;  original value: {f:?}&quot;);
-  f += 1.0;
-  println!(&quot;, changed value:  {f:?}&quot;);
-  nl();
-
-  show_op(&quot;demo_mutable for std::lib types&quot;);
-  let mut v = vec![1, 2, 3];
-  print!(&quot;  original value: {v:?}&quot;);
-  v[1] += 1;
-  println!(&quot;, changed value:  {v:?}&quot;);
-
-  let mut m = HashMap::&lt;&str,i32&gt;::new();
-  m.insert(&quot;zero&quot;, 0);
-  m.insert(&quot;one&quot;, 1);
-  m.insert(&quot;two&quot;, 2);
-  println!(&quot;  original value: {m:?}&quot;);
-  /* entry returns reference to value of supplied key */
-  let mut value = m.entry(&quot;one&quot;).or_insert(1);
-  *value += 1;
-  println!(&quot;  changed value:  {m:?}&#92;n&quot;);
-}
-/*---------------------------------------------------------
-  Demonstrate references
-  - illustrates that mutability cannot be shared using
-    references
-*/
-fn demo_ref() {
-  show_note(&quot;demonstrate references&quot;);
-  nl();
-
-  show_op(&quot;demo_ref immutable&quot;);
-  let v1 = vec![1, 2, 3, 2, 1];
-  /* can use any number of immutable referenes */
-  let r1v1 = &v1;
-  println!(&quot;  r1v1: {r1v1:?}&quot;);
-  let r2v1 = &v1;
-  println!(&quot;  r2v1: {r2v1:?}&quot;);
-  nl();
-
-  show_op(&quot;demo_ref mutable&quot;);
-  /* can't mutate data through shared references */
-  let mut v2 = vec![1, 2, 3, 4, 5];
-  /* immutable borrow */
-  let r1v2 = &v2;
-  println!(&quot;  r1v2: {r1v2:?}&quot;);
-  /* mutable borrow ok if we don't use immutable borrow later */
-  let mr2v2 = &mut v2;
-  mr2v2.push(42);
-  println!(&quot;  mr2v2: {mr2v2:?}&quot;);
-  /*
-    Use of immutable borrow in println! illegal with active
-    mutable borrow. Try uncommenting line below.
-  */
-  // println!(&quot;  r1v2: {r1v2:?}&quot;);
-}
-/*-- execute demonstrations -----------------------------*/
-fn main() {
-    show_note(
-      &quot;Demonstrate Rust types&quot;
-    );
-
-    create_initialize();
-    demo_copy();
-    demo_pass_by_ref();
-    demo_move();
-    demo_mutable();
-    demo_ref();
-
-    println!(&quot;&#92;n&#92;nThat's all Folks!!&#92;n&#92;n&quot;);
-}</code></pre>
-          <h4 id="anal">Source Code: bits_data_analysis.rs</h4>
-          <pre><code class="language-rust">#![allow(unused_mut)]
-#![allow(dead_code)]
-#![allow(clippy::approx_constant)]
-
-/* rust_data::bits_data_analysis.rs */
-/*-----------------------------------------------
-Note:
-Find all Bits code, including this in
-https://github.com/JimFawcett/Bits
-You can clone the repo from this link.
------------------------------------------------*/
-
-use std::fmt::Debug;
-
-/*-- show_type --------------------------------------------
-  Shows compiler recognized type and data value
-*/
-pub fn show_type&lt;T: Debug&gt;(t: &T, nm: &str) {
-  let typename = std::any::type_name::&lt;T&gt;();
-  print!(&quot;  {nm}, {typename}&quot;);
-  println!(
-    &quot;&#92;n  value: {:?}, size: {}&quot;,  // smart formatting {:?}
-    t, std::mem::size_of::&lt;T&gt;()   // handles both scalars
-  );                              // and collections
-}
-/*---------------------------------------------------------
-  show string wrapped with long dotted lines above and below
-*/
-pub fn show_label(note: &str, n:usize) {
-  let mut line = String::new();
-  for _i in 0..n {
-    line.push('-');
-  }
-  print!(&quot;&#92;n{line}&#92;n&quot;);
-  print!(&quot;  {note}&quot;);
-  print!(&quot;&#92;n{line}&#92;n&quot;);
-}
-pub fn show_label_def(note:&str) {
-  show_label(note, 50);
-}
-/*---------------------------------------------------------
-  show string wrapped with dotted lines above and below
-*/
-pub fn show_note(note: &str) {
-  print!(&quot;&#92;n-------------------------&#92;n&quot;);
-  print!(&quot; {note}&quot;);
-  print!(&quot;&#92;n-------------------------&#92;n&quot;);
-}
-/*---------------------------------------------------------
-  show string wrapped in short lines
-*/
-pub fn show_op(opt: &str) {
-  println!(&quot;--- {opt} ---&quot;);
-}
-/*---------------------------------------------------------
-  print newline
-*/
-pub fn nl() {
-  println!();
-}</code></pre>
-          <h4 id="out">Output</h4>
-          <pre class="codeSnaps"><code class="language-shell">C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data
-&gt; cargo run
-    Finished dev [unoptimized + debuginfo] target(s) in 0.00s
-     Running `target&#92;debug&#92;rust_data.exe`
-
--------------------------
- Demonstrate Rust types
--------------------------
-
--------------------------
- create and initialize
--------------------------
-
---- initialize primitives ---
-  int, i64
-  value: 42, size: 8
-  double, f64
-  value: 3.15927, size: 8
-  arr, [i32; 3]
-  value: [1, 2, 3], size: 12
-
---- initialize std::lib types ---
-  vec, alloc::vec::Vec&lt;i32&gt;
-  value: [1, 2, 3, 2, 1], size: 24
-  map, std::collections::hash::map::HashMap&lt;&str, i32&gt;
-  value: {&quot;one&quot;: 1, &quot;two&quot;: 2, &quot;zero&quot;: 0}, size: 48
-
---- initialize user-defined type ---
-  udt, rust_data::create_initialize::Demo
-  value: Demo { name: &quot;demo&quot; }, size: 24
-
--------------------------
- demonstrate copy and pass-by-value
--------------------------
-
---- direct integer copy ---
-  source: 42
-  destin: 42
-
---- direct copy of array of f64 ---
-  source: [3.14, 0.5, -0.75]
-  destin: [3.14, 0.5, -0.75]
-
---- direct vector clone ---
-  source: [1, 2, 3, 2, 1]
-  destin: [1, 2, 3, 2, 1]
-
---- pass-by-value copies integer ---
-  T, i64
-  value: 42, size: 8
-  value mutated internally to 0
-
---- pass-by-value moves vector ---
-  T, alloc::vec::Vec&lt;i32&gt;
-  value: [1, 2, 3, 2, 1], size: 24
-  value mutated internally to []
-
---------------------------------------------------
-  demonstrate pass-by-reference
---------------------------------------------------
-
------------------------------------
-  these demos have side effects
------------------------------------
-
---- pass integer reference ---
-  before pass_by_ref: 42
-  T, &mut i64
-  value: 42, size: 8
-  value mutated internally to 0
-  after pass_by_ref: 0
-
---- pass reference to vector ---
-  before pass_by_ref: [1, 2, 3, 4, 5]
-  T, &mut alloc::vec::Vec&lt;i32&gt;
-  value: [1, 2, 3, 4, 5], size: 8
-  value mutated internally to []
-  after pass_by_ref: []
-
---- pass reference to HashMap ---
-  before pass_by_ref: {&quot;zero&quot;: 0, &quot;two&quot;: 2, &quot;one&quot;: 1}
-  T, &mut std::collections::hash::map::HashMap&lt;&str, i32&gt;
-  value: {&quot;zero&quot;: 0, &quot;two&quot;: 2, &quot;one&quot;: 1}, size: 8
-  value mutated internally to {}
-  after pass_by_ref: {}
-
--------------------------
- demonstrate move
--------------------------
-
---- demo_move for String ---
-  s: &quot;a string&quot;
-  static address of s: 0x6a4c5af440
-  heap address of s's buffer: 0x1d0d45282e0
-  check - address of first byte of chars: 0x1d0d45282e0
---- let t:String = s; // move ---
-  t: &quot;a string&quot;
-  static address of t: 0x6a4c5af4a0
-  heap address of t's buffer: 0x1d0d45282e0
-
-  Note: s and t are unique objects
-  that share same buffer
-  but now, s is invalid
-
---- demo_move for Vec ---
-  u: [1, 2, 3, 2, 1]
-  static address of u: 0x6a4c5af550
-  heap address of u's buffer: 0x1d0d4534980
-  check - address of u[0]: 0x1d0d4534980
---- let v:Vec&lt;u8&gt; = u; // move ---
-  v: [1, 2, 3, 2, 1]
-  static address of v: 0x6a4c5af5b0
-  heap address of v's buffer: 0x1d0d4534980
-
--------------------------
- demonstrate mutability
--------------------------
-
---- demo_mutable for primitives ---
-
---- demo_mutable for primitives ---
-  original value: 42, changed value:  43
-  original value: 3.14159, changed value:  4.14159
-
---- demo_mutable for std::lib types ---
-  original value: [1, 2, 3], changed value:  [1, 3, 3]
-  original value: {&quot;one&quot;: 1, &quot;two&quot;: 2, &quot;zero&quot;: 0}
-  changed value:  {&quot;one&quot;: 2, &quot;two&quot;: 2, &quot;zero&quot;: 0}
-
-
--------------------------
- demonstrate references
--------------------------
-
---- demo_ref immutable ---
-  r1v1: [1, 2, 3, 2, 1]
-  r2v1: [1, 2, 3, 2, 1]
-
---- demo_ref mutable ---
-  r1v2: [1, 2, 3, 4, 5]
-  mr2v2: [1, 2, 3, 4, 5, 42]
-
-
-That's all Folks!!
-
-
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data
-</code></pre>
-          <h4 id="build">Build</h4>
-          <pre class="codeSnaps"><code class="language-shell">C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data
-&gt; cargo run
-   Compiling rust_data v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.37s
-     Running `target&#92;debug&#92;rust_data.exe`
-          </code></pre>
-        </div>
-        <h3 id="ide">2.0 VS Code View</h3>
-        <t-b>
-          The code for this demo is available in 
-          <a target="_blank" href="https://github.com/JimFawcett/Bits">github.com/JimFawcett/Bits</a>. If you click on
-          the Code dropdown you can clone the repository of all code for these demos to your local drive.
-          Then, it is easy to bring up any example, in any of the languages, in VS Code.
-        </t-b>
-        <t-b>
-          Here, we do that for Rust\rust_hello_data.
-        </t-b>
-        <photosizer-block src="pictures/VS_Code_Rust_Data.JPG" width="800" class="photoSizerBlock left"
-          style="overflow-x:auto;"
-        >
-          <span style="font-family:'Comic Sans MS';">Figure 1. VS Code IDE</span>
-        </photosizer-block>
-        <photosizer-block src="pictures/LaunchJSON_Rust_Data.JPG" width="700" class="photoSizerBlock left"
-          style="overflow-x:auto;"
-        >
-          <span style="font-family:'Comic Sans MS';">Figure 2. Launch.JSON</span>
-        </photosizer-block>-->
-        <!--<photosizer-block src="pictures/VS_Code_Cpp_Plugins.jpg" width="700" class="photoSizerBlock left">
-          <span style="font-family:'Comic Sans MS';">Figure 3. C++ Plugins</span>
-        </photosizer-block>-->
-
-        <!--<div style="height:0.75em;" class="clear"></div>
-        <h3 id="refs">3.0 References</h3>
-        <table class="indent">
-          <tr>
-            <th class="darkItem">Reference</th><th class="darkItem">Description</th>
-          </tr>
-          <tr>
-            <td>
-              <a target="_blank" href="../../RustStoryRepo.html">Rust Story</a>
-            </td>
-            <td>
-              E-book with seven chapters covering most of intermediate Rust
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a target="_blank" href="../RustBites/RustBites_Intro.html">Rust Bites</a>
-            </td>
-            <td>
-              Relatively short feature discussions
-            </td>
-          </tr>
-        </table>
-        <div style="height:10em;"></div>-->
+        <div style="height:50em;"></div>
       </content>
       <a id="bottom"></a>
       <page-TOC id="pages" style="display:none;">
@@ -1813,7 +1232,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_data
   </script>
   <script>
     //localStorage.clear();
-    getScroll();
+    //gotoLastScroll();
   </script>
 </body>
 </html>
