@@ -8,6 +8,13 @@
 
 /* custom webcomponent - HideablePhotoSizerBlock*/
 
+function isDefined(elem) {
+  if (typeof elem === 'undefined' || elem === null || elem === undefined) {
+    return false;
+  }
+  return true;
+}
+
 class HideablePhotoSizerBlock extends HTMLElement {
   constructor(...args) {
     const self = super(...args);
