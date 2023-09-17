@@ -1016,11 +1016,158 @@
 </code></pre>
         </details>
         <h3 id="move">6.0 Move std::string</h3>
-        <pre><code class="language-cpp">
-  Coming Soon
-        </code></pre>
+        <pre><code class="language-cpp">  /*-- move temporary string --*/
+  auto first = std::string(&quot;first part&quot;);
+  auto mid = std::string(&quot; and &quot;);
+  auto last = std::string(&quot;last part&quot;);
+  auto aggr = first + mid + last;
+  /*-----------------------------------------------------
+    first + mid + last is a temporary string that
+    is moved to aggr using move constructor.
+  ------------------------------------------------------*/
+
+  /*-- forced string move --*/
+  auto src = std::string(&quot;src string&quot;);
+  auto dst = std::move(src);
+  /*-----------------------------------------------------
+    There is no guarantee that src will have valid
+    state after move, so using src after has undefined
+    behavior.
+  ------------------------------------------------------*/
+
+</code></pre>
         <details>
           <summary class="darkItem">Output</summary>
+          <pre><code class="language-cpp">  --- move temporary string ---
+  first:  "first part"
+  mid:    " and "
+  last:   "last part"
+  --- auto aggr = first + mid + last ---
+  aggr:   "first part and last part"
+  --------------------------------------------------
+   first + mid + last is a temporary string that
+   is moved to aggr using move constructor.
+  --------------------------------------------------
+
+  --- forced string move ---
+  src:    "src string"
+  src:    type: class std::basic_string&lt;char,struct std:...
+  --- auto dst=std::move(src) ---
+  dst: "src string"
+  dst: type: class std::basic_string&lt;char,struct std:...
+  src:    &quot;&quot;
+  src:    type: class std::basic_string&lt;char,struct std:...
+  --------------------------------------------------
+   There is no guarantee that src will have a valid
+   state after move, so the src display, above, has
+   undefined behavior - just happens to work on MSVC.
+  --------------------------------------------------
+</code></pre>
+        </details>
+        <h3 id="passvalref">7.0 Pass-by-value &amp; Pass-by-reference</h3>
+        <pre><code class="language-cpp">  template&lt;typename T&gt;
+  void pass_seq_by_value(T t) {
+    std::cout &lt;&lt; formatOutput&lt;T&gt;(
+                   t, &quot;   passed&quot;, seq_collectionToString&lt;T&gt;
+                 );
+    std::cout &lt;&lt; formatAddress&lt;T&gt;(t, &quot;   passed&quot;);
+    std::cout &lt;&lt; formatAddress&lt;typename T::value_type&gt;(
+                   t[0], &quot;passed[0]&quot;
+                 );
+  }
+  template&lt;typename T&gt;
+  void pass_seq_by_reference(T& t) {
+    std::cout &lt;&lt; formatOutput&lt;T&gt;(
+                   t, &quot;   passed&quot;, seq_collectionToString&lt;T&gt;
+                 );
+    std::cout &lt;&lt; formatAddress&lt;T&gt;(t, &quot;   passed&quot;);
+    std::cout &lt;&lt; formatAddress&lt;typename T::value_type&gt;(
+                   t[0], &quot;passed[0]&quot;
+                 );
+  }
+
+  void pass_by_value_and_ref() {
+
+    showLabel(&quot;pass-by-value and pass-by-reference&quot;);
+    nl();
+
+    showOp(&quot;std::vector&lt;int&gt; pass-by-value&quot;);
+    nl();
+    using VECI = std::vector&lt;int&gt;;
+    auto v = std::vector&lt;int&gt;() = { 1, 2, 3 };
+    std::cout &lt;&lt; formatOutput&lt;VECI&gt;(
+                   v, &quot;     call&quot;, 
+                   seq_collectionToString&lt;VECI&gt;
+                 );
+    std::cout &lt;&lt; formatAddress&lt;VECI&gt;(v, &quot;     call&quot;);
+    std::cout &lt;&lt; formatAddress&lt;int&gt;(v[0], &quot;  call[0]&quot;);
+    pass_seq_by_value(v);
+    showLabel(
+      &quot;passed has the same value as call.&#92;n&quot;
+      &quot;  call and its resources are different from&#92;n&quot;
+      &quot;  passed and its resources.  That demonstrates&#92;n&quot;
+      &quot;  passed was copy constructed from call.&quot;
+    );
+    nl();
+
+    showOp(&quot;std::vector&lt;int&gt; pass-by-reference&quot;);
+    nl();
+    using VECI = std::vector&lt;int&gt;;
+    auto rv = std::vector&lt;int&gt;() = { 1, 2, 3 };
+    std::cout &lt;&lt; formatOutput&lt;VECI&gt;(
+                   rv, &quot;     call&quot;, 
+                   seq_collectionToString&lt;VECI&gt;
+                 );
+    std::cout &lt;&lt; formatAddress&lt;VECI&gt;(rv, &quot;     call&quot;);
+    std::cout &lt;&lt; formatAddress&lt;int&gt;(rv[0], &quot;  call[0]&quot;);
+    pass_seq_by_reference(rv);
+    showLabel(
+      &quot;call and its resources are the same as&#92;n&quot;
+      &quot;  passed and its resources.  That demonstrates&#92;n&quot;
+      &quot;  that only reference was copied.&quot;
+    );
+}
+</code></pre>
+        <details>
+          <summary class="darkItem">Output</summary>
+          <pre><code class="language-cpp">
+  --------------------------------------------------
+  pass-by-value and pass-by-reference
+  --------------------------------------------------
+
+  --- std::vector&lt;int> pass-by-value ---
+
+       call: [ 1, 2, 3 ]
+       call: type: class std::vector&lt;int,class std::allocat...
+       call: address: 0000004A4276F3C8
+    call[0]: address: 00000202AD1B4B80
+     passed: [ 1, 2, 3 ]
+     passed: type: class std::vector&lt;int,class std::allocat...
+     passed: address: 0000004A4276F760
+  passed[0]: address: 00000202AD1B4AE0
+--------------------------------------------------
+  passed has the same value as call.
+  call and its resources are different from
+  passed and its resources.  That demonstrates
+  passed was copy constructed from call.
+--------------------------------------------------
+
+  --- std::vector&lt;int> pass-by-reference ---
+
+       call: [ 1, 2, 3 ]
+       call: type: class std::vector&lt;int,class std::allocat...
+       call: address: 0000004A4276F578
+    call[0]: address: 00000202AD1B45E0
+     passed: [ 1, 2, 3 ]
+     passed: type: class std::vector&lt;int,class std::allocat...
+     passed: address: 0000004A4276F578
+  passed[0]: address: 00000202AD1B45E0
+--------------------------------------------------
+  call and its resources are the same as
+  passed and its resources.  That demonstrates
+  that only reference was copied.
+--------------------------------------------------
+</code></pre>
         </details>
         <h3 id="displfunc">7.0 Display Functions</h3>
         <t-b style="margin-top:0.5em;">
@@ -1153,6 +1300,12 @@
     out &lt;&lt; std::showbase &lt;&lt; std::hex &lt;&lt; ptrToArg &lt;&lt; "\n";
     return out.str();
   }
+/*-----------------------------------------------
+  emit newline
+*/
+static void nl() {
+  std::cout &lt;&lt; std::endl;
+}
 
 </code></pre>
         </details>
