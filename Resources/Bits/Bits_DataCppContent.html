@@ -266,6 +266,19 @@
       text-align: left;
       background-color: var(--menu);
     }
+    .block {
+      display: flex;
+      flex-direction: column;
+      margin-right: 5em;
+      margin-top: 1.25em;
+    }
+    .row {
+      display: flex;
+      flex-direction: row;
+      padding: 0.25em 0.5em;
+      border: 1px solid #aaa;
+      /* box-shadow: 2px 2px 2px 2px rgba(9,9,9,0.1); */
+    }
   </style>
   <script>
     function setScroll() {
@@ -428,7 +441,7 @@
               <th colspan="3" class="cat">-- Floating point types ----</th>
             </tr>
             <tr>
-              <td><c-s>float, double</c-s></td>
+              <td><c-s>float, double, long double</c-s></td>
               <td>values have finite precision, and may have approximate values</td>
               <td><c-s>double d = 3.14159;</c-s></td>
             </tr>
@@ -524,10 +537,13 @@
               </td>
             </tr>
             <tr>
-              <td>forward_list, list, unordered_set, unordered_multiset, ...</td>
               <td>
-                The C++ std::library defines types for threading and synchronization,<br />
-                reading and writing to streams, anonymous functions, ...
+                forward_list, list, unordered_map, unordered_set, unordered_multimap, unordered_multiset, 
+                set, multiset, and several adapters like stack and queue
+              </td>
+              <td>
+                The C++ std::library also defines types for threading and synchronization,
+                reading and writing to streams, anonymous functions, and many more.
               </td>
               <td><a href="https://en.cppreference.com/w/cpp/container">Containers library</a></td>
             </tr>
@@ -664,22 +680,22 @@
         <h3 id="init">1.0 Initialization</h3>
         <t-b>
           Several of the code blocks shown below have formatting and output code elided.  You can find
-          the complete code in the <a target="_blank" href="https://github.com/JimFawcett/Bits">Bits Repository</a>:
-          <ul>
-            <li>
-              <a target="_blank" href="https://github.com/JimFawcett/Bits/blob/master/Cpp/Cpp_Data/src/Bits_Data.cpp">Bits_Data.cpp</a>
-            </li>
-            <li>
-              <a target="_blank" href="https://github.com/JimFawcett/Bits/blob/master/Cpp/Cpp_Data/src/Bits_DataAnalysis.h">Bits_DataAnalysis.h</a>
-            </li>
-            <li>
-              <a target="_blank" href="https://github.com/JimFawcett/Bits/blob/master/Cpp/Cpp_Data/src/Bits_DataAnalysis.cpp">Bits_DataAnalysis.cpp</a>
-            </li>
-          </ul>
+          complete code in the <a target="_blank" href="https://github.com/JimFawcett/Bits">Bits Repository</a>:
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/blob/master/Cpp/Cpp_Data/src/Bits_Data.cpp">Bits_Data.cpp</a>, 
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/blob/master/Cpp/Cpp_Data/src/Bits_DataAnalysis.h">Bits_DataAnalysis.h</a>, 
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/blob/master/Cpp/Cpp_Data/src/Bits_DataAnalysis.cpp">Bits_DataAnalysis.cpp</a>
         </t-b>
         <h3 id="prim">1.1 Primitives</h3>
-        <div style="display:flex; flex-direction:column; margin-right:1em;">
-          <div style="display:flex; flex-direction:row;">
+        <t-b>
+          Initialization is the process of endowing a newly created type instance with a specified value.
+          Uninitialized local instances have undefined values. Uninitialized variables at global 
+          scope are initialized to zero.
+        </t-b>
+        <t-b>
+          To insure well defined behavior initialize all varibles where they are declared, as shown below.
+        </t-b>
+        <div class="block">
+          <div class="row">
             <div>
               <pre><code class="language-cpp">  /*---------------------------------------------------  
     All code used for output has been elided
@@ -693,16 +709,102 @@
   char ch = 'z';
   const char* lst = &quot;a literal string&quot;;
 
+</code></pre>
+            </div>
+            <div style="margin-left:2em;">
+              <t-b>
+                Instances of primitive types each occupy one block of contiguous memory.
+              </t-b>
+              <t-b>
+                Scalars can be initialized by either assigning a value or with a braced initializer.
+              </t-b>
+              <t-b>
+                The int type can be qualified with keywords short, long, and long long. Type double
+                can be qualified with long. A complete list of types and their qualifiers are given in
+                the &quot;C++ Types Details&quot; dropdown list, above.
+              </t-b>
+            </div>
+          </div>
+          <details>
+            <summary class="darkItem">Output</summary>
+            <div class="row">
+              <div>
+                <pre><code class="language-cpp">  --- bool ---
+  b: true
+  b: type: bool
+  b: size = 1
+  --- byte ---
+  byte: 0xf
+  byte: type: enum std::byte
+  byte: size = 1
+  --- int ---
+  i: 42
+  i: type: int
+  i: size = 4
+  --- double ---
+  d: 3.141593
+  d: type: double
+  d: size = 8
+  --- char ---
+  ch: z
+  ch: type: char
+  ch: size = 1
+  --- const char* ---
+  lst: "a literal string"
+  lst: type: char const * __ptr64  
+  lst: size = 8
+  lst: char count = 16
+
+</code></pre>
+              </div>
+              <div style="margin-left:2em;">
+                <t-b>
+                  Each type in the code block on the left is characterized by its value,
+                  type evaluated from the core C++ function <c-s>typeid(t).name()</c-s>,
+                  and size retrieved from the core C++ function <c-s>sizeof(t)</c-s>.
+                </t-b>
+                <t-b>
+                  <c-s>sizeof(t)</c-s> returns the number of bytes allocated by the compiler for
+                  the value&nbsp;of&nbsp;t.
+                </t-b>
+                <t-b>
+                  Note that the literal string, lst, at the bottom, is accessed from a pointer,
+                  which, for a 64 bit computer, is 8 bytes, not the count of characters.
+                </t-b>
+                <t-b>
+                  The actual length of lst is 17 bytes, because <c-s>strlen(lst)</c-s> ignores the
+                  trailing null terminator which all C++ strings have.
+                </t-b>
+              </div>
+            </div>
+          </details>
+        </div>
+        <h3 id="aggr">1.2 Aggregates</h3>
+        <t-b>
+          Aggregate types each occupy one block of contiguous memory if and only if
+          all their items are primitives.
+          If they have any non-primitive items then they are copied with the type&apos;s
+          Copy construction and copy assignment operator.
+        </t-b>
+        <div class="block">
+          <div class="row">
+            <div>
+              <pre><code class="language-cpp">  /*---------------------------------------------------
+  All code used for output has been elided
+  */
   /*-- array --*/
   short int fa[] { 1, 2, 3, 4, 5 };
   short int fa_alt[5] { 1, 2, 3, 4, 5 };
+  auto afirst = fa[0];
 
   /*-- struct --*/
   struct S { int a; char b; double c; };
   S strct { 1, 'a', 3.1415927 };
+  auto sfirst = strct.a;
 
   /*-- tuple --*/
   std::tuple&lt;int, double, char&gt; tup { 1, 3.14, 'z' };
+  auto tfirst = get<0>(tup);
 
   /*-- optional --*/
   std::optional&lt;double&gt; opt1 { 3.1415927 };
@@ -717,66 +819,57 @@
             </div>
             <div style="margin-left:2em;">
               <t-b>
-                Instances of primitive types each occupy one block of contiguous memory.
-                Copy construction and copy assignment copies the source value to the
-                desgination using mem-copy, e.g., a byte-by-byte copy.
-              </t-b>
-              <t-b>
-                Scalars can be initialized by either assigning a value or with a braced initializer.
                 All the aggregate types: array, struct, tuple, and optional use a braced
                 initializer list.
               </t-b>
               <t-b>
                 <c-s>std::tuple</c-s> and <c-s>std::optional</c-s> are generic types defined in the
-                std::library, not by the core C++ language. They are included in this list of primitives
-                because they occupy contiguous blocks of memory and are copied with a mem-copy
-                operation.
+                std::library, not by the core C++ language.
+                We discuss generic types in <a target="_blank" href="Bits_GenericCpp.html#top">Bits_GenericCpp</a>.
               </t-b>
               <t-b>
-                We discuss generic types in <a target="_blank" href="Bits_GenericCpp.html#top">Bits_GenericCpp</a>.
+                All the aggregates occupy contiguous blocks of memory if and only if all their elements
+                are primitive. Those are copied with a bit-wise copy supplied by <cos>std::memcopy</cos>.
+              </t-b>
+              <t-b>
+                If any of their elements are non-primitive, e.g., a std::string element, the element is copied 
+                by its copy constructor or copy assignment operator.
+              </t-b>
+              <t-b>
+                The <c-s>struct</c-s> and <c-s>tuple</c-s> types are similar in that they each contain a list
+                of elements of heterogeneous types. Struct elements are retrieved by name while tuple elements
+                are retrieved by position.
               </t-b>
             </div>
           </div>
           <details>
             <summary class="darkItem">Output</summary>
-            <div style="display:flex; flex-direction:row;">
+            <div class="row">
               <div>
-                <pre><code class="language-cpp">  --- scalars ---
-
-  --- bool ---
-  b:      true
-  b:      type: bool
-  --- byte ---
-  byte:   0xf
-  byte:   type: enum std::byte
-  --- int ---
-  i:      42
-  i:      type: int
-  --- double ---
-  d:      3.141593
-  d:      type: double
-  --- char ---
-  ch:     z
-  ch:     type: char
-  --- const char* ---
-  lst:    &quot;a literal string&quot;
-  lst:    type: char const * __ptr64
-
+                <pre><code class="language-cpp">
   --- aggregate types ---
 
   --- native array ---
-  fa[]:   [ 1, 2, 3, 4, 5 ]
-  fa[]:   type: short const * __ptr64
+  fa[]: [ 1, 2, 3, 4, 5 ]
+  fa[]: type: short const * __ptr64
+  fa[]: size = 10
+  afirst = 1
   --- struct ---
-  strct:  S { 1, a, 3.14159 }
-  strct:  type: struct `void __cdecl initialize_primitiv...
+  strct: S { 42, a, 3.14159 }
+  strct: type: struct `void __cdecl initialize_primitiv...
+  strct: size = 16
+  sfirst = 42
   --- tuple ---
-  tup:    { 1, 3.14, z }
-  tup:    type: class std::tuple&lt;int,double,char&gt;
+  tfirst = -1
+  tup: { -1, 3.14, z }
+  tup: type: class std::tuple<int,double,char>
+  tup: size = 24
+  tfirst = -1
   --- optional ---
-  opt1:   3.14159
-  opt2:   empty
-  opt1:   type: class std::optional&lt;double&gt;
+  opt1: 3.14159
+  opt2: empty
+  opt1: type: class std::optional<double>
+  opt1: size = 16
 
 </code></pre>
               </div>
@@ -786,82 +879,9 @@
             </div>
           </details>
         </div>
-        <h3 id="initheap">1.2 Heap Storage</h3>
-        <div style="display:flex; flex-direction:column; margin-right:1em;">
-          <div style="display:flex; flex-direction:row;">
-            <div>
-              <pre><code class="language-cpp">  /*-- initialized in heap memory --*/
-
-  /*-------------------------------------------------------
-    All code for output has been elided
-  */
-  /*-- raw pointer --*/
-  int* tmol = new int{42};
-  delete tmol;  // forgetting this causes memory leak
-
-  /*-- shared-ptr to scalar --*/
-  std::shared_ptr&lt;int&gt; stmol = std::make_shared&lt;int&gt;(42);
-  int stmp = *stmol;
-  // std::shared_ptr deallocates heap storage when
-  // all references go out of scope. So no memory leak.
-
-  /*-- shared-ptr to collection --*/
-  std::shared_ptr&lt;std::vector&lt;int&gt;&gt; pVec =
-    make_shared&lt;std::vector&lt;int&gt;&gt;(std::vector&lt;int&gt;{ 1, 2, 3 });
-  auto vtmp = *pVec;
-
-  /*-- using aliases to simplify --*/
-  using VecI = std::vector&lt;int&gt;;
-  using SPtr = std::shared_ptr&lt;std::vector&lt;int&gt;&gt;;
-  SPtr pVec2 = make_shared&lt;VecI&gt;(VecI{ 1, 2, 3 });
-
-</code></pre>
-            </div>
-            <div style="margin-left:2em;">
-              text here
-            </div>
-          </div>
-          <details>
-            <summary class="darkItem">Output</summary>
-            <div style="display:flex; flex-direction:row;">
-              <div>
-                <pre><code class="language-cpp">  --- initialized in heap memory ---
-
-  --- raw pointer ---
-  *tmol:  42
-  *tmol:  type: int
-  tmol:   0000016E4A956D80
-  tmol:   type: int * __ptr64
-
-  --- std::shared_ptr ---
-  *stmol: 42
-  *stmol: type: int
-  stmol:  0000016E4A967420
-  stmol:  type: class std::shared_ptr<int>
-
-    --- std::shared_ptr&lt;std::vector&lt;int>> ---
-  *pVec:  [ 1, 2, 3 ]
-  *pVec:  type: class std::vector&lt;int,class std::allocat...
-  pVec:   0000016E4A968260
-  pVec:   type: class std::shared_ptr&lt;class std::vector&lt;...
-
-  --- using aliases to simplify ---
-  *pVec2: [ 1, 2, 3 ]
-  *pVec2: type: class std::vector&lt;int,class std::allocat...
-  pVec2:  0000016E4A968880
-  pVec2:  type: class std::shared_ptr&lt;class std::vector&lt;...
-
-</code></pre>
-              </div>
-              <div style="margin-left:2em;">
-                text here
-              </div>
-            </div>
-          </details>
-        </div>
         <h3 id="initstdlib">1.3 Std::library Types</h3>
-        <div style="display:flex; flex-direction:column; margin-right:1em;">
-          <div style="display:flex; flex-direction:row;">
+        <div class="block">
+          <div class="row">
             <div>
               <pre><code class="language-cpp">
   /*-- initialize std::library types --*/
@@ -898,7 +918,7 @@
           </div>
           <details>
             <summary class="darkItem">Output</summary>
-            <div style="display:flex; flex-direction:row;">
+            <div class="row">
               <div>
                 <pre><code class="language-cpp">  --- std::array&lt;double> ---
   sarr:   [ 1.00, 1.50, 2.00, 2.50, 2.00, 1.50, 1.00 ]
@@ -928,18 +948,91 @@
             </div>
           </details>
         </div>
+        <h3 id="initheap">1.4 Heap Storage</h3>
+        <div class="block">
+          <div class="row">
+            <div>
+              <pre><code class="language-cpp">  /*-- initialized in heap memory --*/
+
+  /*-------------------------------------------------------
+    All code for output has been elided
+  */
+  /*-- raw pointer --*/
+  int* tmol = new int{42};
+  delete tmol;  // forgetting this causes memory leak
+
+  /*-- shared-ptr to scalar --*/
+  std::shared_ptr&lt;int&gt; stmol = std::make_shared&lt;int&gt;(42);
+  int stmp = *stmol;
+  // std::shared_ptr deallocates heap storage when
+  // all references go out of scope. So no memory leak.
+
+  /*-- shared-ptr to collection --*/
+  std::shared_ptr&lt;std::vector&lt;int&gt;&gt; pVec =
+    make_shared&lt;std::vector&lt;int&gt;&gt;(std::vector&lt;int&gt;{ 1, 2, 3 });
+  auto vtmp = *pVec;
+
+  /*-- using aliases to simplify --*/
+  using VecI = std::vector&lt;int&gt;;
+  using SPtr = std::shared_ptr&lt;std::vector&lt;int&gt;&gt;;
+  SPtr pVec2 = make_shared&lt;VecI&gt;(VecI{ 1, 2, 3 });
+
+</code></pre>
+            </div>
+            <div style="margin-left:2em;">
+              text here
+            </div>
+          </div>
+          <details>
+            <summary class="darkItem">Output</summary>
+            <div class="row">
+              <div>
+                <pre><code class="language-cpp">  --- initialized in heap memory ---
+
+  --- raw pointer ---
+  *tmol:  42
+  *tmol:  type: int
+  tmol:   0000016E4A956D80
+  tmol:   type: int * __ptr64
+
+  --- std::shared_ptr ---
+  *stmol: 42
+  *stmol: type: int
+  stmol:  0000016E4A967420
+  stmol:  type: class std::shared_ptr<int>
+
+    --- std::shared_ptr&lt;std::vector&lt;int>> ---
+  *pVec:  [ 1, 2, 3 ]
+  *pVec:  type: class std::vector&lt;int,class std::allocat...
+  pVec:   0000016E4A968260
+  pVec:   type: class std::shared_ptr&lt;class std::vector&lt;...
+
+  --- using aliases to simplify ---
+  *pVec2: [ 1, 2, 3 ]
+  *pVec2: type: class std::vector&lt;int,class std::allocat...
+  pVec2:  0000016E4A968880
+  pVec2:  type: class std::shared_ptr&lt;class std::vector&lt;...
+
+</code></pre>
+              </div>
+              <div style="margin-left:2em;">
+                text here
+              </div>
+            </div>
+          </details>
+        </div>
         <h3 id="copy">2.0 Copy Operations</h3>
         <t-b>
           C++ copy operations occur during construction, assignment, and pass-by-value.
           Primitive types and aggregates of primitive types occupy a contiguous block of memory and
-          are copied bit-wize with <c-s>mem-copy</c-s>.  
+          are copied bit-wise with <c-s>mem-copy</c-s>.
           Non-primitives like all of the std::library collections have a control block in stack memory
           and values in heap memory.  They are copied with copy constructor and copy assignment
           operator.
         </t-b>
         <h3 id="copyprim">2.1 Copy Operations for Primitives</h3>
-        <div style="display:flex; flex-direction:column; margin-right:1em;">
-          <div style="display:flex; flex-direction:row;">
+        <div class="block">
+          <div class="row">
             <div>
               <pre><code class="language-cpp">  /*-- copy operations for primitives --*/
 
@@ -963,7 +1056,7 @@
           </div>
           <details>
             <summary class="darkItem">Output</summary>
-            <div style="display:flex; flex-direction:row;">
+            <div class="row">
               <div>
                 <pre><code class="language-cpp">
   ------------------------------------------
@@ -1008,8 +1101,8 @@
           </details>
         </div>
         <h3 id="copystdlib">2.2 Copy Operations for Std::library Types</h3>
-        <div style="display:flex; flex-direction:column; margin-right:1em;">
-          <div style="display:flex; flex-direction:row;">
+        <div class="block">
+          <div class="row">
             <div>
               <pre><code class="language-cpp">  /*-- copy operations for std::library types --*/
 
@@ -1032,7 +1125,7 @@
           </div>
           <details>
             <summary class="darkItem">Output</summary>
-            <div style="display:flex; flex-direction:row;">
+            <div class="row">
               <div>
                 <pre><code class="language-cpp">  --------------------------------------------------  
     copy operations for std::library types
@@ -1092,8 +1185,8 @@
         <h3 id="move">3.0 Move Operations</h3>
         <t-b></t-b>
         <h3 id="movestr">Move std::string</h3>
-        <div style="display:flex; flex-direction:column; margin-right:1em;">
-          <div style="display:flex; flex-direction:row;">
+        <div class="block">
+          <div class="row">
             <div>
               <pre><code class="language-cpp">  /*-- move temporary string --*/
   auto first = std::string(&quot;first part&quot;);
@@ -1122,7 +1215,7 @@
           </div>
           <details>
             <summary class="darkItem">Output</summary>
-            <div style="display:flex; flex-direction:row;">
+            <div class="row">
               <div>
                 <pre><code class="language-cpp">  --- move temporary string ---
   first:  "first part"
@@ -1156,9 +1249,9 @@
             </div>
           </details>
         </div>
-        <h3 id="">4.0 Pass-by-value &amp; Pass-by-reference</h3>
-        <div style="display:flex; flex-direction:column; margin-right:1em;">
-          <div style="display:flex; flex-direction:row;">
+        <h3 id="passvalref">4.0 Pass-by-value &amp; Pass-by-reference</h3>
+        <div class="block">
+          <div class="row">
             <div>
               <pre><code class="language-cpp">  /*-------------------------------------------
     All code is shown for this example, e.g.,
@@ -1234,7 +1327,7 @@
           </div>
           <details>
             <summary class="darkItem">Output</summary>
-            <div style="display:flex; flex-direction:row;">
+            <div class="row">
               <div>
                 <pre><code class="language-cpp">  --------------------------------------------------
     pass-by-value and pass-by-reference
@@ -1281,10 +1374,10 @@
           </details>
         </div>
         <h3 id="displfunc">5.0 Display Functions</h3>
-        <div style="display:flex; flex-direction:column; margin-right:1em;">
-          <div style="display:flex; flex-direction:row;">
+        <div class="block" style="margin-top:0em;">
+          <div class="row" style="border:none;">
             <div>
-              <t-b style="margin-top:0.5em;">
+              <t-b style="margin-top:0em;">
                 When you look at any of the &quot;Output&quot; details, you will see
                 some output with detailed formatting, but you won&apos;t see code providing
                 that output in corresponding code sections.
@@ -1300,13 +1393,14 @@
                 in the <a target="_blank" href="https://github.com/JimFawcett/Bits">Bits Repository</a>.
               </t-b>
             </div>
-            <div style="margin-left:2em;">
-              text here
-            </div>
+            <!--             <div style="margin-left:2em;">
+                   text here
+                 </div>
+      -->
           </div>
           <details>
             <summary class="darkItem">Display Functions</summary>
-            <div style="display:flex; flex-direction:row;">
+            <div class="row">
               <div>
                 <pre><code class="language-cpp">  /*---------------------------------------------------------
     Show operation text surrounded by "---" strings
@@ -1440,8 +1534,8 @@ static void nl() {
         </div>
 
         <h3 id="build">6.0 Build</h3>
-        <div style="display:flex; flex-direction:column; margin-right:1em;">
-          <div style="display:flex; flex-direction:row;">
+        <div class="block">
+          <div class="row">
             <pre class="codeSnaps"><code class="language-shell">  C:\github\JimFawcett\Bits\Cpp\Cpp_Data\build
 cmake --build .
 MSBuild version 17.5.1+f6fdcf537 for .NET Framework
@@ -1459,8 +1553,8 @@ C:\github\JimFawcett\Bits\Cpp\Cpp_Data\build
           </div>
         </div>
         <h3 id="cmake">6.1 CMakeLists.txt</h3>
-        <div style="display:flex; flex-direction:column; margin-right:1em;">
-          <div style="display:flex; flex-direction:row;">
+        <div class="block">
+          <div class="row">
             <div>
 <pre><code class="language-shell">
   cmake_minimum_required(VERSION 3.25)
