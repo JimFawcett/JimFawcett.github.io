@@ -241,7 +241,6 @@
     }
 
     .code-block {
-      /*display:flex;*/
       margin: 0.0em 1em;
       font-family: monospace;
     } */
@@ -916,7 +915,7 @@
 
   /*-- expandable string --*/
   std::string sstr = &quot;a string&quot;;
-  double ssecond = sstr[1];
+  double sfirst = sstr[0];
 
   /*-- expandable indexable array --*/
   std::vector&lt;int&gt; vec { 1, 2, 3, 4 };
@@ -951,9 +950,14 @@
                 move construction and assignment operations.
               </t-b>
               <t-b>
-                The next <a target="_blank" href="Bits_ObjectsCpp.html">Bit</a> discusses
-                user-defined types.  Construction and assignment operations will be
-                implemented there.
+                The next <a target="_blank" href="Bits_ObjectsCpp.html">Bits_ObjectsCpp</a> discusses
+                user-defined types.  Definition of construction and assignment operations will be
+                illustrated there.
+              </t-b>
+              <t-b>
+                The <c-s>std::string</c-s>, <c-s>std::vector&lt;T&gt;</c-s>, and 
+                <c-s>std::unordered_map&lt;K,&nbsp;V&gt;</c-s> are the most frequently used
+                of the collection types.
               </t-b>
             </div>
             </div>
@@ -961,7 +965,7 @@
                 <summary class="darkItem">Output</summary>
                 <div class="block">
                   <div class="codewrap">
-                    <pre><code class="language-cpp">  --- std::array&lt;double> ---
+                    <pre><code class="language-cpp">  --- std::array&lt;double, 7> ---
   sarr:   [ 1.00, 1.50, 2.00, 2.50, 2.00, 1.50, 1.00 ]
   sarr:   type: class std::array&lt;double,7>
       
@@ -985,7 +989,26 @@
                   </div>
                   <div class="textwrap">
                     <t-b>
-                      text here
+                      <c-s>std::array&lt;T, N&gt</c-s>; is similar to C++&apos;s native array <c-s>T[N]</c-s>, but
+                      also provides methods like <c-s>size_t size()</c-s>, <c-s>constexpr&nbsp;T&&nbsp;front()</c-s> and 
+                      <c-s>constexpr&nbsp;T&&nbsp;back()</c-s>.  Both are stored in contiguous memory in the program&apos;
+                      stack.
+                    </t-b>
+                    <t-b>
+                      The <c-s>std::string</c-s>, <c-s>std::vector&lt;T&gt;</c-s>, <c-s>std::deque&lt;T&gt;</c-s>
+                      and <c-s>std::unordered_map&lt;K, V&gt;</c-s> all have control blocks stored in stack memory
+                      and data elements stored in the heap.  That is done so that their capacities are expandable and
+                      can be as large as available memory.
+                    </t-b>
+                    <t-b>
+                      Insertions into vector, string, and deque are linear time, while insertions into an unordered_map
+                      are nearly constant time.  A map insertion takes constant time to compute a table address and
+                      linear time to walk short bucket lists.
+                    </t-b>
+                    <t-b>
+                      All but the fixed-size array are subject to memory reallocations when an insertion is attempted
+                      when their data memory is full.  That includes the map which may have to reallocate its table
+                      to avoid long bucket lists.
                     </t-b>
                   </div>
                 </div>
@@ -995,7 +1018,7 @@
                 <div class="codewrap">
                   <pre><code class="language-cpp">  /*-- initialized in heap memory --*/
 
-  /*-------------------------------------------------------
+  /*--------------------------------------------------
     All code for output has been elided
   */
   /*-- raw pointer --*/
@@ -1003,25 +1026,42 @@
   delete tmol;  // forgetting this causes memory leak
 
   /*-- shared-ptr to scalar --*/
-  std::shared_ptr&lt;int&gt; stmol = std::make_shared&lt;int&gt;(42);
+  std::shared_ptr&lt;int&gt; stmol 
+    = std::make_shared&lt;int&gt;(42);
   int stmp = *stmol;
   // std::shared_ptr deallocates heap storage when
   // all references go out of scope. So no memory leak.
 
   /*-- shared-ptr to collection --*/
   std::shared_ptr&lt;std::vector&lt;int&gt;&gt; pVec =
-    make_shared&lt;std::vector&lt;int&gt;&gt;(std::vector&lt;int&gt;{ 1, 2, 3 });
+    make_shared&lt;std::vector&lt;int&gt;&gt;(
+      std::vector&lt;int&gt;{ 1, 2, 3 }
+  );
   auto vtmp = *pVec;
 
   /*-- using aliases to simplify --*/
   using VecI = std::vector&lt;int&gt;;
-  using SPtr = std::shared_ptr&lt;std::vector&lt;int&gt;&gt;;
+  using SPtr = std::shared_ptr&lt;VecI&gt;;
   SPtr pVec2 = make_shared&lt;VecI&gt;(VecI{ 1, 2, 3 });
 
 </code></pre>
                 </div>
                 <div class="textwrap">
-                  text here and more text and ... and ...
+                  <t-b>
+                    Heap memory is used for on-demand allocation at run-time, most often for std::library
+                    and user-define collection types. Memory is
+                    allocated with the <c-s>new</c-s> operator and deallocted with <c-s>delete</c-s>;
+                  </t-b>
+                  <t-b>
+                    Modern C++ by convention replaces use of raw pointer for allocation and deallocation with the
+                    smart pointer <c-s>std::unique_ptr&lt;T&gt;</c-s>, its creational function
+                    <c-s>std::make_unique&lt;T&gt;(T t)</c-s>, or <c-s>std::shared_ptr&lt;T&gt;</c-s>, and its
+                    creational function <c-s>std::make_unique&lt;T&gt;(T t)</c-s>. Both call delete on their
+                    member pointers when they go out of scope.
+                  </t-b>
+                  <t-b>
+
+                  </t-b>
                 </div>
               </div>
               <details>
