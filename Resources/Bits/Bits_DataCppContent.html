@@ -1023,6 +1023,7 @@
   */
   /*-- raw pointer --*/
   int* tmol = new int{42};
+  // using code here
   delete tmol;  // forgetting this causes memory leak
 
   /*-- shared-ptr to scalar --*/
@@ -1038,11 +1039,13 @@
       std::vector&lt;int&gt;{ 1, 2, 3 }
   );
   auto vtmp = *pVec;
+  // works like use for scalars
 
   /*-- using aliases to simplify --*/
   using VecI = std::vector&lt;int&gt;;
   using SPtr = std::shared_ptr&lt;VecI&gt;;
   SPtr pVec2 = make_shared&lt;VecI&gt;(VecI{ 1, 2, 3 });
+  // equivalent to pVec, just abbreviates syntax
 
 </code></pre>
                 </div>
@@ -1056,11 +1059,21 @@
                     Modern C++ by convention replaces use of raw pointer for allocation and deallocation with the
                     smart pointer <c-s>std::unique_ptr&lt;T&gt;</c-s>, its creational function
                     <c-s>std::make_unique&lt;T&gt;(T t)</c-s>, or <c-s>std::shared_ptr&lt;T&gt;</c-s>, and its
-                    creational function <c-s>std::make_unique&lt;T&gt;(T t)</c-s>. Both call delete on their
+                    creational function <c-s>std::make_unique&lt;T&gt;(T t)</c-s>.
+                  </t-b>
+                  <t-b>
+                    The creational functions internally use the new operator to create an instance of the input
+                    type on the heap.
+                    Both call delete on their
                     member pointers when they go out of scope.
                   </t-b>
                   <t-b>
-
+                    That eliminates one source of memory leaks, but depends on convention to advocate for its use.
+                  </t-b>
+                  <t-b>
+                    Syntax for the standard pointers and their creational functions is rather
+                    verbose.  That can be simplified by using alias declarations that provide
+                    shorter, but equivalent, syntax.
                   </t-b>
                 </div>
               </div>
@@ -1071,22 +1084,28 @@
                     <pre><code class="language-cpp">  --- initialized in heap memory ---
 
   --- raw pointer ---
-  *tmol:  42
-  *tmol:  type: int
-  tmol:   0000016E4A956D80
-  tmol:   type: int * __ptr64
+  *tmol: 42
+  *tmol: type: int
+  *tmol: size = 4
+  tmol: 0000016E4A956D80
+  tmol: type: int * __ptr64
+  tmol: size = 8
 
-  --- std::shared_ptr ---
+  --- std::shared_ptr&lt;int&gt; ---
   *stmol: 42
   *stmol: type: int
-  stmol:  0000016E4A967420
-  stmol:  type: class std::shared_ptr<int>
+  *stmol: size = 4
+  stmol: 0000016E4A967420
+  stmol: type: class std::shared_ptr&lt;int&gt;
+  stmol: size = 16
 
-    --- std::shared_ptr&lt;std::vector&lt;int>> ---
+  --- std::shared_ptr&lt;std::vector&lt;int&gt;&gt; ---
   *pVec:  [ 1, 2, 3 ]
   *pVec:  type: class std::vector&lt;int,class std::allocat...
+  *pVec: size = 32
   pVec:   0000016E4A968260
   pVec:   type: class std::shared_ptr&lt;class std::vector&lt;...
+  pVec: size = 16
 
   --- using aliases to simplify ---
   *pVec2: [ 1, 2, 3 ]
@@ -1097,7 +1116,16 @@
 </code></pre>
                 </div>
                 <div class="textwrap">
-                  text here
+                  <t-b>
+                    Smart pointers <c-s>std::unique_ptr&lt;T&gt;</c-s> and
+                    <c-s>std::shared_ptr&lt;T&gt;</c-s> are dereferenced using
+                    the same syntax as raw pointers.
+                  </t-b>
+                  <t-b>
+                    Note that the size of the raw pointer is 8 bytes and the size of
+                    the smart pointers are 16 bytes, so there is very little size and copy 
+                    performance penalty for using them.
+                  </t-b>
                 </div>
               </div>
             </details>
@@ -1105,7 +1133,7 @@
             <t-b>
               C++ copy operations occur during construction, assignment, and pass-by-value.
               Primitive types and aggregates of primitive types occupy a contiguous block of memory and
-              are copied bit-wise with <c-s>mem-copy</c-s>.
+              are copied bit-wise with <c-s>std::memcopy</c-s>.
               Non-primitives like all of the std::library collections have a control block in stack memory
               and values in heap memory.  They are copied with copy constructor and copy assignment
               operator.
