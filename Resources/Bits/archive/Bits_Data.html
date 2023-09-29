@@ -15,18 +15,12 @@
   <link rel="stylesheet" href="css/StylesPageFrameThemeDefault.css" />
   <link rel="stylesheet" href="css/StylesWebComponents.css" />
   <script src="js/ScriptsWebComponents.js"></script>
-  <!--<script src="js/ScriptsPageFrameDefaults.js"></script>-->
   <script src="js/ScriptsPageFrame.js"></script>
   <script src="js/ScriptsPageFramePagesBits.js"></script>
   <script src="js/ScriptsPageFrameKeyboard.js"></script>
   <script src="js/ScriptsPageFrameRadioButtons.js"></script>
-  <!-- No need for Pages script for pages with no next or prev pages -->
-  <!--<script src="js/ScriptsPageFramePages.js"></script>-->
   <style>
-/*    :root {
-      --hinc : 0em;
-    }
-*/    #github .note {
+    #github .note {
       border: 1px solid var(--dark);
       padding:0.75em 1.5em;
       margin-top:1.25em;
@@ -38,7 +32,7 @@
     #github h2 {
       margin-top: 0.75em;
     }
-    #github notes-container {
+/*    #github notes-container {
       display: grid;
       grid-template-columns: 0.45fr 1fr;
       grid-gap: 0px;
@@ -46,7 +40,6 @@
       padding: 0px;
       border: 1px solid black;
     }
-
 
     #github note-link {
       grid-column: 1;
@@ -92,9 +85,8 @@
     }
 
     #github .topicLink {
-      /*border-right: none;*/
     }
-
+*/
     #github #pagetitle {
       border:2px double var(--dark);
     }
@@ -156,7 +148,8 @@
     }
     #github table.showcode {
       table-layout:fixed;
-      width:100%;
+      width:calc(100% + 4em);
+      margin-left:-2em;
     }
     #github th.leftblock {
       border: 2px solid var(--dark);
@@ -176,18 +169,30 @@
     #github th.centerblock {
       border: none;
       padding: 0em;
-      width:2em;
+      width:1em;
     }
     #github td.leftblock {
       border: 2px solid var(--dark);
       width: calc(50% - 0.5em);
       overflow-x: auto;
+      background-color: #222233;
+      color: #ffffbb;
+    }
+
+    #github td.leftblock summary {
+      border: 1px solid #ffffbb;
     }
 
     #github td.rightblock {
       border: 2px solid var(--dark);
       width: calc(50% - 0.5em) !important;
-      overflow-x:auto;
+      overflow-x: auto;
+      background-color: #222233;
+      color: #ffffbb;
+    }
+
+    #github td.rightblock summary {
+      border: 1px solid #ffffbb;
     }
 
     #github td.centerblock {
@@ -198,12 +203,33 @@
       overflow-x: auto !important;
     }
     #github #left1 {
-      height:45em;
-      overflow-y:auto;
+      /*height:45em;*/
+      max-height: calc(100vh - 10em);
+      overflow-y: auto;
     }
+
     #github #right1 {
-      height:45em;
-      overflow-y:auto;
+      max-height: calc(100vh - 10em);
+      overflow-y: auto;
+    }
+    #github #left2 {
+      /*height:45em;*/
+      max-height: calc(100vh - 7em);
+      overflow-y: auto;
+    }
+
+    #github #right2 {
+      max-height: calc(100vh - 7em);
+      overflow-y: auto;
+    }
+    #github #left3 {
+      max-height: calc(100vh - 7em);
+      overflow-y: auto;
+    }
+
+    #github #right3 {
+      max-height: calc(100vh - 7em);
+      overflow-y: auto;
     }
     #github .mover {
       width:2em;
@@ -214,10 +240,13 @@
     }
     #github #ruler {
 
-      width:calc(50% - 0.5em);
+      width:calc(50% - 1.5em);
       height:0.001em;
       margin:-0.45em 0em;
-      /*display:none;*/
+    }
+    #github .btns {
+      width:3em;
+      border:none;
     }
   </style>
   <script>
@@ -238,14 +267,6 @@
     <li>\
       show function is designed to display type and calling name of its\
       first argument and its value and size.\
-    </li>\
-    <li>\
-      At the call site its second argument is a string representation of\
-      the calling name, created using the # operator for macro arguments.\
-    </li>\
-    <li>\
-      There is no advantage using the macro over just passing in a string,\n\
-      but was done to demonstrate a simple macro process.\
     </li>\
     <li>\
       <c-s>template&lt;typename T&gt;</c-s>\n\
@@ -270,113 +291,147 @@
     array, pointer, reference\n\
     struct, class, enum class, using\n\
   Qualifiers:\n\
-    short, long, const\n\
+    short, long, const, unsigned\n\
 \n\
   Operations:\n\
     Primitive types can all be copied.\n\
-    Most library and user-defined types can be copied,\n\
-    moved, and deleted by providing member constructors\n\
-    and destructor. Often compiler generation works well.\n\
-    For classes with pointer members developers must\n\
-    provide them.\n\
-      \n\
+    Most library and user-defined types can be copied, moved, and deleted\n\
+    by providing member constructors and destructor.  Often compiler \n\
+    generation works well, but for classes with pointer members developers \n\
+    must provide them.\n\
+\n\
   Processing:\n\
-    All types are static, operations run as native code,\n\
-    and no garbage collection is needed. Resources are\n\
-    returned at end of declr scope.\n\
+    All types are static, operations run as native code, and no garbage\n\
+    collection is needed. Resources are returned at end of declr scope.\n\
 */\n\
-/*-- macro turns name into string --*/\n\
-#define STRINGIFY_(x) #x     // # is a macro stringizer\n\
-#define TS(x) STRINGIFY_(x)  // operator\n\
-      \n\
+/* C++ requires declaration before use */\n\
 template&lt;typename T&gt;\n\
-void show(T t, const std::string &ts) {\n\
-  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; typeid(t).name();  // show type\n\
-  std::cout &lt;&lt; &quot;, &quot; &lt;&lt; ts;                  // show name at call site\n\
+void showType(T t, const std::string &nm);\n\
+void print(const std::string& txt = &quot;&quot;);\n\
+void println(const std::string& txt = &quot;&quot;);\n\
+\n\
+int main() {\n\
+    print(&quot; Demonstrate C++ types&quot;);\n\
+    println(&quot;-----------------------&quot;);\n\
+    /*-- values live in stack frame --*/\n\
+    println(&quot;-- initialize from literals --&quot;);\n\
+    int t1 = int{3}; \n\
+    showType(t1, &quot;t1&quot;);\n\
+    long long int t1a = 3;\n\
+    showType(t1a, &quot;t1a&quot;);\n\
+\n\
+    println(&quot;-- copy construct --&quot;);\n\
+    auto t1b = t1a;\n\
+    showType(t1b, &quot;t1b&quot;);\n\
+    // double t1 = 3.1415927; // not allowed to redefine type of t1\n\
+    \n\
+    /*-- values live in heap when using new --*/\n\
+    println(&quot;-- store in heap --&quot;);\n\
+    double* t2 = new double{3.14159};\n\
+    showType(t2, &quot;t2&quot;);\n\
+    showType(*t2, &quot;*t2&quot;);\n\
+    delete(t2);  // see unique_ptr, below\n\
+    \n\
+    /*-- control block lives in stack, char data live in heap --*/\n\
+    println(&quot;-- string: control block in stack, data in heap --&quot;);\n\
+    auto t3 = std::string(&quot;Hello Data&quot;);  // move ctor - rhs is temp\n\
+    showType(t3, &quot;t3&quot;);\n\
+    println(&quot;-- C++ reference --&quot;);\n\
+    auto& t4 = t3;      // create reference, no copy or move\n\
+    showType(t4, &quot;t4&quot;);\n\
+    \n\
+    /*-- unique_ptr may not be copied but move allowed --*/\n\
+    println(&quot;-- unique_ptr owns data --&quot;);\n\
+    auto t5 = std::unique_ptr&lt;int&gt;(new int{-3});\n\
+    showType(std::move(t5), &quot;t5&quot;);  // unique_ptr can't be copied so move\n\
+    t5 = std::unique_ptr&lt;int&gt;(new int{-3});\n\
+    showType(*t5, &quot;*t5&quot;); // contents can be copied\n\
+    println(&quot;-- t5 deleted when unique_ptr leaves scope&quot;);\n\
+    std::cout &lt;&lt; std::endl;\n\
+}\n\
+\n\
+template&lt;typename T&gt;\n\
+void showType(T t, const std::string &nm) {\n\
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; nm;                // show name at call site\n\
+  std::cout &lt;&lt; &quot;: type: &quot; &lt;&lt; typeid(t).name();  // show type\n\
   std::cout &lt;&lt; &quot;&#92;n  value: &quot; &lt;&lt; t;          // show value\n\
   std::cout &lt;&lt; &quot;,  size:  &quot; &lt;&lt; sizeof(t);   // show size on stack\n\
   std::cout &lt;&lt; &quot;&#92;n&quot;;\n\
 }\n\
-int main() {\n\
-    std::cout &lt;&lt; &quot;&#92;n  Demonstrate C++ types:&quot;;\n\
-    std::cout &lt;&lt; &quot;&#92;n ------------------------&quot;;\n\
-    /*-- values live in stack frame --*/\n\
-    int t1 = int{3};\n\
-    show(t1, TS(t1));\n\
-    long long int t1a = 3;\n\
-    show(t1a, TS(t1a));\n\
-    // double t1 = 3.1415927; // not allowed to redefine type of t1\n\
-      \n\
-    /*-- values live in heap when using new --*/\n\
-    double* t2 = new double{3.14159};\n\
-    show(t2, TS(t2));\n\
-    show(*t2, TS(*t2));\n\
-    delete(t2);\n\
-      \n\
-    /*-- control block lives in stack, char data live in heap --*/\n\
-    auto t3 = std::string(&quot;Hello Data&quot;);  // move ctor - rhs is temp\n\
-    show(t3, TS(t3));\n\
-      \n\
-    auto& t4 = t3;      // reference\n\
-    show(t4, TS(t4));\n\
-      \n\
-    /*-- unique_ptr can not be copied but move allowed --*/\n\
-    auto t5 = std::unique_ptr&lt;int&gt;(new int{-3});\n\
-    show(std::move(t5), TS(t5));  // unique_ptr can't be copied so move\n\
-    t5 = std::unique_ptr&lt;int&gt;(new int{-3});\n\
-    show(*t5, TS(*t5)); // contents can be copied\n\
-    /*-- unique_ptr releases its heap storage when it goes out of scope --*/\n\n\
-    std::cout &lt;&lt; std::endl;\n\
+void print(const std::string& txt) {\n\
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt;\n\
 }\n\
-</div></pre>\
+void println(const std::string& txt) {\n\
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt &lt;&lt; &quot;&#92;n&quot;;\n\
+}\n\</div></pre>\
 ";
     }
 
     function loadCppOut(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\
-  Demonstrate C++ types:\n\
- ------------------------\n\
-  int, t1\n\
+   Demonstrate C++ types\n\
+  -----------------------\n\
+\n\
+  -- initialize from literals --\n\
+\n\
+  t1: type: int\n\
   value: 3,  size:  4\n\
-      \n\
-  __int64, t1a\n\
+\n\
+  t1a: type: __int64\n\
   value: 3,  size:  8\n\
-      \n\
-  double * __ptr64, t2\n\
-  value: 000001E8347573B0,  size:  8\n\
-      \n\
-  double, *t2\n\
+\n\
+  -- copy construct --\n\
+\n\
+  t1b: type: __int64\n\
+  value: 3,  size:  8\n\
+\n\
+  -- store in heap --\n\
+\n\
+  t2: type: double * __ptr64\n\
+  value: 0000029E1568AE70,  size:  8\n\
+\n\
+  *t2: type: double\n\
   value: 3.14159,  size:  8\n\
-      \n\
-  class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >, t3\n\
+\n\
+  -- string: control block in stack, data in heap --\n\
+\n\
+  t3: type: class std::basic_string&lt;char,struct std::char_traits&lt;char&gt;,class std::allocator&lt;char&gt; &gt;\n\
   value: Hello Data,  size:  40\n\
-      \n\
-  class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >, t4\n\
+\n\
+  -- C++ reference --\n\
+\n\
+  t4: type: class std::basic_string&lt;char,struct std::char_traits&lt;char&gt;,class std::allocator&lt;char&gt; &gt;\n\
   value: Hello Data,  size:  40\n\
-      \n\
-  class std::unique_ptr<int,struct std::default_delete<int> >, t5\n\
-  value: 000001E8347465D0,  size:  8\n\
-      \n\
-  int, *t5\n\
+\n\
+  -- unique_ptr owns data --\n\
+\n\
+  t5: type: class std::unique_ptr&lt;int,struct std::default_delete&lt;int&gt; &gt;\n\
+  value: 0000029E15676B10,  size:  8\n\
+\n\
+  *t5: type: int\n\
   value: -3,  size:  4\n\
-      \n\
-C:\github\JimFawcett\Bits\Cpp\Cpp_Data\build\n\
-></pre>";
+\n\
+  -- t5 deleted when unique_ptr leaves scope\n\
+\n\
+\n\></pre>";
     }
 
     function loadCppBld(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<div class='code'>\
 <pre style='overflow-x:auto;'>\n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build\n\
-> cmake --build .     \n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;cpp&#92;Cpp_Data&#92;build\n\
+&gt; cmake --build .     \n\
 MSBuild version 17.4.0+18d5aef85 for .NET Framework\n\
-  Cpp_Data.cpp\n\
-  Cpp_Data.vcxproj -> C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build&#92;Debug&#92;Cpp_Data.exe\n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build\n\
-      \n\
-</pre>\
+  Cpp_Data.vcxproj -&gt; C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build&#92;Debug&#92;Cpp_Data.e\n\
+  xe\n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;cpp&#92;Cpp_Data&#92;build\n\
+&gt; ./debug/Cpp_Data.exe\n\
+\n\
+   Demonstrate C++ types\n\
+  -----------------------\n\
+\n\</pre>\
 </div>\
 ";
     }
@@ -393,7 +448,11 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build\n\
       struct, and class\
     </li>\
     <li>\
-      It explores instance sharing and copy on write.\
+      All implementation code is required to be placed inline within the class method\
+      declarations.\
+    </li>\
+    <li>\
+      This code explores instance sharing and copy on write.\
     </li>\
     <li>\
       It enumerates members of value and reference types.\
@@ -404,7 +463,8 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build\n\
     </li>\
     <li>\
       Some of the analysis methods require reflection. The method\
-      int GetManagedSize(Type type) requires advanced reflection techniques.\
+      int GetManagedSize(Type type), at the bottom of the code listing, requires\
+      advanced reflection techniques.\
     </li>\
   </ol >\
   <div style=&quot;height: 3em;&quot;>&nbsp;</div>\
@@ -412,23 +472,26 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Data&#92;build\n\
 </div >\
 </div>\
 <pre>\n\
+using System;\n\
+using System.Reflection;\n\
+using System.Reflection.Emit;\n\
+\n\
 /* Cs_Data::Cs_Data.cs */\n\
 /*\n\
   Static Data Types:\n\
-    value types => assignment copies value\n\
+    value types =&gt; assignment copies value\n\
     --------------------------------------\n\
       sbyte, byte, short, int, long, ushort, uint, ulong\n\
       float, double\n\
       decimal, char, bool\n\
       struct\n\
-    Reference types => assignment copies reference\n\
+      Reference types =&gt; assignment copies reference\n\
     ----------------------------------------------\n\
       object, string, class\n\
 */\n\
-using System;\n\
-using System.Reflection;\n\
-using System.Reflection.Emit;\n\
-\n\
+//#pragma warning disable CS8602  // possibly null reference warning\n\
+// https://stackoverflow.com/questions/8173239/c-getting-size-of-a-value-type-variable-at-runtime/8173293#8173293\n\
+// \n\
 namespace HelloData\n\
 {\n\
   /*-- \n\
@@ -460,50 +523,58 @@ namespace HelloData\n\
     }\n\
   }\n\
   /*-- type demonstration --*/\n\
+\n\
+\n\
   class Program\n\
   {\n\
     /*-- demonstration begins here --*/\n\
+    const string nl = &quot;&#92;n&quot;;\n\
+\n\
     static void Main(string[] args)\n\
     {\n\
       print(&quot; Demonstrate C# types&quot;);\n\
-      label(&quot;int - value type&quot;);\n\
+      showNote(&quot;int - value type&quot;);\n\
       showOp(&quot;int t1 = 42&quot;);\n\
       int t1 = 42;\n\
-      showType(t1, &quot;t1&quot;);\n\
+      showType(t1, &quot;t1&quot;, nl);\n\
+      showOp(&quot;interate over val type members using reflection&quot;);\n\
       iterate(t1);\n\
       print();\n\
-      showOp(&quot;int t1a = t1&quot;);\n\
+      showOp(&quot;int t1a = t1 : copy of value type&quot;);\n\
       int t1a = t1;\n\
-      isSameObj(t1a, &quot;t1a&quot;, t1, &quot;t1&quot;);\n\
+      isSameObj(t1a, &quot;t1a&quot;, t1, &quot;t1&quot;, nl);\n\
 \n\
       // reference behavior - copy on write\n\
-      label(&quot;string - reference type&quot;);\n\
+      showNote(&quot;string - reference type&quot;);\n\
       showOp(&quot;string t2 = &#92;&quot;a string&#92;&quot;&quot;);\n\
       string t2 = &quot;a string&quot;;\n\
       showType(t2, &quot;t2&quot;);\n\
       showNote(&quot;string has many methods - uncomment next line to see them&quot;);\n\
       //iterate(t2);\n\
-      showOp(&quot;string t3 = t2&quot;);\n\
+      showOp(&quot;string t3 = t2 : copy handle of ref type&quot;);\n\
       string t3 = t2;\n\
       showType(t3, &quot;t3&quot;);\n\
       isSameObj(t3,&quot;t3&quot;,t2,&quot;t2&quot;);\n\
-\n\
-      showOp(&quot;t3 += &#92;&quot; is here&#92;&quot;&quot;);\n\
+      showOp(&quot;t3 += &#92;&quot; is here&#92;&quot; : copy on write&quot;);\n\
       t3 += &quot; is here&quot;;\n\
+      showType(t2, &quot;t2&quot;);\n\
       showType(t3, &quot;t3&quot;);\n\
       isSameObj(t3,&quot;t3&quot;,t2,&quot;t2&quot;);\n\
+      showNote(&quot;t2 not modified by change in t3 due to copy on write&quot;, nl);\n\
       \n\
-      label(&quot;Object - base reference type&quot;);\n\
+      showNote(&quot;Object - base reference type&quot;);\n\
       showOp(&quot;Object obj1 - new Object()&quot;);\n\
       Object obj1 = new Object();\n\
       // showIdent(obj, &quot;obj&quot;);\n\
       showType(obj1, &quot;obj&quot;);\n\
+      showOp(&quot;interate over ref type members using reflection&quot;);\n\
       iterate(obj1);\n\
+      print();\n\
       showOp(&quot;Object obj2 = obj1&quot;);\n\
       Object obj2 = obj1;\n\
-      isSameObj(obj2, &quot;obj2&quot;, obj1, &quot;obj1&quot;);\n\
+      isSameObj(obj2, &quot;obj2&quot;, obj1, &quot;obj1&quot;, nl);\n\
 \n\
-      label(&quot;Svt Struct value type&quot;);\n\
+      showNote(&quot;Svt Struct value type&quot;);\n\
       showOp(&quot;Svt t4 = new Svt()&quot;);\n\
       Svt t4 = new Svt();\n\
       t4.I = 3;\n\
@@ -511,10 +582,13 @@ namespace HelloData\n\
       t4.C = 'z';\n\
       t4.printSelf(&quot;t4&quot;);\n\
       showType(t4, &quot;t4&quot;);\n\
-      showNote(&quot;value type: size of object in stackframe&quot;);\n\
-      iterate(t4);\n\
+      showNote(&quot;value type: size of object in stackframe&quot;, nl);\n\
 \n\
-      showOp(&quot;Svt t4a = t4&quot;);\n\
+      showOp(&quot;iterate over val type members using reflection&quot;);\n\
+      iterate(t4);\n\
+      print();\n\
+\n\
+      showOp(&quot;Svt t4a = t4 : copy of val type&quot;);\n\
       Svt t4a = t4;\n\
       t4a.printSelf(&quot;t4a&quot;);\n\
       t4.printSelf(&quot;t4&quot;);\n\
@@ -525,70 +599,62 @@ namespace HelloData\n\
       t4a.C = 'q';\n\
       t4a.printSelf(&quot;t4a&quot;);\n\
       t4.printSelf(&quot;t4&quot;);\n\
-      isSameObj(t4, &quot;t4&quot;, t4a, &quot;t4a&quot;);\n\
+      isSameObj(t4, &quot;t4&quot;, t4a, &quot;t4a&quot;, nl);\n\
 \n\
-      label(&quot;Crt - ref type with ref member&quot;);\n\
+      showNote(&quot;Crt - ref type with ref member&quot;);\n\
       showOp(&quot;Crt t5 = new Crt()&quot;);\n\
       Crt t5 = new Crt();\n\
       t5.S = &quot;SomeString&quot;;\n\
       t5.printSelf(&quot;t5&quot;);\n\
       showType(t5, &quot;t5&quot;);\n\
-      showNote(&quot;ref type: size of handle to object in heap&quot;);\n\
+      showNote(&quot;ref type: size of handle to object in heap&quot;, nl);\n\
 \n\
-      showOp(&quot;Crt t5a = t5&quot;);\n\
+      showOp(&quot;Crt t5a = t5 : copy handle of ref type&quot;);\n\
       Crt t5a = t5;\n\
       t5a.printSelf(&quot;t5a&quot;);\n\
       isSameObj(t5a, &quot;t5a&quot;, t5, &quot;t5&quot;);\n\
       isSameObj(t5a.S, &quot;t5a.S&quot;, t5.S, &quot;t5.S&quot;);\n\
 \n\
-      showOp(&quot;t5a.S = &#92;&quot;new string&#92;&quot;&quot;);\n\
+      showOp(&quot;t5a.S = &#92;&quot;new string&#92;&quot; : no copy on write&quot;);\n\
       t5a.S = &quot;new string&quot;;\n\
       t5a.printSelf(&quot;t5a&quot;);\n\
       t5a.printSelf(&quot;t5&quot;);\n\
       isSameObj(t5a, &quot;t5a&quot;, t5, &quot;t5&quot;);\n\
       isSameObj(t5a.S, &quot;t5a.S&quot;, t5.S, &quot;t5.S&quot;);\n\
       showNote(&quot;source t5 was altered!&quot;);\n\
+\n\
       Console.WriteLine(&quot;&#92;nThat's all Folks!&#92;n&quot;);\n\
     }\n\
-    /*--\n\
-      Analysis function: void showType&lt;T&gt; shows type name,\n\
-      calling argument name, value, and size, using simple reflection.\n\
-    --*/\n\
-    public static void showType&lt;T&gt;(T t, String s)\n\
+    /*-- simple reflection --*/\n\
+    public static void showType&lt;T&gt;(T t, String nm, string suffix = &quot;&quot;)\n\
     {\n\
       #pragma warning disable CS8602  // possibly null reference warning\n\
       Type tt = t.GetType();\n\
-      Console.WriteLine(&quot;{0}, {1}&quot;,tt.Name, s);\n\
+      Console.WriteLine(&quot;{0}, {1}&quot;, nm, tt.Name);\n\
       int size = Utils.GetManagedSize(tt);\n\
-      Console.WriteLine(&quot;value: {0}, size: {1}&quot;, t, size);\n\
+      Console.WriteLine(&quot;value: {0}, size: {1}{2}&quot;, t, size, suffix);\n\
     }\n\
     /*-- beware, two distinct objects may have same hashcode --*/\n\
-    public static void showIdent&lt;T&gt;(T t, String n) {\n\
+    public static void showIdent&lt;T&gt;(T t, String n, string suffix = &quot;&quot;) {\n\
       int id = t.GetHashCode();\n\
-      Console.WriteLine(&quot;{0}, {1}&quot;, n, id);\n\
+      Console.WriteLine(&quot;{0}, {1}{2}&quot;, n, id, suffix);\n\
     }\n\
-    /*--\n\
-      Analysis function: void isSameObj&lt;T&gt; shows whether two,\n\
-      references point to the same instance.\n\
-    --*/\n\
-    public static void isSameObj&lt;T&gt;(T t1, String n1, T t2, String n2) {\n\
+    public static void isSameObj&lt;T&gt;(\n\
+      T t1, String n1, T t2, String n2, string suffix = &quot;&quot;\n\
+    ) {\n\
       if(ReferenceEquals(t1, t2)) {\n\
-        Console.WriteLine(&quot;{0} is same object as {1}&quot;, n1, n2);\n\
+        Console.WriteLine(\n\
+          &quot;{0} is same object as {1}{2}&quot;, n1, n2, suffix\n\
+        );\n\
       }\n\
       else {\n\
-        Console.WriteLine(&quot;{0} is not same object as {1}&quot;, n1, n2);\n\
+        Console.WriteLine(\n\
+          &quot;{0} is not same object as {1}{2}&quot;, n1, n2, suffix);\n\
       }\n\
     }\n\
-    /*--\n\
-      Display function: void showOp; prints a formatted string to,\n\
-      indicate an operation was executed with one or more instances.\n\
-    --*/\n\
-    public static void showOp(string op) {\n\
-      Console.WriteLine(&quot;--- {0} ---&quot;, op);\n\
+    public static void showOp(string op, string suffix = &quot;&quot;) {\n\
+      Console.WriteLine(&quot;--- {0} ---{1}&quot;, op, suffix);\n\
     }\n\
-    /*--\n\
-      Display function enumerates members of struct or class.\n\
-    --*/\n\
     // https://stackoverflow.com/questions/7613782/iterating-through-struct-members\n\
     public static void iterate&lt;T&gt;(T t) /*where T:new()*/ {\n\
       Console.WriteLine(&quot;fields:&quot;);\n\
@@ -612,31 +678,24 @@ namespace HelloData\n\
         );\n\
       }\n\
     }\n\
-    /*--\n\
-      Display function is shorthand for Console.WriteLine\n\
-    --*/\n\
     public static void print(String s = &quot;&quot;) {\n\
       Console.WriteLine(s);\n\
     }\n\
-    /*--\n\
-      Display function prints a formatted string label.\n\
-    --*/\n\
-    public static void label(string s) {\n\
+    public static void showNote(string s, string suffix = &quot;&quot;) {\n\
       Console.WriteLine(\n\
-        &quot;&#92;n---------------&#92;n  {0}&#92;n---------------&quot;, s\n\
+        &quot;-------------------------&quot;\n\
       );\n\
-    }\n\
-    /*--\n\
-      Display function prints a formatted string note.\n\
-    --*/\n\
-    public static void showNote(string s) {\n\
-      Console.WriteLine(&quot;--- Note: ---&#92;n  {0}&quot;, s);\n\
+      Console.WriteLine(&quot;{0}&quot;, s);  \n\
+      Console.WriteLine(\n\
+        &quot;-------------------------{0}&quot;, suffix\n\
+      );\n\
     }\n\
   }\n\
   /*-- \n\
     Utils uses advanced relection \n\
-    - This is function returns the size of value types and handles\n\
-      which is part of discovering how things work.\n\
+    - GetMangedSize(Type type) is function that returns the size of \n\
+      value types and handles.\n\
+      It is used to help discover how things work.\n\
       It is placed here because it uses advanced techniques that\n\
       will eventually be covered elsewhere in this site.  Knowing\n\
       how it works is not essential for the things we are examining\n\
@@ -663,22 +722,21 @@ namespace HelloData\n\
     }\n\
   }\n\
 }\n\
-</pre>\n\
+\n\></pre>\n\
 "
     }
     function loadCsOut(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
-&gt; dotnet run\n\
  Demonstrate C# types\n\
-\n\
----------------\n\
-  int - value type\n\
----------------\n\
+-------------------------\n\
+int - value type\n\
+-------------------------\n\
 --- int t1 = 42 ---\n\
-Int32, t1\n\
+t1, Int32\n\
 value: 42, size: 4\n\
+\n\
+--- interate over val type members using reflection ---\n\
 fields:\n\
   m_value = 42\n\
 methods:\n\
@@ -695,50 +753,61 @@ methods:\n\
   GetTypeCode\n\
   GetType\n\
 \n\
---- int t1a = t1 ---\n\
+--- int t1a = t1 : copy of value type ---\n\
 t1a is not same object as t1\n\
 \n\
----------------\n\
-  string - reference type\n\
----------------\n\
+-------------------------\n\
+string - reference type\n\
+-------------------------\n\
 --- string t2 = &quot;a string&quot; ---\n\
-String, t2\n\
+t2, String\n\
 value: a string, size: 8\n\
---- Note: ---\n\
-  string has many methods - uncomment next line to see them\n\
---- string t3 = t2 ---\n\
-String, t3\n\
+-------------------------\n\
+string has many methods - uncomment next line to see them\n\
+-------------------------\n\
+--- string t3 = t2 : copy handle of ref type ---\n\
+t3, String\n\
 value: a string, size: 8\n\
 t3 is same object as t2\n\
---- t3 += &quot; is here&quot; ---\n\
-String, t3\n\
+--- t3 += &quot; is here&quot; : copy on write ---\n\
+t2, String\n\
+value: a string, size: 8\n\
+t3, String\n\
 value: a string is here, size: 8\n\
 t3 is not same object as t2\n\
+-------------------------\n\
+t2 not modified by change in t3 due to copy on write\n\
+-------------------------\n\
 \n\
----------------\n\
-  Object - base reference type\n\
----------------\n\
+-------------------------\n\
+Object - base reference type\n\
+-------------------------\n\
 --- Object obj1 - new Object() ---\n\
-Object, obj\n\
+obj, Object\n\
 value: System.Object, size: 8\n\
+--- interate over ref type members using reflection ---\n\
 fields:\n\
 methods:\n\
   GetType\n\
   ToString\n\
   Equals\n\
   GetHashCode\n\
+\n\
 --- Object obj2 = obj1 ---\n\
 obj2 is same object as obj1\n\
 \n\
----------------\n\
-  Svt Struct value type\n\
----------------\n\
+-------------------------\n\
+Svt Struct value type\n\
+-------------------------\n\
 --- Svt t4 = new Svt() ---\n\
 t4  { I:3, D:3.1415927, C:z }\n\
-Svt, t4\n\
+t4, Svt\n\
 value: HelloData.Svt, size: 24\n\
---- Note: ---\n\
-  value type: size of object in stackframe\n\
+-------------------------\n\
+value type: size of object in stackframe\n\
+-------------------------\n\
+\n\
+--- iterate over val type members using reflection ---\n\
 fields:\n\
   &lt;I&gt;k__BackingField = 3\n\
   &lt;D&gt;k__BackingField = 3.1415927\n\
@@ -755,43 +824,44 @@ methods:\n\
   GetHashCode\n\
   ToString\n\
   GetType\n\
---- Svt t4a = t4 ---\n\
+\n\
+--- Svt t4a = t4 : copy of val type ---\n\
 t4a  { I:3, D:3.1415927, C:z }\n\
 t4  { I:3, D:3.1415927, C:z }\n\
 t4a is not same object as t4\n\
-Svt, t4a\n\
+t4a, Svt\n\
 value: HelloData.Svt, size: 24\n\
 --- t4a.C = 'q' ---\n\
 t4a  { I:3, D:3.1415927, C:q }\n\
 t4  { I:3, D:3.1415927, C:z }\n\
 t4 is not same object as t4a\n\
 \n\
----------------\n\
-  Crt - ref type with ref member\n\
----------------\n\
+-------------------------\n\
+Crt - ref type with ref member\n\
+-------------------------\n\
 --- Crt t5 = new Crt() ---\n\
 t5  { I:0, D:1, S:SomeString }\n\
-Crt, t5\n\
+t5, Crt\n\
 value: HelloData.Crt, size: 8\n\
---- Note: ---\n\
-  ref type: size of handle to object in heap\n\
---- Crt t5a = t5 ---\n\
+-------------------------\n\
+ref type: size of handle to object in heap\n\
+-------------------------\n\
+\n\
+--- Crt t5a = t5 : copy handle of ref type ---\n\
 t5a  { I:0, D:1, S:SomeString }\n\
 t5a is same object as t5\n\
 t5a.S is same object as t5.S\n\
---- t5a.S = &quot;new string&quot; ---\n\
+--- t5a.S = &quot;new string&quot; : no copy on write ---\n\
 t5a  { I:0, D:1, S:new string }\n\
 t5  { I:0, D:1, S:new string }\n\
 t5a is same object as t5\n\
 t5a.S is same object as t5.S\n\
---- Note: ---\n\
-  source t5 was altered!\n\
+-------------------------\n\
+source t5 was altered!\n\
+-------------------------\n\
 \n\
 That's all Folks!\n\
-\n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
-&gt;\n\
-</pre>\n\
+\n\</pre>\n\
 "
     }
     function loadCsBld(id) {
@@ -802,17 +872,15 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
 MSBuild version 17.4.0+18d5aef85 for .NET\n\
   Determining projects to restore...\n\
   All projects are up-to-date for restore.\n\
-  Cs_Hello -&gt; C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data&#92;bin&#92;De\n\
-  bug&#92;net7.0&#92;Cs_Hello.dll\n\
+  Cs_Hello -&gt; C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data&#92;bin&#92;Debug&#92;net7.0&#92;Cs_Hello.dll\n\
 \n\
 Build succeeded.\n\
     0 Warning(s)\n\
     0 Error(s)\n\
 \n\
-Time Elapsed 00:00:01.69\n\
+Time Elapsed 00:00:00.84\n\
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
-&gt;\n\
-</pre>"
+&gt;\n\</pre>"
     }
 
     /*-- Load Rust Code, Output, Build --*/
@@ -825,28 +893,26 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
           <ol class='tight' style='margin-left:0em;'>\
             <li>\
               This Bit illustrates use of basic types: i32, i64, double, mutable reference,\
-              and String.\
+              and library types string and vec.\
             </li>\
             <li>\
               It illustrates use of copy, move, and clone operations, as well as stack\n\
               and heap memory.\
             </li>\
             <li>\
-              show function is designed to display type and calling name of its\
-              first argument and its value and size.\
+              show_type&lt;T:Debug&gt;(t:T, nm: &amp;str) function is designed to display type\
+              and calling name of its first argument and its value and size.\
             </li>\
             <li>\
-              At the call site its second argument is a string representation of\
-              the calling name, created using the stringify! macro. There is no\
-              advantage over passing in a literal string.  This was done to demonstrate\
-              use of stringify! macro.  All Rust macros end with the ! character.\
-            </li>\
-            <li>\
-              <c-s>show&lt;T: Debug&gt;(T:t, n:&str)</c-s> is generic on the type T\
-              with the bound that T must satisfy the Debug trait.\
+              show&lt;T: Debug&gt;(t:T, nm:&amp;str) is generic on the type T\
+              with bound that T must satisfy the Debug trait.\
             </li>\
             <li>\
               The Debug trait provides a simple formatting using {:?} in print macro.\
+              That shows structured data like arrays and structs as well as scalar values.\
+            </li>\
+            <li>\
+              Macros end with &quot;!&quot; character.  The macro println! is an example.\
               <div style='height:0.75em;'></div>\
             </li>\
           </ol >\
@@ -854,6 +920,9 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
       </div >\
 <pre>\
 #![allow(unused_mut)]\n\
+#![allow(clippy::approx_constant)]\n\
+\n\
+use std::fmt::Debug;\n\
 /* rust_hello_data::main.rs */\n\
 /*\n\
   Static Data Types:\n\
@@ -866,92 +935,103 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data\n\
     struct, enum, use\n\
   Qualifiers:\n\
     mutable, const\n\
-      \n\
+\n\
   Operations:\n\
     Primitive types can all be copied.\n\
     Most library and user-defined types can be moved,\n\
     cloned, but only aggregates with all copyable members\n\
     can be copied.\n\
-      \n\
+\n\
   Processing:\n\
     All types are static, operations run as native code,\n\
     and no garbage collection is needed. Resources are\n\
     returned at end of declr scope.\n\
 */\n\
-use std::fmt::Debug;\n\
 /*\n\
   First argument is passed by value, second passed\n\
   by reference. Non-copy types supplied to the first\n\
   argument will be moved.\n\
 */\n\
-fn show&lt;T: Debug&gt;(t:T, n:&str) {\n\
-  let typename = std::any::type_name::&lt;T&gt;();\n\
-  println!(&quot;&#92;n{}, {}&quot;,typename, n);\n\
-  println!(&quot;value: {:?}, size: {}&quot;, t, std::mem::size_of::&lt;T&gt;());\n\
-}\n\
-      \n\
 fn main() {\n\
-    print!(\n\
-      &quot;&#92;n Demonstrate Rust types&#92;n&#92;\n\
+    println!(\n\
+        &quot;&#92;n Demonstrate Rust types&#92;n&#92;\n\
        ------------------------&quot;\n\
     );\n\
     /*\n\
       Primitive data types: i32, f64, ... occupy contiguous\n\
       regions of memory, so they satisfy the copy trait.\n\
-      \n\
+\n\
       Library types like String have a control block in stack\n\
       and data in heap. So they do not satisfy the copy trait.\n\
       They can be cloned, but that requires an explicit call\n\
       to clone().\n\
     */\n\
-      \n\
+\n\
     /*-- values live in stack frame --*/\n\
-    let mut t1 :i32 = 42;\n\
-    show(t1, stringify!(t1));\n\
-    let t1a:i64 = 42;\n\
-    show(t1a, stringify!(t1a));\n\
+    println!(&quot;&#92;n  -- initialize on stack from literals --&quot;);\n\
+    let mut t1: i32 = 42;\n\
+    show_type(t1, &quot;t1&quot;);\n\
+    let t1a = 42i64;      // alternate declaration\n\
+    show_type(t1a, &quot;t1a&quot;);\n\
     /*\n\
       Below is not type redefinition, it is shadowing,\n\
       e.g., a new variable that hides the older t1a.\n\
     */\n\
-    let t1a:f64 = 42.0;\n\
-    show(t1a, stringify!(t1a));\n\
-      \n\
+    let mut t1a: f64 = 42.0;\n\
+    show_type(t1a, &quot;t1a&quot;);\n\
+\n\
     /*-- create mutable reference --*/\n\
-    let t1b:&mut f64 = &mut t1a;\n\
+    let t1b: &mut f64 = &mut t1a;  // requires t1a to be mutable\n\
     *t1b = 84.0;\n\
-    show(t1b, stringify!(t1b));\n\
-      \n\
+    show_type(t1b, &quot;t1b&quot;);\n\
+\n\
     /*-- values live in heap when wrapped with box --*/\n\
-    let t2 = Box::new(3.14159f64);  // 3.14159f64 value specified to be f64\n\
-    show(t2.clone(), stringify!(t2));\n\
-    show(*t2, stringify!(*t2));\n\
-    /*-- Box releases heap storage when it goes out of scope --*/\n\n\
+    println!(&quot;&#92;n  -- initialize on heap --&quot;);\n\
+    let t2 = Box::new(3.14159f64); // 3.14159f64 is value specified to be f64\n\
+    show_type(*t2, &quot;*t2&quot;);\n\
+    show_type(t2, &quot;t2&quot;);    // moves t2, use t2.clone() to avoid move\n\
+    // print!(&quot;{}&quot;, &t2.to_string());  // error - t2 moved\n\
+    /*-- Box releases its heap storage when it goes out of scope --*/\n\
+\n\
+    println!(&quot;&#92;n  -- size_of measures size of handle to heap element --&quot;);\n\
     let s1 = std::mem::size_of::&lt;Box&lt;i8&gt;&gt;();\n\
     let s2 = std::mem::size_of::&lt;Box&lt;i64&gt;&gt;();\n\
     println!(&quot;&#92;nsize_of::&lt;Box&lt;i8&gt;&gt;() = {}&quot;, s1);\n\
     println!(&quot;size_of::&lt;Box&lt;i64&gt;&gt;() = {}&quot;, s2);\n\
-      \n\
+\n\
     /*--\n\
-      Control block lives on stack, char data live in heap.\n\
-      Passing by value or assignment transfers ownership\n\
-      from source to destination.  That is termed a move.\n\
+      String control block lives on stack, char data live in heap.\n\
+      Passing by value or assignment transfers ownership from\n\
+      source to destination.  That is termed a move.\n\
     --*/\n\
-    let t3:String = String::from(&quot;Hello Data&quot;);  // temp moved\n\
-    show(t3.clone(), stringify!(t3.clone()));    // moves t3s clone\n\
-      \n\
-    let t4 = &t3;  // reference to still valid t3\n\
-    show(t4, stringify!(t4));\n\
-      \n\
-    let t5 = [1, 2, 3, 4, 5];  // copy type\n\
-    show(t5, stringify!(t5));\n\
-    let mut txt = String::from(&quot;&#92;nt5 was copied into show(...)&quot;);\n\
+    println!(&quot;&#92;n  -- use clone to avoid src move --&quot;);\n\
+    let t3: String = String::from(&quot;Hello Data&quot;); // temp moved\n\
+    show_type(t3.clone(), &quot;t3.clone()&quot;); // moves t3s clone, not t3\n\
+\n\
+    let t4 = &t3; // reference to still valid t3\n\
+    show_type(t4, &quot;t4&quot;);\n\
+\n\
+    println!(&quot;&#92;n  -- array of copy type elements is copy --&quot;);\n\
+    let t5 = [1, 2, 3, 4, 5]; // copy type\n\
+    show_type(t5, &quot;t5&quot;);\n\
+    let mut txt = String::from(&quot;&#92;nt5 was copied into show_type(...)&quot;);\n\
     txt += &quot;, see:&#92;nt5 = &quot;;\n\
     println!(&quot;{}{:?} is still valid&quot;, txt, t5);\n\
-      \n\
+\n\
     println!(&quot;&#92;n&#92;nThat's all Folks!!&#92;n&#92;n&quot;);\n\
 }\n\
-</pre></div>\
+/*\n\
+  show_type is generic function with Debug bound.\n\
+  Using format {:?} requires Debug.\n\
+*/\n\
+fn show_type&lt;T: Debug&gt;(t: T, nm: &str) {\n\
+  let typename = std::any::type_name::&lt;T&gt;();\n\
+  println!(&quot;&#92;n{}, {}&quot;, nm, typename);\n\
+  println!(&quot;value: {:?}, size: {}&quot;, t, std::mem::size_of::&lt;T&gt;());\n\
+}\n\
+\n\
+\n\
+<</pre></div>\
 ";
     }
 
@@ -960,56 +1040,68 @@ fn main() {\n\
       codecont.innerHTML = "<pre>\
  Demonstrate Rust types\n\
 ------------------------\n\
-i32, t1\n\
+\n\
+  -- initialize on stack from literals --\n\
+\n\
+t1, i32\n\
 value: 42, size: 4\n\
-      \n\
-i64, t1a\n\
+\n\
+t1a, i64\n\
 value: 42, size: 8\n\
-      \n\
-f64, t1a\n\
+\n\
+t1a, f64\n\
 value: 42.0, size: 8\n\
-      \n\
-&mut f64, t1b\n\
+\n\
+t1b, &mut f64\n\
 value: 84.0, size: 8\n\
-      \n\
-alloc::boxed::Box&lt;f64&gt;, t2\n\
+\n\
+  -- initialize on heap --\n\
+\n\
+*t2, f64\n\
 value: 3.14159, size: 8\n\
-      \n\
-f64, * t2\n\
+\n\
+t2, alloc::boxed::Box&lt;f64&gt;\n\
 value: 3.14159, size: 8\n\
-      \n\
+\n\
+  -- size_of measures size of handle to heap element --\n\
+\n\
 size_of::&lt;Box&lt;i8&gt;&gt;() = 8\n\
 size_of::&lt;Box&lt;i64&gt;&gt;() = 8\n\
 \n\
-alloc::string::String, t3.clone()\n\
+  -- use clone to avoid src move --\n\
+\n\
+t3.clone(), alloc::string::String\n\
 value: &quot;Hello Data&quot;, size: 24\n\
-    \n\
-&alloc::string::String, t4\n\
+\n\
+t4, &alloc::string::String\n\
 value: &quot;Hello Data&quot;, size: 8\n\
-    \n\
-[i32; 5], t5\n\
+\n\
+  -- array of copy type elements is copy --\n\
+\n\
+t5, [i32; 5]\n\
 value: [1, 2, 3, 4, 5], size: 20\n\
-    \n\
-t5 was copied into show(...), see:\n\
+\n\
+t5 was copied into show_type(...), see:\n\
 t5 = [1, 2, 3, 4, 5] is still valid\n\
-    \n\
-    \n\
+\n\
+\n\
 That's all Folks!!\n\
-    \n\
+\n\
+\n\
 </pre>";
     }
 
     function loadRsBld(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;rust&#92;rust_hello_data\n\
-> cargo run\n\
-   Compiling rust_hello_data v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;rust&#92;rust_hello_data)\n\
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_data\n\
+&gt; cargo run\n\
+   Compiling rust_hello_data v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_data)\n\
     Finished dev [unoptimized + debuginfo] target(s) in 0.32s\n\
      Running `target&#92;debug&#92;rust_hello_data.exe`\n\
-        ...\n\n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;rust&#92;rust_hello_data\n\
->      </pre>";
+\n\
+\n\
+></pre>";
     }
     /*-- Load Python Code, Output, Build --*/
     function loadPyCode(id) {
@@ -1035,7 +1127,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;rust&#92;rust_hello_data\n\
       C++, Rust, and especially C#\
     </li>\
     <li>\
-      Python does not have a generics. It is dynamically typed, so\n\
+      Python does not have generics. It is dynamically typed, so\n\
       everything is already generic.\
     </li>\
   </ol >\
@@ -1043,6 +1135,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;rust&#92;rust_hello_data\n\
 </details >\
 </div >\
 <pre>\n\
+import sys\n\
 # Python/Py_Data::Py_Data.py\n\
 # \n\
 # Python Dynamic Data Types\n\
@@ -1054,89 +1147,116 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;rust&#92;rust_hello_data\n\
 #   str\n\
 #   NoneType\n\
 \n\
-import sys\n\
-def showType(t, n) :\n\
-    print(type(t), n)\n\
-    print(&quot;value: &quot;, t, ', size: ', sys.getsizeof(t))\n\
+# Python requires definition before use ordering\n\
+#  - no link phase to find definitions\n\
 \n\
-def showIdent(t, n) :\n\
-    print(n, t, id(t))\n\
+nl = &quot;&#92;n&quot;\n\
 \n\
-def separate() :\n\
-    print(&quot;------&quot;)\n\
+def showType(t, nm, suffix = &quot;&quot;) :\n\
+    print(nm, type(t))\n\
+    print(&quot;value: &quot;, t, ', size: ', sys.getsizeof(t), suffix)\n\
+\n\
+def showIdent(t, n, suffix = &quot;&quot;) :\n\
+    print(n, t, id(t), suffix)\n\
+\n\
+def showNote(text, suffix = &quot;&quot;) :\n\
+    print(&quot;-------------------------&quot;)\n\
+    print(text)\n\
+    print(&quot;-------------------------&quot;, suffix)\n\
 \n\
 def execute() : \n\
     print(&quot; Demonstrate Python Types&quot;)\n\
     print(&quot;--------------------------&quot;)\n\
     # types\n\
+    print(&quot;&#92;n  -- instances of all types reside in managed heap --&#92;n&quot;)\n\
     t1 = 42\n\
-    showType(t1, &quot;t1&quot;)\n\
+    showType(t1, &quot;t1&quot;, nl)\n\
     t1 = 3.14159         #dynamic type t1 redefined\n\
-    showType(t1, &quot;t1&quot;)\n\
+    showType(t1, &quot;t1&quot;, nl)\n\
     t1 = [1, 2, 3, 4]    #dynamic type t1 redefined\n\
-    showType(t1, &quot;t1&quot;)\n\
+    showType(t1, &quot;t1&quot;, nl)\n\
 \n\
-    # reference behavior - copy on write\n\
-    separate()\n\
-    print(&quot;t2 = t1&quot;)\n\
+    # reference behavior - change of object\n\
+    print(&quot;-- t2 = t1 --&quot;)\n\
     t2 = t1\n\
     showIdent(t1,&quot;t1&quot;)\n\
-    showIdent(t2,&quot;t2&quot;)\n\
-    print(&quot;&#92;nt2 = 3.33333&quot;)\n\
+    showIdent(t2,&quot;t2&quot;, nl)\n\
+\n\
+    print(&quot;&#92;n-- t2 = 3.33333 : change of object --&quot;)\n\
     t2 = 3.33333\n\
-    showIdent(t1,&quot;t1&quot;)\n\
     showIdent(t2,&quot;t2&quot;)\n\
+    showType(t2,&quot;t2&quot;, nl)\n\
 \n\
-    # reference behavior - copy on write\n\
-    separate()\n\
-    print(&quot;t2 += -1.0&quot;)\n\
+    # reference behavior - modify object\n\
+    print(&quot;-- t2 += -1.0 : modify object --&quot;)\n\
     t2 += -1.0\n\
-    showIdent(t1,&quot;t1&quot;)\n\
-    showType(t1, &quot;t1&quot;)\n\
     showIdent(t2,&quot;t2&quot;)\n\
-    showType(t2, &quot;t2&quot;)\n\
+    showType(t2, &quot;t2&quot;, nl)\n\
 \n\
-    # reference behavior - copy on write\n\
-    separate()\n\
+    # reference behavior\n\
+    print(&quot;-- t3 = [1, &#92;&quot;one&#92;&quot;] --&quot;)\n\
     t3 = [1, &quot;one&quot;]\n\
     showIdent(t3, &quot;t3&quot;)\n\
-    print(&quot;t4 = t3&quot;)\n\
+    showType(t3, &quot;t3&quot;, nl)\n\
+\n\
+    print(&quot;-- t4 = t3 --&quot;)\n\
     t4 = t3\n\
     showIdent(t3, &quot;t3&quot;)\n\
     showType(t3,&quot;t3&quot;)\n\
     showIdent(t4, &quot;t4&quot;)\n\
-    showType(t4,&quot;t4&quot;)\n\
+    showType(t4,&quot;t4&quot;, nl)\n\
     \n\
     # reference behavior - no copy on write\n\
-    separate()\n\
-    print(&quot;t3.append('b')&quot;)\n\
-    t3.append('b')\n\
+    print(&quot;-- t4.append('b') : no copy on write --&quot;)\n\
+    t4.append('b')\n\
     showIdent(t3, &quot;t3&quot;)\n\
     showType(t3,&quot;t3&quot;)\n\
     showIdent(t4, &quot;t4&quot;)\n\
     showType(t4,&quot;t4&quot;)\n\
+    showNote(&quot;t3 modified - same heap object, no copy on write&quot;, nl)\n\
 \n\
-    # reference behavior - child copy on write\n\
-    separate()\n\
+    # reference behavior - new child object\n\
+    print(&quot;-- t5 = (1, 2, 3) --&quot;)\n\
     t5 = (1, 2, 3)\n\
-    t6 = [1, t5, &quot;weird&quot;]\n\
     showIdent(t5, &quot;t5&quot;)\n\
+    print(&quot;-- t6 = [1, t5, &#92;&quot;weird&#92;&quot;] --&quot;)\n\
+    t6 = [1, t5, &quot;weird&quot;]\n\
     showIdent(t6, &quot;t6&quot;)\n\
+    showType(t6, &quot;t6&quot;)\n\
+    print(&quot;-- t5 = 1 + 1j : new object --&quot;)\n\
     t5 = 1 + 1j\n\
     showIdent(t5, &quot;t5&quot;)\n\
     showIdent(t6, &quot;t6&quot;)\n\
+    showNote(&quot;new object for t5, t6 not affected&quot;, nl)\n\
     \n\
+    # reference behavior - string copy on write\n\
+    print(&quot;-- t7 = &#92;&quot;a string&#92;&quot; --&quot;)\n\
+    t7 = &quot;a string&quot;\n\
+    showIdent(t7, &quot;t7&quot;)\n\
+    showType(t7, &quot;t7&quot;)\n\
+    print(&quot;-- t8 = t7 --&quot;)\n\
+    t8 = t7\n\
+    showIdent(t8, &quot;t8&quot;)\n\
+    print(&quot;-- t8 += &#92;&quot; and another string&#92;&quot; : copy on write&quot;)\n\
+    t8 += &quot; and another string&quot;\n\
+    showIdent(t7, &quot;t7&quot;)\n\
+    showIdent(t8, &quot;t8&quot;)\n\
+    showType(t8, &quot;t8&quot;)\n\
+    showNote(&quot;t7 not modified : copy on write&quot;, nl)\n\
+\n\
     # reference behavior - iterate over children\n\
-    separate()\n\
-    print(&quot;iterate over t6&quot;)\n\
+    print(&quot;-- iterate over t6 children --&quot;)\n\
     for i in t6:\n\
         showIdent(i, &quot;elem&quot;)\n\
-    # print(dir(t6))\n\
+\n\
+    print(&quot;&#92;n-- iterate over t6 methods --&quot;)\n\
+    print(dir(t6))\n\
       \n\
     print(&quot;&#92;nThat's all folks!&#92;n&quot;)\n\
+\n\
 execute()\n\
 \n\
-</pre>\n\
+\n\</pre>\n\
 </div>\n\
 ";
     }
@@ -1145,65 +1265,107 @@ execute()\n\
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<div class='code'>\n\
 <pre>\n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
-&gt; python .&#92;Py_Data.py\n\
  Demonstrate Python Types\n\
 --------------------------\n\
-&lt;class 'int'&gt; t1\n\
-value:  42 , size:  28\n\
-&lt;class 'float'&gt; t1\n\
-value:  3.14159 , size:  24\n\
-&lt;class 'list'&gt; t1\n\
-value:  [1, 2, 3, 4] , size:  88\n\
-------\n\
-t2 = t1\n\
-t1 [1, 2, 3, 4] 1581050570752\n\
-t2 [1, 2, 3, 4] 1581050570752\n\
 \n\
-t2 = 3.33333\n\
-t1 [1, 2, 3, 4] 1581050570752\n\
-t2 3.33333 1581050207984\n\
-------\n\
-t2 += -1.0\n\
-t1 [1, 2, 3, 4] 1581050570752\n\
-&lt;class 'list'&gt; t1\n\
+  -- instances of all types reside in managed heap --\n\
+\n\
+t1 &lt;class 'int'&gt;\n\
+value:  42 , size:  28\n\
+\n\
+t1 &lt;class 'float'&gt;\n\
+value:  3.14159 , size:  24\n\
+\n\
+t1 &lt;class 'list'&gt;\n\
 value:  [1, 2, 3, 4] , size:  88\n\
-t2 2.33333 1581050209360\n\
-&lt;class 'float'&gt; t2\n\
+\n\
+-- t2 = t1 --\n\
+t1 [1, 2, 3, 4] 2480814681792\n\
+t2 [1, 2, 3, 4] 2480814681792\n\
+\n\
+\n\
+-- t2 = 3.33333 : change of object --\n\
+t2 3.33333 2480814399344\n\
+t2 &lt;class 'float'&gt;\n\
+value:  3.33333 , size:  24\n\
+\n\
+-- t2 += -1.0 : modify object --\n\
+t2 2.33333 2480814400880\n\
+t2 &lt;class 'float'&gt;\n\
 value:  2.33333 , size:  24\n\
-------\n\
-t3 [1, 'one'] 1581050507840\n\
-t4 = t3\n\
-t3 [1, 'one'] 1581050507840\n\
-&lt;class 'list'&gt; t3\n\
+\n\
+-- t3 = [1, &quot;one&quot;] --\n\
+t3 [1, 'one'] 2480814699136\n\
+t3 &lt;class 'list'&gt;\n\
 value:  [1, 'one'] , size:  72\n\
-t4 [1, 'one'] 1581050507840\n\
-&lt;class 'list'&gt; t4\n\
+\n\
+-- t4 = t3 --\n\
+t3 [1, 'one'] 2480814699136\n\
+t3 &lt;class 'list'&gt;\n\
 value:  [1, 'one'] , size:  72\n\
-------\n\
-t3.append('b')\n\
-t3 [1, 'one', 'b'] 1581050507840\n\
-&lt;class 'list'&gt; t3\n\
+t4 [1, 'one'] 2480814699136\n\
+t4 &lt;class 'list'&gt;\n\
+value:  [1, 'one'] , size:  72\n\
+\n\
+-- t4.append('b') : no copy on write --\n\
+t3 [1, 'one', 'b'] 2480814699136\n\
+t3 &lt;class 'list'&gt;\n\
 value:  [1, 'one', 'b'] , size:  120\n\
-t4 [1, 'one', 'b'] 1581050507840\n\
-&lt;class 'list'&gt; t4\n\
+t4 [1, 'one', 'b'] 2480814699136\n\
+t4 &lt;class 'list'&gt;\n\
 value:  [1, 'one', 'b'] , size:  120\n\
-------\n\
-t5 (1, 2, 3) 1581050830144\n\
-t6 [1, (1, 2, 3), 'weird'] 1581050835264\n\
-t5 (1+1j) 1581050208048\n\
-t6 [1, (1, 2, 3), 'weird'] 1581050835264\n\
-------\n\
-iterate over t6\n\
-elem 1 1581049184496\n\
-elem (1, 2, 3) 1581050830144\n\
-elem weird 1581050834288\n\
+-------------------------\n\
+t3 modified - same heap object, no copy on write\n\
+-------------------------\n\
+\n\
+-- t5 = (1, 2, 3) --\n\
+t5 (1, 2, 3) 2480815021312\n\
+-- t6 = [1, t5, &quot;weird&quot;] --\n\
+t6 [1, (1, 2, 3), 'weird'] 2480815027072\n\
+t6 &lt;class 'list'&gt;\n\
+value:  [1, (1, 2, 3), 'weird'] , size:  80\n\
+-- t5 = 1 + 1j : new object --\n\
+t5 (1+1j) 2480814399280\n\
+t6 [1, (1, 2, 3), 'weird'] 2480815027072\n\
+-------------------------\n\
+new object for t5, t6 not affected\n\
+-------------------------\n\
+\n\
+-- t7 = &quot;a string&quot; --\n\
+t7 a string 2480815025968\n\
+t7 &lt;class 'str'&gt;\n\
+value:  a string , size:  57\n\
+-- t8 = t7 --\n\
+t8 a string 2480815025968\n\
+-- t8 += &quot; and another string&quot; : copy on write\n\
+t7 a string 2480815025968\n\
+t8 a string and another string 2480815035040\n\
+t8 &lt;class 'str'&gt;\n\
+value:  a string and another string , size:  76\n\
+-------------------------\n\
+t7 not modified : copy on write\n\
+-------------------------\n\
+\n\
+-- iterate over t6 children --\n\
+elem 1 2480813375728\n\
+elem (1, 2, 3) 2480815021312\n\
+elem weird 2480815025520\n\
+\n\
+-- iterate over t6 methods --\n\
+['__add__', '__class__', '__class_getitem__', '__contains__',\n\
+ '__delattr__', '__delitem__', '__dir__', '__doc__', '__eq__',\n\
+ '__format__', '__ge__', '__getattribute__', '__getitem__',\n\
+ '__gt__', '__hash__', '__iadd__', '__imul__', '__init__',\n\
+ '__init_subclass__', '__iter__', '__le__', '__len__', '__lt__',\n\
+ '__mul__', '__ne__', '__new__', '__reduce__', '__reduce_ex__',\n\
+ '__repr__', '__reversed__', '__rmul__', '__setattr__', '__setitem__',\n\
+ '__sizeof__', '__str__', '__subclasshook__',\n\
+ 'append', 'clear', 'copy', 'count', 'extend', 'index', 'insert',\n\
+ 'pop', 'remove', 'reverse', 'sort']\n\
 \n\
 That's all folks!\n\
 \n\
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
-&gt;\n\
-</pre>\n\
+\n\</pre>\n\
 </div>";
     }
 
@@ -1211,7 +1373,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
-> python Py_Data.py\n\
+&gt; python Py_Data.py\n\
  Demonstrate Python Types\n\
 --------------------------\n\
 >\
@@ -1220,32 +1382,179 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
     /*-- Load Javascript Code, Output, Build --*/
     function loadJsCode(id) {
       let codecont = document.getElementById(id);
-      codecont.innerHTML = "<div class='code'>\
+      codecont.innerHTML = "<div style='white-space:normal; margin-left:2em;'>\
+<details>\
+  <summary class='darkItem' style='margin-left:-2em;'>Code Notes&nbsp;&nbsp;</summary>\
+  <ol class='tight' style='margin-left:0em;'>\
+    <li>\
+      This code is a not so simple demonstrations of numbers, strings, and arrays.\
+    </li>\
+    <li>\
+      All JavaScript types are reference types with values stored in heap.\
+    </li>\
+    <li>\
+      showType function is designed to display type and calling name of its\n\
+      first argument and its value and size.\
+    </li>\
+    <li>\
+      Note that the display functions are simple but the analysis function sizeof(object)\n\
+      requires recursive iteration through the members and decendents of object.\
+    </li>\
+    <li>\
+      JavaScript does not have generics. It is dynamically typed, so\n\
+      everything is already generic.\
+    </li>\
+  </ol >\
+  <div style=&quot;height: 3em;&quot;>&nbsp;</div>\
+</details >\
+</div >\
+<div class='code'>\
 <pre>\
-&lt;!DOCTYPE html>\n\
-&lt;html>\n\
-&lt;!-- Js_Hello.html -->\n\
-&lt;head>\n\
-  &lt;script>\n\
-    function hello() {\n\
-      document.getElementById(&quot;hello&quot;).innerHTML =\n\
-        &quot;&lt;h2>Hello JavaScript World&lt;/h2>&quot;;\n\
+&lt;!DOCTYPE html&gt;\n\
+&lt;html&gt;\n\
+&lt;!-- \n\
+  Js_Data.html \n\
+--&gt;\n\
+&lt;head&gt;\n\
+  &lt;script&gt;\n\
+    var nl = &quot;&lt;br /&gt;&quot;;\n\
+    var nil = &quot;&quot;;\n\
+\n\
+    /* Demonstration starts here */\n\
+    function heading() {\n\
+            document.getElementById(&quot;data&quot;).innerHTML = &quot;&lt;h2&gt;Javascript Data&lt;/h2&gt;&quot;;\n\
+    }\n\
+    function execute() {\n\
+      showNote(&quot;Demo numbers&quot;)\n\
+      println(&quot;-- let t1 = 42 --&quot;);\n\
+      let t1 = 42;\n\
+      showType(t1, &quot;t1&quot;);\n\
+      println(nil);\n\
+      println(&quot;-- let t2 = t1 --&quot;);\n\
+      let t2 = t1;\n\
+      isSameObject(t2, &quot;t2&quot;, t1, &quot;t1&quot;);\n\
+      println(nil);\n\
+      println(&quot;-- let t2 = 3.1415927 -- : change of object&quot;);\n\
+      t2 = 3.1415927;\n\
+      isSameObject(t2, &quot;t2&quot;, t1, &quot;t1&quot;);\n\
+      print(nl);\n\
+      showType(t1, &quot;t1&quot;);\n\
+      showType(t2, &quot;t2&quot;);\n\
+      println(nil);\n\
+      \n\
+      showNote(&quot;Demo strings&quot;);\n\
+      println(&quot;-- let t3 = &#92;&quot;a string&#92;&quot; --&quot;);\n\
+      let t3 = &quot;a string&quot;;\n\
+      showType(t3, &quot;t3&quot;);\n\
+      print(nl);\n\
+      println(&quot;-- let t4 = t3 --&quot;);\n\
+      let t4 = t3;\n\
+      isSameObject(t4, &quot;t4&quot;, t3, &quot;t3&quot;);\n\
+      println(nil);\n\
+      showType(t3, &quot;t3&quot;);\n\
+      showType(t4, &quot;t4&quot;);\n\
+      print(nl);\n\
+      println(&quot;-- t4 += &quot; + &quot;&#92;&quot; and another string&#92;&quot; -- : copy on write&quot;);\n\
+      t4 += &quot; and another string&quot;;\n\
+      isSameObject(t4, &quot;t4&quot;, t3, &quot;t3&quot;);\n\
+      println(nil);\n\
+      showType(t3, &quot;t3&quot;);\n\
+      showType(t4, &quot;t4&quot;);\n\
+      print(nl);\n\
+      \n\
+      showNote(&quot;Demo arrays&quot;);\n\
+      println(&quot;--- t5 = [1, 2, 3] ---&quot;);\n\
+      let t5 = [1, 2, 3];\n\
+      showType(t5, &quot;t5&quot;);\n\
+      print(nl);\n\
+      println(&quot;--- let t6 = t5 ---&quot;);\n\
+      let t6 = t5;\n\
+      isSameObject(t6, &quot;t6&quot;, t5, &quot;t5&quot;);\n\
+      println(nil);\n\
+      showType(t5, &quot;t5&quot;);\n\
+      showType(t6, &quot;t6&quot;);\n\
+      print(nl);\n\
+      println(&quot;--- t6[1] = -2 --- : no copy on write&quot;);\n\
+      t6[1] = -2;\n\
+      isSameObject(t6, &quot;t6&quot;, t5, &quot;t5&quot;);\n\
+      println(nil);\n\
+      showType(t5, &quot;t5&quot;);\n\
+      showType(t6, &quot;t6&quot;);\n\
+      showNote(&quot;Source t5 modified!&quot;)\n\
+    }\n\
+    /* display functions */\n\
+    function print(str) {\n\
+      document.write(str);\n\
+    }\n\
+    function println(str) {\n\
+      document.write(str + &quot;&lt;br /&gt;&quot;);\n\
+    }\n\
+    function showNote(text) {\n\
+      println(&quot;-------------------------&quot;);\n\
+      println(text);\n\
+      println(&quot;-------------------------&quot;);\n\
+    }\n\
+    /* Analysis functions */\n\
+    function showType(t, nm) {\n\
+      println(nm + &quot;, &quot; + typeof t);\n\
+      print(&quot;size: &quot; + sizeof(t) + &quot;, value: &quot; + t);\n\
+      println(nil);\n\
+    }\n\
+    function isSameObject(o1, nm1, o2, nm2) {\n\
+      if (o1 === o2) {\n\
+        println(nm1 + &quot; is same object as &quot; + nm2)\n\
+      }\n\
+      else {\n\
+        println(nm1 + &quot; is not same object as &quot; + nm2)\n\
+      }\n\
+    }\n\
+    // <a href='https://gist.github.com/pgpbpadilla/10344038'>github pgpbpadilla</a>\n\
+    function sizeof(object) {\n\
+      var objectList = [],\n\
+        stack = [ object ],\n\
+        bytes = 0,\n\
+        value,\n\
+        i;\n\
+\n\
+      while (stack.length) {\n\
+        value = stack.pop();\n\
+\n\
+        if (typeof value === 'boolean') {\n\
+          bytes += 4;\n\
+        } else if (typeof value === 'string') {\n\
+          bytes += value.length * 2;\n\
+        } else if (typeof value === 'number') {\n\
+          bytes += 8;\n\
+        } else if (typeof value === 'object'\n\
+            && objectList.indexOf(value) === -1) {\n\
+          objectList.push(value);\n\
+\n\
+          for (i in value) {\n\
+            if (value.hasOwnProperty(i)) {\n\
+              stack.push(value[i]);\n\
+            }\n\
+          }\n\
+        }\n\
+      }\n\
+      return bytes;\n\
     }\n\
   &lt;/script&gt;\n\
   &lt;style&gt;\n\
     body {\n\
       font-family:'Comic Sans MS', Tahoma;\n\
       padding:2em;\n\
-    }\n\
+    } \n\
   &lt;/style&gt;\n\
 &lt;/head&gt;\n\
 &lt;body&gt;\n\
-  &lt;div id=&quot;hello&quot;&gt;&lt;/div&gt;\n\
+  &lt;div id=&quot;data&quot;&gt;&lt;/div&gt;\n\
   &lt;script&gt;\n\
-    hello();\n\
-  &lt;/script>\n\
+    heading();\n\
+    execute();\n\
+  &lt;/script&gt;\n\
 &lt;/body&gt;\n\
 &lt;/html&gt;\n\
+\n\
 </pre>\
 </div>\
 ";
@@ -1254,17 +1563,82 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data\n\
     function loadJsOut(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\
-Hello JavaScript world\
+Javascript Data\n\
+-------------------------\n\
+Demo numbers\n\
+-------------------------\n\
+-- let t1 = 42 --\n\
+t1, number\n\
+size: 8, value: 42\n\
+\n\
+-- let t2 = t1 --\n\
+t2 is same object as t1\n\
+\n\
+-- let t2 = 3.1415927 -- : change of object\n\
+t2 is not same object as t1\n\
+\n\
+t1, number\n\
+size: 8, value: 42\n\
+t2, number\n\
+size: 8, value: 3.1415927\n\
+\n\
+-------------------------\n\
+Demo strings\n\
+-------------------------\n\
+-- let t3 = &quot;a string&quot; --\n\
+t3, string\n\
+size: 16, value: a string\n\
+\n\
+-- let t4 = t3 --\n\
+t4 is same object as t3\n\
+\n\
+t3, string\n\
+size: 16, value: a string\n\
+t4, string\n\
+size: 16, value: a string\n\
+\n\
+-- t4 += &quot; and another string&quot; -- : copy on write\n\
+t4 is not same object as t3\n\
+\n\
+t3, string\n\
+size: 16, value: a string\n\
+t4, string\n\
+size: 54, value: a string and another string\n\
+\n\
+-------------------------\n\
+Demo arrays\n\
+-------------------------\n\
+--- t5 = [1, 2, 3] ---\n\
+t5, object\n\
+size: 24, value: 1,2,3\n\
+\n\
+--- let t6 = t5 ---\n\
+t6 is same object as t5\n\
+\n\
+t5, object\n\
+size: 24, value: 1,2,3\n\
+t6, object\n\
+size: 24, value: 1,2,3\n\
+\n\
+--- t6[1] = -2 --- : no copy on write\n\
+t6 is same object as t5\n\
+\n\
+t5, object\n\
+size: 24, value: 1,-2,3\n\
+t6, object\n\
+size: 24, value: 1,-2,3\n\
+-------------------------\n\
+Source t5 modified!\n\
+-------------------------\n\
 </pre>";
     }
 
     function loadJsBld(id) {
       let codecont = document.getElementById(id);
       codecont.innerHTML = "<pre>\
-Source html, script, and styles are loaded,\n\
-parsed and rendered by browser&apos;s execution\n\
-engine.\n\
-      </pre>";
+C:&#92;github&#92;JimFawcett&#92;Bits&#92;JavaScript&#92;Js_Data\n\
+&gt; start firefox C:&#92;github&#92;JimFawcett&#92;Bits&#92;JavaScript&#92;Js_Data&#92;Js_Data.html\n\
+\n\      </pre>";
     }
     //function load1() {
 
@@ -1272,11 +1646,11 @@ engine.\n\
     function remoteLeft() {
       let cp = document.getElementById("Cp1");
       if (cp.checked) {
-        window.open('https://godbolt.org/z/f5x1W8Exx', '_blank');
+        window.open('https://godbolt.org/z/13bG59MYM', '_blank');
       }
       let cs = document.getElementById("Cs1");
       if (cs.checked) {
-        window.open('https://godbolt.org/z/rnTvM3E1a', '_blank');
+        window.open('https://godbolt.org/z/Pbxj6rb6d', '_blank');
       }
       let rs = document.getElementById("Rs1");
       if (rs.checked) {
@@ -1288,14 +1662,14 @@ engine.\n\
       let py = document.getElementById("Py1");
       if (py.checked) {
         window.open(
-          'https://godbolt.org/z/7noK4Yvvd',
+          'https://godbolt.org/z/bj8Wc7oxb',
           '_blank'
         )
       }
       let js = document.getElementById("Js1");
       if (js.checked) {
         window.open(
-          'Js_Hello.html',
+          'Js_Data.html',
           '_blank'
         )
       }
@@ -1303,11 +1677,11 @@ engine.\n\
     function remoteRight() {
       let cp = document.getElementById("Cp2");
       if (cp.checked) {
-        window.open('https://godbolt.org/z/f5x1W8Exx', '_blank');
+        window.open('https://godbolt.org/z/13bG59MYM', '_blank');
       }
       let cs = document.getElementById("Cs2");
       if (cs.checked) {
-        window.open('https://godbolt.org/z/rnTvM3E1a', '_blank');
+        window.open('https://godbolt.org/z/Pbxj6rb6d', '_blank');
       }
       let rs = document.getElementById("Rs2");
       if (rs.checked) {
@@ -1326,18 +1700,16 @@ engine.\n\
       let js = document.getElementById("Js2");
       if (js.checked) {
         window.open(
-          'Js_Hello.html',
+          'Js_Data.html',
           '_blank'
         )
       }
     }
-    //function toggleHideLeft() { }
-    //function toggleHideRight() { }
   </script>
 </head>
 <body id="github" onload="initialize()">
 
-  <a id="Next" href="Bits_Data.html">Next</a>
+  <a id="Next" href="Bits_Objects.html">Next</a>
   <a id="Prev" href="Bits_Hello.html">Prev</a>
 
   <page-frame>
@@ -1347,14 +1719,14 @@ engine.\n\
     <main>
       <div id="about">about</div>
       <div id="page">Bits Data</div>
-      <div id="modified">01/08/2022</div>
+      <div id="modified">01/18/2022</div>
       <div id="hlp"></div>
       <a id="top"></a>
       <content>
 
         <header>
           <hgroup id="pagetitle">
-            <!--<a class="repoLink" href="https://github.com/JimFawcett">github Repositories</a>-->
+            <a class="repoLink" href="../../BitsRepo.html">Bits Repository</a>
             <h1 id="title">Bits_Data</h1>
             <h3 id="subtitle" class="indent">
               code, output, and build for C++, Rust, C#, Python, and JavaScript on Windows, macOS, and Linux
@@ -1366,18 +1738,21 @@ engine.\n\
           languages, much as you might compare a sentence of English with one in Spanish to help you learn
           Spanish.
         </t-b>
-        <t-b>
-          The examples below show how to use primitive and library defined types with emphasis on
-          binding names to values, copy and move operations, and references. Later Bits will look at 
-          creation and use of user-defined types.
+        <t-b style="border:1px solid maroon; padding:0.25em 1em 0.5em 1em;">
+          <h4 style="margin:0em 0em 0.25em 0em;">Synopsis:</h4>
+          This page demonstrates initialization and simple uses of built-in and library-defined types for
+          C++, Rust, C#, Python, and JavaScript.
         </t-b>
         <details>
           <summary class="darkItem">Demo Notes&nbsp;&nbsp;</summary>
-          All of the languages covered in this demonstration have type categories shown in the table below.
-          The purpose of this demonstration is to show how type categories affect the code we produce.
+          <t-b><hr /></t-b>
+          <t-b>
+            All of the languages covered in this demonstration have type categories shown in the table below.
+            The purpose of this demonstration is to show how type categories affect code we produce.
+          </t-b>
           <table style="width:calc(100% - 0em); margin-top:1em;">
             <tr>
-              <th style="width:6em;">Category</th>
+              <th style="width:6em;">Operation</th>
               <th style="width:30em;">Discussion</th><th>Languages supporting this category</th>
             </tr>
             <tr>
@@ -1409,7 +1784,17 @@ engine.\n\
                 of primitive types. Copy occurs implicitly for definition, assignment, and pass by value.
                 Copy is effected with a simple memcopy operation.
               </td>
-              <td>C++, Rust, and C#</td>
+              <td>
+                C++, Rust, and C# implicitly copy primitive types with contiguous memory layout.
+                <div style="height:0.75em;"></div>
+                C++ supports the definition of copy constructors and assignment operators that copy 
+                non-contiguous memory structures implicitly.
+                <div style="height:0.75em;"></div>
+                Rust supports definition of clone operations that create deep copies via explicit invocation.
+                <div style="height:0.75em;"></div>
+                C#, Python, and JavaScript also support building clones, but that requires significant
+                expertise and effort to implement correctly.
+              </td>
             </tr>
             <tr>
               <td>Move</td>
@@ -1445,6 +1830,12 @@ engine.\n\
                 Reference types wrap a pointer to an object but use object syntax for its operations.
                 Construction, assignment, and pass reference by value all result in the destination
                 pointing to the same instance as the source. 
+                <div style="height:0.75em;"></div>
+                The consequences are significant: after constructing <c-s>SomeType&nbsp;t2&nbsp;=&nbsp;t1</c-s> or
+                assigning <c-s>t2&nbsp;=&nbsp;t1</c-s> any change in <c-s>t2</c-s>&apos;s child elements 
+                will cause <c-s>t1</c-s>&apos;s child elements to be modified as well.
+                <div style="height:0.75em;"></div>
+                That can be mitigated if the type implements &quot;copy-on-write&quot;.
               </td>
               <td>
                 <t-b style="margin-top:0em;">
@@ -1465,60 +1856,36 @@ engine.\n\
                   In Python and JavaScript instances of any type reside on a managed heap, accessed with
                   references.
                 </t-b>
+                <t-b>
+                  C#, Python, and JavaScript implement copy-on-write for strings, but not for other 
+                  types.
+                </t-b>
               </td>
             </tr>
           </table>
-          <div style="height:0.75em;"></div>
+          <t-b><hr /></t-b>
         </details>
-        <div style="height:0.75em;"></div>
-        <table id="compare" style="width:100%; border:none;">
-          <tr>
-            <td style="border:none;">
-              <form id="left" name="left">
-                <input type="radio" id="Cp1" name="lang1" value="1" onclick="loadCppLeft()">
-                <label for="Cp1">C++</label>
-                <input type="radio" id="Rs1" name="lang1" value="3" onclick="loadRsLeft()">
-                <label for="Rs1">Rust</label>
-                <input type="radio" id="Cs1" name="lang1" value="2" onclick="loadCsLeft()">
-                <label for="Cs1">C#&nbsp;</label><br />
-                <input type="radio" id="Py1" name="lang1" value="4" onclick="loadPyLeft()">
-                <label for="Py1">Python</label>
-                <input type="radio" id="Js1" name="lang1" value="5" onclick="loadJsLeft()">
-                <label for="Js1">JavaScript</label>
-                <div style="height:0.5em;"></div>
-                <!--<input type="button" id="exeLeft" value="RemoteExecute" onclick="remoteLeft()">-->
-              </form>
-            </td>
-            <td class="centerblock">
-              <form>
-                <input class="mover" type="button" name="size" value="-" onclick="movel()">
-                <input class="mover" type="button" name="size" value="C" onclick="movec()">
-                <input class="mover" type="button" name="size" value="+" onclick="mover()">
-              </form>
-            </td>
-            <td style="border:none; text-align:right;">
-              <form id="right" name="right">
-                <input type="radio" id="Cp2" name="lang2" value="4" onclick="loadCppRight()">
-                <label for="Cp2">C++</label>
-                <input type="radio" id="Rs2" name="lang2" value="6" onclick="loadRsRight()">
-                <label for="Rs2">Rust</label>
-                <input type="radio" id="Cs2" name="lang2" value="5" onclick="loadCsRight()">
-                <label for="Cs2">C#</label><br />
-                <input type="radio" id="Py2" name="lang2" value="4" onclick="loadPyRight()">
-                <label for="Py2">Python</label>
-                <input type="radio" id="Js2" name="lang2" value="5" onclick="loadJsRight()">
-                <label for="Js2">JavaScript</label><br />
-                <input type="radio" id="No2" name="lang2" value="5" onclick="load1()">
-                <label for="No2">None</label><br />
-                <div style="height:0.5em;"></div>
-                <!--<input type="button" id="exeRight" value="RemoteExecute" onclick="remoteRight()">-->
-              </form>
-            </td>
-          </tr>
-        </table>
+        <t-b>
+          The examples below show how to use primitive and library defined types with emphasis on
+          binding names to values, copy and move operations, and references. Later Bits will look at 
+          creation and use of user-defined types.
+        </t-b>
+        <t-b>
+          Note: the help page, activated by the &quot;Help&quot; button on the top menu will
+          help you understand how to select one language or two language view.
+        </t-b>
+        <div id="compare" style="height:0.0em;"></div>
+        <div style="width:100%; text-align:center; position:relative; right:1.5em;">
+          <input class="mover" type="button" name="size" value="-" onclick="movel()">
+          <input class="mover" type="button" name="size" value="C" onclick="movec()">
+          <input class="mover" type="button" name="size" value="+" onclick="mover()">
+        </div>
+        <div style="height:1.5em;"></div>
         <div id="ruler">&nbsp;</div>
         <table class="showcode" style="position:relative;">
           <tr>
+            <th class="btns">
+            </th>
             <th id="lb" class="leftblock" style="position:relative; z-index:10;">
               <input type="button" id="exeLeft" value="RemoteExecute" onclick="remoteLeft()" 
                      style="position:absolute; left:1em;" />
@@ -1530,8 +1897,25 @@ engine.\n\
                      style="position:absolute; right:1em;"/>
               <span id="rbt">Source Code</span>
             </th>
+            <th class="btns">
+
+            </th>
           </tr>
           <tr>
+            <td class="btns">
+              <form id="left" name="left" style="margin-left:-2em;">
+                <label for="Cp1">C++</label>
+                <input type="radio" id="Cp1" name="lang1" value="1" onclick="loadCppLeft()">
+                <label for="Rs1">Rust</label>
+                <input type="radio" id="Rs1" name="lang1" value="3" onclick="loadRsLeft()">
+                <label for="Cs1">C#&nbsp;</label><br />
+                <input type="radio" id="Cs1" name="lang1" value="2" onclick="loadCsLeft()">
+                <label for="Py1">Python</label>
+                <input type="radio" id="Py1" name="lang1" value="4" onclick="loadPyLeft()">
+                <label for="Js1">JvScpt</label>
+                <input type="radio" id="Js1" name="lang1" value="5" onclick="loadJsLeft()">
+              </form>
+            </td>
             <td class="leftblock">
               <div id="left1">
                 left1 left1 left1 left1 left1 left1 left1 left1 left1 left1 left1 left1 left1 left1 left1 left1  
@@ -1544,30 +1928,70 @@ engine.\n\
                 right1 right1 right1 right1 right1 right1 right1 right1 right1 right1 right1 right1 right1 right1  
               </div>
             </td>
+            <td class="btns">
+              <form id="right" name="right" style="margin-left:-1.2em;">
+                <label for="Cp2">C++</label>
+                <input type="radio" id="Cp2" name="lang2" value="4" onclick="loadCppRight()">
+                <label for="Rs2">Rust</label>
+                <input type="radio" id="Rs2" name="lang2" value="6" onclick="loadRsRight()">
+                <label for="Cs2">C#</label><br />
+                <input type="radio" id="Cs2" name="lang2" value="5" onclick="loadCsRight()">
+                <label for="Py2">Python</label>
+                <input type="radio" id="Py2" name="lang2" value="4" onclick="loadPyRight()">
+                <label for="Js2">JvScrpt</label><br />
+                <input type="radio" id="Js2" name="lang2" value="5" onclick="loadJsRight()">
+                <label for="No2">None</label><br />
+                <input type="radio" id="No2" name="lang2" value="5" onclick="load1()">
+              </form>
+            </td>
           </tr>
           <tr id="outlabel">
+            <th class="btns">
+
+            </th>
             <th class="leftblock">Output</th>
             <th class="centerblock"></th>
             <th class="rightblock">Output</th>
+            <th class="btns">
+
+            </th>
           </tr>
           <tr id="outcontent">
+            <td class="btns">
+
+            </td>
             <td class="leftblock"><div id="left2">left2</div></td>
             <td class="centerblock"></td>
             <td class="rightblock"><div id="right2">right2</div></td>
+            <td class="btns">
+
+            </td>
           </tr>
           <tr id="bldlabel">
+            <th class="btns">
+
+            </th>
             <th class="leftblock">Build</th>
             <th class="centerblock"></th>
             <th class="rightblock">Build</th>
+            <th class="btns">
+
+            </th>
           </tr>
           <tr id="bldcontent">
+            <td class="btns">
+
+            </td>
             <td class="leftblock"><div id="left3">left3</div></td>
             <td class="centerblock"></td>
             <td class="rightblock"><div id="right3">right3</div></td>
+            <td class="btns">
+
+            </td>
           </tr>
         </table>
         <t-b>
-          <h3 id="notes">Notes</h3>
+          <!--<h3 id="notes">Notes</h3>
           <ul>
             <li>
               Rust is built with the Cargo tool: package manager, builder, executer, and more.
@@ -1594,7 +2018,7 @@ engine.\n\
               All you need for Javascript development is a text editor and browser. The major browsers,
               Firefox, Chrome, Edge, ... all have tools for inspecting and debugging JavaScript.
             </li>
-          </ul>
+          </ul>-->
         </t-b>
         <div style="height:10em;"></div>
       </content>
@@ -1605,7 +2029,9 @@ engine.\n\
         <menu-elem style="width:0.0em">&nbsp;</menu-elem>
         <menu-elem class="secElem"><a href="#bottom">bottom</a></menu-elem>
         <menu-elem class="secElem"><a href="#notes">notes</a></menu-elem>
-        <menu-elem class="secElem"><a href="#compare">compare</a></menu-elem>
+        <menu-elem class="secElem"><a href="#bldlabel">build</a></menu-elem>
+        <menu-elem class="secElem"><a href="#outlabel">output</a></menu-elem>
+        <menu-elem class="secElem"><a href="#compare">codeview</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
       </page-sections>
     </main>
