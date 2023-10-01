@@ -227,17 +227,24 @@
               pass-by-value copies the source&apos;s value to the destination.
             </li>
             <li>
-              Value types have a nullable variant declared by adding a &quot;?&quot; suffix, 
-              e.g., <c-s>bool? b;</c-s>.
-              Nullable value types hold <c-s>null</c-s> by default and may be assigned
-              a null value as well as non-null values. The value can be tested with
-              <c-s>Nullable&lt;T&gt;.HasValue</c-s> property which holds a boolean, 
-              true if t&epsilon;T is non-null, otherwise false.
-            </li>
-            <li>
               Reference types are not copyable. Assignment and pass-by-value copies the reference,
               not the referenced instance.  That results in two handles referring to the same
               heap-based instance.
+            </li>
+            <li>
+              Value types have a nullable variant declared by adding a &quot;?&quot; suffix,
+              e.g., <c-s>bool? b;</c-s>.
+              Nullable value types hold <c-s>null</c-s> by default and may be assigned
+              a null value as well as non-null values. The value can be tested with
+              <c-s>Nullable&lt;T&gt;.HasValue</c-s> property which holds a boolean,
+              true if t&epsilon;T is non-null, otherwise false.
+            </li>
+            <li>
+              Reference types may be decorated with a &quot;?&quot; to indicate that it is a
+              nullable type. They may also be decorated with the &quot;!&quot; suffix to assert that
+              they are not null. That is done when the compiler&apos;s static analysis yields a
+              &quot;maybe null&quot; state for the variable but the designer knows that
+              it is not null.
             </li>
             <li>
               C# does not support move operations since the CLR owns all reference type instances.
@@ -250,7 +257,7 @@
             </li>
             <li>
               C# is memory safe because all memory management operations are executed by the CLR, not
-              by a user&apos;s code. That comes with performance - throughput and latency - that are 
+              by user&apos;s code. That comes with performance penalties, throughput and latency that are
               significantly worse than that of native code languages like C++ and Rust.
             </li>
             <li>
@@ -263,7 +270,7 @@
         </t-b>
         <div style="height:0.75em;"></div>
         <details id="types">
-          <summary class="darkItem">C++&nbsp;Types&nbsp;Details&nbsp;</summary>
+          <summary class="darkItem">C#&nbsp;Types&nbsp;Details&nbsp;</summary>
           <h3>Table 1.0 C# Types</h3>
           <table style="font-size: 0.9em; max-width: 71em;">
             <tr>
@@ -272,7 +279,7 @@
               <th>Example</th>
             </tr>
             <tr>
-              <th colspan="3" class="cat">-- Integral types ----</th>
+              <th colspan="3" class="cat">-- Integral value types ----</th>
             </tr>
             <tr>
               <td><c-s>bool</c-s></td>
@@ -280,145 +287,174 @@
               <td><c-s>bool b = true;</c-s></td>
             </tr>
             <tr>
-              <td>
-                <c-s>int<br />with signed, unsigned, short, long qualifiers</c-s>
-              </td>
-              <td>1 == sizeof(char) ≤ sizeof(short) ≤ sizeof(int) ≤ sizeof(long) ≤ sizeof(long long)</td>
-              <td><c-s>short int i = 42;</c-s></td>
+              <td><c-s>byte</c-s></td>
+              <td>unsigned 8-bit integer</td>
+              <td><c-s>byte bt = 0x2A;</c-s></td>
+            </tr>
+            <tr>
+              <td><c-s>sbyte</c-s></td>
+              <td>signed 8-bit integer</td>
+              <td><c-s>byte sb = 0xffD6;</c-s></td>
             </tr>
             <tr>
               <td>
-                <c-s>size_t</c-s>
+                <c-s>int<br />with short, ushort, uint, long, ulong qualifiers</c-s>
               </td>
-              <td><c-s>2 ≤ sizeof(size_t)</c-s>,<br /><c-s>size_t</c-s> is used for indexing</td>
-              <td><c-s>size_t i = 0;</c-s></td>
+              <td>
+                <c-s>int</c-s> is a signed 32 bit integer
+              </td>
+              <td><c-s>int i = 42;</c-s></td>
             </tr>
             <tr>
               <td>
-                <c-s>char<br />with signed and unsigned qualifiers</c-s>
+                <c-s>nint, unint</c-s>
               </td>
-              <td>signedness of <c-s>char</c-s> depends on platform</td>
+              <td>
+                nint and unint are signed and unsigned native size integers.
+                Size is platform dependent.
+              </td>
+              <td><c-s>nint i = 42;</c-s></td>
+            </tr>
+            <tr>
+              <td>
+                <c-s>char</c-s>
+              </td>
+              <td>16 bit unsigned value</td>
               <td><c-s>char c = 'a';</c-s></td>
             </tr>
             <tr>
-              <td>
-                <c-s>wchar_t, char16_t, char32_t</c-s>
-              </td>
-              <td>
-                wchar_t is 16 bits and holds UTF-16 code units on Windows,
-                32 bits and holds UTF-32 on Linux
-              </td>
-              <td><c-s>wchar_t c = L'\U263A';</c-s></td>
+              <th colspan="3" class="cat">-- Floating point value types ----</th>
             </tr>
             <tr>
-              <th colspan="3" class="cat">-- Floating point types ----</th>
+              <td><c-s>float</c-s></td>
+              <td>size = 4 bytes, values have finite precision, and may have approximate values</td>
+              <td><c-s>float f = 3.1415927;</c-s></td>
             </tr>
             <tr>
-              <td><c-s>float, double, long double</c-s></td>
-              <td>values have finite precision, and may have approximate values</td>
-              <td><c-s>double d = 3.14159;</c-s></td>
+              <td><c-s>double</c-s></td>
+              <td>size = 8 bytes, values have finite precision, and may have approximate values</td>
+              <td><c-s>double d = 3.14159265359;</c-s></td>
             </tr>
             <tr>
-              <th colspan="3" class="cat">-- literal string types --</th>
-            </tr>
-            <tr>
-              <td><c-s>const&nbsp;char[], const&nbsp;wchar_t[]</c-s></td>
-              <td>
-                literal string, resides in static memory and is always null terminated.
-                "Hello" is a const char[6] containing the chars: 'H', 'e', 'l', 'l', 'o', '\0'.
-              </td>
-              <td>
-                <c-s>char* lst = "a literal string"</c-s>
-              </td>
+              <td><c-s>decimal</c-s></td>
+              <td>size = 16 bytes, values are exact, has no exponent</td>
+              <td><c-s>decimal dc = 100000000.00;</c-s></td>
             </tr>
             <tr>
               <th colspan="3" class="cat">-- Aggregate types ----</th>
             </tr>
             <tr>
-              <td><c-s>T[N]</c-s></td>
-              <td>Native array of N elements all of type <c-s>T</c-s></td>
+              <td><c-s>T[]</c-s></td>
+              <td>Reference type, array of N elements all of type <c-s>T</c-s></td>
               <td>
-                <c-s>int arr[] = [1, 2, 3, 2, 1];<br />let first = arr[0];</c-s>
+                <c-s>int[]arr = { 1, 2, 3, 2, 1 };<br />let first = arr[0];</c-s>
               </td>
             </tr>
             <tr>
-              <td><c-s>std::tuple&lt;T1, T2, ...&gt;</c-s></td>
-              <td>collection of heterogeneous types accessed by position</td>
+              <td><c-s>(T1, T2, ...)</c-s></td>
+              <td>Value type, collection of heterogeneous types accessed by position</td>
               <td>
                 <c-s>
-                  std::tuple&lt;int, float, char&gt; tu&nbsp;=&nbsp;(42,&nbsp;3.14159,&nbsp;'z');<br />char third = get&lt;2&gt;(tu);
+                  (int, float, char)tup&nbsp;=&nbsp;(42,&nbsp;3.14159,&nbsp;'z');<br />char third = tup.Item3;
                 </c-s>
               </td>
             </tr>
             <tr>
-              <td><c-s>std::optional&lt;T&gt;</c-s></td>
-              <td>std::optional holds optional value <c-s>t&epsi;T</c-s> or <c-s>std::nullopt</c-s></td>
-              <td><c-s>fn doOp(..args) -> Optional&lt;T&gt;</c-s></td>
-            </tr>
-            <tr><th colspan="3" class="cat">-- Std::library types ----</th></tr>
-            <tr>
-              <td><c-s>std::string</c-s></td>
-              <td>Expandable collection of ASCII characters allocated in the heap</td>
-              <td><c-s>std::string strg = "a string";</c-s></td>
-            </tr>
-            <tr>
-              <td><c-s>std::wstring</c-s></td>
-              <td>Expandable collection of Unicode characters allocated in the heap</td>
-              <td><c-s>std::wstring strg = L"a wstring";</c-s></td>
-            </tr>
-            <tr>
-              <td><c-s>std::array&lt;T, N&gt;</c-s></td>
-              <td>Fixed size generic array of items of type <c-s>T</c-s></td>
-              <td><c-s>std::array&lt;int,3&gt; v { 1, 2, 3 };</c-s></td>
-            </tr>
-            <tr>
-              <td><c-s>std::vector&lt;T&gt;</c-s></td>
-              <td>Expandable generic collection of items of type <c-s>T</c-s></td>
-              <td><c-s>std::vector&lt;double&gt;&nbsp;v&nbsp;{&nbsp;1.0,&nbsp;1.5,&nbsp;2.0 }; v.push(2.5);</c-s></td>
-            </tr>
-            <tr>
-              <td><c-s>std::deque&lt;T&gt;</c-s></td>
+              <td><c-s>struct</c-s></td>
+              <td>Value type, collection of heterogeneous types accessed by name</td>
               <td>
-                Expandable double-ended generic collection of items of type <c-s>T</c-s>.
-                Uses circular buffer internally.
+                <c-s>
+                  struct S { public int I; public double D; }<br />
+                  S s; s.I = 42; s.D = 3.14159;<br />
+                  int first = s.I;
+                </c-s>
+              </td>
+            </tr>
+            <tr><th colspan="3" class="cat">-- Reference types defined by language ----</th></tr>
+            <tr>
+              <td><c-s>object</c-s></td>
+              <td>
+                Base for all value and reference types<br />
+                with methods <c-s>GetType, ToString, Equals, ...</c-s>
               </td>
               <td>
                 <c-s>
-                  std::deque&lt;int&gt; vd { 1, 2, 3 }<br />
-                  v.push_front(-1); ...
+                  object o = new object();<br />
+                  string type = o.GetType().ToString();
                 </c-s>
               </td>
             </tr>
             <tr>
-              <td><c-s>std::unordered_map&lt;K,V&gt;</c-s></td>
-              <td>Unordered associative container of Key-Value pairs, held in a table of bucket lists.</td>
+              <td><c-s>string</c-s></td>
+              <td>Expandable collection of Unicode characters allocated in the managed heap</td>
               <td>
                 <c-s>
-                  std::unordered_map&lt;std::string, int&gt; m {&nbsp;{"one",1},&nbsp;{"two",2}&nbsp;}<br />
-                  map.insert("zero", 0); ...
+                  string str = new("a string");
+                  Console.WriteLine("str: {0}", str);
                 </c-s>
               </td>
             </tr>
             <tr>
-              <td><c-s>std::map&lt;K,V&gt;</c-s></td>
-              <td>Ordered associative container of Key-Value pairs, held in binary tree.</td>
+              <td><c-s>delegate</c-s></td>
+              <td>Reference type that encapsulates a method</td>
+              <td><c-s>delegate int methodDelegate(A1&nbsp;a1,&nbsp;A2&nbsp;a2,&nbsp;...)</c-s></td>
+            </tr>
+            <tr>
+              <td><c-s>dynamic</c-s></td>
+              <td>
+                An instance of dynamic type can be bound to any type of data.
+                Use of a dynamic instance is checked at run-time, not compile-time.
+              </td>
               <td>
                 <c-s>
-                  std::map&lt;std::string, int&gt; m {&nbsp;{"one",1},&nbsp;{"two",2}&nbsp;}<br />
-                  map.insert("zero", 0); ...
+                  dynamic dyn = 42;<br />
+                  Console.WriteLine("dyn: {0}", dyn);<br />
+                  dyn = 3.1415927;<br />
+                  Console.WriteLine("dyn: {0}", dyn);
                 </c-s>
               </td>
             </tr>
             <tr>
+              <td><c-s>class</c-s></td>
               <td>
-                forward_list, list, unordered_map, unordered_set, unordered_multimap, unordered_multiset,
-                set, multiset, and several adapters like stack and queue
+                <c-s>class</c-s> is a meta-type, used to define library and user reference types.
               </td>
               <td>
-                The C++ std::library also defines types for threading and synchronization,
-                reading and writing to streams, anonymous functions, and many more.
+                <c-s>
+                  public class X {<br />
+                  &nbsp;&nbsp;public X(int ia, double da) {<br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;i = ia;<br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;d = da;<br />
+                  &nbsp;&nbsp;}<br />
+                  &nbsp;&nbsp;public int i {get;set;} = 0;<br />
+                  &nbsp;&nbsp;public double d {get;set;} = 0.0;<br />
+                  }<br />
+                  X x = new X(42, 3.1415927);
+                  Console.WriteLine("X.d: {0}", x.d);
+                </c-s>
               </td>
-              <td><a href="https://en.cppreference.com/w/cpp/container">Containers library</a></td>
+            </tr>
+            <tr><th colspan="3" class="cat">-- Reference types defined by .net library ----</th></tr>
+            <tr>
+              <td><c-s>List&lt;T&gt;</c-s></td>
+              <td>Expandable list of elements of type <c-s>T</c-s></td>
+              <td>
+                <c-s>
+                  List&lt;int&gt; li = <br />&nbsp;&nbsp;new List&lt;int&gt; { 1, 2, 3, 2, 1 };<br />
+                  int lfirst = li[0];
+                </c-s>
+              </td>
+            </tr>
+            <tr>
+              <td><c-s>Dictionary</c-s></td>
+              <td>Unordered associative container of Key-Value pairs, held in table of buckets.</td>
+              <td>
+                <c-s>
+                  Dictionary&lt;string, int&gt; dict =<br />
+                  &nbsp;&nbsp;new Dictionary&lt;string, int&gt;()<br />
+                  dict["zero"] = 0;
+                </c-s>
+              </td>
             </tr>
             <tr>
               <th colspan="3" class="cat">-- User-defined Types --</th>
@@ -435,89 +471,38 @@
         </details>
         <div style="height:0.25em;"></div>
         <details id="typesys">
-          <summary class="darkItem">C++&nbsp;Type&nbsp;System&nbsp;Details&nbsp;</summary>
-          <h3>Table 2. C++ Copy and Move Operations</h3>
-          <table style="font-size:0.9em; max-width:65em;">
-            <colgroup>
-              <col span="1" style="width:12%;" />
-              <col span="1" style="width:16%;" />
-              <col span="1" style="width:36%;" />
-              <col span="1" style="width:36%;" />
-            </colgroup>
-            <tr>
-              <th>Operation</th>
-              <th>Example</th>
-              <th>Primitive or Aggregate of Primitives</th>
-              <th>Library or User-defined Type</th>
-            </tr>
-            <tr style="background-color:var(--menu);">
-              <th colspan="4">If u&epsilon;T is a named variable</th>
-            </tr>
-            <tr>
-              <td>Construction</td>
-              <td><c-s>T t = u; u&epsilon;T</c-s></td>
-              <td><c-s>u</c-s>&apos;s value is mem-copy&apos;ed to <c-s>t</c-s></td>
-              <td><c-s>T</c-s>&apos;s copy constructor copies <c-s>u</c-s></td>
-            </tr>
-            <tr>
-              <td>Assignment</td>
-              <td><c-s>t = u, t&epsilon;T, u&epsilon;T</c-s></td>
-              <td><c-s>u</c-s>&apos;s value is mem-copy&apos;ed to <c-s>t</c-s></td>
-              <td><c-s>T</c-s>&apos;s assignment operator copies value of <c-s>u</c-s></td>
-            </tr>
-            <tr>
-              <td>Pass-by-value</td>
-              <td><c-s>fn doOp(T t)</c-s></td>
-              <td><c-s>t</c-s>&apos;s value is mem-copy&apos;ed to doOp stack frame</td>
-              <td><c-s>t</c-s>&apos;s value is copied to doOp stack frame,<br />using <c-s>T</c-s>&apos;s copy constructor</td>
-            </tr>
-            <tr style="background-color:var(--menu);">
-              <th colspan="4">If u&epsilon;T is a temporary or u = std::move(v), v&epsilon;T</th>
-            </tr>
-            <tr>
-              <td>Construction</td>
-              <td><c-s>T t = u; u&epsilon;T</c-s></td>
-              <td><c-s>u</c-s>&apos;s value is mem-copy&apos;ed to <c-s>t</c-s></td>
-              <td><c-s>u</c-s>&apos;s value is moved to <c-s>t</c-s> using <c-s>T</c-s>&apos;s move constructor<br /><c-s>u</c-s>&apos;s value becomes undefined</td>
-            </tr>
-            <tr>
-              <td>Assignment</td>
-              <td><c-s>t = u, t&epsilon;T, u&epsilon;T</c-s></td>
-              <td><c-s>u</c-s>&apos;s value is mem-copy&apos;ed to <c-s>t</c-s></td>
-              <td><c-s>u</c-s>&apos;s value is moved to <c-s>t</c-s> using <c-s>T</c-s>&apos;s move assignment operator<br /><c-s>u</c-s>&apos;s value becomes undefined</td>
-            </tr>
-            <tr>
-              <td>Pass-by-value</td>
-              <td><c-s>fn doOp(T t)</c-s></td>
-              <td><c-s>t</c-s>&apos;s value is mem-copy&apos;ed to doOp stack frame</td>
-              <td><c-s>T</c-s>&apos;s move constructor copies <c-s>t</c-s> to doOp stack frame<br /><c-s>t</c-s>&apos;s value becomes undefined</td>
-            </tr>
-          </table>
+          <summary class="darkItem">C#&nbsp;Type&nbsp;System&nbsp;Details&nbsp;</summary>
           <t-b>
-            <h3>Table 3. C++ Type System Attributes</h3>
+            <h3>Table 2. C# Type System Attributes</h3>
           </t-b>
           <table style="font-size:0.9em; max-width:65em;">
             <tr>
               <td>Static&nbsp;typing</td>
               <td>
-                All types are known at compile time and are fixed throughout program execution.
+                All non-dynamic types are known at compile-time and are fixed throughout program execution.
               </td>
             </tr>
             <tr>
-              <td>Inference</td>
+              <td>Dynamic&nbsp;typing</td>
               <td>
-                Compiler infers types in expressions if not explicitly annotated or if declared <c-s>auto</c-s>.
+                Dynamic types are evaluated at run-time and may be bound to any type of data.
+              </td>
+            </tr>
+            <tr>
+              <td>Type inference</td>
+              <td>
+                Compiler infers types in expressions if not explicitly annotated or if declared <c-s>var</c-s>.
                 Occasionally inference fails and explicit annotation is required.
               </td>
             </tr>
             <tr>
-              <td>Intermediate&nbsp;strength typing</td>
+              <td>Intermediate strength typing</td>
               <td>
-                Types are exhaustively checked but there are many implicit conversions.
+                Types are exhaustively checked but allow both implicit and explicit conversions.
                 <ul class="tight">
                   <li>Numeric and boolean literals coerce to their correspoinding type, e.g., 42 to int.</li>
-                  <li>Variables with auto type declarations are coerced to the type of their RHS&apos;s</li>
-                  <li>Values can be coerced using user-defined conversion constructors.</li>
+                  <li>Variables with var type declarations are coerced to the type of their RHS&apos;s</li>
+                  <li>Values can be coerced using user-defined explicit and implicit conversion methods.</li>
                 </ul>
               </td>
             </tr>
@@ -526,24 +511,12 @@
               <td>
                 Generics provide types and functions with unspecified parameters,
                 supporting code reuse and abstraction
-                over types. Generic parameters are specified at the call site, e.g., <c-s>doOp&lt;T, U&gt;(T t, U u)</c-s>
-                The function <c-s>doOp</c-s> is checked for syntax before instantiating with specific type(s). Any
-                use of <c-s>t</c-s> or <c-s>u</c-s> in the <c-s>doOp</c-s> body are not checked until the types
-                of <c-s>t</c-s> and <c-s>u</c-s> are known.
-                <div style="height:0.75em;"></div>
-                Unlike all the other languages examined in these Bits, C++ generics use an internal meta language
-                at compile time to implement generic facilities. That can be used to move some processing from
-                run-time to compile-time using &quot;template metaprogramming&quot;.
-              </td>
-            </tr>
-            <tr>
-              <td>Concepts</td>
-              <td>
-                Concepts are similar to Rust traits and Java and C# interfaces.
-                They define shared behavior that types can
-                implement, supporting abstraction over behavior. Concepts define behavior by declaring concept
-                specific functions. A template type can use a Requires clause with concept arguments to bound
-                types that are valid for a class or function.
+                over types. Generic parameters are specified at the call site, e.g., <c-s>doOp&lt;T, U&gt;(T t, U u)</c-s>.
+                The function <c-s>doOp</c-s> is checked for syntax before instantiating with specific type(s). Calling
+                methods on <c-s>t</c-s> or <c-s>u</c-s> in the <c-s>doOp</c-s> body require type constraints to interfaces
+                that declare those methods.
+                That will be demonstrated in the
+                <a target="_blank" href="Bits_GenericCSharp.html">Bit on Generics</a>.
               </td>
             </tr>
           </table>
