@@ -163,6 +163,11 @@
     function remote() {
       window.open('https://godbolt.org/z/19YYo3a68', '_blank');
     }
+    function toggleTypes() {
+      typesdetails = document.getElementById("types");
+      typesdetails.open = !typesdetails.open;
+      return true;
+    }
   </script>
 </head>
 <body id="github" onload="load()">
@@ -176,8 +181,8 @@
     </frame-header> -->
     <main id="main">
       <div id="about">about</div>
-      <div id="page">Bits Data C#</div>
-      <div id="modified">08/05/2023</div>
+      <div id="page">Bits: C# Data</div>
+      <div id="modified">10/08/2023</div>
       <div id="hlp"></div>
       <a id="top"></a>
       <content id="content">
@@ -197,7 +202,7 @@
           <a target="_blank" class="repoLink" href="https://github.com/JimFawcett/Bits">Bits Repo Code</a>
           <a target="_blank" class="repoLink" href="../../BitsRepo.html" style="margin-right:7.5em;">Bits Repo Docs</a>
           <hgroup id="pagetitle">
-            <h1 id="title">Bits_Data C#</h1>
+            <h1 id="title">Bits: C# Data</h1>
             <h3 id="subtitle" class="indent">
               types, initialization, construction, assignment
             </h3>
@@ -206,6 +211,8 @@
         <div style="border:1px solid red; padding:0.5em 1em; width:max-content;">
           This page is under construction.
         </div>
+        <!-- <a id="typesanchor" href="#types" onclick="toggleTypes()">types</a> -->
+
         <t-b id="syn" style="border:1px solid maroon; padding:0.25em 1em 0.5em 1em;">
           <h4 style="margin:0em 0em 0.25em 0em;">Synopsis:</h4>
           Most of a language&apos;s syntax and semantics derives directly from its type
@@ -271,6 +278,18 @@
         <div style="height:0.75em;"></div>
         <details id="types">
           <summary class="darkItem">C#&nbsp;Types&nbsp;Details&nbsp;</summary>
+          <t-b>
+            Types are defined by the size of their memory allocations, the encodings used to place values
+            in memory, and rules that define how the values can be accessed, modified, and combined.
+          </t-b>
+          <t-b>
+            The name of an instance of a Value type binds to a single contiguous block of stack memory. Each name
+            is an identifier to a unique block of memory.
+          </t-b>
+          <t-b>
+            The name of an instance of a Reference type binds to a unique handle that refers to a heap allocation
+            that may have other handles referring to it.
+          </t-b>
           <h3>Table 1.0 C# Types</h3>
           <table style="font-size: 0.9em; max-width: 71em;">
             <tr>
@@ -370,7 +389,7 @@
                 </c-s>
               </td>
             </tr>
-            <tr><th colspan="3" class="cat">-- Reference types defined by language ----</th></tr>
+            <tr><th colspan="3" class="cat">-- Reference types defined by C# language ----</th></tr>
             <tr>
               <td><c-s>object</c-s></td>
               <td>
@@ -446,7 +465,7 @@
               </td>
             </tr>
             <tr>
-              <td><c-s>Dictionary</c-s></td>
+              <td><c-s>Dictionary&lt;K, V&gt;</c-s></td>
               <td>Unordered associative container of Key-Value pairs, held in table of buckets.</td>
               <td>
                 <c-s>
@@ -572,7 +591,11 @@
         </t-b>
         <div class="block">
           <div class="codewrap">
-            <pre><code class="language-cpp">  /*-- bool --*/
+            <pre><code class="language-cpp">  /*---------------------------------
+    All code used for output has 
+    been elided
+  */
+  /*-- bool --*/
   bool b = true;
 
   /*-- int --*/
@@ -593,7 +616,7 @@
               Instances of value types each occupy one block of contiguous memory.
             </t-b>
             <t-b>
-              Scalars are initialized by assigning a value.
+              These scalars, types with a single value, are initialized by assigning a value.
             </t-b>
             <t-b>
               The int type can be qualified with keywords short, ushort, uint, long, and ulong. Floating
@@ -643,17 +666,35 @@
             <div class="textwrap">
               <t-b>
                 Each type in the code block on the left is characterized by its value,
-                type evaluated using reflection with
+                its type evaluated using reflection with
                 <div class="focus"><c-s>&nbsp;&nbsp;&nbsp;Type tt = t.GetType()</c-s></div>
-                and size retrieved using reflection in the function
+                and its size retrieved using reflection in the function
                 <div class="focus"><c-s>&nbsp;&nbsp;&nbsp;int GetManagedSize(Type type)</c-s></div>
-                That is defined in the AnalysisData.cs file.
+                That is defined in the AnalysisData.cs file, and shown in Section 3.0, below.
+              </t-b>
+              <t-b>
+                Value types are held in a single block of contiguous memory.  Value copies are byte-by-byte
+                copies of value from source location to the destination.
+              </t-b>
+              <t-b>
+                The <c-s>char</c-s> type has size of two bytes, e.g., 16 bits. That holds a
+                Unicode UTF-16 character. The <c-s>string</c-s> type holds an array of these <c-s>char</c-s>s
+                in the managed heap.
+              </t-b>
+              <t-b>
+                The <c-s>decimal</c-s> type is larger than <c-s>double</c-s>. Decimals are intended to hold large
+                numbers with no exponent.
+              </t-b>
+              <t-b>
+                The <c-s>double</c-s> type has lower precision, but can
+                approximate very large numbers using an exponent. Its contiguous memory allocation is partitioned
+                into a value part and exponent part.
               </t-b>
             </div>
           </div>
         </details>
         <div style="height:0.25em;"></div>
-        <h3 id="values">1.2 Language-defined Aggregate Types</h3>
+        <h3 id="aggr">1.2 Language-defined Aggregate Types</h3>
         <t-b>
           Aggregates are types composed of a collection of zero or more instances of item type(s).
           The language-defined aggregates are arrays, <c-s>T[]</c-s>, tuples, <c-s>(T1, T2, ...)</c-s>,
@@ -735,8 +776,8 @@
         <div style="height:0.25em;"></div>
         <h3 id="refs">1.3 Language-defined Reference Types</h3>
         <t-b>
-          There are many types associated with C# defined by the language or by its libraries.
-          The types presented in this block are defined directly by the language, e.g., 
+          There are many types associated with C# defined by the language and by its libraries.
+          The types presented in this block are defined directly by the language, e.g.,
           <c-s>object, string, dynamic, and class</c-s>.
         </t-b>
         <div class="block">
@@ -765,7 +806,11 @@
               allowing instances of other types to be bound, as elements, to a collection instance.
             </t-b>
             <t-b>
-              String represents a constant sequence of characters. Strings cannot be directly modified,
+              All other reference types derive directly, or indirectly, from the object class.
+            </t-b>
+            <t-b>
+              String represents a constant sequence of characters including a null terminator, &quot;\0&quot;. 
+              Strings cannot be directly modified,
               but changes result in a new string instance with copies of the original charcter sequence
               with the new modification.
             </t-b>
@@ -849,24 +894,25 @@
         </details>
 
         <div style="height:0.25em;"></div>
-        <h3 id="refs">1.4 Library-defined Reference Types</h3>
+        <h3 id="librefs">1.4 Library-defined Reference Types</h3>
         <t-b>
           Many types are defined in <c-s>System.Collections</c-s> and <c-s>System.Collections.Generic</c-s>.
-          Typical examples are the sequential collections: 
-          <div class="focus">
-            &nbsp;&nbsp;&nbsp;<c-s>Array, ArrayList, List&lt;T&gt;, Queue, Stack</c-s>
-          </div>
-          all implement <c-s>IList</c-s>.
+          Typical examples are the sequential collections:
+          <c-s>Array, ArrayList, List&lt;T&gt;, Queue, Stack</c-s>, which
+          all implement the <c-s>IList</c-s> inteface.
         </t-b>
         <t-b>
           The associative collections:
-          <div class="focus">
-            &nbsp;&nbsp;&nbsp;<c-s>Hashtable, SortedList, SortedList&lt;Tkey, TValue&gt;, Dictionaryt&lt;Tkey, TValue&gt;</c-s>
-          </div>
-          all derive from <c-s>IDictionary</c-s>.
+          <c-s>Hashtable, SortedList, SortedList&lt;Tkey, TValue&gt;, Dictionaryt&lt;Tkey, TValue&gt;</c-s>
+          all derive from the <c-s>IDictionary</c-s> interface.
         </t-b>
         <t-b>
-          We focus here on the commonly used <c-s>List&lt;T&gt;</c-s> and <c-s>Dictionary&lt;TKey, TValue&gt;</c-s> types.
+          We focus here on the 
+          <a target="_blank" 
+             href="https://learn.microsoft.com/en-us/dotnet/standard/collections/commonly-used-collection-types">
+             Commonly Used Collections
+          </a>
+          <c-s>List&lt;T&gt;</c-s> and <c-s>Dictionary&lt;TKey, TValue&gt;</c-s> types.
         </t-b>
         <div class="block">
           <div class="codewrap">
@@ -876,26 +922,28 @@
   int lfirst = li[0];
   li.Insert(5, 0);
 
-  /*---------------------------------------------------
-    These declarations must immediately follow
-    namespace declaration (see top of file)
+  /*----------------------------------------------
+    Alias declaration, shown here, must immediately
+    follow a namespace declaration (see top of file)
     - using Dict = Dictionary&lt;string,int&gt;;
-    - using KVPair = KeyValuePair&lt;string,int&gt;;
+    This alias is used to simplify Dictionary 
+    declarations below.
   */
   Dict dict = new Dict();
   dict.Add(&quot;three&quot;, 3);
   dict[&quot;zero&quot;] = 0;
   dict[&quot;one&quot;] = 1;
   dict[&quot;two&quot;] = 22;
-  dict[&quot;two&quot;] = 2;    // overrites previous value
+  dict[&quot;two&quot;] = 2;  // overwrites previous value
   int oneval = dict[&quot;one&quot;];
-  /*---------------------------------------------------
+  /*-----------------------------------------
     Find first key and value
     - this is here just to show how to retrieve
       an element from an associative collection
   */
-  IDictionaryEnumerator enumr = dict.GetEnumerator();
-  if(enumr.MoveNext()) {  // returns false at end
+  IDictionaryEnumerator enumr = 
+    dict.GetEnumerator();
+  if(enumr.MoveNext()) { // returns false at end
     string key = (string)enumr.Key;
     int? value = null;
     if(enumr.Value != null) {
@@ -909,12 +957,49 @@
     string keyfirst = keys[0];
     int valfirst = dict[keyfirst];
     // do something with key and value
-  }</code>
+  }
+</code>
             </pre>
           </div>
           <div class="textwrap">
             <t-b>
-              List&lt;T&gt; is sequential container with an expandable number of elements all of type t&epsilon;T.
+              <c-s>List&lt;T&gt;</c-s> is sequential container with an expandable number of elements 
+              all of type t&epsilon;T.
+            </t-b>
+            <t-b>
+              New lists are initialized with a braced list of elements of the specified type. Element values are
+              accessed via indexing, and new values can be added, inserted, and removed.
+            </t-b>
+            <t-b>
+              <c-s>Dictionary&lt;K, V&gt;</c-s> is an associative container of values accessed with keys.
+              The associative containers use a table of buckets, where each bucket is a linked list of
+              <c-s>KeyValuePair</c-s>s.  An item is accessed with a hashed address followed by a walk up
+              the bucket list looking for the specified key to find its value.
+            </t-b>
+            <t-b>
+              The table size is adjusted at run-time to keep the bucket lists short, e.g., one or two items.
+              That means that value access via a key is nearly constant time, e.g., the time to compute
+              the hashed address.
+            </t-b>
+            <t-b>
+              <c-s>KeyValuePair</c-s>s are added using <c-s>Add(Key,Value)</c-s> or by &quot;indexing&quot
+              with <c-s>Dict[key] = value</c-s>.
+            </t-b>
+            <t-b>
+              All of the keys and values can be accessed sequentially using an enumerator since 
+              <c-s>Dictionary&lt;K, V&gt;</c-s>
+              implements the <c-s>IEnumerable&lt;T&gt;</c-s> interface.
+            </t-b>
+            <t-b>
+              Individual key-value pairs can be accessed from the dictionary&apos;s key collection, e.g.,
+              <c-s>dict.keys.ToList()</c-s>.
+            </t-b>
+            <t-b>
+              Collection elements can also be accessed using C#&apos;s <c-s>LINQ</c-s> facility.  That provides
+              an <c-s>SQL</c-s> like programming interface:<br />
+              <a target="_blank" href="https://learn.microsoft.com/en-us/dotnet/csharp/linq/query-a-collection-of-objects">
+                Query a collection of objects
+              </a>
             </t-b>
           </div>
         </div>
@@ -940,27 +1025,92 @@
             </div>
             <div class="textwrap">
               <t-b>
-
+                Initialization and display of <c-s>List&lt;int&gt;</c-s> and <c-s>Dictionary&lt;string, int&gt;</c-s>
+                are shown here.
+              </t-b>
+              <t-b>
+                The output functionalities of <c-s>Console.Write</c-s> and <c-s>String.Format</c-s> do not enumerate
+                through collection types.  Instead they display the compiler&apos;s version of the collection type name.
+              </t-b>
+              <t-b>
+                Enumerated values shown here were generated from generic functions defined in 
+                <a target="_blank" href="https://github.com/JimFawcett/Bits/blob/master/CSharp/Cs_Data/AnalysisData.cs">
+                  AnalysisData.cs
+                </a>, found in the <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master">
+                  Bits&nbsp;Repository
+                </a>.
+                These functions use C# syntax we won&apos;t cover until the 
+                <a target="_blank" href="Bits_GenericCSharp.html">C# Generics</a> bit.  We will discuss them in
+                some detail in that Bit.  You don&apos;t need to
+                understand how they work for now.
+                <ul>
+                  <li>
+                    <c-s>ToStringRepIEnumerable&lt;List&lt;int&gt;, int&gt;(li)</c-s>
+                  </li>
+                  <li>
+                    <c-s>ToStringRepAssocCont&lt;Dict,string,int&gt;(dict)</c-s>
+                  </li>
+                </ul>
+                shown in <a target="_blank" href="#funcs">Section 3.0</a>, below.
               </t-b>
             </div>
           </div>
         </details>
 
         <div style="height:0.25em;"></div>
-        <h3 id="refs">2.0 Copy Operations</h3>
+        <h3 id="copies">2.0 Copy Operations</h3>
         <t-b>
 
         </t-b>
         <div class="block">
           <div class="codewrap">
             <pre>
-<code class="language-cpp">  /*-- code here --*/
-              </code>
+<code class="language-cpp">  /*--- copy value type ---*/
+
+  int i = 42;
+  string addri = ToStringAddress&lt;int&gt;(&i);
+
+  int j = i;  // copy
+  string addrj = ToStringAddress&lt;int&gt;(&j);
+
+  /*--- copy reference ---*/
+
+  List&lt;int&gt; li = new List&lt;int&gt; { 1, 2, 3, 2, 1 };
+  string addrli = ToStringAddress&lt;List&lt;int&gt;&gt;(&li);
+
+  List&lt;int&gt; lj = li;  // copy of ref
+  string addrlj = ToStringAddress&lt;List&lt;int&gt;&gt;(&lj);</code>
             </pre>
           </div>
           <div class="textwrap">
             <t-b>
-              text here
+              Since i and j are value types, e.g., integers, the
+              copy construction operation shown is a bit-wise copy of the value
+              of the source i into the newly created destination j.
+            </t-b>
+            <t-b>
+              The lists li and lj are reference types. That is, li is not an instance of a list,
+              it is a handle to an instance of a list in the managed heap.
+            </t-b>
+            <t-b>
+              The copy construction
+              operation shown creates a new location to store a handle for lj and copies the
+              li&apos;s reference into that location. The result is two handles pointing to
+              the same underlying instance of a list in the managed heap.
+            </t-b>
+            <t-b>
+              The <c-s>ToStringAddress&lt;T&gt;(T* ptr)</c-s> function creates a string representation
+              of the specified addresses &amp;i, &amp;j, &amp;li, and &amp;lj. Its definition is shown
+              in <a target="_blank" href="#funcs">Section 3.0</a>.
+            </t-b>
+            <t-b>
+              Note that pointers can only be used in <c-s>unsafe</c-s> C# code blocks. We use the
+              pointers to investigate consequences of copying.  They are not dereferenced in any part
+              of this code.
+            </t-b>
+            <t-b>
+              If you examine the output provided below, you will see that the address data verifies claims
+              made in this text.
             </t-b>
           </div>
         </div>
@@ -969,8 +1119,29 @@
           <div class="block">
             <div class="codewrap">
               <pre>
-<code class="language-cpp">  /*-- code here --*/
-</code>
+<code class="language-shell">  -----------------------------------
+    Demonstrate Copy Operations
+  -----------------------------------
+
+  --- int i = 42; ---
+  i: address: 0x5614b7e9c8
+  --- int j = i; ---  // copy of value
+  j: address: 0x5614b7e9b8
+  --------------------------------------------------
+    Addresses of i and j are unique, demonstrating
+    value of i was copied to new j location.
+  --------------------------------------------------
+
+  --- List&lt;int&gt; li = new List&lt;int&gt; { 1, 2, 3, 2, 1 } ---
+  li: address: 0x5614b7e9a8
+  --- List&lt;int&gt; lj = li ---  // copy of reference
+  lj: address: 0x5614b7e9a8
+  -------------------------------------------------------
+    Addresses of li and lj are the same, demonstrating
+    reference of li was copied to new reference lj.
+    Both references point to the same managed heap-based
+    instance.
+  -------------------------------------------------------</code>
             </pre>
             </div>
             <div class="textwrap">
@@ -980,8 +1151,260 @@
             </div>
           </div>
         </details>
+        <div style="height:0.25em;"></div>
+        <h3 id="funcs">3.0 Analysis and Display Functions</h3>
+        <t-b>
 
-        <h3 id="anal">4.0 Analysis and Display Functions</h3>
+        </t-b>
+        <div class="block">
+          <div class="codewrap">
+            <pre>
+<code class="language-cpp">
+  class Anal {
+    /*-- simple reflection --*/
+    public static void ShowType&lt;T&gt;(
+      T t, String nm, String suffix = &quot;&quot;
+    )
+    {
+      #pragma warning disable CS8602 // possible null ref
+      Type tt = t.GetType();
+      Console.WriteLine(&quot;{0}: Type: {1}&quot;, nm, tt.Name);
+      int size = Anal.GetManagedSize(tt);
+      Console.WriteLine(
+        &quot;value: {0}&#92;nsize: {1}{2}&quot;, t, size, suffix
+      );
+      #pragma warning restore CS8602
+    }
+    public static string GetTypeString&lt;T&gt;(
+      T t, String nm, String suffix = &quot;&quot;
+    ) {
+      #pragma warning disable CS8602 // possible null ref
+      Type tt = t.GetType();
+      string typeInfo = 
+        String.Format(&quot;{0}: Type: {1}&#92;n&quot;, nm, tt.Name);
+      int size = Anal.GetManagedSize(tt);
+      string instanceInfo = 
+        String.Format(
+          &quot;value: {0}&#92;nsize: {1}{2}&quot;, t, size, suffix
+        );
+      return typeInfo + instanceInfo;
+      #pragma warning restore CS8602
+    }
+    public static void IsSameObj&lt;T&gt;(
+      T t1, String n1, T t2, String n2, 
+      string suffix = &quot;&quot;
+    ) {
+      if(ReferenceEquals(t1, t2)) {
+        Console.WriteLine(
+          &quot;{0} is same object as {1}{2}&quot;,
+          n1, n2, suffix
+        );
+      }
+      else {
+      Console.WriteLine(
+        &quot;{0} is not same object as {1}{2}&quot;, 
+        n1, n2, suffix
+      );
+      }
+    }
+    /*--
+      uses advanced relection
+      - GetMangedSize(Type type) is function that
+        returns size of value types and handles.
+      - It uses advanced techniques that will 
+        eventually be covered elsewhere in this
+        site. Knowing how it works is not essential 
+        for things we are examining in this demo.
+    --*/
+    // https://stackoverflow.com/questions/8173239/...
+    public static int GetManagedSize(Type type)
+    {
+      var method = new DynamicMethod(
+        &quot;GetManagedSizeImpl&quot;, 
+        typeof(uint), new Type[0],
+        typeof(TypeExtensions), false
+      );
+
+      ILGenerator gen = method.GetILGenerator();
+      gen.Emit(OpCodes.Sizeof, type);
+      gen.Emit(OpCodes.Ret);
+
+      var func = 
+        (Func&lt;uint&gt;)method.CreateDelegate(
+          typeof(Func&lt;uint&gt;)
+        );
+      return checked((int)func());
+    }
+
+    #pragma warning disable 8500
+    /*
+      Suppress warning about taking address of 
+      managed type. Pointer is used only to show 
+      address of ptr as part of analysis of copy 
+      operations.
+    */
+    public static unsafe string 
+      ToStringAddress&lt;T&gt;(T* ptr) {
+      if(ptr == null) {
+        return &quot;&quot;;
+      }
+      IntPtr addr = (IntPtr)ptr;
+      string addrstr = 
+        string.Format(
+          &quot;address: 0x&quot; + addr.ToString(&quot;x&quot;)
+        );
+      return addrstr;
+    }
+    #pragma warning restore 8500
+  }
+  class Display
+  {
+    public static void ShowOp(
+      String op, String suffix = &quot;&quot;
+    ) {
+      Console.WriteLine(
+        &quot;--- {0} ---{1}&quot;, op, suffix
+      );
+    }
+    /*-- more advanced reflection --*/
+    // https://stackoverflow.com/questions/7613782/...
+    public static void Iterate&lt;T&gt;(T t) {
+      Console.WriteLine(&quot;fields:&quot;);
+      foreach(
+        var field in typeof(T).GetFields(
+          BindingFlags.Instance | 
+          BindingFlags.NonPublic | 
+          BindingFlags.Public
+        )
+      ) {
+        Console.WriteLine(
+          &quot;{0} = {1}&quot;, field.Name, field.GetValue(t)
+        );
+      }
+      Console.WriteLine(&quot;methods:&quot;);
+      foreach(
+        var method in typeof(T).GetMethods(
+          BindingFlags.Instance | BindingFlags.Public
+        )
+      ) {
+        Console.WriteLine(
+          &quot;{0}&quot;, method.Name
+        );
+      }
+    }
+    public static void Print(String s = &quot;&quot;) {
+      Console.WriteLine(s);
+    }
+    public static void ShowNote(
+      string s, string suffix = &quot;&quot;, int length = 35
+    ) {
+      string line = new string('-', length);
+      Console.WriteLine(line);
+      Console.WriteLine(&quot;  {0}&quot;, s);
+      Console.WriteLine(line + suffix);
+    }
+    /*---------------------------------------------
+      Build string rep of array of type T
+    ---------------------------------------------*/
+    public static string ToStringRepArray&lt;T&gt;(T[] arr) {
+      StringBuilder sb = new StringBuilder();
+      sb.Append(&quot;{ &quot;);
+      bool first = true;
+      foreach(T item in arr) {
+        if(item == null) {
+          break;
+        }
+        if(first) {
+          sb.Append(item.ToString());
+          first = false;
+        }
+        else {
+          sb.AppendFormat(&quot;, {0}&quot;, item);
+        }
+      }
+      sb.Append(&quot; }&#92;n&quot;);
+      return sb.ToString();
+    }
+    /*---------------------------------------------
+      Build string rep of IEnumerable collection
+      T&lt;U&gt;. Works for array too.
+    ---------------------------------------------*/
+    public static string 
+      ToStringRepIEnumerable&lt;T,U&gt;(T enu)
+      where T:IEnumerable&lt;U&gt;
+    {
+      StringBuilder sb = new StringBuilder();
+      sb.Append(&quot;{ &quot;);
+      bool first = true;
+      foreach(U item in enu) {
+        if(item == null) {
+          break;
+        }
+        if(first) {
+          sb.Append(item.ToString());
+          first = false;
+        }
+        else {
+          sb.AppendFormat(&quot;, {0}&quot;, item);
+        }
+      }
+      sb.Append(&quot; }&#92;n&quot;);
+      return sb.ToString();
+    }
+  }
+  /*-----------------------------------------------------
+    Direct implementation of enumerating associative
+    collection.  This can also be done with 
+    ToStringRepIEnumerable&lt;Dict,KVPair&gt;(dict).
+  -----------------------------------------------------*/
+  public static string 
+    ToStringRepAssocCont&lt;Dict,Key,Value&gt;(Dict assoc)
+    where Dict:IDictionary&lt;Key,Value&gt;
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.Append(&quot;{ &quot;);
+    bool first = true;
+    foreach(var item in assoc) {
+      if(first) {
+        var sf = String.Format(
+          &quot;{{ {0}, {1} }}&quot;, item.Key, item.Value
+        );
+        sb.Append(sf);
+        first = false;
+      }
+      else {
+        sb.AppendFormat(
+          &quot;, {{ {0}, {1} }}&quot;, item.Key, item.Value
+        );
+      }
+    }
+    sb.Append(&quot; }&#92;n&quot;);
+    return sb.ToString();
+  }
+}</code>
+            </pre>
+          </div>
+          <div class="textwrap">
+            <t-b>
+              text here
+            </t-b>
+          </div>
+        </div>
+<!--         <details>
+          <summary class="darkItem">Output</summary>
+          <div class="block">
+            <div class="codewrap">
+              <pre>
+              <code class="language-csharp">
+
+                </code>
+              </pre>
+            </div>
+          </div>
+        </details>
+ -->        <div style="height:0.25em;"></div>
+
+<!--         <h3 id="funcsa">3.0 Analysis and Display Functions</h3>
         <div style="display:flex; flex-direction:column;">
           <h4 id="source">Source Code: Program.cs</h4>
           <pre class="codeSnaps"><code class="language-csharp">using System;
@@ -1417,7 +1840,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data
 &gt;
 </code></pre>
         </div>
-
+ -->
         <h3 id="ide">2.0 VS Code View</h3>
         <t-b>
           The code for this demo is available in
