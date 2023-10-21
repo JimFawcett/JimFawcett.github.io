@@ -223,8 +223,10 @@
           value types and reference types. Its value types are similar to the primitive
           types defined by C++ and Rust. Reference types each consist of a handle in stack
           memory referring to a value stored in the dotnet managed heap. Execution is controlled
-          by a virtual machine called the Common Language Runtime (CLR).
+          by a virtual machine called the Common Language Runtime
+          (<a target="_blank" href="https://learn.microsoft.com/en-us/dotnet/standard/clr">CLR</a>).
           <div style=height:0.5em;></div>
+          C# was created starting from Microsoft&apos;s Java definition, with 
           This page demonstrates simple uses of the most important C# types.
           The purpose is to quickly acquire some familiarity with types and their uses.
           <hr class="spread" />
@@ -572,7 +574,6 @@
     illustrating syntax and basic operations.
   </t-b>-->
         <div style="height:0.5em;"></div>
-
         <h3 id="init">1.0 Initialization</h3>
         <t-b>
           Several of the code blocks shown below have formatting and output code elided.  You can find
@@ -584,7 +585,7 @@
         <t-b>
           Initialization is the process of endowing a newly created type instance with a specified value.
           Uninitialized local value type instances have undefined values. All other uninitialized variables
-          are compiler-initialized to nul for reference types, zero for numeric types, and false for bools.
+          are compiler-initialized to null for reference types, zero for numeric types, and false for bools.
         </t-b>
         <t-b>
           To insure well defined behavior initialize all varibles where they are declared, as shown below.
@@ -809,7 +810,8 @@
               All other reference types derive directly, or indirectly, from the object class.
             </t-b>
             <t-b>
-              String represents a constant sequence of characters including a null terminator, &quot;\0&quot;.
+              String represents a constant sequence of characters. C# strings have no null terminator, unlike
+              C and C++.
               Strings cannot be directly modified,
               but changes result in a new string instance with copies of the original charcter sequence
               with the new modification.
@@ -1477,459 +1479,7 @@
         </div>
         </details>
         <div style="height:0.75em;"></div>
-        <!--         <details>
-            <summary class="darkItem">Output</summary>
-            <div class="block">
-              <div class="codewrap">
-                <pre>
-                <code class="language-csharp">
-
-                  </code>
-                </pre>
-              </div>
-            </div>
-          </details>
-   -->
-        <div style="height:0.25em;"></div>
-
-        <!--         <h3 id="funcsa">3.0 Analysis and Display Functions</h3>
-          <div style="display:flex; flex-direction:column;">
-            <h4 id="source">Source Code: Program.cs</h4>
-            <pre class="codeSnaps"><code class="language-csharp">using System;
-  using System.Reflection;
-  using System.Reflection.Emit;
-  using Analysis;
-
-  /* Cs_Data::Program.cs */
-  /*
-    Static Data Types:
-      value types =&gt; assignment copies value
-      --------------------------------------
-        sbyte, byte, short, int, long, ushort, uint, ulong
-        float, double
-        decimal, char, bool
-        struct
-      Reference types =&gt; assignment copies reference
-      ----------------------------------------------
-        object, string, class
-  */
-  //#pragma warning disable CS8602  // possibly null reference warning
-  // https://stackoverflow.com/questions/8173239/c-getting-size-of-a-value-type-variable-at-runtime/8173293#8173293
-  //
-  namespace HelloData
-  {
-  //  using AnalysisData
-    /*--
-      Svt is a value type used for type demo example.
-      It consists of three public properties.
-    --*/
-    public struct Svt   // value type with value type members
-    {
-      public Svt() {}
-      public int I { get; set; } = 0;
-      public double D { get; set; } = 1.0;
-      public char C { get; set; }  = 'a';
-      public readonly void PrintSelf(string name) {
-        Console.Write(&quot;{0}  {{ I:{1}, D:{2}, C:{3} }}&#92;n&quot;, name, I, D, C);
-      }
-    }
-    /*--
-      Crt is a reference type used for type demo example.
-      It consists of three public properties.
-    --*/
-    public class Crt   // reference type with a reference type member
-    {
-      public Crt() {}
-      public int I { get; set; } = 0;
-      public double D { get; set; } = 1.0;
-      public string S { get; set; }  = &quot;a string&quot;;
-      public void PrintSelf(string name) {
-        Console.Write(&quot;{0}  {{ I:{1}, D:{2}, S:{3} }}&#92;n&quot;, name, I, D, S);
-      }
-    }
-    /*-- type demonstration --*/
-
-    class Program
-    {
-      /*-- demonstration begins here --*/
-
-      const string nl = &quot;&#92;n&quot;;
-
-      static void Main(string[] args)
-      {
-        Display.Print(&quot; Demonstrate C# types&quot;);
-
-        Display.ShowNote(&quot;int - value type&quot;);
-
-        Display.ShowOp(&quot;int t1 = 42&quot;);
-        int t1 = 42;
-        Display.ShowType(t1, &quot;t1&quot;, nl);
-
-        Display.ShowOp(&quot;interate over val type members using reflection&quot;);
-        Display.Iterate(t1);
-        Display.Print();
-
-        Display.ShowOp(&quot;int t1a = t1 : copy of value type&quot;);
-        int t1a = t1;
-        Display.IsSameObj(t1a, &quot;t1a&quot;, t1, &quot;t1&quot;, nl);
-
-        // reference behavior - copy on write
-        Display.ShowNote(&quot;string - reference type&quot;);
-
-        Display.ShowOp(&quot;string t2 = &#92;&quot;a string&#92;&quot;&quot;);
-        string t2 = &quot;a string&quot;;
-        Display.ShowType(t2, &quot;t2&quot;);
-
-        Display.ShowNote(&quot;string has many methods - uncomment next line to see them&quot;, &quot;&quot;, 60);
-        //Display.Iterate(t2);
-
-        Display.ShowOp(&quot;string t3 = t2 : copy handle of ref type&quot;);
-        string t3 = t2;
-        Display.ShowType(t3, &quot;t3&quot;);
-        Display.IsSameObj(t3,&quot;t3&quot;,t2,&quot;t2&quot;);
-
-        Display.ShowOp(&quot;t3 += &#92;&quot; is here&#92;&quot; : copy on write&quot;);
-        t3 += &quot; is here&quot;;
-        Display.ShowType(t2, &quot;t2&quot;);
-        Display.ShowType(t3, &quot;t3&quot;);
-        Display.IsSameObj(t3,&quot;t3&quot;,t2,&quot;t2&quot;);
-        Display.ShowNote(&quot;t2 not modified by change in t3 due to copy on write&quot;, nl, 55);
-        Console.WriteLine();
-
-        Display.ShowNote(&quot;Object - base reference type&quot;);
-
-        Display.ShowOp(&quot;Object obj1 - new Object()&quot;);
-        Object obj1 = new Object();
-        Display.ShowType(obj1, &quot;obj&quot;);
-
-        Display.ShowOp(&quot;interate over ref type members using reflection&quot;);
-        Display.Iterate(obj1);
-        Display.Print();
-
-        Display.ShowOp(&quot;Object obj2 = obj1&quot;);
-        Object obj2 = obj1;
-        Display.IsSameObj(obj2, &quot;obj2&quot;, obj1, &quot;obj1&quot;, nl);
-
-        Display.ShowNote(&quot;Svt Struct value type&quot;);
-
-        Display.ShowOp(&quot;Svt t4 = new Svt()&quot;);
-        Svt t4 = new() { I=3, D=3.1415927, C='z' };
-        t4.PrintSelf(&quot;t4&quot;);
-        Display.ShowType(t4, &quot;t4&quot;);
-        Display.ShowNote(&quot;value type: size of object in stackframe&quot;, nl, 45);
-
-        /* Iterate over val type members using reflection */
-        Display.ShowOp(&quot;Iterate over val type members using reflection&quot;);
-        Display.Iterate(t4);
-        Display.Print();
-
-        /* copy of value type */
-        Display.ShowOp(&quot;Svt t4a = t4 : copy of val type&quot;);
-        Svt t4a = t4;
-        t4a.PrintSelf(&quot;t4a&quot;);
-        t4.PrintSelf(&quot;t4&quot;);
-        Display.IsSameObj(t4a,&quot;t4a&quot;,t4,&quot;t4&quot;);
-        Display.ShowType(t4a, &quot;t4a&quot;);
-
-        Display.ShowOp(&quot;t4a.C = 'q'&quot;);
-        t4a.C = 'q';
-        t4a.PrintSelf(&quot;t4a&quot;);
-        t4.PrintSelf(&quot;t4&quot;);
-        Display.IsSameObj(t4, &quot;t4&quot;, t4a, &quot;t4a&quot;, nl);
-
-        Display.ShowNote(&quot;Crt - ref type with ref member&quot;);
-
-        Display.ShowOp(&quot;Crt t5 = new Crt()&quot;);
-        Crt t5 = new() { S = &quot;SomeString&quot; };
-        // using default values for I and D
-        t5.PrintSelf(&quot;t5&quot;);
-        Display.ShowType(t5, &quot;t5&quot;);
-        Display.ShowNote(&quot;ref type: size of handle to object in heap&quot;, nl, 45);
-
-        /* copy handle of reference type */
-        Display.ShowOp(&quot;Crt t5a = t5 : copy handle of ref type&quot;);
-        Crt t5a = t5;
-        t5a.PrintSelf(&quot;t5a&quot;);
-        Display.IsSameObj(t5a, &quot;t5a&quot;, t5, &quot;t5&quot;);
-        Display.IsSameObj(t5a.S, &quot;t5a.S&quot;, t5.S, &quot;t5.S&quot;);
-
-        /* literal strings are not immutable */
-        Display.ShowOp(&quot;t5a.S = &#92;&quot;new literal string&#92;&quot; : no copy on write&quot;);
-        t5a.S = &quot;new string&quot;;
-        t5a.PrintSelf(&quot;t5a&quot;);
-        t5a.PrintSelf(&quot;t5&quot;);
-        Display.IsSameObj(t5a, &quot;t5a&quot;, t5, &quot;t5&quot;);
-        Display.IsSameObj(t5a.S, &quot;t5a.S&quot;, t5.S, &quot;t5.S&quot;);
-        Display.ShowNote(&quot;source t5 was altered!&quot;);
-
-        Console.WriteLine(&quot;&#92;nThat's all Folks!&#92;n&quot;);
-      }
-    }
-  }</code></pre>
-            <h4 id="anal">Source Code: AnalysisData.cs</h4>
-            <pre><code class="language-csharp">using System;
-  using System.Reflection;
-  using System.Reflection.Emit;
-
-  /* Cs_Data::AnalysisData.cs */
-
-  namespace Analysis
-  {
-    class Display
-    {
-      /*-- simple reflection --*/
-      public static void ShowType&lt;T&gt;(T t, String nm, String suffix = &quot;&quot;)
-      {
-        #pragma warning disable CS8602  // possibly null reference warning
-        Type tt = t.GetType();
-        Console.WriteLine(&quot;{0}, {1}&quot;, nm, tt.Name);
-        int size = Utils.GetManagedSize(tt);
-        Console.WriteLine(&quot;value: {0}, size: {1}{2}&quot;, t, size, suffix);
-      }
-      /*-- beware, two distinct objects may have same hashcode --*/
-      public static void showIdent&lt;T&gt;(T t, String n, string suffix = &quot;&quot;) {
-        int id = t.GetHashCode();
-        Console.WriteLine(&quot;{0}, {1}{2}&quot;, n, id, suffix);
-      }
-      public static void IsSameObj&lt;T&gt;(
-        T t1, String n1, T t2, String n2, string suffix = &quot;&quot;
-      ) {
-        if(ReferenceEquals(t1, t2)) {
-          Console.WriteLine(
-            &quot;{0} is same object as {1}{2}&quot;, n1, n2, suffix
-          );
-        }
-        else {
-          Console.WriteLine(
-            &quot;{0} is not same object as {1}{2}&quot;, n1, n2, suffix);
-        }
-      }
-      public static void ShowOp(String op, String suffix = &quot;&quot;) {
-        Console.WriteLine(&quot;--- {0} ---{1}&quot;, op, suffix);
-      }
-      // https://stackoverflow.com/questions/7613782/iterating-through-struct-members
-      public static void Iterate&lt;T&gt;(T t) /*where T:new()*/ {
-        Console.WriteLine(&quot;fields:&quot;);
-        foreach(
-          var field in typeof(T).GetFields(
-            BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
-          )
-        ) {
-          Console.WriteLine(
-            &quot;  {0} = {1}&quot;, field.Name, field.GetValue(t)
-          );
-        }
-        Console.WriteLine(&quot;methods:&quot;);
-        foreach(
-          var method in typeof(T).GetMethods(
-            BindingFlags.Instance | BindingFlags.Public
-          )
-        ) {
-          Console.WriteLine(
-            &quot;  {0}&quot;, method.Name
-          );
-        }
-      }
-      public static void Print(String s = &quot;&quot;) {
-        Console.WriteLine(s);
-      }
-      public static void ShowNote(string s, string suffix = &quot;&quot;, int length = 35) {
-        string line = new string('-', length);
-        Console.WriteLine(line);
-        Console.WriteLine(&quot;  {0}&quot;, s);
-        Console.WriteLine(line);
-      }
-    }
-    /*--
-      Utils uses advanced relection
-      - GetMangedSize(Type type) is function that returns the size of
-        value types and handles.
-        It is used to help discover how things work.
-        It is placed here because it uses advanced techniques that
-        will eventually be covered elsewhere in this site.  Knowing
-        how it works is not essential for the things we are examining
-        in this demo.
-    --*/
-    // https://stackoverflow.com/questions/8173239/c-getting-size-of-a-value-type-variable-at-runtime/8173293#8173293
-    public static class Utils {
-      /*-- more advanced reflection --*/
-      // https://stackoverflow.com/questions/7613782/iterating-through-struct-members
-      public static int GetManagedSize(Type type)
-      {
-        // all this just to invoke one opcode with no arguments!
-        var method = new DynamicMethod(
-          &quot;GetManagedSizeImpl&quot;, typeof(uint), new Type[0],
-          typeof(TypeExtensions), false
-        );
-
-        ILGenerator gen = method.GetILGenerator();
-        gen.Emit(OpCodes.Sizeof, type);
-        gen.Emit(OpCodes.Ret);
-
-        var func = (Func&lt;uint&gt;)method.CreateDelegate(typeof(Func&lt;uint&gt;));
-        return checked((int)func());
-      }
-    }
-  }</code></pre>
-            <h4 id="out">Output</h4>
-            <pre><code class="language-shell">C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data
-  &gt; dotnet run
-   Demonstrate C# types
-  -----------------------------------
-    int - value type
-  -----------------------------------
-  --- int t1 = 42 ---
-  t1, Int32
-  value: 42, size: 4
-
-  --- interate over val type members using reflection ---
-  fields:
-    m_value = 42
-  methods:
-    CompareTo
-    CompareTo
-    Equals
-    Equals
-    GetHashCode
-    ToString
-    ToString
-    ToString
-    ToString
-    TryFormat
-    GetTypeCode
-    GetType
-
-  --- int t1a = t1 : copy of value type ---
-  t1a is not same object as t1
-
-  -----------------------------------
-    string - reference type
-  -----------------------------------
-  --- string t2 = &quot;a string&quot; ---
-  t2, String
-  value: a string, size: 8
-  ------------------------------------------------------------
-    string has many methods - uncomment next line to see them
-  ------------------------------------------------------------
-  --- string t3 = t2 : copy handle of ref type ---
-  t3, String
-  value: a string, size: 8
-  t3 is same object as t2
-  --- t3 += &quot; is here&quot; : copy on write ---
-  t2, String
-  value: a string, size: 8
-  t3, String
-  value: a string is here, size: 8
-  t3 is not same object as t2
-  -------------------------------------------------------
-    t2 not modified by change in t3 due to copy on write
-  -------------------------------------------------------
-
-  -----------------------------------
-    Object - base reference type
-  -----------------------------------
-  --- Object obj1 - new Object() ---
-  obj, Object
-  value: System.Object, size: 8
-  --- interate over ref type members using reflection ---
-  fields:
-  methods:
-    GetType
-    ToString
-    Equals
-    GetHashCode
-
-  --- Object obj2 = obj1 ---
-  obj2 is same object as obj1
-
-  -----------------------------------
-    Svt Struct value type
-  -----------------------------------
-  --- Svt t4 = new Svt() ---
-  t4  { I:3, D:3.1415927, C:z }
-  t4, Svt
-  value: HelloData.Svt, size: 24
-  ---------------------------------------------
-    value type: size of object in stackframe
-  ---------------------------------------------
-  --- Iterate over val type members using reflection ---
-  fields:
-    &lt;I&gt;k__BackingField = 3
-    &lt;D&gt;k__BackingField = 3.1415927
-    &lt;C&gt;k__BackingField = z
-  methods:
-    get_I
-    set_I
-    get_D
-    set_D
-    get_C
-    set_C
-    PrintSelf
-    Equals
-    GetHashCode
-    ToString
-    GetType
-
-  --- Svt t4a = t4 : copy of val type ---
-  t4a  { I:3, D:3.1415927, C:z }
-  t4  { I:3, D:3.1415927, C:z }
-  t4a is not same object as t4
-  t4a, Svt
-  value: HelloData.Svt, size: 24
-  --- t4a.C = 'q' ---
-  t4a  { I:3, D:3.1415927, C:q }
-  t4  { I:3, D:3.1415927, C:z }
-  t4 is not same object as t4a
-
-  -----------------------------------
-    Crt - ref type with ref member
-  -----------------------------------
-  --- Crt t5 = new Crt() ---
-  t5  { I:0, D:1, S:SomeString }
-  t5, Crt
-  value: HelloData.Crt, size: 8
-  ---------------------------------------------
-    ref type: size of handle to object in heap
-  ---------------------------------------------
-  --- Crt t5a = t5 : copy handle of ref type ---
-  t5a  { I:0, D:1, S:SomeString }
-  t5a is same object as t5
-  t5a.S is same object as t5.S
-  --- t5a.S = &quot;new literal string&quot; : no copy on write ---
-  t5a  { I:0, D:1, S:new string }
-  t5  { I:0, D:1, S:new string }
-  t5a is same object as t5
-  t5a.S is same object as t5.S
-  -----------------------------------
-    source t5 was altered!
-  -----------------------------------
-
-  That's all Folks!
-
-  C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data
-  &gt;
-  </code></pre>
-            <h4 id="build">Build</h4>
-            <pre class="codeSnaps"><code class="language-csharp">
-  C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data
-  &gt; dotnet build
-  MSBuild version 17.4.1+fedecea9d for .NET
-    Determining projects to restore...
-    All projects are up-to-date for restore.
-    Cs_Hello -&gt; C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data&#92;bin
-    &#92;Debug&#92;net7.0&#92;Cs_Hello.dll
-
-  Build succeeded.
-      0 Warning(s)
-      0 Error(s)
-
-  Time Elapsed 00:00:00.79
-  C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data
-  &gt;
-  </code></pre>
-          </div>
-   -->
-        <h3 id="ide">2.0 VS Code View</h3>
+        <h3 id="ide">4.0 VS Code View</h3>
         <t-b>
           The code for this demo is available in
           <a target="_blank" href="https://github.com/JimFawcett/Bits">github.com/JimFawcett/Bits</a>. If you click on
@@ -1953,7 +1503,7 @@
   </photosizer-block>-->
 
         <div style="height:0.75em;" class="clear"></div>
-        <h3 id="refers">3.0 References</h3>
+        <h3 id="refers">5.0 References</h3>
         <table class="indent">
           <tr>
             <th class="darkItem">Reference</th>
