@@ -599,7 +599,7 @@
                 <div class="focus"><c-s>&nbsp;&nbsp;&nbsp;type(t)</c-s></div>
                 and its size retrieved using reflection in the function
                 <div class="focus"><c-s>&nbsp;&nbsp;&nbsp;sys.getsizeof(t)</c-s></div>
-                That is defined in the AnalysisData.cs file, and shown in Section 3.0, below.
+                That is defined in the AnalysisData.cs file, and shown in Section 1.5, below.
               </t-b>
               <t-b>
                 Scalar types are held in a single block of contiguous heap memory.  Copies of all Python types,
@@ -723,7 +723,7 @@
           <div class="block">
             <div class="codewrap">
               <pre>
-<code class="language-python">  ----------------------------------------
+<code class="language-shell">  ----------------------------------------
   Initialize Aggregates
   ----------------------------------------
 
@@ -798,7 +798,7 @@
                 <div class="focus"><c-s>&nbsp;&nbsp;&nbsp;type(t)</c-s></div>
                 and its size retrieved using reflection in the function
                 <div class="focus"><c-s>&nbsp;&nbsp;&nbsp;sys.getsizeof(t)</c-s></div>
-                That is defined in the AnalysisData.cs file, and shown in Section 3.0, below.
+                That is defined in the AnalysisData.cs file, and shown in Section 1.5, below.
               </t-b>
               <hr />
               <t-b>
@@ -848,12 +848,19 @@
 <code class="language-python">  /*-- Copy and Modify scalar --*/
 
   t1 = 42  # t1 is handle pointing to value 42 in heap
-  t2 = t1  # copy t1 heap-based value to newly created t2 value
+  t2 = t1  # copy heap-based value to newly created value
   t1 = 0   # change of heap object</code>
             </pre>
           </div>
           <div class="textwrap">
-            text here
+            <t-b>
+              All Python data is stored in managed heap. Copies, even of scalars, result
+              in two handles pointing to same managed object.
+            </t-b>
+            <t-b>
+              One of the handles, as shown here, can be programmatically reset to a
+              new object.
+            </t-b>
           </div>
         </div>
         <details>
@@ -895,7 +902,28 @@
             </div>
             <div class="textwrap">
               <t-b>
-                output text here
+                Each type in the code block on the left is characterized by its value,
+                its type evaluated using reflection with
+                <div class="focus"><c-s>&nbsp;&nbsp;&nbsp;type(t)</c-s></div>
+                and its size retrieved using reflection in the function
+                <div class="focus"><c-s>&nbsp;&nbsp;&nbsp;sys.getsizeof(t)</c-s></div>
+                That is defined in the AnalysisData.cs file, and shown in Section 1.5, below.
+              </t-b>
+              <hr />
+              <t-b>
+                The statement <c-s>t2 = t1</c-s> constructs a new t2 handle from a copy of t1&apos;s handle.
+              </t-b>
+              <t-b>
+                Note that <c-s>t1</c-s> and <c-s>t2</c-s> have the same address, e.g., they are two handles pointing 
+                to the same underlying object.
+              </t-b>
+              <t-b>
+                The languages C++, Rust, and C# all make unique copies of scalar types. 
+                Python and JavaScript do not, as shown here.
+              </t-b>
+              <t-b>
+                Resetting a handle by assigning a new value creates a new object. That is,
+                <c-s>t1</c-s>&apos;s value is reset, but that does not affect the <c-s>t2</c-s> value.
               </t-b>
             </div>
           </div>
@@ -909,13 +937,27 @@
         <div class="block">
           <div class="codewrap">
             <pre>
-            <code class="language-python">
-                code here
-              </code>
+<code class="language-python">  /*-- copy and modify aggregates --*/
+
+  t3 = [1, 2, 3, 2, 1]  # handle pointing to list in heap
+  t4 = t3  # copy construction
+  t3.append(0)  # changes value, doesn't create new object
+
+  t5 = &quot;Hello Python&quot;  # handle pointing to string in heap
+  t6 = t5   # copy construction
+  t6 = t6.replace(&quot;P&quot;, &quot;p&quot;)  # copy on write creates new object</code>
             </pre>
           </div>
           <div class="textwrap">
-            text here
+            <t-b>
+              For all aggregate types except <c-s>str</c-s>, modifying a value affects all variables
+              that refer to that value.
+            </t-b>
+            <t-b>
+              Instances of the <c-s>str</c-s> type implement copy on write.  Values of <c-s>str</c-s> are
+              immutable.  Member functions that modify the underlying value return a new modified string
+              without affecting the original stored value.
+            </t-b>
           </div>
         </div>
         <details>
@@ -923,14 +965,82 @@
           <div class="block">
             <div class="codewrap">
               <pre>
-              <code class="language-python">
-                  output code here
-                </code>
+<code class="language-shell">  ----------------------------------------
+  copy and modify aggregate
+  ----------------------------------------
+
+  -- t3 = [1, 2, 3, 2, 1] --
+  t3 &lt;class 'list'&gt;
+  value:  [1, 2, 3, 2, 1] , size:  104
+  -- t4 = t3 --
+  t4 &lt;class 'list'&gt;
+  value:  [1, 2, 3, 2, 1] , size:  104
+  t3: address: 0x248ce392280
+  t4: address: 0x248ce392280
+  ----------------------------------------
+  After copy construction t3 and t4 have
+  same address, e.g., two handles pointing
+  to the same heap integer object.
+  ----------------------------------------
+  -- t3.append(0)  # modify object --
+  t3 &lt;class 'list'&gt;
+  value:  [1, 2, 3, 2, 1, 0] , size:  104
+  t3: address: 0x248ce392280
+  t4 &lt;class 'list'&gt;
+  value:  [1, 2, 3, 2, 1, 0] , size:  104
+  t4: address: 0x248ce392280
+  ----------------------------------------
+  After appending new value for t3,
+  t3 and t4 still have same value and
+  address, e.g., two handles pointing
+  to same heap integer object. No copy
+  on write.
+  ----------------------------------------
+
+  -- t5 = &quot;Hello Python&quot; --
+  t5 &lt;class 'str'&gt;
+  value:  Hello Python , size:  61
+  -- t6 = t5  # copy construction --
+  t6 &lt;class 'str'&gt;
+  value:  Hello Python , size:  61
+  t5: address: 0x248ce3ac5f0
+  t6: address: 0x248ce3ac5f0
+  ----------------------------------------
+  After copy construction t5 and t6 have
+  same address, e.g., two handles pointing
+  to the same heap string object.
+  ----------------------------------------
+  -- t6 = t6.replace(&quot;P&quot;, &quot;p&quot;)  # copy on write --
+  t6 &lt;class 'str'&gt;
+  value:  Hello python , size:  61
+  t5 &lt;class 'str'&gt;
+  value:  Hello Python , size:  61
+  t6: address: 0x248ce3ada70
+  t5: address: 0x248ce3ac5f0
+  ----------------------------------------
+  After modifying value for t6,
+  t5 and t6 have different values
+  and addresses, e.g., string has
+  copy on write.
+  ----------------------------------------</code>
               </pre>
             </div>
             <div class="textwrap">
               <t-b>
-                output text here
+                <c-s>t3</c-s> is an instance of the <c-s>list</c-s> type. Assignment creates a new
+                handle, <c-s>t4</c-s> to the same heap value.
+              </t-b>
+              <t-b>
+                Modification of the value referred to by <c-s>t3</c-s>, by appending the value 
+                <c-s>0</c-s>, is also seen by the handle <c-s>t4</c-s>.
+              </t-b>
+              <t-b>
+                The same is true for all mutable aggregate types, e.g., <c-s>bytearray, tuple, dict, ...</c-s>
+              </t-b>
+              <t-b>
+                Immutable data types, e.g., <c-s>bytes, str, ...</c-s> support modification via methods
+                that generate a new, modified, instance. That is subsequently assigned to a handle for
+                later use.
               </t-b>
             </div>
           </div>
@@ -944,317 +1054,95 @@
         <div class="blocks">
           <div class="textwrap">
             <t-b>
-              funcs text goes here
+              Python does not directly support generics so methods can be used for more than one
+              type without a lot of code scaffolding as in C++, Rust, and C#.
+            </t-b>
+            <t-b>
+              That makes the code much simpler, but now the developer must insure valid method arguments
+              without the help of compiler diagnostics.
+            </t-b>
+            <t-b>
+              For quick small prototypes, that works well. For large code bases, getting to valid
+              argments requires careful implementation with a lot of trial and error.
+            </t-b>
+            <t-b>
+              Python makes a very good prototyping language, but static typing is much more effective
+              when working with large projects.
             </t-b>
           </div>
         </div>
         <details>
-          <summary class="darkItem">Functions Code&nbsp;</summary>
+          <summary class="darkItem">Function Code&nbsp;</summary>
           <div class="block">
             <div class="codewrap">
               <pre>
-                <code class="language-python">
-                  funcs code goes here
-                </code>
-              </pre>
-            </div>
-          </div>
-        </details>
-        <!--         <h3 id="code">1.0 CodeSnaps</h3>
-          <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote()" />
-          <div style="display:flex; flex-direction:column;">
-            <h4 id="source">Source Code</h4>
-            <pre class="codeSnaps"><code class="language-python">import sys
-  # Python/Py_Data::Py_Data.py
-  #
-  # Python Dynamic Data Types
-  #   int, float, complex
-  #   bytes, bytearray, memoryview
-  #   list, tuple, range
-  #   dict, set, frozenset
-  #   bool
-  #   str
-  #   NoneType
-
-  # Python requires definition before use ordering
-  #  - no link phase to find definitions
-
-  # nl = &quot;&#92;n&quot;
-
-  # def showType(t, nm, suffix = &quot;&quot;) :
-  #     print(nm, type(t))
-  #     print(&quot;value: &quot;, t, ', size: ', sys.getsizeof(t), suffix)
-
-  # def showIdent(t, n, suffix = &quot;&quot;) :
-  #     print(n, t, id(t), suffix)
-
-  # def showNote(text, suffix = &quot;&quot;) :
-  #     print(&quot;-------------------------&quot;)
-  #     print(text)
-  #     print(&quot;-------------------------&quot;, suffix)
-
-  import Py_DataAnalysis
-  import copy
-
-  Anal = Py_DataAnalysis
-  nl = Anal.nl
-
-  def execute() :
-      Anal.showNote(&quot;Demonstrate Python Types&quot;)
-      # types
-      print(&quot;&#92;n  -- instances of all types reside in managed heap --&#92;n&quot;)
-      t1 = 42
-      Anal.showType(t1, &quot;t1&quot;, nl)
-      t1 = 3.14159         #dynamic type t1 redefined
-      Anal.showType(t1, &quot;t1&quot;, nl)
-      t1 = [1, 2, 3, 4]    #dynamic type t1 redefined
-      Anal.showType(t1, &quot;t1&quot;, nl)
-
-      # reference behavior - change of object
-      Anal.showOp(&quot;t2 = t1&quot;)
-      t2 = t1
-      Anal.showIdent(t1,&quot;t1&quot;)
-      Anal.showIdent(t2,&quot;t2&quot;, nl)
-
-      Anal.showOp(&quot;t2 = 3.33333 : change of object&quot;)
-      t2 = 3.33333
-      Anal.showIdent(t2,&quot;t2&quot;)
-      Anal.showType(t2,&quot;t2&quot;, nl)
-
-      # reference behavior - modify object
-      Anal.showOp(&quot;t2 += -1.0 : modify object&quot;)
-      t2 += -1.0
-      Anal.showIdent(t2,&quot;t2&quot;)
-      Anal.showType(t2, &quot;t2&quot;, nl)
-
-      # reference behavior
-      Anal.showOp(&quot;t3 = [1, &#92;&quot;one&#92;&quot;]&quot;)
-      t3 = [1, &quot;one&quot;]
-      Anal.showIdent(t3, &quot;t3&quot;)
-      Anal.showType(t3, &quot;t3&quot;, nl)
-
-      Anal.showOp(&quot;t4 = t3&quot;)
-      t4 = t3
-      Anal.showIdent(t3, &quot;t3&quot;)
-      Anal.showType(t3,&quot;t3&quot;)
-      Anal.showIdent(t4, &quot;t4&quot;)
-      Anal.showType(t4,&quot;t4&quot;)
-      Anal.showNote(
-        &quot;&quot;&quot;t3 and t4 are two distinct handles&#92;n&quot;&quot;&quot;
-        &quot;&quot;&quot;  pointing to same instance&quot;&quot;&quot;, nl
-      )
-
-      # reference behavior - no copy on write
-      Anal.showOp(&quot;t4.append('b') : no copy on write&quot;)
-      t4.append('b')
-      Anal.showIdent(t3, &quot;t3&quot;)
-      Anal.showType(t3,&quot;t3&quot;)
-      Anal.showIdent(t4, &quot;t4&quot;)
-      Anal.showType(t4,&quot;t4&quot;)
-      Anal.showNote(
-        &quot;t3 modified - same heap object,&#92;n  no copy on write&quot;, nl
-      )
-
-      # reference behavior - new child object
-      Anal.showOp(&quot;t5 = (1, 2, 3)&quot;)
-      t5 = (1, 2, 3)
-      Anal.showIdent(t5, &quot;t5&quot;)
-      Anal.showOp(&quot;t6 = [1, t5, &#92;&quot;weird&#92;&quot;]&quot;)
-      t6 = [1, t5, &quot;weird&quot;]
-      Anal.showIdent(t6, &quot;t6&quot;)
-      Anal.showType(t6, &quot;t6&quot;)
-      Anal.showOp(&quot;t5 = 1 + 1j : new object&quot;)
-      t5 = 1 + 1j
-      Anal.showIdent(t5, &quot;t5&quot;)
-      Anal.showIdent(t6, &quot;t6&quot;)
-      Anal.showNote(&quot;new object for t5, t6 not affected&quot;, nl)
-
-      # reference behavior - string copy on write
-      Anal.showOp(&quot;t7 = &#92;&quot;a string&#92;&quot;&quot;)
-      t7 = &quot;a string&quot;
-      Anal.showIdent(t7, &quot;t7&quot;)
-      Anal.showType(t7, &quot;t7&quot;)
-      Anal.showOp(&quot;t8 = t7&quot;)
-      t8 = t7
-      Anal.showIdent(t8, &quot;t8&quot;)
-      Anal.showOp(&quot;t8 += &#92;&quot; and another string&#92;&quot; : copy on write&quot;)
-      t8 += &quot; and another string&quot;
-      Anal.showIdent(t7, &quot;t7&quot;)
-      Anal.showIdent(t8, &quot;t8&quot;)
-      Anal.showType(t8, &quot;t8&quot;)
-      Anal.showNote(&quot;t7 not modified : str copy on write&quot;, nl)
-
-      # deepcopy
-      Anal.showOp(&quot;t10 = copy.deepcopy(t9)&quot;)
-      t9 = list[1, 2, 3]
-      Anal.showIdent(t9, &quot;t9&quot;)
-      t10 = copy.deepcopy(t9);
-      Anal.showIdent(t10, &quot;t10&quot;)
-      Anal.showNote(
-        &quot;two distinct handles each with&#92;n  a unique instance&quot;,
-        nl
-      )
-
-      # reference behavior - iterate over children
-      Anal.showOp(&quot;iterate over t6 children&quot;)
-      for i in t6:
-          Anal.showIdent(i, &quot;elem&quot;)
-      print();
-
-      Anal.showOp(&quot;iterate over t6 methods&quot;)
-      print(dir(t6))
-
-      print(&quot;&#92;nThat's all folks!&#92;n&quot;)
-
-  execute()
-  </code></pre>
-            <h4 id="anal">Source Code: Py_DataAnalysis.py</h4>
-            <pre><code class="language-python">import sys
+<code class="language-python">  /*-- Analysis and Display Functions --*/
   # Python/Py_Data::Py_DataAnalysis.py
   #
+  import sys
 
   nl = &quot;&#92;n&quot;
 
+  # displays type, value, and size of apex object
+  # - does not account for sizes of decendent objects
   def showType(t, nm, suffix = &quot;&quot;) :
-      print(nm, type(t))
-      print(&quot;value: &quot;, t, ', size: ', sys.getsizeof(t), suffix)
+    print(nm, type(t))
+    print(
+      &quot;value: &quot;, t, ', size: ', sys.getsizeof(t), suffix&nbsp;&nbsp;
+    )
 
+  # id is heap address
   def showIdent(t, nm, suffix = &quot;&quot;) :
-      print(nm, t, &quot;:&quot;, id(t), suffix, sep=' ')
+    print(nm, &quot;: &quot;, hex(id(t)), suffix, sep='')
 
+  # evaluates heap address
+  def showAddress(t, nm, suffix = &quot;&quot;) :
+    print(nm, &quot;address: &quot;, hex(id(t)), suffix, sep='')
+
+  # show text encased in upper and lower lines
   def showNote(text, suffix = &quot;&quot;) :
-      print(&quot;----------------------------------------&quot;)
-      print(&quot; &quot;, text)
-      print(&quot;----------------------------------------&quot;, suffix)
+    print(
+      &quot;----------------------------------------&quot;
+    )
+    print(&quot; &quot;, text)
+    print(
+      &quot;----------------------------------------&quot;, suffix
+    )
 
-  def showOp(text):
-      print(&quot;--&quot;, text, &quot;--&quot;)          </code></pre>
-            <h4 id="out">Output</h4>
-            <pre class="codeSnaps"><code class="language-python">C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data
-  &gt; python Py_Data.py
-   Demonstrate Python Types
-  --------------------------
-
-    -- instances of all types reside in managed heap --
-
-  t1 &lt;class 'int'&gt;
-  value:  42 , size:  28
-
-  t1 &lt;class 'float'&gt;
-  value:  3.14159 , size:  24
-
-  t1 &lt;class 'list'&gt;
-  value:  [1, 2, 3, 4] , size:  88
-
-  -- t2 = t1 --
-  t1 [1, 2, 3, 4] 2778705766400
-  t2 [1, 2, 3, 4] 2778705766400
-
-
-  -- t2 = 3.33333 : change of object --
-  t2 3.33333 2778703241072
-  t2 &lt;class 'float'&gt;
-  value:  3.33333 , size:  24
-
-  -- t2 += -1.0 : modify object --
-  t2 2.33333 2778703242608
-  t2 &lt;class 'float'&gt;
-  value:  2.33333 , size:  24
-
-  -- t3 = [1, &quot;one&quot;] --
-  t3 [1, 'one'] 2778705703488
-  t3 &lt;class 'list'&gt;
-  value:  [1, 'one'] , size:  72
-
-  -- t4 = t3 --
-  t3 [1, 'one'] 2778705703488
-  t3 &lt;class 'list'&gt;
-  value:  [1, 'one'] , size:  72
-  t4 [1, 'one'] 2778705703488
-  t4 &lt;class 'list'&gt;
-  value:  [1, 'one'] , size:  72
-
-  -- t4.append('b') : no copy on write --
-  t3 [1, 'one', 'b'] 2778705703488
-  t3 &lt;class 'list'&gt;
-  value:  [1, 'one', 'b'] , size:  120
-  t4 [1, 'one', 'b'] 2778705703488
-  t4 &lt;class 'list'&gt;
-  value:  [1, 'one', 'b'] , size:  120
-  -------------------------
-  t3 modified - same heap object, no copy on write
-  -------------------------
-
-  -- t5 = (1, 2, 3) --
-  t5 (1, 2, 3) 2778706025792
-  -- t6 = [1, t5, &quot;weird&quot;] --
-  t6 [1, (1, 2, 3), 'weird'] 2778706031616
-  t6 &lt;class 'list'&gt;
-  value:  [1, (1, 2, 3), 'weird'] , size:  80
-  -- t5 = 1 + 1j : new object --
-  t5 (1+1j) 2778703241008
-  t6 [1, (1, 2, 3), 'weird'] 2778706031616
-  -------------------------
-  new object for t5, t6 not affected
-  -------------------------
-
-  -- t7 = &quot;a string&quot; --
-  t7 a string 2778706030512
-  t7 &lt;class 'str'&gt;
-  value:  a string , size:  57
-  -- t8 = t7 --
-  t8 a string 2778706030512
-  -- t8 += &quot; and another string&quot; : copy on write
-  t7 a string 2778706030512
-  t8 a string and another string 2778706039936
-  t8 &lt;class 'str'&gt;
-  value:  a string and another string , size:  76
-  -------------------------
-  t7 not modified : copy on write
-  -------------------------
-
-  -- iterate over t6 children --
-  elem 1 2778702217456
-  elem (1, 2, 3) 2778706025792
-  elem weird 2778706030064
-
-  -- iterate over t6 methods --
-  ['__add__', '__class__', '__class_getitem__', '__contains__',
-  '__delattr__', '__delitem__', '__dir__', '__doc__', '__eq__',
-  '__format__', '__ge__', '__getattribute__', '__getitem__', '
-  __gt__', '__hash__', '__iadd__', '__imul__', '__init__', '
-  __init_subclass__', '__iter__', '__le__', '__len__', '__lt__',
-  '__mul__', '__ne__', '__new__', '__reduce__', '__reduce_ex__',
-  '__repr__', '__reversed__', '__rmul__', '__setattr__',
-  '__setitem__', '__sizeof__', '__str__', '__subclasshook__',
-  'append', 'clear', 'copy', 'count', 'extend', 'index', 'insert',
-  'pop', 'remove', 'reverse', 'sort']
-
-  That's all folks!
-
-  C:&#92;github&#92;JimFawcett&#92;Bits&#92;Python&#92;Py_Data
-  &gt;
-  </code></pre>
-   -->
-        <!--<h4>Build</h4>
-            <pre class="codeSnap">
-  C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data
-  &gt; dotnet build
-  MSBuild version 17.4.1+fedecea9d for .NET
-    Determining projects to restore...
-    All projects are up-to-date for restore.
-    Cs_Hello -&gt; C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data&#92;bin
-    &#92;Debug&#92;net7.0&#92;Cs_Hello.dll
-
-  Build succeeded.
-      0 Warning(s)
-      0 Error(s)
-
-  Time Elapsed 00:00:00.79
-  C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Data
-  &gt;
-            </pre>-->
-        </div>
+  # show text enclosed in -- delimiters on same line
+  def showOp(text, suffix = &quot;&quot;):
+    print(&quot;--&quot;, text, &quot;--&quot;, suffix)</code>
+              </pre>
+            </div>
+<!--             </div>
+ -->            <div class="textwrap">
+              <t-b>
+                The function <c-s>showType</c-s> displays the caller name, type, value, and size of the first
+                argument. This uses reflection for type with <c-s>type(t)</c-s> and for size with
+                <c-s>sys.getsizeof(t)</c-s>.
+              </t-b>
+              <t-b>
+                <c-s>getsizeof</c-s> evaluates the apex object from <c-s>t</c-s>&apos;s object graph, but
+                not the size of its children.
+              </t-b>
+              <hr />
+              <t-b>
+                The functions <c-s>showIdent</c-s> and <c-s>showAddress</c-s> are the same except for
+                display of the string &quot;address: &quot; in the later.  Python uses the addess of an
+                object&apos;s heap location as an identifer.
+              </t-b>
+              <hr />
+              <t-b>
+                Function <c-s>showNote</c-s> displays text with prefix and suffix lines to highlight
+                its message.
+              </t-b>
+              <hr />
+              <t-b>
+                Function <c-s>showOp</c-s> displays text between two &quot;--&quot; delimiters. It is
+                often used to display an operation that generates data, like construction or assignment.
+              </t-b>
+            </div>
+        </details>
 
         <h3 id="ide">2.0 VS Code View</h3>
         <t-b>
@@ -1304,6 +1192,22 @@
             </td>
             <td>
               Detailed description of Python Types
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a target="_blank" href="https://realpython.com/python-encodings-guide/">Character Encodings</a>
+            </td>
+            <td>
+              Detailed summary of Python strs and encodings.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a target="_blank" href="https://geekflare.com/popular-python-libraries-modules/">Python Libraries</a>
+            </td>
+            <td>
+              Summaries of 14 popular libraries and modules.
             </td>
           </tr>
         </table>
