@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="css/StylesWebComponents.css" />
   <script src="js/ScriptsWebComponents.js"></script>
   <script src="js/ScriptsPageFrameTOC.js"></script>
-  <script src="js/ScriptsPageFramePagesBitsRust.js"></script>
+  <script src="js/ScriptsPageFramePagesBits.js"></script>
   <script src="js/ScriptsPageFrameKeyboard.js"></script>
   <link rel="stylesheet" href="css/prism.css" />
   <script src="js/prism.js"></script>
@@ -690,397 +690,179 @@
           Rust types are initialized with a let statement that binds a variable name to a memory location
           with specified value.
         </t-b>
-        <h3 id="langdef">1.1 Initializing language-defined types</h3>
-        <t-b>
-          The Rust language defines scalar types: booleans, integers, and floats,
-          and aggregate types:
-          literal strings and slices, arrays and array slices, tuples, and enums Result&lt;T,E&gt;
-          and Option&lt;T&gt;.
-        </t-b>
-        <t-b>
-          All of the type variations, e.g., i8, i16, ... are are enumerated in the 
-          &quot;Rust Types Details&quot; dropdown, above.
-        </t-b>
-        <t-b>
-          The code block below shows how to initialize them and how to access members of
-          an aggregate.
-        </t-b>
-        <div class="block">
-          <div class="codewrap">
-            <pre><code class="language-rust">  /*-- initialize language defined types --*/
-
-  let i = 42i8;         // data type specified
-
-  let b = true;         // data type inferred
-
-  let f:f32 = 3.14159;  // variable type specified&nbsp;&nbsp;
-
-  let c:char = 'z';
-
-  let sl:&str = "a literal string";
-  let second = sl.chars().nth(1);
-
-  let st = "an owned string".to_string();
-  let fourth = st.chars().nth(3);
-
-  let arr:[i32; 3] = [1, 2, 3];
-  let first = arr[0];
-
-  let tp: (i32, f64, char) = (1, 2.5, 'a');
-  let second = tp.1;
-
-  let iref: &i8 = &amp;i;
-
-  let aref: &[i32; 3] = &arr;</code></pre>
-          </div>
-          <div class="textwrap">
-            <t-b>
-              Type specifications like i8 and f64 can be applied to the variable name or to it&apos;s initializing
-              data, as shown here.
-            </t-b>
-            <t-b>
-              Rust can usually infer appropriate types for data, but a code developer can
-              explicitly define them.
-              If the type annotations were removed in this example, Rust would infer i to be i32 and f to be f64.
-            </t-b>
-            <t-b>
-              The char type occupies 4 bytes of storage, large enough to hold any of the utf-8 characters.
-            </t-b>
-            <t-b>
-              The type <c-s>&str</c-s> is a reference to a fixed-size immutable literal string in stack memory.
-              It may hold
-              any of the utf-8 characters. It&apos;s size is the sum of the actual literal character sizes.
-              For the literal string shown, all of the characters are 1 byte.
-            </t-b>
-            <t-b>
-              Arrays are fixed size sequences of values of the specified type.  They are indexable and individual
-              element values may be changed if the array has mutable type.
-            </t-b>
-            <t-b>
-              Tuples are sequences of values of heterogeneous types.  Elements are accessed via position
-              arguments, e.g., tp.1 accesses the second element, a float.
-            </t-b>
-            <t-b>
-              References like &arr are fixed pointers to the beginning of the variable&apos;s data storage.
-            </t-b>
-          </div>
+        <h3>Example: primitive type initializations</h3>
+        <div style="float:left; margin-left:1em; padding-right:2em;">
+          <pre><code class="language-rust">let i = 42i8;         // data type specified
+  // size: 1 byte => 8bits
+let f:f32 = 3.14159;  // variable type specified
+  // size: 4 bytes
+let c:char = 'z';
+  // size: 4 bytes, enough to hold utf-8 character 
+let sl:&str = "a literal string";
+  // size: 16 bytes, all its characters are 1 byte
+let arr:[i32; 3] = [1, 2, 3];
+  // array size: 12 bytes
+let tp: (i32, f64, char) = (1, 2.5, 'a');
+  // tuple size: 16 bytes
+let iref: &i8 = &amp;i;
+  // size: 8 bytes, a reference to i&apos;s value
+let aref: &[i32; 3] = &arr;
+  // size: 8 bytes, a reference to arr&apos;s values
+/*--------------------------------------------
+  All sizes are space allocated in local
+  stack frame.
+*/</code></pre>
         </div>
-        <details>
-          <summary class="darkItem">Output</summary>
-          <div class="block">
-            <div class="codewrap">
-              <pre>
-<code class="language-shell">  -------------------------
-    create and initialize
-  -------------------------
-
-  --- initialize language-defined types ---&nbsp;&nbsp;
-
-  --- i8 ---
-  i, i8
-  value: 42, size: 1
-
-  --- bool ---
-  b, bool
-  value: true, size: 1
-
-  --- f32 ---
-  f, f32
-  value: 3.15927, size: 4
-
-  --- char ---
-  c, char
-  value: 'z', size: 4
-
-  --- &str ---
-  ls, &str
-  value: &quot;literal string&quot;, size: 16
-  second, core::option::Option&lt;char&gt;
-  value: Some('i'), size: 4
-
-  --- alloc::string::String ---
-  st, alloc::string::String
-  value: &quot;an owned string&quot;, size: 24
-  fourth, core::option::Option&lt;char&gt;
-  value: Some('o'), size: 4
-
-  --- [i32; 3] ---
-  arr, [i32; 3]
-  value: [1, 2, 3], size: 12
-  first, i32
-  value: 1, size: 4
-
-  --- (i32, f64, char) ---
-  tp, (i32, f64, char)
-  value: (1, 2.5, 'a'), size: 16
-  second, f64
-  value: 2.5, size: 8
-
-  --- &i8 ---
-  iref, &i8
-  value: 42, size: 8
-
-  --- &[i32; 3] ---
-  aref, &[i32; 3]
-  value: [1, 2, 3], size: 8
-  second, i32
-  value: 2, size: 4
-
-  --- &str ---
-  lscs, &str
-  value: &quot;iter&quot;, size: 16
-  second, core::option::Option&lt;char&gt;
-  value: Some('t'), size: 4
-
-  --- &[i32] ---
-  sla, &[i32]
-  value: [2, 3], size: 16
-  second, i32
-  value: 3, size: 4</code>
-              </pre>
-            </div>
-            <div class="textwrap">
-              <t-b>
-                Each type in the code block on the left is characterized by its value,
-                its type evaluated using <c-s>std::any::type_name::&lt;T&gt;()</c-s>
-                and its size retrieved using <c-s>std::mem::size_of::&lt;T&gt;()</c-s>.
-              </t-b>
-              <t-b>
-                The function <c-s>showType</c-s> formats that information for display
-                and is defined in the bits_data_analysis.rs file, shown in Section 1.5, below.
-              </t-b>
-              <hr />
-              <t-b>
-                Scalar types are held in a single block of contiguous heap memory.  Copies of all scalar types
-                are byte-wise copies of the source data.  That results
-                in two unique instances residing in the invoking function&apos;s stackframe.
-              </t-b>
-              <hr />
-              <t-b>
-                Language-defined aggregate types with scalar members are also held in a contiguous region
-                of stack memory, and are copied with byte-wise copy. 
-              </t-b>
-              <t-b>
-                Aggregates with members using heap
-                allocations like <c-s>string</c-s>s and <c-s>vector</c-s>s are moved instead of copied.
-              </t-b>
-              <hr />
-              <t-b>
-                Copies, moves, and clones are discussed in section 1.4, below.
-              </t-b>
-              <hr />
-              <t-b>
-                The char type is large enough to hold any utf-8 character, e.g., 4 bytes.
-              </t-b>
-              <t-b>
-                literal strings and instances of the <c-s>string</c-s> type are sequences of utf-8 
-                characters. Each utf-8 character consits of
-                from 1 to 4 bytes.  That supports many different character sets , ASCII, Unicode,
-                Mandarin, Kanji, Arabic, ...
-              </t-b>
-              <t-b>
-                Rust strings pack the utf-8 characters so string elements are not fixed size. That
-                means that they are not indexable.  
-              </t-b>
-              <t-b>
-                Instead, rust provides the <c-s>chars</c-s>
-                iterator which returns an <c-s>Option</c-s> enumeration holding either <c-s>Some(ch)</c-s>
-                or <c-s>None</c-s> when the iteration has reached the end of the characer sequence.
-              </t-b>
-              <t-b>
-                The character value, ch, is accessed by (conditionally) unwrapping Option.
-              </t-b>
-              <t-b>
-                Arrays are fixed size, indexable, collections of values of a single type, defined
-                by the array&apos;s declaration. Values are accessed and mutable arrays are modified
-                by index.
-              </t-b>
-              <t-b>
-                Tuples are fixed size collections of values of heterogeneous types. Elements are accessed
-                by position: 0, 1, ...
-              </t-b>
-            </div>
-          </div>
-        </details>
-        <h4 id="locs">1.11 Specifying locations</h4>
         <t-b>
-          Rust supports storing data in static memory for constants and static data, in stack memory
-          for function arguments and data local to a function, and in the native heap. These are
-          illustrated in the code block below.
+          Type specifications like i8 and f64 can be applied to the variable name or to it&apos;s initializing
+          data, as shown here. 
         </t-b>
-        <div class="block">
-          <div class="codewrap">
-            <pre>
-<code class="language-rust">  /*-- static, stack, and heap allocations --*/
-
-  static PI:f64 = 3.1415927;      // static memory&nbsp;&nbsp;
-  // static address: &PI = 0x7ff730eb7668
-  ------------------------------------
-  let f:f64 = 3.1415927;          // stack memory
-  // stack address:   &f = 0x40a1cff8c0
-  ------------------------------------
-  let s:&str = "3.1415927";       // stack memory
-  // stack address: &str = 0x40a1cff910
-  ------------------------------------
-  let g = box::new(3.1415927f64); // heap memory
-  // heap address:   &*g = 0x1b78cc05bd0
-</code>
-            </pre>
-          </div>
-          <div class="textwrap">
-            <t-b>
-              <t-b>
-                Variables can be bound to locations in static memory, stack memory, or heap memory.
-              </t-b>
-              <t-b>
-                Static memory is allocated at compile-time and so contents live for the duration of
-                the program.
-              </t-b>
-              <t-b>
-                Stack memory is implicitly allocated at run-time for each function call, including main.
-                That serves as scratch-pad storage for input parameters and locally declared data. It is
-                implicitly deallocated when the thread of execution leaves it&apos;s function&apos;s scope.
-              </t-b>
-              <t-b>
-                Heap memory is explicitly allocated with construction of a smart Box pointer. That
-                allocation is returned when the smart pointer, g, goes out of scope.
-              </t-b>
-            </t-b>
-          </div>
-        </div>
+        <t-b>
+          Rust can usually infer appropriate types for data, but a code developer can
+          explicitly define them.
+          If the type annotations were removed in this example, Rust would infer i to be i32 and f to be f64.
+        </t-b>
+        <t-b>
+          The char type occupies 4 bytes of storage, large enough to hold any of the utf-8 characters.
+        </t-b>
+        <t-b>
+          The type <c-s>&str</c-s> is a reference to a fixed-size immutable literal string in stack memory. 
+          It may hold
+          any of the utf-8 characters. It&apos;s size is the sum of the actual literal character sizes.
+          For the literal string shown, all of the characters are 1 byte.
+        </t-b>
+        <t-b>
+          Arrays are fixed size sequences of values of the specified type.  They are indexable and individual
+          element values may be changed if the array has mutable type.
+        </t-b>
+        <t-b>
+          Tuples are sequences of values of heterogeneous types.  Elements are accessed via position
+          arguments, e.g., tp.1 accesses the second element, a float.
+        </t-b>
+        <t-b>
+          References like &arr are fixed pointers to the beginning of the variable&apos;s data storage. 
+        </t-b>
         <div style="clear:both;"></div>
-        <h3 id="libdef">1.2 Initializing standard library types</h3>
-        <div class="block">
-          <div class="codewrap">
-            <pre>
-<code class="language-rust">  /*-- standard library types --*/
-
-  let v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1];
+        <h3>Example: Specifying locations</h3>
+        <div style="clear:both; float:left; margin-left:1em; padding-right:2em;">
+          <pre><code class="language-rust">static PI:f64 = 3.1415927;      // static memory
+// static address: &PI = 0x7ff730eb7668
+------------------------------------
+let f:f64 = 3.1415927;          // stack memory
+// stack address:   &f =   0x40a1cff8c0
+------------------------------------
+let s:&str = "3.1415927";       // stack memory
+// stack address: &str =   0x40a1cff910
+------------------------------------
+let g = box::new(3.1415927f64); // heap memory
+// heap address:   &*g =  0x1b78cc05bd0</code></pre>
+        </div>
+        <t-b>
+          Variables can be bound to locations in static memory, stack memory, or heap memory.
+        </t-b>
+        <t-b>
+          Static memory is allocated at compile-time and so contents live for the duration of
+          the program. 
+        </t-b>
+        <t-b>
+          Stack memory is implicitly allocated at run-time for each function call, including main.
+          That serves as scratch-pad storage for input parameters and locally declared data. It is
+          implicitly deallocated when the thread of execution leaves it&apos;s function&apos;s scope. 
+        </t-b>
+        <t-b>
+          Heap memory is explicitly allocated with construction of a smart Box pointer. That  
+          allocation is returned when the smart pointer g goes out of scope.
+        </t-b>
+        <div style="clear:both;"></div>
+        <h3>Example: Initializing standard library types</h3>
+        <div style="clear:both; float:left; margin-left:1em; padding-right:2em;">
+          <pre><code class="language-rust">let v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1];
   // size: 24 bytes, control block holds
   // ptr to ints on heap, length, capacity
-  ------------------------------------
-  let st:String = "an owned string".to_string();
+------------------------------------
+let st:String = "an owned string".to_string();
   // size: 24 bytes, control block holds
   // ptr to chars on heap, length, capacity
-  ------------------------------------
-  let mut vecdeq = VecDeque::&lt;f64&gt;::new();
-  vecdeq.push_front(1.0);
-  vecdeq.push_front(1.5);
-  vecdeq.push_front(2.0);
-  vecdeq.push_front(1.5);
-  vecdeq.push_front(1.0);
-  ------------------------------------
-  let mut map = HashMap::<&str,i32>
-    ::new();
-    map.insert("zero", 0);
-    map.insert("one", 1);
-    map.insert("two", 2);</code>
-            </pre>
-          </div>
-          <div class="textwrap">
-            <t-b>
-              <t-b>
-                Standard Library types are initialized with a call to new and possibly modified with
-                subsequent additions of data.
-              </t-b>
-              <t-b>
-                Here, <c-s>vec!</c-s> is a std::library macro that initializes variable <c-s>v</c-s> by
-                creating a <c-s>Vec&lt;int&gt;</c-s>
-                and pushing the elements 1, 2, ...
-              </t-b>
-              <t-b>
-                <c-s>Vec</c-s>s consist of a control block in stack memory
-                that holds a pointer to a resizeable array of elements in the heap, a count of the number of
-                elements currently stored, and a count of the available capacity for data.
-              </t-b>
-              <t-b>
-                When the length
-                equals the <c-s>Vec</c-s>&apos;s capacity and a new element is pushed the <c-s>Vec</c-s>
-                allocates a new heap array of twice the size of the current capacity, copies the elements
-                to the new storage and deallocates the original heap array.
-              </t-b>
-              <t-b>
-                The string, st, is initialized by converting a literal string to a
-                String type.  Strings are sequences of utf-8 characters, each of which may contain
-                from one to four bytes.  That supports representing characters from non-roman languages,
-                e.g., arabic, kanji, etc., as well as emoji&apos;s and symbols.
-              </t-b>
-              <t-b>
-                The structure of a <c-s>String</c-s> is very similar to a <c-s>Vec</c-s>. It has a control
-                block in stack memory and a collection of characters in the heap. The main difference is that
-                vectors hold elements of a fixed size, and so are indexable.  Strings hold utf-8 characters
-                which vary in size from one to four bytes.  They are not indexable, but provide an iterator,
-                <c-s>chars</c-s> that steps through the character collection.
-              </t-b>
-              <t-b>
-                The statement <c-s>let mut vecdeq = ...</c-s>
-                creates a double ended <c-s>VecDeque</c-s> queue.  It must be declared <c-s>mut</c-s>
-                to allow later modifications with <c-s>push-front</c-s> statements. Data is stored
-                in a circular buffer in the heap, supporting efficiently pushing data onto either front or back of the queue.
-              </t-b>
-              <t-b>
-                <c-s>HashMap</c-s> is an associative container with, in this example, <c-s>Key:&str</c-s>, and <c-s>Value:i32</c-s>.
-                The <c-s>&str</c-s> type is a reference to a literal string like <c-s>"zero"</c-s>.
-                Key-value pairs are stored in a table of buckets which are linked lists.  Lookup
-                applies a hash function to a unique key to find the table address of the bucket holding
-                that key.  The HashMap retrieval API provides methods that use the hash to walk the
-                bucket list searching for the specified key.
-              </t-b>
-              <t-b>
-                The code block, below, displays some of the output of a demonstration program in
-                Bits/Rust/rust_data, stored in a <a target="_blank" href="https://github.com/JimFawcett/Bits">Bits repository</a>
-                for all the code used in the Bits for C++, Rust, C#, Python, and JavaScript.
-                You are invited to clone or download the repository and explore these examples using Visual Studio Code.
-              </t-b>
-            </t-b>
-          </div>
+------------------------------------
+let mut vecdeq = VecDeque::&lt;f64&gt;::new();
+vecdeq.push_front(1.0);
+vecdeq.push_front(1.5);
+vecdeq.push_front(2.0);
+vecdeq.push_front(1.5);
+vecdeq.push_front(1.0);
+------------------------------------
+let mut map = HashMap::<&str,i32>::new();
+map.insert("zero", 0);
+map.insert("one", 1);
+map.insert("two", 2);</code></pre>
         </div>
-        <details>
-          <summary class="darkItem">Output</summary>
-          <div class="block">
-            <div class="codewrap">
-              <pre>
-<code class="language-shell">--- initialize std::lib types ---
-
+        <t-b>
+          Standard Library types are initialized with a call to new and possibly modified with
+          subsequent additions of data.
+        </t-b>
+        <t-b>
+          Here, <c-s>vec!</c-s> is a std::library macro that initializes variable <c-s>v</c-s> by 
+          creating a <c-s>Vec&lt;int&gt;</c-s>
+          and pushing the elements 1, 2, ...  
+        </t-b>
+        <t-b>
+          <c-s>Vec</c-s>s consist of a control block in stack memory
+          that holds a pointer to a resizeable array of elements in the heap, a count of the number of
+          elements currently stored, and a count of the available capacity for data.  
+        </t-b>
+        <t-b>
+          When the length
+          equals the <c-s>Vec</c-s>&apos;s capacity and a new element is pushed the <c-s>Vec</c-s>
+          allocates a new heap array of twice the size of the current capacity, copies the elements
+          to the new storage and deallocates the original heap array.
+        </t-b>
+        <t-b>
+          The string, st, is initialized by converting a literal string to a
+          String type.  Strings are sequences of utf-8 characters, each of which may contain
+          from one to four bytes.  That supports representing characters from non-roman languages,
+          e.g., arabic, kanji, etc., as well as emoji&apos;s and symbols.
+        </t-b>
+        <t-b>
+          The structure of a <c-s>String</c-s> is very similar to a <c-s>Vec</c-s>. It has a control
+          block in stack memory and a collection of characters in the heap. The main difference is that
+          vectors hold elements of a fixed size, and so are indexable.  Strings hold utf-8 characters
+          which vary in size from one to four bytes.  They are not indexable, but provide an iterator,
+          <c-s>chars</c-s> that steps through the character collection.
+        </t-b>
+        <t-b>
+          The statement <c-s>let mut vecdeq = ...</c-s>
+          creates a double ended <c-s>VecDeque</c-s> queue.  It must be declared <c-s>mut</c-s> 
+          to allow later modifications with <c-s>push-front</c-s> statements. Data is stored
+          in a circular buffer in the heap, supporting efficiently pushing data onto either front or back of the queue.
+        </t-b>
+        <t-b>
+          <c-s>HashMap</c-s> is an associative container with, in this example, <c-s>Key:&str</c-s>, and <c-s>Value:i32</c-s>.
+          The <c-s>&str</c-s> type is a reference to a literal string like <c-s>"zero"</c-s>.
+          Key-value pairs are stored in a table of buckets which are linked lists.  Lookup
+          applies a hash function to a unique key to find the table address of the bucket holding
+          that key.  The HashMap retrieval API provides methods that use the hash to walk the
+          bucket list searching for the specified key.
+        </t-b>
+        <t-b>
+          The code block, below, displays some of the output of a demonstration program in 
+          Bits/Rust/rust_data, stored in a <a target="_blank" href="https://github.com/JimFawcett/Bits">Bits repository</a> 
+          for all the code used in the Bits for C++, Rust, C#, Python, and JavaScript.
+          You are invited to clone or download the repository and explore these examples using Visual Studio Code.
+        </t-b>
+        <div style="clear:both; height:0.5em;"></div>
+        <div style="float:left; margin-left:1em; padding-right:2em;">
+          <h4 style="margin-top: 0em;">Example: Output</h4>
+          <pre><code class="language-rust">--- initialize std::lib types ---
 vec, alloc::vec::Vec<i32>
 value: [1, 2, 3, 2, 1], size: 24
-
 st, alloc::string::String
 value: "an owned string", size: 24
-
 vecdeq, alloc::collections::vec_deque::VecDeque<f64>
 value: [1.0, 1.5, 2.0, 1.5, 1.0], size: 32
-
 map, std::collections::hash::map::HashMap<&str, i32>
-value: {"one": 1, "zero": 0, "two": 2}, size: 48
-</code>
-              </pre>
-            </div>
-            <div class="textwrap">
-              <t-b>
-                Each type in the code block on the left is characterized by its value,
-                its type evaluated using <c-s>std::any::type_name::&lt;T&gt;()</c-s>
-                and its size retrieved using <c-s>std::mem::size_of::&lt;T&gt;()</c-s>.
-              </t-b>
-              <t-b>
-                The function <c-s>showType</c-s> formats that information for display
-                and is defined in the bits_data_analysis.rs file, shown in Section 1.5, below.
-              </t-b>
-              <hr />
-              <t-b>
-                Language-defined aggregate types with scalar members are held in a contiguous region
-                of stack memory, and are copied with byte-wise copy.
-              </t-b>
-              <t-b>
-                Aggregates with members using heap
-                allocations like <c-s>string</c-s>s and <c-s>vector</c-s>s are moved instead of copied.
-              </t-b>
-              <t-b>
-                Copies, moves, and clones are discussed in section 1.4, below.
-              </t-b>
-            </div>
-          </div>
-        </details>
+value: {"one": 1, "zero": 0, "two": 2}, size: 48</code></pre>
+        </div>
+        <div style="clear:both; height:1em;"></div>
         <div style="float:left; margin-left:1em; padding-right:2em;">
           <h4 style="margin-top: 0em;">Example: Code used to generate output</h4>
           <pre><code class="language-rust">use std::fmt::Debug;
@@ -1254,11 +1036,11 @@ error: could not compile `rust_data` (bin "rust_data") due to previous error
             <li>
               For all copy types, construction, assignment, and pass-by-value results in data copy
               with no transfer of ownership, so the source is still valid.
-              <div id="strcpy" style="height:0.75em;"></div>
-              The <c-s>str</c-s> type represents a constant literal string in static memory. All <c-s>str</c-s>&apos;s
-              are accessed by a reference, <c-s>&str</c-s>. The reference <c-s>&str</c-s> is copy.
+              <div style="height:0.75em;"></div>
+              The <c-s>str</c-s> type represents a constant literal string in memory. All <c-s>str</c-s>&apos;s
+              are accessed by a reference, <c-s>&str</c-s>. Both <c-s>str</c-s> and <c-s>&</c-s> are copy.
               So copying an <c-s>&str</c-s> results in a second reference pointing to the original address.
-                      <photosizer-block src="pictures/strCopy2.png" width="500" class="photoSizerBlock" style="margin-top:0;">
+                      <photosizer-block src="../../Pictures/StrCopy.jpg" width="300" class="photoSizerBlock" style="margin-top:0;">
                         <span style="
               display: inline-block;
               font-weight: bold;
@@ -1297,7 +1079,7 @@ error: could not compile `rust_data` (bin "rust_data") due to previous error
           </div>
               <div style="height:1.0em; clear:both;"></div>
             </li>
-            <li id="strmove">
+            <li>
               For all move types ownership will be transferred to another variable by construction, 
               assignment, or pass-by-value as a function argument.  A &quot;moved-from&quot; variable
               is invalid. Any use of that will result in a compile error.
@@ -1353,7 +1135,7 @@ but now, s is invalid
               </t-b>
               <div style="clear:both;"></div>
             </li>
-            <li id="strclone">
+            <li>
               Move types usually implement the <c-s>Clone</c-s> trait with the function <c-s>clone()</c-s>.
               Calling clone makes an independent copy of the source. The original and clone are independent
               entities with different owners. They have the same values immediately following the clone
@@ -1422,53 +1204,6 @@ So they are unique entities.
         </t-b>
         <t-b>
           <h3 id="ref">4.0 References</h3>
-          <table>
-            <tr>
-              <th>Link</th>
-              <th>Comments</th>
-            </tr>
-            <tr>
-              <td>
-                <a target="_blank" href="https://stackoverflow.com/questions/57754901/what-is-a-fat-pointer">
-                  fat pointers
-                </a>
-              </td>
-              <td>
-                Pointer to slices or trait objects contain an address and a length for these dynamically sized
-                types.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <a target="_blank" href="https://sanjuvi.github.io/Blog/posts/Rust-type-system-part-1/">
-                  Rust&nbsp;Type&nbsp;System&nbsp;#1
-                </a>
-              </td>
-              <td>
-                Ownership, aliasing, lifetime
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <a target="_blank" href="https://sanjuvi.github.io/Blog/posts/Rust-type-system-part-2/">
-                  Rust&nbsp;Type&nbsp;System&nbsp;#2
-                </a>
-              </td>
-              <td>
-                Algebraic types, generic associated types
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <a target="_blank" href="https://sanjuvi.github.io/Blog/posts/Rust-type-system-part-3/">
-                  Rust&nbsp;Type&nbsp;System&nbsp;#3
-                </a>
-              </td>
-              <td>
-                Generic container types, interior mutability
-              </td>
-            </tr>
-          </table>
         </t-b>
 
 

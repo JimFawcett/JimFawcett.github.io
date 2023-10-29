@@ -73,7 +73,7 @@ function initializeMenu() {
           <div class='ddItem'><a href='indexCpp.html'>&nbsp;C++</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexRust.html'>&nbsp;Rust</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexCs.html'>&nbsp;C#</a>&nbsp;</div>\
-          <div class='ddItem'><a href='BitsRepo.html'>&nbsp;Bits</a>&nbsp;</div>\
+          <div class='ddItem'><a href='Resources/Bits/Bits_Intro.html'>&nbsp;Bits</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexDesign.html'>&nbsp;Design</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexDeployment.html'>&nbsp;Deployment</a>&nbsp;</div>\
