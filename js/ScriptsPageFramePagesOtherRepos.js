@@ -1,5 +1,5 @@
 /*
- * ScriptsPageFramePagesCppTrack.js
+ * ScriptsPageFramePagesOtherRepos.js
  */
 
 function initializePages() {
@@ -12,8 +12,7 @@ function initializePages() {
           <menu-elem class='ddItems pageElem'><a href='CommCompare.html'>CommCompare</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='BasicBiteByByte.html'>BasicBites</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='DesignBites.html'>DesignBites</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='CodeBits.html'>CodeBits</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='IdiomsAndPatterns.html'>IdiomsAndPatterns</a>&nbsp;</menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='BitsRepo.html'>CodeBits</a>&nbsp;</menu-elem>\
           <menu-elem>&nbsp;</menu-elem>\
           <menu-elem>&nbsp;</menu-elem>";
   }
