@@ -317,7 +317,9 @@ bottomMenu.prev = function () {
 }
 
 bottomMenu.pages = function () {
+  /*alert('pages');*/
   var menu = document.getElementById("pages");
+  document.getElementById("sections").style.display = "none";
   var pageStyle = menu.style.display;
   if (isDefined(menu)) {
     if (menu.style.display == "flex")
@@ -329,6 +331,7 @@ bottomMenu.pages = function () {
 
 bottomMenu.sections = function () {
   var menu = document.getElementById("sections");
+  document.getElementById("pages").style.display = "none";
   if (isDefined(menu)) {
     if (menu.style.display == "flex")
       menu.style.display = "none";
