@@ -281,17 +281,17 @@
     <main id="main">
       <div id="about">about</div>
       <div id="page">Bits Objects Rust</div>
-      <div id="modified">11/13/2023</div>
+      <div id="modified">11/16/2023</div>
       <div id="hlp"></div>
       <a id="top"></a>
       <content>
         <!-- <div class="rightPanelLinks">
-          <a target="_parent" href="Bits_ObjectsCpp.html">C++</a>
-          <a target="_parent" class="darkItem" href="Bits_ObjectsRust.html">Rust</a>
-          <a target="_parent" href="Bits_ObjectsCSharp.html">C#</a>
-          <a target="_parent" href="Bits_ObjectsPython.html">Python</a>
-          <a target="_parent" href="Bits_ObjectsJs.html">JvScrpt</a>
-        </div> -->
+    <a target="_parent" href="Bits_ObjectsCpp.html">C++</a>
+    <a target="_parent" class="darkItem" href="Bits_ObjectsRust.html">Rust</a>
+    <a target="_parent" href="Bits_ObjectsCSharp.html">C#</a>
+    <a target="_parent" href="Bits_ObjectsPython.html">Python</a>
+    <a target="_parent" href="Bits_ObjectsJs.html">JvScrpt</a>
+  </div> -->
         <div id="scrollY"
              style="position:fixed; bottom:0.50em; right:1.50em; width:max-content; height:1.5em;
            text-align:right; padding:0.15em 0.5em; border:1px solid red;">
@@ -307,10 +307,6 @@
             </h3>
           </hgroup>
         </header>
-        <t-b style="border:2px solid red; padding:0.5em 1.5em;">
-          This page is a prototype used to decide which language features to emphasize. It will
-          be replaced with a final version soon.
-        </t-b>
         <t-b id="syn" style="border:1px solid maroon; padding:0.25em 1em 0.5em 1em;">
           <h4 style="margin:0em 0em 0.25em 0em;">Synopsis:</h4>
           This page demonstrates uses of Rust User-Defined types and their objects.
@@ -371,10 +367,404 @@
           illustrating syntax and basic operations.
         </t-b>
         <div style="height:0.25em;"></div>
-        <h3 id="code">1.0 CodeSnaps</h3>
+        <h3 id="code">1.0 Source code</h3>
         <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote()" />
-        <!-- <div style="display:flex; flex-direction:column;"> -->
-        <h4 id="funcs">Source Code - Analysis.rs</h4>
+        <h4 id="points">1.1 Source Code - Points.rs</h4>
+        <div class="blockSingle">
+          <pre class="codeSnap">
+/*-------------------------------------------------------------------
+  points.rs
+  - defines types Point1 and Point2&lt;T&gt;
+-------------------------------------------------------------------*/
+
+use std::default::*;
+use std::fmt::*;
+
+use crate::analysis;    // identify source code
+use analysis::*;        // import public functions and types
+
+/*---------------------------------------------------------
+  - Declare Point1 struct, like a C++ class
+  - Request compiler implement traits Debug & Clone
+*/
+#[derive(Debug, Clone)] <span class="info" style="float:right;" onclick="toggleInfoRel(this, 'txt1')">?</span>
+pub struct Point1 {
+    x: i32,
+    y: i32,
+    z: i32,
+}
+/*-- implement function new --*/
+impl Point1 {
+    pub fn new() -&gt; Point1 {
+        Point1 { x: 0, y: 0, z: 0 }
+    }
+    /*
+      For simple types like this it would be reasonable to
+      make x, y, z public and remove the getter and setter
+      functions.
+    */
+    pub fn get_x(&self) -&gt; &i32 {  <span class="info" style="float:right;" onclick="toggleInfoRel(this, 'txt2')">?</span>
+        &self.x
+    }
+    pub fn get_y(&self) -&gt; &i32 {
+        &self.y
+    }
+    pub fn get_z(&self) -&gt; &i32 {
+        &self.z
+    }
+    pub fn set_x(&mut self, x: i32) {
+        self.x = x
+    }
+    pub fn set_y(&mut self, y: i32) {
+        self.y = y
+    }
+    pub fn set_z(&mut self, z: i32) {
+        self.z = z
+    }
+    pub fn show(&self, nm:&str) {
+        print!(&quot;{:?}: Point1 {{ &quot;, nm);
+        print!(&quot;{0}, &quot;, self.x);
+        print!(&quot;{0}, &quot;, self.y);
+        println!(&quot;{0} }}&quot;, self.z);
+    }
+}
+
+/*---------------------------------------------------------
+  - Declare Point2&lt;T&gt; struct, like a C++ template class
+  - Request compiler implement traits Debug & Clone
+*/
+#[derive(Debug, Clone)]
+pub struct Point2&lt;T&gt;
+where
+    T: Debug,
+    T: Default,
+    T: Clone,
+{
+    coor: Vec&lt;T&gt;,
+}
+impl&lt;T&gt; Point2&lt;T&gt;
+where
+    T: Debug,
+    T: Default,
+    T: Clone,
+{
+    pub fn new(n: usize) -&gt; Point2&lt;T&gt; {
+        Point2::&lt;T&gt; {
+            coor: vec![T::default(); n],
+        }
+    }
+    pub fn init(mut self, coord: Vec&lt;T&gt;) -&gt; Point2&lt;T&gt; {
+        self.coor = coord;
+        self
+    }
+    pub fn len(&self) -&gt; usize {
+        self.coor.len()
+    }
+    /* acts as both get_coor() and set_coor(vec![1, 2, 3]) */
+    pub fn coors(&mut self) -&gt; &mut Vec&lt;T&gt; {
+        &mut self.coor
+    }
+    pub fn show(&self, nm:&str, left: usize, width:usize) {
+        print!(&quot;{:?}: Point2&lt;T&gt; {{&#92;n&quot;, nm);
+        show_fold(&self.coor, left, width);
+        println!(&quot;}}&quot;)
+    }
+}
+            </pre>
+          <div id="txt1" class="txt">
+            <t-b>
+              Rust uses structs as patterns for laying out objects in memory, 
+              much like C++ uses classes.
+            </t-b>
+            <t-b>
+              Methods are not declared within the struct body.  Instead, they are
+              defined in a seperate &quot;impl&quot; scope.
+            </t-b>
+          </div>
+          <div id="txt2" class="txt">
+            <t-b>
+              To insure memory safety, returning references from methods requires
+              lifetime annotations, and things start to get complicated.
+            </t-b>
+            <t-b>
+              Note that, as shown in <a href="Bits_DataCpp.html#source">Cpp Objects</a>,
+              C++ allows returning references and does no checking to ensure that
+              the referend still exists when used.
+            </t-b>
+            <t-b>
+              So, idiomatic Rust code will use getters and setters as shown here,
+              or in simple cases, use public data.
+            </t-b>
+          </div>
+        </div>
+        <h4 id="source">1.2 Source Code - main.rs</h4>
+        <div class="blockSingle">
+          <splitter-container id="container">
+            <first-item id="fig1-first" style="width:55%;">
+              <div class="codewrap">
+                <pre class="codeSnap">
+#![allow(dead_code)]
+#![allow(clippy::approx_constant)]
+
+/*------------------------------------------------------
+  rust_hello_objects::main.rs
+  - Demonstrates creation and use of Rust objects
+  - Rust uses struct instead of class to create objects
+*/
+mod analysis;     // identify module source file
+use analysis::*;  // import public functions and types
+mod points;       // identify module source file
+use points::*;    // import public functions and types
+
+/*------------------------------------------------------
+  Demo object instances in action
+*/
+fn main() {
+    show_label(&quot;demonstrate object creation&quot;, 50);
+
+    show_label(
+      &quot;std::library objects, string and vector&lt;T&gt;&quot;, 46
+    );
+    nl();
+
+    show_op(&quot;let mut s1 = &#92;&quot;a string&#92;&quot;.to_string()&quot;);
+    let mut s1 = &quot;a string&quot;.to_string();
+
+    show_op(&quot;show_type_scalar(&s1, &#92;&quot;&s1&#92;&quot;)&quot;);
+    show_type_scalar(&s1, &quot;&s1&quot;);
+    nl();
+
+    show_op(&quot;s1.push_str(&#92;&quot; and more&#92;&quot;);&quot;);
+    s1.push_str(&quot; and more&quot;);
+    show_type_scalar(&s1, &quot;&s1&quot;);
+    nl();
+
+    show_op(&quot;let mut v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1];&quot;);
+    let mut v: Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1];
+    show_type_scalar(&v, &quot;&v&quot;);
+    nl();
+
+    show_op(&quot;v.push(42);&quot;);
+    v.push(42);
+    show_type_scalar(&v, &quot;&v&quot;);
+
+    show_label(&quot;instances of user-defined types&quot;, 35);
+    nl();
+
+    show_op(&quot;let mut p1 = Point1::new()&quot;);
+    let mut p1 = Point1::new();
+    p1.show(&quot;p1&quot;);
+    p1.set_x(42);
+    p1.set_y(-3);
+    p1.set_z(2);
+    p1.show(&quot;p1&quot;);
+    show_type_scalar(&p1, &quot;p1&quot;);
+    nl();
+
+    show_op(&quot;let p1a = p1.clone()&quot;);
+    let p1a = p1.clone();
+    p1a.show(&quot;p1a.clone()&quot;);
+    nl();
+
+    let mut p2 = Point2::&lt;f64&gt;::new(10);
+    p2.show(&quot;p2&quot;, 2, 7);
+
+    show_op(&quot;show_type(p2, &#92;&quot;p2&#92;&quot;)&quot;);
+    show_type(&p2, &quot;p2&quot;);
+
+    show_op(&quot;show_value_enum(p2.coors(), &#92;&quot;p2&#92;&quot;, 2, 7)&quot;);
+    show_value_enum(p2.coors(), &quot;p2.coors()&quot;, 2, 7);
+    nl();
+
+    show_op(&quot;p2.coors()[2] = 3.1415&quot;);
+    p2.coors()[2] = 3.1415;
+
+    show_op(&quot;show_value_enum(p2.coors(), &#92;&quot;p2.coors()&#92;&quot;, 2, 7)&quot;);
+    show_value_enum(p2.coors(), &quot;p2.coors()&quot;, 2, 7);
+    nl();
+
+    let p2a =
+      Point2::&lt;i32&gt;::new(1).init(
+        vec![0, 1, 2, 3, 4, 4, 3, 2, 1, 0]
+      );
+    p2a.show(&quot;p2a&quot;, 2,7);
+    nl();
+
+    show_op(&quot;show_type_scalar(p2a, &#92;&quot;p2a&#92;&quot;)&quot;);
+    show_type_scalar(&p2a, &quot;p2a&quot;);
+
+    println!(&quot;p2a.len() = {:?}&quot;, p2a.len());
+    nl();
+
+    show_op(&quot;p2a.show(&#92;&quot;p2a&#92;&quot;, 2, 7)&quot;);
+    p2a.show(&quot;p2a&quot;, 2, 7);
+
+    show_label(&quot;Testing formats for collections&quot;, 35);
+    nl();
+
+    let v =
+      vec![
+        0i32, -1, 2, -3, 4, -5, 6, -7, 8, -9,
+        10, -11, 12, -13, 14
+      ];
+
+    show_op(&quot;show_type_scalar(&v, &#92;&quot;&v&#92;&quot;)&quot;);
+    show_type_scalar(&v, &quot;&v&quot;);
+    nl();
+
+    show_op(&quot;show_fold(&v, 2, 5)&quot;);
+    show_fold(&v, 2, 5);
+    nl();
+
+    show_op(&quot;let v = vec![0i32, ... ];&quot;);
+    show_op(&quot;fold(&v, 2, 12)&quot;);
+    let stmp = fold(&v, 2, 12);
+    println!(&quot;{stmp}&quot;);
+    nl();
+
+    show_op(&quot;let a = &[f64; 8];&quot;);
+    let a =
+      &[1.0, 2.5, -3.1, 4.3, 5.0, 6.0, 7.0, -8.0];
+    show_op(&quot;show_fold(a, 4, 5)&quot;);
+    show_fold(a, 4, 5);
+
+    print!(&quot;&#92;n&#92;n  That's all Folks!&#92;n&#92;n&quot;);
+}
+          </pre>
+              </div>
+            </first-item>
+            <splitter-bar id="fig1-seperator"></splitter-bar>
+            <second-item id="fig1-second" style="width:45%; display:block;">
+              <div style="white-space:nowrap; font-size:1.2em; margin:2em 5em;">
+                Output starts below:
+              </div>
+              <div style="margin:0em 2em;">
+                Vertical spacing has been adjusted to keep output close to the 
+                code that generated it.
+              </div>
+              <div style="height:7em;">&nbsp;</div>
+              <pre class="codeSnap">
+
+
+
+--------------------------------------------------
+  demonstrate object creation
+--------------------------------------------------
+
+----------------------------------------------
+  std::library objects, string and vector&lt;T&gt;
+----------------------------------------------
+
+
+--- let mut s1 = &quot;a string&quot;.to_string() ---
+
+--- show_type_scalar(&s1, &quot;&s1&quot;) ---
+call name: &quot;&s1&quot;, type: &quot;alloc::string::String&quot;
+value: &quot;a string&quot;, size: 24
+
+
+--- s1.push_str(&quot; and more&quot;); ---
+call name: &quot;&s1&quot;, type: &quot;alloc::string::String&quot;
+value: &quot;a string and more&quot;, size: 24
+
+
+--- let mut v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1]; ---
+call name: &quot;&v&quot;, type: &quot;alloc::vec::Vec&lt;i32&gt;&quot;
+value: [1, 2, 3, 2, 1], size: 24
+
+--- v.push(42); ---
+call name: &quot;&v&quot;, type: &quot;alloc::vec::Vec&lt;i32&gt;&quot;
+value: [1, 2, 3, 2, 1, 42], size: 24
+
+-----------------------------------
+  instances of user-defined types
+-----------------------------------
+
+--- let mut p1 = Point1::new() ---
+&quot;p1&quot;: Point1 { 0, 0, 0 }
+&quot;p1&quot;: Point1 { 42, -3, 2 }
+call name: &quot;p1&quot;, type: &quot;rust_hello_objects::points::Point1&quot;
+value: Point1 { x: 42, y: -3, z: 2 }, size: 12
+
+
+
+
+
+--- let p1a = p1.clone() ---
+&quot;p1a.clone()&quot;: Point1 { 42, -3, 2 }
+
+
+
+&quot;p2&quot;: Point2&lt;T&gt; {
+  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+  0.0, 0.0, 0.0
+}
+--- show_type(p2, &quot;p2&quot;) ---
+call name: &quot;p2&quot;, type: &quot;rust_hello_objects::points::Point2&lt;f64&gt;&quot;
+--- show_value_enum(p2.coors(), &quot;p2&quot;, 2, 7) ---
+&quot;p2.coors()&quot; {
+  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+  0.0, 0.0, 0.0
+}
+size: 24
+
+--- p2.coors()[2] = 3.1415 ---
+--- show_value_enum(p2.coors(), &quot;p2.coors()&quot;, 2, 7) ---
+&quot;p2.coors()&quot; {
+  0.0, 0.0, 3.1415, 0.0, 0.0, 0.0, 0.0,
+  0.0, 0.0, 0.0
+}
+size: 24
+
+&quot;p2a&quot;: Point2&lt;T&gt; {
+  0, 1, 2, 3, 4, 4, 3,
+  2, 1, 0
+}
+value: Point2 { coor: [0, 1, 2, 3, 4, 4, 3, 2, 1, 0] }, size: 24
+p2a.len() = 10
+
+--- p2a.show(&quot;p2a&quot;, 2, 7) ---
+&quot;p2a&quot;: Point2&lt;T&gt; {
+  0, 1, 2, 3, 4, 4, 3,
+  2, 1, 0
+}
+
+-----------------------------------
+  Testing formats for collections
+-----------------------------------
+
+
+
+--- show_type_scalar(&v, &quot;&v&quot;) ---
+call name: &quot;&v&quot;, type: &quot;alloc::vec::Vec&lt;i32&gt;&quot;
+value: [0, -1, 2, -3, 4, -5, 6, -7, 8, -9, 10, -11, 12, -13, 14], size: 24
+
+--- show_fold(&v, 2, 5) ---
+  0, -1, 2, -3, 4,
+  -5, 6, -7, 8, -9,
+  10, -11, 12, -13, 14
+
+
+--- let v = vec![0i32, ... ]; ---
+--- fold(&v, 2, 12) ---
+  0, -1, 2, -3, 4, -5, 6, -7, 8, -9, 10, -11,
+  12, -13, 14
+
+
+--- let a = &[f64; 8]; ---
+--- show_fold(a, 4, 5) ---
+    1.0, 2.5, -3.1, 4.3, 5.0,
+    6.0, 7.0, -8.0
+
+
+  That's all Folks!
+
+
+            </pre>
+            </second-item>
+          </splitter-container>
+        </div>
+        <h4 id="funcs">1.3 Source Code - Analysis.rs</h4>
         <div class="blockSingle">
           <pre class="codeSnap">
 /*-------------------------------------------------------------------
@@ -543,409 +933,18 @@ pub fn nl() {
 }
             </pre>
         </div>
-        <h4 id="source">1.2 Source Code - main.rs</h4>
-        <div class="blockSingle">
-          <splitter-container id="container" style="height:200em;">
-            <first-item id="fig1-first" style="width:55%;">
-              <div class="codewrap">
-                <pre class="codeSnap">
-#![allow(dead_code)]
-#![allow(clippy::approx_constant)]
-
-/*-------------------------------------------------------------------
-  rust_hello_objects::main.rs
-  - Demonstrates creation and use of Rust objects
-  - Rust uses struct instead of class to create objects
-*/
-mod analysis;     // identify module source file
-use analysis::*;  // import public functions and types
-mod points;       // identify module source file
-use points::*;    // import public functions and types
-
-/*---------------------------------------------------------
-  Demo object instances in action
-*/
-fn main() {
-    show_label(&quot;demonstrate object creation&quot;, 50);
-
-    show_label(
-      &quot;std::library objects, string and vector&lt;T&gt;&quot;, 46
-    );
-    nl();
-
-    /* #region - to use this feature install #region folding */
-    show_op(&quot;let mut s1 = &#92;&quot;a string&#92;&quot;.to_string()&quot;);
-    /* #endregion */
-    let mut s1 = &quot;a string&quot;.to_string();
-
-    /* #region */
-    show_op(&quot;show_type_scalar(&s1, &#92;&quot;&s1&#92;&quot;)&quot;);
-    /* #endregion */
-    show_type_scalar(&s1, &quot;&s1&quot;);
-    nl();
-
-    /* #region */
-    show_op(&quot;s1.push_str(&#92;&quot; and more&#92;&quot;);&quot;);
-    /* #endregion */
-    s1.push_str(&quot; and more&quot;);
-    show_type_scalar(&s1, &quot;&s1&quot;);
-    nl();
-
-    /* #region */
-    show_op(&quot;let mut v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1];&quot;);
-    /* #endregion */
-    let mut v: Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1];
-    show_type_scalar(&v, &quot;&v&quot;);
-    nl();
-
-    /* #region */
-    show_op(&quot;v.push(42);&quot;);
-    /* #endregion */
-    v.push(42);
-    show_type_scalar(&v, &quot;&v&quot;);
-
-    show_label(&quot;instances of user-defined types&quot;, 35);
-    nl();
-
-    /* #region */
-    show_op(&quot;let mut p1 = Point1::new()&quot;);
-    /* #endregion */
-    let mut p1 = Point1::new();
-    p1.show(&quot;p1&quot;);
-    p1.set_x(42);
-    p1.set_y(-3);
-    p1.set_z(2);
-    p1.show(&quot;p1&quot;);
-    show_type_scalar(&p1, &quot;p1&quot;);
-    nl();
-
-    /* #region */
-    show_op(&quot;let p1a = p1.clone()&quot;);
-    /* #endregion */
-    let p1a = p1.clone();
-    p1a.show(&quot;p1a.clone()&quot;);
-    nl();
-
-    let mut p2 = Point2::&lt;f64&gt;::new(10);
-    p2.show(&quot;p2&quot;, 2, 7);
-
-    /* #region */
-    show_op(&quot;show_type(p2, &#92;&quot;p2&#92;&quot;)&quot;);
-    /* #endregion */
-    show_type(&p2, &quot;p2&quot;);
-
-    /* #region */
-    show_op(&quot;show_value_enum(p2.coors(), &#92;&quot;p2&#92;&quot;, 2, 7)&quot;);
-    /* #endregion */
-    show_value_enum(p2.coors(), &quot;p2.coors()&quot;, 2, 7);
-    nl();
-
-    /* #region */
-    show_op(&quot;p2.coors()[2] = 3.1415&quot;);
-    /* #endregion */
-    p2.coors()[2] = 3.1415;
-
-    /* #region */
-    show_op(&quot;show_value_enum(p2.coors(), &#92;&quot;p2.coors()&#92;&quot;, 2, 7)&quot;);
-    /* #endregion */
-    show_value_enum(p2.coors(), &quot;p2.coors()&quot;, 2, 7);
-    nl();
-
-    let p2a =
-      Point2::&lt;i32&gt;::new(1).init(
-        vec![0, 1, 2, 3, 4, 4, 3, 2, 1, 0]
-      );
-    p2a.show(&quot;p2a&quot;, 2,7);
-    nl();
-
-    /* #region */
-    show_op(&quot;show_type_scalar(p2a, &#92;&quot;p2a&#92;&quot;)&quot;);
-    /* #endregion */
-    show_type_scalar(&p2a, &quot;p2a&quot;);
-
-    println!(&quot;p2a.len() = {:?}&quot;, p2a.len());
-    nl();
-
-    /* #region */
-    show_op(&quot;p2a.show(&#92;&quot;p2a&#92;&quot;, 2, 7)&quot;);
-    /* #endregion */
-    p2a.show(&quot;p2a&quot;, 2, 7);
-
-    show_label(&quot;Testing formats for collections&quot;, 35);
-    nl();
-
-    let v =
-      vec![
-        0i32, -1, 2, -3, 4, -5, 6, -7, 8, -9,
-        10, -11, 12, -13, 14
-      ];
-
-    /* #region */
-    show_op(&quot;show_type_scalar(&v, &#92;&quot;&v&#92;&quot;)&quot;);
-    /* #endregion */
-    show_type_scalar(&v, &quot;&v&quot;);
-    nl();
-
-    /* #region */
-    show_op(&quot;show_fold(&v, 2, 5)&quot;);
-    /* #endregion */
-    show_fold(&v, 2, 5);
-    nl();
-
-    /* #region */
-    show_op(&quot;let v = vec![0i32, ... ];&quot;);
-    show_op(&quot;fold(&v, 2, 12)&quot;);
-    /* #endregion */
-    let stmp = fold(&v, 2, 12);
-    println!(&quot;{stmp}&quot;);
-    nl();
-
-    /* #region */
-    show_op(&quot;let a = &[f64; 8];&quot;);
-    /* #endregion */
-    let a =
-      &[1.0, 2.5, -3.1, 4.3, 5.0, 6.0, 7.0, -8.0];
-    show_op(&quot;show_fold(a, 4, 5)&quot;);
-    show_fold(a, 4, 5);
-
-    print!(&quot;&#92;n&#92;n  That's all Folks!&#92;n&#92;n&quot;);
-}
-          </pre>
-              </div>
-            </first-item>
-            <splitter-bar id="fig1-seperator"></splitter-bar>
-            <second-item id="fig1-second" style="width:45%; display:block;">
-              <div style="white-space:nowrap; font-size:1.2em; margin:2em 5em;">
-                Output starts below:
-              </div>
-              <div style="height:7em;">&nbsp;</div>
-              <pre class="codeSnap" style="height:280em;">
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects
-&gt; cargo run
-   Compiling rust_hello_objects v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.42s
-     Running `target&#92;debug&#92;rust_hello_objects.exe`
-
---------------------------------------------------
-  demonstrate object creation
---------------------------------------------------
-
-----------------------------------------------
-  std::library objects, string and vector&lt;T&gt;
-----------------------------------------------
-
---- let mut s1 = &quot;a string&quot;.to_string() ---
---- show_type_scalar(&s1, &quot;&s1&quot;) ---
-call name: &quot;&s1&quot;, type: &quot;alloc::string::String&quot;
-value: &quot;a string&quot;, size: 24
-
---- s1.push_str(&quot; and more&quot;); ---
-call name: &quot;&s1&quot;, type: &quot;alloc::string::String&quot;
-value: &quot;a string and more&quot;, size: 24
-
---- let mut v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1]; ---
-call name: &quot;&v&quot;, type: &quot;alloc::vec::Vec&lt;i32&gt;&quot;
-value: [1, 2, 3, 2, 1], size: 24
-
---- v.push(42); ---
-call name: &quot;&v&quot;, type: &quot;alloc::vec::Vec&lt;i32&gt;&quot;
-value: [1, 2, 3, 2, 1, 42], size: 24
-
------------------------------------
-  instances of user-defined types
------------------------------------
-
---- let mut p1 = Point1::new() ---
-&quot;p1&quot;: Point1 { 0, 0, 0 }
-&quot;p1&quot;: Point1 { 42, -3, 2 }
-call name: &quot;p1&quot;, type: &quot;rust_hello_objects::points::Point1&quot;
-value: Point1 { x: 42, y: -3, z: 2 }, size: 12
-
---- let p1a = p1.clone() ---
-&quot;p1a.clone()&quot;: Point1 { 42, -3, 2 }
-
-&quot;p2&quot;: Point2&lt;T&gt; {
-  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-  0.0, 0.0, 0.0
-}
---- show_type(p2, &quot;p2&quot;) ---
-call name: &quot;p2&quot;, type: &quot;rust_hello_objects::points::Point2&lt;f64&gt;&quot;
---- show_value_enum(p2.coors(), &quot;p2&quot;, 2, 7) ---
-&quot;p2.coors()&quot; {
-  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-  0.0, 0.0, 0.0
-}
-size: 24
-
---- p2.coors()[2] = 3.1415 ---
---- show_value_enum(p2.coors(), &quot;p2.coors()&quot;, 2, 7) ---
-&quot;p2.coors()&quot; {
-  0.0, 0.0, 3.1415, 0.0, 0.0, 0.0, 0.0,
-  0.0, 0.0, 0.0
-}
-size: 24
-
-&quot;p2a&quot;: Point2&lt;T&gt; {
-  0, 1, 2, 3, 4, 4, 3,
-  2, 1, 0
-}
-
-&quot;
-value: Point2 { coor: [0, 1, 2, 3, 4, 4, 3, 2, 1, 0] }, size: 24p2a.len() = 10
-
---- p2a.show(&quot;p2a&quot;, 2, 7) ---
-&quot;p2a&quot;: Point2&lt;T&gt; {
-  0, 1, 2, 3, 4, 4, 3,
-  2, 1, 0
-}
-
------------------------------------
-  Testing formats for collections
------------------------------------
-
---- show_type_scalar(&v, &quot;&v&quot;) ---
-call name: &quot;&v&quot;, type: &quot;alloc::vec::Vec&lt;i32&gt;&quot;
-value: [0, -1, 2, -3, 4, -5, 6, -7, 8, -9, 10, -11, 12, -13, 14], size: 24
-
---- show_fold(&v, 2, 5) ---
-  0, -1, 2, -3, 4,
-  -5, 6, -7, 8, -9,
-  10, -11, 12, -13, 14
-
---- let v = vec![0i32, ... ]; ---
---- fold(&v, 2, 12) ---
-  0, -1, 2, -3, 4, -5, 6, -7, 8, -9, 10, -11,
-  12, -13, 14
-
---- let a = &[f64; 8]; ---
---- show_fold(a, 4, 5) ---
-    1.0, 2.5, -3.1, 4.3, 5.0,
-    6.0, 7.0, -8.0
-
-
-  That's all Folks!
-
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects
-&gt;
-            </pre>
-            </second-item>
-          </splitter-container>
-        </div>
-        <h4 id="points">Source Code - Points.rs</h4>
+        <h4 id="build">2.0 Build</h4>
         <div class="blockSingle">
           <pre class="codeSnap">
-/*-------------------------------------------------------------------
-  points.rs
-  - defines types Point1 and Point2&lt;T&gt;
--------------------------------------------------------------------*/
-
-use std::default::*;
-use std::fmt::*;
-
-use crate::analysis;    // identify source code
-use analysis::*;        // import public functions and types
-
-/*---------------------------------------------------------
-  - Declare Point1 struct, like a C++ class
-  - Request compiler implement traits Debug & Clone
-*/
-#[derive(Debug, Clone)]
-pub struct Point1 {
-    x: i32,
-    y: i32,
-    z: i32,
-}
-/*-- implement function new --*/
-impl Point1 {
-    pub fn new() -&gt; Point1 {
-        Point1 { x: 0, y: 0, z: 0 }
-    }
-    /*
-      For simple types like this it would be reasonable to
-      make x, y, z public and remove the getter and setter
-      functions.
-    */
-    pub fn get_x(&self) -&gt; &i32 {
-        &self.x
-    }
-    pub fn get_y(&self) -&gt; &i32 {
-        &self.y
-    }
-    pub fn get_z(&self) -&gt; &i32 {
-        &self.z
-    }
-    pub fn set_x(&mut self, x: i32) {
-        self.x = x
-    }
-    pub fn set_y(&mut self, y: i32) {
-        self.y = y
-    }
-    pub fn set_z(&mut self, z: i32) {
-        self.z = z
-    }
-    pub fn show(&self, nm:&str) {
-        print!(&quot;{:?}: Point1 {{ &quot;, nm);
-        print!(&quot;{0}, &quot;, self.x);
-        print!(&quot;{0}, &quot;, self.y);
-        println!(&quot;{0} }}&quot;, self.z);
-    }
-}
-
-/*---------------------------------------------------------
-  - Declare Point2&lt;T&gt; struct, like a C++ template class
-  - Request compiler implement traits Debug & Clone
-*/
-#[derive(Debug, Clone)]
-pub struct Point2&lt;T&gt;
-where
-    T: Debug,
-    T: Default,
-    T: Clone,
-{
-    coor: Vec&lt;T&gt;,
-}
-impl&lt;T&gt; Point2&lt;T&gt;
-where
-    T: Debug,
-    T: Default,
-    T: Clone,
-{
-    pub fn new(n: usize) -&gt; Point2&lt;T&gt; {
-        Point2::&lt;T&gt; {
-            coor: vec![T::default(); n],
-        }
-    }
-    pub fn init(mut self, coord: Vec&lt;T&gt;) -&gt; Point2&lt;T&gt; {
-        self.coor = coord;
-        self
-    }
-    pub fn len(&self) -&gt; usize {
-        self.coor.len()
-    }
-    /* acts as both get_coor() and set_coor(vec![1, 2, 3]) */
-    pub fn coors(&mut self) -&gt; &mut Vec&lt;T&gt; {
-        &mut self.coor
-    }
-    pub fn show(&self, nm:&str, left: usize, width:usize) {
-        print!(&quot;{:?}: Point2&lt;T&gt; {{&#92;n&quot;, nm);
-        show_fold(&self.coor, left, width);
-        println!(&quot;}}&quot;)
-    }
-}
-            </pre>
-        </div>
-        <h4 id="out">Output</h4>
-        <h4 id="build">Build</h4>
-        <pre class="codeSnap">
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects
 &gt; cargo build
    Compiling rust_hello_objects v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects)
     Finished dev [unoptimized + debuginfo] target(s) in 0.42s
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects
 &gt;
-          </pre>
+</pre>
         </div>
-        <h3 id="vscode">2.0 VS Code View</h3>
+        <h3 id="vscode">3.0 VS Code View</h3>
         <t-b>
           The code for this demo is available in
           <a target="_blank" href="https://github.com/JimFawcett/Bits">github.com/JimFawcett/Bits</a>. If you click on
@@ -968,8 +967,8 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects
           <span style="font-family:'Comic Sans MS';">Figure 3. Debugging Rust Objects</span>
         </photosizer-block>
         <!--<photosizer-block src="pictures/VS_Code_Cpp_Plugins.jpg" width="700" class="photoSizerBlock left">
-          <span style="font-family:'Comic Sans MS';">Figure 3. C++ Plugins</span>
-        </photosizer-block>-->
+    <span style="font-family:'Comic Sans MS';">Figure 3. C++ Plugins</span>
+  </photosizer-block>-->
 
         <div style="height:0.75em;" class="clear"></div>
         <h3 id="refs">3.0 References</h3>
