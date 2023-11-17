@@ -200,7 +200,7 @@
       display: none;
       position: absolute;
       right: 4.5em;
-      width: 25em;
+      width: 20em;
       z-index: 10;
       color: var(--dark);
       font-size: small;
@@ -209,6 +209,7 @@
       padding: 0em 0.5em;
       overflow-y: visible;
     }
+
   </style>
   <script>
     function closeInfos() {
@@ -374,100 +375,89 @@
           <pre class="codeSnap">
 /*-------------------------------------------------------------------
   points.rs
-  - defines types Point1 and Point2&lt;T&gt;
+  - defines type Point4D representing points in space-time
 -------------------------------------------------------------------*/
 
-use std::default::*;
 use std::fmt::*;
-
-use crate::analysis;    // identify source code
-use analysis::*;        // import public functions and types
+use chrono::prelude::*;
 
 /*---------------------------------------------------------
-  - Declare Point1 struct, like a C++ class
+  - Declare Point4D struct, like a C++ class
   - Request compiler implement traits Debug & Clone
 */
-#[derive(Debug, Clone)] <span class="info" style="float:right;" onclick="toggleInfoRel(this, 'txt1')">?</span>
-pub struct Point1 {
-    x: i32,
-    y: i32,
-    z: i32,
+#[derive(Debug, Clone)]  <span class="info" style="float:right;" onclick="toggleInfoRel(this, 'txt1', -25)">?</span>
+pub struct Point4D {
+    x: f64,
+    y: f64,
+    z: f64,
+    t: DateTime&lt;Local&gt;,
 }
-/*-- implement function new --*/
-impl Point1 {
-    pub fn new() -&gt; Point1 {
-        Point1 { x: 0, y: 0, z: 0 }
+/*-- implement constructor function new --*/
+impl Point4D {
+    pub fn new() -&gt; Point4D {
+        Point4D { x: 0.0, y: 0.0, z: 0.0, t: Local::now() }
     }
+    /*------------------------------------------------
+      These methods can be used to set or retrieve
+      values of Point4D instance coordinates, as they
+      return a mutable reference. Note similarity with
+      C++ code.
+    */
+    pub fn coor_x(&mut self) -&gt; &mut f64 {<span class="info" style="float:right;" onclick="toggleInfoRel(this, 'txt2', -25)">?</span>
+      &mut self.x
+    }
+    pub fn coor_y(&mut self) -&gt; &mut f64 {
+      &mut self.y
+    }
+    pub fn coor_z(&mut self) -&gt; &mut f64 {
+      &mut self.z
+    }
+    pub fn time(&self) -&gt; String {<span class="info" style="float:right;" onclick="toggleInfoRel(this, 'txt3', -25)">?</span>
+      self.t.format(&quot;%a %b %e %Y, %T&quot;).to_string()
+    }
+    pub fn update_time(&mut self) {
+      self.t = Utc::now().with_timezone(&Local);
+    }
+    /*------------------------------------------------
+      An alternate design for mutating coordinates.
+      This set has twice as many methods, but may
+      make access and mutation more obvious when
+      reading source code.
+    */
+    pub fn get_x(&self) -&gt; &f64 {
+        &self.x
+    }
+    pub fn get_y(&self) -&gt; &f64 {
+        &self.y
+    }
+    pub fn get_z(&self) -&gt; &f64 {
+        &self.z
+    }
+    pub fn set_x(&mut self, x: f64) {
+        self.x = x
+    }
+    pub fn set_y(&mut self, y: f64) {
+        self.y = y
+    }
+    pub fn set_z(&mut self, z: f64) {
+        self.z = z
+    }
+    /*
+      A different strategy is used in the Generic Bit to
+      access an arbitrary number of coordinate values.
+    */
     /*
       For simple types like this it would be reasonable to
       make x, y, z public and remove the getter and setter
       functions.
     */
-    pub fn get_x(&self) -&gt; &i32 {  <span class="info" style="float:right;" onclick="toggleInfoRel(this, 'txt2')">?</span>
-        &self.x
-    }
-    pub fn get_y(&self) -&gt; &i32 {
-        &self.y
-    }
-    pub fn get_z(&self) -&gt; &i32 {
-        &self.z
-    }
-    pub fn set_x(&mut self, x: i32) {
-        self.x = x
-    }
-    pub fn set_y(&mut self, y: i32) {
-        self.y = y
-    }
-    pub fn set_z(&mut self, z: i32) {
-        self.z = z
-    }
     pub fn show(&self, nm:&str) {
-        print!(&quot;{:?}: Point1 {{ &quot;, nm);
+        print!(&quot;{nm}: Point4D {{&#92;n  &quot;);
         print!(&quot;{0}, &quot;, self.x);
         print!(&quot;{0}, &quot;, self.y);
-        println!(&quot;{0} }}&quot;, self.z);
-    }
-}
-
-/*---------------------------------------------------------
-  - Declare Point2&lt;T&gt; struct, like a C++ template class
-  - Request compiler implement traits Debug & Clone
-*/
-#[derive(Debug, Clone)]
-pub struct Point2&lt;T&gt;
-where
-    T: Debug,
-    T: Default,
-    T: Clone,
-{
-    coor: Vec&lt;T&gt;,
-}
-impl&lt;T&gt; Point2&lt;T&gt;
-where
-    T: Debug,
-    T: Default,
-    T: Clone,
-{
-    pub fn new(n: usize) -&gt; Point2&lt;T&gt; {
-        Point2::&lt;T&gt; {
-            coor: vec![T::default(); n],
-        }
-    }
-    pub fn init(mut self, coord: Vec&lt;T&gt;) -&gt; Point2&lt;T&gt; {
-        self.coor = coord;
-        self
-    }
-    pub fn len(&self) -&gt; usize {
-        self.coor.len()
-    }
-    /* acts as both get_coor() and set_coor(vec![1, 2, 3]) */
-    pub fn coors(&mut self) -&gt; &mut Vec&lt;T&gt; {
-        &mut self.coor
-    }
-    pub fn show(&self, nm:&str, left: usize, width:usize) {
-        print!(&quot;{:?}: Point2&lt;T&gt; {{&#92;n&quot;, nm);
-        show_fold(&self.coor, left, width);
-        println!(&quot;}}&quot;)
+        println!(&quot;{0},&quot;, self.z);
+        println!(&quot;  {}&quot;, Local::now().format(&quot;%a %b %e %Y, %T&quot;));
+        println!(&quot;}}&quot;);
     }
 }
             </pre>
@@ -483,17 +473,23 @@ where
           </div>
           <div id="txt2" class="txt">
             <t-b>
-              To insure memory safety, returning references from methods requires
-              lifetime annotations, and things start to get complicated.
+              Unlike C++, the input reference to self must be supplied explicitly, where
+              C++ passes that implicitly, e.g., for C++ it doesn&apos;t appear in user code.
             </t-b>
             <t-b>
-              Note that, as shown in <a href="Bits_DataCpp.html#source">Cpp Objects</a>,
-              C++ allows returning references and does no checking to ensure that
-              the referend still exists when used.
+              Mutability must be explicit.  If not declared, any attempt to change
+              value will fail to compile.
+            </t-b>
+          </div>
+          <div id="txt3" class="txt">
+            <t-b>
+              Return types are declared explicitly, as shown here for the
+              return of a string representation of Point4D&apos;s
+              value of local time.
             </t-b>
             <t-b>
-              So, idiomatic Rust code will use getters and setters as shown here,
-              or in simple cases, use public data.
+              <c-s>t:DateTime&lt;Local&gt;</c-s> is converted to a string
+              using its format method.
             </t-b>
           </div>
         </div>
@@ -506,131 +502,138 @@ where
 #![allow(dead_code)]
 #![allow(clippy::approx_constant)]
 
-/*------------------------------------------------------
-  rust_hello_objects::main.rs
+/*-------------------------------------------------------------------
+  rust_objects::main.rs
   - Demonstrates creation and use of Rust objects
   - Rust uses struct instead of class to create objects
 */
-mod analysis;     // identify module source file
-use analysis::*;  // import public functions and types
-mod points;       // identify module source file
-use points::*;    // import public functions and types
+/*-----------------------------------------------
+Note:
+Find all Bits code, including this in
+https://github.com/JimFawcett/Bits
+You can clone the repo from this link.
+-----------------------------------------------*/
 
-/*------------------------------------------------------
+mod analysis_objects;     // identify module source file
+use analysis_objects::*;  // import public functions and types
+mod points_objects;       // identify module source file
+use points_objects::*;    // import public functions and types
+
+fn demo_standard_objects() {
+                <span class="info" style="float:right;" onclick="toggleInfoRel(this, 'mtxt1', -60)">?</span>
+  show_label(
+    &quot;std::library objects: string and vector&lt;T&gt;&quot;, 46
+  );
+  nl();
+                <span class="info" style="float:right;" onclick="toggleInfoRel(this, 'mtxt2', -60)">?</span>
+  /*-- create instance of String ----*/
+  show_op(&quot;let mut s1 = &#92;&quot;a string&#92;&quot;.to_string()&quot;);
+  let mut s1 = &quot;a string&quot;.to_string();
+  println!(&quot;  s1:String - {:?}&quot;, s1);
+  nl();
+  /*-- show type of s1 --------------*/
+  show_op(&quot;show_type_scalar(&s1, &#92;&quot;&s1&#92;&quot;)&quot;);
+  show_type_scalar(&s1, &quot;&s1&quot;);
+  nl();
+  /*-- one of many operations -------*/
+  show_op(&quot;s1.push_str(&#92;&quot; and more&#92;&quot;);&quot;);
+  s1.push_str(&quot; and more&quot;);
+  println!(&quot;  s1:String - {:?}&quot;, s1);
+  nl();
+  //https://jimfawcett.github.io/Resources/RustBites/RustBites_Strings.html
+
+  /*-- create instance of Vec&lt;i32&gt; --*/
+  show_op(&quot;let mut v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1];&quot;);
+  let mut v: Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1];
+  println!(&quot;  v:Vec&lt;i32&gt; - {:?}&quot;, v);
+  nl();
+  /*-- show type of v ---------------*/
+  show_op(&quot;show_type_scalar(&v, &#92;&quot;&v&#92;&quot;)&quot;);
+  show_type_scalar(&v, &quot;&v&quot;);
+  nl();
+  /*-- show one of many operations --*/
+  show_op(&quot;v.push(42);&quot;);
+  v.push(42);
+  println!(&quot;  v:Vec&lt;i32&gt; - {:?}&quot;, v);
+  //https://jimfawcett.github.io/Resources/RustBites/RustBites_DataStr.html#vec
+}
+
+fn demo_user_defined_objects() {
+
+  show_label(&quot;instances of user-defined type&quot;, 35);
+  nl();
+
+  /*-- create instance of Point4D ---*/
+  show_op(&quot;let mut p1 = Point4D::new()&quot;);
+  let mut p1 = Point4D::new();
+  p1.show(&quot;p1&quot;);
+  p1.set_x(42.0);
+  p1.set_y(-3.0);
+  p1.set_z(2.0);
+  p1.show(&quot;p1&quot;);
+  /*-- show p1's type ---------------*/
+  show_type_scalar(&p1, &quot;p1&quot;);
+  nl();
+
+  /*-- show one of its operations ---*/
+  show_op(&quot;let p1a = p1.clone()&quot;);
+  let p1a = p1.clone();
+  p1a.show(&quot;p1.clone()&quot;);
+
+  println!(&quot;&#92;nusing PointN&lt;f64&gt;::coor_x function:&quot;);
+  let rx = p1.coor_x();
+  *rx = 84.0;
+  p1.show(&quot;p1&quot;);
+
+  println!(&quot;&#92;nusing PointN&lt;f64&gt;::coor_y function:&quot;);
+  let ry = p1.coor_y();
+  *ry = 84.0;
+  p1.show(&quot;p1&quot;);
+
+  println!(&quot;&#92;nusing PointN&lt;f64&gt;::coor_z function:&quot;);
+  let rz = p1.coor_z();
+  *rz = 84.0;
+  p1.show(&quot;p1&quot;);
+
+  println!(&quot;&#92;nupdating time value:&quot;);
+  /*-- delay 5 secs for update_time demo --*/
+  println!(&quot;delaying 5 seconds before time update&quot;);
+  use std::time::Duration;
+  let dur:Duration = Duration::from_secs(5);
+  std::thread::sleep(dur);
+
+  p1.update_time();
+  p1.show(&quot;p1&quot;);
+}
+
+/*---------------------------------------------------------
   Demo object instances in action
 */
 fn main() {
     show_label(&quot;demonstrate object creation&quot;, 50);
 
-    show_label(
-      &quot;std::library objects, string and vector&lt;T&gt;&quot;, 46
-    );
-    nl();
+    demo_standard_objects();
+    demo_user_defined_objects();
 
-    show_op(&quot;let mut s1 = &#92;&quot;a string&#92;&quot;.to_string()&quot;);
-    let mut s1 = &quot;a string&quot;.to_string();
-
-    show_op(&quot;show_type_scalar(&s1, &#92;&quot;&s1&#92;&quot;)&quot;);
-    show_type_scalar(&s1, &quot;&s1&quot;);
-    nl();
-
-    show_op(&quot;s1.push_str(&#92;&quot; and more&#92;&quot;);&quot;);
-    s1.push_str(&quot; and more&quot;);
-    show_type_scalar(&s1, &quot;&s1&quot;);
-    nl();
-
-    show_op(&quot;let mut v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1];&quot;);
-    let mut v: Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1];
-    show_type_scalar(&v, &quot;&v&quot;);
-    nl();
-
-    show_op(&quot;v.push(42);&quot;);
-    v.push(42);
-    show_type_scalar(&v, &quot;&v&quot;);
-
-    show_label(&quot;instances of user-defined types&quot;, 35);
-    nl();
-
-    show_op(&quot;let mut p1 = Point1::new()&quot;);
-    let mut p1 = Point1::new();
-    p1.show(&quot;p1&quot;);
-    p1.set_x(42);
-    p1.set_y(-3);
-    p1.set_z(2);
-    p1.show(&quot;p1&quot;);
-    show_type_scalar(&p1, &quot;p1&quot;);
-    nl();
-
-    show_op(&quot;let p1a = p1.clone()&quot;);
-    let p1a = p1.clone();
-    p1a.show(&quot;p1a.clone()&quot;);
-    nl();
-
-    let mut p2 = Point2::&lt;f64&gt;::new(10);
-    p2.show(&quot;p2&quot;, 2, 7);
-
-    show_op(&quot;show_type(p2, &#92;&quot;p2&#92;&quot;)&quot;);
-    show_type(&p2, &quot;p2&quot;);
-
-    show_op(&quot;show_value_enum(p2.coors(), &#92;&quot;p2&#92;&quot;, 2, 7)&quot;);
-    show_value_enum(p2.coors(), &quot;p2.coors()&quot;, 2, 7);
-    nl();
-
-    show_op(&quot;p2.coors()[2] = 3.1415&quot;);
-    p2.coors()[2] = 3.1415;
-
-    show_op(&quot;show_value_enum(p2.coors(), &#92;&quot;p2.coors()&#92;&quot;, 2, 7)&quot;);
-    show_value_enum(p2.coors(), &quot;p2.coors()&quot;, 2, 7);
-    nl();
-
-    let p2a =
-      Point2::&lt;i32&gt;::new(1).init(
-        vec![0, 1, 2, 3, 4, 4, 3, 2, 1, 0]
-      );
-    p2a.show(&quot;p2a&quot;, 2,7);
-    nl();
-
-    show_op(&quot;show_type_scalar(p2a, &#92;&quot;p2a&#92;&quot;)&quot;);
-    show_type_scalar(&p2a, &quot;p2a&quot;);
-
-    println!(&quot;p2a.len() = {:?}&quot;, p2a.len());
-    nl();
-
-    show_op(&quot;p2a.show(&#92;&quot;p2a&#92;&quot;, 2, 7)&quot;);
-    p2a.show(&quot;p2a&quot;, 2, 7);
-
-    show_label(&quot;Testing formats for collections&quot;, 35);
-    nl();
-
-    let v =
-      vec![
-        0i32, -1, 2, -3, 4, -5, 6, -7, 8, -9,
-        10, -11, 12, -13, 14
-      ];
-
-    show_op(&quot;show_type_scalar(&v, &#92;&quot;&v&#92;&quot;)&quot;);
-    show_type_scalar(&v, &quot;&v&quot;);
-    nl();
-
-    show_op(&quot;show_fold(&v, 2, 5)&quot;);
-    show_fold(&v, 2, 5);
-    nl();
-
-    show_op(&quot;let v = vec![0i32, ... ];&quot;);
-    show_op(&quot;fold(&v, 2, 12)&quot;);
-    let stmp = fold(&v, 2, 12);
-    println!(&quot;{stmp}&quot;);
-    nl();
-
-    show_op(&quot;let a = &[f64; 8];&quot;);
-    let a =
-      &[1.0, 2.5, -3.1, 4.3, 5.0, 6.0, 7.0, -8.0];
-    show_op(&quot;show_fold(a, 4, 5)&quot;);
-    show_fold(a, 4, 5);
-
-    print!(&quot;&#92;n&#92;n  That's all Folks!&#92;n&#92;n&quot;);
+    print!(&quot;&#92;n&#92;nThat's all Folks!&#92;n&#92;n&quot;);
 }
           </pre>
+                <div id="mtxt1" class="txt">
+                  <t-b>
+                    This code has been structured with topic-specific demonstration
+                    functions that are called in main.
+                  </t-b>
+                </div>
+                <div id="mtxt2" class="txt">
+                  <t-b>
+                    This demo code is cluttered with a lot of analysis and display
+                    functions like <c-s>show_op</c-s> and <c-s>show_type</c-s>. 
+                  </t-b>
+                  <t-b>
+                    That makes source code in main harder to read,
+                    but makes the output easier to understand.
+                  </t-b>
+                </div>
               </div>
             </first-item>
             <splitter-bar id="fig1-seperator"></splitter-bar>
@@ -647,118 +650,108 @@ fn main() {
 
 
 
+
+
+
 --------------------------------------------------
   demonstrate object creation
 --------------------------------------------------
 
 ----------------------------------------------
-  std::library objects, string and vector&lt;T&gt;
+  std::library objects: string and vector&lt;T&gt;
 ----------------------------------------------
 
 
+
 --- let mut s1 = &quot;a string&quot;.to_string() ---
+  s1:String - &quot;a string&quot;
+
+
 
 --- show_type_scalar(&s1, &quot;&s1&quot;) ---
-call name: &quot;&s1&quot;, type: &quot;alloc::string::String&quot;
+&quot;&s1&quot;, type: &quot;alloc::string::String&quot;
 value: &quot;a string&quot;, size: 24
 
-
 --- s1.push_str(&quot; and more&quot;); ---
-call name: &quot;&s1&quot;, type: &quot;alloc::string::String&quot;
-value: &quot;a string and more&quot;, size: 24
+  s1:String - &quot;a string and more&quot;
+
+
+
 
 
 --- let mut v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1]; ---
-call name: &quot;&v&quot;, type: &quot;alloc::vec::Vec&lt;i32&gt;&quot;
-value: [1, 2, 3, 2, 1], size: 24
-
---- v.push(42); ---
-call name: &quot;&v&quot;, type: &quot;alloc::vec::Vec&lt;i32&gt;&quot;
-value: [1, 2, 3, 2, 1, 42], size: 24
-
------------------------------------
-  instances of user-defined types
------------------------------------
-
---- let mut p1 = Point1::new() ---
-&quot;p1&quot;: Point1 { 0, 0, 0 }
-&quot;p1&quot;: Point1 { 42, -3, 2 }
-call name: &quot;p1&quot;, type: &quot;rust_hello_objects::points::Point1&quot;
-value: Point1 { x: 42, y: -3, z: 2 }, size: 12
-
-
-
-
-
---- let p1a = p1.clone() ---
-&quot;p1a.clone()&quot;: Point1 { 42, -3, 2 }
-
-
-
-&quot;p2&quot;: Point2&lt;T&gt; {
-  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-  0.0, 0.0, 0.0
-}
---- show_type(p2, &quot;p2&quot;) ---
-call name: &quot;p2&quot;, type: &quot;rust_hello_objects::points::Point2&lt;f64&gt;&quot;
---- show_value_enum(p2.coors(), &quot;p2&quot;, 2, 7) ---
-&quot;p2.coors()&quot; {
-  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-  0.0, 0.0, 0.0
-}
-size: 24
-
---- p2.coors()[2] = 3.1415 ---
---- show_value_enum(p2.coors(), &quot;p2.coors()&quot;, 2, 7) ---
-&quot;p2.coors()&quot; {
-  0.0, 0.0, 3.1415, 0.0, 0.0, 0.0, 0.0,
-  0.0, 0.0, 0.0
-}
-size: 24
-
-&quot;p2a&quot;: Point2&lt;T&gt; {
-  0, 1, 2, 3, 4, 4, 3,
-  2, 1, 0
-}
-value: Point2 { coor: [0, 1, 2, 3, 4, 4, 3, 2, 1, 0] }, size: 24
-p2a.len() = 10
-
---- p2a.show(&quot;p2a&quot;, 2, 7) ---
-&quot;p2a&quot;: Point2&lt;T&gt; {
-  0, 1, 2, 3, 4, 4, 3,
-  2, 1, 0
-}
-
------------------------------------
-  Testing formats for collections
------------------------------------
+  v:Vec&lt;i32&gt; - [1, 2, 3, 2, 1]
 
 
 
 --- show_type_scalar(&v, &quot;&v&quot;) ---
-call name: &quot;&v&quot;, type: &quot;alloc::vec::Vec&lt;i32&gt;&quot;
-value: [0, -1, 2, -3, 4, -5, 6, -7, 8, -9, 10, -11, 12, -13, 14], size: 24
+&quot;&v&quot;, type: &quot;alloc::vec::Vec&lt;i32&gt;&quot;
+value: [1, 2, 3, 2, 1], size: 24
 
---- show_fold(&v, 2, 5) ---
-  0, -1, 2, -3, 4,
-  -5, 6, -7, 8, -9,
-  10, -11, 12, -13, 14
+--- v.push(42); ---
+  v:Vec&lt;i32&gt; - [1, 2, 3, 2, 1, 42]
 
 
---- let v = vec![0i32, ... ]; ---
---- fold(&v, 2, 12) ---
-  0, -1, 2, -3, 4, -5, 6, -7, 8, -9, 10, -11,
-  12, -13, 14
 
 
---- let a = &[f64; 8]; ---
---- show_fold(a, 4, 5) ---
-    1.0, 2.5, -3.1, 4.3, 5.0,
-    6.0, 7.0, -8.0
+
+-----------------------------------
+  instances of user-defined type
+-----------------------------------
+
+--- let mut p1 = Point4D::new() ---
+p1: Point4D {
+  0, 0, 0,
+  Fri Nov 17 2023, 09:09:15
+}
+p1: Point4D {
+  42, -3, 2,
+  Fri Nov 17 2023, 09:09:15
+}
+&quot;p1&quot;, type: &quot;rust_objects::points_objects::Point4D&quot;
+value: Point4D { x: 42.0, y: -3.0, z: 2.0, t: 2023-11-17T09:09:15.936911500-06:00 }, size: 40
+
+--- let p1a = p1.clone() ---
+p1.clone(): Point4D {
+  42, -3, 2,
+  Fri Nov 17 2023, 09:09:15
+}
+
+using PointN&lt;f64&gt;::coor_x function:
+p1: Point4D {
+  84, -3, 2,
+  Fri Nov 17 2023, 09:09:15
+}
+
+using PointN&lt;f64&gt;::coor_y function:
+p1: Point4D {
+  84, 84, 2,
+  Fri Nov 17 2023, 09:09:15
+}
+
+using PointN&lt;f64&gt;::coor_z function:
+p1: Point4D {
+  84, 84, 84,
+  Fri Nov 17 2023, 09:09:15
+}
+
+updating time value:
+delaying 5 seconds before time update
+p1: Point4D {
+  84, 84, 84,
+  Fri Nov 17 2023, 09:09:20
+}
 
 
-  That's all Folks!
 
+
+
+
+
+
+
+
+That's all Folks!
 
             </pre>
             </second-item>
@@ -768,7 +761,7 @@ value: [0, -1, 2, -3, 4, -5, 6, -7, 8, -9, 10, -11, 12, -13, 14], size: 24
         <div class="blockSingle">
           <pre class="codeSnap">
 /*-------------------------------------------------------------------
-  analysis.rs
+  analysis.rs<span class="info" style="float:right;" onclick="toggleInfoRel(this, 'ftxt0')">?</span>
   - provides analysis and display functions for Objects demo.
   - a few of these require advanced generics code.
   - You don't need to know how these work to understand this
@@ -784,28 +777,9 @@ use std::fmt::*;
   - show_type is generic function with Debug bound.
     Using format &quot;{:?}&quot; requires Debug.
 */
-pub fn show_type&lt;T:Debug&gt;(_t: &T, nm: &str) {
+pub fn show_type&lt;T:Debug&gt;(_t: &T, nm: &str) {<span class="info" style="float:right;" onclick="toggleInfoRel(this, 'ftxt1')">?</span>
     let typename = std::any::type_name::&lt;T&gt;();
-    println!(&quot;call name: {nm:?}, type: {typename:?}&quot;);
-}
-/*---------------------------------------------------------
-  Show enumerable input's values
-  - 'a is an annotation saying that T's lifetime
-    is as long as the function's lifetime.
-  - I is the type of T's elements, that is coll:T&lt;I&gt;.
-  - T can be any iterable type and both T and I must
-    satisfy Debug trait.
-  - Does not consume input t since passed by reference.
-*/
-pub fn show_value_enum&lt;T:Debug, I:Debug&gt;(
-    t: &T, nm: &str, left:usize, width:usize
-)
-  where for&lt;'a&gt; &'a T: IntoIterator&lt;Item = &'a I&gt;
-{
-    print!(&quot;{nm:?} {{&#92;n&quot;);
-    show_fold(&t, left, width);
-    print!(&quot;}}&quot;);
-    println!(&quot;&#92;nsize: {}&quot;, std::mem::size_of::&lt;T&gt;());
+    println!(&quot;{nm:?}, type: {typename:?}&quot;);
 }
 /*---------------------------------------------------------
   Show facts about a type's elements, e.g., name, type,
@@ -823,18 +797,6 @@ pub fn show_type_scalar&lt;T:Debug&gt;(t: &T, nm: &str) {
     );
 }
 /*---------------------------------------------------------
-Show facts about an enumerable type's elements, e.g.,
-name, type, values, and size.
-- show_type is generic function with Debug bound.
-  Using format &quot;{:?} requires Debug.&quot;
-*/
-pub fn show_type_enum&lt;T:Debug, I:Debug&gt;(t: &T, nm: &str, left:usize, width:usize)
-  where for&lt;'a&gt; &'a T: IntoIterator&lt;Item = &'a I&gt;
-{
-    show_type(t, nm);
-    show_value_enum(t, nm, left, width);
-}
-/*---------------------------------------------------------
   build indent string with &quot;left&quot; spaces
 */
 pub fn offset(left: usize) -&gt; String {
@@ -850,51 +812,15 @@ pub fn offset(left: usize) -&gt; String {
   https://stackoverflow.com/questions/50101842/how-to-find-the-last-occurrence-of-a-char-in-a-string
 */
 fn find_last_utf8(s: &str, chr: char) -&gt; Option&lt;usize&gt; {
-    if let Some(rev_pos) =
-      s.chars().rev().position(|c| c == chr) {
-        Some(s.chars().count() - rev_pos - 1)
-    } else {
-        None
-    }
-}
-/*---------------------------------------------------------
-  fold an enumerable's elements into rows of w elements
-  - indent by left spaces
-  - does not consume t since passed as reference
-  - returns string
-  https://users.rust-lang.org/t/generic-code-over-iterators/10907/3
-*/
-pub fn fold&lt;T, I:Debug&gt;(
-    t: &T, left: usize, width: usize
-) -&gt; String
-    where for&lt;'a&gt; &'a T: IntoIterator&lt;Item = &'a I&gt;, T:Debug
-{
-    let mut accum = String::new();
-    accum += &offset(left);
-    let mut i = 0usize;
-    for item in t {
-        accum += &format!(&quot;{item:?}, &quot;);
-        if ((i + 1) % width) == 0 && i != 0 {
-            accum += &quot;&#92;n&quot;;
-            accum += &offset(left);
-        }
-        i += 1;
-    }
-    let opt = find_last_utf8(&accum, ',');
-    if let Some(index) = opt {
-        accum.truncate(index);
-    }
-    accum
-}
-/*---------------------------------------------------------
-  show enumerables's elements as folded rows
-  - width is number of elements in each row
-  - left is indent from terminal left
-*/
-pub fn show_fold&lt;T:Debug, I:Debug&gt;(t:&T, left:usize, width:usize)
-  where for&lt;'a&gt; &'a T: IntoIterator&lt;Item = &'a I&gt;
-{
-  println!(&quot;{}&quot;,fold(t, left, width));
+  /*-- commented lines are equivalent to below --*/
+    // if let Some(rev_pos) =
+    //   s.chars().rev().position(|c| c == chr) {
+    //     Some(s.chars().count() - rev_pos - 1)
+    // } else {
+    //     None
+    // }
+    s.chars().rev().position(|c| c== chr)
+     .map(|rev_pos| s.chars().count() - rev_pos - 1)
 }
 /*---------------------------------------------------------
   show string wrapped with long dotted lines above and below
@@ -904,9 +830,9 @@ pub fn show_label(note: &str, n:usize) {
   for _i in 0..n {
     line.push('-');
   }
-  print!(&quot;&#92;n{}&#92;n&quot;, line);
+  print!(&quot;&#92;n{line}&#92;n&quot;);
   print!(&quot;  {note}&quot;);
-  print!(&quot;&#92;n{}&#92;n&quot;, line);
+  print!(&quot;&#92;n{line}&#92;n&quot;);
 }
 pub fn show_label_def(note:&str) {
   show_label(note, 50);
@@ -923,15 +849,115 @@ pub fn show_note(note: &str) {
   show string wrapped in short lines
 */
 pub fn show_op(opt: &str) {
-  println!(&quot;--- {} ---&quot;, opt);
+  println!(&quot;--- {opt} ---&quot;);
+}
+/*---------------------------------------------------------
+  fold an enumerable's elements into rows of w elements
+  - indent by left spaces
+  - does not consume t since passed as reference
+  - returns string
+  https://users.rust-lang.org/t/generic-code-over-iterators/10907/3
+*/
+pub fn fold&lt;T, I:Debug&gt;(
+  t: &T, left: usize, width: usize
+) -&gt; String
+    where for&lt;'a&gt; &'a T: IntoIterator&lt;Item = &'a I&gt;, T:Debug
+{
+  let mut accum = String::new();
+  accum += &offset(left);
+
+  /*-- Alternate direct implementation --*/
+  //let mut i = 0usize;
+  // for item in t {
+  //   accum += &format!(&quot;{item:?}, &quot;);
+  //   if ((i + 1) % width) == 0 && i != 0 {
+  //       accum += &quot;&#92;n&quot;;
+  //       accum += &offset(left);
+  //   }
+  //   i += 1;
+  // }
+
+  for (i, item) in t.into_iter().enumerate() {
+    accum += &format!(&quot;{item:?}, &quot;);
+    if ((i + 1) % width) == 0 && i != 0 {
+        accum += &quot;&#92;n&quot;;
+        accum += &offset(left);
+    }
+  }
+  let opt = find_last_utf8(&accum, ',');
+  if let Some(index) = opt {
+    accum.truncate(index);
+  }
+  accum
+}
+/*---------------------------------------------------------
+  show enumerables's elements as folded rows
+  - width is number of elements in each row
+  - left is indent from terminal left
+*/
+pub fn show_fold&lt;T:Debug, I:Debug&gt;(t:&T, left:usize, width:usize)
+  where for&lt;'a&gt; &'a T: IntoIterator&lt;Item = &'a I&gt;
+{
+  println!(&quot;{}&quot;,fold(t, left, width));
 }
 /*---------------------------------------------------------
   print newline
 */
 pub fn nl() {
   println!();
-}
-            </pre>
+}            </pre>
+            <div id="ftxt0" class="txt">
+              <t-b>
+                Several of the functions in this file are generic.  That means that
+                each one works for a set of input types that are not specified
+                until called by using code.
+              </t-b>
+              <t-b>
+                That code reuse is good, but syntax is more complex and won&apos;t be
+                explained until the next 
+                <a target="_blank" href="Bits_GenericRust.html">Bit</a>.
+              </t-b>
+            </div>
+            <div id="ftxt1" class="txt">
+              <t-b>
+                <c-s>show_type</c-s>&apos;s arguments are passed by reference.
+                So, references are copied; the arguments are not moved.
+              </t-b>
+              <t-b>
+                That means that the instance being analyzed, _t, will
+                still be valid after the call.
+              </t-b>
+            </div>
+            <div id="ftxt2" class="txt">
+              <t-b>
+                The where clause specifies that the lifetime &quot;`a&quot; of 
+                <c-s>T</c-s> is at least as long as the lifetime of its items
+                and that the items are of type <c-s>T</c-s>.
+              </t-b>
+              <t-b>
+                It also specifies that <c-s>T</c-s> satisfies the
+                <c-s>IntoIterator</c-s> trait, meaning that it implements
+                method <c-s>into_iter()</c-s> that converts <c-s>T</c-s>
+                into an iterator.
+              </t-b>
+              <t-b>
+                All of this will be covered in the next
+                <a target="_blank" href="Bits_GenericRust.html">Bit</a>.
+              </t-b>
+            </div>
+            <div id="ftxt3" class="txt">
+              <t-b>
+                <c-s>fold</c-s> supports showing a large enumerable collection
+                as a series of stacked rows of values.
+              </t-b>
+            </div>
+            <div id="ftxt4" class="txt">
+              <t-b>
+                The only difference between <c-s>fold</c-s> and <c-s>show_fold</c-s>
+                is that the first returns a string while the second displays the
+                string.
+              </t-b>
+            </div>
         </div>
         <h4 id="build">2.0 Build</h4>
         <div class="blockSingle">
