@@ -111,12 +111,26 @@
       overflow-x: auto !important;
     }
 
-    .block {
-      border: 1px solid var(--dark);
-      overflow: hidden;
-      clear: both;
-      max-width: 50em;
+    #github .blockDouble {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid green;
+      overflow-x: auto;
+      overflow-y: hidden;
       margin-right: 0.75em;
+      padding: 0.75em;
+      padding-right: 0em;
+    }
+
+    #github .blockSingle {
+      position: relative;
+      border: 1px solid green;
+      overflow-x: auto;
+      overflow-y: hidden;
+      margin-right: 0.75em;
+      padding: 0.75em;
+      /* padding-right: 0em; */
     }
 
     .codewrap {
@@ -134,7 +148,103 @@
     table {
       margin-right: 0.75em;
     }
+
+    #github .scrollable {
+      overflow: auto;
+    }
   </style>
+  <style>
+    #github .info {
+      position: relative;
+      top: 0em;
+      float: right;
+      font-size: large;
+      font-weight: bold;
+      text-align: center;
+      background-color: var(--dark);
+      border-radius: 8px;
+      color: var(--light);
+      width: 1.25em;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    #github .infoKill {
+      position: relative;
+      top: 0.05em;
+      float: right;
+      font-size: large;
+      font-weight: bold;
+      text-align: center;
+      background-color: var(--light);
+      border-radius: 8px;
+      color: var(--dark);
+      width: 1.25em;
+      cursor: pointer;
+      user-select: none;
+      margin: 0.25em;
+    }
+
+    #github .txt {
+      display: none;
+      position: absolute;
+      right: 4.5em;
+      width: 20em;
+      z-index: 10;
+      color: var(--dark);
+      font-size: small;
+      background-color: var(--light);
+      border: 2px solid var(--dark);
+      padding: 0em 0.5em;
+      overflow-y: visible;
+    }
+
+    #github .txtout {
+      display: none;
+      position: absolute;
+      right: 4.5em;
+      width: 30em;
+      z-index: 10;
+      color: var(--dark);
+      font-size: small;
+      background-color: var(--light);
+      border: 2px solid var(--dark);
+      padding: 0em 0.0em;
+      overflow-y: visible;
+    }
+
+  </style>
+  <script>
+    function closeInfos() {
+      var elems = document.querySelectorAll('.txt');
+      for (let i = 0; i < elems.length; ++i) {
+        if (elems[i].style.display === "block") {
+          elems[i].style.display = "none";
+        }
+      }
+    }
+    function toggleInfo(dst) {
+      var elem = document.getElementById(dst);
+      if (elem.style.display === "none" || elem.style.display === "") {
+        elem.style.display = "block";
+      }
+      else {
+        elem.style.display = "none";
+      }
+    }
+    function toggleInfoRel(src, dst, adj = 0) {
+      var txtcont = document.getElementById(dst);
+      var elemtop = src.offsetTop;
+      txtcont.style.top = parseInt(elemtop - 25 - adj) + 'px';
+      var top = txtcont.style.top;
+      if (txtcont.style.display === "none" || txtcont.style.display === "") {
+        txtcont.style.display = "block";
+      }
+      else {
+        txtcont.style.display = "none";
+      }
+    }
+  </script>
   <script>
     function setScroll() {
       let main = document.querySelector("#main");
@@ -175,7 +285,7 @@
     <main id="main">
       <div id="about">about</div>
       <div id="page">Bits Objects C#</div>
-      <div id="modified">11/02/2023</div>
+      <div id="modified">11/18/2023</div>
       <div id="hlp"></div>
       <a id="top"></a>
       <content>
@@ -201,10 +311,6 @@
             </h3>
           </hgroup>
         </header>
-        <t-b style="border:2px solid red; padding:0.5em 1.5em;">
-          This page is a prototype used to decide which language features to emphasize. It will
-          be replaced with a final version soon.
-        </t-b>
         <t-b id="syn" style="border:1px solid maroon; padding:0.25em 1em 0.5em 1em;">
           <h4 style="margin:0em 0em 0.25em 0em;">Synopsis:</h4>
           This page demonstrates uses of C# User-Defined types and their objects.
@@ -305,12 +411,66 @@
           illustrating syntax and basic operations.
         </t-b>
         <div style="height:0.25em;"></div>
-        <div style="height:0.25em;"></div>
-        <h3 id="code">1.0 CodeSnaps</h3>
+        <h3 id="code">1.0 Source Code</h3>
         <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote()" />
-        <div style="display:flex; flex-direction:column;">
-          <h4 id="source">Source Code - Program.cs</h4>
+        <h4 id="points">1.1 Source Code - PointsObjects.cs</h4>
+        <div class="blockSingle">
           <pre class="codeSnap">
+/*-------------------------------------------------------------------
+  PointsObjects.cs
+  - provides definitions for user-defined class Point4D
+*/
+
+using System.Collections;
+using System.Collections.Generic;   // IEnumerable&lt;T&gt;, List&lt;T&gt;
+using Analysis;
+
+namespace Points {
+  /*-----------------------------------------------------------------------
+    Point4D is a basic point class with three integer coordinates and one
+    time coordinate.
+    - It is a reference type because it's instances are created
+      from a class
+    - That affects the way assignments work - see demo near the
+      end of main.
+  */
+  public class Point4D : Analysis.IShow  // reference type with value type members
+  {
+    public Point4D() {
+      /*
+        doesn't need to do anything because its properties have
+        default values
+      */
+    }
+    public double x { get; set; } = 0.0;
+    public double y { get; set; } = 0.0;
+    public double z { get; set; } = 0.0;
+    public DateTime dt { get; set; } = DateTime.Now;
+    public int Length { get; } = 4;
+    public int Width { get; set; } = 3;
+    public int Left { get; set; } = 2;
+    public int Indent { get; set; } = 2;
+    /* translates IShow::show to needs of class */
+    public void Show(string name) {
+      PrintSelf(name);
+    }
+    /* Display Point4D structure and state */
+    public void PrintSelf(string name) {
+      string ofstr = Display.Spaces(Left);
+      string instr = Display.Spaces(Indent);
+
+      Console.WriteLine(&quot;{0}{1} {{&quot;, ofstr, name);
+      Console.WriteLine(
+        &quot;{5}x:{1}, y:{2}, z:{3},&#92;n{5}{4}&quot;, name, x, y, z, dt, ofstr + instr
+      );
+      Console.WriteLine(&quot;{0}}}&#92;n&quot;, ofstr);
+    }
+  }
+}          </pre>
+          </div>
+          <h4 id="source">1.2 Source Code - Program.cs</h4>
+          <div class="blockSingle">
+<pre class="codeSnap">
 /*-------------------------------------------------------------------
   Cs_Objects::Program.cs
   - Demonstrates creation and assignment of objects as well as a few
@@ -507,92 +667,11 @@ namespace CSharpObjects
     }
   }
 }
-
-          </pre>
-          <h4 id="points">Source Code - PointsObjects.cs</h4>
-          <pre class="codeSnap">
-/*-------------------------------------------------------------------
-  PointsObjects.cs
-  - provides definitions for user-defined class Point4D
-*/
-
-using System.Collections;
-using System.Collections.Generic;   // IEnumerable&lt;T&gt;, List&lt;T&gt;
-using Analysis;
-
-namespace Points {
-  /*-----------------------------------------------------------------------
-    Point4D is a basic point class with three integer coordinates and one
-    time coordinate.
-    - It is a reference type because it's instances are created
-      from a class
-    - That affects the way assignments work - see demo near the
-      end of main.
-  */
-  public class Point4D : Analysis.IShow  // reference type with value type members
-  {
-    public Point4D() {
-      /*
-        doesn't need to do anything because its properties have
-        default values
-      */
-    }
-    public double x { get; set; } = 0.0;
-    public double y { get; set; } = 0.0;
-    public double z { get; set; } = 0.0;
-    public DateTime dt { get; set; } = DateTime.Now;
-    public int Length { get; } = 4;
-    public int Width { get; set; } = 3;
-    public int Left { get; set; } = 2;
-    public int Indent { get; set; } = 2;
-    /* translates IShow::show to needs of class */
-    public void Show(string name) {
-      PrintSelf(name);
-    }
-    /* Display Point4D structure and state */
-    public void PrintSelf(string name) {
-      string ofstr = Display.Spaces(Left);
-      string instr = Display.Spaces(Indent);
-
-      Console.WriteLine(&quot;{0}{1} {{&quot;, ofstr, name);
-      Console.WriteLine(
-        &quot;{5}x:{1}, y:{2}, z:{3},&#92;n{5}{4}&quot;, name, x, y, z, dt, ofstr + instr
-      );
-      Console.WriteLine(&quot;{0}}}&#92;n&quot;, ofstr);
-    }
-  }
-}          </pre>
-          <h3 id="pass">2.0 Pass-by-value and Pass-by-reference</h3>
-          <t-b>
-
-          </t-b>
-          <div class="block">
-            <div class="codewrap">
-              <pre>
-<code class="language-cpp">  /*--- copy value type ---*/
-</code>
-            </pre>
-            </div>
-            <div class="textwrap">
-              <t-b>
-                text here
-              </t-b>
-            </div>
+</pre>
           </div>
-          <details>
-            <summary class="darkItem">Output</summary>
-            <div class="block">
-              <div class="codewrap">
-                <pre>
-                <code class="language-csharp">
-
-                </code>
-              </pre>
-              </div>
-            </div>
-          </details>
-          <h4 id="funcs">Source Code - AnalysisObjects.cs</h4>
-          <pre class="codeSnap">
+          <h4 id="funcs">1.3 Source Code - AnalysisObjects.cs</h4>
+          <div class="blockSingle">
+            <pre class="codeSnap">
 /*-------------------------------------------------------------------
   AnalysisObjects.cs
   - provides several type analysis and display methods in the
@@ -847,9 +926,11 @@ namespace Analysis {
     }
   }
 }
-          </pre>
-          <h4 id="out">Output</h4>
-          <pre class="codeSnap">
+</pre>
+          </div>
+          <h4 id="out">2.0 Output</h4>
+          <div class="blockSingle">
+            <pre class="codeSnap">
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects
 &gt; dotnet run
 
@@ -993,9 +1074,11 @@ That's all Folks!
 
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects
 &gt;&gt;
-          </pre>
-          <h4 id="build">Build</h4>
-          <pre class="codeSnap">
+</pre>
+          </div>
+          <h4 id="build">3.0 Build</h4>
+          <div class="blockSingle">
+            <pre class="codeSnap">
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects
 &gt; dotnet build
 MSBuild version 17.4.1+fedecea9d for .NET
@@ -1011,9 +1094,9 @@ Build succeeded.
 Time Elapsed 00:00:00.92
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects
 &gt;
-          </pre>
+</pre>
         </div>
-        <h3 id="ide">2.0 VS Code View</h3>
+        <h3 id="ide">4.0 VS Code View</h3>
         <t-b>
           The code for this demo is available in
           <a target="_blank" href="https://github.com/JimFawcett/Bits">github.com/JimFawcett/Bits</a>. If you click on
