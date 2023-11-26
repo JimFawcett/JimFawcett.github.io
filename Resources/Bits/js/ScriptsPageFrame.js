@@ -48,12 +48,6 @@ function initializeMenu() {
               <div class='ddItem ddDetails'><a target='_self' href='../../Friends.html'>Friends&nbsp;&amp;&nbsp;Collaborators</a></div>\
               <div class='ddItem ddDetails'><a target='_self' href='../../Help.html'>Help</a></div>\
               <div class='ddItem ddDetails'><a target='_self' href='../../SitePlans.html'>Site Plans</a></div>\
-              <div class='ddItem ddDetails'><a href='#' onclick='togglenavKeys()'>Toggle Nav Keys</a></div>\
-              <div class='ddItem ddDetails'><a href='#' onclick='toggleSwipeEvents()'>Toggle Swipe Events</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BookDesignCourse.html'>Design Course</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' class='border' href='../../index.html'>L1 Site Home</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' class='border' href='../../RsRepositories.html'>L2&nbsp;Repository&nbsp;webpage</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' class='border' href='../../RustBiteByByte.html'>L3&nbsp;Rust&nbsp;Bites</a></div>\
               <div class='ddItem ddDetails'><a target='_self' href='https://github.com/JimFawcett'>Repositories&nbsp;code</a></div>\
               <div style='height:1em;'></div>\
             </div>\
