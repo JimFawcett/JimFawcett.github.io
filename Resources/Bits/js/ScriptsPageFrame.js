@@ -49,7 +49,7 @@ function initializeMenu() {
               <div class='ddItem ddDetails'><a target='_self' href='../../Help.html'>Help</a></div>\
               <div class='ddItem ddDetails'><a target='_self' href='../../SitePlans.html'>Site Plans</a></div>\
               <div class='ddItem ddDetails'><a target='_self' href='https://github.com/JimFawcett'>Repositories&nbsp;code</a></div>\
-              <div style='height:1em;'></div>\
+              <div class='ddDetails' style='height:1em;'></div>\
             </div>\
           </details>\
           <div style='height:2em;'></div>\
