@@ -278,6 +278,25 @@ function initializeMenu() {
   <div style='clear:all;'></div>";
 }
 
+function postMsg(msg) {
+  let parent = window.parent;
+  parent.postMessage(msg, '*');
+}
+window.onmessage = function (e) {
+  // alert('into msg handler - Bits_Stuff');
+  // alert(e.data);
+  let msg = e.data;
+  if (e === null | e.data === 'sections') {
+    bottomMenu.sections();
+  } else {
+    if (e.data === 'exit') {
+      // alert('into exit handler - Bits_Intro');
+      let url = window.location.href;
+      // alert(url);
+      postMsg(url);
+    }
+  }
+}
 /* define page object with page methods and data fields */
 
 let page = new Object();
