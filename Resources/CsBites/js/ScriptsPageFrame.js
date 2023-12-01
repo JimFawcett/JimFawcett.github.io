@@ -34,6 +34,16 @@ function getHelp() {
 }
 
 
+function loadif() {
+  loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = '../../TOC.html?src=' + loc;
+  }
+  else {
+    location.reload();
+  }
+}
+
 /* create top menu */
 
 function initializeMenu() {

@@ -27,7 +27,12 @@ function initialize() {
 /* create top menu */
 function loadif() {
   loc = window.location.href;
-  window.location.href = '../../TOC.html?src=' + loc;
+  if (window.self === window.top) {
+    window.location.href = '../../TOC.html?src=' + loc;
+  }
+  else {
+    location.reload();
+  }
 }
 
 function initializeMenu() {

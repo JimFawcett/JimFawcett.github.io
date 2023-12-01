@@ -48,8 +48,14 @@ function getHelp() {
 
 function loadif() {
   loc = window.location.href;
-  parent.location.href = 'TOC.html?src=' + loc;
+  if (window.self === window.top) {
+    window.location.href = 'TOC.html?src=' + loc;
+  }
+  else {
+    location.reload();
+  }
 }
+
 function initializeMenu() {
   var topMenu = document.getElementById("navbar");
   topMenu.innerHTML = "<div style='position: relative; width:100%;' class='navbar'>\

@@ -33,11 +33,16 @@ function getHelp() {
   window.open("../../Help.html", "_blank");
 }
 
-
 function loadif() {
   loc = window.location.href;
-  window.location.href = '../../TOC.html?src=' + loc;
+  if (window.self === window.top) {
+    window.location.href = '../../TOC.html?src=' + loc;
+  }
+  else {
+    location.reload();
+  }
 }
+
 /* create top menu */
 
 function initializeMenu() {
