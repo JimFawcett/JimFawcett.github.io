@@ -29,6 +29,10 @@ function initialize() {
   storyHlpMenu.helpMenu();
 }
 
+function loadif() {
+  loc = window.location.href;
+  window.location.href = 'TOC.html?src=' + loc;
+}
 /* create top menu */
 
 function initializeMenu() {
@@ -40,7 +44,7 @@ function initializeMenu() {
         <div class='dropdown'>\
             <div style='height:0.25em;'></div>\
             <div class='ddItem'><a href='index.html'>Home</a></div>\
-            <div class='ddItem'><a href='TOC.html'>Site Explorer</a></div>\
+            <div class='ddItem'><a onclick='loadif()'>Site Explorer</a></div>\
             <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
             <div class='ddItem'><a href='SiteDemo.html'>SiteDemo</a></div>\
             <div class='ddItem'><a href='SiteDesign.html'>SiteDesign</a></div>\
@@ -148,6 +152,25 @@ function initializeMenu() {
   <div style='clear:all;'></div>";
 }
 
+function postMsg(msg) {
+  let parent = window.parent;
+  parent.postMessage(msg, '*');
+}
+window.onmessage = function (e) {
+  // alert('into msg handler - Bits_Stuff');
+  // alert(e.data);
+  let msg = e.data;
+  if (e === null | e.data === 'sections') {
+    bottomMenu.sections();
+  } else {
+    if (e.data === 'exit') {
+      // alert('into exit handler - Bits_Intro');
+      let url = window.location.href;
+      // alert(url);
+      postMsg(url);
+    }
+  }
+}
 /* define page object with page methods and data fields */
 
 let page = new Object();
