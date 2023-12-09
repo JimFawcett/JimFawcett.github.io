@@ -1322,7 +1322,7 @@ That's all Folks!
           <div class="blockSingle">
             <div class="codewrap" style="width:max-content; float:left;">
               <pre><code class="language-cpp">/*---------------------------------------------------------
-  AnalysisObj.h
+  Analysis.h
   - Provides functions that analyze types, display results
     and other program defined information.
   - Some of this code requires complex template operations.
@@ -1338,61 +1338,98 @@ That's all Folks!
 #include &lt;iostream&gt;     // cout
 #include &lt;vector&gt;       // vector
 
+/*-----------------------------------------------------------
+  Analysis function declarations are provided here so that
+  definitions below may be placed in any order. That's
+  needed because C++ requires declaration before use.
+*/
+template&lt;typename T&gt;  
+void showType(
+  T t, const std::string &nm, const std::string& suffix = &quot;&quot;
+);
+void showNote(
+  const std::string& txt, const std::string& suffix = &quot;&quot;
+);
+void showOp(
+  const std::string& opstr, const std::string& suffix = &quot;&quot;
+);
+void print(const std::string& txt = &quot;&quot;);
+void println(const std::string& txt = &quot;&quot;);
+std::string truncate(size_t N, const char* pStr);
+std::string indent(size_t n);
+template&lt;typename T&gt;
+std::string fold(std::vector&lt;T&gt;& v, size_t left, size_t width);
+template&lt;typename T&gt;
+std::string formatColl(
+  const T& t, const std::string& nm,
+  const std::string& suffix = &quot;&quot;, 
+  size_t left = 2, size_t width = 7
+);
+template&lt;typename T&gt;
+std::string formatScalar(
+  const T& t, const std::string& nm,
+  const std::string& suffix = &quot;&quot;, size_t left = 2
+);
+template&lt;typename T&gt;
+std::string formatString(
+  const T& t, const std::string& nm, const std::string& suffix,
+  size_t left = 2
+);
+template&lt;typename T&gt;
+std::string format(
+  const T& t, const std::string& nm, 
+  const std::string& suffix = &quot;&quot;,
+  size_t left = 2, size_t width = 7
+);
 /*---------------------------------------------------------
-  Display and Analysis function and globals definitions
+  Display and Analysis functions and globals definitions
 -----------------------------------------------------------
 */
 const std::string nl = &quot;&#92;n&quot;;
-/*---------------------------------------------------------
+/*-----------------------------------------------------------
   Mutable globals are a common source of bugs.  We try not
-  to use them, but will use DisplayParams here to control
-  how insertion operator sends instances to std output.
-
-  Only the trunc variable is used in this demo. The others
-  will be used in the Bits_GenericCpp demo.
+  to use them, but will use DisplayParams here to control 
+  how insertion operator sends instances to standard output.
 */
 struct displayParams {
   size_t left = 2;    // number of spaces to indent
   size_t width = 7;   // width of display row
   size_t trunc = 40;  // replace text after trunc with ...
 } DisplayParams;      // global object
-
-/*-----------------------------------------------
-  Display text after newline and indentation
-*/
-inline void print(const std::string& txt = &quot;&quot;) {
-  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt;
-}
-/*-----------------------------------------------
-  Display text after newline and indentation
-  - provides trailing newline
-*/
-inline void println(const std::string& txt = &quot;&quot;) {
-  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt &lt;&lt; &quot;&#92;n&quot;;
-}
+          
 /*-----------------------------------------------
   Overload operator&lt;&lt; required for
   showType(std::vector&lt;T&gt; v, const std::vector&lt;T&gt;& nm)
 */
 template&lt;typename T&gt;
-std::ostream& operator&lt;&lt; (
-  std::ostream& out, const std::vector&lt;T&gt;& vec
+std::ostream& operator&lt;&lt;(
+  std::ostream& out, std::vector&lt;T&gt;& v
 ) {
-    out &lt;&lt; &quot;[&quot;;
-    for (auto it = vec.begin(); it != vec.end(); ++it)
-    {
-        out &lt;&lt; *it;
-        if (it != vec.end() - 1)
-            out &lt;&lt; &quot;, &quot;;
-    }
-    out &lt;&lt; &quot;]&quot;;
-    return out;
+  out &lt;&lt; format(
+                 v, &quot;vector&lt;T&gt;&quot;, &quot;&quot;, 
+                 DisplayParams.left, DisplayParams.width
+               );
+  return out;
+}
+/*-----------------------------------------------
+  Display calling name, static class, and size
+*/
+template&lt;typename T&gt; 
+void showType(
+  T t, const std::string &callname, const std::string& suffix
+) {
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; callname;  // show name at call site
+  std::cout &lt;&lt; &quot; type: &quot;
+            &lt;&lt; truncate(DisplayParams.trunc,typeid(t).name());
+  std::cout &lt;&lt; &quot;&#92;n  size:  &quot; 
+            &lt;&lt; sizeof(t);  // show size on stack
+  std::cout &lt;&lt; suffix;
 }
 /*-----------------------------------------------
   Display emphasized text
 */
 inline void showNote(
-  const std::string& txt, const std::string& suffix = &quot;&quot;
+  const std::string& txt, const std::string& suffix
 ) {
   print(&quot;--------------------------------------------------&quot;);
   print(&quot;  &quot; + txt);
@@ -1403,7 +1440,7 @@ inline void showNote(
   Display emphasized line
 */
 inline void showOp(
-  const std::string& opstr, const std::string& suffix = &quot;&quot;
+  const std::string& opstr, const std::string& suffix
 ) {
   std::cout &lt;&lt; &quot;&#92;n  --- &quot; &lt;&lt; opstr &lt;&lt; &quot; ---&quot; &lt;&lt; suffix;
 }
@@ -1427,30 +1464,87 @@ inline std::string indent(size_t n) {
   return std::string(n, ' ');
 }
 /*-----------------------------------------------
-  Display calling name, static class, and size
+  Helper function for formatting output
+  - folds lines after width elements
 */
 template&lt;typename T&gt;
-void showType(
-  T t, const std::string &callname,
-  const std::string& suffix = &quot;&quot;
+std::string fold(
+  std::vector&lt;T&gt;& v, size_t left, size_t width
+) { 
+  std::stringstream out(&quot;&#92;n&quot;);
+  out &lt;&lt; indent(left);
+  for(int i=0; i&lt;v.size(); ++i) {
+    if((i % width) == 0 && i != 0 && i != width - 1) {
+      out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left);
+    }
+    if(i &lt; v.size() - 1) {
+      out &lt;&lt; v[i] &lt;&lt; &quot;, &quot;;
+    }
+    else {
+      out &lt;&lt; v[i] &lt;&lt; &quot;&#92;n&quot;;
+      break;
+    }
+  }
+  return out.str();
+}
+/*-----------------------------------------------
+  Helper function for formatColl
+  - defines out &lt;&lt; std::pair&lt;K,V&gt;
+  - used in formatColl for associative containers
+*/
+template&lt;typename K, typename V&gt;
+std::stringstream& operator&lt;&lt;(
+  std::stringstream& out, const std::pair&lt;K,V&gt;& p
 ) {
-  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; callname;  // show name at call site
-  std::cout &lt;&lt; &quot; type: &quot;
-            &lt;&lt; truncate(DisplayParams.trunc,typeid(t).name());
-  std::cout &lt;&lt; &quot;&#92;n  size:  &quot; &lt;&lt; sizeof(t);  // show size on stack
-  std::cout &lt;&lt; suffix;
+  out &lt;&lt; &quot;{&quot; &lt;&lt; p.first &lt;&lt; &quot;, &quot; &lt;&lt; p.second &lt;&lt; &quot;}&quot;;
+  return out;
+}
+/*-----------------------------------------------
+  Format output for Collection types 
+  - any type with begin() and end() like
+    all the STL containers.
+*/
+template&lt;typename Coll&gt;
+std::string formatColl(
+  const Coll& c, const std::string& nm, 
+  const std::string& suffix,
+  size_t left, size_t width
+) {
+  std::stringstream out;
+  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm 
+      &lt;&lt; &quot;: {&#92;n&quot; &lt;&lt; indent(left + 2);
+  /*-- 
+    fold rows of comma separated elements with width
+    elements in each row 
+  */
+  size_t i = 0;
+  for(const Coll::value_type& elem : c) {
+    if((i % width) == 0 && i != 0 && i != width - 1) {
+      out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left + 2);
+    }
+    if(i &lt; c.size() - 1) {
+      out &lt;&lt; elem &lt;&lt; &quot;, &quot;;
+    }
+    else {
+      out &lt;&lt; elem &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; &quot;}&quot; &lt;&lt; suffix;
+      break;
+    }
+    ++i;
+  }
+  return out.str();
 }
 /*-----------------------------------------------
   Format output for scalar types like primitives
 */
 template&lt;typename T&gt;
 std::string formatScalar(
-  const T& t, const std::string& nm,
-  const std::string& suffix = &quot;&quot;,
-  size_t left = 2
+  const T& t, const std::string& nm, 
+  const std::string& suffix,
+  size_t left
 ) {
   std::stringstream out;
-  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm &lt;&lt; &quot;: &quot; &lt;&lt; t &lt;&lt; suffix;
+  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm 
+      &lt;&lt; &quot;: &quot; &lt;&lt; t &lt;&lt; suffix;
   return out.str();
 }
 /*-----------------------------------------------
@@ -1459,21 +1553,75 @@ std::string formatScalar(
 */
 template&lt;typename T&gt;
 std::string formatString(
-  const T& t, const std::string& nm,
-  const std::string& suffix = &quot;&quot;,
-  size_t left = 2
+  const T& t, const std::string& nm, 
+  const std::string& suffix,
+  size_t left
 ) {
   std::stringstream out;
-  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm
+  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm 
       &lt;&lt; &quot;: &#92;&quot;&quot; &lt;&lt; t &lt;&lt; &quot;&#92;&quot;&quot; &lt;&lt; suffix;
   return out.str();
 }
-</code></pre>
+/*----------------------------------------------- 
+  Defines is_iterable trait
+  - detects STL containers and user-defined types
+    that provide iteration
+  https://stackoverflow.com/questions/13830158/
+*/
+template &lt;typename T, typename = void&gt;
+struct is_iterable : std::false_type {};
+
+// this gets used only when we can call
+// std::begin() and std::end() on that type
+template &lt;typename T&gt;
+struct is_iterable&lt;
+  T,
+  std::void_t
+    &lt;decltype(std::begin(std::declval&lt;T&gt;())),
+     decltype(std::end(std::declval&lt;T&gt;()))&gt;
+&gt; : std::true_type {};
+
+template &lt;typename T&gt;
+constexpr bool is_iterable_v = is_iterable&lt;T&gt;::value;
+
+/*-----------------------------------------------
+  Displays almost everything.
+  - strings work better with formatString(...)
+  https://www.cppstories.com/2018/03/ifconstexpr/
+*/
+template&lt;typename T&gt;
+std::string format(
+  const T& t, const std::string& nm, 
+  const std::string& suffix,
+  size_t left, size_t width
+) {
+  if constexpr(is_iterable_v&lt;T&gt;) {
+    // decision at compile-time
+    return formatColl(t, nm, suffix, left, width);
+  }
+  else {
+    return formatScalar(t, nm, suffix, left);
+  }
+}
+/*-----------------------------------------------
+  Display text after newline and indentation
+*/
+inline void print(const std::string& txt) {
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt;
+}
+/*-----------------------------------------------
+  Display text after newline and indentation
+  - provides trailing newline
+*/
+inline void println(const std::string& txt) {
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt &lt;&lt; &quot;&#92;n&quot;;
+}
+            </code></pre>
             </div>
             <div class="textwrap">
               <h4>Analysis and Display</h4>
               <t-b>
-                This code block contains definitions of ten functions, four of which
+                This code block contains definitions of a dozen functions, half of which
                 are templates.  If this seems too complex for you right now, you don&apos;t
                 have to understand them completely to understand this Bits demo.
               </t-b>
@@ -1484,14 +1632,15 @@ std::string formatString(
               </t-b>
               <t-b>
                 The next <a target="_blank" href="Bits_GenericCpp.html">Bit</a>
-                will explore generics and will help you understand how these functions
+                explores generics and will help you understand how these functions
                 work.
               </t-b>
               <h4>Template functions:</h4>
               <t-b>
                 <t-b>
-                  Template functions are code generators that create code for specific template argument
-                  types using the template pattern.
+                  Six of the twelve functions presented here are templates.  That means that
+                  they are code generators that create code for specific template arguments
+                  using the template pattern.
                 </t-b>
                 <t-b>
                   In the code blocks above you have seen <c-s>showType(T t, ...)</c-s> used
@@ -1503,15 +1652,7 @@ std::string formatString(
                   functions generated from a single template function definition.
                 </t-b>
               </t-b>
-              <t-b>
-                <c-s>showType(T t, ...)</c-s> is the only analysis function in this file. The
-                next <a target="_blank" href="Bits_GenericCpp.html">Bit</a> will add several more.
-              </t-b>
-              <t-b>
-                The other functions simply format and display their instance arguments, or provide helper
-                activities for display.
-              </t-b>
-              <!--<h4>Template Functions supporting display of collections:</h4>
+              <h4>Template Functions supporting display of collections:</h4>
               <t-b>
                 <c-s>formatColl&lt;T&gt;(const T&t, ...)</c-s> displays enumerable collections like
                 <c-s>std::Vector&lt;T&gt;</c-s> for any of the types usually contained in a vector.
@@ -1547,7 +1688,7 @@ std::string formatString(
               <t-b>
                 Most of the remaining functions are simple display operations like
                 <c-s>showNote</c-s>, <c-s>showOp</c-s>, and <c-s>showType</c-s>.
-              </t-b>-->
+              </t-b>
             </div>
             <!--           <div id="fcode1" class="txt">
                 <t-b>
