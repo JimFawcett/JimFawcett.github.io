@@ -120,7 +120,7 @@
       position: relative;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      border: 1px solid green;
+      border: 1px solid var(--dark);
       overflow-x: auto;
       overflow-y: hidden;
       margin-right: 0.75em;
@@ -130,7 +130,7 @@
 
     .blockSingle {
       position: relative;
-      border: 1px solid green;
+      border: 1px solid var(--dark);
       overflow-x: auto;
       overflow-y: hidden;
       margin-right: 0.75em;
@@ -143,7 +143,7 @@
       padding: 0.5em;
       padding-right: 0em;
       overflow-y: auto;
-      border: 1px dashed blue;
+      /*border: 1px dashed blue;*/
       font-size:0.80em;
     }
 
@@ -158,7 +158,7 @@
       padding-left: 1em;
       margin-right: 0.5em;
       overflow-y: scroll;
-      border: 1px dashed red;
+      /*border: 1px dashed red;*/
     }
 
     table {
@@ -398,7 +398,7 @@
           <ol>
             <li>
               Code for a user-defined type, Point4D is presented in the first block. Much of the
-              technical weight of this Bit is carried by the two panels in this block.
+              technical weight of this Bit is carried by the left and right panels in this block.
             </li>
             <li>
               That is followed by the execution code in <c-s>main</c-s> broken up into
@@ -407,8 +407,11 @@
               in the left panel with corresponding output in the right panel. That adjacency
               makes it easier to understand what the code is doing.
               <div style="height:0.5em;"></div>
+              A splitter bar is provided between the code and output blocks to enable
+              viewing any horizontal text overflow.
+              <div style="height:0.5em;"></div>
               These blocks contain definitions and output for demos of std library
-              String and Vector instances and also for instances of user-defined Point4D
+              String and Vector instances and also for instances of a user-defined Point4D
               class.
             </li>
             <li>
@@ -523,8 +526,7 @@ std::ostream& operator&lt;&lt;(
                 &lt;&lt; &quot;  }&quot; &lt;&lt; std::endl;
   return out;
 }
-
-              </code></pre>
+</code></pre>
             </div>
             <div class="textwrap">
               <h4>Concept:</h4>
@@ -542,14 +544,14 @@ std::ostream& operator&lt;&lt;(
                 all based on class name. They are illustrated in this block.
               </t-b>
               <t-b>
-                The C++ compiler will implement copy constructor, destructor, and assignment operator
+                The C++ compiler will implement default copy constructor, destructor, and assignment operator
                 if using code implies a copy and/or assignment and the class designer has
                 not provided them<sup>1</sup>.
                 Destructors are always required
                 and are generated if the class does not provide one.
               </t-b>
               <t-b>
-                The compiler does this by using its member&apos;s and base&apos;s construction, assignment,
+                The compiler does this by using its member&apos;s and base&apos;s<sup>2</sup> construction, assignment,
                 and destruction operations for all the parts of the class.  We say these operations are 
                 applied member-wise.
               </t-b>
@@ -557,7 +559,7 @@ std::ostream& operator&lt;&lt;(
                 However, the implemented methods are correct if, and only if, class
                 members and bases have correct copy, destruction, and assignment semantics. That is true
                 for primitive types and collections from the Standard Template Library (STL),
-                but otherwise designers must implement those methods<sup>2</sup>.
+                but otherwise designers must implement those methods<sup>3</sup>.
               </t-b>
               <t-b>
                 This is a common source of errors so it is appropriate to use the
@@ -578,8 +580,9 @@ std::ostream& operator&lt;&lt;(
                 overloads.
               </t-b>
               <t-b>
-                The <c-s>std::operator&lt;&lt;(std::ostream& out, T& t)</c-s> ostream operator
-                converts objects of type <c-s>T</c-s> into parts that the default operator can
+                The <c-s>operator&lt;&lt;(std::ostream& out, T& t)</c-s> ostream operator
+                converts objects of type <c-s>T</c-s> into parts that the default 
+                <c-s>std::operator&lt;&lt;</c-s> can
                 process. The overload for Point4D is needed by functions in the AnalysisObjects.h
                 library.
               </t-b>
@@ -588,19 +591,6 @@ std::ostream& operator&lt;&lt;(
                 are encountered, e.g., <c-s>x&nbsp;=&nbsp;y</c-s> is equivalent to
                 <c-s>x.operator=(y)</c-s> and <c-s>std::cout&nbsp;&lt;&lt;&nbsp;x</c-s> is
                 equivalent to <c-s>operator&lt;&lt;(std::cout,&nbsp;x)</c-s>.
-              </t-b>
-              <hr />
-              <t-b>
-                <ol>
-                  <li>
-                    Move operators may also be compiler generated. That happens in
-                    certain, rather obscure, contexts.
-                  </li>
-                  <li>
-                    An example definition of all of the special class methods is given in
-                    the <a target="_blank" href="../../StrCode.html">STR class</a> web page.
-                  </li>
-                </ol>
               </t-b>
             </div>
             <div id="txt0" class="txt">
@@ -705,6 +695,33 @@ std::ostream& operator&lt;&lt;(
               </t-b>
               <t-b>
                 This supports statements like <c-s>std::cout &lt;&lt; apoint;</c-s>.
+              </t-b>
+            </div>
+            <div style="padding:1em;">
+              <t-b class="clear">
+                <hr />
+                <ol>
+                  <li>
+                    Move operators may also be compiler generated. That happens in
+                    certain, rather obscure, contexts.
+                  </li>
+                  <li>
+                    C++ inherits base implementations, which become part of the memory
+                    footprint of class instances. If the class is to be copied, these
+                    base parts must also be copied.  It is standard practice to use the
+                    base copy operations to copy its content into the copy&apos;s destination.
+                    <div style="height:0.5em;"></div>
+                    Point4D has no base classes, so we don&apos;t see code that copies
+                    base parts. That is illustrated by code in the 
+                    <a target="_blank" href="https://jimfawcett.github.io/CompoundObjects.html">
+                      CompoundObjects Repository
+                    </a>
+                  </li>
+                  <li>
+                    An example definition of all of the special class methods is given in
+                    the <a target="_blank" href="../../StrCode.html">STR class</a> web page.
+                  </li>
+                </ol>
               </t-b>
             </div>
           </div>
@@ -834,7 +851,7 @@ using pU = std::unique_ptr&lt;T&gt;;
             <splitter-container id="container">
               <first-item id="fig2-first" style="width:52%; padding-right:0.5em;">
                 <div class="codewrap">
-                  <pre><code class="language-cpp">/*-------------------------------------------------------------------
+                  <pre><code class="language-cpp">/*-------------------------------------------------------------------                              
   Demonstration starts here
 */
 int main() {
@@ -898,7 +915,7 @@ int main() {
 
 Demonstrate C++ Objects
 
---------------------------------------------------
+--------------------------------------------------                                        
   std library types string and vector&lt;T&gt;
 --------------------------------------------------
 contents of str = &quot;Wile E. Coyote&quot;
@@ -1010,7 +1027,7 @@ vector&lt;T&gt;: {
                 <div class="codewrap">
                   <pre><code class="language-shell">--------------------------------------------------
   user-defined type Point4D
---------------------------------------------------                           
+--------------------------------------------------                                
   Point4D {
     0, 0, 0,
     Mon May  1 16:04:27 2023
@@ -1216,7 +1233,7 @@ size:  8
             <splitter-container id="container">
               <first-item id="fig6-first" style="width:52%;margin-right:0.5em;">
                 <div class="codewrap">
-                  <pre><code class="language-cpp">/*------------------------------------------------*/                              
+                  <pre><code class="language-cpp">/*------------------------------------------------*/                                        
     /* custom point types */
     showNote(&quot;heap-based Point4D instance&quot;);
     showOp(&quot;pU&lt;Point4D&gt; pPoint4D(new Point4D())&quot;);
@@ -1248,7 +1265,7 @@ size:  8
                 <div class="codewrap">
                   <pre><code class="language-cpp">--------------------------------------------------
   heap-based Point4D instance
---------------------------------------------------                              
+--------------------------------------------------                                        
 --- pU&lt;Point4D&gt; pPoint4D(new Point4D()) ---
 Point4D {
   0, 0, 0,
@@ -1567,6 +1584,94 @@ std::string formatString(
                 <c-s>showNote</c-s>, <c-s>showOp</c-s>, and <c-s>showType</c-s>.
               </t-b>-->
             </div>
+            <div>
+            <table style="width:40%; float:right;">
+              <tr>
+                <th>function</th>
+                <th>operation</th>
+              </tr>
+              <tr>
+                <td>
+                  print
+                </td>
+                <td>
+                  display string argument after newline and indent
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  println
+                </td>
+                <td>
+                  print with a trailing newline
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  operator&lt;&lt;
+                </td>
+                <td>
+                  insert text repr of object into stream
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  showNote
+                </td>
+                <td>
+                  display block of text encased in horizontal lines
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  showOp
+                </td>
+                <td>
+                  display --- short text ---
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  truncate
+                </td>
+                <td>
+                  clip string to n chars followed by ellipsis
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  indent
+                </td>
+                <td>
+                  create string of n spaces
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  showType
+                </td>
+                <td>
+                  display compiler&apos;s repr of type of T
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  formatScalar
+                </td>
+                <td>
+                  return string with name : value
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  formatString
+                </td>
+                <td>
+                  return string with name : &quot;value&quot;
+                </td>
+              </tr>
+            </table>
+            </div>
             <!--           <div id="fcode1" class="txt">
                 <t-b>
                   C++ requires functions and classes to be declared before use in compile scan order.
@@ -1736,6 +1841,31 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Objects&#92;build
             </td>
             <td>
               Relatively short feature discussions
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a target="_blank " href="../../StrCode.Html">STRCode</a>
+            </td>
+            <td>
+              User-defined string type with all standard methods and functions
+              documented with: purpose, declaration, definition, invocation, and notes.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a target="_blank" href="https://www.w3schools.com/cpp/default.asp">w3schools&nbsp;tutorial</a>
+            </td>
+            <td>
+              Slow and easy walk throught basics.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a target="_blank" href="https://en.cppreference.com/w/">cppreference.com</a>
+            </td>
+            <td>
+              Very complete reference with lots of details and examples.
             </td>
           </tr>
         </table>
