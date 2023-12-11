@@ -20,6 +20,8 @@
   <script src="js/ScriptsPageFrame.js"></script>
   <script src="js/ScriptsPageFramePagesBitsRust.js"></script>
   <script src="js/ScriptsPageFrameKeyboard.js"></script>
+  <link rel="stylesheet" href="css/prism.css" />
+  <script src="js/prism.js"></script>
   <!--<script src="js/ScriptsPageFrameNewRadioButtons.js"></script>-->
   <style>
     #github .note {
@@ -118,7 +120,7 @@
       position: relative;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      border: 1px solid green;
+      border: 1px solid var(--dark);
       overflow-x: auto;
       overflow-y: hidden;
       margin-right: 0.75em;
@@ -128,19 +130,22 @@
 
     .blockSingle {
       position: relative;
-      border: 1px solid green;
+      border: 1px solid var(--dark);
       overflow-x: auto;
       overflow-y: hidden;
+      margin-top: 1.5em;
       margin-right: 0.75em;
-      padding: 0.75em;
+      padding: 0.0em;
       padding-right: 0em;
     }
 
     .codewrap {
       padding: 0.5em;
       padding-right: 0em;
+      margin-right:0.75em;
       overflow-y: auto;
       border: 1px dashed blue;
+      font-size:0.80em;
     }
 
     #github div.block t-b {
@@ -151,6 +156,7 @@
     .textwrap {
       position: relative;
       padding-right: 1em;
+      padding-left: 1em;
       margin-right: 0.5em;
       overflow-y: scroll;
       border: 1px dashed red;
@@ -282,7 +288,7 @@
     <main id="main">
       <div id="about">about</div>
       <div id="page">Bits Objects Rust</div>
-      <div id="modified">11/26/2023</div>
+      <div id="modified">12/10/2023</div>
       <div id="hlp"></div>
       <a id="top"></a>
       <content>
@@ -370,10 +376,29 @@
         <div style="height:0.25em;"></div>
         <h3 id="code">1.0 Source code</h3>
         <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote()" />
-        <h4 id="points">1.1 Source Code - Points.rs</h4>
+        <h3 id="points">1.1 Source Code - Points.rs</h3>
+        <t-b>
+          A Rust struct is a pattern for laying out data in memory with member functions,
+          called methods, for all of its operations.  Making data members private ensures
+          that class methods have valid data for their operations. A class designer may
+          choose to selectively allow user data modification.
+        </t-b>
+        <t-b style="margin-bottom:1em;">
+          This block presents code that defines a Rust type, Point4D. It defines the
+          data held by instances of the type, three floating point coordinates and
+          a <c-s>DateTime&lt;Local&gt;</c-s> variable, and methods to create, copy, assign, modify
+          and destroy instances.
+        </t-b>
+        <t-b>
+          You can find all the code for this demo
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/Rust/rust_objects/src">here</a>
+          and code for the entire Bits repository
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master">here</a>.
+        </t-b>
         <div class="blockSingle">
-          <pre class="codeSnap">
-/*-------------------------------------------------------------------
+          <div class="codewrap" style="float:left; width:60%;">
+            <pre style="font-size:1em; margin-right:0.75em;">
+<code class="language-rust">/*-------------------------------------------------------------------
   points.rs
   - defines type Point4D representing points in space-time
 -------------------------------------------------------------------*/
@@ -385,93 +410,100 @@ use chrono::prelude::*;
   - Declare Point4D struct, like a C++ class
   - Request compiler implement traits Debug & Clone
 */
-#[derive(Debug, Clone)]  <span class="info" style="float:right;" onclick="toggleInfoRel(this, 'txt1', -25)">?</span>
-pub struct Point4D {
-    x: f64,
-    y: f64,
-    z: f64,
-    t: DateTime&lt;Local&gt;,
+#[derive(Debug, Clone)]
+pub struct Point4D {  // public instance, private data
+  x: f64,
+  y: f64,
+  z: f64,
+  t: DateTime&lt;Local&gt;,
 }
 /*-- implement constructor function new --*/
 impl Point4D {
-    pub fn new() -&gt; Point4D {
-        Point4D { x: 0.0, y: 0.0, z: 0.0, t: Local::now() }
-    }
-    /*------------------------------------------------
-      These methods can be used to set or retrieve
-      values of Point4D instance coordinates, as they
-      return a mutable reference. Note similarity with
-      C++ code.
-    */
-    pub fn coor_x(&mut self) -&gt; &mut f64 {<span class="info" style="float:right;" onclick="toggleInfoRel(this, 'txt2', -25)">?</span>
-      &mut self.x
-    }
-    pub fn coor_y(&mut self) -&gt; &mut f64 {
-      &mut self.y
-    }
-    pub fn coor_z(&mut self) -&gt; &mut f64 {
-      &mut self.z
-    }
-    pub fn time(&self) -&gt; String {<span class="info" style="float:right;" onclick="toggleInfoRel(this, 'txt3', -25)">?</span>
-      self.t.format(&quot;%a %b %e %Y, %T&quot;).to_string()
-    }
-    pub fn update_time(&mut self) {
-      self.t = Utc::now().with_timezone(&Local);
-    }
-    /*------------------------------------------------
-      An alternate design for mutating coordinates.
-      This set has twice as many methods, but may
-      make access and mutation more obvious when
-      reading source code.
-    */
-    pub fn get_x(&self) -&gt; &f64 {
-        &self.x
-    }
-    pub fn get_y(&self) -&gt; &f64 {
-        &self.y
-    }
-    pub fn get_z(&self) -&gt; &f64 {
-        &self.z
-    }
-    pub fn set_x(&mut self, x: f64) {
-        self.x = x
-    }
-    pub fn set_y(&mut self, y: f64) {
-        self.y = y
-    }
-    pub fn set_z(&mut self, z: f64) {
-        self.z = z
-    }
-    /*
-      A different strategy is used in the Generic Bit to
-      access an arbitrary number of coordinate values.
-    */
-    /*
-      For simple types like this it would be reasonable to
-      make x, y, z public and remove the getter and setter
-      functions.
-    */
-    pub fn show(&self, nm:&str) {
-        print!(&quot;{nm}: Point4D {{&#92;n  &quot;);
-        print!(&quot;{0}, &quot;, self.x);
-        print!(&quot;{0}, &quot;, self.y);
-        println!(&quot;{0},&quot;, self.z);
-        println!(&quot;  {}&quot;, Local::now().format(&quot;%a %b %e %Y, %T&quot;));
-        println!(&quot;}}&quot;);
-    }
+  pub fn new() -&gt; Point4D {
+    Point4D { x: 0.0, y: 0.0, z: 0.0, t: Local::now() }
+  }
+  /*------------------------------------------------
+    These methods can be used to set or retrieve
+    values of Point4D instance coordinates, as they
+    return a mutable reference. Note similarity with
+    C++ code.
+  */
+  pub fn coor_x(&mut self) -&gt; &mut f64 {
+    &mut self.x
+  }
+  pub fn coor_y(&mut self) -&gt; &mut f64 {
+    &mut self.y
+  }
+  pub fn coor_z(&mut self) -&gt; &mut f64 {
+    &mut self.z
+  }
+  pub fn time(&self) -&gt; String {
+    self.t.format(&quot;%a %b %e %Y, %T&quot;).to_string()
+  }
+  pub fn update_time(&mut self) {
+    self.t = Utc::now().with_timezone(&Local);
+  }
+  /*------------------------------------------------
+    An alternate design for mutating coordinates.
+    This set has twice as many methods, but may
+    make access and mutation more obvious when
+    reading source code.
+  */
+  pub fn get_x(&self) -> &f64 {
+    &self.x
+  }
+  pub fn get_y(&self) -> &f64 {
+    &self.y
+  }
+  pub fn get_z(&self) -> &f64 {
+    &self.z
+  }
+  pub fn set_x(&mut self, x: f64) {
+    self.x = x
+  }
+  pub fn set_y(&mut self, y: f64) {
+    self.y = y
+  }
+  pub fn set_z(&mut self, z: f64) {
+    self.z = z
+  }
+  /*-- this design would continue for y and z coords --*/
+  /*
+    For simple types like this it would be reasonable to
+    make x, y, z public and remove the getter and setter
+    functions.
+  */
+  pub fn show(&self, nm:&str) {
+    print!(&quot;{nm}: Point4D {{&#92;n  &quot;);
+    print!(&quot;{0}, &quot;, self.x);
+    print!(&quot;{0}, &quot;, self.y);
+    println!(&quot;{0},&quot;, self.z);
+    println!(&quot;  {}&quot;, Local::now().format(&quot;%a %b %e %Y, %T&quot;));
+    println!(&quot;}}&quot;);
+  }
 }
+              </code>
             </pre>
-          <div id="txt1" class="txt">
+          </div>
+          <div class="textwrap">
+            <h4>Concept:</h4>
             <t-b>
-              Rust uses structs as patterns for laying out objects in memory, 
+              Point4D holds data for a point in 3 dimensional space and a time
+              when something was at that point.
+            </t-b>
+            <t-b>
+              These points could be collected into a vector to represent a trajectory
+              of an aircraft or a machine tool cutting edge.
+            </t-b>
+            <h4>Rust struct syntax:</h4>
+            <t-b>
+              Rust uses structs as patterns for laying out objects in memory,
               much like C++ uses classes.
             </t-b>
             <t-b>
               Methods are not declared within the struct body.  Instead, they are
               defined in a seperate &quot;impl&quot; scope.
             </t-b>
-          </div>
-          <div id="txt2" class="txt">
             <t-b>
               Unlike C++, the input reference to self must be supplied explicitly, where
               C++ passes that implicitly, e.g., for C++ it doesn&apos;t appear in user code.
@@ -480,8 +512,6 @@ impl Point4D {
               Mutability must be explicit.  If not declared, any attempt to change
               value will fail to compile.
             </t-b>
-          </div>
-          <div id="txt3" class="txt">
             <t-b>
               Return types are declared explicitly, as shown here for the
               return of a string representation of Point4D&apos;s
@@ -491,18 +521,66 @@ impl Point4D {
               <c-s>t:DateTime&lt;Local&gt;</c-s> is converted to a string
               using its format method.
             </t-b>
+            <h4>Special struct methods:</h4>
+            <t-b>
+              Unlike C++, Rust does not provide, nor require special methods.
+            </t-b>
+            <t-b>
+              Rust construction and assignment are always move operations, so there
+              is no corresponding set of copy operations. Note that Rust structs
+              do support making clones so code can move clones into the destination
+              instances, ensuring that the original cloned instance remains valid.
+            </t-b>
+            <t-b>
+              A clone operation copies resources from the cloned instance to the
+              new clone.  It is not an ownership transfer of those resources.
+            </t-b>
+            <t-b>
+              For purposes of performance, idomatic Rust code avoids copy operations
+              wherever possible, and when used, makes that use explicit with a call
+              to <c-s>clone()</c-s>.
+            </t-b>
+            <t-b>
+              Note that the <c-s>#[derive(Debug, Clone)]</c-s> just above the Point4D
+              declaration requires the Rust compiler
+              to generate <c-s>Debug</c-s> and <c-s>Clone</c-s> traits.  A trait is very similar to a
+              C# interface, declaring methods like <c-s>clone()</c-s> for the
+              <c-s>Clone</c-s> trait.
+            </t-b>
+            <t-b>
+              The
+              <c-s><a target="_blank" href="https://doc.rust-lang.org/std/fmt/trait.Debug.html">Debug</a></c-s>
+              trait declares the <c-s>fmt</c-s> method and is used
+              to deplay a simple, debug friendly, representation of its argument.
+              In this case the argument will be an instance of Point4D.
+            </t-b>
           </div>
         </div>
-        <h4 id="source">1.2 Source Code - main.rs</h4>
+        <h3 id="demo">1.2 main.rs</h3>
+        <t-b>
+          All code in this section is used to conduct demonstrations, e.g., it is
+          the contents of <c-s>main()</c-s>. That is broken up into sections for
+          declarations, library types, and a user-defined types in each of the
+          following code blocks, respectively.
+        </t-b>
+        <h3 id="demodclr">1.2.1 Declarations</h3>
+        <t-b>
+          This first code block has only module declarations. It has no executable
+          code, so there is no output.
+        </t-b>
+        <t-b>
+          You can find all the code for this demo
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/Rust/rust_objects/src">here</a>
+          and code for the entire Bits repository
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master">here</a>.
+        </t-b>
         <div class="blockSingle">
-          <splitter-container id="container">
-            <first-item id="fig1-first" style="width:55%;">
-              <div class="codewrap">
-                <pre class="codeSnap">
-#![allow(dead_code)]
+          <div class="codewrap" style="float:left; width:60%;">
+            <pre>
+<code class="language-rust">#![allow(dead_code)]
 #![allow(clippy::approx_constant)]
 
-/*-------------------------------------------------------------------
+/*---------------------------------------------------------
   rust_objects::main.rs
   - Demonstrates creation and use of Rust objects
   - Rust uses struct instead of class to create objects
@@ -515,21 +593,65 @@ You can clone the repo from this link.
 -----------------------------------------------*/
 
 mod analysis_objects;     // identify module source file
-use analysis_objects::*;  // import public functions and types
+use analysis_objects::*;  // import public functs and types
 mod points_objects;       // identify module source file
-use points_objects::*;    // import public functions and types
+use points_objects::*;    // import public functs and types              </code>
+            </pre>
+          </div>
+          <div class="textwrap">
+            <h4>Modules:</h4>
+            <t-b>
+              This is the first Rust demonstration that partitions its code into
+              more than one file.
+            </t-b>
+            <t-b>
+              Rust defines modules to support partitioning.  Here we have two of
+              them, &quot;analysis_objects&quot; and &quot;points_objects&quot;
+            </t-b>
+            <t-b>
+              A Rust module is simply a file that implements program functionality
+              focused in a single area, but has no main function, as only one main
+              is allowed per program.
+            </t-b>
+            <t-b>
+              Both module files, analysis_objects.rs and points_objects.rs
+              are placed in the src directory along with main.rs. That makes
+              it simple to import them, e.g., no path required.
+            </t-b>
+            <t-b>
+              That also means that a module can depend on code in another module.
+            </t-b>
+          </div>
+        </div>
+        <h3 id="demolib">1.2.2 standard library objects</h3>
+        <t-b>
+          This Bit demonstration starts by creating and using operations of instances of
+          <c-s>String</c-s> and <c-s>Vector&lt;T&gt;</c-s>, both defined as part of the
+          <a target="_blank" href="https://doc.rust-lang.org/std/">standard library</a>.
+          The code consists of a single function <c-s>demo_standard_objects()</c-s>.
+        </t-b>
+        <t-b>
+          You can find all the code for this demo
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/Rust/rust_objects/src">here</a>
+          and code for the entire Bits repository
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master">here</a>.
+        </t-b>
+        <div class="blockSingle">
+          <splitter-container id="container">
+            <first-item id="fig1-first" style="width:55%;">
+              <div class="codewrap">
+                <pre>
+<code class="language-rust">fn demo_standard_objects() {
 
-fn demo_standard_objects() {
-                <span class="info" style="float:right;" onclick="toggleInfoRel(this, 'mtxt1', -60)">?</span>
-  show_label(
-    &quot;std::library objects: string and vector&lt;T&gt;&quot;, 46
+  show_note(
+    &quot;std::library objects: string and vector&lt;T&gt;&quot;, 46                                        
   );
   nl();
-                <span class="info" style="float:right;" onclick="toggleInfoRel(this, 'mtxt2', -60)">?</span>
+
   /*-- create instance of String ----*/
   show_op(&quot;let mut s1 = &#92;&quot;a string&#92;&quot;.to_string()&quot;);
   let mut s1 = &quot;a string&quot;.to_string();
-  println!(&quot;  s1:String - {:?}&quot;, s1);
+  println!(&quot;  s1:String : {:?}&quot;, s1);
   nl();
   /*-- show type of s1 --------------*/
   show_op(&quot;show_type_scalar(&s1, &#92;&quot;&s1&#92;&quot;)&quot;);
@@ -538,14 +660,30 @@ fn demo_standard_objects() {
   /*-- one of many operations -------*/
   show_op(&quot;s1.push_str(&#92;&quot; and more&#92;&quot;);&quot;);
   s1.push_str(&quot; and more&quot;);
-  println!(&quot;  s1:String - {:?}&quot;, s1);
+  println!(&quot;  s1:String : {:?}&quot;, s1);
   nl();
+  /*-- move construction --*/
+  show_op(&quot;let s2 = s1 : move construction&quot;);
+  let s2 = s1;
+  println!(&quot;  s2:String : {:?}&quot;, s2);
+  println!(&quot;  s1 now invalid&#92;n&quot;);
+  // println!(&quot;  s1:String : {:?}&#92;n&quot;, s1);
+  // uncomment line above to see error message
+
+  /*-- move assignment --*/
+  show_op(&quot;s1 = s2 : move assignment&quot;);
+  let s1 = s2;
+  println!(&quot;  s1:String : {:?}&quot;, s1);
+  println!(&quot;  s2 now invalid&#92;n&quot;);
+  // println!(&quot;  s2:String : {:?}&#92;n&quot;, s2);
+  // uncomment line above to see error message
+
   //https://jimfawcett.github.io/Resources/RustBites/RustBites_Strings.html
 
   /*-- create instance of Vec&lt;i32&gt; --*/
   show_op(&quot;let mut v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1];&quot;);
   let mut v: Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1];
-  println!(&quot;  v:Vec&lt;i32&gt; - {:?}&quot;, v);
+  println!(&quot;  v:Vec&lt;i32&gt; : {:?}&quot;, v);
   nl();
   /*-- show type of v ---------------*/
   show_op(&quot;show_type_scalar(&v, &#92;&quot;&v&#92;&quot;)&quot;);
@@ -554,13 +692,97 @@ fn demo_standard_objects() {
   /*-- show one of many operations --*/
   show_op(&quot;v.push(42);&quot;);
   v.push(42);
-  println!(&quot;  v:Vec&lt;i32&gt; - {:?}&quot;, v);
+  println!(&quot;  v:Vec&lt;i32&gt; : {:?}&quot;, v);
   //https://jimfawcett.github.io/Resources/RustBites/RustBites_DataStr.html#vec
-}
+}                </code>
+              </pre>
+              </div>
+            </first-item>
+            <splitter-bar id="fig1-seperator"></splitter-bar>
+            <second-item id="fig1-second" style="width:45%;">
+              <div class="codewrap">
+                <pre>
+                <code class="language-rust">
 
+----------------------------------------------                                                  
+  std::library objects: string and vector&lt;T&gt;
+----------------------------------------------
+
+--- let mut s1 = &quot;a string&quot;.to_string() ---
+  s1:String : &quot;a string&quot;
+
+--- show_type_scalar(&s1, &quot;&s1&quot;) ---
+&quot;&s1&quot;, type: &quot;alloc::string::String&quot;
+value: &quot;a string&quot;, size: 24
+
+--- s1.push_str(&quot; and more&quot;); ---
+  s1:String : &quot;a string and more&quot;
+
+--- let s2 = s1 : move construction ---
+  s2:String : &quot;a string and more&quot;
+  s1 now invalid
+
+--- s1 = s2 : move assignment ---
+  s1:String : &quot;a string and more&quot;
+  s2 now invalid
+
+--- let mut v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1]; ---
+  v:Vec&lt;i32&gt; : [1, 2, 3, 2, 1]
+
+--- show_type_scalar(&v, &quot;&v&quot;) ---
+&quot;&v&quot;, type: &quot;alloc::vec::Vec&lt;i32&gt;&quot;
+value: [1, 2, 3, 2, 1], size: 24
+
+--- v.push(42); ---
+  v:Vec&lt;i32&gt; : [1, 2, 3, 2, 1, 42]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</code></pre>
+              </div>
+            </second-item>
+          </splitter-container>
+        </div>
+        <h3 id="demousr">1.2.3 user-defined objects</h3>
+        <t-b>
+          Code in this block demonstrates creation and use of instances of the
+          user-defined type <c-s>Point4D</c-s>.  All the code is created as part
+          of a single function: <c-s>demo_user_defined_objects()</c-s>.
+        </t-b>
+        <t-b>
+          You can find all the code for this demo
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/Rust/rust_objects/src">here</a>
+          and code for the entire Bits repository
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master">here</a>.
+        </t-b>
+        <div class="blockSingle">
+          <splitter-container id="container">
+            <first-item id="fig2-first" style="width:55%;">
+              <div class="codewrap">
+                <pre>
+                <code class="language-rust">
 fn demo_user_defined_objects() {
 
-  show_label(&quot;instances of user-defined type&quot;, 35);
+  show_note(&quot;instances of user-defined type&quot;, 35);                                                  
   nl();
 
   /*-- create instance of Point4D ---*/
@@ -604,164 +826,165 @@ fn demo_user_defined_objects() {
 
   p1.update_time();
   p1.show(&quot;p1&quot;);
+
+  show_op("let p2 = p1 : move construction");
+  let mut p2 = p1;
+  p2.show("p2");
+
+  show_op("*p2.coor_x() = 42.0");
+  *p2.coor_x() = 42.0;
+  p2.show("p2");
+
+  show_op("p1 = p2 : move assignment");
+  p1 = p2;
+  p1.show("p1");
 }
 
-/*---------------------------------------------------------
-  Demo object instances in action
-*/
-fn main() {
-    show_label(&quot;demonstrate object creation&quot;, 50);
 
-    demo_standard_objects();
-    demo_user_defined_objects();
-
-    print!(&quot;&#92;n&#92;nThat's all Folks!&#92;n&#92;n&quot;);
-}
-          </pre>
-                <div id="mtxt1" class="txt">
-                  <t-b>
-                    This code has been structured with topic-specific demonstration
-                    functions that are called in main.
-                  </t-b>
-                </div>
-                <div id="mtxt2" class="txt">
-                  <t-b>
-                    This demo code is cluttered with a lot of analysis and display
-                    functions like <c-s>show_op</c-s> and <c-s>show_type</c-s>. 
-                  </t-b>
-                  <t-b>
-                    That makes source code in main harder to read,
-                    but makes the output easier to understand.
-                  </t-b>
-                </div>
+</code>
+              </pre>
               </div>
             </first-item>
-            <splitter-bar id="fig1-seperator"></splitter-bar>
-            <second-item id="fig1-second" style="width:45%; display:block;">
-              <div style="white-space:nowrap; font-size:1.2em; margin:2em 5em;">
-                Output starts below:
-              </div>
-              <div style="margin:0em 2em;">
-                Vertical spacing has been adjusted to keep output close to the 
-                code that generated it.
-              </div>
-              <div style="height:7em;">&nbsp;</div>
-              <pre class="codeSnap">
+            <splitter-bar id="fig2-seperator"></splitter-bar>
+            <second-item id="fig2-second" style="width:45%;">
+              <div class="codewrap">
+                <pre>
+                <code class="language-rust">
 
-
-
-
-
-
---------------------------------------------------
-  demonstrate object creation
---------------------------------------------------
-
-----------------------------------------------
-  std::library objects: string and vector&lt;T&gt;
-----------------------------------------------
-
-
-
---- let mut s1 = &quot;a string&quot;.to_string() ---
-  s1:String - &quot;a string&quot;
-
-
-
---- show_type_scalar(&s1, &quot;&s1&quot;) ---
-&quot;&s1&quot;, type: &quot;alloc::string::String&quot;
-value: &quot;a string&quot;, size: 24
-
---- s1.push_str(&quot; and more&quot;); ---
-  s1:String - &quot;a string and more&quot;
-
-
-
-
-
---- let mut v:Vec&lt;i32&gt; = vec![1, 2, 3, 2, 1]; ---
-  v:Vec&lt;i32&gt; - [1, 2, 3, 2, 1]
-
-
-
---- show_type_scalar(&v, &quot;&v&quot;) ---
-&quot;&v&quot;, type: &quot;alloc::vec::Vec&lt;i32&gt;&quot;
-value: [1, 2, 3, 2, 1], size: 24
-
---- v.push(42); ---
-  v:Vec&lt;i32&gt; - [1, 2, 3, 2, 1, 42]
-
-
-
-
-
------------------------------------
+-----------------------------------                                                  
   instances of user-defined type
 -----------------------------------
 
 --- let mut p1 = Point4D::new() ---
-p1: Point4D {
+p1 : Point4D {
   0, 0, 0,
-  Fri Nov 17 2023, 09:09:15
+  Sat Dec  9 2023, 18:03:02
 }
-p1: Point4D {
+p1 : Point4D {
   42, -3, 2,
-  Fri Nov 17 2023, 09:09:15
+  Sat Dec  9 2023, 18:03:02
 }
 &quot;p1&quot;, type: &quot;rust_objects::points_objects::Point4D&quot;
-value: Point4D { x: 42.0, y: -3.0, z: 2.0, t: 2023-11-17T09:09:15.936911500-06:00 }, size: 40
+value: Point4D { x: 42.0, y: -3.0, z: 2.0, t: 2023-12-09T18:03:02.862125200-06:00 }, size: 40
 
 --- let p1a = p1.clone() ---
-p1.clone(): Point4D {
+p1.clone() : Point4D {
   42, -3, 2,
-  Fri Nov 17 2023, 09:09:15
+  Sat Dec  9 2023, 18:03:02
 }
 
 using PointN&lt;f64&gt;::coor_x function:
-p1: Point4D {
+p1 : Point4D {
   84, -3, 2,
-  Fri Nov 17 2023, 09:09:15
+  Sat Dec  9 2023, 18:03:02
 }
 
 using PointN&lt;f64&gt;::coor_y function:
-p1: Point4D {
+p1 : Point4D {
   84, 84, 2,
-  Fri Nov 17 2023, 09:09:15
+  Sat Dec  9 2023, 18:03:02
 }
 
 using PointN&lt;f64&gt;::coor_z function:
-p1: Point4D {
+p1 : Point4D {
   84, 84, 84,
-  Fri Nov 17 2023, 09:09:15
+  Sat Dec  9 2023, 18:03:02
 }
 
 updating time value:
 delaying 5 seconds before time update
-p1: Point4D {
+p1 : Point4D {
   84, 84, 84,
-  Fri Nov 17 2023, 09:09:20
+  Sat Dec  9 2023, 18:03:07
 }
-
-
-
-
-
-
-
-
-
-
-That's all Folks!
-
-            </pre>
+--- let p2 = p1 : move construction ---
+p2 : Point4D {
+  84, 84, 84,
+  Sun Dec 10 2023, 16:31:54
+}
+--- *p2.coor_x() = 42.0 ---
+p2 : Point4D {
+  42, 84, 84,
+  Sun Dec 10 2023, 16:31:54
+}
+--- p1 = p2 : move assignment ---
+p1 : Point4D {
+  42, 84, 84,
+  Sun Dec 10 2023, 16:31:54
+</code>
+              </pre>
+              </div>
             </second-item>
           </splitter-container>
         </div>
-        <h4 id="funcs">1.3 Source Code - Analysis.rs</h4>
+        <h3 id="demomain">1.2.4 main function</h3>
+        <t-b>
+          You can find all the code for this demo
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/Rust/rust_objects/src">here</a>
+          and code for the entire Bits repository
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master">here</a>.
+        </t-b>
         <div class="blockSingle">
-          <pre class="codeSnap">
-/*-------------------------------------------------------------------
-  analysis.rs<span class="info" style="float:right;" onclick="toggleInfoRel(this, 'ftxt0')">?</span>
+          <splitter-container id="container">
+            <first-item id="fig3-first" style="width:55%;">
+              <div class="codewrap">
+                <pre>
+<code class="language-rust">/*---------------------------------------------------------                              
+  Demo object instances in action
+*/
+fn main() {
+    show_note(&quot;demonstrate object creation&quot;, 50);
+
+    demo_standard_objects();
+    demo_user_defined_objects();
+  }
+  print!(&quot;&#92;n&#92;nThat's all Folks!&#92;n&#92;n&quot;);
+}
+
+
+                </code>
+              </pre>
+              </div>
+            </first-item>
+            <splitter-bar id="fig3-seperator"></splitter-bar>
+            <second-item id="fig3-second" style="width:45%;">
+              <div class="codewrap">
+                <pre>
+<code class="language-rust">
+ 
+--------------------------------------------------                              
+  demonstrate object creation
+--------------------------------------------------
+  /*----------------------------
+    output of demo_standard_objects() appears here
+    output of demo_user_defined_objects() appears here
+  */
+
+That's all Folks!
+
+
+                </code>
+              </pre>
+              </div>
+            </second-item>
+          </splitter-container>
+        </div>
+        <h3 id="funcs">1.3 Source Code - Analysis.rs</h3>
+        <t-b>
+          Code in this block provides analysis and display functions used in the
+          other code blocks.
+        </t-b>
+        <t-b>
+          You can find all the code for this demo
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/Rust/rust_objects/src">here</a>
+          and code for the entire Bits repository
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master">here</a>.
+        </t-b>
+        <div class="blockSingle">
+          <div class="codewrap" style="float:left; width:60%;">
+            <pre>
+ <code class="language-rust">/*-------------------------------------------------------------------
+  analysis.rs
   - provides analysis and display functions for Objects demo.
   - a few of these require advanced generics code.
   - You don't need to know how these work to understand this
@@ -772,12 +995,43 @@ That's all Folks!
 use std::fmt::*;
 
 /*---------------------------------------------------------
+  show string wrapped with long dotted lines above and below
+*/
+pub fn show_note(note: &str, n:usize) {
+  let mut line = String::new();
+  for _i in 0..n {
+    line.push('-');
+  }
+  print!(&quot;&#92;n{line}&#92;n&quot;);
+  print!(&quot;  {note}&quot;);
+  print!(&quot;&#92;n{line}&#92;n&quot;);
+}
+/*---------------------------------------------------------
+  label with default length
+  - Rust does not support default argument values
+*/
+pub fn show_label(note:&str) {
+  show_note(note, 50);
+}
+/*---------------------------------------------------------
+  show string wrapped in short lines
+*/
+pub fn show_op(opt: &str) {
+  println!(&quot;--- {opt} ---&quot;);
+}
+/*---------------------------------------------------------
+  print newline
+*/
+pub fn nl() {
+  println!();
+}
+/*---------------------------------------------------------
   Show input's call name and type
   - doesn't consume input
   - show_type is generic function with Debug bound.
     Using format &quot;{:?}&quot; requires Debug.
 */
-pub fn show_type&lt;T:Debug&gt;(_t: &T, nm: &str) {<span class="info" style="float:right;" onclick="toggleInfoRel(this, 'ftxt1')">?</span>
+pub fn show_type&lt;T:Debug&gt;(_t: &T, nm: &str) {
     let typename = std::any::type_name::&lt;T&gt;();
     println!(&quot;{nm:?}, type: {typename:?}&quot;);
 }
@@ -823,35 +1077,6 @@ fn find_last_utf8(s: &str, chr: char) -&gt; Option&lt;usize&gt; {
      .map(|rev_pos| s.chars().count() - rev_pos - 1)
 }
 /*---------------------------------------------------------
-  show string wrapped with long dotted lines above and below
-*/
-pub fn show_label(note: &str, n:usize) {
-  let mut line = String::new();
-  for _i in 0..n {
-    line.push('-');
-  }
-  print!(&quot;&#92;n{line}&#92;n&quot;);
-  print!(&quot;  {note}&quot;);
-  print!(&quot;&#92;n{line}&#92;n&quot;);
-}
-pub fn show_label_def(note:&str) {
-  show_label(note, 50);
-}
-/*---------------------------------------------------------
-  show string wrapped with dotted lines above and below
-*/
-pub fn show_note(note: &str) {
-  print!(&quot;&#92;n-------------------------&#92;n&quot;);
-  print!(&quot; {note}&quot;);
-  print!(&quot;&#92;n-------------------------&#92;n&quot;);
-}
-/*---------------------------------------------------------
-  show string wrapped in short lines
-*/
-pub fn show_op(opt: &str) {
-  println!(&quot;--- {opt} ---&quot;);
-}
-/*---------------------------------------------------------
   fold an enumerable's elements into rows of w elements
   - indent by left spaces
   - does not consume t since passed as reference
@@ -866,6 +1091,13 @@ pub fn fold&lt;T, I:Debug&gt;(
   let mut accum = String::new();
   accum += &offset(left);
 
+  for (i, item) in t.into_iter().enumerate() {
+    accum += &format!(&quot;{item:?}, &quot;);
+    if ((i + 1) % width) == 0 && i != 0 {
+        accum += &quot;&#92;n&quot;;
+        accum += &offset(left);
+    }
+  }
   /*-- Alternate direct implementation --*/
   //let mut i = 0usize;
   // for item in t {
@@ -877,13 +1109,7 @@ pub fn fold&lt;T, I:Debug&gt;(
   //   i += 1;
   // }
 
-  for (i, item) in t.into_iter().enumerate() {
-    accum += &format!(&quot;{item:?}, &quot;);
-    if ((i + 1) % width) == 0 && i != 0 {
-        accum += &quot;&#92;n&quot;;
-        accum += &offset(left);
-    }
-  }
+  /*-- strip off trailing comma --*/
   let opt = find_last_utf8(&accum, ',');
   if let Some(index) = opt {
     accum.truncate(index);
@@ -900,75 +1126,52 @@ pub fn show_fold&lt;T:Debug, I:Debug&gt;(t:&T, left:usize, width:usize)
 {
   println!(&quot;{}&quot;,fold(t, left, width));
 }
-/*---------------------------------------------------------
-  print newline
-*/
-pub fn nl() {
-  println!();
-}            </pre>
-            <div id="ftxt0" class="txt">
-              <t-b>
-                Several of the functions in this file are generic.  That means that
-                each one works for a set of input types that are not specified
-                until called by using code.
-              </t-b>
-              <t-b>
-                That code reuse is good, but syntax is more complex and won&apos;t be
-                explained until the next 
-                <a target="_blank" href="Bits_GenericRust.html">Bit</a>.
-              </t-b>
-            </div>
-            <div id="ftxt1" class="txt">
-              <t-b>
-                <c-s>show_type</c-s>&apos;s arguments are passed by reference.
-                So, references are copied; the arguments are not moved.
-              </t-b>
-              <t-b>
-                That means that the instance being analyzed, _t, will
-                still be valid after the call.
-              </t-b>
-            </div>
-            <div id="ftxt2" class="txt">
-              <t-b>
-                The where clause specifies that the lifetime &quot;`a&quot; of 
-                <c-s>T</c-s> is at least as long as the lifetime of its items
-                and that the items are of type <c-s>T</c-s>.
-              </t-b>
-              <t-b>
-                It also specifies that <c-s>T</c-s> satisfies the
-                <c-s>IntoIterator</c-s> trait, meaning that it implements
-                method <c-s>into_iter()</c-s> that converts <c-s>T</c-s>
-                into an iterator.
-              </t-b>
-              <t-b>
-                All of this will be covered in the next
-                <a target="_blank" href="Bits_GenericRust.html">Bit</a>.
-              </t-b>
-            </div>
-            <div id="ftxt3" class="txt">
-              <t-b>
-                <c-s>fold</c-s> supports showing a large enumerable collection
-                as a series of stacked rows of values.
-              </t-b>
-            </div>
-            <div id="ftxt4" class="txt">
-              <t-b>
-                The only difference between <c-s>fold</c-s> and <c-s>show_fold</c-s>
-                is that the first returns a string while the second displays the
-                string.
-              </t-b>
-            </div>
+</code>
+            </pre>
+          </div>
+          <div class="textwrap">
+            <h4>Analysis and Display:</h4>
+            <t-b>
+              This code block contains definitions of ten functions:
+              <ol>
+                <li>four non-generic display functions</li>
+                <li>three generic analysis functions</li>
+                <li>one generic and two non-generic helpers</li>
+              </ol>
+            </t-b>
+            <h4>Generic functions:</h4>
+            <t-b>
+              Two of the more complex generic functions <c-s>fold&lt;T,&nbsp;I:Debug&gt</c-s>
+              and <c-s>show_fold&lt;T:Debug, I:Debug&gt;</c-s> were only used for testing
+              large vectors and won&apos;t be discussed until the next
+              <a target="_blank" href="Bits_GenericRust.html">Bit</a>.
+            </t-b>
+            <t-b>
+              <c-s>show_type</c-s>&apos;s arguments are passed by reference.
+              So, references are copied; the arguments are not moved.
+            </t-b>
+            <t-b>
+              That means that the instance being analyzed, _t, will
+              still be valid after the call.
+            </t-b>
+            <t-b>
+              Note that using a leading underscore, as in _t, tells the compiler
+              not to warn about no use of that variable.
+            </t-b>
+          </div>
         </div>
         <h4 id="build">2.0 Build</h4>
         <div class="blockSingle">
-          <pre class="codeSnap">
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects
-&gt; cargo build
-   Compiling rust_hello_objects v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.42s
-C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects
-&gt;
-</pre>
+          <pre style="font-size:0.8em; margin:0.5em;">
+<code class="language-shell">
+  C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects
+  &gt; cargo build
+  Compiling rust_hello_objects v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects)
+  Finished dev [unoptimized + debuginfo] target(s) in 0.42s
+  C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects
+  &gt;
+</code>
+          </pre>
         </div>
         <h3 id="vscode">3.0 VS Code View</h3>
         <t-b>
@@ -1072,6 +1275,8 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_hello_objects
   </script>
   <script>
     onLoadSplitter("fig1");
+    onLoadSplitter("fig2");
+    onLoadSplitter("fig3");
   </script>
 </body>
 </html>
