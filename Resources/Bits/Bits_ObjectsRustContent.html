@@ -917,7 +917,104 @@ p1 : Point4D {
             </second-item>
           </splitter-container>
         </div>
-        <h3 id="demomain">1.2.4 main function</h3>
+        <h3 id="heap">1.2.4 Objects in heap</h3>
+        <t-b>
+          Heap objects are created in Rust using the <c-s>Box&lt;T&gt;</c-s> smart pointer.
+          <c-s>Box</c-s> implements Rust&apos;s <c-s>Deref</c-s> trait. That will often
+          automatically dereference the pointer to use its inner object&apos;s interface.
+        </t-b>
+        <t-b>
+          Automatic dereferencing worked for <c-s>Vec&lt;T&gt;</c-s> but did not for
+          Point4D, as shown below. That inconsistency is not a major problem, as intellisence indicates
+          when it will not work and the developer simply provides explicit dereferencing
+          as was done in this demo.
+        </t-b>
+        <div class="blockSingle">
+          <splitter-container id="container">
+            <first-item id="fig3-first" style="width:55%;">
+              <div class="codewrap">
+                <pre>
+                  <code class="language-rust">
+fn demo_heap_operations() {
+
+  show_note(&quot;std library objects in heap&quot;, 40);
+  let mut h_str = Box::new(vec![1, 2, 3, 2, 1]);
+  show_type(&h_str, &quot;h_str&quot;);
+  println!(&quot;h_str: {:?}&quot;, h_str);
+
+  show_op(&quot;h_str[1] = -1&quot;);
+  /*-------------------------------------------------------                              
+    This works because Box implements Deref and DerefMut
+    traits which automatically dereference smart Box pointers.
+    That essentially delegates the inner interface back
+    to the Box pointer.
+  */
+  h_str[1] = -1;
+  /*
+    equivalent to (*h_str)[1] = -1;
+    because of DerefMut
+  */
+  println!(&quot;h_str: {:?}&quot;, h_str);
+
+  show_note(&quot;user-defined objects in heap&quot;, 40);
+  let mut h_point = Box::new(Point4D::new());
+  show_type(&h_point, &quot;h_point&quot;);
+  /*
+    Point4D does not implement trait DerefMut, so code has to
+    explicitly deref, as shown here.
+  */
+  *h_point.coor_x() = 2.0;
+  *h_point.coor_y() = 1.0;
+  *h_point.coor_z() = 0.0;
+  (*h_point).show(&quot;h_point&quot;);
+}                  </code>
+                </pre>
+              </div>
+            </first-item>
+            <splitter-bar id="fig3-seperator"></splitter-bar>
+            <second-item id="fig3-second" style="width:45%;">
+              <div class="codewrap">
+                <pre>
+                  <code class="language-shell">
+--------------------------------------------------
+  demonstrate object creation
+--------------------------------------------------
+
+----------------------------------------
+  std library objects in heap
+----------------------------------------
+&quot;h_str&quot;, type: &quot;alloc::boxed::Box&lt;alloc::vec::Vec&lt;i32&gt;&gt;&quot;
+h_str: [1, 2, 3, 2, 1]
+--- h_str[1] = -1 ---
+h_str: [1, -1, -2, 2, 1]
+
+----------------------------------------
+  user-defined objects in heap
+----------------------------------------
+&quot;h_point&quot;, type: &quot;alloc::boxed::Box&lt;rust_objects::points_objects::Point4D&gt;&quot;                    
+h_point : Point4D {
+  2, 1, 0,
+  Mon Dec 11 2023, 14:53:31
+}
+
+
+
+
+
+
+
+
+
+
+
+
+                  </code>
+                </pre>
+              </div>
+            </second-item>
+          </splitter-container>
+        </div>
+        <h3 id="demomain">1.2.5 main function</h3>
         <t-b>
           You can find all the code for this demo
           <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/Rust/rust_objects/src">here</a>
@@ -926,7 +1023,7 @@ p1 : Point4D {
         </t-b>
         <div class="blockSingle">
           <splitter-container id="container">
-            <first-item id="fig3-first" style="width:55%;">
+            <first-item id="fig4-first" style="width:55%;">
               <div class="codewrap">
                 <pre>
 <code class="language-rust">/*---------------------------------------------------------                              
@@ -937,6 +1034,7 @@ fn main() {
 
     demo_standard_objects();
     demo_user_defined_objects();
+    demo_heap_operations();
   }
   print!(&quot;&#92;n&#92;nThat's all Folks!&#92;n&#92;n&quot;);
 }
@@ -946,8 +1044,8 @@ fn main() {
               </pre>
               </div>
             </first-item>
-            <splitter-bar id="fig3-seperator"></splitter-bar>
-            <second-item id="fig3-second" style="width:45%;">
+            <splitter-bar id="fig4-seperator"></splitter-bar>
+            <second-item id="fig4-second" style="width:45%;">
               <div class="codewrap">
                 <pre>
 <code class="language-rust">
@@ -958,6 +1056,7 @@ fn main() {
   /*----------------------------
     output of demo_standard_objects() appears here
     output of demo_user_defined_objects() appears here
+    output of demo_heap_operations() appears here
   */
 
 That's all Folks!
@@ -1277,6 +1376,7 @@ pub fn show_fold&lt;T:Debug, I:Debug&gt;(t:&T, left:usize, width:usize)
     onLoadSplitter("fig1");
     onLoadSplitter("fig2");
     onLoadSplitter("fig3");
+    onLoadSplitter("fig4");
   </script>
 </body>
 </html>
