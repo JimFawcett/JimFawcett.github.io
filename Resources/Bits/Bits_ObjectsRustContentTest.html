@@ -25,13 +25,12 @@
   <!--<script src="js/ScriptsPageFrameNewRadioButtons.js"></script>-->
   <style>
     #github .note {
-      border: 2px solid red;
+      border: 1px solid var(--dark);
       padding: 0.75em 1.5em;
       margin-top: 1.25em;
       margin-bottom: 1.25em;
       background-color: var(--light);
       color: var(--dark);
-      width:max-content;
       max-width: 50em;
     }
 
@@ -289,7 +288,7 @@
     <main id="main">
       <div id="about">about</div>
       <div id="page">Bits Objects Rust</div>
-      <div id="modified">12/20/2023</div>
+      <div id="modified">12/10/2023</div>
       <div id="hlp"></div>
       <a id="top"></a>
       <content>
@@ -315,9 +314,6 @@
             </h3>
           </hgroup>
         </header>
-        <div class="note">
-          This page is under construction.
-        </div>
         <t-b id="syn" style="border:1px solid maroon; padding:0.25em 1em 0.5em 1em;">
           <h4 style="margin:0em 0em 0.25em 0em;">Synopsis:</h4>
           This page demonstrates uses of Rust User-Defined types and their objects.
@@ -387,7 +383,6 @@
           that class methods have valid data for their operations. A class designer may
           choose to selectively allow user data modification.
         </t-b>
-        <h3 id="point4d">1.1.1 User-defined Type Point4D</h3>
         <t-b style="margin-bottom:1em;">
           This block presents code that defines a Rust type, Point4D. It defines the
           data held by instances of the type, three floating point coordinates and
@@ -412,15 +407,11 @@ use std::fmt::*;
 use chrono::prelude::*;
 
 /*---------------------------------------------------------
-  Declare Point4D struct
-  - similar in function to a C++ class
-  - Request compiler to implement traits: Debug, Copy & Clone
-  - Can be Copy since all members are copy
-  - So, construction and assignment are copy operations
-  - Demos two types of member access, only one needed
+  - Declare Point4D struct, like a C++ class
+  - Request compiler implement traits Debug & Clone
 */
-#[derive(Debug, Copy, Clone)]
-pub struct Point4D {
+#[derive(Debug, Clone)]
+pub struct Point4D {  // public instance, private data
   x: f64,
   y: f64,
   z: f64,
@@ -458,53 +449,40 @@ impl Point4D {
     make access and mutation more obvious when
     reading source code.
   */
-    pub fn get_x(&self) -&gt; &f64 {
-      &self.x
-    }
-    pub fn get_y(&self) -&gt; &f64 {
-      &self.y
-    }
-    pub fn get_z(&self) -&gt; &f64 {
-      &self.z
-    }
-    pub fn set_x(&mut self, x: f64) {
-      self.x = x
-    }
-    pub fn set_y(&mut self, y: f64) {
-      self.y = y
-    }
-    pub fn set_z(&mut self, z: f64) {
-      self.z = z
-    }
+  pub fn get_x(&self) -> &f64 {
+    &self.x
+  }
+  pub fn get_y(&self) -> &f64 {
+    &self.y
+  }
+  pub fn get_z(&self) -> &f64 {
+    &self.z
+  }
+  pub fn set_x(&mut self, x: f64) {
+    self.x = x
+  }
+  pub fn set_y(&mut self, y: f64) {
+    self.y = y
+  }
+  pub fn set_z(&mut self, z: f64) {
+    self.z = z
+  }
+  /*-- this design would continue for y and z coords --*/
   /*
     For simple types like this it would be reasonable to
     make x, y, z public and remove the getter and setter
     functions.
   */
-  /*-----------------------------------------------------
-    show method displays instance values
-    - uses helper function indent
-  */
-  pub fn indent(ch:char, n:usize) -&gt; String {
-    (0..n).map(|_i| ch).collect::&lt;String&gt;()
-    // equivalent to:
-    //   let ind = (0..n).map(|_i| ch).collect::&lt;String&gt;();
-    //   ind
-    // - (0..n) is an iterator yielding values 0 through n-1
-    // - map sets each iterator item to same char ch
-    // - collect appends each char to temporary String
-    // ind defines return value, the collected String
+  pub fn show(&self, nm:&str) {
+    print!(&quot;{nm}: Point4D {{&#92;n  &quot;);
+    print!(&quot;{0}, &quot;, self.x);
+    print!(&quot;{0}, &quot;, self.y);
+    println!(&quot;{0},&quot;, self.z);
+    println!(&quot;  {}&quot;, Local::now().format(&quot;%a %b %e %Y, %T&quot;));
+    println!(&quot;}}&quot;);
   }
-  pub fn show(&self, nm:&str, ind:usize) {
-    let indstr = Point4D::indent(' ', ind);
-    print!(&quot;{indstr}{nm} : Point4D {{&#92;n  &quot;);
-    print!(&quot;{indstr}{0}, &quot;, self.x);
-    print!(&quot;{indstr}{0}, &quot;, self.y);
-    println!(&quot;{indstr}{0},&quot;, self.z);
-    println!(&quot;{indstr}  {}&quot;, Local::now().format(&quot;%a %b %e %Y, %T&quot;));
-    println!(&quot;{indstr}}}&quot;);
-  }
-}</code>
+}
+              </code>
             </pre>
           </div>
           <div class="textwrap">
@@ -548,31 +526,10 @@ impl Point4D {
               Unlike C++, Rust does not provide, nor require special methods.
             </t-b>
             <t-b>
-              Note that the <c-s>#[derive(Debug, Copy, Clone)]</c-s> just above the Point4D
-              declaration requires the Rust compiler
-              to generate <c-s>Debug</c-s>, <c-s>Move</c-s> and <c-s>Clone</c-s> traits.
-              A trait is very similar to a
-              C# interface, declaring methods like <c-s>clone()</c-s> for the
-              <c-s>Clone</c-s> trait.
-            </t-b>
-            <t-b>
-              Rust types are either <c-s>Copy</c-s> or <c-s>Move</c-s> (!<c-s>Copy</c-s>). A type can be <c-s>Copy</c-s> if, and
-              only if, all its members are <c-s>Copy</c-s> and the struct implements the <c-s>Copy</c-s>
-              trait.
-            </t-b>
-            <t-b>
-              The <c-s>Copy</c-s> trait declares no methods.  It is simply a marker that tells the
-              compiler to copy the memory footprint of an instance for construction
-              and assignment.
-            </t-b>
-            <t-b>
-              Since it implements <c-s>Copy</c-s>, <c-s>Point4D</c-s> is a copy type.
-            </t-b>
-            <t-b>
-              Rust construction and assignment are always either <c-s>Copy</c-s> or <c-s>Move</c-s> operations,
-              so there are either copy construction and assignment or move construction and
-              assignment, but not both. Moves are transfers of ownership of the source&apos;s
-              resources.
+              Rust construction and assignment are always move operations, so there
+              is no corresponding set of copy operations. Note that Rust structs
+              do support making clones so code can move clones into the destination
+              instances, ensuring that the original cloned instance remains valid.
             </t-b>
             <t-b>
               A clone operation copies resources from the cloned instance to the
@@ -584,135 +541,18 @@ impl Point4D {
               to <c-s>clone()</c-s>.
             </t-b>
             <t-b>
+              Note that the <c-s>#[derive(Debug, Clone)]</c-s> just above the Point4D
+              declaration requires the Rust compiler
+              to generate <c-s>Debug</c-s> and <c-s>Clone</c-s> traits.  A trait is very similar to a
+              C# interface, declaring methods like <c-s>clone()</c-s> for the
+              <c-s>Clone</c-s> trait.
+            </t-b>
+            <t-b>
               The
               <c-s><a target="_blank" href="https://doc.rust-lang.org/std/fmt/trait.Debug.html">Debug</a></c-s>
               trait declares the <c-s>fmt</c-s> method and is used
               to deplay a simple, debug friendly, representation of its argument.
               In this case the argument will be an instance of Point4D.
-            </t-b>
-            <h4>Design Note:</h4>
-            <t-b>
-              <c-s>Point4D</c-s> implements two distinct sets of accessor methods:
-              the coors methods and getter and setter methods. At most only one of
-              these is needed.
-            </t-b>
-            <t-b>
-              For simple types like <c-s>Point4D</c-s> it would be very reasonable to
-              simply make the data x, y, and z public.  That would not be appropriate
-              for t
-              because the t data member must be of type <c-s>DateTime&lt;Local&gt;</c-s>
-              and can&apos;t accept arbitrary data.
-            </t-b>
-          </div>
-        </div>
-        <h3 id="point4d">1.1.2 User-defined Type PointNPrototype</h3>
-        <t-b style="margin-bottom:1em;">
-          This block presents code that defines a Rust type, Point4D. It defines
-          data held by instances of the type, three floating point coordinates and
-          a <c-s>DateTime&lt;Local&gt;</c-s> variable, and methods to create and modify
-          instances.
-        </t-b>
-        <t-b>
-          Point4D is a Copy type.  Construction and assignment are copy operations that
-          are created by the compiler, as is the drop operation, similar to a C++
-          destructor. That means that Rust developers do not create special class methods
-          for them.
-        </t-b>
-        <t-b>
-          <c-s>Point4D</c-s> requests the compiler to implement the Copy trait using
-          <c-s>#[derive(Copy)]</c-s>.
-          This is a trait that has no declared methods, but serves as a marker
-          telling the compiler to copy its memory footprint for construction and
-          assignment operations.
-        </t-b>
-        <t-b>
-          You can find all the code for this demo
-          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/Rust/rust_objects/src">here</a>
-          and code for the entire Bits repository
-          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master">here</a>.
-        </t-b>
-        <div class="blockSingle">
-          <div class="codewrap" style="float:left; width:60%;">
-            <pre style="font-size:1em; margin-right:0.75em;">
-<code class="language-rust">/*
-  PointNPrototype
-  - Request compiler implement traits Debug & Clone
-  - Can't be Copy since members are not copy
-  - So, construction and assignment are move operations
-  - This demo will be expanded into useful type in
-    next Bit: Rust_GenericBit
-*/
-#[derive(Debug, Clone)]   // can't make Copy type
-pub struct PointNPrototype {
-  coords: Vec&lt;f64&gt;        // not copy type
-}
-impl PointNPrototype {
-  pub fn new() -&gt; PointNPrototype {
-    PointNPrototype {
-      coords: vec![]
-    }
-  }
-  /*-- initialize from elements of array slice --*/
-  pub fn init(&mut self, arr: &[f64]) -&gt; &mut PointNPrototype {
-    self.coords = (0..arr.len()).map(|i| arr[i]).collect::&lt;Vec&lt;f64&gt;&gt;();
-    self
-  }
-  /*-- make coordinates accessible for reading and writing --*/
-  pub fn coors(&mut self) -&gt; &mut Vec&lt;f64&gt; {
-    &mut self.coords
-  }
-}</code>
-            </pre>
-          </div>
-          <div class="textwrap">
-            <h4>Concept:</h4>
-            <t-b>
-              PointNPrototype holds data for a point in N dimensional space.
-            </t-b>
-            <t-b>
-              These points could represent the state of an electomechanical
-              control system or chemical process.
-            </t-b>
-            <h4>Prototype syntax:</h4>
-            <t-b>
-              PointNPrototype is a prototype for a type we will implement completely
-              in the next Bit: Bits_GenericRust. It is included here to illustrate
-              the distinction between Copy and Move types.
-            </t-b>
-            <t-b>
-              It includes two methods, <c-s>new()</c-s> and
-              <c-s>init(&amp;mut&nbsp;self,&nbsp;arr:&nbsp;&amp[f64])</c-s>
-              to create and initialize instances, and a
-              method, <c-s>coors(&mut&nbsp;self)</c-s> to provide access to their internal
-              states.
-            </t-b>
-            <h4>Special struct methods:</h4>
-            <t-b>
-              Unlike <c-s>Point4D</c-s>, <c-s>PointNPrototype</c-s> is a <c-s>Move</c-s> type.
-              It cannot be made <c-s>Copy</c-s> because it has a Vec&lt;f64&gt; member
-              which is <c-s>Move</c-s>.
-            </t-b>
-            <t-b>
-              A declaration <c-s>#[derive(Copy, ...)</c-s> would fail to compile.
-              So <c-s>PointNPrototype</c-s> leaves the <c-s>Copy</c-s> trait out of
-              that declaration.
-            </t-b>
-            <t-b>
-              Construction and assignment for <c-s>PointNPrototype</c-s> are move
-              operations. There
-              are no corresponding copy operations. Note that it does
-              support making clones so code can move clones into the destination
-              instances, ensuring that the original cloned instance remains valid.
-            </t-b>
-            <t-b>
-              A clone operation moves resources from the cloned instance to the
-              new clone usually by copying a few pointers.  It is not an ownership
-              transfer of those resources.
-            </t-b>
-            <t-b>
-              For purposes of performance, idomatic Rust code avoids copy operations
-              wherever possible, and when used, makes that use explicit with a call
-              to <c-s>clone()</c-s>.
             </t-b>
           </div>
         </div>
@@ -796,6 +636,20 @@ use points_objects::*;    // import public functs and types              </code>
           and code for the entire Bits repository
           <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master">here</a>.
         </t-b>
+        <iframe id="pgframe"
+                src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=47becda220c9dba7128f6322b0dd66de"
+                style="width:99%; height:38em;">
+        </iframe>
+        <t-b>
+
+        </t-b>
+        <iframe id="pgframe2"
+                src="https://godbolt.org/#z:OYLghAFBqd5QCxAYwPYBMCmBRdBLAF1QCcAaPECAMzwBtMA7AQwFtMQByARg9KtQYEAysib0QXACx8BBAKoBnTAAUAHpwAMvAFYTStJg1DEArgoKkl9ZATwDKjdAGFUtEywYgAHKUcAZPAZMADl3ACNMYhAAJi5SAAdUBUI7Bhc3D28EpJSBAKDQlgio2MtMa1sBIQImYgJ0908fK0wbVOragnyQ8MiYuPNOhszmmrruwuL%2BgEpLVBNiZHYOAHoVgGosFlR183R1gDVW9YBadf5idYAhQgUAfQAlMwIAeTDtVoIFADoEAhZaABSDQAQWBIKoDF2CFQAHc7rYCPQIAoQIDogA2czEabrQEAdiu4PWJPW9AI6zCJCwl0BAGYACLrCAab7fSQaabfFhMeIQAlOO4CvHRaIndHRLloWgVEBoulOarEQLAenYCDTelE0Gk9bxZWCWgMMCQCUEon4hkS0gijFU4g0zV07Ug3X6wJI42m0Uk80Eq2im0KJ0ut0Gz0m/miv2W622%2B2OrXg/3gyHQuF3VB81HorEEHF4wnE0nuw1eqNik5nc3ygBi/tOVbjwaToJToLTPMCGsLodJChh8MRyIlWx2e3WADdPiQJSHiyTyesWCYKZOQIdWvSnHg6dE1XjGVPWibAQBWK5xdbRG10m039Zcc9W50LvXho2RiXr3t1lNnpwGDjSd5x1Uk3wHDMswrJdJy4Q8mUndYN22ad1jQBhsRMNoBDnVtXVJJcVzXeD6UQrUSTWZdUDQjCsJwoCwJJUsI29aI4I3Gt6XrWMAKAwMpy4UCCMojYkIYOF1kCScxDwdAbQiRhqOnfYNxMBg0BYNhBHWIhdkwTB1kiYgSGXBRVSY9YqJYz82K4ukeIDB8QPw3UIMHTM%2BW/J8Lx8pkyNOaJkPWARDNQKhl0MABPEL4kiJhKkwvDX0suDz0vZ8EMC1ySw/ctvM4wk/14wDgKE/D3KgrzRSQgK4O%2BZBaFC4LUMMpgFGSYAGG0ilwvQpqgmSvsSVqo96sa0KNRy0T%2BuatB4jwTAFEEsAOGW4glvmRYlt2HY4Kk5bzDoWgp1k9A3xs/KasKq5iqcm0XJSkT3w9WyKw439uP/UqBLg4S3MsyD4WgiUmCy3NJ3Srg2TpZ8hrfKjkA2hK2uIYgmBiqgTJYY8bFMhRaDwJY3yXJhOMxdLd33M9/KPCGoZhuGnrDV6ruiMnPoc77%2BIfJh/vAwGPJBmqgrwZbpQqc5sd2QmlltSHfMZmn4cs2CgoCiBoe%2BOkuR5Lz8R3YU0ovPBnylVxZXlJwjmQbcqbVNUpuZ3LWa/EWbru88fucyUKsFqr3qyycgpQmi2o6vAup6oaAee0bEP3Z3mLyt32I9r6Sp5h7%2BZm4P1gk2EpIYGTCfkykDKhVrzsshGNht3YiA2/ZAnWBBMF5Srgeq6IiNXVu7mnZAsquVB1BAIJYX5ACJTZb4vbw0Uc7JTAKWI/vB%2BH0e5QniBB9PXz71vG1pHWM8zeml6y1ThAB9adOuczuMb8HpfO88isIAAKmf1pNQvan/LRCJEefci8L5fx/sgP%2BVwAEimAUyROw1L6sQrJA%2B%2Bjkn63ygRfN%2BwtoiQPSrA9E8Drw2jMDtJgq4dg0kwFQFWz0CH/0ysQgKiCLopzYmgzmGCBKQNfm2WMbZQQcFmLQTgZ5eCeA4FoUgqBOBPHMLtBYct0R0h4KQAgmgRGzAANYgDPJIb4Z4uAYjpF4DEXgACcGhJBeHxBiOIYiOCSEkVo2RnBeCog0BorRsw4CwCQJgVQrQqFkAoBAWowAFDKEMOUIQg4pHqM0gtAwiUYlBFoPEuEUiZHJLoH0YgXB8QclIHk%2BgxBgisGWLwMpkQXiriybCHJvAgmtBBMQKJHjfDBOQNUfAUjeD8EECIMQ7ApAyEEIoFQ6hpE6D0AYIwIBTDmH0HgMIqJICzCzIlVEHBeBhzRnJJa8BZimEEHgNgAAVVArgNkajmMosZlgCD9PSXEhJnB1H5gMp83gsJ0bxF%2BaI8RrjZnuI4NgHpoT1jLIIEPaGxTvgaGZAoiw6xcCEFMqooSvBNGzOmLokAkgzzsi8HSBxaiNCWOMdEOklj9CcBcaQZp4LPEgG8XirQBKGUcGiKCmRci9k%2BPxbMacxBkj2EkEAA"
+                style="width:99%; height:38em;">
+        </iframe>
+        <t-b>
+
+        </t-b>
         <div class="blockSingle">
           <splitter-container id="container">
             <first-item id="fig1-first" style="width:55%;">
@@ -804,7 +658,7 @@ use points_objects::*;    // import public functs and types              </code>
 <code class="language-rust">fn demo_standard_objects() {
 
   show_note(
-    &quot;std::library objects: string and vector&lt;T&gt;&quot;, 46                                        
+    &quot;std::library objects: string and vector&lt;T&gt;&quot;, 46
   );
   nl();
 
@@ -864,7 +718,7 @@ use points_objects::*;    // import public functs and types              </code>
                 <pre>
                 <code class="language-rust">
 
-----------------------------------------------                                                  
+----------------------------------------------
   std::library objects: string and vector&lt;T&gt;
 ----------------------------------------------
 
@@ -942,7 +796,7 @@ value: [1, 2, 3, 2, 1], size: 24
                 <code class="language-rust">
 fn demo_user_defined_objects() {
 
-  show_note(&quot;instances of user-defined type&quot;, 35);                                                  
+  show_note(&quot;instances of user-defined type&quot;, 35);
   nl();
 
   /*-- create instance of Point4D ---*/
@@ -1011,7 +865,7 @@ fn demo_user_defined_objects() {
                 <pre>
                 <code class="language-rust">
 
------------------------------------                                                  
+-----------------------------------
   instances of user-defined type
 -----------------------------------
 
@@ -1103,7 +957,7 @@ fn demo_heap_operations() {
   println!(&quot;h_str: {:?}&quot;, h_str);
 
   show_op(&quot;h_str[1] = -1&quot;);
-  /*-------------------------------------------------------                              
+  /*-------------------------------------------------------
     This works because Box implements Deref and DerefMut
     traits which automatically dereference smart Box pointers.
     That essentially delegates the inner interface back
@@ -1151,7 +1005,7 @@ h_str: [1, -1, -2, 2, 1]
 ----------------------------------------
   user-defined objects in heap
 ----------------------------------------
-&quot;h_point&quot;, type: &quot;alloc::boxed::Box&lt;rust_objects::points_objects::Point4D&gt;&quot;                    
+&quot;h_point&quot;, type: &quot;alloc::boxed::Box&lt;rust_objects::points_objects::Point4D&gt;&quot;
 h_point : Point4D {
   2, 1, 0,
   Mon Dec 11 2023, 14:53:31
@@ -1186,7 +1040,7 @@ h_point : Point4D {
             <first-item id="fig4-first" style="width:55%;">
               <div class="codewrap">
                 <pre>
-<code class="language-rust">/*---------------------------------------------------------                              
+<code class="language-rust">/*---------------------------------------------------------
   Demo object instances in action
 */
 fn main() {
@@ -1209,8 +1063,8 @@ fn main() {
               <div class="codewrap">
                 <pre>
 <code class="language-rust">
- 
---------------------------------------------------                              
+
+--------------------------------------------------
   demonstrate object creation
 --------------------------------------------------
   /*----------------------------
