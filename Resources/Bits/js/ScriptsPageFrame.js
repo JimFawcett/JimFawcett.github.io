@@ -72,7 +72,7 @@ function initializeMenu() {
           <div class='ddItem'><a target='_self' href='../../indexCpp.html'>&nbsp;C++</a>&nbsp;</div>\
           <div class='ddItem'><a target='_self' href='../../indexRust.html'>&nbsp;Rust</a>&nbsp;</div>\
           <div class='ddItem'><a target='_self' href='../../indexCs.html'>&nbsp;C#</a>&nbsp;</div>\
-          <div class='ddItem'><a target='_self' href='../Bits/Bits_Intro.html'>&nbsp;Bits</a>&nbsp;</div>\
+          <div class='ddItem'><a target='_self' href='../../indexBits.html'>&nbsp;Bits</a>&nbsp;</div>\
           <div class='ddItem'><a target='_self' href='../../indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>\
           <div class='ddItem'><a target='_self' href='../../indexDesign.html'>&nbsp;Design</a>&nbsp;</div>\
           <div class='ddItem'><a target='_self' href='../../indexDeployment.html'>&nbsp;Deployment</a>&nbsp;</div>\
