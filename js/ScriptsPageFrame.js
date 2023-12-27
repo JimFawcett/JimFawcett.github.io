@@ -49,6 +49,7 @@ function getHelp() {
 function loadif() {
   loc = window.location.href;
   if (window.self === window.top) {
+    if (window.location.href = 'TOC.html') { return; }
     window.location.href = 'TOC.html?src=' + loc;
   }
   else {
@@ -330,23 +331,92 @@ function initializeNextPrev() {
   page.nxtlnk2 = document.getElementById("nextLink2");
   page.prvlnk2 = document.getElementById("prevLink2");
 
-  if (!isDefined(page.nxt)) {
-    page.nxtlnk.style.display = "none";  // button top right menu
-    page.nxtlnk2.style.display = "none";  // button bottom right menu
-  }
-  else {
+  if (isDefined(page.nxt)) {
     page.nxtlnk.setAttribute('href', page.nxt.href);
     page.nxtlnk2.setAttribute('href', page.nxt.href);
   }
+  else {
+    page.nxtlnk.style.display = "none";
+    page.nxtlnk2.style.display = "none";
+  }
 
-  if (page.prv === null) {
-    page.prvlnk.style.display = "none";  // button top right menu
-    page.prvlnk2.style.display = "none";  // button bottom right menu
+  if (isDefined(page.prv)) {
+    page.prvlnk.setAttribute('href', page.prv.href);
+    page.prvlnk2.setAttribute('href', page.prv.href);
   }
   else {
-    page.prvlnk.href = page.prv.href;
-    page.prvlnk2.href = page.prv.href;
+    page.prvlnk.style.display = "none";
+    page.prvlnk2.style.display = "none";
   }
+
+
+  //{
+  //  if (isDefined(page.nxtlnk)) {
+  //    page.nxtlnk.setAttribute('href', page.nxt.href);
+  //  }
+  //  else {
+  //    page.nxtlnk.style.display = "none";
+  //  }
+  //  if (isDefined(page.nxtlnk2)) {
+  //    page.nxtlnk2.setAttribute('href', page.nxt.href);
+  //  }
+  //  else {
+  //    page.nxtlnk2.style.display = "none";
+  //  }
+  //}
+  ////if (isDefined(page.prv))
+  //if (!isDefined(page.prv)) {
+  //  page.prv.style.display = "none";
+  //}
+  //{
+  //  if (isDefined(page.prvlnk)) {
+  //    page.prvlnk.setAttribute('href', page.prv.href);
+  //  }
+  //  else {
+  //    page.prvlnk.style.display = "none";
+  //  }
+  //  if (isDefined(page.prvlnk2)) {
+  //    page.prvlnk2.setAttribute('href', page.prv.href);
+  //  }
+  //  else {
+  //    page.prvlnk2.style.display = "none";
+  //  }
+  //}
+
+  //if (isDefined(page.nxtlnk) & isDefined(page.nxtlnk2)) {
+  //  if (!isDefined(page.nxt)) {
+  //    page.nxtlnk.style.display = "none";  // button top right menu
+  //    page.nxtlnk2.style.display = "none";  // button bottom right menu
+  //  }
+  //  else {
+  //    page.nxtlnk.setAttribute('href', page.nxt.href);
+  //    page.nxtlnk2.setAttribute('href', page.nxt.href);
+  //  }
+  //}
+
+//  if (isDefined(page.nxtlnk) & isDefined(page.nxtlnk2)) {
+//    if (!isDefined(page.nxt)) {
+//      page.nxtlnk.style.display = "none";  // button top right menu
+//      page.nxtlnk2.style.display = "none";  // button bottom right menu
+//    }
+//    else {
+//      page.nxtlnk.setAttribute('href', page.nxt.href);
+//      page.nxtlnk2.setAttribute('href', page.nxt.href);
+//    }
+//  }
+
+//  if (isDefined(page.prvlnk) & isDefined(page.prvlnk2))
+//  {
+//    if (!isDefined(page.prv))
+//    {
+//      page.prvlnk.style.display = "none";  // button top right menu
+//      page.prvlnk2.style.display = "none";  // button bottom right menu
+//    }
+//    else {
+//      page.prvlnk.setAttribute('href', page.prv.href);
+//      page.prvlnk2.setAttribute('href', page.prv.href);
+//    }
+//  }
 }
 
 function initializePages() { }
