@@ -49,7 +49,7 @@ function getHelp() {
 function loadif() {
   loc = window.location.href;
   if (window.self === window.top) {
-    if (window.location.href = 'TOC.html') { return; }
+    /*if (window.location.href = 'TOC.html') { return; }*/
     window.location.href = 'TOC.html?src=' + loc;
   }
   else {
