@@ -291,13 +291,6 @@
       <div id="hlp"></div>
       <a id="top"></a>
       <content>
-        <!-- <div class="rightPanelLinks">
-    <a target="_parent" href="Bits_ObjectsCpp.html">C++</a>
-    <a target="_parent" href="Bits_ObjectsRust.html">Rust</a>
-    <a target="_parent" class="darkItem" href="Bits_ObjectsCSharp.html">C#</a>
-    <a target="_parent" href="Bits_ObjectsPython.html">Python</a>
-    <a target="_parent" href="Bits_ObjectsJs.html">JvScrpt</a>
-  </div> -->
         <div id="scrollY"
              style="position:fixed; bottom:0.50em; right:1.50em; width:max-content; height:1.5em;
            text-align:right; padding:0.15em 0.5em; border:1px solid red;">
@@ -443,37 +436,39 @@
         <div class="blockSingle">
           <div class="codewrap" style="float:left; width:60%;">
             <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-cpp">
-  /*----------------------------------------------------------------  
-  PointsObjects.cs
+/*-------------------------------------------------------------------
+  Points.cs
   - provides definitions for user-defined class Point4D
-  */
+*/
 
-  using System.Collections;
-  using System.Collections.Generic;   // IEnumerable&lt;T&gt;, List&lt;T&gt;
-  using Analysis;
+using System.Collections;
+using System.Collections.Generic;   // IEnumerable&lt;T&gt;, List&lt;T&gt;
+using Analysis;
 
-  namespace Points {
-  /*----------------------------------------------------------------  
-  Point4D is a basic point class with three integer coordinates
-  and one time coordinate.
-  - It is a reference type because it's instances are created
-  from a class
-  - That affects the way assignments work - see demo near the
-  end of main.
+namespace Points {
+  /*-----------------------------------------------------------------------
+    Point4D is a basic point class with three integer coordinates and one
+    time coordinate.
+    - It is a reference type because it's instances are created
+      from a class
+    - That affects the way assignments work - see demo in Program.cs
   */
-  public class Point4D : Analysis.IShow
-  {                     // reference type with value type members
+  public class Point4D : Analysis.IShow  // reference type with value type members
+  {
     public Point4D() {
-    /*
-      doesn't need to do anything because its properties have
-      default values
-    */
+      /*
+        doesn't need to do anything because its properties have
+        default values
+      */
     }
-    // get, set properties
+    public Point4D(double xarg, double yarg, double zarg) {
+      x = xarg;
+      y = yarg;
+      z = zarg;
+    }
     public double x { get; set; } = 0.0;
     public double y { get; set; } = 0.0;
     public double z { get; set; } = 0.0;
-
     public DateTime dt { get; set; } = DateTime.Now;
     public int Length { get; } = 4;
     public int Width { get; set; } = 3;
@@ -490,14 +485,12 @@
 
       Console.WriteLine(&quot;{0}{1} {{&quot;, ofstr, name);
       Console.WriteLine(
-        &quot;{5}x:{1}, y:{2}, z:{3},&#92;n{5}{4}&quot;, name, 
-        x, y, z, dt, ofstr + instr
+        &quot;{5}x:{1}, y:{2}, z:{3},&#92;n{5}{4}&quot;, name, x, y, z, dt, ofstr + instr
       );
       Console.WriteLine(&quot;{0}}}&#92;n&quot;, ofstr);
     }
-    }
   }
-</code></pre>
+}</code></pre>
           </div>
           <div class="textwrap">
             <h4>Concept:</h4>
@@ -661,34 +654,45 @@ namespace CSharpObjects
           <splitter-container id="container">
             <first-item id="fig2-first" style="width:52%; padding-right:0.5em;">
               <div class="codewrap">
-                <pre><code class="language-csharp">/*-------------------------------------------------------------------*/                              
-static void DemoLibraryTypes() {
+                <pre><code class="language-csharp">static void DemoLibraryTypes() {
   Display.ShowNote(
     &quot;Examples of creation and display of Library Types&#92;n  &quot; +
     &quot;- size is the size of reference, not instance&quot;,
     &quot;&quot;, 60
   );
+  /*-- Strings --*/
   string aString = &quot;a string&quot;;  // hides construction
   Display.ShowTypeScalar(aString, &quot;aString&quot;, nl);
 
   string another = new string(&quot;another string&quot;);
-  Display.ShowTypeScalar(another, &quot;another&quot;, nl);
+  Console.WriteLine(&quot;another: &#92;&quot;{0}&#92;&quot;&#92;n&quot;, another);
 
+  aString += &quot; and &quot; + another;
+  Console.WriteLine(&quot;modified aString: &#92;&quot;{0}&#92;&quot;&#92;n&quot;, aString);
+
+  /*-- List&lt;T&gt; --*/
   List&lt;double&gt; aList =
     new List&lt;double&gt;{ 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0 };
 
   Display.ShowTypeScalar(aList, &quot;aList&quot;);
-  Display.ShowDoubleList(aList, nl);
-  // Display.ShowTypeEnum(aList, &quot;aList&quot;, 5, nl);
+  Console.WriteLine();
+  Display.ShowDoubleList(&quot;aList&quot;, aList, nl);
 
+  aList.Insert(1, -1.5);
+  Display.ShowDoubleList(&quot;aList&quot;, aList, nl);
+
+  /*-- Dictionary --*/
   var d1 = new Dictionary&lt;int, string&gt;
   {
     { 0, &quot;zero&quot;}, {1, &quot;one&quot;}, {2, &quot;two&quot;}
   };
+
   Display.ShowTypeScalar(d1, &quot;d1&quot;);
-  Display.ShowDictionary(d1, nl);
-  // Display.ShowTypeEnum(d1, &quot;d1&quot;, 5, nl);
   Console.WriteLine();
+  Display.ShowDictionary(&quot;d1&quot;, d1, nl);
+
+  d1.Add(3, &quot;three&quot;);
+  Display.ShowDictionary(&quot;d1&quot;, d1, nl);
 }
 </code></pre>
               </div>
@@ -1032,34 +1036,30 @@ str2: immutable string
 
         <h4 id="funcs">1.3 Source Code - AnalysisObjects.cs</h4>
         <div class="blockSingle">
-          <pre class="codeSnap">
-/*-------------------------------------------------------------------
-  AnalysisObjects.cs
-  - provides several type analysis and display methods in the
-    class Display
-*/
+          <div class="codewrap" style="float:left; width:70%;">
+            <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-cpp">
+/*---------------------------------------------------------
+  Cs_Data::AnalysisData.cs
+    - class Anal contains static functions that analyze
+      types, identities, sizes, and addresses
+    - class Display contains static functions that
+      provide console displays of headings, notes,
+      and operations.
+---------------------------------------------------------*/
 
+using System;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Collections;
-using System.Collections.Generic;   // IEnumerable&lt;T&gt;, List&lt;T&gt;
-using System.Linq;                  // IEnumerable&lt;T&gt;.ToArray
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Collections;
+using System.Collections.Generic;
 
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    cut here
+namespace Analysis
+{
+  using Dict = Dictionary&lt;string,int&gt;;
+  using KVPair = System.Collections.Generic.KeyValuePair&lt;string,int&gt;;
 
-    The functions below are used for analysis and display. They
-    have varying complexities. It is not essential to understand
-    them in order to follow the demonstrations in this demo.
-    We will look at them in some detail in Bits_Generic and
-    Bits_Iter.
-*/
-namespace Analysis {
-  /*----------------------------------------------------------------------
-      IShow allows analysis functions to operate on instances of any class
-      that implements it. See ShowTypeShowable&lt;T&gt;(T t, ...), below.
-  */
   public interface IShow {
     void Show(string name);   // show instance state as rows of elements
     int Length { get; }       // total number of elements
@@ -1068,13 +1068,141 @@ namespace Analysis {
     int Indent {get; set; }   // element indent
   }
 
-  public class Display {
-    /*-------------------------------------------------
-      Show static type with some formatting adjustments
-      and name at callsite.
+  class Anal {
+
+    /*-- simple reflection --*/
+    public static void ShowType&lt;T&gt;(T t, String nm, String suffix = &quot;&quot;)
+    {
+      /*-- t! asserts that t is not null --*/
+      Type tt = t!.GetType();
+      Console.WriteLine(&quot;{0}: Type: {1}&quot;, nm, tt.Name);
+      int size = Anal.GetManagedSize(tt);
+      Console.WriteLine(&quot;value: {0}&#92;nsize: {1}{2}&quot;, t, size, suffix);
+    }
+    public static string GetTypeString&lt;T&gt;(T t, String nm, String suffix = &quot;&quot;)
+    {
+      /*-- t! asserts that t is not null --*/
+      Type tt = t!.GetType();
+      string typeInfo = String.Format(&quot;{0}: Type: {1}&#92;n&quot;, nm, tt.Name);
+      int size = Anal.GetManagedSize(tt);
+      string instanceInfo = String.Format(&quot;value: {0}&#92;nsize: {1}{2}&quot;, t, size, suffix);
+      return typeInfo + instanceInfo;
+    }
+    /*-- beware, two distinct objects may have same hashcode --*/
+    public static void showIdent&lt;T&gt;(T t, String n, string suffix = &quot;&quot;) {
+      /*-- t! asserts that t is not null --*/
+      int id = t!.GetHashCode();
+      Console.WriteLine(&quot;{0}, {1}{2}&quot;, n, id, suffix);
+    }
+    public static void IsSameObj&lt;T&gt;(
+      T t1, String n1, T t2, String n2, string suffix = &quot;&quot;
+    ) {
+      if(ReferenceEquals(t1, t2)) {
+        Console.WriteLine(
+          &quot;{0} is same object as {1}{2}&quot;, n1, n2, suffix
+        );
+      }
+      else {
+        Console.WriteLine(
+          &quot;{0} is not same object as {1}{2}&quot;, n1, n2, suffix);
+      }
+    }
+    /*--
+      uses advanced reflection
+      - GetMangedSize(Type type) is function that returns the size of
+        value types and handles.
+        It is used to help discover how things work.
+        It is placed here because it uses advanced techniques that
+        will eventually be covered elsewhere in this site.  Knowing
+        how it works is not essential for the things we are examining
+        in this demo.
+    --*/
+    // https://stackoverflow.com/questions/8173239/c-getting-size-of-a-value-type-variable-at-runtime/8173293#8173293
+    public static int GetManagedSize(Type type)
+    {
+      // all this just to invoke one opcode with no arguments!
+      var method = new DynamicMethod(
+        &quot;GetManagedSizeImpl&quot;, typeof(uint), new Type[0],
+        typeof(TypeExtensions), false
+      );
+
+      ILGenerator gen = method.GetILGenerator();
+      gen.Emit(OpCodes.Sizeof, type);
+      gen.Emit(OpCodes.Ret);
+
+      var func = (Func&lt;uint&gt;)method.CreateDelegate(typeof(Func&lt;uint&gt;));
+      return checked((int)func());
+    }
+
+    #pragma warning disable 8500
+    /*
+      Suppresses warning about taking address of managed type.
+      The pointer is used only to show the address of ptr
+      as part of analysis of copy operations.
     */
+    public static unsafe string ToStringAddress&lt;T&gt;(T* ptr) {
+      if(ptr == null) {
+        return &quot;&quot;;
+      }
+      IntPtr addr = (IntPtr)ptr;
+      string addrstr = string.Format(&quot;address: 0x&quot; + addr.ToString(&quot;x&quot;));
+      return addrstr;
+    }
+    public static unsafe string ToStringAdddressFromHandle&lt;T&gt;(T t) {
+      string addrstr = &quot;for handle&#92;n&quot;;
+      try {
+        GCHandle handle = GCHandle.Alloc(t, GCHandleType.Pinned);
+        IntPtr address = handle.AddrOfPinnedObject();
+        addrstr = &quot;address: &quot; + String.Format(&quot;0x&quot; + address.ToString(&quot;x&quot;));
+        handle.Free();
+        return addrstr + &quot;&#92;n&quot;;
+      }
+      catch {
+        Console.WriteLine(&quot;GCHandle exception thrown&quot;);
+      }
+      return addrstr;
+    }
+  }
+  class Display
+  {
     public static String Spaces(int i) {
       return new String(' ', i);
+    }
+    public static void ShowOp(String op, String suffix = &quot;&quot;) {
+      Console.WriteLine(&quot;--- {0} ---{1}&quot;, op, suffix);
+    }
+    /*-- more advanced reflection --*/
+    // https://stackoverflow.com/questions/7613782/iterating-through-struct-members
+    public static void Iterate&lt;T&gt;(T t) /*where T:new()*/ {
+      Console.WriteLine(&quot;fields:&quot;);
+      foreach(
+        var field in typeof(T).GetFields(
+          BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+        )
+      ) {
+        Console.WriteLine(
+          &quot;  {0} = {1}&quot;, field.Name, field.GetValue(t)
+        );
+      }
+      Console.WriteLine(&quot;methods:&quot;);
+      foreach(
+        var method in typeof(T).GetMethods(
+          BindingFlags.Instance | BindingFlags.Public
+        )
+      ) {
+        Console.WriteLine(
+          &quot;  {0}&quot;, method.Name
+        );
+      }
+    }
+    public static void Print(String s = &quot;&quot;) {
+      Console.WriteLine(s);
+    }
+    public static void ShowNote(string s, string suffix = &quot;&quot;, int length = 35) {
+      string line = new string('-', length);
+      Console.WriteLine(line);
+      Console.WriteLine(&quot;  {0}&quot;, s);
+      Console.WriteLine(line + suffix);
     }
     public static void ShowType&lt;T&gt;(T t, string nm) {
       Type tt = t!.GetType();
@@ -1085,7 +1213,7 @@ namespace Analysis {
         }
       }
       Console.Write(&quot;{0}: {1}, &quot;, nm, tnm);
-      int size = GetManagedSize(tt);
+      int size = Anal.GetManagedSize(tt);
       Console.Write(&quot;size: {0}, &quot;, size);
       if (tt.IsValueType) {
         Console.WriteLine(&quot;value type&quot;);
@@ -1134,9 +1262,9 @@ namespace Analysis {
       }
       Console.Write(&quot;]&#92;n&quot; + suffix);
     }
-    public static void ShowDoubleList(List&lt;double&gt; list, string suffix=&quot;&quot;)
+    public static void ShowDoubleList(string nm, List&lt;double&gt; list, string suffix=&quot;&quot;)
     {
-      Console.Write(&quot;[ {0}&quot;, list[0]);
+      Console.Write(&quot;{0}: [ {1}&quot;, nm, list[0]);
       for (int i = 1; i &lt; list.Count; i++)
       {
         Console.Write(&quot;, &quot; + list[i] + &quot; &quot;);
@@ -1144,16 +1272,25 @@ namespace Analysis {
       Console.Write(&quot;]&#92;n&quot; + suffix);
     }
     public static void ShowDictionary(
+      string nm,
       Dictionary&lt;int, string&gt; dict, string suffix=&quot;&quot;
     )
     {
       Dictionary&lt;int, string&gt;.KeyCollection keyColl = dict.Keys;
-      Console.Write(&quot;[ &quot;);
+      Console.Write(&quot;{0}: [ &quot;, nm);
       foreach(KeyValuePair&lt;int, string&gt; entry in dict)
       {
         Console.Write(&quot;{{{0},{1}}} &quot;, entry.Key, entry.Value);
       }
       Console.Write(&quot;]&#92;n&quot; + suffix);
+    }
+    /*-------------------------------------------------
+      Surround note with empty lines
+    */
+    public static void ShowLabel(string s, string suffix=&quot;&quot;, int len=35) {
+      Console.WriteLine();
+      ShowNote(s, suffix, len);
+      Console.WriteLine();
     }
     /*-------------------------------------------------
       Provides name of caller, nm, as label for IShow() information.
@@ -1197,101 +1334,24 @@ namespace Analysis {
       int id = t!.GetHashCode();
       Console.WriteLine(&quot;{0}, {1}{2}&quot;, n, id, suffix);
     }
-    /*-------------------------------------------------
-      Display function call or operation to help turn
-      output data into information
-    */
-    public static void ShowOp(string op, string suffix = &quot;&quot;) {
-      Console.WriteLine(&quot;--- {0} ---{1}&quot;, op, suffix);
-    }
     public static void print(String s = &quot;&quot;) {
       Console.Write(s);
     }
     public static void println(String s = &quot;&quot;) {
       Console.WriteLine(s);
     }
-    /*-------------------------------------------------
-      Emphasize text with borders
-    */
-    public static void ShowNote(string s, string suffix = &quot;&quot;) {
-      Console.WriteLine(
-        &quot;--------------------------------------------------&quot;
-      );
-      Console.WriteLine(&quot;{0}&quot;, s);
-      Console.WriteLine(
-        &quot;--------------------------------------------------{0}&quot;,
-        suffix
-      );
-    }
-    /*-------------------------------------------------
-      Surround note with empty lines
-    */
-    public static void ShowLabel(string s) {
-      Console.WriteLine();
-      ShowNote(s);
-      Console.WriteLine();
-    }
-    /*
-      Show fields and methods for either reference or value types
-      using reflection
-    */
-    // https://stackoverflow.com/questions/7613782/iterating-through-struct-members
-    public static void iterate&lt;T&gt;(T t) /*where T:new()*/ {
-      Console.WriteLine(&quot;fields:&quot;);
-      foreach(
-        var field in typeof(T).GetFields(
-        BindingFlags.Instance |
-        BindingFlags.NonPublic |
-        BindingFlags.Public
-      )
-      ) {
-        Console.WriteLine(
-          &quot;  {0} = {1}&quot;, field.Name, field.GetValue(t)
-        );
-      }
-      Console.WriteLine(&quot;methods:&quot;);
-      foreach(
-        var method in typeof(T).GetMethods(
-          BindingFlags.Instance | BindingFlags.Public
-        )
-      ) {
-        Console.WriteLine(
-          &quot;  {0}&quot;, method.Name
-        );
-      }
-    }
-    /*----------------------------------------------------------------
-      Utils uses advanced relection
-      - GetMangedSize(Type type) is function that returns the size of
-      value types and handles, used to help discover how things work.
-      It is placed here because it uses advanced techniques that
-      will eventually be covered elsewhere in this site.  Knowing
-      how it works is not essential for the things we are examining
-      in this demo.
-    */
-    // https://stackoverflow.com/questions/8173239/c-getting-size-of-a-value-type-variable-at-runtime/8173293#8173293
-    public static int GetManagedSize(Type type)
-    {
-      // all this just to invoke one opcode with no arguments!
-      var method = new DynamicMethod(
-        &quot;GetManagedSizeImpl&quot;, typeof(uint), new Type[0],
-        typeof(TypeExtensions), false
-      );
-
-      ILGenerator gen = method.GetILGenerator();
-      gen.Emit(OpCodes.Sizeof, type);
-      gen.Emit(OpCodes.Ret);
-
-      var func = (Func&lt;uint&gt;)method.CreateDelegate(typeof(Func&lt;uint&gt;));
-      return checked((int)func());
-    }
   }
-}
-</pre>
-        </div>
-        <h4 id="out">2.0 Output</h4>
-        <div class="blockSingle">
-          <pre class="codeSnap">
+}</code></pre>
+            </div>
+            <div class="textwrap">
+              <t-b>
+                text here
+              </t-b>
+            </div>
+          </div>
+          <h4 id="out">2.0 Output</h4>
+          <div class="blockSingle">
+            <pre class="codeSnap">
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects
 &gt; dotnet run
 
@@ -1436,10 +1496,10 @@ That's all Folks!
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects
 &gt;&gt;
 </pre>
-        </div>
-        <h4 id="build">3.0 Build</h4>
-        <div class="blockSingle">
-          <pre class="codeSnap">
+          </div>
+          <h4 id="build">3.0 Build</h4>
+          <div class="blockSingle">
+            <pre class="codeSnap">
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects
 &gt; dotnet build
 MSBuild version 17.4.1+fedecea9d for .NET
@@ -1456,59 +1516,59 @@ Time Elapsed 00:00:00.92
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects
 &gt;
 </pre>
-        </div>
-        <h3 id="ide">4.0 VS Code View</h3>
-        <t-b>
-          The code for this demo is available in
-          <a target="_blank" href="https://github.com/JimFawcett/Bits">github.com/JimFawcett/Bits</a>. If you click on
-          the Code dropdown you can clone the repository of all code for these demos to your local drive.
-          Then, it is easy to bring up any example, in any of the languages, in VS Code.
-        </t-b>
-        <t-b>
-          Here, we do that for CSharp\CSharp_Objects.
-        </t-b>
-        <photosizer-block src="pictures/VS_Code_CSharp_Objects.JPG" width="800" class="photoSizerBlock left"
-                          style="overflow-x:auto;">
-          <span style="font-family:'Comic Sans MS';">Figure 1. VS Code IDE - C# Objects</span>
-        </photosizer-block>
-        <photosizer-block src="pictures/LaunchJSON_CSharp_Objects.JPG" width="800" class="photoSizerBlock left"
-                          style="overflow-x:auto;">
-          <span style="font-family:'Comic Sans MS';">Figure 2. C# Launch.JSON</span>
-        </photosizer-block>
-        <photosizer-block src="pictures/VS_Code_Debugging_CSharp_Objects.JPG" width="800" class="photoSizerBlock left"
-                          style="overflow-x:auto;">
-          <span style="font-family:'Comic Sans MS';">Figure 3. Debugging C# Objects</span>
-        </photosizer-block>
-        <!--<photosizer-block src="pictures/VS_Code_Cpp_Plugins.jpg" width="700" class="photoSizerBlock left">
+          </div>
+          <h3 id="ide">4.0 VS Code View</h3>
+          <t-b>
+            The code for this demo is available in
+            <a target="_blank" href="https://github.com/JimFawcett/Bits">github.com/JimFawcett/Bits</a>. If you click on
+            the Code dropdown you can clone the repository of all code for these demos to your local drive.
+            Then, it is easy to bring up any example, in any of the languages, in VS Code.
+          </t-b>
+          <t-b>
+            Here, we do that for CSharp\CSharp_Objects.
+          </t-b>
+          <photosizer-block src="pictures/VS_Code_CSharp_Objects.JPG" width="800" class="photoSizerBlock left"
+                            style="overflow-x:auto;">
+            <span style="font-family:'Comic Sans MS';">Figure 1. VS Code IDE - C# Objects</span>
+          </photosizer-block>
+          <photosizer-block src="pictures/LaunchJSON_CSharp_Objects.JPG" width="800" class="photoSizerBlock left"
+                            style="overflow-x:auto;">
+            <span style="font-family:'Comic Sans MS';">Figure 2. C# Launch.JSON</span>
+          </photosizer-block>
+          <photosizer-block src="pictures/VS_Code_Debugging_CSharp_Objects.JPG" width="800" class="photoSizerBlock left"
+                            style="overflow-x:auto;">
+            <span style="font-family:'Comic Sans MS';">Figure 3. Debugging C# Objects</span>
+          </photosizer-block>
+          <!--<photosizer-block src="pictures/VS_Code_Cpp_Plugins.jpg" width="700" class="photoSizerBlock left">
     <span style="font-family:'Comic Sans MS';">Figure 3. C++ Plugins</span>
   </photosizer-block>-->
 
-        <div style="height:0.75em;" class="clear"></div>
-        <h3 id="refs">3.0 References</h3>
-        <table class="indent">
-          <tr>
-            <th class="darkItem">Reference</th>
-            <th class="darkItem">Description</th>
-          </tr>
-          <tr>
-            <td>
-              <a target="_blank" href="https://www.w3schools.com/cs/index.php">C# Tutorial - w3schools</a>
-            </td>
-            <td>
-              Interactive examples
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <a target="_blank" href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/">C# Reference - Microsoft</a>
-            </td>
-            <td>
-              Relatively complete informal language reference
-            </td>
-          </tr>
-        </table>
-        <div style="height:10em;"></div>
-      </content>
+          <div style="height:0.75em;" class="clear"></div>
+          <h3 id="refs">3.0 References</h3>
+          <table class="indent">
+            <tr>
+              <th class="darkItem">Reference</th>
+              <th class="darkItem">Description</th>
+            </tr>
+            <tr>
+              <td>
+                <a target="_blank" href="https://www.w3schools.com/cs/index.php">C# Tutorial - w3schools</a>
+              </td>
+              <td>
+                Interactive examples
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <a target="_blank" href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/">C# Reference - Microsoft</a>
+              </td>
+              <td>
+                Relatively complete informal language reference
+              </td>
+            </tr>
+          </table>
+          <div style="height:10em;"></div>
+</content>
       <a id="bottom"></a>
       <page-TOC id="pages" style="display:none;">
       </page-TOC>
