@@ -1212,7 +1212,7 @@ namespace Analysis
       var func = (Func&lt;uint&gt;)method.CreateDelegate(typeof(Func&lt;uint&gt;));
       return checked((int)func());
     }
-    /*-- returns string displaying heap address of t --*/
+    /*-- returns string displaying heap address of ref type instance t --*/
     public static unsafe string ToStringAdddressFromHandle&lt;T&gt;(T t) {
       string addrstr = &quot;for handle&#92;n&quot;;
       try {
@@ -1227,6 +1227,22 @@ namespace Analysis
       }
       return addrstr;
     }
+    /*-- unsafe cast pointer to address of value type --*/
+    #pragma warning disable 8500
+    /*
+      Suppresses warning about taking address of managed type.
+      The pointer is used only to show the address of ptr
+      as part of analysis of copy operations.
+    */
+    public static unsafe string ToStringAddress&lt;T&gt;(T* ptr) {
+      if(ptr == null) {
+        return &quot;&quot;;
+      }
+      IntPtr addr = (IntPtr)ptr;
+      string addrstr = string.Format(&quot;address: 0x&quot; + addr.ToString(&quot;x&quot;));
+      return addrstr;
+    }
+    #pragma warning restore 8500
   }
   class Display
   {
@@ -1418,6 +1434,16 @@ namespace Analysis
               <c-s>ToStringAddressFromHandle&lt;T&gt(T t)</c-s> evaluates the managed heap address
               to which t binds. It is used to confirm the results of <c-s>IsSameObj&lt;T&gt;</c-s>.
             </t-b>
+            <t-b>
+              <c-s>ToStringAddress&lt;T&gt:</c-s> extracts the address of a value type and
+              returns a string representation of the address. It was used in earlier versions
+              of this code, but is not used now.  It is here to illustrate two things: how to
+              find the address of value instances in stack memory and use of unsafe blocks.
+            </t-b>
+            <t-b>
+              This function must be declared unsafe because it uses a pointer, but does so in a
+              safe way, e.g., simply returns a string representation.
+            </t-b>
             <h4>Display Class:</h4>
             <t-b>
               Most of the functions in <c-s>Display</c-s> are easy to understand. Focusing on the
@@ -1445,8 +1471,24 @@ namespace Analysis
           </div>
         </div>
         <h4 id="build">3.0 Build</h4>
+        <t-b>
+          The left panel shows this project built with the dotnet CLI. The CLI interface has
+          commands: build, run, clean, new, format, ...  You can see all of the commands using
+          the command &quot;<c-s>dotnet -h</c-s>&quot;.
+        </t-b>
+        <t-b>
+          The right panel contains XAML code for the project Cs_Objects.csproj. That file was
+          built with the <c-s>dotnet new</c-s> command. Note that the project contains an element
+          configuring the build to allow unsafe code.  That is needed because one of the
+          analysis functions uses an unsafe block to extract an address from a managed instance.
+        </t-b>
+        <t-b>
+          Note that you do not need to, and should not, configure the Visual Studio Code launch
+          file and task file for this code usage. It has to be done in the project file.
+        </t-b>
         <div class="blockSingle">
-          <div class="codewrap" style="float:left; width:60%;">
+          <div class="codewrap" style="float:left; width:50%;">
+            <strong>Terminal</strong>
             <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-cpp">
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects
 &gt; dotnet build
@@ -1464,14 +1506,28 @@ Time Elapsed 00:00:00.92
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects
 &gt;
 </code></pre>
-            </div>
-            <div>
-              <t-b>
-                This build uses the dotnet CLI in a PowerShell window attached to Visual Studio Code
-                IDE.
-              </t-b>
-            </div>
           </div>
+          <div class="codewrap" style="float:left; width:50%;">
+            <strong>Cs_Objects.csproj</strong>
+            <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-cpp">
+&lt;Project Sdk=&quot;Microsoft.NET.Sdk&quot;&gt;
+  &lt;PropertyGroup&gt;
+    &lt;OutputType&gt;Exe&lt;/OutputType&gt;
+    &lt;TargetFramework&gt;net7.0&lt;/TargetFramework&gt;
+    &lt;ImplicitUsings&gt;enable&lt;/ImplicitUsings&gt;
+    &lt;Nullable&gt;enable&lt;/Nullable&gt;
+    &lt;AllowUnsafeBlocks&gt;true&lt;/AllowUnsafeBlocks&gt;
+  &lt;/PropertyGroup&gt;
+&lt;/Project&gt;
+
+
+
+
+
+
+</code></pre>
+            </div>
+            </div>
           <h3 id="ide">4.0 VS Code View</h3>
           <t-b>
             The code for this demo is available in
@@ -1495,8 +1551,8 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects
             <span style="font-family:'Comic Sans MS';">Figure 3. Debugging C# Objects</span>
           </photosizer-block>
           <!--<photosizer-block src="pictures/VS_Code_Cpp_Plugins.jpg" width="700" class="photoSizerBlock left">
-      <span style="font-family:'Comic Sans MS';">Figure 3. C++ Plugins</span>
-    </photosizer-block>-->
+    <span style="font-family:'Comic Sans MS';">Figure 3. C++ Plugins</span>
+  </photosizer-block>-->
 
           <div style="height:0.75em;" class="clear"></div>
           <h3 id="refs">3.0 References</h3>
@@ -1523,7 +1579,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects
             </tr>
           </table>
           <div style="height:10em;"></div>
-      </content>
+</content>
       <a id="bottom"></a>
       <page-TOC id="pages" style="display:none;">
       </page-TOC>
