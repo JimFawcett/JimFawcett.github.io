@@ -12,20 +12,18 @@
   <link rel="stylesheet" href="css/StylesPageFrameDefaults.css" />
   <link rel="stylesheet" href="css/StylesPageFrameStructure.css" />
   <link rel="stylesheet" href="css/StylesPageFrameMenus.css" />
-  <link rel="stylesheet" href="css/StylesPageFrameThemeDefault.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameThemeJs.css" />
   <link rel="stylesheet" href="css/StylesWebComponents.css" />
   <script src="js/ScriptsWebComponents.js"></script>
   <script src="js/ScriptsPageFrame.js"></script>
   <script src="js/ScriptsPageFramePagesBitsJs.js"></script>
   <script src="js/ScriptsPageFrameKeyboard.js"></script>
+  <link rel="stylesheet" href="css/StylesSplitterBar.css" />
+  <script src="js/ScriptsSplitterBar.js"></script>
   <link rel="stylesheet" href="css/prism.css" />
   <script src="js/prism.js"></script>
   <!--<script src="js/ScriptsPageFrameNewRadioButtons.js"></script>-->
   <style>
-    #github content {
-      min-width: 47em;
-    }
-
     #github .note {
       border: 1px solid var(--dark);
       padding: 0.75em 1.5em;
@@ -42,6 +40,7 @@
 
     #github #pagetitle {
       border: 2px double var(--dark);
+      /* line-height:1.5em; */
     }
 
     #github .hide {
@@ -50,14 +49,7 @@
 
     body {
       position: relative;
-    }
-
-    #github .codeSnap {
-      font-family: Consolas, Courier New, Courier, monospace, sans-serif;
-      font-size: small;
-      font-weight: bold;
-      background-color: #eee;
-      padding: 10px;
+      line-height: 1.25em;
     }
 
     #github .remotebutton {
@@ -84,22 +76,12 @@
       margin: 0.75em 0em;
     }
 
-    body {
-      overflow-y: auto;
-    }
-
-    #github pre {
-      min-width: 20em;
-      max-width: 60em;
-      user-select: all;
-    }
-
     #github {
       user-select: none;
     }
 
     .focus {
-      padding: 0.5em 1.0em 0.5em 0.5em;
+      padding: 0.5em 1.0em 0.5em 1.0em;
       /*border:1px solid red;*/
     }
 
@@ -113,41 +95,167 @@
       background-color: var(--menu);
     }
 
-    #github pre {
-      overflow-x: auto !important;
+    #github .codeSnap {
+      font-family: Consolas, Courier New, Courier, monospace, sans-serif;
+      font-size: small;
+      font-weight: bold;
+      background-color: #eee;
+      padding: 1em 1.5em;
+      margin-right: 0.5em;
     }
 
-    .block {
+    #github pre {
+      overflow-x: auto;
+      /* user-select: all; */
+    }
+
+    code-style {
+      white-space: pre;
+      font-family: Consolas;
+      font-size: 0.95em;
+      font-weight: bold;
+    }
+
+    .blockDouble {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       border: 1px solid var(--dark);
-      overflow: hidden;
-      clear: both;
-      max-width: 50em;
+      overflow-x: auto;
+      overflow-y: hidden;
       margin-right: 0.75em;
+      padding: 0.75em;
+      padding-right: 0em;
+    }
+
+    .blockSingle {
+      position: relative;
+      border: 1px solid var(--dark);
+      overflow-x: auto;
+      overflow-y: hidden;
+      margin-right: 0.75em;
+      margin-top: 1.5em;
+      padding: 0.0em;
+      padding-right: 0em;
     }
 
     .codewrap {
-      float: left;
+      padding: 0.5em;
+      padding-right: 0em;
+      overflow-y: auto;
+      /*border: 1px dashed blue;*/
+      font-size: 0.80em;
+    }
+
+    #github div.block t-b {
+      max-width: 100%;
       padding-left: 0.5em;
-      padding-right: 0.75em;
     }
 
     .textwrap {
-      padding: 0.0em 0.75em 0.5em 0.5em;
-      padding-left: 0.5em;
-      padding-right: 0.75em;
+      position: relative;
+      padding-right: 1em;
+      padding-left: 1em;
+      margin-right: 0.5em;
+      overflow-y: scroll;
+      /*border: 1px dashed red;*/
     }
 
     table {
       margin-right: 0.75em;
     }
+
+    #github .scrollable {
+      overflow: auto;
+    }
   </style>
+  <style>
+    #github .info {
+      position: relative;
+      top: 0em;
+      float: right;
+      font-size: large;
+      font-weight: bold;
+      text-align: center;
+      background-color: var(--light);
+      border-radius: 8px;
+      color: var(--dark);
+      width: 1.25em;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    #github .infoKill {
+      position: relative;
+      top: 0.05em;
+      float: right;
+      font-size: large;
+      font-weight: bold;
+      text-align: center;
+      background-color: var(--light);
+      border-radius: 8px;
+      color: var(--dark);
+      width: 1.25em;
+      cursor: pointer;
+      user-select: none;
+      margin: 0.25em;
+    }
+
+    #github .txt {
+      display: none;
+      position: absolute;
+      right: 4.5em;
+      width: 25em;
+      z-index: 10;
+      color: var(--dark);
+      font-size: small;
+      background-color: var(--light);
+      border: 2px solid var(--dark);
+      padding: 0em 0.5em;
+      overflow-y: visible;
+    }
+  </style>
+  <script>
+    function closeInfos() {
+      var elems = document.querySelectorAll('.txt');
+      for (let i = 0; i < elems.length; ++i) {
+        if (elems[i].style.display === "block") {
+          elems[i].style.display = "none";
+        }
+      }
+    }
+    function toggleInfo(dst) {
+      var elem = document.getElementById(dst);
+      if (elem.style.display === "none" || elem.style.display === "") {
+        elem.style.display = "block";
+      }
+      else {
+        elem.style.display = "none";
+      }
+    }
+    function toggleInfoRel(src, dst, adj = 0) {
+      var txtcont = document.getElementById(dst);
+      var elemtop = src.offsetTop;
+      txtcont.style.top = parseInt(elemtop - 25 - adj) + 'px';
+      var top = txtcont.style.top;
+      if (txtcont.style.display === "none" || txtcont.style.display === "") {
+        txtcont.style.display = "block";
+      }
+      else {
+        txtcont.style.display = "none";
+      }
+    }
+  </script>
   <script>
     function setScroll() {
       let main = document.querySelector("#main");
       const scrollPosition = main.scrollTop;
       localStorage.setItem('scrollPositionHelloRust', scrollPosition);
+      let body = document.getElementById("github");
+      let style = window.getComputedStyle(body, null).getPropertyValue('line-height');
+      let fontsize = parseFloat(style);
       let scroller = document.getElementById("scrollY")
-      scroller.innerHTML = Math.trunc(scrollPosition);
+      scroller.innerHTML = Math.trunc(scrollPosition / fontsize);
     }
     function gotoLastScroll() {
       let main = document.querySelector("#main");
@@ -162,6 +270,7 @@
       gotoLastScroll();
     }
   </script>
+
 
   <script>
     function remote() {
@@ -186,12 +295,12 @@
       <a id="top"></a>
       <content>
         <!-- <div class="rightPanelLinks">
-          <a target="_parent" href="Bits_DataCpp.html">C++</a>
-          <a target="_parent" href="Bits_DataRust.html">Rust</a>
-          <a target="_parent" href="Bits_DataCSharp.html">C#</a>
-          <a target="_parent" href="Bits_DataPython.html">Python</a>
-          <a target="_parent" class="darkItem" href="Bits_DataJs.html">JvScrpt</a>
-        </div> -->
+    <a target="_parent" href="Bits_DataCpp.html">C++</a>
+    <a target="_parent" href="Bits_DataRust.html">Rust</a>
+    <a target="_parent" href="Bits_DataCSharp.html">C#</a>
+    <a target="_parent" href="Bits_DataPython.html">Python</a>
+    <a target="_parent" class="darkItem" href="Bits_DataJs.html">JvScrpt</a>
+  </div> -->
         <div id="scrollY"
              style="position:fixed; bottom:0.50em; right:1.50em; width:max-content; height:1.5em;
            text-align:right; padding:0.15em 0.5em; border:1px solid red;">
@@ -207,10 +316,15 @@
             </h3>
           </hgroup>
         </header>
+        <div id="scrollY"
+             style="position:fixed; bottom:0.50em; right:1.50em; width:max-content; height:1.5em;
+           text-align:right; padding:0.15em 0.5em; border:1px solid red;">
+          0
+        </div>
         <!-- <t-b style="border:2px solid red; padding:0.5em 1.5em;">
-          This page is a prototype used to decide which language features to emphasize. It will
-          be replaced with a final version soon.
-        </t-b> -->
+    This page is a prototype used to decide which language features to emphasize. It will
+    be replaced with a final version soon.
+  </t-b> -->
         <t-b id="syn" style="border:1px solid maroon; padding:0.25em 1em 0.5em 1em;">
           <h4 style="margin:0em 0em 0.25em 0em;">Synopsis:</h4>
           This page demonstrates simple uses of the most important JavaScript types.
@@ -235,46 +349,266 @@
           </ul>
           <div style="height:0.25em;"></div>
         </t-b>
-        <!--<details>
-    <summary class="darkItem">Demo Notes&nbsp;&nbsp;</summary>
-    <t-b><hr /></t-b>
-    <t-b>
-      All of the languages covered in this demonstration support classes.  Each class provides
-      a pattern for laying out a memory footprint and defines how data within are accessed.
-    </t-b>
-    <t-b>
-      Three of the languages: C++, Rust, and C# provide generics.  Each generic function or class
-      is a pattern for defining functions and classes of a specific type.  Thus a generic is a
-      pattern for making patterns.
-    </t-b>
-    <t-b>
-      The other two, Python and JavaScript, are dynamically typed and already support defining
-      functions and classes for multiple types, e.g., no need for generics.
-    </t-b>
-    <t-b>
-      This demonstration illustrates use of classes and objects, which for C++, Rust, and C#,
-      are defined in a stackframe or in the heap or both. <strongs>All</strongs> data for Python and JavaScript are
-      stored in managed heaps.
-    </t-b>
-    <t-b><hr /></t-b>
-  </details>-->
-        <!--<t-b>
-    The examples below show how to use library and user defined types with emphasis on
-    illustrating syntax and basic operations.
-  </t-b>-->
+        <div style="height:0.75em;"></div>
+        <details id="types">
+          <summary class="darkItem">JavaScript&nbsp;Types&nbsp;Details&nbsp;</summary>
+          <t-b>
+            Types are defined by the size of their memory allocations, the encodings used to place values
+            in memory, and rules that define how the values can be accessed, modified, and combined.
+          </t-b>
+          <t-b>
+            The name of an instance of any JavaScript type binds to a unique handle that refers to a heap allocation
+            that may have other handles referring to it.
+          </t-b>
+          <h3>Table 1.0 JavaScript Types</h3>
+          <table style="font-size: 0.9em; max-width: 71em;">
+            <colgroup>
+              <col span="1" style="width:auto;" />
+              <col span="1" style="width:auto;" />
+              <col span="1" style="width:20em;" />
+            </colgroup>
+            <tr>
+              <th style="width:15em;">Type</th>
+              <th>Comment</th>
+              <th>Example</th>
+            </tr>
+            <tr>
+              <th colspan="3" class="cat">-- Primitive reference types ----</th>
+            </tr>
+            <tr>
+              <td><c-s><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a></c-s></td>
+              <td>ints and floats</td>
+              <td><c-s>-53, 3.14159, 1.333e+8</c-s></td>
+            </tr>
+            <tr>
+              <td><c-s><c-s><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt">BigInt</a></c-s></c-s></td>
+              <td>arbitrarily large integer up to capacity of memory</td>
+              <td><c-s>34567898765432101234567</c-s></td>
+            </tr>
+            <tr>
+              <td><c-s><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></c-s></td>
+              <td>
+                immutable sequence of chars<br />
+                change creates new String object
+              </td>
+              <td>
+                <c-s>s = "a string";</c-s>
+              </td>
+            </tr>
+            <tr>
+              <td><c-s><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></c-s></td>
+              <td>
+                exactly two values, <c-s>true</c-s> and <c-s>false</c-s>
+              </td>
+              <td><c-s>bool b = true;</c-s></td>
+            </tr>
+            <tr>
+              <td><c-s><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbol</a></c-s></td>
+              <td>
+                unique value which may be used as key for object structures
+              </td>
+              <td><c-s>const sym1 = Symbol('prop1');</c-s></td>
+            </tr>
+            <tr>
+              <td><c-s><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Undefined">Undefined</a></c-s></td>
+              <td>
+                value given to unintialized variable
+              </td>
+              <td><c-s>let sym1;&nbsp;&nbsp;&nbsp;// value is undefined</c-s></td>
+            </tr>
+            <tr>
+              <td>
+                <c-s><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Null">Null</a></c-s>
+              </td>
+              <td>
+                <c-s>intentional no value
+              </td>
+              <td><c-s>let i = null;</c-s></td>
+            </tr>
+            <tr>
+              <th colspan="3" class="cat">-- Object reference types ----</th>
+            </tr>
+            <tr>
+              <td><c-s><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></c-s></td>
+              <td>Structure with hashed (key, value) elements</td>
+              <td>
+                <c-s>
+                  let o = Object();<br />o.name = &quot;Jim&quot;<br />
+                  o.show = function () {<br />
+                  &nbsp;&nbsp;document.write("name = ", o.name);<br />
+                  }
+                </c-s>
+              </td>
+            </tr>
+            <tr>
+              <td><c-s><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></c-s></td>
+              <td>Object with reference to code in static memory so it can be executed</td>
+              <td>
+                <c-s>
+                  function f(a) {<br />
+                  &nbsp;&nbsp;/* executes using a */<br />
+                  }
+                </c-s>
+              </td>
+            </tr>
+            <tr>
+              <td><c-s><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></c-s></td>
+              <td>sequential resizeable indexed collection of arbitrary elements</td>
+              <td>
+                <c-s>
+                  let a = [1, 3, 2, -5]<br />
+                  let b = new Array(1, "three", 2);
+                </c-s>
+              </td>
+            </tr>
+            <tr>
+              <td><c-s><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a></c-s></td>
+              <td>
+                holds a timestamp equal to number of milliseconds since January 1, 1970, UTC,
+                and provides methods to access current local time and UTC, and set timestamps
+              </td>
+              <td>
+                <c-s>
+                  let dt = Date();<br />
+                  let day_of_week = dt.getDay();
+                </c-s>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <c-s>
+                  <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp">RegExp</a>
+                </c-s>
+              </td>
+              <td>
+                holds state machine that matches an input string to a specified pattern<br />
+                <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions">Regular Expressions Reference</a>
+              </td>
+              <td>
+                <c-s>
+                  const text = "first line\nsecond line\r\nlast line";<br />
+                  let lines = text.split(/\r\n|\r|\n);  // split accepts RegEx
+                </c-s>
+              </td>
+            </tr>
+            <tr>
+              <td><c-s><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></c-s></td>
+              <td>
+                Error objects are thrown when runtime error occurs.<br />
+                Error subtypes:<br /><c-s>EvalError</c-s>, <c-s>RangeError</c-s>, <c-s>Reference Error</c-s>,
+                <c-s>SyntaxError</c-s>, <c-s>TypeError</c-s>, <c-s>URIError</c-s>,
+                <c-s>AggregateError</c-s>, <c-s>InternalError</c-s>,
+              </td>
+              <td>
+                <c-s>
+                  throw new Error("some message");
+                </c-s>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Many additional JavaScript <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects">defined types</a>:
+              </td>
+              <td colspan="2">
+                <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map">Map</a>,
+                <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set">Set</a>,
+                <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array">Int32Array</a>,
+                <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView">DataView</a>,
+                <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Atomics">Atomics</a>, ...,
+                <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math">Math</a>, ...,
+              </td>
+            </tr>
+            <tr>
+              <th colspan="3" class="cat">-- User-defined Types --</th>
+            </tr>
+            <tr>
+              <td>User-defined types</td>
+              <td colspan="2">
+                Based on classes, these will be discussed in the <a href="Bits_ObjectsPython.html">next Bit</a>.
+              </td>
+            </tr>
+          </table>
+          <div style="height:0.5em;"></div>
+        </details>
         <div style="height:0.25em;"></div>
-        <h3 id="code">1.0 CodeSnaps</h3>
-        <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote()" />
-        <div style="display:flex; flex-direction:column;">
-          <h4 id="source">Source Code - Js_Data.html</h4>
-          <div class="block">
-            <div class="codewrap">
-              <div id="scrollY"
-                   style="position:fixed; bottom:0.50em; right:1.50em; width:max-content; height:1.5em;
-           text-align:right; padding:0.15em 0.5em; border:1px solid red;">
-                0
-              </div>
-              <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+        <details id="typesys">
+          <summary class="darkItem">JavaScript&nbsp;Type&nbsp;System&nbsp;Details&nbsp;</summary>
+          <t-b>
+            <h3>Table 2. JavaScript Type System Attributes</h3>
+          </t-b>
+          <table style="font-size:0.9em; max-width:65em;">
+            <tr>
+              <td>Dynamic&nbsp;typing</td>
+              <td>
+                JavaScript types are dynamic.
+                All names bind to any type, types are evaluated at run-time, and names may be rebound to any type of data.
+                All data is held in the JavaScript managed heap.
+              </td>
+            </tr>
+            <tr>
+              <td>Type inference</td>
+              <td>
+                Compiler infers all types from the declaring definition at load or run-time.
+              </td>
+            </tr>
+            <tr>
+              <td>Duck typing</td>
+              <td>
+                All expressions are checked at run-time. Exceptions are thrown at load-time if there
+                are any failures of syntax. An exception is thrown at run-time if an expression cannot
+                be evaluated.
+              </td>
+            </tr>
+            <tr>
+              <td>Generics</td>
+              <td>
+                There are no generics in JavaScript code since any type can be passed to a function or
+                added to a collection. The JavaScript interpreter checks the validity of operations on
+                data and throws exceptions if expressions are invalid.
+              </td>
+            </tr>
+          </table>
+        </details>
+        <h3 id="code">1.0 JavaScript Types</h3>
+        <t-b>
+          All JavaScript data is located in the host&apos;s managed heap. Varibles hold handles
+          to that data. Assignment and construction of numbers and arrays copies the source
+          object&apos;s handle, not its instance, so that results in two handles pointing to the
+          same instance.
+        </t-b>
+        <t-b>
+          JavaScript strings are immutable, so any change will create a new object. All the other
+          types illustrated here, numbers and arrays, are mutable
+        </t-b>
+        <h3 id="demo">1.1 Demonstration Code</h3>
+        <t-b>
+          JavaScript needs a host to load and execute. In this demo we use a simple web page
+          With a <c-s>head</c-s> element holding all of the JavaScript definitions, a <c-s>body</c-s>
+          element that holds a placeholder <c-s>div</c-s> element where a title will be rendered,
+          using the function <c-s>heading()</c-s>, and a <c-s>script</c-s> element with function
+          invocations for the heading and demonstrations.
+        </t-b>
+        <t-b>
+          Styles and JavaScript in the <c-s>head</c-s> are parsed and tokenized. JavaScript in the
+          body is executed as it is encountered during loading.
+        </t-b>
+        <t-b>
+          The panels, below, contain demonstration code in the left and output in the right. The
+          output has been placed so that it is adjacent to the code that generates it.
+        </t-b>
+        <t-b>
+          The panels are seperated by a &quot;splitter bar&quot; that can be dragged to the left
+          or right to see any content that may not be visible after loading.
+        </t-b>
+        <t-b>
+          You can accomplish the same thing by clicking in either panel to increase its width.
+        </t-b>
+        <div class="blockSingle" style="padding:0em;">
+          <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote()" />
+          <splitter-container id="container">
+            <first-item id="fig1-first" style="width:52%; padding-right:0.5em;">
+              <div class="codewrap">
+                <pre onclick="cbubbleup('fig1-first')" style="width:200em;"><code class="language-cpp">&lt;!DOCTYPE html&gt;>
 &lt;html&gt;
 &lt;!--
   Js_Data.html
@@ -367,62 +701,11 @@
       showType(t6, &quot;t6&quot;);
       showNote(&quot;Source t5 modified!&quot;)
     }
-    /* display functions */
-    function print(str) {
-      document.write(str);
-    }
-    function println(str) {
-      document.write(str + &quot;&lt;br /&gt;&quot;);
-    }
-    function showNote(text) {
-      println(&quot;-------------------------&quot;);
-      println(text);
-      println(&quot;-------------------------&quot;);
-    }
-    /* Analysis functions */
-    function showType(t, nm) {
-      println(nm + &quot;, &quot; + typeof t);
-      print(&quot;size: &quot; + sizeof(t) + &quot;, value: &quot; + t);
-      println(nil);
-    }
-    function isSameObject(o1, nm1, o2, nm2) {
-      if (o1 === o2) {
-        println(nm1 + &quot; is same object as &quot; + nm2)
-      }
-      else {
-        println(nm1 + &quot; is not same object as &quot; + nm2)
-      }
-    }
-    // https://gist.github.com/pgpbpadilla/10344038
-    function sizeof(object) {
-      var objectList = [],
-        stack = [ object ],
-        bytes = 0,
-        value,
-        i;
 
-      while (stack.length) {
-        value = stack.pop();
+    /*----------------------------------------------------- 
+      display and analysis functions elided, see below
+    */
 
-        if (typeof value === 'boolean') {
-          bytes += 4;
-        } else if (typeof value === 'string') {
-          bytes += value.length * 2;
-        } else if (typeof value === 'number') {
-          bytes += 8;
-        } else if (typeof value === 'object'
-            && objectList.indexOf(value) === -1) {
-          objectList.push(value);
-
-          for (i in value) {
-            if (value.hasOwnProperty(i)) {
-              stack.push(value[i]);
-            }
-          }
-        }
-      }
-      return bytes;
-    }
   &lt;/script&gt;
   &lt;style&gt;
     body {
@@ -440,10 +723,30 @@
 &lt;/body&gt;
 &lt;/html&gt;
 </code></pre>
-                </div>
               </div>
-              <h4 id="out">Output</h4>
-              <pre class="codeSnaps"><code class="language-shell">Javascript Data
+            </first-item>
+            <splitter-bar id="fig1-seperator"></splitter-bar>
+            <second-item id="fig1-second" style="width:40em; padding-right:0.5em;">
+              <div class="codewrap">
+                <pre onclick="obubbleup('fig1-first')" style="width:200em;"><code class="language-shell">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Javascript Data
 -------------------------
 Demo numbers
 -------------------------
@@ -510,23 +813,161 @@ size: 24, value: 1,-2,3
 -------------------------
 Source t5 modified!
 -------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </code></pre>
-              <h4 id="build">Build</h4>
-              <div class="codeSnap">
-                <h4 style="margin-bottom:0;">local machine</h4>
               </div>
-              <pre class="codeSnaps"><code class="language-shell">C:&#92;github&#92;JimFawcett&#92;Bits&#92;Javascript&#92;Js_Data
+            </second-item>
+          </splitter-container>
+        </div>
+        <div style="height:0.75em;"></div>
+        <h3 id="funcs">1.2 Display and Analysis Functions</h3>
+        <t-b>
+          JavaScript does not directly support generics so functions can be used for more than one
+          type without a lot of code scaffolding as in C++, Rust, and C#.
+        </t-b>
+        <t-b>
+          That makes the code much simpler, but now the developer must insure valid method arguments
+          without the help of compiler diagnostics.
+        </t-b>
+        <t-b>
+          For quick small prototypes, that works well. For large code bases, getting to valid
+          argments requires careful implementation with a lot of trial and error.
+        </t-b>
+        <t-b>
+          All of the functions used in this file to enhance output displays are discussed in the dropdown,
+          below.
+        </t-b>
+        <details>
+          <summary class="darkItem">Display &amp Analysis</summary>
+          <div class="blockSingle">
+            <div class="codewrap" style="float:left; width:55%; border-right:1px solid var(--dark)">
+              <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-cpp">  /* analysis and display functions */
+
+  function print(str) {
+    document.write(str);
+  }
+  function println(str) {
+    document.write(str + &quot;&lt;br /&gt;&quot;);
+  }
+  function showNote(text) {
+    println(&quot;-------------------------&quot;);
+    println(text);
+    println(&quot;-------------------------&quot;);
+  }
+  /* Analysis functions */
+  function showType(t, nm) {
+    println(nm + &quot;, &quot; + typeof t);
+    print(&quot;size: &quot; + sizeof(t) + &quot;, value: &quot; + t);
+    println(nil);
+  }
+  function isSameObject(o1, nm1, o2, nm2) {
+    if (o1 === o2) {
+      println(nm1 + &quot; is same object as &quot; + nm2)
+    }
+    else {
+      println(nm1 + &quot; is not same object as &quot; + nm2)
+    }
+  }
+  // https://gist.github.com/pgpbpadilla/10344038
+  function sizeof(object) {
+    var objectList = [],
+      stack = [ object ],
+      bytes = 0,
+      value,
+      i;
+
+    while (stack.length) {
+      value = stack.pop();
+
+      if (typeof value === 'boolean') {
+        bytes += 4;
+      } else if (typeof value === 'string') {
+        bytes += value.length * 2;
+      } else if (typeof value === 'number') {
+        bytes += 8;
+      } else if (typeof value === 'object'
+          && objectList.indexOf(value) === -1) {
+        objectList.push(value);
+
+        for (i in value) {
+          if (value.hasOwnProperty(i)) {
+            stack.push(value[i]);
+          }
+        }
+      }
+    }
+    return bytes;
+  }
+</code></pre>
+            </div>
+            <div class="textwrap">
+              <h4>Display:</h4>
+              <t-b>
+                The functions &quot;<c-s>print(str)</c-s>&quot;, &quot;<c-s>println(str)</c-s>&quot;, and
+                &quot;<c-s>showNote(text)</c-s>&quot; are used to enhance the demonstration output
+                and are simple enought to be self-explanitory.
+              </t-b>
+              <h4>Analysis:</h4>
+              <t-b>
+                &quot;<c-s>showType(t, nm)</c-s>&quot; accepts an object <c-s>t</c-s> and
+                name string <c-s>nm</c-s>.
+                It displays the name and type of <c-s>t</c-s> as evaluated by the interpreter,
+                followed by its size and value.
+                Size is computed with the <c-s>sizeof(object)</c-s> function discussed below and value
+                is interpreted by <c-s>document.write(t)</c-s>.
+              </t-b>
+              <t-b>
+                The function &quot;<c-s>sizeof(object)</c-s>&quot; iterates recursively through the
+                <c-s>object</c-s>&apos;s properties, accumulating the size of each, using an array
+                with stack operations to traverse the <c-s>object</c-s>&apos;s tree.
+              </t-b>
+            </div> <!-- textwrap -->
+          </div> <!-- blockSingle -->
+        </details>
+        <div style="height:0.75em"></div>
+        <h4 id="build">2.0 Build</h4>
+        <div class="codeSnap" style="border:1px solid var(--dark); width:60em;">
+          <h4 style="margin-bottom:0;">local machine</h4>
+          <pre class="codeSnaps"><code class="language-shell">C:&#92;github&#92;JimFawcett&#92;Bits&#92;Javascript&#92;Js_Data
 &gt; start firefox C:&#92;github&#92;JimFawcett&#92;Bits&#92;Javascript&#92;Js_Data&#92;Js_Data.html
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;Javascript&#92;Js_Data
 &gt;
 </code></pre>
-              <div class="codeSnap">
-                <h4 style="margin-bottom:0;">github site</h4>
-              </div>
-              <pre class="codeSnaps"><code class="language-shell">clone Bits repository and double click on Js_Data.html
+          <div style="height:0.75em;"></div>
+          <h4 style="margin-bottom:0;">github site</h4>
+          <pre class="codeSnaps"><code class="language-shell">clone Bits repository and double click on Js_Data.html
 </code></pre>
-            </div>
-        <h3 id="ide">2.0 VS Code View</h3>
+        </div>
+        <div style="height:0.75em;"></div>
+        <h3 id="ide">3.0 VS Code View</h3>
         <t-b>
           The code for this demo is available in
           <a target="_blank" href="https://github.com/JimFawcett/Bits">github.com/JimFawcett/Bits</a>. If you click on
@@ -554,8 +995,8 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Javascript&#92;Js_Data
   </photosizer-block>-->
 
         <div style="height:0.75em;" class="clear"></div>
-        <h3 id="refs">3.0 References</h3>
-        <table class="indent">
+        <h3 id="refs">4.0 References</h3>
+        <table class="indent" style="width:45em;">
           <tr>
             <th class="darkItem">Reference</th>
             <th class="darkItem">Description</th>
@@ -622,6 +1063,9 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Javascript&#92;Js_Data
   </script>
   <script>
     // getScroll();
+  </script>
+  <script>
+    onLoadSplitter("fig1");
   </script>
 </body>
 </html>
