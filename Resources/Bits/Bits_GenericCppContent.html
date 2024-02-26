@@ -163,15 +163,179 @@
         </t-b>
         <div>
           <div style="height:0.25em;"></div>
-          <h3 id="points">1.1 User-defined ...</h3>
+          <h3 id="democls">1.1 Demo&lt;T&gt;</h3>
           <t-b>
             User defined intro ...
           </t-b>
           <div class="blockSingle">
             <div class="codewrap" style="float:left; width:60%;">
-              <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-cpp">/*---------------------------------------------------------         
-  Code here
-</code></pre>
+              <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-cpp">/*-------------------------------------------------------------------
+  Demos.h defines Demo&lt;T&gt; and Stats&lt;T&gt; classes
+  - Demo&lt;T&gt; is a simple demonstration of a generic type that
+    does'nt do anything very useful except to explain syntax.
+  - Stats&lt;T&gt; holds a std::vector&lt;T&gt; and provides methods for
+    computing max, min, average of this collection of elements
+    of unspecified type T
+*/
+/*-------------------------------------------------------------------
+  simple user-defined type to demonstrate template syntax
+*/
+template&lt;typename T&gt;
+class Demo {
+public:
+  Demo() = default;
+  Demo(T& tin) : t(tin) {};
+  Demo(const Demo&lt;T&gt;& t) = default;
+  Demo&lt;T&gt;& operator=(const Demo&lt;T&gt;&t) = default;
+  ~Demo() = default;
+  T& value() { return t; }
+  void show();
+private:
+  T t;
+};
+
+template&lt;typename T&gt;
+void Demo&lt;T&gt;::show() {
+  std::cout &lt;&lt; &quot;  Demo&lt;T&gt; {&#92;n  &quot;;
+  std::cout &lt;&lt; &quot;  type T: &quot;
+            &lt;&lt; truncate(DisplayParams.trunc,typeid(t).name());  // show type
+  std::cout &lt;&lt; &quot;, size: &quot; &lt;&lt; sizeof(t);  // show size on stack
+  std::cout &lt;&lt; &quot;, value: &quot; &lt;&lt; t;
+  std::cout &lt;&lt; &quot;&#92;n  }&#92;n&quot;;
+}
+/*-------------------------------------------------------------------
+  Stats&lt;T&gt;
+  - Stats&lt;T&gt; holds a std::vector&lt;T&gt; and provides methods for
+    computing max, min, average of this collection
+    of unspecified type T
+  - Code builds as a template definition
+  - Will fail to build instantiation if T is not a numeric type
+*/
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;exception&gt;
+/*-------------------------------------------------------------------
+  Stats&lt;T&gt; class provides several simple computational services on
+  a vector of items who's type provides required arithmetic operations.
+  - This class inhibits compiler generation of default constructor
+    and assignment operator.
+*/
+template &lt;typename T&gt;
+class Stats {
+public:
+    Stats(const std::vector&lt;T&gt;& v);
+    Stats() = delete;
+    Stats&lt;T&gt;& operator=(Stats&lt;T&gt;& s) = delete;
+    size_t size();
+    T max();
+    T min();
+    T sum();
+    double avg();
+    void show(const std::string& name=&quot;&quot;);
+private:
+    bool check();
+    const std::vector&lt;T&gt;& items;
+};
+/*-------------------------------------------------------------------
+  Constructor initialized with vector of values
+*/
+template&lt;typename T&gt;
+Stats&lt;T&gt;::Stats(const std::vector&lt;T&gt;& v) : items(v) {}
+
+/*-------------------------------------------------------------------
+  check that Stats instance contains at least one value
+*/
+template&lt;typename T&gt;
+bool Stats&lt;T&gt;::check() {
+    return items.size() &gt; 0;
+}
+/*-------------------------------------------------------------------
+  returns number of data items
+*/
+template&lt;typename T&gt;
+size_t Stats&lt;T&gt;::size() {
+    if(!check()) {
+        throw &quot;Stats is empty&quot;;
+    }
+    return items.size();
+}
+/*-------------------------------------------------------------------
+  returns largest value (not necessarily largerst magnitude)
+*/
+template&lt;typename T&gt;
+T Stats&lt;T&gt;::max() {
+    if(!check()) {
+        throw &quot;Stats is empty&quot;;
+    }
+    auto max = items[0];
+    for( auto item : items) {
+        if (item &gt; max) {
+            max = item;
+        }
+    }
+    return max;
+}
+/*-------------------------------------------------------------------
+  returns smallest value (not necessarily smallest magnitude)
+*/
+template&lt;typename T&gt;
+T Stats&lt;T&gt;::min() {
+    if(!check()) {
+        throw &quot;Stats is empty&quot;;
+    }
+    auto min = items[0];
+    for( auto item : items) {
+        if (item &lt; min) {
+            min = item;
+        }
+    }
+    return min;
+}
+/*-------------------------------------------------------------------
+  returns sum of data values
+*/
+template&lt;typename T&gt;
+T Stats&lt;T&gt;::sum() {
+    if(!check()) {
+        throw &quot;Stats is empty&quot;;
+    }
+    auto sum = T{0};
+    for( auto item : items) {
+        sum += item;
+    }
+    return sum;
+}
+/*-------------------------------------------------------------------
+  returns average of data values
+*/
+template&lt;typename T&gt;
+double Stats&lt;T&gt;::avg() {
+    if(!check()) {
+        throw &quot;Stats is empty&quot;;
+    }
+    auto sum = T{0};
+    for( auto item : items) {
+        sum += item;
+    }
+    return double(sum)/double(items.size());
+}
+/*-------------------------------------------------------------------
+  displays current contents
+*/
+template&lt;typename T&gt;
+void Stats&lt;T&gt;::show(const std::string& name) {
+    if(!check()) {
+        throw &quot;Stats is empty&quot;;
+    }
+    std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; name &lt;&lt; &quot; {&#92;n    &quot;;
+    auto iter = items.begin();
+    std::cout &lt;&lt; *iter++;
+    while(iter != items.end()) {
+        std::cout &lt;&lt; &quot;, &quot; &lt;&lt; *iter++;
+        std::cout.flush();
+    }
+    std::cout &lt;&lt; &quot;&#92;n  }&#92;n&quot;;
+}</code></pre>
             </div>
             <div class="textwrap">
               <h4>Heading:</h4>
@@ -181,7 +345,392 @@
             </div>
           </div>
           <div style="height:1em;"></div>
-          <h3 id="source">1.2 Program Structure</h3>
+          <div style="height:0.25em;"></div>
+          <h3 id="points">1.2 Point&lt;T, N&gt;</h3>
+          <t-b>
+            User defined intro ...
+          </t-b>
+          <div class="blockSingle">
+            <div class="codewrap" style="float:left; width:60%;">
+              <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-cpp">/*-------------------------------------------------------------------
+  PointsGen.h defines point classe Point&lt;T, N&gt;
+  - Point&lt;T, N&gt; represents points with N coordinates of
+    unspecified type T and a Time t.
+*/
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;initializer_list&gt;
+#include &quot;Time.h&quot;
+
+namespace Points {
+  /*-------------------------------------------------------------------
+    Point&lt;T, N&gt; class represents a point in an N-Dimensional hyperspace.
+    It uses a template parameter to support a variety of coordinate
+    types, and uses a vector to hold any finite number of
+    coordinates, specified by N.
+
+    It also carries a Time t instance which conceptually is the time
+    at which something was at that point in space. Time is a class
+    defined for this demonstration defined in Time.h.
+
+    All its special members, ctors, assignment, ... with the exception
+    of constructor Point(), are declared default to indicate to a maintainer
+    that compiler generated methods are correct and should not be provided.
+
+    It does not provide an iterator nor begin() and end() members.
+    Those will added in the iteration bit.
+  */
+  template&lt;typename T, size_t N&gt;
+  class Point {
+  public:
+    Point();                                      // default ctor
+    Point(std::initializer_list&lt;T&gt; il);           // construct from list
+    Point(const Point& pt) = default;             // copy ctor
+    Point(Point&& pt) = default;                  // move ctor
+    Point& operator=(const Point& pt) = default;  // copy assignment
+    Point& operator=(Point&& pt) = default;       // move assignemnt
+    ~Point() = default;                           // dtor
+
+    void init(const std::vector&lt;T&gt;& v);
+
+    std::string timeToString();
+    void updateTime();
+    std::time_t& time();
+    const size_t size() const;
+    T& operator[](size_t index);                  // index oper
+    const T operator[](size_t index) const;       // const index oper
+
+    std::vector&lt;T&gt;& coords() { return coord; }    // accessor
+
+    void show(const std::string& name);           // display contents
+    size_t& left() { return _left; }              // display indent
+    size_t& width() { return _width; }            // display width
+  private:
+    std::vector&lt;T&gt; coord;
+    Time tm;
+    size_t _left = 2;   // default display indent
+    size_t _width = 7;  // default display row width
+  };
+  /*-----------------------------------------------
+    Point&lt;T, N&gt; constructor with size Template
+    parameter
+  */
+  template&lt;typename T, size_t N&gt;
+  Point&lt;T, N&gt;::Point()
+    : tm(Time()) {
+    for(size_t i=0; i&lt;N; i++) {
+      coord.push_back(T{0});
+    }
+  }
+  /*-----------------------------------------------
+    Fill coor with elements from initializer list li
+    - if li is smaller than N then fill remainder with
+      default values of T
+    - if li is larger use first N elements of li
+  */
+  template&lt;typename T, size_t N&gt;
+  Point&lt;T, N&gt;::Point(std::initializer_list&lt;T&gt; il)
+    : tm(Time()) {
+    size_t sz = std::min(N, il.size());
+    size_t i = 0;
+    for(auto item : il) {
+      coord.push_back(item);
+      if(++i == sz) {
+        break;
+      }
+    }
+    for(size_t i = il.size(); i&lt;N; i++) {
+      coord.push_back(T{0});
+    }
+  }
+  /*---------------------------------------------
+    Always returns N
+  */
+  template&lt;typename T, size_t N&gt;
+  const size_t Point&lt;T, N&gt;::size() const {
+    return coord.size();
+  }
+  /*---------------------------------------------
+    index returns mutable value
+  */
+  template&lt;typename T, size_t N&gt;
+  T& Point&lt;T, N&gt;::operator[](size_t index) {
+    if (index &lt; 0 || coord.size() &lt;= index) {
+      throw &quot;Point&lt;T, N&gt; indexing error&quot;;
+    }
+    return coord[index];
+  }
+  /*---------------------------------------------
+    index returns immutable value
+  */
+  template&lt;typename T, size_t N&gt;
+  const T Point&lt;T, N&gt;::operator[](size_t index) const {
+    if (index &lt; 0 || coord.len() &lt;= index) {
+      throw &quot;Point&lt;T, N&gt; indexing error&quot;;
+    }
+    return coord[index];
+  }
+  /*-----------------------------------------------
+    Fill coor with elements from vector v
+    - if v is smaller fill remainder with default
+      values of T
+    - if v is larger use first N elements of v
+  */
+  template&lt;typename T, size_t N&gt;
+  void Point&lt;T, N&gt;::init(const std::vector&lt;T&gt;& v) {
+    size_t sz = std::min(N, v.size());
+    for(size_t i=0; i&lt;sz; i++) {
+      coord[i] = v[i];
+    }
+    for(size_t i = v.size(); i&lt;N; i++) {
+      coord[i] = T{0};
+    }
+  }
+  /*---------------------------------------------
+    returns string datetime
+  */
+  template&lt;typename T, size_t N&gt;
+  std::string Point&lt;T, N&gt;::timeToString() {
+    std::string ts = tm.toString();
+    return ts;
+  }
+  /*---------------------------------------------
+    set time to current time
+  */
+  template&lt;typename T, size_t N&gt;
+  void Point&lt;T, N&gt;::updateTime() {
+    tm = std::time(0);
+  }
+  /*---------------------------------------------
+    returns current number of seconds in clock's
+    epoch
+  */
+  template&lt;typename T, size_t N&gt;
+  std::time_t& Point&lt;T, N&gt;::time() {
+    return tm;
+  }
+  /*-----------------------------------------------
+    PointtN&lt;T&gt; display function
+  */
+  template&lt;typename T, size_t N&gt;
+  void Point&lt;T, N&gt;::show(const std::string& name) {
+    std::cout &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(_left) &lt;&lt; name &lt;&lt; &quot;: &quot; &lt;&lt; &quot;Point&lt;T, N&gt;&quot;;
+    std::cout &lt;&lt; &quot; {&#92;n&quot;;
+    std::cout &lt;&lt; fold(coord, _left + 2, _width);
+    std::cout &lt;&lt; indent(_left) &lt;&lt; &quot;}&quot;;
+    std::cout &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(_left) &lt;&lt; tm.toString() &lt;&lt; std::endl;
+  }
+  /*-----------------------------------------------
+    Overload operator&lt;&lt; required for
+    showType(Point&lt;T, N&gt; t, const std::string& nm)
+  */
+  template&lt;typename T, size_t N&gt;
+  std::ostream& operator&lt;&lt;(std::ostream& out, Point&lt;T, N&gt;& t2) {
+    out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(t2.left()) &lt;&lt; &quot;Point&lt;T, N&gt;&quot;;
+    out &lt;&lt; &quot; {&#92;n&quot;;
+    out &lt;&lt; fold(t2.coords(), t2.left() + 2, t2.width());
+    out &lt;&lt; indent(t2.left()) &lt;&lt; &quot;}&quot;;
+    return out;
+  }
+}</code></pre>
+            </div>
+            <div class="textwrap">
+              <h4>Heading:</h4>
+              <t-b>
+                Explanitory text here
+              </t-b>
+            </div>
+          </div>
+          <div style="height:1em;"></div>
+          <div style="height:0.25em;"></div>
+          <h3 id="points">1.3 Time and Timer</h3>
+          <t-b>
+            User defined intro ...
+          </t-b>
+          <div class="blockSingle">
+            <div class="codewrap" style="float:left; width:60%;">
+              <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-cpp">/*-------------------------------------------------------------------
+  Time.h defines Time class to manage datetime strings
+  - Uses chrono to implement class for updateable time instances
+
+  Note: Add callable function for end of time period
+*/
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;chrono&gt;
+#include &lt;ctime&gt;
+
+namespace Points {
+
+  /*---------------------------------------------
+    Time manages calendar times
+  */
+  class Time {
+    public:
+      Time();
+      time_t getTime();
+      tm getLocalTime();
+      tm getGMTTime();
+      std::string getTimeZone();
+      std::string toString();
+      size_t year();
+      size_t month();
+      size_t day();
+      size_t hour();
+      size_t minutes();
+      size_t seconds();
+    private:
+      std::chrono::time_point&lt;std::chrono::system_clock&gt; tp;
+      std::tm calTime;
+      std::string dateTimeSuffix;
+  };
+  /*-----------------------------------------------
+    Construct instance holding time_point for
+    std::chrono::system_clock's epoch
+    - epoch is number of seconds since 1 January 1970 UTC
+    - epoch may vary with clock, e.g.,
+      system_clock, high_resolution_clock
+    - time_point is a structure holding chrono::duration
+      for the clock's epoch
+  */
+  Time::Time() {
+    tp = std::chrono::system_clock::now();
+    calTime = getLocalTime();
+  }
+  /*-----------------------------------------------
+    time_t is an integral type holding number of
+    seconds in the current time_point
+  */
+  std::time_t Time::getTime() {
+    return std::chrono::system_clock::to_time_t(tp);
+  }
+  /*-----------------------------------------------
+    returns datetime string
+    - Wed Feb 21 10:18:12 2024 local_time_zone
+  */
+  std::string Time::toString() {
+    struct tm time;
+    time_t tt = getTime();
+    /* compute for GMT zone */
+    if(dateTimeSuffix == &quot;GMT&quot;) {
+      gmtime_s(&time, &tt);
+    }
+    /* compute for local time zone*/
+    else {
+      localtime_s(&time, &tt);
+    }
+    std::string rs = asctime(&time);
+    rs.resize(rs.size() - 1);  // remove trailing newline
+    rs += &quot; &quot; + dateTimeSuffix;
+    return rs;
+  }
+  /*-----------------------------------------------
+    tm is structure holding components of calendar
+    date and time, e.g., tm_sec, tm_min, ...
+    - member calTime is localtime after calling
+      this function
+  */
+  tm Time::getLocalTime() {
+    time_t tt = getTime();
+    localtime_s(&calTime, &tt);  // save in calTime
+    dateTimeSuffix = &quot;local time zone&quot;;
+    return calTime;
+  }
+  /*-----------------------------------------------
+    tm is structure holding components of calendar
+    date and time, e.g., tm_sec, tm_min, ...
+    - member calTime is gmttime after calling
+      this function
+  */
+  tm Time::getGMTTime() {
+    time_t tt = getTime();
+    gmtime_s(&calTime, &tt);  // save in calTime
+    dateTimeSuffix = &quot;GMT&quot;;
+    return calTime;
+  }
+  /*---------------------------------------------
+    methods to retrieve dateTime components
+  */
+  std::string Time::getTimeZone() {
+    return dateTimeSuffix;
+  }
+  size_t Time::year() {
+    auto yr = calTime.tm_year + 1900;
+    return yr;
+  }
+  size_t Time::month() {
+    auto mn = calTime.tm_mon + 1;
+    return mn;
+  }
+  size_t Time::day() {
+    auto d = calTime.tm_mday;
+    return d;
+  }
+  size_t Time::hour() {
+    auto hr = calTime.tm_hour;
+    return hr;
+  }
+  size_t Time::minutes() {
+    auto min = calTime.tm_min;
+    return min;
+  }
+  size_t Time::seconds() {
+    double sec = calTime.tm_sec;
+    return sec;
+  }
+
+  /*---------------------------------------------
+    Timer provides elapsed time services
+  */
+  class Timer {
+    public:
+    Timer();
+    void start();
+    void stop();
+    size_t elapsedNanoSec();
+    size_t elapsedMicroSec();
+    size_t elapsedMilliSec();
+    private:
+      std::chrono::time_point&lt;
+        std::chrono::high_resolution_clock
+      &gt; tp;
+      std::chrono::time_point&lt;std::chrono::high_resolution_clock&gt; starttime;
+      std::chrono::time_point&lt;std::chrono::high_resolution_clock&gt; stoptime;
+  };
+  Timer::Timer() {
+    starttime = std::chrono::high_resolution_clock::now();
+    stoptime = std::chrono::high_resolution_clock::now();
+  }
+  void Timer::start() {
+    starttime = std::chrono::high_resolution_clock::now();
+  }
+  void Timer::stop() {
+    stoptime = std::chrono::high_resolution_clock::now();
+  }
+  size_t Timer::elapsedNanoSec() {
+    auto duration = duration_cast&lt;std::chrono::nanoseconds&gt;(stoptime - starttime);
+    return duration.count();
+  }
+  size_t Timer::elapsedMicroSec() {
+    auto duration = duration_cast&lt;std::chrono::microseconds&gt;(stoptime - starttime);
+    return duration.count();
+  }
+  size_t Timer::elapsedMilliSec() {
+    auto duration = duration_cast&lt;std::chrono::milliseconds&gt;(stoptime - starttime);
+    return duration.count();
+  }
+}</code></pre>
+            </div>
+            <div class="textwrap">
+              <h4>Heading:</h4>
+              <t-b>
+                Explanitory text here
+              </t-b>
+            </div>
+          </div>
+          <div style="height:1em;"></div>
+          <h3 id="source">1.4 Program Structure</h3>
           <t-b style="margin-bottom:1em;">
             The block below illustrates how this program is structured using three files:
             PointsObj.h, AnalysisObj.h, and Cpp_Objects.cpp, and several functions
@@ -199,68 +748,67 @@
           </t-b>
           <div class="blockSingle">
             <div class="codewrap" style="float:left; width:60%;">
-              <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-cpp">
-/*-------------------------------------------------------------------
-  Cpp_Objects.cpp
-  - depends on Points.h to provide user-defined point class
+              <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-cpp">/*-------------------------------------------------------------------
+  Cpp_Generics.cpp
+  - demonstrates creating and using std::library generic types:
+      array, basic_string, vector, and map
+  - demonstrates creating and using user-defined generic types:
+      Stats, Demo, and PointsN
+  - depends on PointsGen.h to provide user-defined generic point class
+  - depends on Demos.h to provide simple generic classes
   - depends on Analysis.h for several display and analysis functions
 */
-#include &lt;iostream&gt;     // std::cout
-#include &lt;memory&gt;       // std::unique_ptr
-#include &lt;vector&gt;       // vector&lt;T&gt; class
-#include &lt;array&gt;        // array&lt;T&gt; class
-#include &lt;map&gt;          // map&lt;K,V&gt; class
-#include &lt;set&gt;          // set&lt;T&gt; class
-#include &quot;AnalysisObj.h&quot;   // Analysis functions for this demo
-#include &quot;PointsObj.h&quot;     // Point4D class declaration
 /*-----------------------------------------------
   Note:
   Find all Bits code, including this in
   https://github.com/JimFawcett/Bits
   You can clone the repo from this link.
 -----------------------------------------------*/
-/*
-  This demo uses the std::string and std::vector&lt;T&gt; classes
-  and a user defined class, Point4D, to illustrate how objects
-  are defined and instantiated.
+#include &lt;iostream&gt;       // std::cout
+#include &lt;memory&gt;         // std::unique_ptr
+#include &lt;vector&gt;         // vector&lt;T&gt; class
+#include &lt;array&gt;          // array&lt;T&gt; class
+#include &lt;map&gt;            // map&lt;K,V&gt; class
+#include &lt;set&gt;            // set&lt;T&gt; class
+#include &lt;thread&gt;         // this_thread
+#include &quot;AnalysisGen.h&quot;  // Analysis functions
+#include &quot;PointsGen.h&quot;    // Point&lt;T, N&gt; class declaration
+#include &quot;Demos.h&quot;        // Demo and Stats class declarations
 
-  Operations:
-    All the classes discussed here provide operations for:
-      T t2 = t1          // copy construction
-      T t3 = temporary   // move construction
-      t1 = t2            // copy assignment
-      t3 = temporary     // move assignment
+using namespace Points;
 
-    All instances return their resources when they go out of
-    scope by implicitly calling their destructor.
-    Primitive types can all be copied.
-
-    Most library and user-defined types can be copied, moved,
-    and deleted by providing member constructors and destructor.
-    Often compiler generation works well, but for classes with
-    pointer members developers must provide those methods.
-
-  Processing:
-    All types are static, operations run as native code, and no
-    garbage collection is needed. Resources are returned at end
-    of their declaration scope.
+void demo_std_generic_types() {
+  /* code elided */
+}
+void demo_user_defined_generic_types() {
+  /* code elided */
+}
+void demo_generic_functions() {
+  /* code elided */
+}
+void testtime() {
+  /* code elided */
+}
+void testtimer() {
+  /* code elided */
+}
+/*-----------------------------------------------
+  Demo execution starts here
 */
-
-void demo_stdlib() { /*-- code elided --*/ }
-void demo_Point4D() { /*-- code elided --*/ }
-void demo_heap_string() { /*-- code elided --*/ }
-void demo_heap_vector() { /*-- code elided --*/ }
-void demo_heap_Point4D() { /*-- code elided --*/ }
-
 int main() {
 
-    print(&quot;Demonstrate C++ Objects&#92;n&quot;);
+    showNote(&quot;Demonstrate C++ Generics&quot;, nl);
 
-    demo_stdlib();
-    demo_Point4D();
-    demo_heap_string();
-    demo_heap_vector();
-    demo_heap_Point4D();
+    demo_std_generic_types();
+    demo_user_defined_generic_types();
+    demo_generic_functions();
+
+    testtime();
+
+    for(size_t i=0; i&lt;4; ++i) {
+      testtimer();
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
 
     print(&quot;&#92;n  That's all Folks!&#92;n&#92;n&quot;);
 }
@@ -307,7 +855,68 @@ int main() {
               </t-b>
             </div>
           </div>
-          <h3 id="libtyp">1.3 Declaration and use of ...</h3>
+          <h3 id="libtyp">1.5 Demo Standard Generic Types</h3>
+          <t-b>
+            This block presents ...
+          </t-b>
+          <t-b>
+            Here you see a side-by-side view of executable code with the output
+            it provides. That proximity makes it easier to understand how the code works.
+          </t-b>
+          <t-b>
+            Source code is available
+            <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/Cpp/Cpp_Objects/src">here</a>.
+            Download the entire Bits repository
+            <a target="_blank" href="https://github.com/JimFawcett/Bits">here</a>.
+          </t-b>
+          <t-b>
+            The two panels below are separated by a &quot;splitter bar&quot;.  You can drag the
+            bar horizontally to view hidden code or output.
+          </t-b>
+          <t-b>
+            You can also click in either panel to widen and display overflow
+          </t-b>
+          <div class="blockSingle" style="padding:0em;">
+            <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
+            <splitter-container id="container">
+              <first-item id="fig1-first" style="width:52%; padding-right:0.5em;">
+                <div class="codewrap">
+                  <pre onclick="cbubbleup('fig1-first')" style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------                              
+void demo_std_generic_types() {
+
+  showNote(&quot;Demo std generic types&quot;, nl);
+  showOp(&quot;array&lt;int,4&gt;&quot;,nl);
+  auto a = std::array&lt;int, 4&gt; { 1, 2, 3, 4 };
+  showArray(a);
+  showColl(a);
+
+  showOp(&quot;vector&lt;double&gt;&quot;);
+  std::vector&lt;double&gt; v = { 1.0, 1.5, 2.0, 2.5 };
+  std::cout &lt;&lt; v &lt;&lt; &quot;&#92;n&quot;;
+  showColl(v);
+
+  showOp(&quot;map&lt;string,int&gt;&quot;, nl);
+  std::map&lt;std::string, int&gt; m {
+    {&quot;zero&quot;, 0}, {&quot;one&quot;, 1}, {&quot;two&quot;, 2}, {&quot;three&quot;, 3}
+  };
+  showMap(m);  // std::map&lt;K,V&gt; only
+  std::cout &lt;&lt; formatColl(m, &quot;m&quot;, &quot;&#92;n&quot;); // any STL collection
+}
+</code></pre>
+                </div>
+              </first-item>
+              <splitter-bar id="fig1-seperator"></splitter-bar>
+              <second-item id="fig1-second" style="width:48%; padding-right:0.5em;">
+                <div class="codewrap">
+                  <pre onclick="obubbleup('fig1-first')" style="width:200em;"><code class="language-shell">
+output shown here
+                  </code></pre>
+                </div>
+              </second-item>
+            </splitter-container>
+          </div>
+          <div style="height:1em;"></div>
+          <h3 id="libtyp">1.6 Demo User-defined Generic Types</h3>
           <t-b>
             This block presents ...
           </t-b>
@@ -334,8 +943,40 @@ int main() {
               <first-item id="fig2-first" style="width:52%; padding-right:0.5em;">
                 <div class="codewrap">
                   <pre onclick="cbubbleup('fig2-first')" style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------                              
-  Demonstration of ... 
-*/
+void demo_user_defined_generic_types() {
+
+  showNote(&quot;Demo user-defined generic types&quot;, nl);
+
+  showOp(&quot;Demo&lt;int&gt;&quot;, nl);
+  int arg = 42;
+  Demo&lt;int&gt; demi(arg);
+  demi.show();
+  std::cout &lt;&lt; std::endl;;
+  double pi = 3.1415927;
+  Demo&lt;double&gt; demd(pi);
+  demd.show();
+
+  showOp(&quot;Stats&lt;double&gt;&quot;, nl);
+  std::vector&lt;double&gt; v { 1.0, 2.5, -3.0, 4.5 };
+  showColl(v);
+  Stats&lt;double&gt; s(v);
+  std::cout &lt;&lt; &quot;  min: &quot; &lt;&lt; s.min();
+  std::cout &lt;&lt; &quot;, max: &quot; &lt;&lt; s.max();
+  std::cout &lt;&lt; &quot;, sum: &quot; &lt;&lt; s.sum();
+  std::cout &lt;&lt; &quot;, avg: &quot; &lt;&lt; s.avg() &lt;&lt; std::endl;
+
+  showOp(&quot;Point&lt;double, 3&gt; p1 {1.0, 1.5, 2.0}&quot;);
+  Point&lt;double, 3&gt; p1 {1.0, 1.5, 2.0};
+  p1.show(&quot;p1&quot;);
+  showOp(&quot;Point&lt;double, 3&gt; p2 {1.0, 1.5}&quot;);
+  Point&lt;double, 3&gt; p2 {1.0, 1.5};
+  p2.show(&quot;p2&quot;);
+  showOp(&quot;Point&lt;double, 3&gt; p3 {1.0, 1.5, 2.0, 2.5}&quot;);
+  Point&lt;double, 3&gt; p3 {1.0, 1.5, 2.0, 2.5};
+  p3.show(&quot;p3&quot;);
+  std::cout &lt;&lt; &quot;&#92;n  p3.timeToString():&#92;n    &#92;&quot;&quot; &lt;&lt; p3.timeToString() &lt;&lt; &quot;&#92;&quot;&quot;;
+  println();
+}
 </code></pre>
                 </div>
               </first-item>
@@ -343,6 +984,207 @@ int main() {
               <second-item id="fig2-second" style="width:48%; padding-right:0.5em;">
                 <div class="codewrap">
                   <pre onclick="obubbleup('fig2-first')" style="width:200em;"><code class="language-shell">
+output shown here
+                  </code></pre>
+                </div>
+              </second-item>
+            </splitter-container>
+          </div>
+          <div style="height:1em;"></div>
+          <h3 id="libtyp">1.7 Demo Generic Functions</h3>
+          <t-b>
+            This block presents ...
+          </t-b>
+          <t-b>
+            Here you see a side-by-side view of executable code with the output
+            it provides. That proximity makes it easier to understand how the code works.
+          </t-b>
+          <t-b>
+            Source code is available
+            <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/Cpp/Cpp_Objects/src">here</a>.
+            Download the entire Bits repository
+            <a target="_blank" href="https://github.com/JimFawcett/Bits">here</a>.
+          </t-b>
+          <t-b>
+            The two panels below are separated by a &quot;splitter bar&quot;.  You can drag the
+            bar horizontally to view hidden code or output.
+          </t-b>
+          <t-b>
+            You can also click in either panel to widen and display overflow
+          </t-b>
+          <div class="blockSingle" style="padding:0em;">
+            <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
+            <splitter-container id="container">
+              <first-item id="fig3-first" style="width:52%; padding-right:0.5em;">
+                <div class="codewrap">
+                  <pre onclick="cbubbleup('fig3-first')" style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------                              
+void demo_generic_functions() {
+
+showNote(&quot;demo generic functions&quot;, nl);
+
+showOp(&quot;showType for std::string&quot;);
+std::string s = &quot;a string&quot;;
+showType(s, &quot;s&quot;, nl);
+
+showOp(&quot;showType for std::vector&quot;);
+std::vector&lt;int&gt; v {1, 2, 3, 2, 1};
+showType(v, &quot;v&quot;, nl);
+
+showOp(&quot;showColl for std::string&quot;, nl);
+showColl(s);
+
+showOp(&quot;showColl for std::vector&quot;, nl);
+showColl(v);
+}
+</code></pre>
+                </div>
+              </first-item>
+              <splitter-bar id="fig3-seperator"></splitter-bar>
+              <second-item id="fig3-second" style="width:48%; padding-right:0.5em;">
+                <div class="codewrap">
+                  <pre onclick="obubbleup('fig2-first')" style="width:200em;"><code class="language-shell">
+output shown here
+                  </code></pre>
+                </div>
+              </second-item>
+            </splitter-container>
+          </div>
+          <div style="height:1em;"></div>
+          <h3 id="libtyp">1.8 Demo Time</h3>
+          <t-b>
+            This block presents ...
+          </t-b>
+          <t-b>
+            Here you see a side-by-side view of executable code with the output
+            it provides. That proximity makes it easier to understand how the code works.
+          </t-b>
+          <t-b>
+            Source code is available
+            <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/Cpp/Cpp_Objects/src">here</a>.
+            Download the entire Bits repository
+            <a target="_blank" href="https://github.com/JimFawcett/Bits">here</a>.
+          </t-b>
+          <t-b>
+            The two panels below are separated by a &quot;splitter bar&quot;.  You can drag the
+            bar horizontally to view hidden code or output.
+          </t-b>
+          <t-b>
+            You can also click in either panel to widen and display overflow
+          </t-b>
+          <div class="blockSingle" style="padding:0em;">
+            <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
+            <splitter-container id="container">
+              <first-item id="fig4-first" style="width:52%; padding-right:0.5em;">
+                <div class="codewrap">
+                  <pre onclick="cbubbleup('fig4-first')" style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------                              
+void testtime() {
+  showNote(&quot;test Time&quot;,&quot;&#92;n&quot;);
+  Time t;
+  t.getLocalTime();
+  std::cout &lt;&lt; &quot;&#92;n  datetime = &quot; &lt;&lt; t.toString() &lt;&lt; std::endl;
+  std::cout &lt;&lt; &quot;&#92;n  epoch in secs = &quot; &lt;&lt; t.getTime();
+  std::cout &lt;&lt; &quot;&#92;n  year:     &quot; &lt;&lt; t.year();
+  std::cout &lt;&lt; &quot;&#92;n  month:    &quot; &lt;&lt; t.month();
+  std::cout &lt;&lt; &quot;&#92;n  day:      &quot; &lt;&lt; t.day();
+  std::cout &lt;&lt; &quot;&#92;n  hour:     &quot; &lt;&lt; t.hour();
+  std::cout &lt;&lt; &quot;&#92;n  minutes:  &quot; &lt;&lt; t.minutes();
+  std::cout &lt;&lt; &quot;&#92;n  seconds:  &quot; &lt;&lt; t.seconds();
+  std::cout &lt;&lt; &quot;&#92;n  timezone: &quot; &lt;&lt; t.getTimeZone();
+  std::cout &lt;&lt; std::endl;
+
+  t.getGMTTime();
+  std::cout &lt;&lt; &quot;&#92;n  datetime = &quot; &lt;&lt; t.toString() &lt;&lt; std::endl;
+  std::cout &lt;&lt; &quot;&#92;n  epoch in secs = &quot; &lt;&lt; t.getTime();
+  std::cout &lt;&lt; &quot;&#92;n  year:     &quot; &lt;&lt; t.year();
+  std::cout &lt;&lt; &quot;&#92;n  month:    &quot; &lt;&lt; t.month();
+  std::cout &lt;&lt; &quot;&#92;n  day:      &quot; &lt;&lt; t.day();
+  std::cout &lt;&lt; &quot;&#92;n  hour:     &quot; &lt;&lt; t.hour();
+  std::cout &lt;&lt; &quot;&#92;n  minutes:  &quot; &lt;&lt; t.minutes();
+  std::cout &lt;&lt; &quot;&#92;n  seconds:  &quot; &lt;&lt; t.seconds();
+  std::cout &lt;&lt; &quot;&#92;n  timezone: &quot; &lt;&lt; t.getTimeZone();
+  std::cout &lt;&lt; std::endl;
+}
+</code></pre>
+                </div>
+              </first-item>
+              <splitter-bar id="fig4-seperator"></splitter-bar>
+              <second-item id="fig4-second" style="width:48%; padding-right:0.5em;">
+                <div class="codewrap">
+                  <pre onclick="obubbleup('fig4-first')" style="width:200em;"><code class="language-shell">
+output shown here
+                  </code></pre>
+                </div>
+              </second-item>
+            </splitter-container>
+          </div>
+          <div style="height:1em;"></div>
+          <div style="height:1em;"></div>
+          <h3 id="libtyp">1.9 Demo Timer</h3>
+          <t-b>
+            This block presents ...
+          </t-b>
+          <t-b>
+            Here you see a side-by-side view of executable code with the output
+            it provides. That proximity makes it easier to understand how the code works.
+          </t-b>
+          <t-b>
+            Source code is available
+            <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/Cpp/Cpp_Objects/src">here</a>.
+            Download the entire Bits repository
+            <a target="_blank" href="https://github.com/JimFawcett/Bits">here</a>.
+          </t-b>
+          <t-b>
+            The two panels below are separated by a &quot;splitter bar&quot;.  You can drag the
+            bar horizontally to view hidden code or output.
+          </t-b>
+          <t-b>
+            You can also click in either panel to widen and display overflow
+          </t-b>
+          <div class="blockSingle" style="padding:0em;">
+            <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
+            <splitter-container id="container">
+              <first-item id="fig5-first" style="width:52%; padding-right:0.5em;">
+                <div class="codewrap">
+                  <pre onclick="cbubbleup('fig5-first')" style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------                              
+void testtimer() {
+
+  showNote(&quot;test Timer&quot;);
+
+  std::vector&lt;double&gt; v {
+    1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5
+  };
+  auto f = [&v]() {
+    for(auto &item : v) { item *= item; }
+  };
+
+  auto g = [f](size_t n) {
+    for(size_t i = 0; i &lt; n; ++i) { f(); }
+  };
+
+  Timer tmr;
+  tmr.start();
+  tmr.stop();
+  std::cout &lt;&lt; &quot;&#92;n  noOp elapsed interval in nanosec = &quot; &lt;&lt; tmr.elapsedNanoSec();
+
+  tmr.start();
+  g(200);
+  tmr.stop();
+  std::cout &lt;&lt; &quot;&#92;n  g(200) elapsed interval in nanosec = &quot; &lt;&lt; tmr.elapsedNanoSec();
+  std::cout &lt;&lt; &quot;&#92;n  g(200) elapsed interval in microsec = &quot; &lt;&lt; tmr.elapsedMicroSec();
+
+  tmr.start();
+  std::this_thread::sleep_for(std::chrono::milliseconds(5));
+  tmr.stop();
+  std::cout &lt;&lt; &quot;&#92;n  5 millisec sleep elapsed interval in millisec = &quot; &lt;&lt; tmr.elapsedMilliSec();
+  std::cout &lt;&lt; std::endl;
+}
+</code></pre>
+                </div>
+              </first-item>
+              <splitter-bar id="fig5-seperator"></splitter-bar>
+              <second-item id="fig5-second" style="width:48%; padding-right:0.5em;">
+                <div class="codewrap">
+                  <pre onclick="obubbleup('fig5-first')" style="width:200em;"><code class="language-shell">
 output shown here
                   </code></pre>
                 </div>
@@ -361,8 +1203,317 @@ output shown here
           <div class="blockSingle">
             <div class="codewrap" style="width:max-content; float:left;">
               <pre><code class="language-cpp">/*---------------------------------------------------------
-Analysis code here
-</code></pre>
+/*-------------------------------------------------------------------
+  AnalysisGen.h
+  - Provides functions that analyze types, display results
+    and other program defined information.
+  - Some of this code requires complex template operations.
+    Those will be discussed in the generics bit.
+  - You can skip the hard parts until then, without loss
+    of understanding.
+*/
+
+#include &lt;typeinfo&gt;     // typeid
+#include &lt;utility&gt;      // move()
+#include &lt;sstream&gt;      // stringstream
+#include &lt;type_traits&gt;  // is_scalar, if constexpr
+#include &lt;iostream&gt;     // cout
+#include &lt;vector&gt;       // vector
+
+/*-------------------------------------------------------------------
+  Analysis function declarations are provided here so that
+  definitions below may be placed in any order. That's
+  needed because C++ requires declaration before use.
+*/
+template&lt;typename T, int N&gt;
+void showArray(std::array&lt;T,N&gt; &a);
+template&lt;typename C&gt;
+void showColl(const C& c);
+template&lt;typename K, typename V&gt;
+void showMap(const std::map&lt;K,V&gt; &m);
+template&lt;typename T&gt;
+void showType(T t, const std::string &nm, const std::string& suffix = &quot;&quot;);
+void showNote(const std::string& txt, const std::string& suffix = &quot;&quot;);
+void showOp(const std::string& opstr, const std::string& suffix = &quot;&quot;);
+void print(const std::string& txt = &quot;&quot;);
+void println(const std::string& txt = &quot;&quot;);
+std::string truncate(size_t N, const char* pStr);
+std::string indent(size_t n);
+template&lt;typename T&gt;
+std::string fold(std::vector&lt;T&gt;& v, size_t left, size_t width);
+template&lt;typename T&gt;
+std::string formatColl(
+  const T& t, const std::string& nm,
+  const std::string& suffix = &quot;&quot;, size_t left = 2, size_t width = 7
+);
+template&lt;typename T&gt;
+std::string formatScalar(
+  const T& t, const std::string& nm,
+  const std::string& suffix = &quot;&quot;, size_t left = 2
+);
+template&lt;typename T&gt;
+std::string formatString(
+  const T& t, const std::string& nm, const std::string& suffix,
+  size_t left = 2
+);
+template&lt;typename T&gt;
+std::string format(
+  const T& t, const std::string& nm, const std::string& suffix = &quot;&quot;,
+  size_t left = 2, size_t width = 7
+);
+/*-- end of function declarations --*/
+/*-------------------------------------------------------------------
+  Display and Analysis functions and global definitions
+---------------------------------------------------------------------
+*/
+const std::string nl = &quot;&#92;n&quot;;
+/*-------------------------------------------------------------------
+  Mutable globals are a common source of bugs.  We try not
+  to use them, but will use DisplayParams here to control how
+  the insertion operator sends instances to standard output.
+*/
+struct displayParams {
+  size_t left = 2;    // number of spaces to indent
+  size_t width = 7;   // width of display row
+  size_t trunc = 40;  // replace text after trunc with ...
+} DisplayParams;      // global object
+
+/*-----------------------------------------------
+  Overload operator&lt;&lt; required for
+  showType(std::vector&lt;T&gt; v, const std::vector&lt;T&gt;& nm)
+*/
+template&lt;typename T&gt;
+std::ostream& operator&lt;&lt;(std::ostream& out, std::vector&lt;T&gt;& v) {
+  out &lt;&lt; format(v, &quot;vector&lt;T&gt;&quot;, &quot;&quot;, DisplayParams.left, DisplayParams.width);
+  return out;
+}
+/*-----------------------------------------------
+  Demonstration functions
+*/
+/*-- showArray function --*/
+template&lt;typename T, int N&gt;
+void showArray(std::array&lt;T,N&gt; &a) {
+  std::cout &lt;&lt; &quot;  array&lt;T,N&gt; [&quot;;
+  std::cout &lt;&lt; a[0];
+  for(int i=1; i&lt;N; ++i) {
+    std::cout &lt;&lt; &quot;, &quot; &lt;&lt; a[i];
+  }
+  std::cout &lt;&lt; &quot;]&quot; &lt;&lt; std::endl;
+}
+/*-- show collection function --*/
+template&lt;typename C&gt;
+void showColl(const C& c) {
+  std::cout &lt;&lt; &quot;  Collection [&quot;;
+  std::cout &lt;&lt; c[0];
+  for(size_t i=1; i&lt;c.size(); ++i) {
+    std::cout &lt;&lt; &quot;, &quot; &lt;&lt; c[i];
+  }
+  std::cout &lt;&lt; &quot;]&quot; &lt;&lt; std::endl;
+}
+/*-- showMap function --*/
+template&lt;typename K, typename V&gt;
+void showMap(const std::map&lt;K,V&gt; &m) {
+  std::cout &lt;&lt; &quot;  map&lt;K,V&gt; {&#92;n    &quot;;
+  bool first = true;
+  for(const auto& pair : m) {
+    if(first) {
+      std::cout &lt;&lt; &quot;{&quot; &lt;&lt; pair.first &lt;&lt; &quot;,&quot; &lt;&lt; pair.second &lt;&lt; &quot;}&quot;;
+      first = false;
+    }
+    else {
+      std::cout &lt;&lt; &quot;, {&quot; &lt;&lt; pair.first &lt;&lt; &quot;,&quot; &lt;&lt; pair.second &lt;&lt; &quot;}&quot;;
+    }
+  }
+  std::cout &lt;&lt; &quot;&#92;n  }&#92;n&quot;;
+}
+
+/*-----------------------------------------------
+  Display calling name, static class, and size
+*/
+template&lt;typename T&gt;
+void showType(T t, const std::string &callname, const std::string& suffix) {
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; callname;          // show name at call site
+  std::cout &lt;&lt; &quot; type: &quot;
+            &lt;&lt; truncate(DisplayParams.trunc,typeid(t).name());  // show type
+  std::cout &lt;&lt; &quot;&#92;n  size:  &quot; &lt;&lt; sizeof(t);  // show size on stack
+  std::cout &lt;&lt; suffix;
+}
+/*-----------------------------------------------
+  Display emphasized text
+*/
+inline void showNote(const std::string& txt, const std::string& suffix) {
+  print(&quot;--------------------------------------------------&quot;);
+  print(&quot;  &quot; + txt);
+  print(&quot;--------------------------------------------------&quot;);
+  std::cout &lt;&lt; suffix;
+}
+/*-----------------------------------------------
+  Display emphasized line
+*/
+inline void showOp(const std::string& opstr, const std::string& suffix) {
+  std::cout &lt;&lt; &quot;&#92;n  --- &quot; &lt;&lt; opstr &lt;&lt; &quot; ---&quot; &lt;&lt; suffix;
+}
+/*-----------------------------------------------
+  Helper function for formatting output
+  - truncates line to N chars and adds ellipsis
+*/
+inline std::string truncate(size_t N, const char* pStr) {
+  std::string temp(pStr);
+  if(temp.length() &gt; N) {
+    temp.resize(N);
+    return temp + &quot;...&quot;;
+  }
+  return temp;
+}
+/*-----------------------------------------------
+  Helper function for formatting output
+  - generates string of n blanks to offset text
+*/
+inline std::string indent(size_t n) {
+  return std::string(n, ' ');
+}
+/*-----------------------------------------------
+  Helper function for formatting output
+  - folds lines after width elements
+*/
+template&lt;typename T&gt;
+std::string fold(std::vector&lt;T&gt;& v, size_t left, size_t width) {
+  std::stringstream out(&quot;&#92;n&quot;);
+  out &lt;&lt; indent(left);
+  for(size_t i=0; i&lt;v.size(); ++i) {
+    if((i % width) == 0 && i != 0 && i != width - 1) {
+      out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left);
+    }
+    if(i &lt; v.size() - 1) {
+      out &lt;&lt; v[i] &lt;&lt; &quot;, &quot;;
+    }
+    else {
+      out &lt;&lt; v[i] &lt;&lt; &quot;&#92;n&quot;;
+      break;
+    }
+  }
+  return out.str();
+}
+/*-----------------------------------------------
+  Helper function for formatColl
+  - defines out &lt;&lt; std::pair&lt;K,V&gt;
+  - used in formatColl for associative containers
+*/
+template&lt;typename K, typename V&gt;
+std::stringstream& operator&lt;&lt;(
+  std::stringstream& out, const std::pair&lt;K,V&gt;& p
+) {
+  out &lt;&lt; &quot;{&quot; &lt;&lt; p.first &lt;&lt; &quot;, &quot; &lt;&lt; p.second &lt;&lt; &quot;}&quot;;
+  return out;
+}
+/*-----------------------------------------------
+  Format output for Collection types
+  - any type with begin() and end() like
+    all the STL containers.
+*/
+template&lt;typename Coll&gt;
+std::string formatColl(
+  const Coll& c, const std::string& nm, const std::string& suffix,
+  size_t left, size_t width
+) {
+  std::stringstream out;
+  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm &lt;&lt; &quot;: {&#92;n&quot; &lt;&lt; indent(left + 2);
+  size_t i = 0;
+  for(const Coll::value_type& elem : c) {
+    if((i % width) == 0 && i != 0 && i != width - 1) {
+      out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left + 2);
+    }
+    if(i &lt; c.size() - 1) {
+      out &lt;&lt; elem &lt;&lt; &quot;, &quot;;
+    }
+    else {
+      out &lt;&lt; elem &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; &quot;}&quot; &lt;&lt; suffix;
+      break;
+    }
+    ++i;
+  }
+  return out.str();
+}
+/*-----------------------------------------------
+  Format output for scalar types like primitives
+*/
+template&lt;typename T&gt;
+std::string formatScalar(
+  const T& t, const std::string& nm, const std::string& suffix,
+  size_t left
+) {
+  std::stringstream out;
+  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm &lt;&lt; &quot;: &quot; &lt;&lt; t &lt;&lt; suffix;
+  return out.str();
+}
+/*-----------------------------------------------
+  Format output for strings
+  - indent and embed in quotation marks
+*/
+template&lt;typename T&gt;
+std::string formatString(
+  const T& t, const std::string& nm, const std::string& suffix,
+  size_t left
+) {
+  std::stringstream out;
+  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm &lt;&lt; &quot;: &#92;&quot;&quot; &lt;&lt; t &lt;&lt; &quot;&#92;&quot;&quot; &lt;&lt; suffix;
+  return out.str();
+}
+/*-----------------------------------------------
+  Defines is_iterable trait
+  - uses template metaprogramming, e.g., user code
+    that runs during compilation
+  - detects STL containers and user-defined types
+    that provide iteration
+https://stackoverflow.com/questions/13830158/check-if-a-variable-type-is-iterable
+*/
+template &lt;typename T, typename = void&gt;
+struct is_iterable : std::false_type {};
+
+// this gets used only when we can call
+// std::begin() and std::end() on that type
+template &lt;typename T&gt;
+struct is_iterable&lt;
+  T,
+  std::void_t
+    &lt;decltype(std::begin(std::declval&lt;T&gt;())),
+     decltype(std::end(std::declval&lt;T&gt;()))&gt;
+&gt; : std::true_type {};
+
+template &lt;typename T&gt;
+constexpr bool is_iterable_v = is_iterable&lt;T&gt;::value;
+
+/*-----------------------------------------------
+  Displays almost everything.
+  - strings work better with formatString(...)
+  https://www.cppstories.com/2018/03/ifconstexpr/
+  Iteration is discussed in Bit Cpp_iter
+*/
+template&lt;typename T&gt;
+std::string format(
+  const T& t, const std::string& nm, const std::string& suffix,
+  size_t left, size_t width
+) {
+  if constexpr(is_iterable_v&lt;T&gt;) {  // decision at compile-time
+    return formatColl(t, nm, suffix, left, width);
+  }
+  else {
+    return formatScalar(t, nm, suffix, left);
+  }
+}
+/*-----------------------------------------------
+  Display text after newline and indentation
+*/
+inline void print(const std::string& txt) {
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt;
+}
+/*-----------------------------------------------
+  Display text after newline and indentation
+  - provides trailing newline
+*/
+inline void println(const std::string& txt) {
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt &lt;&lt; &quot;&#92;n&quot;;
+}</code></pre>
             </div>
             <div class="textwrap">
               <h4>Analysis and Display</h4>
@@ -516,11 +1667,11 @@ Analysis code here
     // https://stackoverflow.com/questions/7600454/how-to-prevent-page-scrolling-when-scrolling-a-div-element
   </script>
   <script>
+    onLoadSplitter("fig1");
     onLoadSplitter("fig2");
     onLoadSplitter("fig3");
     onLoadSplitter("fig4");
     onLoadSplitter("fig5");
-    onLoadSplitter("fig6");
   </script>
 </body>
 </html>
