@@ -148,22 +148,27 @@
         </details>
         <div style="height:0.25em;"></div>
         <t-b>
-          The examples below show how to use ...
+          The examples below show how to create generic definitions for classes and functions.
         </t-b>
         <div style="height:0.15em;"></div>
         <h3 id="code">1.0 Source Code</h3>
         <t-b>
-          Introduction here
+          These demonstrations of generics start with two simple simple classes, <c-s>Demo&lt;T&gt;</c-s>
+          and <c-s>Stats&lt;T&gt;</c-s> in <a target="_blank" href="#democls">Section 1.1</a> 
+          to illustrate basic syntax for class templates.  A larger, more useful 
+          <c-s>Point&lt;T, N&gt;</c-s> class is
+          defined in <a target="_blank" href="#points">Section 1.2</a>, and <c-s>Time</c-s> and <c-s>Timer</c-s>
+          classes in <a target="_blank" href="#time">Section 1.3</a>.
         </t-b>
         <t-b>
           The source code is available
-          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/Cpp/Cpp_Objects/src">here</a>.
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/Cpp/Cpp_Generics/src">here</a>.
           Download the entire Bits repository
           <a target="_blank" href="https://github.com/JimFawcett/Bits">here</a>.
         </t-b>
         <div>
           <div style="height:0.25em;"></div>
-          <h3 id="democls">1.1 Demo&lt;T&gt;</h3>
+          <h3 id="democls">1.1 Demo&lt;T&gt; and Stats&lt;T&gt;</h3>
           <t-b>
             User defined intro ...
           </t-b>
@@ -183,13 +188,13 @@
 template&lt;typename T&gt;
 class Demo {
 public:
-  Demo() = default;
+  Demo() = default;                               // void constructor
   Demo(T& tin) : t(tin) {};
-  Demo(const Demo&lt;T&gt;& t) = default;
-  Demo&lt;T&gt;& operator=(const Demo&lt;T&gt;&t) = default;
-  ~Demo() = default;
-  T& value() { return t; }
-  void show();
+  Demo(const Demo&lt;T&gt;& t) = default;               // copy constructor
+  Demo&lt;T&gt;& operator=(const Demo&lt;T&gt;&t) = default;  // assignment operator
+  ~Demo() = default;                              // destructor
+  T& value() { return t; }                        // mutable accessor
+  void show();                                    // display
 private:
   T t;
 };
@@ -337,10 +342,58 @@ void Stats&lt;T&gt;::show(const std::string& name) {
     std::cout &lt;&lt; &quot;&#92;n  }&#92;n&quot;;
 }</code></pre>
             </div>
-            <div class="textwrap">
-              <h4>Heading:</h4>
+            <t-b class="textwrap">
+              <h4>Purpose:</h4>
               <t-b>
-                Explanitory text here
+                These are simple classes intended to illustrate template syntax, but are otherwise
+                not very useful.
+              </t-b>
+              <h4>Basic Syntax:</h4>
+              <t-b>
+                Each generic class and function must be preceeded by a template declaration:
+                <c-s style="display:block; padding: 0.5em 1.5em;">
+                  template&lt;typename T, ...&gt;
+                </c-s>
+                that has one or more typename arguments. <c-s>T</c-s> is an abstract type that
+                will be replaced by a specific type in the using code.
+              </t-b>
+              <t-b>
+                So a template is a pattern for defining one unique class or function
+                for each unique type list used by the application code.
+              </t-b>
+              <t-b>
+                <c-s>Demo&lt;int&gt;</c-s> and <c-s>Demo&lt;double&gt;</c-s> generate
+                two unique classes.
+              </t-b>
+              <h4>Demo&lt;T&gt;:</h4>
+              <t-b>
+                <c-s>Demo&lt;T&gt;</c-s> simply holds, provides mutable access to, and
+                displays a single instance of the type <c-s>T</c-s>.  That type can be almost anything
+                that can send its value to <c-s>std::cout</c-s>.
+              </t-b>
+              <t-b>
+                Its special methods are all declared default and no definitions are provided.
+                That means that the compiler will generate them by calling the operation applied
+                to a <c-s>Demo&lt;T&gt;</c-s> instance on its composed instance of <c-s>T</c-s>.
+              </t-b>
+              <h4>Stats&lt;T&gt;:</h4>
+              <t-b>
+                The <c-s>Stats&lt;T&gt;</c-s> class contains a <c-s>std::vector&lt;T&gt;</c-s>
+                of <c-s>items</c-s>, and defines methods to carry out numerical operations on 
+                those, e.g., <c-s>sum()</c-s> and <c-s>avg()</c-s>.
+              </t-b>
+              <t-b>
+                All templates are compiled in two phases.  The first checks template syntax but
+                does not generate code as the size of <c-s>items</c-s> is unknown. The second
+                phase occurs when using code supplies a specific type for <c-s>T</c-s>.  That will 
+                succeed if and only if all of the member functions are valid for that specific type.
+              </t-b>
+              <t-b>
+                So the second compilation phase will succeed if and only if <c-s>T</c-s> is a 
+                numeric type that can be ordered, added, and divided. 
+              </t-b>
+              <t-b>
+                Any methods that are not used by the program will not be compiled.
               </t-b>
             </div>
           </div>
@@ -372,7 +425,7 @@ namespace Points {
 
     It also carries a Time t instance which conceptually is the time
     at which something was at that point in space. Time is a class
-    defined for this demonstration defined in Time.h.
+    defined for this demonstration in Time.h.
 
     All its special members, ctors, assignment, ... with the exception
     of constructor Point(), are declared default to indicate to a maintainer
@@ -385,7 +438,7 @@ namespace Points {
   class Point {
   public:
     Point();                                      // default ctor
-    Point(std::initializer_list&lt;T&gt; il);           // construct from list
+    Point(std::initializer_list&lt;T&gt; il);     // construct from list
     Point(const Point& pt) = default;             // copy ctor
     Point(Point&& pt) = default;                  // move ctor
     Point& operator=(const Point& pt) = default;  // copy assignment
@@ -544,7 +597,7 @@ namespace Points {
           </div>
           <div style="height:1em;"></div>
           <div style="height:0.25em;"></div>
-          <h3 id="points">1.3 Time and Timer</h3>
+          <h3 id="time">1.3 Time and Timer</h3>
           <t-b>
             User defined intro ...
           </t-b>
