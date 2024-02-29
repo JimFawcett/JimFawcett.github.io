@@ -188,13 +188,13 @@
 template&lt;typename T&gt;
 class Demo {
 public:
-  Demo() = default;                               // void constructor
+  Demo() = default;
   Demo(T& tin) : t(tin) {};
-  Demo(const Demo&lt;T&gt;& t) = default;               // copy constructor
-  Demo&lt;T&gt;& operator=(const Demo&lt;T&gt;&t) = default;  // assignment operator
-  ~Demo() = default;                              // destructor
-  T& value() { return t; }                        // mutable accessor
-  void show();                                    // display
+  Demo(const Demo&lt;T&gt;& t) = default;
+  Demo&lt;T&gt;& operator=(const Demo&lt;T&gt;&t) = default;
+  ~Demo() = default;
+  T& value() { return t; }
+  void show();
 private:
   T t;
 };
@@ -207,6 +207,18 @@ void Demo&lt;T&gt;::show() {
   std::cout &lt;&lt; &quot;, size: &quot; &lt;&lt; sizeof(t);  // show size on stack
   std::cout &lt;&lt; &quot;, value: &quot; &lt;&lt; t;
   std::cout &lt;&lt; &quot;&#92;n  }&#92;n&quot;;
+}
+/* template method specialization */
+template&lt;&gt;
+void inline Demo&lt;std::vector&lt;int&gt;&gt;::show() {
+  std::cout &lt;&lt; &quot;  Demo&lt;T&gt; {&#92;n  &quot;;
+  std::cout &lt;&lt; &quot;  type T: &quot;
+            &lt;&lt; truncate(DisplayParams.trunc,typeid(t).name());  // show type
+  std::cout &lt;&lt; &quot;, size: &quot; &lt;&lt; sizeof(t) &lt;&lt; &quot;&#92;n    value: [ &quot;;
+  for (auto item : t) {
+    std::cout &lt;&lt; item &lt;&lt; &quot; &quot;;
+  };
+  std::cout &lt;&lt; &quot;]&#92;n  }&#92;n&quot;;
 }
 /*-------------------------------------------------------------------
   Stats&lt;T&gt;
@@ -228,9 +240,10 @@ void Demo&lt;T&gt;::show() {
 template &lt;typename T&gt;
 class Stats {
 public:
+    Stats() = default;
     Stats(const std::vector&lt;T&gt;& v);
-    Stats() = delete;
-    Stats&lt;T&gt;& operator=(Stats&lt;T&gt;& s) = delete;
+    Stats(const Stats&lt;T&gt;& s) = default;
+    Stats&lt;T&gt;& operator=(Stats&lt;T&gt;& s) = default;
     size_t size();
     T max();
     T min();
@@ -345,7 +358,7 @@ void Stats&lt;T&gt;::show(const std::string& name) {
             <t-b class="textwrap">
               <h4>Purpose:</h4>
               <t-b>
-                These are simple classes intended to illustrate template syntax, but are otherwise
+                These are simple classes, intended to illustrate template syntax, but are otherwise
                 not very useful.
               </t-b>
               <h4>Basic Syntax:</h4>
@@ -376,11 +389,27 @@ void Stats&lt;T&gt;::show(const std::string& name) {
                 That means that the compiler will generate them by calling the operation applied
                 to a <c-s>Demo&lt;T&gt;</c-s> instance on its composed instance of <c-s>T</c-s>.
               </t-b>
+              <h4>Specialization:</h4>
+              <t-b>
+                Template classes can have a specialized method for a specified type. Specialization
+                is used when a method needs to treat the specified type differently than for all of
+                the other generic types.
+              </t-b>
+              <t-b>
+                <c-s>Demo&lt;T&gt;::show()</c-s> has been specialized for 
+                <c-s>std::vector&lt;int&gt;</c-s> to support displaying the vector&apos;s items.
+              </t-b>
+              <t-b>
+                The C++ language guarantees that when the template type <c-s>T</c-s> is a
+                specialized type it will call the specialized method. If not a specialized type
+                the generic method is called.
+              </t-b>
+              <!-- <div style="height:2em;"></div> -->
               <h4>Stats&lt;T&gt;:</h4>
               <t-b>
                 The <c-s>Stats&lt;T&gt;</c-s> class contains a <c-s>std::vector&lt;T&gt;</c-s>
                 of <c-s>items</c-s>, and defines methods to carry out numerical operations on 
-                those, e.g., <c-s>sum()</c-s> and <c-s>avg()</c-s>.
+                those, e.g., <c-s>sum()</c-s>, <c-s>avg()</c-s>, ...
               </t-b>
               <t-b>
                 All templates are compiled in two phases.  The first checks template syntax but
@@ -401,7 +430,9 @@ void Stats&lt;T&gt;::show(const std::string& name) {
           <div style="height:0.25em;"></div>
           <h3 id="points">1.2 Point&lt;T, N&gt;</h3>
           <t-b>
-            User defined intro ...
+            <c-s>Point&lt;T, N&gt;</c-s> is a parameterized class representing points in an
+            N-dimensional hyperspace with a time member indicating the date and time at which 
+            something was at that point.
           </t-b>
           <div class="blockSingle">
             <div class="codewrap" style="float:left; width:60%;">
@@ -438,7 +469,7 @@ namespace Points {
   class Point {
   public:
     Point();                                      // default ctor
-    Point(std::initializer_list&lt;T&gt; il);     // construct from list
+    Point(std::initializer_list&lt;T&gt; il);           // construct from list
     Point(const Point& pt) = default;             // copy ctor
     Point(Point&& pt) = default;                  // move ctor
     Point& operator=(const Point& pt) = default;  // copy assignment
@@ -449,7 +480,7 @@ namespace Points {
 
     std::string timeToString();
     void updateTime();
-    std::time_t& time();
+    Time& time();
     const size_t size() const;
     T& operator[](size_t index);                  // index oper
     const T operator[](size_t index) const;       // const index oper
@@ -560,7 +591,7 @@ namespace Points {
     epoch
   */
   template&lt;typename T, size_t N&gt;
-  std::time_t& Point&lt;T, N&gt;::time() {
+  Time& Point&lt;T, N&gt;::time() {
     return tm;
   }
   /*-----------------------------------------------
@@ -589,9 +620,58 @@ namespace Points {
 }</code></pre>
             </div>
             <div class="textwrap">
-              <h4>Heading:</h4>
+              <h4>Concept:</h4>
               <t-b>
-                Explanitory text here
+                A <c-s>Point&lt;T, N&gt;</c-s> instance could represent the state of some weather
+                event at a given time, e.g., latitude, longitude, series of altitudes, wind
+                velocities, dewpoint, ... 
+              </t-b>
+              <t-b>
+                A sequence of instances could represent the evolution of
+                a complex chemical process, e.g. temperature, pressure, sequence of concentrations
+                of molecules, ...
+              </t-b>
+              <h4>Purpose:</h4>
+              <t-b>
+                This example illustrates the use of both type <c-s>T</c-s> and numeric <c-s>N</c-s> 
+                template parameters. <c-s>N</c-s> is the fixed number of elements of type 
+                <c-s>T</c-s> in point instances.  
+              </t-b>
+              <t-b>
+                Each point also contains a <c-s>Time</c-s> instance, representing a datetime stamp 
+                for the point. <c-s>Time</c-s> is a type defined in the file Time.h. An application
+                can extract both date and time information for each point.
+              </t-b>
+              <h4>Operations:</h4>
+              <t-b>
+                The <c-s>Point&lt;T, N&gt;</c-s> class declares all of the special methods. The
+                void constructor <c-s>Point&lt;T, N&gt;()</c-s> initializes its <c-s>T</c-s>
+                members to <c-s>T{0}</c-s> default values and sets <c-s>tm</c-s> to the current 
+                date and time.
+              </t-b>
+              <t-b>
+                It also declares a constructor
+                <c-s>Point&lt;T,&nbsp;N&gt;(std::initializer_list&lt;T&gt;)</c-s> that supports the
+                syntax:
+                <c-s style="display:block; margin-left:0em; padding:0.25em 1.25em; font-size:0.9em;">
+                  Point&lt;double, 4&gt; p {<br />&nbsp;&nbsp;&nbsp;&nbsp;1.0, 1.5, 2.0, 1.5<br /> };
+                </c-s>
+                and index operators for reading and writing specific dimension values:
+                <c-s style="display:block; margin-left:0em; padding:0.25em 1.25em; font-size:0.9em;">
+                  T& operator[](size_t index);<br />
+                  const T operator[](size_t index);
+                </c-s>
+                using syntax:
+                <c-s style="display:block; margin-left:0em; padding:0.25em 1.25em; font-size:0.9em;">
+                  p[0] = 1.5;<br />
+                  const double d2 = p[1];
+                </c-s>
+                The first returns a reference to <c-s>p</c-s>&apos;s value at index 0 and assigns
+                it the value 1.5. The second simply returns a copy of the value at index 1.
+              </t-b>
+              <t-b>
+                A point&apos;s datetime stamp can be retrieved using <c-s>Time& time()</c-s> and
+                reset to current time with <c-s>void updateTime()</c-s>.
               </t-b>
             </div>
           </div>
@@ -1000,7 +1080,7 @@ void demo_user_defined_generic_types() {
 
   showNote(&quot;Demo user-defined generic types&quot;, nl);
 
-  showOp(&quot;Demo&lt;int&gt;&quot;, nl);
+  showOp(&quot;Demo&lt;T&gt;&quot;, nl);
   int arg = 42;
   Demo&lt;int&gt; demi(arg);
   demi.show();
