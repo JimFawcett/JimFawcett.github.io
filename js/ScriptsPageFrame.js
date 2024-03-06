@@ -49,9 +49,9 @@ function getHelp() {
 function loadif() {
   loc = window.location.href;
   if (window.self === window.top) {
-    if (window.location.href = 'TOC.html') { return; }
-    //window.location.href = 'TOC.html?src=' + loc;
-    // temp change 3/6/2024
+    //if (window.location.href = 'TOC.html') { return; }
+    window.location.href = 'TOC.html?src=' + loc;
+    // temp change 3/6/2024 undone
   }
   else {
     location.reload();
