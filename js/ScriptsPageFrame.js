@@ -53,7 +53,8 @@ function loadif() {
     window.location.href = 'TOC.html?src=' + loc;
   }
   else {
-    location.reload();
+    //location.reload();
+    // changed 3/6/2024
   }
 }
 
