@@ -482,7 +482,7 @@ bottomMenu.about = function () {
   var page = document.getElementById("page");
   var date = document.getElementById("modified");
   var menu = document.getElementById("about");
-  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2022";
+  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2022-2024";
   if (isDefined(page)) {
     menu.innerHTML += "<br />" + page.innerText;
   }
