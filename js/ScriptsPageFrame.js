@@ -60,6 +60,9 @@ function loadif() {
 
 function initializeMenu() {
   var topMenu = document.getElementById("navbar");
+  if (!isDefined(topMenu)) {
+    return;
+  }
   topMenu.innerHTML = "<div style='position: relative; width:100%;' class='navbar'>\
     <div class='menuItem'>\
         Site&#9662\
