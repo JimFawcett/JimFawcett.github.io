@@ -336,23 +336,42 @@ function initializeNextPrev() {
   page.nxtlnk2 = document.getElementById("nextLink2");
   page.prvlnk2 = document.getElementById("prevLink2");
 
-  if (isDefined(page.nxt)) {
+  if (isDefined(page.nxtlnk)) {
     page.nxtlnk.setAttribute('href', page.nxt.href);
+  }
+  if (isDefined(page.nxtlnk2)) {
     page.nxtlnk2.setAttribute('href', page.nxt.href);
   }
-  else {
-    page.nxtlnk.style.display = "none";
-    page.nxtlnk2.style.display = "none";
-  }
-
-  if (isDefined(page.prv)) {
+  if (isDefined(page.prvlnk)) {
     page.prvlnk.setAttribute('href', page.prv.href);
+  }
+  if (isDefined(page.prvlnk2)) {
     page.prvlnk2.setAttribute('href', page.prv.href);
   }
-  else {
-    page.prvlnk.style.display = "none";
-    page.prvlnk2.style.display = "none";
-  }
+  //page.nxt = document.getElementById("Next");
+  //page.prv = document.getElementById("Prev");
+  //page.nxtlnk = document.getElementById("nextLink");
+  //page.prvlnk = document.getElementById("prevLink");
+  //page.nxtlnk2 = document.getElementById("nextLink2");
+  //page.prvlnk2 = document.getElementById("prevLink2");
+
+  //if (isDefined(page.nxt)) {
+  //  page.nxtlnk.setAttribute('href', page.nxt.href);
+  //  page.nxtlnk2.setAttribute('href', page.nxt.href);
+  //}
+  //else {
+  //  page.nxtlnk.style.display = "none";
+  //  page.nxtlnk2.style.display = "none";
+  //}
+
+  //if (isDefined(page.prv)) {
+  //  page.prvlnk.setAttribute('href', page.prv.href);
+  //  page.prvlnk2.setAttribute('href', page.prv.href);
+  //}
+  //else {
+  //  page.prvlnk.style.display = "none";
+  //  page.prvlnk2.style.display = "none";
+  //}
 
 
   //{
