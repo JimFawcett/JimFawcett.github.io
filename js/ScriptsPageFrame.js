@@ -296,6 +296,18 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='menuItem'><a id='help' onclick='getHelp()'>Help</a></div>\
+    <div class='menuItem'>\
+        Pages&#9662\
+        <div class='dropdown'>\
+          <div class='ddLabel darkItem'>Pages&nbsp;in&nbsp;thread</div>\
+            <div style='height:0.0em;'></div>\
+            <div class='ddItem'><a href='index.html'>Home</a></div>\
+            <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
+            <div class='ddItem'><a href='SiteDemo.html'>SiteDemo</a></div>\
+            <div class='ddItem'><a href='SiteDesign.html'>SiteDesign</a></div>\
+          <div style='height:2em;'></div>\
+        </div>\
+    </div>\
     <div class='menuItem'><a id='prevLink' href='#'>Prev</a></div>\
     <div class='menuItem'><a id='nextLink' href='#'>Next</a></div>\
   </div>\
