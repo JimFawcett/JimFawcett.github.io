@@ -1,5 +1,5 @@
 /*
- * ScriptsPageFrameOtherRepos.js
+ * ScriptsPageFrameCsRepos.js
  * - Builds top menu so only one place to change for adding or removing link
  * - Builds bottom Pages menu since all pages in thread have same sibling pages
  * - Builds About popup, used by all pages
@@ -28,6 +28,7 @@ function getHelp() {
   //window.open("Help.html", "help", "popup=1, height=700, width=600");
   window.open("Help.html", "_blank");
 }
+
 function loadif() {
   loc = window.location.href;
   window.location.href = 'TOC.html?src=' + loc;
@@ -43,7 +44,7 @@ function initializeMenu() {
         <div class='dropdown'>\
             <div style='height:0.25em;'></div>\
             <div class='ddItem'><a href='index.html'>Home</a></div>\
-            <div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>\
+            <div class='ddItem'><a onclick='loadif()'>Site Explorer</a></div>\
             <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
             <div class='ddItem'><a href='SiteDemo.html'>SiteDemo</a></div>\
             <div class='ddItem'><a href='SiteDesign.html'>SiteDesign</a></div>\
@@ -99,10 +100,7 @@ function initializeMenu() {
         Utils&#9662\
         <div class='dropdown'>\
             <div class='ddLabel darkItem'>Utilities</div>\
-            <div class='ddItem'><a href='CppUtilities.html'>CppUtilities</a></div>\
-            <div class='ddItem'><a href='FileUtilities.html'>FileUtilities</a></div>\
-            <div class='ddItem'><a href='Testing.html'>Testing</a></div>\
-            <div class='ddItem'><a href='Logger.html'>Logger</a></div>\
+            <div class='ddItem'><a href='javascript:;'>None yet</a></div>\
             <div style='height:2em;'></div>\
         </div>\
     </div>\
@@ -110,13 +108,7 @@ function initializeMenu() {
         Tools&#9662\
         <div class='dropdown'>\
             <div class='ddLabel darkItem'>SW Tools</div>\
-            <div class='ddItem'><a href='TextFinder.html'>TextFinder</a></div>\
-            <div class='ddItem'><a href='Duplicates.html'>Duplicates</a></div>\
-            <div class='ddItem'><a href='FileDates.html'>FileDates</a></div>\
-            <div class='ddItem'><a href='FileSizes.html'>FileSizes</a></div>\
-            <div class='ddItem'><a href='FindFiles.html'>FindFiles</a></div>\
-            <div class='ddItem'><a href='CodeWebifier.html'>CodeWebifier</a></div>\
-            <div class='ddItem'><a href='PrettyPrint.html'>PrettyPrint</a></div>\
+            <div class='ddItem'><a href='Diff_WPF.html'>Diff_WPF</a></div>\
             <div style='height:2em;'></div>\
         </div>\
     </div>\
@@ -124,15 +116,8 @@ function initializeMenu() {
         Cmps&#9662\
         <div class='dropdown'>\
             <div class='ddLabel darkItem'>SW Components</div>\
-            <div class='ddItem'><a href='CppBlockingQueue.html'>CppBlockingQueue</a></div>\
-            <div class='ddItem'><a href='FileManager.html'>File Manager</a></div>\
-            <div class='ddItem'><a href='CppProperties.html'>CppProperties</a></div>\
-            <div class='ddItem'><a href='ThreadPool.html'>ThreadPool</a></div>\
-            <div class='ddItem'><a href='CppNoSqlDb.html'>CppNoSqlDb</a></div>\
-            <div class='ddItem'><a href='Process.html'>Process</a></div>\
-            <div class='ddItem'><a href='CppConcurrentFileAccess.html'>CppConcurrentFileAccess</a></div>\
-            <div class='ddItem'><a href='CppLexicalScanner.html'>CppLexicalScanner</a></div>\
-            <div class='ddItem'><a href='RetryWrapper.html'>RetryWrapper</a></div>\
+            <div class='ddItem'><a href='CsBlockingQueue.html'>CsBlockingQueue</a></div>\
+            <div class='ddItem'><a href='CsNavigator.html'>CsNavigator</a></div>\
             <div style='height:2em;'></div>\
         </div>\
     </div>\
@@ -140,12 +125,10 @@ function initializeMenu() {
         Libs&#9662\
         <div class='dropdown'>\
             <div class='ddLabel darkItem'>Libraries</div>\
-            <div class='ddItem'><a href='FileSystem.html'>FileSystem-Windows</a></div>\
-            <div class='ddItem'><a class='undefined' href='Javascript:;'>FileSystem-Linux</a></div>\
-            <div class='ddItem'><a href='Sockets.html'>Sockets-Windows</a></div>\
-            <div class='ddItem'><a class='undefined' href='Javascript:;'>Sockets-Linux</a></div>\
-            <div class='ddItem'><a href='XmlDocument.html'>XmlDocument</a></div>\
-            <div class='ddItem'><a href='CppGraph.html'>CppGraph</a></div>\
+            <div class='ddItem'><a href='CsConcurrentFileAccess.html'>CsConcurrentFileAccess</a></div>\
+            <div class='ddItem'><a href='CsGraph.html'>CsGraph</a></div>\
+            <div class='ddItem'><a href='CsParser.html'>CsParser</a></div>\
+            <div class='ddItem'><a href='CsXDocument.html'>CsXDocument</a>\</div>\
             <div style='height:2em;'></div>\
         </div>\
     </div>\
@@ -153,10 +136,9 @@ function initializeMenu() {
         Prjs&#9662\
         <div class='dropdown'>\
             <div class='ddLabel darkItem'>Projects</div>\
-            <div class='ddItem'><a href='CppParser.html'>CppParser</a></div>\
-            <div class='ddItem'><a href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a></div>\
-            <div class='ddItem'><a href='CppCommWithFileXfer.html'>CppCommWithFileXfer</a></div>\
-            <div class='ddItem'><a href='CppHttpClientServer.html'>CppHttpClientServer</a></div>\
+            <div class='ddItem'><a href='CsDependencyAnalysis.html'>CsDependencyAnalysis</a></div>\
+            <div class='ddItem'><a href='CsCommPrototype.html'>CsCommPrototype</a></div>\
+            <div class='ddItem'><a href='CsRemotePluggableRepo.html'>CsRemotePluggableRepo</a>\</div>\
             <div style='height:2em;'></div>\
         </div>\
     </div>\
@@ -164,20 +146,11 @@ function initializeMenu() {
         Dems&#9662\
         <div class='dropdown'>\
             <div class='ddLabel darkItem'>Demonstrations</div>\
-            <div class='ddItem'><a href='CppMakeDemo.html'>C++&nbsp;Make&nbsp;Demo</a></div>\
-            <div class='ddItem'><a href='CppBasicDemos.html'>C++&nbsp;Basic&nbsp;Demos</a></div>\
-            <div class='ddItem'><a href='STR.html'>STR&nbsp;Value&nbsp;Type</a></div>\
-            <div class='ddItem'><a href='CompoundObjects.html'>CompoundObjects</a></div>\
-            <div class='ddItem'><a href='ObjectFactories.html'>ObjectFactories</a></div>\
-            <div class='ddItem'><a href='TemplateTechniques.html'>TemplateTechniques</a></div>\
-            <div class='ddItem'><a href='STL-Containers.html'>STL-Containers</a></div>\
-            <div class='ddItem'><a href='IOStreams.html'>IOStreams</a></div>\
-            <div class='ddItem'><a href='CppThreads.html'>CppThreads</a></div>\
-            <div class='ddItem'><a href='ProcsAndThreads.html'>ProcsAndThreads</a></div>\
-            <div class='ddItem'><a href='Interop.html'>Interop</a></div>\
-            <div class='ddItem'><a href='CppModelsRepo.html'>C++ Models</a></div>\
-            <div class='ddItem'><a href='CppStoryRepo.html'>C++ Story</a></div>\
-            <div class='ddItem'><a class='lightItem' href='CppExamples.html'>More&nbsp;Examples</a></div>\
+            <div class='ddItem'><a href='CsBasicDemos.html'>CsBasicDemos</a></div>\
+            <div class='ddItem'><a href='Cs_WCF_Demos.html'>WCF Demos</a></div>\
+            <div class='ddItem'><a href='Cs_WPF_Demos.html'>WPF Demos</a></div>\
+            <div class='ddItem'><a href='CsProcess.html'>CsProcess</a></div>\
+            <div class='ddItem'><a href='CsPublisherSubscriber.html'>CsPublisherSubscriber</a></div>\
             <div style='height:2em;'></div>\
         </div>\
     </div>\
@@ -185,48 +158,13 @@ function initializeMenu() {
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>C++&nbsp;Repositories&nbsp;thread</div>\
+          <div class='ddLabel darkItem'>Repositories&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a href='CppUtilities.html'>CppUtilities</a></div>\
-            <div class='ddItem'><a href='FileUtilities.html'>FileUtilities</a></div>\
-            <div class='ddItem'><a href='Testing.html'>Testing</a></div>\
-            <div class='ddItem'><a href='Logger.html'>Logger</a></div>\
-            <div class='ddItem'><a href='TextFinder.html'>TextFinder</a></div>\
-            <div class='ddItem'><a href='Duplicates.html'>Duplicates</a></div>\
-            <div class='ddItem'><a href='FileDates.html'>FileDates</a></div>\
-            <div class='ddItem'><a href='FileSizes.html'>FileSizes</a></div>\
-            <div class='ddItem'><a href='FindFiles.html'>FindFiles</a></div>\
-            <div class='ddItem'><a href='CodeWebifier.html'>CodeWebifier</a></div>\
-            <div class='ddItem'><a href='PrettyPrint.html'>PrettyPrint</a></div>\
-            <div class='ddItem'><a href='CppBlockingQueue.html'>CppBlockingQueue</a></div>\
-            <div class='ddItem'><a href='FileManager.html'>FileManager</a></div>\
-            <div class='ddItem'><a href='CppProperties.html'>CppProperties</a></div>\
-            <div class='ddItem'><a href='ThreadPool.html'>ThreadPool</a></div>\
-            <div class='ddItem'><a href='CppNoSqlDb.html'>CppNoSqlDb</a></div>\
-            <div class='ddItem'><a href='Process.html'>Process</a></div>\
-            <div class='ddItem'><a href='CppConcurrentFileAccess.html'>CppConcurrentFileAcess</a></div>\
-            <div class='ddItem'><a href='CppLexicalScanner.html'>CppLexicalScanner</a></div>\
-            <div class='ddItem'><a href='RetryWrapper.html'>RetryWrapper</a></div>\
-            <div class='ddItem'><a href='FileSystem.html'>FileSystem (Windows)</a></div>\
-            <div class='ddItem'><a href='Sockets.html'>Sockets (Windows)</a></div>\
-            <div class='ddItem'><a href='XmlDocument.html'>XmlDocument</a></div>\
-            <div class='ddItem'><a href='CppGraph.html'>CppGraph</a></div>\
-            <div class='ddItem'><a href='CppParser.html'>CppParser</a></div>\
-            <div class='ddItem'><a href='CppCodeAnalyzer.html'>CppCodeAnalyzer</a></div>\
-            <div class='ddItem'><a href='CppCommWithFileXfer.html'>CppCommWithFileXfer</a></div>\
-            <div class='ddItem'><a href='CppHttpClientServer.html'></a></div>\
-            <div class='ddItem'><a href='CppMakeDemo.html'>CppMakeDemo</a></div>\
-            <div class='ddItem'><a href='CppBasicDemos.html'>CppBasicDemos</a></div>\
-            <div class='ddItem'><a href='STR.html'>STR class</a></div>\
-            <div class='ddItem'><a href='CompoundObjects.html'>CompoundObjects</a></div>\
-            <div class='ddItem'><a href='ObjectFactories.html'>ObjectFactories</a></div>\
-            <div class='ddItem'><a href='TemplateTechniques.html'>TemplateTechniques</a></div>\
-            <div class='ddItem'><a href='STL-Containers.html'>STL-Containers</a></div>\
-            <div class='ddItem'><a href='IOStreams.html'>IOStreams</a></div>\
-            <div class='ddItem'><a href='CppThreads.html'>CppThreads</a></div>\
-            <div class='ddItem'><a href='ProcsAndThreads.html'>ProcsAndThreads</a></div>\
-            <div class='ddItem'><a href='Interop.html'>Interop</a></div>\
-            <div class='ddItem'><a href='CppModelsRepo.html'>CppModelsRepo</a></div>\
+            <div class='ddItem'><a href='CppRepositories.html'>C++</a></div>\
+            <div class='ddItem'><a href='RsRepositories.html'>Rust</a></div>\
+            <div class='ddItem'><a href='CsRepositories.html'>C#</a></div>\
+            <div class='ddItem'><a href='JsRepositories.html'>JavaScript</a></div>\
+            <div class='ddItem'><a href='OtherRepositories.html'>Other</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\
@@ -350,7 +288,7 @@ bottomMenu.about = function () {
   var page = document.getElementById("page");
   var date = document.getElementById("modified");
   var menu = document.getElementById("about");
-  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2022";
+  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021";
   if (isDefined(page)) {
     menu.innerHTML += "<br />" + page.innerText;
   }
@@ -358,7 +296,7 @@ bottomMenu.about = function () {
     menu.innerHTML += "<br />" + "Page last modified: " + date.innerText;
   }
   if (isDefined(menu)) {
-    if (menu.style.display === "block") {
+    if (menu.style.display == "block") {
       menu.style.display = "none";
     }
     else {
