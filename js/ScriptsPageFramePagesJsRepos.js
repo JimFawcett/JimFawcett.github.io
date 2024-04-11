@@ -5,9 +5,9 @@
 function initializePages() {
 
   var pagesMenu = document.getElementById("pages");
-  var pgbtn = document.getElementById("pgbtn");
+  /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
-    pgbtn.style.display = "flex";
+    /*pgbtn.style.display = "flex";*/
     pagesMenu.innerHTML = "<div style='width:100%; text-align:center' class='darkItem'>Javascript Repositories</div>\
           <menu-elem class='ddItems pageElem'><a href='WebComponents.html'>WebComponents</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='WebLibraries.html'>WebLibraries</a>&nbsp;</menu-elem>\
@@ -19,6 +19,8 @@ function initializePages() {
   }
   else {
     var pgbtn = document.getElementById("pgbtn");
-    pgbtn.style.display = "none";
+    if (isDefined(pgbtn)) {
+      pgbtn.style.display = "none";
+    }
   }
 }

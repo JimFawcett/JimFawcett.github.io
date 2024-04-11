@@ -5,9 +5,9 @@
 function initializePages() {
 
   var pagesMenu = document.getElementById("pages");
-  var pgbtn = document.getElementById("pgbtn");
+  /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
-    pgbtn.style.display = "flex";
+    /*pgbtn.style.display = "flex";*/
     pagesMenu.innerHTML = "<menu-elem class='ddItems pageElem'><a href='RustStoryRepo.html'>Rust&nbsp;Story&nbsp;Repo&nbsp;</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustStory_Prologue.html'>Prologue</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustStory_Models.html'>Models</a>&nbsp;</menu-elem>\
@@ -21,6 +21,8 @@ function initializePages() {
   }
   else {
     var pgbtn = document.getElementById("pgbtn");
-    pgbtn.style.display = "none";
+    if (isDefined(pgbtn)) {
+      pgbtn.style.display = "none";
+    }
   }
 }

@@ -5,9 +5,9 @@
 function initializePages() {
 
   var pagesMenu = document.getElementById("pages");
-  var pgbtn = document.getElementById("pgbtn");
+  /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
-    pgbtn.style.display = "flex";
+    /*pgbtn.style.display = "flex";*/
     pagesMenu.innerHTML = "<div class='ddLabel darkItem'>Bits Pages</div>\
           <menu-elem class='ddItems pageElem'><a target='_parent' href='../../TOC.html?src=indexBits.html'>Bits Track Summary</a>&nbsp;</menu-elem >\
           <menu-elem class='ddItems pageElem'><a target='_parent' href='../../TOC.html?src=BitsRepo.html'>BitsRepo</a>&nbsp;</menu-elem >\
@@ -23,6 +23,7 @@ function initializePages() {
   }
   else {
     var pgbtn = document.getElementById("pgbtn");
-    pgbtn.style.display = "none";
+    if(isDefined(pgbtn))
+      pgbtn.style.display = "none";
   }
 }

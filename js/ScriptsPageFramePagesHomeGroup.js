@@ -5,9 +5,9 @@
 function initializePages() {
 
   var pagesMenu = document.getElementById("pages");
-  var pgbtn = document.getElementById("pgbtn");
+  /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
-    pgbtn.style.display = "flex";
+    /*pgbtn.style.display = "flex";*/
     pagesMenu.innerHTML = "<div style='margin:0em -1em; text-align:center' class='darkItem'>Pages</div>\
         <menu-elem class='ddItems pageElem'><a href='index.html'>Home</a></menu-elem>\
         <menu-elem class='ddItems pageElem'><a href='SiteMap.html'>SiteMap</a>&nbsp;</menu-elem>\

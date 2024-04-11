@@ -5,9 +5,9 @@
 function initializePages() {
 
   var pagesMenu = document.getElementById("pages");
-  var pgbtn = document.getElementById("pgbtn");
+  /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
-    pgbtn.style.display = "flex";
+    /*pgbtn.style.display = "flex";*/
     pagesMenu.innerHTML = "<div class='ddLabel darkItem'>Repo Summary Pages</div>\
           <menu-elem class='ddItems pageElem'><a href='CppRepositories.html'>C++&nbsp;Repo&nbsp;Summary</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RsRepositories.html'>Rust&nbsp;Repo&nbsp;Summary</a>&nbsp;</menu-elem>\
@@ -19,6 +19,8 @@ function initializePages() {
   }
   else {
     var pgbtn = document.getElementById("pgbtn");
-    pgbtn.style.display = "none";
+    if (isDefined(pgbtn)) {
+      pgbtn.style.display = "none";
+    }
   }
 }

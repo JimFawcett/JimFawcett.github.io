@@ -282,6 +282,48 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='menuItem'><a id='help' onclick='getHelp()'>Help</a></div>\
+    <div class='menuItem'>\
+        Pages&#9662\
+        <div class='dropdown'>\
+          <div class='ddLabel darkItem'>Rust&nbsp;Bites&nbsp;thread</div>\
+            <div style='height:0.0em;'></div>\
+            <div class='ddItem'><a href='RustBites_Intro.html'>Introduction</a></div>\
+            <div class='ddItem'><a href='RustBites_CodeExamples.html'>Code Examples</a></div>\
+            <div class='ddItem'><a href='RustBites_GettingStarted.html'>Getting Started</a></div>\
+            <div class='ddItem'><a href='RustBites_Tooling.html'>Tooling</a></div>\
+            <div class='ddItem'><a href='RustBites_UDB.html'>Undef Behavior</a></div>\
+            <div class='ddItem'><a href='RustBites_Safety.html'>Safety</a></div>\
+            <div class='ddItem'><a href='RustBites_Data.html'>Data</a></div>\
+            <div class='ddItem'><a href='RustBites_FlashCards.html'>Flash Cards</a></div>\
+            <div class='ddItem'><a href='RustBites_Facts.html'>Facts</a></div>\
+            <div class='ddItem'><a href='RustBites_Strings.html'>Strings</a></div>\
+            <div class='ddItem'><a href='RustBites_DataStr.html'>Data Structure</a></div>\
+            <div class='ddItem'><a href='RustBites_SmartPtrs.html'>Smart Pointers</a></div>\
+            <div class='ddItem'><a href='RustBites_LifeCycle.html'>Life Cycle</a></div>\
+            <div class='ddItem'><a href='RustBites_Owners.html'>Ownership</a></div>\
+            <div class='ddItem'><a href='RustBites_Traits.html'>Generics &amp; Traits</a></div>\
+            <div class='ddItem'><a href='RustBites_Functs.html'>Functions</a></div>\
+            <div class='ddItem'><a href='RustBites_Structs.html'>Structs</a></div>\
+            <div class='ddItem'><a href='RustBites_LifeTime.html'>Life Time</a></div>\
+            <div class='ddItem'><a href='RustBites_Abstract.html'>Abstractions</a></div>\
+            <div class='ddItem'><a href='RustBites_Enums.html'>Enums</a></div>\
+            <div class='ddItem'><a href='RustBites_ErrHnd.html'>Error Handling</a></div>\
+            <div class='ddItem'><a href='RustBites_Options.html'>Options</a></div>\
+            <div class='ddItem'><a href='RustBites_Conversions.html'>Conversions</a></div>\
+            <div class='ddItem'><a href='RustBites_Collects.html'>Collections</a></div>\
+            <div class='ddItem'><a href='RustBites_Iterator.html'>Iterators</a></div>\
+            <div class='ddItem'><a href='RustBites_Idioms.html'>Idioms</a></div>\
+            <div class='ddItem'><a href='RustBites_Macros.html'>Macros</a></div>\
+            <div class='ddItem'><a href='RustBites_Threads.html'>Threads</a></div>\
+            <div class='ddItem'><a href='RustBites_Synchron.html'>Synchronization</a></div>\
+            <div class='ddItem'><a class='undefined' href='RustBites_Channels.html'>Channels</a></div>\
+            <div class='ddItem'><a class='undefined' href='RustBites_AsyncAwt.html'>AsyncAwait</a></div>\
+            <div class='ddItem'><a class='undefined' href='RustBites_RegEx.html'>Regular Expressions</a></div>\
+            <div class='ddItem'><a href='RustBites_TipsAndTricks.html'>Hacks &amp; Helpers</a></div>\
+            <div class='ddItem'><a href='RustBites_CodeExperiments.html'>Code Experiments</a></div>\
+          <div style='height:2em;'></div>\
+        </div>\
+    </div>\
     <div class='menuItem'><a id='prevLink' href='#'>Prev</a></div>\
     <div class='menuItem'><a id='nextLink' href='#'>Next</a></div>\
   </div>\

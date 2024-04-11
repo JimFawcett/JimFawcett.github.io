@@ -5,9 +5,9 @@
 function initializePages() {
 
   var pagesMenu = document.getElementById("pages");
-  var pgbtn = document.getElementById("pgbtn");
+  /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
-    pgbtn.style.display = "flex";
+    /*pgbtn.style.display = "flex";*/
     pagesMenu.innerHTML = "<div style='width:100%; text-align:center' class='darkItem'>Other Repositories</div>\
           <menu-elem class='ddItems pageElem'><a href='CommCompare.html'>CommCompare</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='BasicBiteByByte.html'>BasicBites</a>&nbsp;</menu-elem>\
@@ -18,6 +18,8 @@ function initializePages() {
   }
   else {
     var pgbtn = document.getElementById("pgbtn");
-    pgbtn.style.display = "none";
+    if (isDefined(pgbtn)) {
+      pgbtn.style.display = "none";
+    }
   }
 }

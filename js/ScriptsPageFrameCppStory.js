@@ -299,12 +299,21 @@ function initializeMenu() {
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Site&nbsp;thread</div>\
+          <div class='ddLabel darkItem'>Cpp&nbsp;Story&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a href='index.html'>Home</a></div>\
-            <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
-            <div class='ddItem'><a href='SiteDemo.html'>SiteDemo</a></div>\
-            <div class='ddItem'><a href='SiteDesign.html'>SiteDesign</a></div>\
+            <div class='ddItem'><a href='CppStory_Prologue.html'>Prologue</a></div>\
+            <div class='ddItem'><a href='CppStory_Models.html'>Models</a></div>\
+            <div class='ddItem'><a href='CppStory_Survey.html'>Models</a></div>\
+            <div class='ddItem'><a href='CppStory_Data.html'>Data</a></div>\
+            <div class='ddItem'><a href='CppStory_Operations.html'>Operations</a></div>\
+            <div class='ddItem'><a href='CppStory_Classes.html'>Classes</a></div>\
+            <div class='ddItem'><a href='CppStory_ClassRelationships.html'>Class Relationships</a></div>\
+            <div class='ddItem'><a href='CppStory_Templates.html'>Templates</a></div>\
+            <div class='ddItem'><a href='CppStory_TemplateMetaProg.html'>Template&nbsp;MetaProg</a></div>\
+            <div class='ddItem'><a href='CppStory_Libraries.html'>Libraries</a></div>\
+            <div class='ddItem'><a href='CppStory_LibraryStreams.html'>Stream Libraries</a></div>\
+            <div class='ddItem'><a href='CppStory_LibrarySTL.html'>STL Libraries</a></div>\
+            <div class='ddItem'><a href='CppStory_Interesting.html'>References</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\

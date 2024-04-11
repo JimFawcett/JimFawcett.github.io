@@ -282,6 +282,17 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='menuItem'><a id='help' onclick='getHelp()'>Help</a></div>\
+    <div class='menuItem'>\
+        Pages&#9662\
+        <div class='dropdown'>\
+          <div class='ddLabel darkItem'>Cpp&nbsp;Bites&nbsp;thread</div>\
+            <div style='height:0.0em;'></div>\
+            <div class='ddItem'><a href='CppBites_Intro.html'>Introduction</a></div>\
+            <div class='ddItem'><a href='CppBites_Survey.html'>Survey</a></div>\
+            <div class='ddItem'><a class='undefined' href='# CppBites_Survey.html'>more coming</a></div>\
+          <div style='height:2em;'></div>\
+        </div>\
+    </div>\
     <div class='menuItem'><a id='prevLink' href='#'>Prev</a></div>\
     <div class='menuItem'><a id='nextLink' href='#'>Next</a></div>\
   </div>\
