@@ -280,6 +280,22 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='menuItem'><a id='help' onclick='getHelp()'>Help</a></div>\
+    <div class='menuItem'>\
+        Pages&#9662\
+        <div class='dropdown'>\
+          <div class='ddLabel darkItem'>Design&nbsp;Bites&nbsp;thread</div>\
+            <div style='height:0.0em;'></div>\
+            <div class='ddItem'><a href='DesignBites_Intro.html'>Introduction</a></div>\
+            <div class='ddItem'><a href='Design.html'>Design&nbsp;&amp;&nbsp;Documentation</a></div>\
+            <div class='ddItem'><a href='DesignBites_Structure.html'>Structure</a></div>\
+            <div class='ddItem'><a href='DesignBites_StructureBasic.html'>Basic Structure</a></div>\
+            <div class='ddItem'><a href='DesignBites_StructureFactored.html'>Factored</a></div>\
+            <div class='ddItem'><a href='DesignBites_StructureDataFlow.html'>DataFlow</a></div>\
+            <div class='ddItem'><a href='DesignBites_StructureTypeErase.html'>TypeErase</a></div>\
+            <div class='ddItem'><a href='DesignBites_StructurePlugIn.html'>Plugin</a></div>\
+          <div style='height:2em;'></div>\
+        </div>\
+    </div>\
     <div class='menuItem'><a id='prevLink' href='#'>Prev</a></div>\
     <div class='menuItem'><a id='nextLink' href='#'>Next</a></div>\
   </div>\
