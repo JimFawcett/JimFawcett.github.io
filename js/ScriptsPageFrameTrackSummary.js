@@ -310,6 +310,7 @@ function initializeMenu() {
             <div class='ddItem'><a href='indexWebDev.html'>Web Development</a></div>\
             <div class='ddItem'><a href='indexDesign.html'>Design</a></div>\
             <div class='ddItem'><a href='indexDeployment.html'>Deployment</a></div>\
+            <div class='ddItem'><a href='indexProjects.html'>&nbsp;Projects</a>&nbsp;</div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\
