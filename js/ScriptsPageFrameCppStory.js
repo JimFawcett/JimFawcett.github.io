@@ -304,7 +304,7 @@ function initializeMenu() {
             <div style='height:0.0em;'></div>\
             <div class='ddItem'><a href='CppStory_Prologue.html'>Prologue</a></div>\
             <div class='ddItem'><a href='CppStory_Models.html'>Models</a></div>\
-            <div class='ddItem'><a href='CppStory_Survey.html'>Models</a></div>\
+            <div class='ddItem'><a href='CppStory_Survey.html'>Survey</a></div>\
             <div class='ddItem'><a href='CppStory_Data.html'>Data</a></div>\
             <div class='ddItem'><a href='CppStory_Operations.html'>Operations</a></div>\
             <div class='ddItem'><a href='CppStory_Classes.html'>Classes</a></div>\
