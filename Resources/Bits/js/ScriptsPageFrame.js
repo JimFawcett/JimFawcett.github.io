@@ -76,7 +76,8 @@ function initializeMenu() {
           <div class='ddItem'><a target='_self' href='../../indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>\
           <div class='ddItem'><a target='_self' href='../../indexDesign.html'>&nbsp;Design</a>&nbsp;</div>\
           <div class='ddItem'><a target='_self' href='../../indexDeployment.html'>&nbsp;Deployment</a>&nbsp;</div>\
-          <div style='height:2em;'>&nbsp;</div>\
+          <div class='ddItem'><a href='../../indexProjects.html'>&nbsp;Projects</a>&nbsp;</div>\
+         <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
     <div class='menuItem'>\

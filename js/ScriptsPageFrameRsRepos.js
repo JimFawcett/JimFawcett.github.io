@@ -81,6 +81,7 @@ function initializeMenu() {
           <div class='ddItem'><a href='indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexDesign.html'>&nbsp;Design</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexDeployment.html'>&nbsp;Deployment</a>&nbsp;</div>\
+          <div class='ddItem'><a href='indexProjects.html'>&nbsp;Projects</a>&nbsp;</div>\
           <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
@@ -161,13 +162,25 @@ function initializeMenu() {
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Repositories&nbsp;thread</div>\
+          <div class='ddLabel darkItem'>Rust&nbsp;Repositories&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a href='CppRepositories.html'>C++</a></div>\
-            <div class='ddItem'><a href='RsRepositories.html'>Rust</a></div>\
-            <div class='ddItem'><a href='CsRepositories.html'>C#</a></div>\
-            <div class='ddItem'><a href='JsRepositories.html'>JavaScript</a></div>\
-            <div class='ddItem'><a href='OtherRepositories.html'>Other</a></div>\
+            <div class='ddItem'><a href='RustLogger.html'>Logger</a></div>\
+            <div class='ddItem'><a href='RustTextFinder.html'>Text Finder</a></div>\
+            <div class='ddItem'><a href='RustBlockingQueue.html'>Blocking Queue</a></div>\
+            <div class='ddItem'><a href='RustThreadPool.html'>Thread Pool</a></div>\
+            <div class='ddItem'><a href='RustCmdLine.html'>Command Line Parser</a></div>\
+            <div class='ddItem'><a href='RustDisplayLib.html'>Display Library</a></div>\
+            <div class='ddItem'><a href='RustDirNav.html'>Directory Navigation</a></div>\
+            <div class='ddItem'><a href='RustComm.html'>Rust Communicator</a></div>\
+            <div class='ddItem'><a href='RustCommWithThreadPool.html'>Comm with Thread Pool</a></div>\
+            <div class='ddItem'><a href='RustStringConversions.html'>String Conversions</a></div>\
+            <div class='ddItem'><a href='BuildOn.html'>Rust BuildOn Project</a></div>\
+            <div class='ddItem'><a href='RustCommExperiments.html'>Rust Comm Experiments</a></div>\
+            <div class='ddItem'><a href='RustByteRecord.html'>Byte Record</a></div>\
+            <div class='ddItem'><a href='RustBasicDemos.html'>Rust Basic Demos</a></div>\
+            <div class='ddItem'><a href='RustErrorHandling.html'>Rust Error Handling</a></div>\
+            <div class='ddItem'><a href='RustModels.html'>Rust Models</a></div>\
+            <div class='ddItem'><a href='RustLibraryDemos.html'>Rust Library Demos</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\

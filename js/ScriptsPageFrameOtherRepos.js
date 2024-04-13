@@ -82,6 +82,7 @@ function initializeMenu() {
           <div class='ddItem'><a href='indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexDesign.html'>&nbsp;Design</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexDeployment.html'>&nbsp;Deployment</a>&nbsp;</div>\
+          <div class='ddItem'><a href='indexProjects.html'>&nbsp;Projects</a>&nbsp;</div>\
           <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
@@ -152,13 +153,13 @@ function initializeMenu() {
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Repositories&nbsp;thread</div>\
+          <div class='ddLabel darkItem'>Other&nbsp;Repositories&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a href='CppRepositories.html'>C++</a></div>\
-            <div class='ddItem'><a href='RsRepositories.html'>Rust</a></div>\
-            <div class='ddItem'><a href='CsRepositories.html'>C#</a></div>\
-            <div class='ddItem'><a href='JsRepositories.html'>JavaScript</a></div>\
-            <div class='ddItem'><a href='OtherRepositories.html'>Other</a></div>\
+            <div class='ddItem'><a href='CommCompare.html'>Comm Compare</a></div>\
+            <div class='ddItem'><a href='BasicBiteByByte.html'>Basic Bites Repo</a></div>\
+            <div class='ddItem'><a href='DesignBites.html'>Design Bites Repo</a></div>\
+            <div class='ddItem'><a href='BitsRepo.html'>Bits Repo</a></div>\
+            <div class='ddItem'><a href='IdiomsAndPatterns.html'>Idioms &amp; Patterns Repo (depricated)</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\

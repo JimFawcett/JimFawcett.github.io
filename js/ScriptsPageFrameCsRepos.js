@@ -81,6 +81,7 @@ function initializeMenu() {
           <div class='ddItem'><a href='indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexDesign.html'>&nbsp;Design</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexDeployment.html'>&nbsp;Deployment</a>&nbsp;</div>\
+          <div class='ddItem'><a href='indexProjects.html'>&nbsp;Projects</a>&nbsp;</div>\
           <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
@@ -158,13 +159,23 @@ function initializeMenu() {
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Repositories&nbsp;thread</div>\
+          <div class='ddLabel darkItem'>C#&nbsp;Repositories&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a href='CppRepositories.html'>C++</a></div>\
-            <div class='ddItem'><a href='RsRepositories.html'>Rust</a></div>\
-            <div class='ddItem'><a href='CsRepositories.html'>C#</a></div>\
-            <div class='ddItem'><a href='JsRepositories.html'>JavaScript</a></div>\
-            <div class='ddItem'><a href='OtherRepositories.html'>Other</a></div>\
+            <div class='ddItem'><a href='Diff_WPF.html'>Diff WPF</a></div>\
+            <div class='ddItem'><a href='CsBlockingQueue.html'>Blocking Queue</a></div>\
+            <div class='ddItem'><a href='CsNavigator.html'>Directory Navigator</a></div>\
+            <div class='ddItem'><a href='CsConcurrentFileAccess.html'>Conncurrent File Access</a></div>\
+            <div class='ddItem'><a href='CsGraph.html'>Directed Graph</a></div>\
+            <div class='ddItem'><a href='CsParser.html'>C# Code Parser</a></div>\
+            <div class='ddItem'><a href='CsXDocument.html'>XDocument Parser</a></div>\
+            <div class='ddItem'><a href='CsDependencyAnalysis.html'>C# Dependency Analysis</a></div>\
+            <div class='ddItem'><a href='CsCommPrototype.html'>C# Communicator Prototype</a></div>\
+            <div class='ddItem'><a href='CsRemotePluggableRepo.html'>Remote Pluggable Repository</a></div>\
+            <div class='ddItem'><a href='CsBasicDemos.html'>Basic Demos</a></div>\
+            <div class='ddItem'><a href='Cs_WCF_Demos.html'>Windows Communication Foundation (WCF) Demos</a></div>\
+            <div class='ddItem'><a href='Cs_WPF_Demos.html'>Windows Presentation Foundation (WPF) Demos</a></div>\
+            <div class='ddItem'><a href='CsProcess.html'>C# Process</a></div>\
+            <div class='ddItem'><a href='CsPublisherSubscriber.html'>Publisher-Subscriber</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\

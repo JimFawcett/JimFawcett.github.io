@@ -82,6 +82,7 @@ function initializeMenu() {
           <div class='ddItem'><a href='indexDesign.html'>&nbsp;Design</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexDeployment.html'>&nbsp;Deployment</a>&nbsp;</div>\
           <div style='height:2em;'>&nbsp;</div>\
+          <div class='ddItem'><a href='indexProjects.html'>&nbsp;Projects</a>&nbsp;</div>\
         </div>\
     </div>\
     <div class='menuItem'>\
@@ -149,13 +150,13 @@ function initializeMenu() {
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Repositories&nbsp;thread</div>\
+          <div class='ddLabel darkItem'>JavaScript&nbsp;Repositories&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a href='CppRepositories.html'>C++</a></div>\
-            <div class='ddItem'><a href='RsRepositories.html'>Rust</a></div>\
-            <div class='ddItem'><a href='CsRepositories.html'>C#</a></div>\
-            <div class='ddItem'><a href='JsRepositories.html'>JavaScript</a></div>\
-            <div class='ddItem'><a href='OtherRepositories.html'>Other</a></div>\
+            <div class='ddItem'><a href='WebComponents.html'>Web Components</a></div>\
+            <div class='ddItem'><a href='WebLibraries.html'>Web Libraries</a></div>\
+            <div class='ddItem'><a href='SitePages.html'>Site Pages</a></div>\
+            <div class='ddItem'><a href='StoryTellerRepo.html'>StoryTeller</a></div>\
+            <div class='ddItem'><a href='WebComponentTests.html'>Web Component Tests</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\
