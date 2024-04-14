@@ -58,7 +58,6 @@ function initializeMenu() {
             <div class='ddItem'><a href='../../SiteMap.html'>SiteMap</a></div>\
             <div class='ddItem'><a href='../../SiteDemo.html'>SiteDemo</a></div>\
             <div class='ddItem'><a href='../../SiteDesign.html'>SiteDesign</a></div>\
-            <div class='ddItem'><a href='../../ChatGPT.html'>ChatGPT</a></div>\
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
               <summary>About&nbsp;Site&nbsp;&nbsp;&nbsp;</summary>\
               <div style='margin-left:1.0em;'>\
@@ -139,7 +138,8 @@ function initializeMenu() {
           <div class='ddItem'><a href='../../Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a></div>\
           <div class='ddItem'><a href='../PublishingSourceCode.pdf'>Site&nbsp;Presentation</a></div>\
           <div class='ddItem'><a href='../../Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a></div>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+           <div class='ddItem'><a href='../../ChatGPT.html'>ChatGPT</a></div>\
+         <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Design</summary>\
             <div style='margin-left:1.0em;'>\
                 <div class='ddItem ddDetails'><a href='../../Design.html'>Design Process</a></div>\
