@@ -280,23 +280,18 @@ function keyAction(keyEvent) {
   }
   if (key === 'K') {
     storyHlpMenu.keys();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
   if (key === 'A') {
     storyHlpMenu.about();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
   if (key === 'I') {
     storyHlpMenu.incrZoomScreen();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
   if (key === 'U') {
     storyHlpMenu.normZoomScreen();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
   if (key === 'D') {
     storyHlpMenu.decrZoomScreen();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
 };
 

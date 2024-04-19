@@ -5,30 +5,31 @@
 //////////////////////////////////////////////////////////////////////////////
 
 var HelpWin
-var actions = new Object();
+var storyHlpMenu = new Object();
 
 function initHelp() {
-  actions.keysMenu();
+  storyHlpMenu.helpMenu();
 }
 
-actions.keysMenu = function() {
+
+storyHlpMenu.helpMenu = function() {
   var hlpMenu = document.getElementById("hlp");
   hlpMenu.innerHTML = '<table id="keys">\
     <tr>\
       <td colspan=2 style="text-align:center; border-bottom:1px solid var(--light);">Key Commands</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="actions.toggleTOC()">Esc</td>\
+      <td class="key" onclick="storyHlpMenu.toggleTOC()">Esc</td>\
       <td>toggle&nbsp;menus</td>\
     </tr>\
     <tr>\
       <td class="key" onclick="location.reload()">R</td><td>Refresh</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="actions.next()">N</td><td>Next&nbsp;Page</td>\
+      <td class="key" onclick="storyHlpMenu.next()">N</td><td>Next&nbsp;Page</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="actions.prev()">P</td><td>Prev&nbsp;Page</td>\
+      <td class="key" onclick="storyHlpMenu.prev()">P</td><td>Prev&nbsp;Page</td>\
     </tr>\
     <tr>\
       <td class="key" onclick="window.history.back()">B</td><td>Back</td>\
@@ -37,33 +38,39 @@ actions.keysMenu = function() {
       <td class="key" onclick="window.history.forward()">F</td><td>Forward</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="actions.top()">T</td><td>scroll&nbsp;to&nbsp;top</td>\
+      <td class="key" onclick="storyHlpMenu.top()">T</td><td>scroll&nbsp;to&nbsp;top</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="actions.bottom()">E</td><td>scroll&nbsp;to&nbsp;end</td>\
+      <td class="key" onclick="storyHlpMenu.bottom()">E</td><td>scroll&nbsp;to&nbsp;end</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="actions.home()">H</td><td>Home</td>\
+      <td class="key" onclick="storyHlpMenu.home()">H</td><td>Home</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="actions.siteMap()">S</td><td>SiteMap</td>\
+      <td class="key" onclick="storyHlpMenu.siteMap()">S</td><td>SiteMap</td>\
+    </tr>\
+    <tr>\
+      <td class="key" onclick="storyHlpMenu.TOC()">C</td><td>TOC</td>\
+    </tr>\
+    <tr>\
+      <td class="key" onclick="storyHlpMenu.siteX()">X</td><td>Explorer</td>\
     </tr>\
     <tr>\
       <td class="key" onclick="javascript:;">K</td><td>keys</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="actions.about()">A</td><td>about</td>\
+      <td class="key" onclick="storyHlpMenu.about()">A</td><td>about</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="actions.incrZoomScreen()">I</td>\
+      <td class="key" onclick="storyHlpMenu.incrZoomScreen()">I</td>\
       <td>increase font 22px</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="actions.normZoomScreen()">U</td>\
+      <td class="key" onclick="storyHlpMenu.normZoomScreen()">U</td>\
       <td>usual font 18px</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="actions.decrZoomScreen()">D</td>\
+      <td class="key" onclick="storyHlpMenu.decrZoomScreen()">D</td>\
       <td>decrease font 12px</td>\
     </tr>\
     <tr>\
@@ -72,34 +79,30 @@ actions.keysMenu = function() {
   </table>';
 }
 
-actions.viewCode = function viewCode() {
-  location.href = "#compare";
-}
-
-actions.incrZoomScreen = function () {
+storyHlpMenu.incrZoomScreen = function () {
   /*alert("-Zoom");*/
   //document.body.style.zoom = "120%";
   document.body.style.fontSize = "22px";
 }
-actions.normZoomScreen = function () {
+storyHlpMenu.normZoomScreen = function () {
   /*alert("-Zoom");*/
   document.body.style.fontSize = "18px";
 }
-actions.decrZoomScreen = function () {
+storyHlpMenu.decrZoomScreen = function () {
   /*alert("-Zoom");*/
   document.body.style.fontSize = "12px";
 }
 
-actions.prev = function () {
+storyHlpMenu.prev = function () {
   var prv = document.getElementById("Prev");
   prv.click();
 }
 
-actions.next = function () {
+storyHlpMenu.next = function () {
   var nxt = document.getElementById("Next");
   nxt.click();
 }
-actions.chaps = function () {
+storyHlpMenu.chaps = function () {
   var menu = document.getElementById("pages");
   if (isDefined(menu)) {
     if (menu.style.display !== "block")
@@ -109,7 +112,7 @@ actions.chaps = function () {
   }
 };
 
-actions.sects = function () {
+storyHlpMenu.sects = function () {
   var menu = document.getElementById("sections");
   if (isDefined(menu)) {
     if (menu.style.display !== "flex")
@@ -120,9 +123,9 @@ actions.sects = function () {
 };
 
 
-actions.toggleTOC = function () {
-  actions.chaps();
-  actions.sects();
+storyHlpMenu.toggleTOC = function () {
+  storyHlpMenu.chaps();
+  storyHlpMenu.sects();
   var keys = document.getElementById("hlp");
   if (isDefined(keys)) {
     keys.style.display = "none";
@@ -133,7 +136,16 @@ actions.toggleTOC = function () {
   }
 };
 
-//actions.closeTOC = function () {
+storyHlpMenu.siteX = function () {
+  loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = '../../TOC.html?src=' + loc;
+  }
+  else {
+    location.reload();
+  }
+}
+//storyHlpMenu.closeTOC = function () {
 //  // let chaps = document.getElementById("chaps");
 //  // chaps.style.display = "none";
 //  // let sects = document.getElementById("sects");
@@ -142,23 +154,27 @@ actions.toggleTOC = function () {
 //  toc.style.display = "none";
 //};
 
-actions.top = function () {
+storyHlpMenu.top = function () {
   window.location = "#top";
 }
 
-actions.bottom = function () {
+storyHlpMenu.bottom = function () {
   location.hash = "#bottom";
 }
 
-actions.home = function () {
+storyHlpMenu.home = function () {
   window.location = "../../index.html";
 }
 
-actions.siteMap = function () {
+storyHlpMenu.TOC = function () {
+  window.location = "../../TOC.html";
+}
+
+storyHlpMenu.siteMap = function () {
   window.location = "../../SiteMap.html";
 }
 
-actions.keys = function () {
+storyHlpMenu.keys = function () {
   var help = document.getElementById("hlp");
   if (isDefined(help)) {
     if (help.style.display !== "flex")
@@ -168,7 +184,7 @@ actions.keys = function () {
   }
 }
 
-actions.about = function () {
+storyHlpMenu.about = function () {
   var date = document.getElementById("modified").innerText;
   var menu = document.getElementById("about");
   menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021" + "<br />" + "Page last modified: " + date;
@@ -247,39 +263,40 @@ function keyAction(keyEvent) {
   if (key === 'S') {
     window.location.href = "../../SiteMap.html";
   }
+  if (key === 'C') {
+    window.location.href = "../../TOC.html";
+  }
+  if (key === 'X') {
+    let top = window.top;
+    loc = window.location.href;
+    //let url = (location.protocol).concat('//').concat(location.pathname).concat(location.hash);
+    //let url = (location.protocol).concat('//').concat(location.pathname);
+    let url = location.pathname;
+    let filename = url.split('/').pop();
+    if (filename === 'TOC.html') {
+      return;
+    }
+    window.top.location.href = '../../TOC.html?src=' + loc;
+  }
   if (key === 'K') {
-    actions.keys();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
+    storyHlpMenu.keys();
   }
   if (key === 'A') {
-    actions.about();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
-  }
-  if (key === 'C') {
-    actions.viewCode();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
+    storyHlpMenu.about();
   }
   if (key === 'I') {
-    actions.incrZoomScreen();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
+    storyHlpMenu.incrZoomScreen();
   }
   if (key === 'U') {
-    actions.normZoomScreen();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
+    storyHlpMenu.normZoomScreen();
   }
   if (key === 'D') {
-    actions.decrZoomScreen();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
+    storyHlpMenu.decrZoomScreen();
   }
 };
 
-function getHelp() {
-  //window.open("Help.html", "help", "popup=1, height=700, width=600");
-  window.open("Help.html", "_blank");
+
+function helpWin() {
+  window.open('Help.html', 'target=_blank', 'location=yes, width=900, height=650, resizable');
 }
 
-//function helpWin() {
-//  window.open('Help.html', 'target=_blank', 'location=yes, width=900, height=650, resizable');
-//}
-
-document.addEventListener('keydown', (event) => { keyAction(event); }, false);

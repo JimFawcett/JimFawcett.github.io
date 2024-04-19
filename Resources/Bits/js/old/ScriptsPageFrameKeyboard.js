@@ -5,30 +5,30 @@
 //////////////////////////////////////////////////////////////////////////////
 
 var HelpWin
-var storyHlpMenu = new Object();
+var actions = new Object();
 
 function initHelp() {
-  storyHlpMenu.helpMenu();
+  actions.keysMenu();
 }
 
-storyHlpMenu.helpMenu = function() {
+actions.keysMenu = function() {
   var hlpMenu = document.getElementById("hlp");
   hlpMenu.innerHTML = '<table id="keys">\
     <tr>\
       <td colspan=2 style="text-align:center; border-bottom:1px solid var(--light);">Key Commands</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.toggleTOC()">Esc</td>\
+      <td class="key" onclick="actions.toggleTOC()">Esc</td>\
       <td>toggle&nbsp;menus</td>\
     </tr>\
     <tr>\
       <td class="key" onclick="location.reload()">R</td><td>Refresh</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.next()">N</td><td>Next&nbsp;Page</td>\
+      <td class="key" onclick="actions.next()">N</td><td>Next&nbsp;Page</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.prev()">P</td><td>Prev&nbsp;Page</td>\
+      <td class="key" onclick="actions.prev()">P</td><td>Prev&nbsp;Page</td>\
     </tr>\
     <tr>\
       <td class="key" onclick="window.history.back()">B</td><td>Back</td>\
@@ -37,37 +37,33 @@ storyHlpMenu.helpMenu = function() {
       <td class="key" onclick="window.history.forward()">F</td><td>Forward</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.top()">T</td><td>scroll&nbsp;to&nbsp;top</td>\
+      <td class="key" onclick="actions.top()">T</td><td>scroll&nbsp;to&nbsp;top</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.bottom()">E</td><td>scroll&nbsp;to&nbsp;end</td>\
+      <td class="key" onclick="actions.bottom()">E</td><td>scroll&nbsp;to&nbsp;end</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.home()">H</td><td>Home</td>\
+      <td class="key" onclick="actions.home()">H</td><td>Home</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.siteMap()">S</td><td>SiteMap</td>\
+      <td class="key" onclick="actions.siteMap()">S</td><td>SiteMap</td>\
     </tr>\
     <tr>\
       <td class="key" onclick="javascript:;">K</td><td>keys</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.about()">A</td><td>about</td>\
+      <td class="key" onclick="actions.about()">A</td><td>about</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.viewCode()">C</td>\
-      <td>CodeView</td>\
-    </tr>\
-    <tr>\
-      <td class="key" onclick="storyHlpMenu.incrZoomScreen()">I</td>\
+      <td class="key" onclick="actions.incrZoomScreen()">I</td>\
       <td>increase font 22px</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.normZoomScreen()">U</td>\
+      <td class="key" onclick="actions.normZoomScreen()">U</td>\
       <td>usual font 18px</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.decrZoomScreen()">D</td>\
+      <td class="key" onclick="actions.decrZoomScreen()">D</td>\
       <td>decrease font 12px</td>\
     </tr>\
     <tr>\
@@ -76,34 +72,34 @@ storyHlpMenu.helpMenu = function() {
   </table>';
 }
 
-storyHlpMenu.viewCode = function viewCode() {
+actions.viewCode = function viewCode() {
   location.href = "#compare";
 }
 
-storyHlpMenu.incrZoomScreen = function () {
+actions.incrZoomScreen = function () {
   /*alert("-Zoom");*/
   //document.body.style.zoom = "120%";
   document.body.style.fontSize = "22px";
 }
-storyHlpMenu.normZoomScreen = function () {
+actions.normZoomScreen = function () {
   /*alert("-Zoom");*/
   document.body.style.fontSize = "18px";
 }
-storyHlpMenu.decrZoomScreen = function () {
+actions.decrZoomScreen = function () {
   /*alert("-Zoom");*/
   document.body.style.fontSize = "12px";
 }
 
-storyHlpMenu.prev = function () {
+actions.prev = function () {
   var prv = document.getElementById("Prev");
   prv.click();
 }
 
-storyHlpMenu.next = function () {
+actions.next = function () {
   var nxt = document.getElementById("Next");
   nxt.click();
 }
-storyHlpMenu.chaps = function () {
+actions.chaps = function () {
   var menu = document.getElementById("pages");
   if (isDefined(menu)) {
     if (menu.style.display !== "block")
@@ -113,7 +109,7 @@ storyHlpMenu.chaps = function () {
   }
 };
 
-storyHlpMenu.sects = function () {
+actions.sects = function () {
   var menu = document.getElementById("sections");
   if (isDefined(menu)) {
     if (menu.style.display !== "flex")
@@ -124,9 +120,9 @@ storyHlpMenu.sects = function () {
 };
 
 
-storyHlpMenu.toggleTOC = function () {
-  storyHlpMenu.chaps();
-  storyHlpMenu.sects();
+actions.toggleTOC = function () {
+  actions.chaps();
+  actions.sects();
   var keys = document.getElementById("hlp");
   if (isDefined(keys)) {
     keys.style.display = "none";
@@ -137,7 +133,7 @@ storyHlpMenu.toggleTOC = function () {
   }
 };
 
-//storyHlpMenu.closeTOC = function () {
+//actions.closeTOC = function () {
 //  // let chaps = document.getElementById("chaps");
 //  // chaps.style.display = "none";
 //  // let sects = document.getElementById("sects");
@@ -146,23 +142,23 @@ storyHlpMenu.toggleTOC = function () {
 //  toc.style.display = "none";
 //};
 
-storyHlpMenu.top = function () {
+actions.top = function () {
   window.location = "#top";
 }
 
-storyHlpMenu.bottom = function () {
+actions.bottom = function () {
   location.hash = "#bottom";
 }
 
-storyHlpMenu.home = function () {
-  window.location = "index.html";
+actions.home = function () {
+  window.location = "../../index.html";
 }
 
-storyHlpMenu.siteMap = function () {
-  window.location = "SiteMap.html";
+actions.siteMap = function () {
+  window.location = "../../SiteMap.html";
 }
 
-storyHlpMenu.keys = function () {
+actions.keys = function () {
   var help = document.getElementById("hlp");
   if (isDefined(help)) {
     if (help.style.display !== "flex")
@@ -172,7 +168,7 @@ storyHlpMenu.keys = function () {
   }
 }
 
-storyHlpMenu.about = function () {
+actions.about = function () {
   var date = document.getElementById("modified").innerText;
   var menu = document.getElementById("about");
   menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021" + "<br />" + "Page last modified: " + date;
@@ -246,39 +242,44 @@ function keyAction(keyEvent) {
     window.history.back();
   }
   if (key === 'H') {
-    window.location.href = "index.html";
+    window.location.href = "../../index.html";
   }
   if (key === 'S') {
-    window.location.href = "SiteMap.html";
+    window.location.href = "../../SiteMap.html";
   }
   if (key === 'K') {
-    storyHlpMenu.keys();
+    actions.keys();
     //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
   if (key === 'A') {
-    storyHlpMenu.about();
+    actions.about();
     //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
   if (key === 'C') {
-    storyHlpMenu.viewCode();
+    actions.viewCode();
     //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
   if (key === 'I') {
-    storyHlpMenu.incrZoomScreen();
+    actions.incrZoomScreen();
     //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
   if (key === 'U') {
-    storyHlpMenu.normZoomScreen();
+    actions.normZoomScreen();
     //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
   if (key === 'D') {
-    storyHlpMenu.decrZoomScreen();
+    actions.decrZoomScreen();
     //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
 };
 
-
-function helpWin() {
-  window.open('Help.html', 'target=_blank', 'location=yes, width=900, height=650, resizable');
+function getHelp() {
+  //window.open("Help.html", "help", "popup=1, height=700, width=600");
+  window.open("Help.html", "_blank");
 }
 
+//function helpWin() {
+//  window.open('Help.html', 'target=_blank', 'location=yes, width=900, height=650, resizable');
+//}
+
+document.addEventListener('keydown', (event) => { keyAction(event); }, false);

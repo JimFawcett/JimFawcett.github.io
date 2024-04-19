@@ -50,6 +50,12 @@ storyHlpMenu.helpMenu = function() {
       <td class="key" onclick="storyHlpMenu.siteMap()">S</td><td>SiteMap</td>\
     </tr>\
     <tr>\
+      <td class="key" onclick="storyHlpMenu.TOC()">C</td><td>TOC</td>\
+    </tr>\
+    <tr>\
+      <td class="key" onclick="storyHlpMenu.siteX()">X</td><td>Explorer</td>\
+    </tr>\
+    <tr>\
       <td class="key" onclick="javascript:;">K</td><td>keys</td>\
     </tr>\
     <tr>\
@@ -130,6 +136,15 @@ storyHlpMenu.toggleTOC = function () {
   }
 };
 
+storyHlpMenu.siteX = function () {
+  loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = '../../TOC.html?src=' + loc;
+  }
+  else {
+    location.reload();
+  }
+}
 //storyHlpMenu.closeTOC = function () {
 //  // let chaps = document.getElementById("chaps");
 //  // chaps.style.display = "none";
@@ -149,6 +164,10 @@ storyHlpMenu.bottom = function () {
 
 storyHlpMenu.home = function () {
   window.location = "../../index.html";
+}
+
+storyHlpMenu.TOC = function () {
+  window.location = "../../TOC.html";
 }
 
 storyHlpMenu.siteMap = function () {
@@ -239,30 +258,40 @@ function keyAction(keyEvent) {
     window.history.back();
   }
   if (key === 'H') {
-    storyHlpMenu.home();
+    window.location.href = "../../index.html";
   }
   if (key === 'S') {
-    storyHlpMenu.siteMap();
+    window.location.href = "../../SiteMap.html";
+  }
+  if (key === 'C') {
+    window.location.href = "../../TOC.html";
+  }
+  if (key === 'X') {
+    let top = window.top;
+    loc = window.location.href;
+    //let url = (location.protocol).concat('//').concat(location.pathname).concat(location.hash);
+    //let url = (location.protocol).concat('//').concat(location.pathname);
+    let url = location.pathname;
+    let filename = url.split('/').pop();
+    if (filename === 'TOC.html') {
+      return;
+    }
+    window.top.location.href = '../../TOC.html?src=' + loc;
   }
   if (key === 'K') {
     storyHlpMenu.keys();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
   if (key === 'A') {
     storyHlpMenu.about();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
   if (key === 'I') {
     storyHlpMenu.incrZoomScreen();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
   if (key === 'U') {
     storyHlpMenu.normZoomScreen();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
   if (key === 'D') {
     storyHlpMenu.decrZoomScreen();
-    //HelpWin = window.open('Help.html', 'target=_blank',  'location=yes, width=900, height=650, resizable');
   }
 };
 

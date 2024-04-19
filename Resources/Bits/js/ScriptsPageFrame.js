@@ -18,10 +18,11 @@ function isDefined(elem) {
 /* run menu builders at startup */
 
 function initialize() {
-  actions.keysMenu();
+  //actions.keysMenu();
   initializeMenu();
   initializePages();
   initializeNextPrev();
+  storyHlpMenu.helpMenu();
 }
 
 /* create top menu */
@@ -379,7 +380,7 @@ bottomMenu.sections = function () {
 }
 
 bottomMenu.keys = function () {
-  actions.keys();
+  storyHlpMenu.keys();
 }
 
 bottomMenu.toggleMenus = function () {
@@ -408,3 +409,6 @@ bottomMenu.about = function () {
     }
   }
 }
+
+document.addEventListener('keydown', (event) => { keyAction(event); }, false);
+
