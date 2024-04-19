@@ -53,6 +53,9 @@ storyHlpMenu.helpMenu = function() {
       <td class="key" onclick="storyHlpMenu.TOC()">C</td><td>TOC</td>\
     </tr>\
     <tr>\
+      <td class="key" onclick="storyHlpMenu.siteX()">X</td><td>Explorer</td>\
+    </tr>\
+    <tr>\
       <td class="key" onclick="javascript:;">K</td><td>keys</td>\
     </tr>\
     <tr>\
@@ -133,6 +136,15 @@ storyHlpMenu.toggleTOC = function () {
   }
 };
 
+storyHlpMenu.siteX = function () {
+  loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOC.html?src=' + loc;
+  }
+  else {
+    location.reload();
+  }
+}
 //storyHlpMenu.closeTOC = function () {
 //  // let chaps = document.getElementById("chaps");
 //  // chaps.style.display = "none";
@@ -253,6 +265,18 @@ function keyAction(keyEvent) {
   }
   if (key === 'C') {
     window.location.href = "TOC.html";
+  }
+  if (key === 'X') {
+    let top = window.top;
+    loc = window.location.href;
+    //let url = (location.protocol).concat('//').concat(location.pathname).concat(location.hash);
+    //let url = (location.protocol).concat('//').concat(location.pathname);
+    let url = location.pathname;
+    let filename = url.split('/').pop();
+    if (filename === 'TOC.html') {
+      return;
+    }
+    window.top.location.href = 'TOC.html?src=' + loc;
   }
   if (key === 'K') {
     storyHlpMenu.keys();
