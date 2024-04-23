@@ -101,6 +101,7 @@ function initializeMenu() {
           <div class='ddItem'><a href='indexDesign.html'>&nbsp;Design</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexDeployment.html'>&nbsp;Deployment</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexProjects.html'>&nbsp;Projects</a>&nbsp;</div>\
+          <div class='ddItem'><a href='indexPrototypes.html'>&nbsp;Prototypes</a>&nbsp;</div>\
           <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
@@ -302,6 +303,7 @@ function initializeMenu() {
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Prototype&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
+            <div class='ddItem'><a href='indexPrototypes.html'>Prototype Track Summary</a></div>\
             <div class='ddItem'><a href='ThreadPagePrototype.html'>Thread Page Prototype</a></div>\
             <div class='ddItem'><a href='FreePagePrototype.html'>Free Page Prototype</a></div>\
             <div class='ddItem'><a href='Resources/Bits/Bits_Proto.html'>Bits Prototype</a></div>\
