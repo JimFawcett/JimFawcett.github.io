@@ -306,9 +306,8 @@ function initializeMenu() {
             <div class='ddItem'><a href='indexPrototypes.html'>Prototype Track Summary</a></div>\
             <div class='ddItem'><a href='ThreadPagePrototype.html'>Thread Page Prototype</a></div>\
             <div class='ddItem'><a href='FreePagePrototype.html'>Free Page Prototype</a></div>\
-            <div class='ddItem'><a href='Resources/Bits/Bits_Proto.html'>Bits Prototype</a></div>\
-            <div class='ddItem'><a href='Resources/Bits/Bits_PrototypeContent.html'>Bits Proto Content</a></div>\
             <div class='ddItem'><a href='Resources/Bits/Bits_PrototypeWrapper.html'>Bits Proto Wrapper</a></div>\
+            <div class='ddItem'><a href='Resources/Bits/Bits_PrototypeContent.html'>Bits Proto Content</a></div>\
             <div class='ddItem'><a href='PageFramePrototype.html'>PageFrame Prototype</a></div>\
             <div class='ddItem'><a href='Test_PhotoSizerWebComponent.html'>Photo Sizer Web Component</a></div>\
             <div class='ddItem'><a href='Test_HideablePhotoSizerWebComponent-Ver2.html'>Hideable Photo Sizer Web Component</a></div>\
