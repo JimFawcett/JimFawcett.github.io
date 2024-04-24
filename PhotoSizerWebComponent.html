@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<!--
+  ThreadPagePrototype.html
+-->
+<head>
+  <title>PhotoSizer Web Component</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/StylesPhoto.css" />
+  <link rel="stylesheet" href="css/StylesSizerComp.css" />
+  <!-- PageFrame infrastructure -->
+  <link rel="stylesheet" href="css/StylesPageFrameDefaults.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameStructure.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameMenus.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameThemeBrown.css" />
+  <link rel="stylesheet" href="css/StylesWebComponents.css" />
+  <script src="js/ScriptsWebComponents.js"></script>
+  <!--<script src="js/ScriptsPageFrameDefaults.js"></script>-->
+  <script src="js/ScriptsPageFrameThreadPrototype.js"></script>
+  <script src="js/ScriptsPageFramePagesPrototype.js"></script>
+  <script src="js/ScriptsPageFrameKeyboard.js"></script>
+  <!-- No need for Pages script for pages with no next or prev pages -->
+  <!--<script src="js/ScriptsPageFramePages.js"></script>-->
+  <style>
+    #github .note {
+      border: 1px solid var(--dark);
+      padding:0.75em 1.5em;
+      margin-top:1.25em;
+      margin-bottom:1.25em;
+      background-color: var(--light);
+      color: var(--dark);
+      max-width:50em;
+    }
+    #github h2 {
+      margin-top: 0.75em;
+    }
+    #github ol.tight li {
+      margin-top:0.15em;
+      margin-bottom:0.15em;
+    }
+    #github header h3 {
+      margin-top: 0em;
+      margin-left: 1em;
+    }
+  </style>
+</head>
+<body id="github" onload="initialize()">
+
+  <a id="Next" href="HideablePhotoSizerWebComponent.html">Next</a>
+  <a id="Prev" href="PageFramePrototype.html">Prev</a>
+
+  <page-frame>
+    <frame-header>
+      <nav id="navbar"></nav>
+    </frame-header>
+    <main>
+      <div id="about">about</div>
+      <div id="page">PhotoSizer Element</div>
+      <div id="modified">04/24/2024</div>
+      <div id="hlp"></div>
+      <a id="top"></a>
+      <content>
+        <header>
+          <a class="repoLink" href="# Tests.html">Tests.html</a>
+          <hgroup id="pagetitle">
+            <h1 id="title">PhotoSizer Element</h1>
+            <h3 id="subtitle">Implements W3C/Google webcomponent</h3>
+          </hgroup>
+        </header>
+
+        <indent-block>
+          Click on image body to expand, click on title to contract.
+        </indent-block>
+        <div style="height:0.75em;"></div>
+        <indent-block>
+          Works with FireFox, Chrome, Safari, Edge, Opera.
+        </indent-block>
+        <hr class="spread" />
+
+        <indent-block>
+          <photosizer-block src="Pictures/ThreadPool.JPG" width="200" class="photoSizerBlock left">
+            <span style="font-family:'Comic Sans MS';">Figure 1. ThreadPool</span>
+          </photosizer-block>
+          <div style="padding-right:25px;">
+            This is how this page uses the PhotoSizer Element:
+            <pre style="font-family: Consolas, monospace; font-size:1.0em;">
+  &lt;photosizer-block src="Pictures/ThreadPool.JPG" width="200" class="photoSizerBlock left"&gt;
+    &lt;span style="font-family:'Comic Sans MS';"&gt;Figure 1. ThreadPool&lt;/span&gt;
+  &lt;/photosizer-block&gt;
+</pre>
+            And this is how this pages styles the PhotoSizer Element:
+            <pre style="display:flex; font-family: Consolas, monospace; font-size:1.0em;">
+    #github photosizer-block {
+      --border:1px solid black;
+      --box-shadow: 3px 3px 5px #999;
+      --wrapperPadding: 5px 10px 10px 10px;
+      --margin: 20px;
+      --captionPadding: 0px 0px 5px 0px;
+    }
+    /* uncomment .photoBlock to use this class */
+    /*#github .photoSizerBlock {
+      --background-color: #efe;
+      --font-family:Comic Sans MS;
+      --font-weight: Bold;
+      --border: 3px solid darkgreen;
+      --captionPadding: 0px 0px 5px 0px;
+      --wrapperPadding: 5px;
+      --margin: 30px;
+    }*/
+</pre>
+            View page source for all the details.
+          </div>
+        </indent-block>
+        <spacer-10 class="clear"></spacer-10>
+        <hr class="spread" />
+        <indent-block>
+          Here&apos;s the component code:
+          <pre style="font-size:1.0em; font-family:Consolas, monospace;">
+&lt;script&gt;
+  /* custom webcomponent - PhotoSizerBlock*/
+
+  class PhotoSizerBlock extends HTMLElement {
+    constructor(...args) {
+      const self = super(...args);
+      const shadowRoot = this.attachShadow({ mode: 'open' });
+      shadowRoot.innerHTML =
+        `
+          &lt;style&gt;
+            #cont {
+              display:flex;
+              position:relative;
+              padding: var(--padding);
+            }
+            #wrapper {
+              width:min-content;
+              padding: var(--wrapperPadding); //10px;
+              margin: var(--margin);  //20px;
+              background-color: var(--background-color);
+              color: var(--color);
+              box-shadow: var(--box-shadow);
+              font-family: var(--font-family);
+              font-size: var(--font-size);
+              font-weight: var(--font-weight);
+              border: var(--border);
+              cursor: pointer;
+              user-select:none;
+              -webkit-user-select:none;
+              -moz-user-select:none;
+              -ms-user-select:none;
+            }
+            #closer {
+              position:absolute;
+              top:20px; right:8px;
+              border:2px solid red;
+              background-color:black;
+              color:white;
+              cursor:pointer;
+              width:0.5em; height:1em;
+            }
+            #caption {
+              text-align:center;
+              padding-bottom:10px;
+              background-color:white;
+              padding: var(--captionPadding); //0px 0px 10px 0px;
+            }
+            img {
+              user-select:none;
+              -webkit-user-select:none;
+              -moz-user-select:none;
+              -ms-user-select:none;
+            }
+          &lt;/style&gt;
+          &lt;div id="cont"&gt;
+            &lt;slot&gt;&lt;/slot&gt;
+            &lt;div id="closer"&gt;&lt;/div&gt;
+            &lt;div id="wrapper"&gt;
+              &lt;div id="caption"&gt;&lt;/div&gt;
+              &lt;img /&gt;
+            &lt;/div&gt;
+          &lt;/div&gt
+        `;
+      this.bigger = this.bigger.bind(this);
+      this.smaller = this.smaller.bind(this);
+      this.toggle = this.toggle.bind(this);
+      return self;
+    }
+    connectedCallback() {
+      this.url = this.getAttribute('src');
+      this.imgElem = this.shadowRoot.querySelector('img');
+      this.imgElem.setAttribute('src', this.url);
+      this.width = this.getAttribute('width');
+      if (isDefined(this.width))
+        this.imgElem.setAttribute('width', this.width);
+      this.height = this.getAttribute('height');
+      if (isDefined(this.height))
+        this.imgElem.setAttribute(this.height);
+      this.caption = this.shadowRoot.querySelector('#caption');
+      if (isDefined(this.caption)) {
+        this.captionText = this.innerHTML;
+        this.innerHTML = "";
+        this.caption.innerHTML = this.captionText;
+      }
+      this.imgElem.addEventListener('click', this.bigger);
+      this.caption.addEventListener('click', this.smaller);
+      this.closer = this.shadowRoot.querySelector('#closer');
+      this.closer.addEventListener('click', this.toggle);
+    }
+    bigger() {
+      this.imgElem.width = Number(this.imgElem.width) * 1.25;
+    }
+    smaller() {
+      this.imgElem.width = Number(this.imgElem.width) / 1.25;
+    }
+    toggle() {
+      let wrpr = this.shadowRoot.getElementById("wrapper");
+      if (isDefined(wrpr)) {
+        if (wrpr.style.display === "none") {
+          wrpr.style.display = "block";
+          this.closer.style.right = "8px";
+        }
+        else {
+          wrpr.style.display = "none";
+          this.closer.style.right = "7px";
+        }
+      }
+    }
+  }
+  /* register with DOM - don't need to use script block to execute */
+
+  /*---------------------------------------------------------------------------
+    * This listener is added because of a component lifecycle issue with chrome
+    * See first reference, below.
+    */
+  document.addEventListener('DOMContentLoaded', function () {
+    window.customElements.define('photosizer-block', PhotoSizerBlock);
+  });
+  /*
+  * The listener, above, will be removed and replaced with this when chrome
+  * component lifecycle is fixed.
+  *
+  * window.customElements.define('photosizer-block', PhotoSizerBlock);
+  */
+ &lt;/script&gt;
+</pre>
+        </indent-block>
+        <hr class="spread" />
+        <h3>References:</h3>
+        <ol class="tight">
+          <li>
+            <a href="https://stackoverflow.com/questions/48498581/textcontent-empty-in-connectedcallback-of-a-custom-htmlelement">Issue with Chrome loading innerHTML</a>
+          </li>
+          <li>
+            <a href="https://dev.to/bennypowers/lets-build-web-components-part-2-the-polyfills-dkh">polyfills CDN</a>
+          </li>
+          <li>
+            <a href="https://developers.google.com/web/fundamentals/web-components/customelements">customelements - google.com</a>
+          </li>
+          <li>
+            <a href="https://developers.google.com/web/fundamentals/web-components/shadowdom">shadowdom - google.com</a>
+          </li>
+          <li>
+            <a href="https://www.html5rocks.com/en/tutorials/webcomponents/">webcomponents - htm5rocks.com</a>
+          </li>
+          <li>
+            <a href="https://alligator.io/web-components/attributes-properties/">attributes&nbsp;&amp;&nbsp;properties - alligator.io</a>
+          </li>
+          <li>
+            <a href="https://css-tricks.com/styling-a-web-component/">styling webcomponent - css-tricks.com</a>
+          </li>
+          <li>
+            <a href="https://css-tricks.com/encapsulating-style-and-structure-with-shadow-dom/">encapsulating style and structure - css-tricks.com</a>
+          </li>
+          <li>
+            <a href="https://css-tricks.com/creating-a-custom-element-from-scratch/">creating custom component from scratch - css-tricks.com</a>
+          </li>
+          <li>
+            <a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements">Using custom elements - mozilla.org</a>
+          </li>
+          <li>
+            <a href="https://www.webcomponents.org/introduction#custom-elements">introduction to webcomponents - webcomponents.org</a>
+          </li>
+          <li>
+            <a href="https://dev.to/bennypowers/lets-build-web-components-part-3-vanilla-components-4on3">build web components - dev.to</a>
+          </li>
+          <li>
+            <a href="https://www.robinwieruch.de/web-components-tutorial/">tutorial - robinwieruch.de</a>
+          </li>
+          <li>
+            <a href="https://www.grapecity.com/blogs/web-components-introduction-creating-custom-html-elements-2018">introduction - grapecity.com</a>
+          </li>
+        </ol>
+      </content>
+      <a id="bottom"></a>
+      <page-TOC id="pages" style="display:none;">
+      </page-TOC>
+      <page-sections id="sections" style="display:none;padding:0em;">
+        <menu-elem style="width:0.0em">&nbsp;</menu-elem>
+        <menu-elem class="secElem"><a href="#bottom">bottom</a></menu-elem>
+        <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
+        <div class="darkItem" style="width:100%; padding:0.25em 0em;">&nbsp;Page&nbsp;Sections&nbsp;</div>
+      </page-sections>
+    </main>
+    <frame-footer>
+      <menu-item style="width:1.0em;">&nbsp;</menu-item>
+      <menu-elem id="nextLink2" onclick="bottomMenu.next()">Next</menu-elem>
+      <menu-elem id="prevLink2" onclick="bottomMenu.prev()">Prev</menu-elem>
+      <menu-elem id="pgbtn" onclick="bottomMenu.pages()">Pages</menu-elem>
+      <menu-elem onclick="bottomMenu.sections()">Sections</menu-elem>
+      <menu-elem onclick="bottomMenu.about()">About</menu-elem>
+      <menu-elem id="kysbtn" onclick="storyHlpMenu.keys()">Keys</menu-elem>
+      <menu-elem style="margin-right:1em">
+        <span id="loc" style="display:inline-block; font-weight:normal;"></span>
+      </menu-elem>
+    </frame-footer>
+  </page-frame>
+  <script>
+    let loc = document.getElementById("loc");
+    let fn = window.location.href.split(/\/|\\/).pop();
+    loc.innerHTML = fn + ": ";
+  </script>
+</body>
+</html>

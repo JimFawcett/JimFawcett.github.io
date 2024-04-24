@@ -11,21 +11,15 @@ slideIn.state = "closed";
 
 slideIn.toggleSlideIn = function () {
   let cont = document.getElementById("slideInPanel");
-  console.log('cont = ' + cont);
-  console.log('state = ' + slideIn.state);
+  //console.log('cont = ' + cont);
+  //console.log('state = ' + slideIn.state);
   if (slideIn.state === "closed") {
     slideIn.state = "open";
-    if (isEdge())
-      slideIn.openPanelEdge(cont);
-    else
-      slideIn.openPanel(cont);
+    slideIn.openPanel(cont);
   }
   else {
     slideIn.state = "closed";
-    if (isEdge())
-      slideIn.closePanelEdge(cont);
-    else
-      slideIn.closePanel(cont);
+    slideIn.closePanel(cont);
   }
 };
 
@@ -43,19 +37,19 @@ slideIn.closePanel = function (cont) {
   cont.style.border = "none";
 };
 
-slideIn.openPanelEdge = function (cont) {
-  console.log('Edge cont = ' + cont);
-  cont.style.position = "fixed";
-  cont.style.top = "150px";
-  cont.style.right = "0";
-  cont.style.width = "50%";
-  cont.style.maxHeight = "250px";
-  cont.style.padding = "15px 25px";
-  cont.style.border = "1px solid black";
-  cont.style.overflowY = "auto";
-  cont.style.zIndex = 1;
-  cont.style.backgroundColor = "white";
-};
+//slideIn.openPanelEdge = function (cont) {
+//  console.log('Edge cont = ' + cont);
+//  cont.style.position = "fixed";
+//  cont.style.top = "150px";
+//  cont.style.right = "0";
+//  cont.style.width = "50%";
+//  cont.style.maxHeight = "250px";
+//  cont.style.padding = "15px 25px";
+//  cont.style.border = "1px solid black";
+//  cont.style.overflowY = "auto";
+//  cont.style.zIndex = 1;
+//  cont.style.backgroundColor = "white";
+//};
 
 slideIn.closePanelEdge = function (cont) {
   console.log('Edge cont = ' + cont);
