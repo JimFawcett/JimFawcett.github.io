@@ -18,10 +18,11 @@ function isDefined(elem) {
 /* run menu builders at startup */
 
 function initialize() {
-  actions.keysMenu();
+  //actions.keysMenu();
   initializeMenu();
   initializePages();
   initializeNextPrev();
+  storyHlpMenu.helpMenu();
 }
 
 /* create top menu */
@@ -34,6 +35,11 @@ function loadif() {
     location.reload();
   }
 }
+function getHelp() {
+  //window.open("Help.html", "help", "popup=1, height=700, width=600");
+  window.open("Help.html", "_blank");
+}
+
 
 function initializeMenu() {
 
@@ -48,7 +54,6 @@ function initializeMenu() {
             <div class='ddItem'><a target='_self' href='../../SiteMap.html'>SiteMap</a></div>\
             <div class='ddItem'><a target='_self' href='../../SiteDemo.html'>SiteDemo</a></div>\
             <div class='ddItem'><a target='_self' href='../../SiteDesign.html'>SiteDesign</a></div>\
-            <div class='ddItem'><a target='_self' href='../../ChatGPT.html'>ChatGPT</a></div>\
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
               <summary>About&nbsp;Site&nbsp;&nbsp;&nbsp;</summary>\
               <div style='margin-left:1.0em;'>\
@@ -76,8 +81,9 @@ function initializeMenu() {
           <div class='ddItem'><a target='_self' href='../../indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>\
           <div class='ddItem'><a target='_self' href='../../indexDesign.html'>&nbsp;Design</a>&nbsp;</div>\
           <div class='ddItem'><a target='_self' href='../../indexDeployment.html'>&nbsp;Deployment</a>&nbsp;</div>\
-          <div class='ddItem'><a target='_self' href='../../indexProjects.html'>&nbsp;Projects</a>&nbsp;</div>\
-          <div style='height:2em;'>&nbsp;</div>\
+          <div class='ddItem'><a href='../../indexProjects.html'>&nbsp;Projects</a>&nbsp;</div>\
+          <div class='ddItem'><a href='../../indexPrototypes.html'>&nbsp;Prototypes</a>&nbsp;</div>\
+         <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
     <div class='menuItem'>\
@@ -123,6 +129,7 @@ function initializeMenu() {
           <div class='ddItem'><a target='_self' href='../../Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a></div>\
           <div class='ddItem'><a target='_self' href='../PublishingSourceCode.pdf'>Site&nbsp;Presentation</a></div>\
           <div class='ddItem'><a target='_self' href='../../Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a></div>\
+          <div class='ddItem'><a target='_self' href='../../ChatGPT.html'>ChatGPT</a></div>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Design</summary>\
             <div style='margin-left:1.0em;'>\
@@ -379,7 +386,7 @@ bottomMenu.sections = function () {
 }
 
 bottomMenu.keys = function () {
-  actions.keys();
+  storyHlpMenu.keys();
 }
 
 bottomMenu.toggleMenus = function () {
@@ -408,3 +415,6 @@ bottomMenu.about = function () {
     }
   }
 }
+
+document.addEventListener('keydown', (event) => { keyAction(event); }, false);
+
