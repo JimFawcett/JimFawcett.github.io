@@ -376,7 +376,8 @@ bottomMenu.pages = function () {
 
 bottomMenu.sections = function () {
   var menu = document.getElementById("sections");
-  document.getElementById("pages").style.display = "none";
+  /*document.getElementById("sections").style.display = "none";*/
+  var pageStyle = menu.style.display;
   if (isDefined(menu)) {
     if (menu.style.display == "flex")
       menu.style.display = "none";
@@ -399,7 +400,7 @@ bottomMenu.about = function () {
   var page = document.getElementById("page");
   var date = document.getElementById("modified");
   var menu = document.getElementById("about");
-  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021";
+  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021-2024";
   if (isDefined(page)) {
     menu.innerHTML += "<br />" + page.innerText;
   }
