@@ -311,11 +311,11 @@ function initializeMenu() {
             <div class='ddItem'><a href='PageFramePrototype.html'>PageFrame Prototype</a></div>\
             <div class='ddItem'><a href='PhotoSizerWebComponent.html'>Photo Sizer Web Component</a></div>\
             <div class='ddItem'><a href='HideablePhotoSizerWebComponent.html'>Hideable Photo Sizer Web Component</a></div>\
-            <div class='ddItem'><a href='Test_SlideInPanel.html'>Slide In Panel</a></div>\
-            <div class='ddItem'><a href='Test_SlideShow.html'>Slide Show</a></div>\
-            <div class='ddItem'><a href='Test_Draggable.html'>Draggable Prototype</a></div>\
-            <div class='ddItem'><a href='Test_SplitterBar.html'>SplitterBar Prototype</a></div>\
-            <div class='ddItem'><a href='Test_ImageSizer.html'>Image Sizer</a></div>\
+            <div class='ddItem'><a href='SlideInPanel.html'>Slide In Panel</a></div>\
+            <div class='ddItem'><a href='SlideShow.html'>Slide Show</a></div>\
+            <div class='ddItem'><a href='Draggable.html'>Draggable Prototype</a></div>\
+            <div class='ddItem'><a href='SplitterBar.html'>SplitterBar Prototype</a></div>\
+            <div class='ddItem'><a href='ImageSizer.html'>Image Sizer Prototype</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\
