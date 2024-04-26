@@ -304,11 +304,11 @@ function initializeMenu() {
           <div class='ddLabel darkItem'>Prototype&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
             <div class='ddItem'><a href='indexPrototypes.html'>Prototype Track Summary</a></div>\
+            <div class='ddItem'><a href='PageFramePrototype.html'>PageFrame Prototype</a></div>\
             <div class='ddItem'><a href='ThreadPagePrototype.html'>Thread Page Prototype</a></div>\
             <div class='ddItem'><a href='FreePagePrototype.html'>Free Page Prototype</a></div>\
             <div class='ddItem'><a href='Resources/Bits/Bits_PrototypeWrapper.html'>Bits Proto Wrapper</a></div>\
             <div class='ddItem'><a href='Resources/Bits/Bits_PrototypeContent.html'>Bits Proto Content</a></div>\
-            <div class='ddItem'><a href='PageFramePrototype.html'>PageFrame Prototype</a></div>\
             <div class='ddItem'><a href='PhotoSizerWebComponent.html'>Photo Sizer Web Component</a></div>\
             <div class='ddItem'><a href='HideablePhotoSizerWebComponent.html'>Hideable Photo Sizer Web Component</a></div>\
             <div class='ddItem'><a href='SlideInPanel.html'>Slide In Panel</a></div>\
