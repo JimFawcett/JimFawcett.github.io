@@ -167,7 +167,7 @@
       margin-right: 0.5em;
       overflow-y: scroll;
       border: 1px dashed red;
-      font-size: 0.8em;
+      font-size: 0.9em;
     }
  
     table {
@@ -681,43 +681,82 @@ impl&lt;T: Arithmetic&gt; Stats&lt;T&gt;
             <second-item id="fig3-second" style="width:40em; padding-right:0.5em; background-color:var(--light);">
               <div onclick="obubbleup('fig3-first')" class="textwrap">
                 <t-b>
-                  ----- modules -----------------
+                  ----- defining generic types -----------------
                 </t-b>
                 <t-b>
-                  The main module, main.rs, opens by importing definitions from three modules defined for
-                  this demonstraion:
+                  Rust types can be defined with generic data members:
                   <ul>
                     <li>
-                      analysis_generic.rs defines type analysis and display functions
+                      <c-s>struct Stats&lt;T: Arithmetic + Debug&gt;</c-s> 
+                      defines the data member &quot;<c-s>items: Vec&lt;T&gt;</c-s>&quot; in the left panel.
                     </li>
                     <li>
-                      stats.rs provides type definition of a simple user-defined type.
+                      Methods cannot be called on <c-s>T</c-s> unless <c-s>T</c-s> is bounded by traits that 
+                      declare those methods. That guarantees that the invocation is well defined.
                     </li>
                     <li>
-                      points_generic defines a user type PointN&lt;T&gt; representing points in an
-                      N dimensional hyperspace.
+                      This stats.rs module defines a trait &quot;<c-s>Arithmetic</c-s>&quot; as a set of
+                      traits defined in <c-s>std::ops</c-s>: 
+                      <c-s>Add, Sub, Mul, Div, PartialEq, PartialOrd</c-s> plus traits 
+                      <c-s>Default, Copy, Debug, Into</c-s>.
+                    </li>
+                    <li>
+                      That means that T implements operators &quot;<c-s>+, -, *, /</c-s>&quot; and can be
+                      compared and put into at least a partial order.
+                    </li>
+                    <li>
+                      <c-s>Default</c-s> guarantees that <c-s>T::default()</c-s> has a defined value, 
+                      0 for ints and floats.
+                    </li>
+                    <li>
+                      <c-s>Copy</c-s> is a marker trait, e.g., no methods, but requires construction and
+                      assignment to use copy operations instead of move operations. All the primitives
+                      are <c-s>Copy</c-s> types.
+                    </li>
+                    <li>
+                      <c-s>Debug</c-s> means that <c-s>Stats</c-s> instances can be written using the
+                      debug format &quot;<c-s>{:?}</c-s>&quot;
+                    </li>
+                    <li>
+                      <c-s>Into&lt;f64&gt;</c-s> means that any type will be implicitly converted to 
+                      <c-s>f64</c-s> if needed, as in dividing an instance of <c-s>T</c-s> by an
+                      integer.
                     </li>
                   </ul>
+                  If <c-s>Stats</c-s> is declared with a parameter <c-s>T</c-s> that does not meet all
+                  of these requirements, the declaration will fail to compile. Note that this is very
+                  similar to the use of <c-s>C#</c-s> constraints.
                 </t-b>
                 <t-b>
-                  ----- code structure ----------
+                  Note that <c-s>Arithmetic</c-s> has only been implemented in <c-s>Stats</c-s> for the
+                  types <c-s>i32</c-s> and <c-s>f64</c-s>.  Implementing for other integers and floats is
+                  simply a matter of copying the impl statements for those types.
+                </t-b>
+                <t-b>
+                  ----- <c-s>Stats</c-s> methods ----------
                 </t-b>
                 <t-b class="indent">
-                  Code for this demonstration consists of:
+                  <c-s>Stats</c-s> implements the methods:
                   <ul>
                     <li>
-                      Definitions of user-defined types
+                      <c-s>new(v:Vec&lt;T&gt;) -&gt;Stats&lt;T&gt;</c-s>, a constructor that accepts a vector 
+                      of <c-s>T</c-s> values
                     </li>
                     <li>
-                      Functions for analysis and display of specified objects
+                      <c-s>max(&amp;self) -&gt; T</c-s> returns most positive value in <c-s>items</c-s>.
                     </li>
                     <li>
-                      Three functions that demonstrate generics for standard types,
-                      user-defined types, and generic functions
+                      <c-s>min(&amp;self) -&gt; T</c-s> returns most negative value in <c-s>items</c-s>.
+                    </li>
+                    <li>
+                      <c-s>sum(&amp;self) -&gt; T</c-s> returns sum of values in <c-s>items</c-s>.
+                    </li>
+                    <li>
+                      <c-s>avg(&amp;self) -&gt; T</c-s> returns average of values in <c-s>items</c-s>.
                     </li>
                   </ul>
-                  Program execution begins in the main function of the main module. It simply invokes
-                  these functions as shown in the left panel.
+                  Since all methods but the constructor accept a reference, <c-s>&amp;self</c-s>,
+                  invocations do not consume the <c-s>Stats</c-s> instance.
                 </t-b>
               </div>
             </second-item>
