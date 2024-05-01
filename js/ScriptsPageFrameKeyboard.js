@@ -47,13 +47,13 @@ storyHlpMenu.helpMenu = function() {
       <td class="key" onclick="storyHlpMenu.home()">H</td><td>Home</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.siteMap()">S</td><td>SiteMap</td>\
-    </tr>\
-    <tr>\
-      <td class="key" onclick="storyHlpMenu.TOC()">C</td><td>TOC</td>\
+      <td class="key" onclick="storyHlpMenu.siteMap()">M</td><td>SiteMap</td>\
     </tr>\
     <tr>\
       <td class="key" onclick="storyHlpMenu.siteX()">X</td><td>Explorer</td>\
+    </tr>\
+    <tr>\
+      <td class="key" onclick="storyHlpMenu.sects()">S</td><td>page sections</td>\
     </tr>\
     <tr>\
       <td class="key" onclick="javascript:;">K</td><td>keys</td>\
@@ -187,13 +187,15 @@ storyHlpMenu.keys = function () {
 storyHlpMenu.about = function () {
   var date = document.getElementById("modified").innerText;
   var menu = document.getElementById("about");
-  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021" + "<br />" + "Page last modified: " + date;
+  var page = document.getElementById("page");
+  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021-2024" + "<br />"
+    + page.textContent + "<br />" + "Page last modified: " + date;
   if (isDefined(menu)) {
-    if (menu.style.display == "block") {
-      menu.style.display = "none";
+    if (menu.style.display !== "flex") {
+      menu.style.display = "flex";
     }
     else {
-      menu.style.display = "block";
+      menu.style.display = "none";
     }
   }
 }
@@ -260,12 +262,12 @@ function keyAction(keyEvent) {
   if (key === 'H') {
     window.location.href = "index.html";
   }
-  if (key === 'S') {
+  if (key === 'M') {
     window.location.href = "SiteMap.html";
   }
-  if (key === 'C') {
-    window.location.href = "TOC.html";
-  }
+  //if (key === 'C') {
+  //  window.location.href = "TOC.html";
+  //}
   if (key === 'X') {
     let top = window.top;
     loc = window.location.href;
@@ -277,6 +279,9 @@ function keyAction(keyEvent) {
       return;
     }
     window.top.location.href = 'TOC.html?src=' + loc;
+  }
+  if (key === 'S') {
+    storyHlpMenu.sects();
   }
   if (key === 'K') {
     storyHlpMenu.keys();

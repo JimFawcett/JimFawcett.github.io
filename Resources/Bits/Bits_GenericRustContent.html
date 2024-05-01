@@ -481,7 +481,7 @@ fn main() {
           </splitter-container>
         </div>
         <div style="height:0.75em;"></div>
-        <h3 id="standard">1.1.1 Standard Generic Types</h3>
+        <h3 id="standard">1.2 Standard Generic Types</h3>
         <t-b>
           Standard generic types are defined in the Rust Standard Library and include many more
           than shown here. We have selected four frequently used types. You can find details of
@@ -590,10 +590,191 @@ fn main() {
           </splitter-container>
         </div>
         <div style="height:0.75em;"></div>
-        <h3 id="structure">1.2 Stats Definition</h3>
+        <a id="hellogen"></a>
+        <h3>1.4 HelloGeneric</h3>
+        <t-b>
+          <c-s>HelloGeneric&lt;T&gt;</c-s> is a simple generic type defined in the module main.rs.
+          It is included here to introduce basic syntax required for generic types.
+        </t-b>
+        <a id="hellogendef"></a>
+        <h3 id="">1.4.1 HelloGeneric Definition</h3>
+        <t-b>
+          A Rust trait is a declaration that requires any generic type that implements the trait to
+          implement methods defined by the trait.
+          In <c-s>Stats&lt;T&gt;</c-s>, <c-s>T</c-s> is required to implement the trait <c-s>Arithmetic</c-s>.
+          That insures that arithmetic operations can be applied to T.
+        </t-b>
+        <t-b>
+          The <c-s>Stats</c-s> struct holds a vector of data of type <c-s>T</c-s> and its operations
+          evaluate simple arithmetic properties of that data.
+        </t-b>
+        <div class="blockSingle" style="padding:0em;">
+          <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
+          <splitter-container id="container">
+            <first-item id="fig3-first" style="width:52%; padding-right:0.5em;">
+              <div class="codewrap">
+                <pre onclick="cbubbleup('fig3-first')" style="width:200em;"><code class="language-cpp">/*---------------------------------------------------------
+  HelloGeneric: user-defined generic type
+  - Not very useful except as a demonstration of how
+    to create a generic type.
+  - HelloGeneric instances hold a single value of T
+  - Generic parameter T is required to implement traits
+      Debug   - supports using debug format {:?}
+      Default - supports using a default value, T:default()
+      Clone   - implements a copy of an instance with clone()
+  - Specified traits, like those above, are often called
+    bounds because they limit the types that can be used
+    as function and method arguments.
+*/
+#[derive(Debug, Clone)]  // compiler generated code
+struct HelloGeneric&lt;T&gt;
+  where T: Debug + Default + Clone
+{
+  datum: T,
+}
+impl&lt;T&gt; HelloGeneric&lt;T&gt;
+  where T: Debug + Default + Clone
+{
+  /* construct new instance with datum = d */
+  fn new(d:T) -&gt; Self {
+    HelloGeneric::&lt;T&gt; {
+      datum: d,
+    }
+  }
+  /* construct new instance with default data value */
+  fn default_new() -&gt; Self {
+    HelloGeneric::&lt;T&gt; {
+      datum: T::default(),
+    }
+  }
+  /*
+    As shown, value() is equivalent to making datum public.
+    However value method supports adding code to modify the
+    return value.
+  */
+  fn value(&mut self) -&gt; &mut T {
+    &mut self.datum
+  }
+  /* print representation of an instance */
+  fn show(&self) {
+    println!(&quot;  HelloGeneric {{ {:?} }}&quot;, self.datum);
+  }
+}
+
+
+
+
+
+
+</code></pre>
+              </div>
+            </first-item>
+            <splitter-bar id="fig3-seperator"></splitter-bar>
+            <second-item id="fig3-second" style="width:40em; padding-right:0.5em; background-color:var(--light);">
+              <div onclick="obubbleup('fig3-first')" class="textwrap">
+                <t-b>
+                  ----- defining generic types -----------------
+                </t-b>
+                <t-b>
+                  Rust types can be defined with generic data members:
+                  <ul>
+                    <li>
+                      <c-s>struct HelloGeneric&lt;T: Debug + Default + Clone&gt;</c-s> 
+                      defines the data member &quot;<c-s>datum: T</c-s>&quot; in the left panel.
+                    </li>
+                    <li>
+                      Methods cannot be called on <c-s>T</c-s> unless <c-s>T</c-s> is bounded by traits that 
+                      declare those methods. That guarantees that the invocation is well defined.
+                    </li>
+                    <li>
+                      <c-s>Debug</c-s> means that <c-s>HelloGeneric</c-s> instances can be written using the
+                      debug format &quot;<c-s>{:?}</c-s>&quot;
+                    </li>
+                    <li>
+                      <c-s>Default</c-s> guarantees that <c-s>d::default()</c-s> has a defined value, 
+                      e.g., 0 for ints and 0.0 for floats.
+                    </li>
+                    <li>
+                      <c-s>Clone</c-s> ensures that the invocation clone() on <c-s>HelloGeneric</c-s>
+                      and <c-s>T</c-s> is well defined. Those invocations should return an independent
+                      copy of their instances.
+                    </li>
+                  </ul>
+                  If <c-s>HelloGeneric</c-s> is declared with a parameter <c-s>T</c-s> that does not meet all
+                  of these requirements, the declaration will fail to compile. Note that this is very
+                  similar to the use of <c-s>C#</c-s> constraints.
+                </t-b>
+                <t-b>
+                  ----- <c-s>HelloGeneric</c-s> declaration ------
+                </t-b>
+                <t-b>
+                  <c-s>
+                    #[derive(Debug, Clone)]<br />
+                    struct HelloGeneric&lt;T&gt;<br />
+                      &nbsp;&nbsp;&nbsp;&nbsp;where: T: Debug + Default + Clone {<br />
+                        &nbsp;&nbsp;&nbsp;&nbsp;datum: T,<br />
+                    }
+                  </c-s><br />
+                  <t-b>
+                    instructs the compiler to lay out <c-s>HelloGeneric</c-s> instances in memory with 
+                    room to hold a <c-s>T</c-s>
+                  </t-b>
+                  <t-b>
+                    The derive declaration instructs the compiler to implement <c-s>Debug</c-s>
+                    and <c-s>Clone</c-s> traits for <c-s>HelloGeneric</c-s>.
+                  </t-b>
+                  <t-b>
+                    The <c-s>Clone</c-s> trait declares a method <c-s>clone()</c-s>
+                    that copies its instance when <c-s>clone()</c-s> is invoked.
+                  </t-b>
+                </t-b>
+                <t-b>
+                  ----- <c-s>HelloGeneric</c-s> methods ----------
+                </t-b>
+                <t-b class="indent">
+                  <c-s>HelloGeneric</c-s> implements the methods:
+                  <ul>
+                    <li>
+                      <c-s>new(d:T) -&gt; HelloGeneric&lt;T&gt;</c-s>, a constructor that accepts an instance d 
+                      of <c-s>T</c-s> and returns a newly constructed <c-s>HelloGeneric&lt;T&gt;</c-s> instance.
+                    </li>
+                    <li>
+                      <c-s>max(&amp;self) -&gt; T</c-s> returns most positive value in <c-s>items</c-s>.
+                    </li>
+                    <li>
+                      <c-s>min(&amp;self) -&gt; T</c-s> returns most negative value in <c-s>items</c-s>.
+                    </li>
+                    <li>
+                      <c-s>sum(&amp;self) -&gt; T</c-s> returns sum of values in <c-s>items</c-s>.
+                    </li>
+                    <li>
+                      <c-s>avg(&amp;self) -&gt; T</c-s> returns average of values in <c-s>items</c-s>.
+                    </li>
+                    <li>
+                      <c-s>clone(&amp;self) -&gt; Stats&lt;T&gt;</c-s>
+                    </li>
+                  </ul>
+                  Since all methods but the constructor accept a reference, <c-s>&amp;self</c-s>,
+                  invocations do not consume the <c-s>Stats</c-s> instance.
+                </t-b>
+                <div style="height:0.75em;"></div>
+              </div>
+            </second-item>
+          </splitter-container>
+        </div>
+        <div style="height:0.75em;"></div>
+        <div style="height:0.75em;"></div>
+        <h3>1.4 Stats</h3>
         <t-b>
           <c-s>Stats&lt;T&gt;</c-s> is a relatively simple generic type defined in the module stats.rs.
           It is included here to provide an introduction to syntax required for generic types.
+        </t-b>
+        <h3 id="structure">1.2.2 Stats Definition</h3>
+        <t-b>
+          A Rust trait is a declaration that requires any generic type that implements the trait to
+          implement methods defined by the trait.
+          In <c-s>Stats&lt;T&gt;</c-s>, <c-s>T</c-s> is required to implement the trait <c-s>Arithmetic</c-s>.
+          That insures that arithmetic operations can be applied to T.
         </t-b>
         <t-b>
           The <c-s>Stats</c-s> struct holds a vector of data of type <c-s>T</c-s> and its operations
@@ -798,7 +979,7 @@ impl&lt;T: Arithmetic&gt; Stats&lt;T&gt;
           </splitter-container>
         </div>
         <div style="height:0.75em;"></div>
-        <h3 id="standard">1.2.1 Using Stats</h3>
+        <h3 id="standard">1.2.2 Stats Demonstration</h3>
         <t-b>
           <del>Standard generic types are defined in the Rust Standard Library and include many more
           than shown here. We have selected four frequently used types. You can find details of
