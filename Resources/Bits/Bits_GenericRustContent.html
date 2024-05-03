@@ -889,7 +889,7 @@ pub fn demo_HelloGeneric() {
         <h3 id="stats">1.4 Stats</h3>
         <t-b>
           <c-s>Stats&lt;T&gt;</c-s> is a relatively simple generic type defined in the module stats.rs.
-          It is included here to provide an introduction to syntax required for generic types.
+          It is included here to show how to provide indexing for a custom type.
         </t-b>
         <h3 id="statsdef">1.4.1 Stats Definition</h3>
         <t-b>
@@ -897,6 +897,10 @@ pub fn demo_HelloGeneric() {
           implement methods defined by the trait.
           In <c-s>Stats&lt;T&gt;</c-s>, <c-s>T</c-s> is required to implement the trait <c-s>Arithmetic</c-s>.
           That insures that arithmetic operations can be applied to T.
+        </t-b>
+        <t-b>
+          The <c-s>Arithmetic</c-s> trait is simply a union of traits defined in modules std::ops and
+          std::cmp + traits <c-s>Default</c-s>, <c-s>Into</c-s>, <c-s>Debug</c-s>, and <c-s>Copy</c-s>.
         </t-b>
         <t-b>
           The <c-s>Stats</c-s> struct holds a vector of data of type <c-s>T</c-s> and its operations
@@ -1107,57 +1111,28 @@ impl&lt;T: Arithmetic&gt; Stats&lt;T&gt;
         <div style="height:0.75em;"></div>
         <h3 id="statsdemo">1.4.2 Stats Demonstration</h3>
         <t-b>
-          <del>Standard generic types are defined in the Rust Standard Library and include many more
-          than shown here. We have selected four frequently used types. You can find details of
-          the others from the references.</del>
+          
         </t-b>
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
           <splitter-container id="container">
             <first-item id="fig6-first" style="width:52%; padding-right:0.5em;">
               <div class="codewrap">
-                <pre onclick="cbubbleup('fig6-first')" style="width:200em;"><code class="language-cpp">fn demo_std_generic_types() {
-
-  show_note(&quot;demo standard generic types&quot;);
+                <pre onclick="cbubbleup('fig6-first')" style="width:200em;"><code class="language-cpp">/*---------------------------------------------------------
+  Demonstrate user-defined Stats&lt;T&gt; type
+*/
+pub fn demo_stats() {
+  show_label(&quot;demo Arithmetic Trait with Stats&lt;T&gt;&quot;, 40);
   println!();
 
-  show_op(&quot;arrays: [T; N]&quot;);
+  show_op(&quot;Stats&lt;T&gt;&quot;);
   println!();
-  let arri = [1, 2, 3, 2, 1];
-  println!(&quot;  {:?}&quot;, arri);
-  let arrf = [1.0, 1.5, 2.0, 1.5, 1.0];
-  println!(&quot;  {:?}&#92;n&quot;, arrf);
-
-  show_op(&quot;slices: &T[m..n]&quot;);
-  println!();
-  let slicei = &arri[1..5]; // [2, 3, 4, 5]
-  println!(&quot;  {:?}&quot;, slicei);
-  let slicef = &arrf[2..4]; // [2.0, 1.5]
-  println!(&quot;  {:?}&#92;n&quot;, slicef);
-
-  show_op(&quot;vectors: Vec&lt;T&gt;&quot;);
-  println!();
-  let mut v = Vec::&lt;i32&gt;::new();
-  v.push(1);
-  v.push(2);
-  v.push(3);
-  v.push(2);
-  v.push(1);
-  println!(&quot;  Vec&lt;i32&gt; {:?}&quot;, v);
-  let mut v2 = Vec::&lt;(i32,&str)&gt;::new();
-  v2.push((1, &quot;one&quot;));
-  v2.push((2, &quot;two&quot;));
-  println!(&quot;  Vec&lt;(i32, &str)&gt; {:?}&#92;n&quot;, v2);
-
-  show_op(&quot;maps: HashMap&lt;K,V&gt;&quot;);
-  println!();
-  let mut m = HashMap::&lt;&str, i32&gt;::new();
-  m.insert(&quot;zero&quot;, 0);
-  m.insert(&quot;one&quot;, 1);
-  m.insert(&quot;two&quot;, 2);
-  m.insert(&quot;three&quot;, 3);
-  println!(&quot;  maps: HashMap&lt;&str, i32&gt;&quot;);
-  println!(&quot;    {:?}&quot;, m);
+  let s = Stats::&lt;f64&gt;::new(vec![1.5, 2.5, 3.0, -1.25, 0.5]);
+  println!(&quot;  {:?}&quot;, s);
+  println!(&quot;  max: {:?}&quot;, s.max());
+  println!(&quot;  min: {:?}&quot;, s.min());
+  println!(&quot;  sum: {:?}&quot;, s.sum());
+  println!(&quot;  avg: {:?}&quot;, s.avg());
 }
 </code></pre>
               </div>
@@ -1166,46 +1141,19 @@ impl&lt;T: Arithmetic&gt; Stats&lt;T&gt;
             <second-item id="fig6-second" style="width:40em; padding-right:0.5em;">
               <div class="codewrap">
                 <pre onclick="obubbleup('fig6-first')" style="width:200em;"><code class="language-shell">
--------------------------
- demo standard generic types
--------------------------
-
---- arrays: [T; N] ---
-
-  [1, 2, 3, 2, 1]
-  [1.0, 1.5, 2.0, 1.5, 1.0]
 
 
+----------------------------------------
+  demo Arithmetic Trait with Stats&lt;T&gt;
+----------------------------------------
 
---- slices: &T[m..n] ---
+--- Stats&lt;T&gt; ---
 
-  [2, 3, 2, 1]
-  [2.0, 1.5]
-
-
-
---- vectors: Vec&lt;T&gt; ---
-
-  Vec&lt;i32&gt; [1, 2, 3, 2, 1]
-  Vec&lt;(i32, &str)&gt; [(1, &quot;one&quot;), (2, &quot;two&quot;)]
-
-
-
-
-
-
-
-
-
-
---- maps: HashMap&lt;K,V&gt; ---
-
-  maps: HashMap&lt;&str, i32&gt;
-    {&quot;one&quot;: 1, &quot;two&quot;: 2, &quot;zero&quot;: 0, &quot;three&quot;: 3}
-
-
-
-
+  Stats { items: [1.5, 2.5, 3.0, -1.25, 0.5] }
+  max: 3.0
+  min: -1.25
+  sum: 6.25
+  avg: 1.25
 
 
 </code></pre>
