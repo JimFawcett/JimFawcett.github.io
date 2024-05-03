@@ -492,9 +492,10 @@ fn main() {
         <div style="height:0.75em;"></div>
         <h3 id="stdgen">1.2 Standard Generic Types</h3>
         <t-b>
-          Standard generic types are defined in the Rust Standard Library and include many more
-          than shown here. We have selected four frequently used types for demonstration. 
-          You can find details of the others from the references.
+          Standard generic types are defined in the 
+          <a target="_blank" href="https://doc.rust-lang.org/std/index.html">Rust Standard Library</a>
+          and include many more than shown here. We have selected four frequently used types for 
+          demonstration. You can find details of the others from the <a href="#refs">references</a>.
         </t-b>
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
@@ -1164,14 +1165,14 @@ pub fn demo_stats() {
         <div style="height:0.75em;"></div>
         <h3 id="point">1.5 PointN&lt;T&gt;</h3>
         <t-b>
-          <c-s>PointN&lt;T&gt;</c-s> is the first useful generic type presented here. It&apos;s defined in 
-          the module points_generic.rs and has almost all the functionality needed for a working type.
-          Only an iterator is needed, and that will be added in the next Bit.
+          <c-s>PointN&lt;T&gt;</c-s> represents an N-dimensional point by wrapping a vector of coordinates
+          call <c-s>coor</c-s>. It provides methods for initialization, modification, and indexing.
         </t-b>
         <h3 id="pointdef">1.5.1 PointN Definition</h3>
         <t-b>
-          <c-s>PointN&lt;T&gt;</c-s> represents an N-dimensional point by wrapping a vector of coordinates
-          call <c-s>coor</c-s>. It provides methods for initialization, modification, and indexing.
+          <c-s>PointN&lt;T&gt;</c-s> is the first useful generic type presented here. It&apos;s defined in 
+          the module points_generic.rs and has almost all the functionality needed for a working type.
+          Only an iterator is needed, and that will be added in the next <a target="_blank" href="Bits_IterRust.html">Bit</a>.
         </t-b>
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
@@ -1179,8 +1180,8 @@ pub fn demo_stats() {
             <first-item id="fig7-first" style="width:52%; padding-right:0.5em;">
               <div class="codewrap">
                 <pre onclick="cbubbleup('fig7-first')" style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------
-  points.rs
-  - defines types PointN&lt;T&gt;
+  point_generic.rs
+  - defines type PointN&lt;T&gt;
 -------------------------------------------------------------------*/
 
 use std::default::*;
@@ -1281,7 +1282,7 @@ impl&lt;T&gt; std::ops::Deref for PointN&lt;T&gt;
             <second-item id="fig7-second" style="width:40em; padding-right:0.5em; background-color:var(--light);">
               <div onclick="obubbleup('fig7-first')" class="textwrap">
                 <t-b>
-                  ----- <c-s>Stats</c-s> declaration ------
+                  ----- <c-s>PointN&lt;T&gt;</c-s> declaration ------
                 </t-b>
                 <t-b>
                   <c-s>
@@ -1302,29 +1303,47 @@ impl&lt;T&gt; std::ops::Deref for PointN&lt;T&gt;
                   </t-b>
                 </t-b>
                 <t-b>
-                  ----- <c-s>PointN</c-s> methods ----------
+                  ----- <c-s>PointN&lt;T&gt;</c-s> methods ----------
                 </t-b>
                 <t-b class="indent">
-                  <c-s>PointN&lt;T&gt;</c-s> implements the methods:
+                  <c-s>PointN&lt;T&gt;</c-s> implements methods:
                   <ul>
                     <li>
                       <c-s>new(n: usize) -&gt;PointN&lt;T&gt;</c-s>, a constructor that accepts a size 
                       indicating the number of coordinates for this instance.
                     </li>
                     <li>
-                      <c-s>max(&amp;self) -&gt; T</c-s> returns most positive value in <c-s>items</c-s>.
+                      <c-s>init(mut self, coord: Vec&lt;T&gt;) -&gt; PointN&lt;T&gt;</c-s>
+                      accepts vector of coordinates, consumes instance and returns new instance with
+                      the specified coordinates.
                     </li>
                     <li>
-                      <c-s>min(&amp;self) -&gt; T</c-s> returns most negative value in <c-s>items</c-s>.
+                      <c-s>len(&amp;self) -&gt; usize</c-s> returns length of <c-s>coor</c-s>
                     </li>
                     <li>
-                      <c-s>sum(&amp;self) -&gt; T</c-s> returns sum of values in <c-s>items</c-s>.
+                      <c-s>coors(&amp;mut self) -&gt; &mut Vec&lt;T&gt;</c-s> returns mutable reference
+                      to internal coordinates, allowing both reading and writing coordinate values.
+                    </li>
+                  </ul>
+                  ----- <c-s>PointN&lt;T&gt;</c-s> traits ----------
+                  <ul>
+                    <li>
+                      <c-s>std::ops::Index&lt;Idx&gt;</c-s> supports non-mutable indexing with index notation.
                     </li>
                     <li>
-                      <c-s>avg(&amp;self) -&gt; T</c-s> returns average of values in <c-s>items</c-s>.
+                      <c-s>std::ops::IndexMut&lt;Idx&gt;</c-s> supports mutable indexing with index notation.
                     </li>
                     <li>
-                      <c-s>clone(&amp;self) -&gt; Stats&lt;T&gt;</c-s>
+                      <c-s>std::ops::AsRef&lt;[T]&gt;</c-s> provides explicit conversion to array slice
+                      using <c-s>Vec</c-s> AsRef&lt;[T]&gt;
+                    </li>
+                    <li>
+                      <c-s>std::ops::DeRef</c-s> implicit conversion to array slice using <c-s>Vec</c-s>
+                      DeRef.
+                    </li>
+                    <li>
+                      <c-s>clone(&amp;self) -&gt; Stats&lt;T&gt;</c-s> returns independent copy, implemented
+                      by compiler.
                     </li>
                   </ul>
                   Since all methods but the constructor accept a reference, <c-s>&amp;self</c-s>,
@@ -1338,9 +1357,9 @@ impl&lt;T&gt; std::ops::Deref for PointN&lt;T&gt;
         <div style="height:0.75em;"></div>
         <h3 id="pointdemo">1.5.2 PointN Demonstration</h3>
         <t-b>
-          <del>Standard generic types are defined in the Rust Standard Library and include many more
-          than shown here. We have selected four frequently used types. You can find details of
-          the others from the references.</del>
+          Demonstration of <c-s>PointN&lt;T&gt;</c-s> is provided by the function <c-s>demo_pointn()</c-s>
+          in module points_generic.rs, shown in the left panel. When that is executed the results are
+          the content of the right panel.
         </t-b>
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
@@ -1383,20 +1402,33 @@ pub fn demo_pointn() {
             <second-item id="fig8-second" style="width:40em; padding-right:0.5em;">
               <div class="codewrap">
                 <pre onclick="obubbleup('fig8-first')" style="width:200em;"><code class="language-shell">
--------------------------
- demo_generic_functions
--------------------------
+----------------------------------------
+  demo indexing with PointN&lt;T&gt;
+----------------------------------------
 
---- show_type&lt;T:Debug&gt;(_t, &quot;name&quot;) ---
+--- PointN&lt;i32&gt; ---
 
-call name: &quot;v&quot;, type: &quot;alloc::vec::Vec&lt;i32&gt;&quot;
-call name: &quot;m&quot;, type: &quot;std::collections::hash::map::HashMap&lt;&str, i32&gt;&quot;
+  &quot;p&quot;: PointN&lt;T&gt; {
+    1, 2, 3, 2, 1
+  }
 
---- demo_indexer ---
+--- *p.coors() = vec![1, 0, -1, 0, 1] ---
+  &quot;p&quot;: PointN&lt;T&gt; {
+    1, 0, -1, 0, 1
+  }
 
-  [i32; 3]  [ 1, 2, 3 ]
-  Vec&lt;i32&gt;  [ 1, 2, 3 ]
-  PointN&lt;f64&gt;  [ 1.0, 2.0, -0.5 ]
+  using immutable indexer:
+  value of p[0] is 1
+
+  using mutable indexer:
+--- p[0] = 3 ---
+  &quot;p&quot;: PointN&lt;T&gt; {
+    3, 0, -1, 0, 1
+  }
+--- p[1] = 4 ---
+  &quot;p&quot;: PointN&lt;T&gt; {
+    3, 4, -1, 0, 1
+  }
 
 </code></pre>
               </div>
@@ -1406,20 +1438,19 @@ call name: &quot;m&quot;, type: &quot;std::collections::hash::map::HashMap&lt;&s
         <div style="height:0.75em;"></div>
         <h3 id="funcs">1.6 Generic Functions</h3>
         <t-b>
-          <c-s>Stats&lt;T&gt;</c-s> is a relatively simple generic type defined in the module stats.rs.
-          It is included here to provide an introduction to syntax required for generic types.
+          The preceding demonstrations have used several generic functions for analysis of type
+          and display, along with a few non-generic helper functions.
+          These are provided in module analysis_generic.rs and discussed below.
         </t-b>
-        <!--<h3 id="statsdef">1.4.1 Stats Definition</h3>-->
+        <h3 id="funcsdef">1.6.1 Generic Functions Definition</h3>
         <t-b>
-          A Rust trait is a declaration that requires any generic type that implements the trait to
-          implement methods defined by the trait.
-          In <c-s>Stats&lt;T&gt;</c-s>, <c-s>T</c-s> is required to implement the trait <c-s>Arithmetic</c-s>.
-          That insures that arithmetic operations can be applied to T.
+          Code for generic functions, <c-s>show_type&lt;T&gt;</c-s>, <c-s>demo_indexer&lt;T&gt;</c-s>,
+          <c-s>fold&lt;T, I&gt;</c-s>, and <c-s>show_fold&lt;T, I&gt;</c-s> is presented in the left panel.
+          Four non-generic functions are also part of the analysis_generic.rs module.
         </t-b>
-        <h3 id="funcsdef">1.6.1</h3>
         <t-b>
-          The <c-s>Stats</c-s> struct holds a vector of data of type <c-s>T</c-s> and its operations
-          evaluate simple arithmetic properties of that data.
+          Generic functions like <c-s>demo_indexer&lt;T&gt;</c-s> allow us to write one function that can
+          accept aguments of many different types. That improves code ergonomics and developer productivity.
         </t-b>
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
@@ -1591,109 +1622,44 @@ pub fn nl() {
             <second-item id="fig9-second" style="width:40em; padding-right:0.5em; background-color:var(--light);">
               <div onclick="obubbleup('fig9-first')" class="textwrap">
                 <t-b>
-                  ----- defining generic types -----------------
+                  ----- generic functions -----------------
                 </t-b>
+                <ul>
+                  <li>
+                    <c-s>show_type&lt;T&gt;</c-s> prints the second argument string, expected to be the name
+                    at the call-site of the first argument, then prints the compiler generated type representation
+                    of the first argument. 
+                  </li>
+                  <li>
+                    <c-s>demo_indexer&lt;T&gt;</c-s> prints a representation of the slice returned by an
+                    implicit call to std::ops::deref on the second argument. This invocation will fail to
+                    compile if the type of the second argument does not implement trait DeRef.
+                  </li>
+                  <li>
+                    <c-s>show_fold&lt;T&gt;</c-s> prints a column of rows of values for enumerable types,
+                    like the std::collections, making output more readable.
+                  </li>
+                </ul>
                 <t-b>
-                  Rust types can be defined with generic data members:
-                  <ul>
-                    <li>
-                      <c-s>struct Stats&lt;T: Arithmetic + Debug&gt;</c-s> 
-                      defines the data member &quot;<c-s>items: Vec&lt;T&gt;</c-s>&quot; in the left panel.
-                    </li>
-                    <li>
-                      Methods cannot be called on <c-s>T</c-s> unless <c-s>T</c-s> is bounded by traits that 
-                      declare those methods. That guarantees that the invocation is well defined.
-                    </li>
-                    <li>
-                      This stats.rs module defines a trait &quot;<c-s>Arithmetic</c-s>&quot; as a union of
-                      traits defined in <c-s>std::ops</c-s>: 
-                      <c-s>Add, Sub, Mul, Div</c-s> plus traits in <c-s>std::cmd</c-s>: 
-                      <c-s>PartialEq, PartialOrd</c-s> plus traits 
-                      <c-s>Default, Copy, Debug, Into</c-s>.
-                    </li>
-                    <li>
-                      That means that T implements operators &quot;<c-s>+, -, *, /</c-s>&quot; and can be
-                      compared and put into at least a partial order.
-                    </li>
-                    <li>
-                      <c-s>Default</c-s> guarantees that <c-s>T::default()</c-s> has a defined value, 
-                      e.g., 0 for ints and 0.0 for floats.
-                    </li>
-                    <li>
-                      <c-s>Copy</c-s> is a marker trait, e.g., no methods, but requires construction and
-                      assignment to use copy operations instead of move operations. All the primitives
-                      are <c-s>Copy</c-s> types.
-                    </li>
-                    <li>
-                      <c-s>Debug</c-s> means that <c-s>Stats</c-s> instances can be written using the
-                      debug format &quot;<c-s>{:?}</c-s>&quot;
-                    </li>
-                    <li>
-                      <c-s>Into&lt;f64&gt;</c-s> means that any type will be implicitly converted to 
-                      <c-s>f64</c-s> if needed, as in dividing an instance of <c-s>T</c-s> by an
-                      integer.
-                    </li>
-                  </ul>
-                  If <c-s>Stats</c-s> is declared with a parameter <c-s>T</c-s> that does not meet all
-                  of these requirements, the declaration will fail to compile. Note that this is very
-                  similar to the use of <c-s>C#</c-s> constraints.
+                  ----- helper functions ----------
                 </t-b>
+                <ul>
+                  <li>
+                    <c-s>fold&lt;T&gt;</c-s> does all the computation to partition a slice into a column
+                    of rows of values.
+                  </li>
+                  <li>
+                    <c-s>offset</c-s> builds a string of blank spaces to prepend to display lines.
+                  </li>
+                  <li>
+                    <c-s>find_last_utf8</c-s> finds the last occurance of a character in a given string.
+                    It is used to find and remove the last trailing comma in a string of comma separated 
+                    list of values.
+                  </li>
+                </ul>
                 <t-b>
-                  Note that <c-s>Arithmetic</c-s> has only been implemented in <c-s>Stats</c-s> for the
-                  types <c-s>i32</c-s> and <c-s>f64</c-s>.  Implementing for other integers and floats is
-                  simply a matter of copying the impl statements for those types.
-                </t-b>
-                <t-b>
-                  ----- <c-s>Stats</c-s> declaration ------
-                </t-b>
-                <t-b>
-                  <c-s>
-                    #[derive(Debug, Clone)]<br />
-                    pub struct Stats&lt;T: Arithmetic + Debug&gt; {<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;items: Vec&lt;T&gt;;<br />
-                    }
-                  </c-s><br />
-                  <t-b>
-                    instructs the compiler to lay out <c-s>Stats</c-s> instances with a <c-s>Vec</c-s>
-                    control block pointing to a mutable array of <c-s>T</c-s> values in the native heap.
-                  </t-b>
-                  <t-b>
-                    The derive declaration instructs the compiler to implement <c-s>Debug</c-s> and
-                    <c-s>Clone</c-s> traits for <c-s>Stats</c-s>.
-                  </t-b>
-                  <t-b>
-                    The <c-s>Clone</c-s> trait implements a method <c-s>clone()</c-s> for <c-s>Stats</c-s>
-                    that copies the instance when <c-s>clone</c-s> is invoked.
-                  </t-b>
-                </t-b>
-                <t-b>
-                  ----- <c-s>Stats</c-s> methods ----------
-                </t-b>
-                <t-b class="indent">
-                  <c-s>Stats</c-s> implements the methods:
-                  <ul>
-                    <li>
-                      <c-s>new(v:Vec&lt;T&gt;) -&gt;Stats&lt;T&gt;</c-s>, a constructor that accepts a vector 
-                      of <c-s>T</c-s> values
-                    </li>
-                    <li>
-                      <c-s>max(&amp;self) -&gt; T</c-s> returns most positive value in <c-s>items</c-s>.
-                    </li>
-                    <li>
-                      <c-s>min(&amp;self) -&gt; T</c-s> returns most negative value in <c-s>items</c-s>.
-                    </li>
-                    <li>
-                      <c-s>sum(&amp;self) -&gt; T</c-s> returns sum of values in <c-s>items</c-s>.
-                    </li>
-                    <li>
-                      <c-s>avg(&amp;self) -&gt; T</c-s> returns average of values in <c-s>items</c-s>.
-                    </li>
-                    <li>
-                      <c-s>clone(&amp;self) -&gt; Stats&lt;T&gt;</c-s>
-                    </li>
-                  </ul>
-                  Since all methods but the constructor accept a reference, <c-s>&amp;self</c-s>,
-                  invocations do not consume the <c-s>Stats</c-s> instance.
+                  Five of these functions use iterators, which are explained in the next
+                  <a target="_blank" href="Bits_IterRust.html">Bit</a>.
                 </t-b>
                 <div style="height:0.75em;"></div>
               </div>
@@ -1703,9 +1669,10 @@ pub fn nl() {
         <div style="height:0.75em;"></div>
         <h3 id="funcsdemo">1.6.2 Generic Functions Demonstration</h3>
         <t-b>
-          <del>Standard generic types are defined in the Rust Standard Library and include many more
-          than shown here. We have selected four frequently used types. You can find details of
-          the others from the references.</del>
+          The demonstration code and its output illustrate how effective generic functions like
+          <c-s>demo_indexer</c-s> can be to help make code readable and save time by avoiding
+          creation of multiple
+          functions that use the same code except for type declarations.
         </t-b>
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
@@ -1763,8 +1730,10 @@ call name: &quot;m&quot;, type: &quot;std::collections::hash::map::HashMap&lt;&s
             </second-item>
           </splitter-container>
         </div>
+        <div style="height:0.75em;"></div>
         <h4 id="build">Build</h4>
-        <pre class="codeSnap">
+        <div style="border:1px solid var(--dark); padding:0.25em 0.75em; width:max-content;">
+        <pre class="language-shell" style="width:max-content;">
 C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_generics
 &gt; cargo build
    Compiling rust_hello_objects v0.1.0 (C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_generics)
@@ -1773,7 +1742,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_generics
 &gt;
           </pre>
         </div>
-        <h3 id="ide">2.0 VS Code View</h3>
+        <h3 id="vscode">2.0 VS Code View</h3>
         <t-b>
           The code for this demo is available in
           <a target="_blank" href="https://github.com/JimFawcett/Bits">github.com/JimFawcett/Bits</a>. If you click on
@@ -1830,6 +1799,31 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_generics
             </td>
             <td>
               Relatively short feature discussions
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a target="_blank" href="https://doc.rust-lang.org/std/index.html">std library</a>
+            </td>
+            <td>
+              Comprehensive guide organized into primitive types, modules, macros, and keywords
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a target="_blank" href="https://doc.rust-lang.org/std/index.html#modules">std modules</a>
+            </td>
+            <td>
+              Definition of non-primitive types like <c-s>Vec&lt;T&gt;</c-s> and <c-s>String</c-s>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a target="_blank" href="https://doc.rust-lang.org/std/collections/index.html#modules">st::collections</a>
+            </td>
+            <td>
+              Definition of collection types like <c-s>HashMap&lt;K, V&gt;</c-s> and 
+              <c-s>VecDeque&lt;T&gt;</c-s>
             </td>
           </tr>
         </table>
