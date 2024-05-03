@@ -1162,21 +1162,16 @@ pub fn demo_stats() {
           </splitter-container>
         </div>
         <div style="height:0.75em;"></div>
-        <h3 id="point">1.5 PointN</h3>
+        <h3 id="point">1.5 PointN&lt;T&gt;</h3>
         <t-b>
-          <c-s>Stats&lt;T&gt;</c-s> is a relatively simple generic type defined in the module stats.rs.
-          It is included here to provide an introduction to syntax required for generic types.
+          <c-s>PointN&lt;T&gt;</c-s> is the first useful generic type presented here. It&apos;s defined in 
+          the module points_generic.rs and has almost all the functionality needed for a working type.
+          Only an iterator is needed, and that will be added in the next Bit.
         </t-b>
         <h3 id="pointdef">1.5.1 PointN Definition</h3>
         <t-b>
-          A Rust trait is a declaration that requires any generic type that implements the trait to
-          implement methods defined by the trait.
-          In <c-s>Stats&lt;T&gt;</c-s>, <c-s>T</c-s> is required to implement the trait <c-s>Arithmetic</c-s>.
-          That insures that arithmetic operations can be applied to T.
-        </t-b>
-        <t-b>
-          The <c-s>Stats</c-s> struct holds a vector of data of type <c-s>T</c-s> and its operations
-          evaluate simple arithmetic properties of that data.
+          <c-s>PointN&lt;T&gt;</c-s> represents an N-dimensional point by wrapping a vector of coordinates
+          call <c-s>coor</c-s>. It provides methods for initialization, modification, and indexing.
         </t-b>
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
@@ -1205,6 +1200,7 @@ where
 {
   coor: Vec&lt;T&gt;,
 }
+
 impl&lt;T&gt; PointN&lt;T&gt;
 where
 T: Debug + Default + Clone
@@ -1285,90 +1281,35 @@ impl&lt;T&gt; std::ops::Deref for PointN&lt;T&gt;
             <second-item id="fig7-second" style="width:40em; padding-right:0.5em; background-color:var(--light);">
               <div onclick="obubbleup('fig7-first')" class="textwrap">
                 <t-b>
-                  ----- defining generic types -----------------
-                </t-b>
-                <t-b>
-                  Rust types can be defined with generic data members:
-                  <ul>
-                    <li>
-                      <c-s>struct Stats&lt;T: Arithmetic + Debug&gt;</c-s> 
-                      defines the data member &quot;<c-s>items: Vec&lt;T&gt;</c-s>&quot; in the left panel.
-                    </li>
-                    <li>
-                      Methods cannot be called on <c-s>T</c-s> unless <c-s>T</c-s> is bounded by traits that 
-                      declare those methods. That guarantees that the invocation is well defined.
-                    </li>
-                    <li>
-                      This stats.rs module defines a trait &quot;<c-s>Arithmetic</c-s>&quot; as a union of
-                      traits defined in <c-s>std::ops</c-s>: 
-                      <c-s>Add, Sub, Mul, Div</c-s> plus traits in <c-s>std::cmd</c-s>: 
-                      <c-s>PartialEq, PartialOrd</c-s> plus traits 
-                      <c-s>Default, Copy, Debug, Into</c-s>.
-                    </li>
-                    <li>
-                      That means that T implements operators &quot;<c-s>+, -, *, /</c-s>&quot; and can be
-                      compared and put into at least a partial order.
-                    </li>
-                    <li>
-                      <c-s>Default</c-s> guarantees that <c-s>T::default()</c-s> has a defined value, 
-                      e.g., 0 for ints and 0.0 for floats.
-                    </li>
-                    <li>
-                      <c-s>Copy</c-s> is a marker trait, e.g., no methods, but requires construction and
-                      assignment to use copy operations instead of move operations. All the primitives
-                      are <c-s>Copy</c-s> types.
-                    </li>
-                    <li>
-                      <c-s>Debug</c-s> means that <c-s>Stats</c-s> instances can be written using the
-                      debug format &quot;<c-s>{:?}</c-s>&quot;
-                    </li>
-                    <li>
-                      <c-s>Into&lt;f64&gt;</c-s> means that any type will be implicitly converted to 
-                      <c-s>f64</c-s> if needed, as in dividing an instance of <c-s>T</c-s> by an
-                      integer.
-                    </li>
-                  </ul>
-                  If <c-s>Stats</c-s> is declared with a parameter <c-s>T</c-s> that does not meet all
-                  of these requirements, the declaration will fail to compile. Note that this is very
-                  similar to the use of <c-s>C#</c-s> constraints.
-                </t-b>
-                <t-b>
-                  Note that <c-s>Arithmetic</c-s> has only been implemented in <c-s>Stats</c-s> for the
-                  types <c-s>i32</c-s> and <c-s>f64</c-s>.  Implementing for other integers and floats is
-                  simply a matter of copying the impl statements for those types.
-                </t-b>
-                <t-b>
                   ----- <c-s>Stats</c-s> declaration ------
                 </t-b>
                 <t-b>
                   <c-s>
                     #[derive(Debug, Clone)]<br />
-                    pub struct Stats&lt;T: Arithmetic + Debug&gt; {<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;items: Vec&lt;T&gt;;<br />
+                    pub struct PointN&lt;T&gt;<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;where T: Debug + Default + Clone<br />
+                    {<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;coor: Vec&lt;T&gt;,<br />
                     }
                   </c-s><br />
                   <t-b>
-                    instructs the compiler to lay out <c-s>Stats</c-s> instances with a <c-s>Vec</c-s>
+                    instructs the compiler to lay out <c-s>PointN&lt;T&gt;</c-s> instances with a <c-s>Vec</c-s>
                     control block pointing to a mutable array of <c-s>T</c-s> values in the native heap.
                   </t-b>
                   <t-b>
                     The derive declaration instructs the compiler to implement <c-s>Debug</c-s> and
-                    <c-s>Clone</c-s> traits for <c-s>Stats</c-s>.
-                  </t-b>
-                  <t-b>
-                    The <c-s>Clone</c-s> trait implements a method <c-s>clone()</c-s> for <c-s>Stats</c-s>
-                    that copies the instance when <c-s>clone</c-s> is invoked.
+                    <c-s>Clone</c-s> traits.
                   </t-b>
                 </t-b>
                 <t-b>
-                  ----- <c-s>Stats</c-s> methods ----------
+                  ----- <c-s>PointN</c-s> methods ----------
                 </t-b>
                 <t-b class="indent">
-                  <c-s>Stats</c-s> implements the methods:
+                  <c-s>PointN&lt;T&gt;</c-s> implements the methods:
                   <ul>
                     <li>
-                      <c-s>new(v:Vec&lt;T&gt;) -&gt;Stats&lt;T&gt;</c-s>, a constructor that accepts a vector 
-                      of <c-s>T</c-s> values
+                      <c-s>new(n: usize) -&gt;PointN&lt;T&gt;</c-s>, a constructor that accepts a size 
+                      indicating the number of coordinates for this instance.
                     </li>
                     <li>
                       <c-s>max(&amp;self) -&gt; T</c-s> returns most positive value in <c-s>items</c-s>.
