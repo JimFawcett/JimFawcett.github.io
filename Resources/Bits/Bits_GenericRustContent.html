@@ -1114,9 +1114,9 @@ impl&lt;T: Arithmetic&gt; Stats&lt;T&gt;
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
           <splitter-container id="container">
-            <first-item id="fig4-first" style="width:52%; padding-right:0.5em;">
+            <first-item id="fig6-first" style="width:52%; padding-right:0.5em;">
               <div class="codewrap">
-                <pre onclick="cbubbleup('fig4-first')" style="width:200em;"><code class="language-cpp">fn demo_std_generic_types() {
+                <pre onclick="cbubbleup('fig6-first')" style="width:200em;"><code class="language-cpp">fn demo_std_generic_types() {
 
   show_note(&quot;demo standard generic types&quot;);
   println!();
@@ -1162,10 +1162,10 @@ impl&lt;T: Arithmetic&gt; Stats&lt;T&gt;
 </code></pre>
               </div>
             </first-item>
-            <splitter-bar id="fig4-seperator"></splitter-bar>
-            <second-item id="fig4-second" style="width:40em; padding-right:0.5em;">
+            <splitter-bar id="fig6-seperator"></splitter-bar>
+            <second-item id="fig6-second" style="width:40em; padding-right:0.5em;">
               <div class="codewrap">
-                <pre onclick="obubbleup('fig4-first')" style="width:200em;"><code class="language-shell">
+                <pre onclick="obubbleup('fig6-first')" style="width:200em;"><code class="language-shell">
 -------------------------
  demo standard generic types
 -------------------------
@@ -1233,95 +1233,109 @@ impl&lt;T: Arithmetic&gt; Stats&lt;T&gt;
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
           <splitter-container id="container">
-            <first-item id="fig5-first" style="width:52%; padding-right:0.5em;">
+            <first-item id="fig7-first" style="width:52%; padding-right:0.5em;">
               <div class="codewrap">
-                <pre onclick="cbubbleup('fig5-first')" style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------
-  stats.rs
-  - defines type Stats containing Vec of generic Type
-    bounded by Arithmetic trait
-  - Works as is only for i32 and f64, but easy to extend to
-    all integers and floats
-  - Can also be extended to complex numbers
+                <pre onclick="cbubbleup('fig7-first')" style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------
+  points.rs
+  - defines types PointN&lt;T&gt;
 -------------------------------------------------------------------*/
 
-use std::ops::*;
-use std::cmp::*;
-use std::convert::{Into};
-use std::fmt::Debug;
+use std::default::*;
+use std::fmt::*;
 
-pub trait Arithmetic&lt;T = Self&gt;: Add&lt;Output=T&gt; + Sub&lt;Output=T&gt;
-    + Mul&lt;Output=T&gt; + Div&lt;Output=T&gt; + PartialEq + PartialOrd
-    + Default + Copy + Debug + Into&lt;f64&gt; {}
+use crate::analysis_generic;    // identify source code
+use analysis_generic::*;        // import public functions and types
 
-impl Arithmetic&lt;f64&gt; for f64 {}
-impl Arithmetic&lt;i32&gt; for i32 {}
-
+/*---------------------------------------------------------
+  - Declare PointN&lt;T&gt; struct, like a C++ template class
+  - Request compiler implement traits Debug & Clone
+*/
 #[derive(Debug, Clone)]
-pub struct Stats&lt;T: Arithmetic + Debug&gt; {
-  items: Vec&lt;T&gt;
-}
-
-impl&lt;T: Arithmetic&gt; Stats&lt;T&gt;
-    where T: Arithmetic + Debug
+pub struct PointN&lt;T&gt;
+where
+  T: Debug + Default + Clone
 {
-  pub fn new(v:Vec&lt;T&gt;) -&gt; Stats&lt;T&gt; {
-    Stats {
-      items: v,
+  coor: Vec&lt;T&gt;,
+}
+impl&lt;T&gt; PointN&lt;T&gt;
+where
+T: Debug + Default + Clone
+{
+  /*-- constructor --*/
+  pub fn new(n: usize) -&gt; PointN&lt;T&gt; {
+    PointN::&lt;T&gt; {
+      coor: vec![T::default(); n],
     }
   }
-  pub fn max(&self) -&gt; T {
-    let mut biggest = self.items[0];
-    for item in &self.items {
-      if biggest &lt; *item {
-        biggest = *item;
-      }
-    }
-    biggest
+  /*-------------------------------------------------------
+    init(...) moves new coordinate vector into coor and
+    overrides any specified n supplied in new(n: usize)
+  -------------------------------------------------------*/
+  pub fn init(mut self, coord: Vec&lt;T&gt;) -&gt; PointN&lt;T&gt; {
+    self.coor = coord;
+    self
   }
-  pub fn min(&self) -&gt; T {
-    let mut smallest = self.items[0];
-    for item in &self.items {
-      if smallest &gt; *item {
-        smallest = *item;
-      }
-    }
-    smallest
+  pub fn len(&self) -&gt; usize {
+    self.coor.len()
   }
-  pub fn sum(&self) -&gt; T {
-    let mut sum = T::default();
-    for item in &self.items {
-      sum = sum + *item;
-    }
-    sum
+  /*-- acts as both get_coor() and set_coor(some_vector) --*/
+  pub fn coors(&mut self) -&gt; &mut Vec&lt;T&gt; {
+    &mut self.coor
   }
-  pub fn avg(&self) -&gt; f64 {
-    let mut sum = T::default();
-    for item in &self.items {
-      sum = sum + *item;
-    }
-    /*-- cast usize to f64 --*/
-    let den:f64 = self.items.len() as f64;
-    /*-- can't cast non-primitive to primitive --*/
-    let num:f64 = sum.into();
-    num/den
+  /*-- displays name, type, and coordinates --*/
+  pub fn show(&self, nm:&str, left: usize, width:usize) {
+    println!(&quot;  {nm:?}: PointN&lt;T&gt; {{&quot;);
+    show_fold(&self.coor, left + 2, width);
+    println!(&quot;  }}&quot;)
   }
 }
+/*-- implements const indexer -----------------*/
+impl&lt;T:Debug, Idx&gt; std::ops::Index&lt;Idx&gt; for PointN&lt;T&gt;
+    where
+        T:Debug + Default + Clone,
+        Idx: std::slice::SliceIndex&lt;[T]&gt;
+{
+    type Output = Idx::Output;
 
+    fn index(&self, index:Idx) -&gt; &Self::Output {
+        &self.coor[index]
+    }
+}
+/*-- implements mutable indexer ---------------*/
+impl&lt;T, Idx&gt; std::ops::IndexMut&lt;Idx&gt; for PointN&lt;T&gt;
+    where
+        T:Debug + Default + Clone,
+        Idx: std::slice::SliceIndex&lt;[T]&gt;
+{
+    fn index_mut(&mut self, index:Idx) -&gt; &mut Self::Output {
+        &mut self.coor[index]
+    }
+}
+/* explicit conversion to slice &[T] */
+impl&lt;T&gt; AsRef&lt;[T]&gt; for PointN&lt;T&gt;
+  where
+    T: ?Sized,
+    T: Debug + Display + Default + Clone,
+{
+  fn as_ref(&self) -&gt; &[T] {
+    &self.coor
+  }
+}
+/* implicit conversion to slice &[T] */
+impl&lt;T&gt; std::ops::Deref for PointN&lt;T&gt;
+  where T: Debug + Default + Clone,
+{
+  type Target = [T];
 
-
-
-
-
-
-
-
-
-</code></pre>
+  fn deref(&self) -&gt; &Self::Target {
+    &self.coor
+  }
+}</code></pre>
               </div>
             </first-item>
-            <splitter-bar id="fig5-seperator"></splitter-bar>
-            <second-item id="fig5-second" style="width:40em; padding-right:0.5em; background-color:var(--light);">
-              <div onclick="obubbleup('fig5-first')" class="textwrap">
+            <splitter-bar id="fig7-seperator"></splitter-bar>
+            <second-item id="fig7-second" style="width:40em; padding-right:0.5em; background-color:var(--light);">
+              <div onclick="obubbleup('fig7-first')" class="textwrap">
                 <t-b>
                   ----- defining generic types -----------------
                 </t-b>
@@ -1442,99 +1456,58 @@ impl&lt;T: Arithmetic&gt; Stats&lt;T&gt;
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
           <splitter-container id="container">
-            <first-item id="fig4-first" style="width:52%; padding-right:0.5em;">
+            <first-item id="fig8-first" style="width:52%; padding-right:0.5em;">
               <div class="codewrap">
-                <pre onclick="cbubbleup('fig4-first')" style="width:200em;"><code class="language-cpp">fn demo_std_generic_types() {
+                <pre onclick="cbubbleup('fig8-first')" style="width:200em;"><code class="language-cpp">/*---------------------------------------------------------
+  Demonstrate user-defined PointN&lt;T&gt; type
+*/
+pub fn demo_pointn() {
 
-  show_note(&quot;demo standard generic types&quot;);
+  show_label(&quot;demo indexing with PointN&lt;T&gt;&quot;, 40);
   println!();
 
-  show_op(&quot;arrays: [T; N]&quot;);
+  show_op(&quot;PointN&lt;i32&gt;&quot;);
   println!();
-  let arri = [1, 2, 3, 2, 1];
-  println!(&quot;  {:?}&quot;, arri);
-  let arrf = [1.0, 1.5, 2.0, 1.5, 1.0];
-  println!(&quot;  {:?}&#92;n&quot;, arrf);
+  let mut p = PointN::&lt;i32&gt;::new(0)
+         .init(vec![1, 2, 3, 2, 1]);
+  p.show(&quot;p&quot;, 2, 12);
+  println!();
+  show_op(&quot;*p.coors() = vec![1, 0, -1, 0, 1]&quot;);
+  *p.coors() = vec![1, 0, -1, 0, 1];
+  p.show(&quot;p&quot;, 2, 12);
 
-  show_op(&quot;slices: &T[m..n]&quot;);
-  println!();
-  let slicei = &arri[1..5]; // [2, 3, 4, 5]
-  println!(&quot;  {:?}&quot;, slicei);
-  let slicef = &arrf[2..4]; // [2.0, 1.5]
-  println!(&quot;  {:?}&#92;n&quot;, slicef);
+  println!(&quot;&#92;n  using immutable indexer:&quot;);
+  println!(&quot;  value of p[0] is {}&#92;n&quot;, p[0]);
+  println!(&quot;  using mutable indexer:&quot;);
+  show_op(&quot;p[0] = 3&quot;);
+  p[0] = 3;
+  p.show(&quot;p&quot;, 2, 12);
+  show_op(&quot;p[1] = 4&quot;);
+  p[1] = 4;
+  p.show(&quot;p&quot;, 2, 12);
 
-  show_op(&quot;vectors: Vec&lt;T&gt;&quot;);
-  println!();
-  let mut v = Vec::&lt;i32&gt;::new();
-  v.push(1);
-  v.push(2);
-  v.push(3);
-  v.push(2);
-  v.push(1);
-  println!(&quot;  Vec&lt;i32&gt; {:?}&quot;, v);
-  let mut v2 = Vec::&lt;(i32,&str)&gt;::new();
-  v2.push((1, &quot;one&quot;));
-  v2.push((2, &quot;two&quot;));
-  println!(&quot;  Vec&lt;(i32, &str)&gt; {:?}&#92;n&quot;, v2);
-
-  show_op(&quot;maps: HashMap&lt;K,V&gt;&quot;);
-  println!();
-  let mut m = HashMap::&lt;&str, i32&gt;::new();
-  m.insert(&quot;zero&quot;, 0);
-  m.insert(&quot;one&quot;, 1);
-  m.insert(&quot;two&quot;, 2);
-  m.insert(&quot;three&quot;, 3);
-  println!(&quot;  maps: HashMap&lt;&str, i32&gt;&quot;);
-  println!(&quot;    {:?}&quot;, m);
 }
 </code></pre>
               </div>
             </first-item>
-            <splitter-bar id="fig4-seperator"></splitter-bar>
-            <second-item id="fig4-second" style="width:40em; padding-right:0.5em;">
+            <splitter-bar id="fig8-seperator"></splitter-bar>
+            <second-item id="fig8-second" style="width:40em; padding-right:0.5em;">
               <div class="codewrap">
-                <pre onclick="obubbleup('fig4-first')" style="width:200em;"><code class="language-shell">
+                <pre onclick="obubbleup('fig8-first')" style="width:200em;"><code class="language-shell">
 -------------------------
- demo standard generic types
+ demo_generic_functions
 -------------------------
 
---- arrays: [T; N] ---
+--- show_type&lt;T:Debug&gt;(_t, &quot;name&quot;) ---
 
-  [1, 2, 3, 2, 1]
-  [1.0, 1.5, 2.0, 1.5, 1.0]
+call name: &quot;v&quot;, type: &quot;alloc::vec::Vec&lt;i32&gt;&quot;
+call name: &quot;m&quot;, type: &quot;std::collections::hash::map::HashMap&lt;&str, i32&gt;&quot;
 
+--- demo_indexer ---
 
-
---- slices: &T[m..n] ---
-
-  [2, 3, 2, 1]
-  [2.0, 1.5]
-
-
-
---- vectors: Vec&lt;T&gt; ---
-
-  Vec&lt;i32&gt; [1, 2, 3, 2, 1]
-  Vec&lt;(i32, &str)&gt; [(1, &quot;one&quot;), (2, &quot;two&quot;)]
-
-
-
-
-
-
-
-
-
-
---- maps: HashMap&lt;K,V&gt; ---
-
-  maps: HashMap&lt;&str, i32&gt;
-    {&quot;one&quot;: 1, &quot;two&quot;: 2, &quot;zero&quot;: 0, &quot;three&quot;: 3}
-
-
-
-
-
+  [i32; 3]  [ 1, 2, 3 ]
+  Vec&lt;i32&gt;  [ 1, 2, 3 ]
+  PointN&lt;f64&gt;  [ 1.0, 2.0, -0.5 ]
 
 </code></pre>
               </div>
@@ -1547,13 +1520,14 @@ impl&lt;T: Arithmetic&gt; Stats&lt;T&gt;
           <c-s>Stats&lt;T&gt;</c-s> is a relatively simple generic type defined in the module stats.rs.
           It is included here to provide an introduction to syntax required for generic types.
         </t-b>
-        <h3 id="statsdef">1.4.1 Stats Definition</h3>
+        <!--<h3 id="statsdef">1.4.1 Stats Definition</h3>-->
         <t-b>
           A Rust trait is a declaration that requires any generic type that implements the trait to
           implement methods defined by the trait.
           In <c-s>Stats&lt;T&gt;</c-s>, <c-s>T</c-s> is required to implement the trait <c-s>Arithmetic</c-s>.
           That insures that arithmetic operations can be applied to T.
         </t-b>
+        <h3 id="funcsdef">1.6.1</h3>
         <t-b>
           The <c-s>Stats</c-s> struct holds a vector of data of type <c-s>T</c-s> and its operations
           evaluate simple arithmetic properties of that data.
@@ -1561,95 +1535,172 @@ impl&lt;T: Arithmetic&gt; Stats&lt;T&gt;
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
           <splitter-container id="container">
-            <first-item id="fig5-first" style="width:52%; padding-right:0.5em;">
+            <first-item id="fig9-first" style="width:52%; padding-right:0.5em;">
               <div class="codewrap">
-                <pre onclick="cbubbleup('fig5-first')" style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------
-  stats.rs
-  - defines type Stats containing Vec of generic Type
-    bounded by Arithmetic trait
-  - Works as is only for i32 and f64, but easy to extend to
-    all integers and floats
-  - Can also be extended to complex numbers
+                <pre onclick="cbubbleup('fig9-first')" style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------
+  analysis_generics.rs
+  - provides analysis and display functions for Objects demo.
+  - a few of these require advanced generics code.
+  - You don't need to know how these work to understand this
+    demo.
+  - We will come back to these functions in rust_generics.
 -------------------------------------------------------------------*/
 
-use std::ops::*;
-use std::cmp::*;
-use std::convert::{Into};
-use std::fmt::Debug;
+use std::fmt::*;
 
-pub trait Arithmetic&lt;T = Self&gt;: Add&lt;Output=T&gt; + Sub&lt;Output=T&gt;
-    + Mul&lt;Output=T&gt; + Div&lt;Output=T&gt; + PartialEq + PartialOrd
-    + Default + Copy + Debug + Into&lt;f64&gt; {}
-
-impl Arithmetic&lt;f64&gt; for f64 {}
-impl Arithmetic&lt;i32&gt; for i32 {}
-
-#[derive(Debug, Clone)]
-pub struct Stats&lt;T: Arithmetic + Debug&gt; {
-  items: Vec&lt;T&gt;
+/*---------------------------------------------------------
+  Show input's call name and type
+  - doesn't consume input
+  - show_type is generic function with Debug bound.
+    Using format &quot;{:?}&quot; requires Debug.
+*/
+pub fn show_type&lt;T:Debug&gt;(_t: &T, nm: &str) {
+  let typename = std::any::type_name::&lt;T&gt;();
+  println!(&quot;call name: {nm:?}, type: {typename:?}&quot;);
 }
-
-impl&lt;T: Arithmetic&gt; Stats&lt;T&gt;
-    where T: Arithmetic + Debug
+/*---------------------------------------------------------
+  show_indexer&lt;T:Debug&gt;(nm:&str, s:&[T])
+  - accepts any collection that implements Deref to slice
+  - that includes array [T;N], slice T[N], Vec&lt;T&gt;, PointN&lt;T&gt;
+*/
+#[allow(clippy::needless_range_loop)]
+pub fn demo_indexer&lt;T: Debug + Display&gt;(nm:&str, s:&[T])
 {
-  pub fn new(v:Vec&lt;T&gt;) -&gt; Stats&lt;T&gt; {
-    Stats {
-      items: v,
-    }
+  print!(&quot;  {}&quot;, nm);
+  let max = s.len();
+  print!{&quot;  [ {:?}&quot;, s[0]};
+  /* 1..max is range iterator */
+  for i in 1..max {
+      print!(&quot;, {:?}&quot;, s[i]);
   }
-  pub fn max(&self) -&gt; T {
-    let mut biggest = self.items[0];
-    for item in &self.items {
-      if biggest &lt; *item {
-        biggest = *item;
-      }
+  println!(&quot; ]&quot;);
+  /*---------------------------------------------
+    The code above is not idiomatic Rust.
+    Rust style prefers using iterators over indexing
+    like this:
+    for item in s.iter() {
+      print!(&quot;{item} &quot;);
     }
-    biggest
-  }
-  pub fn min(&self) -&gt; T {
-    let mut smallest = self.items[0];
-    for item in &self.items {
-      if smallest &gt; *item {
-        smallest = *item;
-      }
-    }
-    smallest
-  }
-  pub fn sum(&self) -&gt; T {
-    let mut sum = T::default();
-    for item in &self.items {
-      sum = sum + *item;
-    }
-    sum
-  }
-  pub fn avg(&self) -&gt; f64 {
-    let mut sum = T::default();
-    for item in &self.items {
-      sum = sum + *item;
-    }
-    /*-- cast usize to f64 --*/
-    let den:f64 = self.items.len() as f64;
-    /*-- can't cast non-primitive to primitive --*/
-    let num:f64 = sum.into();
-    num/den
-  }
+  */
 }
+/*---------------------------------------------------------
+  build indent string with &quot;left&quot; spaces
+*/
+pub fn offset(left: usize) -&gt; String {
+  let mut accum = String::new();
+  for _i in 0..left {
+    accum += &quot; &quot;;
+  }
+  accum
+}
+/*---------------------------------------------------------
+  find index of last occurance of chr in s
+  - returns option in case chr is not found
+  https://stackoverflow.com/questions/50101842/how-to-find-the-last-occurrence-of-a-char-in-a-string
+*/
+fn find_last_utf8(s: &str, chr: char) -&gt; Option&lt;usize&gt; {
+  s.chars().rev().position(|c| c== chr)
+    .map(|rev_pos| s.chars().count() - rev_pos - 1)
 
+/*-- alternate implementation --*/
+  // if let Some(rev_pos) =
+  //   s.chars().rev().position(|c| c == chr) {
+  //     Some(s.chars().count() - rev_pos - 1)
+  // } else {
+  //     None
+  // }
+}
+/*---------------------------------------------------------
+  fold an enumerable's elements into rows of w elements
+  - indent by left spaces
+  - does not consume t since passed as reference
+  - returns string
+  https://users.rust-lang.org/t/generic-code-over-iterators/10907/3
+*/
+pub fn fold&lt;T, I:Debug&gt;(
+  t: &T, left: usize, width: usize
+) -&gt; String
+    where for&lt;'a&gt; &'a T: IntoIterator&lt;Item = &'a I&gt;, T:Debug
+{
+  let mut accum = String::new();
+  accum += &offset(left);
 
+  /*-- Alternate direct implementation --*/
+  //let mut i = 0usize;
+  // for item in t {
+  //   accum += &format!(&quot;{item:?}, &quot;);
+  //   if ((i + 1) % width) == 0 && i != 0 {
+  //       accum += &quot;&#92;n&quot;;
+  //       accum += &offset(left);
+  //   }
+  //   i += 1;
+  // }
 
-
-
-
-
+  for (i, item) in t.into_iter().enumerate() {
+    accum += &format!(&quot;{item:?}, &quot;);
+    if ((i + 1) % width) == 0 && i != 0 {
+        accum += &quot;&#92;n&quot;;
+        accum += &offset(left);
+    }
+  }
+  let opt = find_last_utf8(&accum, ',');
+  if let Some(index) = opt {
+    accum.truncate(index);
+  }
+  accum
+}
+/*---------------------------------------------------------
+  show enumerables's elements as folded rows
+  - width is number of elements in each row
+  - left is indent from terminal left
+*/
+pub fn show_fold&lt;T:Debug, I:Debug&gt;(t:&T, left:usize, width:usize)
+  where for&lt;'a&gt; &'a T: IntoIterator&lt;Item = &'a I&gt;
+{
+  println!(&quot;{}&quot;,fold(t, left, width));
+}
+/*------------------------------------------------------------
+  show string wrapped with long dotted lines above and below
+*/
+pub fn show_label(note: &str, n:usize) {
+  let line =
+    std::iter::repeat('-').take(n).collect::&lt;String&gt;();
+  print!(&quot;&#92;n{line}&#92;n&quot;);
+  print!(&quot;  {note}&quot;);
+  print!(&quot;&#92;n{line}&#92;n&quot;);
+}
+pub fn show_label_def(note:&str) {
+  show_label(note, 50);
+}
+/*---------------------------------------------------------
+  show string wrapped with dotted lines above and below
+*/
+pub fn show_note(note: &str) {
+  print!(&quot;&#92;n-------------------------&#92;n&quot;);
+  print!(&quot; {note}&quot;);
+  print!(&quot;&#92;n-------------------------&#92;n&quot;);
+}
+/*---------------------------------------------------------
+  show string wrapped in short lines
+*/
+pub fn show_op(opt: &str) {
+  println!(&quot;--- {opt} ---&quot;);
+}
+/*---------------------------------------------------------
+  print newline
+*/
+pub fn nl() {
+  println!();
+}
 
 
 
 </code></pre>
               </div>
             </first-item>
-            <splitter-bar id="fig5-seperator"></splitter-bar>
-            <second-item id="fig5-second" style="width:40em; padding-right:0.5em; background-color:var(--light);">
-              <div onclick="obubbleup('fig5-first')" class="textwrap">
+            <splitter-bar id="fig9-seperator"></splitter-bar>
+            <second-item id="fig9-second" style="width:40em; padding-right:0.5em; background-color:var(--light);">
+              <div onclick="obubbleup('fig9-first')" class="textwrap">
                 <t-b>
                   ----- defining generic types -----------------
                 </t-b>
@@ -1761,7 +1812,7 @@ impl&lt;T: Arithmetic&gt; Stats&lt;T&gt;
           </splitter-container>
         </div>
         <div style="height:0.75em;"></div>
-        <h3 id="statsdemo">1.2.2 Stats Demonstration</h3>
+        <h3 id="funcsdemo">1.6.2 Generic Functions Demonstration</h3>
         <t-b>
           <del>Standard generic types are defined in the Rust Standard Library and include many more
           than shown here. We have selected four frequently used types. You can find details of
@@ -1770,95 +1821,49 @@ impl&lt;T: Arithmetic&gt; Stats&lt;T&gt;
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
           <splitter-container id="container">
-            <first-item id="fig4-first" style="width:52%; padding-right:0.5em;">
+            <first-item id="fig10-first" style="width:52%; padding-right:0.5em;">
               <div class="codewrap">
-                <pre onclick="cbubbleup('fig4-first')" style="width:200em;"><code class="language-cpp">fn demo_std_generic_types() {
-
-  show_note(&quot;demo standard generic types&quot;);
+                <pre onclick="cbubbleup('fig10-first')" style="width:200em;"><code class="language-cpp">fn demo_generic_functions() {
+  show_note(&quot;demo_generic_functions&quot;);
   println!();
 
-  show_op(&quot;arrays: [T; N]&quot;);
+  show_op(&quot;show_type&lt;T:Debug&gt;(_t, &#92;&quot;name&#92;&quot;)&quot;);
   println!();
-  let arri = [1, 2, 3, 2, 1];
-  println!(&quot;  {:?}&quot;, arri);
-  let arrf = [1.0, 1.5, 2.0, 1.5, 1.0];
-  println!(&quot;  {:?}&#92;n&quot;, arrf);
 
-  show_op(&quot;slices: &T[m..n]&quot;);
+  let v = vec![1, 2, 3];
+  show_type(&v, &quot;v&quot;);
+  let m = HashMap::&lt;&str, i32&gt;::new();
+  show_type(&m, &quot;m&quot;);
   println!();
-  let slicei = &arri[1..5]; // [2, 3, 4, 5]
-  println!(&quot;  {:?}&quot;, slicei);
-  let slicef = &arrf[2..4]; // [2.0, 1.5]
-  println!(&quot;  {:?}&#92;n&quot;, slicef);
 
-  show_op(&quot;vectors: Vec&lt;T&gt;&quot;);
+  show_op(&quot;demo_indexer&quot;);
   println!();
-  let mut v = Vec::&lt;i32&gt;::new();
-  v.push(1);
-  v.push(2);
-  v.push(3);
-  v.push(2);
-  v.push(1);
-  println!(&quot;  Vec&lt;i32&gt; {:?}&quot;, v);
-  let mut v2 = Vec::&lt;(i32,&str)&gt;::new();
-  v2.push((1, &quot;one&quot;));
-  v2.push((2, &quot;two&quot;));
-  println!(&quot;  Vec&lt;(i32, &str)&gt; {:?}&#92;n&quot;, v2);
-
-  show_op(&quot;maps: HashMap&lt;K,V&gt;&quot;);
-  println!();
-  let mut m = HashMap::&lt;&str, i32&gt;::new();
-  m.insert(&quot;zero&quot;, 0);
-  m.insert(&quot;one&quot;, 1);
-  m.insert(&quot;two&quot;, 2);
-  m.insert(&quot;three&quot;, 3);
-  println!(&quot;  maps: HashMap&lt;&str, i32&gt;&quot;);
-  println!(&quot;    {:?}&quot;, m);
+  demo_indexer(&quot;[i32; 3]&quot;, &[1, 2, 3]);
+  demo_indexer(&quot;Vec&lt;i32&gt;&quot;, &v);
+  let p = PointN::&lt;f64&gt;::new(3).init(vec![1.0, 2.0, -0.5]);
+  demo_indexer(&quot;PointN&lt;f64&gt;&quot;, &p);
 }
 </code></pre>
               </div>
             </first-item>
-            <splitter-bar id="fig4-seperator"></splitter-bar>
-            <second-item id="fig4-second" style="width:40em; padding-right:0.5em;">
+            <splitter-bar id="fig10-seperator"></splitter-bar>
+            <second-item id="fig10-second" style="width:40em; padding-right:0.5em;">
               <div class="codewrap">
-                <pre onclick="obubbleup('fig4-first')" style="width:200em;"><code class="language-shell">
+                <pre onclick="obubbleup('fig10-first')" style="width:200em;"><code class="language-shell">
 -------------------------
- demo standard generic types
+ demo_generic_functions
 -------------------------
 
---- arrays: [T; N] ---
+--- show_type&lt;T:Debug&gt;(_t, &quot;name&quot;) ---
 
-  [1, 2, 3, 2, 1]
-  [1.0, 1.5, 2.0, 1.5, 1.0]
+call name: &quot;v&quot;, type: &quot;alloc::vec::Vec&lt;i32&gt;&quot;
+call name: &quot;m&quot;, type: &quot;std::collections::hash::map::HashMap&lt;&str, i32&gt;&quot;
 
+--- demo_indexer ---
 
-
---- slices: &T[m..n] ---
-
-  [2, 3, 2, 1]
-  [2.0, 1.5]
-
-
-
---- vectors: Vec&lt;T&gt; ---
-
-  Vec&lt;i32&gt; [1, 2, 3, 2, 1]
-  Vec&lt;(i32, &str)&gt; [(1, &quot;one&quot;), (2, &quot;two&quot;)]
-
-
-
-
-
-
-
-
-
-
---- maps: HashMap&lt;K,V&gt; ---
-
-  maps: HashMap&lt;&str, i32&gt;
-    {&quot;one&quot;: 1, &quot;two&quot;: 2, &quot;zero&quot;: 0, &quot;three&quot;: 3}
-
+  [i32; 3]  [ 1, 2, 3 ]
+  Vec&lt;i32&gt;  [ 1, 2, 3 ]
+  PointN&lt;f64&gt;  [ 1.0, 2.0, -0.5 ]
 
 
 
@@ -2000,6 +2005,7 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Rust&#92;rust_generics
     onLoadSplitter("fig7");
     onLoadSplitter("fig8");
     onLoadSplitter("fig9");
+    onLoadSplitter("fig10");
   </script>
 </body>
 </html>
