@@ -141,7 +141,7 @@
         <t-b>
           <strong>Template functions</strong> use the syntax:<br />
           <div class="inset">
-            <div style="float:right;margin-right:1em;">Examples in <a target="_blank" href="#funcsdef">Section 2.6.1</a></div>
+            <div style="float:right;margin-right:1em;">Examples in <a href="#gfdef">Section 2.6.1</a></div>
             <c-s>
               template &lt;typename T1, T2&gt;<br />
               auto f&lt;T1, T2&gt (t:T1, ...) -&gt; T2 {<br />
@@ -159,7 +159,7 @@
         <t-b>
           <strong>Template classes</strong> are defined with the syntax:
           <div class="inset">
-            <div style="float:right;margin-right:1em;">Examples in <a target="_blank" href="#point">Section 2.5</a></div>
+            <div style="float:right;margin-right:1em;">Examples in <a href="#point">Section 2.5</a></div>
             <c-s>
               template&lt;typename T, const size_t N&gt;<br />
               class Point<br />
@@ -188,7 +188,7 @@
               template &lt;typename T&gt;<br />
               concept Number = std::integral&lt;T&gt; || std::floating_point&lt;T&gt;;<br />
               <div style="height:0.5em;"></div>
-              <div style="float:right;margin-right:1em;">Example in <a target="_blank" href="#statsdef">Section 2.4.1</a></div>
+              <div style="float:right;margin-right:1em;">Example in <a href="#statsdefn">Section 2.4.1</a></div>
               template &lt;typename T&gt;<br />
               &nbsp;&nbsp;&nbsp;requires Number&lt;T&gt;<br />
               class Stats { /* method implementations here */ }
@@ -272,101 +272,104 @@
         <h3 id="source">1.1 Program Structure</h3>
         <t-b style="margin-bottom:1em;">
           The &quot;Program Structure&quot; dropdown below illustrates how this program is structured
-          using four files:
-          PointsGen.h, AnalysisGen.h, Demos.h, and several functions
-          defined in Cpp_Generics.cpp.
+          using six files:
+          AnalysisGen.h, HelloTemplates.h, Stats.h, PointsGen.h, Time.h, and several functions
+          defined in Bits_Generics.cpp.
         </t-b>
         <t-b>
-          The first three files are header-only libraries and the fourth defines execution flow
-          for demonstration of C++ generic library and user-defined types. That file defines
-          seven demonstration functions and calls them in its <c-s>main()</c-s> function.
-        </t-b>
+          The first five files are header-only libraries and the sixth defines execution flow
+          for demonstration of C++ generic library and user-defined types. 
         <t-b>
-          This program&apos;s structure is similar to that used in the previous C++ objects bit
-          so is not shown by default.
+          Each file defines one type and a demonstration function that illustrates how the file&apos;s defined
+          class and functions work. The main program file, Bits_Generics.cpp, invokes the
+          demonstration functions from each of the header libraries.
         </t-b>
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
           <splitter-container id="container">
             <first-item id="structure-first" style="width:52%;">
               <div class="codewrap">
-                <pre onclick="cbubbleup('structure-first')" style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------
+                <pre onclick="cbubbleup('structure-first')" style="width:200em;"><code class="language-cpp">
+  /*-------------------------------------------------------------------
   Cpp_Generics.cpp
   - demonstrates creating and using std::library generic types:
-      array, basic_string, vector, and map
+  array, basic_string, vector, and map
   - demonstrates creating and using user-defined generic types:
-      Stats, Demo, and PointsN
+  HelloTemplates, Stats, and Point
+  - depends on HelloTemplates.h to provide user-defined HelloTemplates class
+  - depends on Stats.h to provide user-defined Stats class
   - depends on PointsGen.h to provide user-defined point class
   - depends on Analysis.h for several display and analysis functions
-*/
-/*-----------------------------------------------
+  */
+  /*-----------------------------------------------
   Note:
   Find all Bits code, including this in
   https://github.com/JimFawcett/Bits
   You can clone the repo from this link.
------------------------------------------------*/
+  -----------------------------------------------*/
 
-#include &lt;iostream&gt;       // std::cout
-#include &lt;memory&gt;         // std::unique_ptr
-#include &lt;vector&gt;         // vector&lt;T&gt; class
-#include &lt;array&gt;          // array&lt;T&gt; class
-#include &lt;map&gt;            // map&lt;K,V&gt; class
-#include &lt;unordered_map&gt;  // unordered_map&lt;k,V&gt; class
-#include &lt;set&gt;            // set&lt;T&gt; class
-#include &lt;thread&gt;         // this_thread
-#include &quot;AnalysisGen.h&quot;  // Analysis functions
-#include &quot;HelloTemplates.h&quot;        // Stats class declaration
-#include &quot;Stats.h&quot;
-#include &quot;PointsGen.h&quot;    // Point&lt;T, N&gt; class declaration
+  #include &lt;iostream&gt;       // std::cout
+  #include &lt;memory&gt;         // std::unique_ptr
+  #include &lt;vector&gt;         // vector&lt;T&gt; class
+  #include &lt;array&gt;          // array&lt;T&gt; class
+  #include &lt;map&gt;            // map&lt;K,V&gt; class
+  #include &lt;unordered_map&gt;  // unordered_map&lt;k,V&gt; class
+  #include &lt;set&gt;            // set&lt;T&gt; class
+  #include &lt;thread&gt;         // this_thread
+  #include &quot;AnalysisGen.h&quot;  // Analysis functions
+  #include &quot;HelloTemplates.h&quot;        // Stats class declaration
+  #include &quot;Stats.h&quot;
+  #include &quot;PointsGen.h&quot;    // Point&lt;T, N&gt; class declaration
 
-using namespace Analysis;
-using namespace Points;
+  using namespace Analysis;
+  using namespace Points;
 
 
-/*-----------------------------------------------
+  /*-----------------------------------------------
   Overload operator&lt;&lt; for std::vector,
   required for demo_std_generic_types()
   and testformats()
-*/
-template&lt;typename T&gt;
-std::ostream& operator&lt;&lt;(std::ostream& out, std::vector&lt;T&gt;& v) {
+  */
+  template&lt;typename T&gt;
+  std::ostream& operator&lt;&lt;(std::ostream& out, std::vector&lt;T&gt;& v) {
   out &lt;&lt; format(v, &quot;vector&lt;T&gt;&quot;, &quot;&quot;, DisplayParams.left, DisplayParams.width);
   return out;
-}
+  }
 
-/*-----------------------------------------------
+  /*-----------------------------------------------
   demonstrate use of std generic types
-*/
-void demo_std_generic_types() {
+  */
+  void demo_std_generic_types() {
   /* code elided */
-}
+  }
 
-/*-----------------------------------------------
+  /*-----------------------------------------------
   demonstrate use of generic functions
-*/
-void demo_generic_functions() {
+  */
+  void demo_generic_functions() {
   /* code elided */
-}
+  }
 
-int main() {
+  int main() {
 
-    showNote(&quot;Demonstrate C++ Generics&quot;, 30, nl);
+  showNote(&quot;Demonstrate C++ Generics&quot;, 30, nl);
 
-    demo_std_generic_types();
-    demo_custom_type_HelloTemplates();
-    demo_custom_type_Stats();
-    demo_custom_type_Point();
-    demo_generic_functions();
+  demo_std_generic_types();
+  demo_custom_type_HelloTemplates();
+  demo_custom_type_Stats();
+  demo_custom_type_Point();
+  demo_generic_functions();
 
-    testtime();
+  testtime();
 
-    for(size_t i=0; i&lt;4; ++i) {
-      testtimer();
-      std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
+  for(size_t i=0; i&lt;4; ++i) {
+  testtimer();
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
 
-    print(&quot;&#92;n  That's all Folks!&#92;n&#92;n&quot;);
-}</code></pre>
+  print(&quot;&#92;n  That's all Folks!&#92;n&#92;n&quot;);
+  }
+</code></pre>
               </div>
             </first-item>
             <splitter-bar id="structure-seperator"></splitter-bar>
