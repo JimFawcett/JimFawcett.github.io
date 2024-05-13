@@ -37,7 +37,9 @@ function toggleInfoRel(src, dst, adj = 0) {
 function setScroll() {
   let main = document.querySelector("#main");
   const scrollPosition = main.scrollTop;
-  localStorage.setItem('scrollPositionHelloRust', scrollPosition);
+    let key = "scrollPos" + window.location;
+  localStorage.setItem(key, scrollPosition);
+//  localStorage.setItem('scrollPositionHelloRust', scrollPosition);
   let body = document.getElementById("github");
   let style = window.getComputedStyle(body, null).getPropertyValue('line-height');
   let fontsize = parseFloat(style);
@@ -46,9 +48,13 @@ function setScroll() {
 }
 function gotoLastScroll() {
   let main = document.querySelector("#main");
-  const scrollPosition = localStorage.getItem('scrollPositionHelloRust');
+  let key = "scrollPos" + window.location;
+  const scrollPosition = localStorage.getItem(key);
+//  const scrollPosition = localStorage.getItem('scrollPositionHelloRust');
   if (scrollPosition) {
+    //main.style.display = "none";
     main.scrollTo(0, scrollPosition);
+    //main.display.style = "block";
   }
   main.addEventListener('scroll', setScroll);
 }
