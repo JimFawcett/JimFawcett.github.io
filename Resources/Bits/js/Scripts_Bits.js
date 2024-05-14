@@ -35,3 +35,7 @@ function toggleInfoRel(src, dst, adj = 0) {
     txtcont.style.display = "none";
   }
 }
+function load() {
+  initialize();
+    //actions.keysMenu();
+}
