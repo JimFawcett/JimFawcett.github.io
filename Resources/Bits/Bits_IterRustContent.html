@@ -750,7 +750,295 @@ modified: [2, 3, 0, -1, 1]
           </splitter-container>
         </div>
         <div style="height:1em;"></div>
-        <h3 id="pointdef">2.3 Iteration over custom Point&lt;T, N&gt; Coordinates</h3>
+        <h3 id="csliter">2.3 Generate CSL for Several Different Types</h3>
+        <t-b>
+
+        </t-b>
+        <div class="blockSingle" style="padding:0em;">
+          <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
+          <splitter-container id="container">
+            <first-item id="csliter-first" style="width:52%;">
+              <div class="codewrap" onclick="cbubbleup('csliter-first')">
+                <pre style="width:200em;"><code class="language-cpp">/*---------------------------------------------------------
+  Demonstrate iter() by displaying a comma seperated
+  list (csl) of items in several common collections.
+  - three different strategies used for making
+    display comma-seperated
+  - syntax used in this demo
+    - iter().next() -&gt; Option&lt;Self::Item&gt;
+    - enum Option&lt;T&gt; { Some(T), None, }
+*/
+fn demo_iter() {
+  show_label(&quot;demo_iter()&quot;, 20);
+
+  /*--------------------------------------------------
+    iterate over array
+    csl strategy #1 extracts first item before iterating
+  --------------------------------------------------*/
+  show_op(&quot;array iter using loop&quot;);
+  let ar = [1, 2, 3, 4];
+  let mut iter = ar.iter();  // extract first item
+  if let Some(item) = iter.next() {
+    print!(&quot;{item}&quot;);
+  }
+  loop {
+    let item = iter.next();
+    match item {  //display remaining items
+      Some(item) =&gt; print!(&quot;, {}&quot;, item),
+      None =&gt; break
+    }
+  }
+  println!();
+  // ar not consumed by ar.iter(), above
+  // so statement below is valid:
+  println!(&quot;using println!:&#92;n{:?}&quot;, ar);
+
+  /*--------------------------------------------------
+    iterate over Vec
+    csl strategy #2 uses first flag
+  --------------------------------------------------*/
+  /*--- functionaly equivalent to loop, above ---*/
+  show_op(&quot;Vec iter using for-in&quot;);
+  let v = vec![1, 2, 3, 4];
+  let mut first = true;   // set first flag
+  for item in &v {
+    if first {
+      print!(&quot;{item}&quot;);
+      first = false;            // reset first flag
+    }
+    else {
+      print!(&quot;, {item}&quot;);
+    }
+  }
+  println!();
+  // statement below is valid, v not consumed since
+  //   for-in used reference &v
+  println!(&quot;using println!:&#92;n{:?}&quot;, v);
+
+  /*--------------------------------------------------
+    iterate over HashMap
+    csl strategy #3 uses enumerate()
+  --------------------------------------------------*/
+  show_op(&quot;HashMap iter using for-in&quot;);
+  let mut hm = HashMap::&lt;&str, i32&gt;::new();
+  hm.insert(&quot;zero&quot;, 0);
+  hm.insert(&quot;one&quot;, 1);
+  hm.insert(&quot;two&quot;, 2);
+  hm.insert(&quot;three&quot;, 3);
+  /*-------------------------------------------------------
+    enumerate is an iterator adapter that returns another
+    iterator yielding (count, value) where value is
+    yielded by iter
+  */
+  for (count, item) in hm.iter().enumerate() {
+    if count == 0 {
+      print!(&quot;{item:?}&quot;);
+    }
+    else {
+      print!(&quot;, {item:?}&quot;);
+    }
+  }
+  println!();
+  println!(&quot;using println!:&#92;n{:?}&quot;, hm);
+
+  /*--------------------------------------------------
+    iterate over Point&lt;T, N&gt;,
+    csl strategy same as above
+  --------------------------------------------------*/
+  show_op(&quot;Point iter using for-in&quot;);
+  let mut p = Point::&lt;f64, 5&gt;::new();
+  p.init(&vec![1.0, 1.5, 2.0, 1.5, 1.0]);
+  for item in p.iter().enumerate() {
+    if item.0 == 0 {  // count == zero
+      print!(&quot;{:?}&quot;, item.1);
+    }
+    else {  // count &gt; 0
+      print!(&quot;, {:?}&quot;, item.1);
+    }
+  }
+  println!();
+  print!(&quot;using println!:&#92;n{p:?}&quot;);  // p not moved
+  println!(&quot;&#92;n&quot;);
+
+  /*--------------------------------------------------
+    Use formatting function that accepts any type
+    implementing IntoIterator trait.
+    - function defined below
+  --------------------------------------------------*/
+  show_op(&quot;using show_csl(&ar) for array&quot;);
+  show_csl(&ar); // ar not consumed
+  show_op(&quot;using show_csl(&v) for Vector&quot;);
+  show_csl(&v);  // v not consumed
+  show_op(&quot;using show_csl(&hm) for HashMap&quot;);
+  show_csl(&hm); // hm not consumed
+  show_op(&quot;using show_csl(&p) for Point&quot;);
+  show_csl(&p);  // p not consumed
+  println!();
+
+  show_op(&quot;using show_csl(ar) for array - copies ar&quot;);
+  show_csl(ar);  // ar is not consumed as it is a copy type
+  show_op(&quot;using show_csl(v) for Vector - moves v&quot;);
+  show_csl(v);   // v is consumed
+  show_op(&quot;using show_csl(hm) for HashMap - moves hm&quot;);
+  show_csl(hm);  // hm is consumed
+  show_op(&quot;using show_csl(p) for Point - moves p&quot;);
+  show_csl(p);   // p is consumed
+}
+
+/* generalize csl strategy #3 */
+fn show_csl&lt;C&gt;(c:C)  // consumes c
+  where C: IntoIterator, C::Item: Debug
+{
+  let iter = c.into_iter();
+  for (count, val) in iter.enumerate() {
+    if count == 0 {
+      print!(&quot;{:?}&quot;, val);
+    }
+    else {
+      print!(&quot;, {:?}&quot;, val);
+    }
+  }
+  println!();
+}</code></pre>
+              </div>
+            </first-item>
+            <splitter-bar id="csliter-seperator"></splitter-bar>
+            <second-item id="csliter-second" style="width:40em;">
+              <div class="codewrap" onclick="obubbleup('csliter-first')">
+                <pre style="width:200em;"><code class="language-term">
+
+
+
+
+
+
+
+
+--------------------
+  demo_iter()
+--------------------
+
+
+
+
+--- array iter using loop ---
+1, 2, 3, 4
+using println!:
+[1, 2, 3, 4]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--- Vec iter using for-in ---
+1, 2, 3, 4
+using println!:
+[1, 2, 3, 4]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--- HashMap iter using for-in ---
+("one", 1), ("three", 3), ("zero", 0), ("two", 2)
+using println!:
+{"one": 1, "three": 3, "zero": 0, "two": 2}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--- Point iter using for-in ---
+1.0, 1.5, 2.0, 1.5, 1.0
+using println!:
+Point { items: [1.0, 1.5, 2.0, 1.5, 1.0] }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--- using show_csl(&ar) for array ---
+1, 2, 3, 4
+--- using show_csl(&v) for Vector ---
+1, 2, 3, 4
+--- using show_csl(&hm) for HashMap ---
+("one", 1), ("three", 3), ("zero", 0), ("two", 2)
+--- using show_csl(&p) for Point ---
+1.0, 1.5, 2.0, 1.5, 1.0
+
+
+--- using show_csl(ar) for array - copies ar ---
+1, 2, 3, 4
+--- using show_csl(v) for Vector - moves v ---
+1, 2, 3, 4
+--- using show_csl(hm) for HashMap - moves hm ---
+("one", 1), ("three", 3), ("zero", 0), ("two", 2)
+--- using show_csl(p) for Point - moves p ---
+1.0, 1.5, 2.0, 1.5, 1.0
+
+</code></pre>
+              </div>
+            </second-item>
+          </splitter-container>
+        </div>
+        <div style="height:1em;"></div>
+
+
+        <h3 id="pointdef">2.4 Iteration over custom Point&lt;T, N&gt; Coordinates</h3>
         <t-b>
 
         </t-b>
@@ -1013,7 +1301,7 @@ Invocation of its trait function <c-s>&mut p.into_iter()</c-s> on
           </splitter-container>
         </div>
         <div style="height:0.75em;"></div>
-        <h3 id="pointdemo">2.4 Point&lt;T, N&gt; Demonstration</h3>
+        <h3 id="pointdemo">2.5 Point&lt;T, N&gt; Demonstration</h3>
         <t-b>
 
         </t-b>
@@ -1116,7 +1404,43 @@ modified:  Point { items: [-2, -1, 0, 1, 2] }
           </splitter-container>
         </div>
         <div style="height:1em;"></div>
+        <h3 id="structure">
+          2.6 Program Structure
+          <t-b>
 
+          </t-b>
+          <div class="blockSingle" style="padding:0em;">
+            <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
+            <splitter-container id="container">
+              <first-item id="fig2-first" style="width:52%;">
+                <div class="codewrap" onclick="cbubbleup('fig2-first')">
+                  <pre style="width:200em;"><code class="language-cpp">/*------------------------------*/
+  code here
+  and here
+  --
+</code></pre>
+                </div>
+              </first-item>
+              <splitter-bar id="fig2-seperator"></splitter-bar>
+              <second-item id="fig2-second" style="width:40em; background-color:var(--light);" onclick="obubbleup('fig2-first')">
+                <div class="textwrap noflow">
+                  <t-b class="indent">
+                    /*------------------------------*/<br />
+                    <strong>Some</strong> explanatory text here<br />
+                    &nbsp;&nbsp;&nbsp;and here<br />
+                    ---<br />
+                    Note: This panel uses style white-space:nowrap<br />
+                    That means that most styles are enforced.
+                  </t-b>
+                </div>
+              </second-item>
+            </splitter-container>
+          </div>
+          <div style="height:0.75em;"></div>
+
+
+        </h3>
+        <div style="height:1em;"></div>
         <h4 id="build">3.0 Build</h4>
         <div style="width:45em; border:2px solid var(--dark); overflow:hidden;">
           <pre class="codeSnap">
