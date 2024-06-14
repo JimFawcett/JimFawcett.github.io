@@ -293,9 +293,9 @@
           </hgroup>
         </header>
         <!-- <t-b style="border:2px solid red; padding:0.5em 1.5em;">
-          This page is a prototype used to decide which language features to emphasize. It will
-          be replaced with a final version soon.
-        </t-b> -->
+    This page is a prototype used to decide which language features to emphasize. It will
+    be replaced with a final version soon.
+  </t-b> -->
         <t-b style="border:1px solid maroon; padding:0.25em 1em 0.5em 1em;">
           <h4 style="margin:0em 0em 0.25em 0em;">Synopsis:</h4>
           This bit demonstrates uses of Rust iterators to walk through enumerable collections.
@@ -1040,7 +1040,21 @@ Point { items: [1.0, 1.5, 2.0, 1.5, 1.0] }
 
         <h3 id="pointdef">2.4 Iteration over custom Point&lt;T, N&gt; Coordinates</h3>
         <t-b>
-
+          A custom type can be implemented to support iterators in the same way as for std::library types.
+          Code in this section illustates how to do that. Essentially, the type must provide methods:
+          <div class="inset">
+            <c-s>iter(), iter_mut()</c-s> and implement the <c-s>IntoIterator</c-s> trait for 
+            <c-s>Point&lt;T, N&gt;</c-s> which provides the <c-s>into_iterator()</c-s> method.
+          </div>
+          Usually it will also implement <c-s>IntoIterator</c-s> for <c-s>&Point&lt;T, N&gt;</c-s> and
+          for <c-s>&mut Point&lt;T, N&gt;</c-s> and
+          non-mutable and mutable indexers using the std::ops module. See commentary below for motivation
+          about adding these traits and operations.
+        </t-b>
+        <t-b>
+          This block defines a <c-s>Point&lt;T, N&gt;</c-s> type that contains a datum: <c-s>items: Vec&lt;T&gt;</c-s>
+          to represent a point in N-dimensional hyperspace. It implements all of the features cited in the
+          previous paragraph.
         </t-b>
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
@@ -1444,7 +1458,7 @@ modified:  Point { items: [-2, -1, 0, 1, 2] }
               (self) -&gt; Cloned&lt;Self&gt;<br />
               where T: 'a + Clone', Self: Sized + Iterator&lt;Item = &amp;'a T&gt;"
             </td>
-            <td>Creates an iterator that clones all of its elements</td>
+            <td>Consumes an iterator to create an iterator that clones all of its elements.</td>
           </tr>
           <tr>
             <td>
@@ -1454,7 +1468,7 @@ modified:  Point { items: [-2, -1, 0, 1, 2] }
               (self) -&gt; B<br />
               where B: FromIterator&lt;Self::Item&gt;, Self: Sized
             </td>
-            <td>Transforms an iterator into a collection</td>
+            <td>Transforms an iterator into a collection, consuming the iterator.</td>
           </tr>
           <tr>
             <td>
@@ -1464,7 +1478,7 @@ modified:  Point { items: [-2, -1, 0, 1, 2] }
               (self) -&gt; Enumerate&lt;Self&gt;<br />
               where Self: Sized
             </td>
-            <td>Creates an iterator which gives current iteration count and the next value</td>
+            <td>Consumes iterator to create an iterator which gives current iteration count and the next value</td>
           </tr>
           <tr>
             <td>
@@ -1474,7 +1488,7 @@ modified:  Point { items: [-2, -1, 0, 1, 2] }
               (self, predicate: P) -&gt; Filter&lt;Self, P&gt;<br />
               where P: FnMut(&Self::Item) -&gt; bool, Self: Sized
             </td>
-            <td>Creates an iterator which takes a closure to determine if an item should be yielded.</td>
+            <td>Consumes iterator to create an iterator which takes a closure to determine if an item should be yielded.</td>
           </tr>
           <tr>
             <td>
@@ -1585,14 +1599,17 @@ fn demo_methods() {
         <div style="height:1em;"></div>
         <h3 id="structure">2.7 Program Structure</h3>
         <t-b>
-
+          The code structure of this demonstration is very similar to that used in earlier Bits, so
+          is hidden by default.
         </t-b>
-        <div class="blockSingle" style="padding:0em;">
-          <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
-          <splitter-container id="container">
-            <first-item id="structure-first" style="width:52%;">
-              <div class="codewrap" onclick="cbubbleup('structure-first')">
-                <pre style="width:200em;"><code class="language-cpp">/*-----------------------------------------------
+        <details id="pstructure">
+          <summary class="darkItem">Code Structure</summary>
+          <div class="blockSingle" style="padding:0em;">
+            <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
+            <splitter-container id="container">
+              <first-item id="structure-first" style="width:52%;">
+                <div class="codewrap" onclick="cbubbleup('structure-first')">
+                  <pre style="width:200em;"><code class="language-cpp">/*-----------------------------------------------
 Bits::rust_iter::main.rs
 - demonstrates iteration over collections with
   Rust iterators
@@ -1649,12 +1666,12 @@ fn main() {
   println!(&quot;&#92;nThat's all folks!&#92;n&quot;);
 }
 </code></pre>
-              </div>
-            </first-item>
-            <splitter-bar id="structure-seperator"></splitter-bar>
-            <second-item id="structure-second" style="width:40em; background-color:var(--light);" onclick="obubbleup('structure-first')">
-              <div class="textwrap noflow">
-                <h3>Program Structure:</h3>
+                </div>
+              </first-item>
+              <splitter-bar id="structure-seperator"></splitter-bar>
+              <second-item id="structure-second" style="width:40em; background-color:var(--light);" onclick="obubbleup('structure-first')">
+                <div class="textwrap noflow">
+                  <h3>Program Structure:</h3>
 <pre class="light">
 This program illustrates how iterators are created and used.
 It also shows how custom types can declare and define 
@@ -1696,10 +1713,11 @@ Code is shown in a left panel and output in a right panel,
 seperated by a splitter-bar enabling views of content that
 may be hidden in default display.
 </pre>
-              </div>
-            </second-item>
-          </splitter-container>
-        </div>
+                </div>
+              </second-item>
+            </splitter-container>
+          </div>
+        </details>
         <div style="height:0.75em;"></div>
 
 
