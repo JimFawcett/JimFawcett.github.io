@@ -61,10 +61,10 @@
             </h3>
           </hgroup>
         </header>
-        <t-b style="border:2px solid red; padding:0.5em 1.5em;">
-          This page is a prototype used to decide which language features to emphasize. It will
-          be replaced with a final version soon.
-        </t-b>
+        <!-- <t-b style="border:2px solid red; padding:0.5em 1.5em;">
+    This page is a prototype used to decide which language features to emphasize. It will
+    be replaced with a final version soon.
+  </t-b> -->
         <t-b style="border:1px solid maroon; padding:0.25em 1em 0.5em 1em;">
           <h4 style="margin:0em 0em 0.25em 0em;">Synopsis:</h4>
           This Bit demonstrates uses of C++ iterators to walk through enumerable collections.
@@ -119,7 +119,8 @@
         <t-b>
           C++ iterators have the size and interface of native C++ pointers. Each standard iterable container,
           like <c-s>std::vector&lt;T&gt;</c-s> and <c-s>std::unordered_map&lt;K, V&gt;</c-s> provide
-          iterators that are designed to step through the container&apos;s data structure.
+          iterators that are designed to step through the container&apos;s data structure. That is accomplished
+          by defining operator overloads like <c-s>C::operator++()</c-s> where C is an iterable container.
         </t-b>
         <h4>Table 1. - Basic Iterator Operations</h4>
         <table>
@@ -172,7 +173,7 @@
         </t-b>
         <h3 id="basics">2.1 Basic Iteration</h3>
         <t-b>
-          The code block below uses operations from Table 1. in executable code using 
+          The code block below uses operations from Table 1. in executable code using
           <c-s>std::vector&lt;int&gt;</c-s> and <c-s>int [N]</c-s> collections. Note that native
           arrays don&apos;t have methods, so the std::library provides <c-s>std::begin(arrayName)</c-s>
           and <c-s>std::end(arrayName)</c-s> functions. Native pointers are used as iterators for
@@ -508,7 +509,7 @@ execute whilerPoint(v)
         <div style="height:0.75em;"></div>
         <h3 id="gencoll">2.3 Iteration for Generic Collections</h3>
         <t-b>
-          It only requires a little more effort to make functions that iterate over generic collections, 
+          It only requires a little more effort to make functions that iterate over generic collections,
           e.g., collections that support:
           <div class="inset">
             <c-s>begin()</c-s>, <c-s>end()</c-s>,
@@ -668,8 +669,1178 @@ execute demoWhiler(c) with double
             </second-item>
           </splitter-container>
         </div>
+        <div style="height:0.75em;"></div>
+        <h3 id="pointdefn">2.4 Point&lt;T, N&gt; Definition</h3>
+        <t-b>
+          The <c-s>Point&lt;T, N&gt;</c-s> type was defined and discussed in the previous
+          &quot;<a target="_blank" href="Bits_GenericCpp.html">Bits C++ Generics</a>&quot;.
+          Here, we extend that type by building in support for iteration. That is fairly simple: add declarations:
+          <div class="inset">
+            <c-s>iterator</c-s>, <c-s>const_iterator</c-s>, and <c-s>value_type</c-s>
+          </div>
+          and add methods:
+          <div class="inset">
+            <c-s>iterator begin()</c-s>, <c-s>iterator end()</c-s>,<br />
+            <c-s>const_iterator begin() const</c-s>, and <c-s>const_iterator end() const</c-s>
+          </div>
+          These methods simply delegate delivery of the iterators to the underlying
+          <c-s>std::vector&lt;T&gt;</c-s> coord methods.
+        </t-b>
+        <div class="blockSingle" style="padding:0em;">
+          <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
+          <splitter-container id="container">
+            <first-item id="pointdef-first" style="width:65%;">
+              <div class="codewrap" onclick="cbubbleup('pointdef-first')">
+                <pre style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------
+  Point&lt;T, N&gt; class represents a point in an N-Dimensional hyperspace.
+  It uses a template parameter to support a variety of coordinate
+  types, and uses a vector to hold any finite number of
+  coordinates, specified by N.
+
+  It also carries a Time t instance which conceptually is the time
+  at which something was at that point in space. Time is a class
+  defined for this demonstration in Time.h.
+
+  All its special members, ctors, assignment, ... with the exception
+  of constructor Point(), are declared default to indicate to a maintainer
+  that compiler generated methods are correct and should not be provided.
+
+  It does not provide an iterator nor begin() and end() members.
+  Those will added in the iteration bit.
+*/
+template&lt;typename T, const size_t N&gt;
+class Point {
+public:
+  using iterator = typename std::vector&lt;T&gt;::iterator;
+  using const_iterator = typename std::vector&lt;T&gt;::const_iterator;
+  using value_type = T;
+
+  Point();                                      // default ctor
+  Point(std::initializer_list&lt;T&gt; il);           // construct from list
+  Point(const Point& pt) = default;             // copy ctor
+  Point(Point&& pt) = default;                  // move ctor
+  Point& operator=(const Point& pt) = default;  // copy assignment
+  Point& operator=(Point&& pt) = default;       // move assignemnt
+  ~Point() = default;                           // dtor
+
+  void init(const std::vector&lt;T&gt;& v);
+
+  std::string timeToString();
+  void updateTime();
+  Time& time();
+  const size_t size() const;
+
+  iterator begin();
+  iterator end();
+  const_iterator begin() const;
+  const_iterator end() const;
+
+  T& operator[](size_t index);                  // index oper
+  const T operator[](size_t index) const;       // const index oper
+
+  std::vector&lt;T&gt;& coords() { return coord; }    // accessor
+
+  void show(const std::string& name);           // display contents
+  size_t& left() { return _left; }              // display indent
+  size_t& width() { return _width; }            // display width
+private:
+  std::vector&lt;T&gt; coord;
+  Time tm;
+  size_t _left = 2;   // default display indent
+  size_t _width = 7;  // default display row width
+};
+/*-----------------------------------------------
+  Point&lt;T, N&gt; constructor with size Template
+  parameter
+*/
+template&lt;typename T, size_t N&gt;
+Point&lt;T, N&gt;::Point()
+  : tm(Time()) {
+  for(size_t i=0; i&lt;N; i++) {
+    coord.push_back(T{0});
+  }
+}
+/*-----------------------------------------------
+  Fill coor with elements from initializer list li
+  - if li is smaller than N then fill remainder with
+    default values of T
+  - if li is larger use first N elements of li
+*/
+template&lt;typename T, size_t N&gt;
+Point&lt;T, N&gt;::Point(std::initializer_list&lt;T&gt; il)
+  : tm(Time()) {
+  size_t sz = std::min(N, il.size());
+  size_t i = 0;
+  for(auto item : il) {
+    coord.push_back(item);
+    if(++i == sz) {
+      break;
+    }
+  }
+  for(size_t i = il.size(); i&lt;N; i++) {
+    coord.push_back(T{0});
+  }
+}
+/*---------------------------------------------
+  Always returns N
+*/
+template&lt;typename T, size_t N&gt;
+const size_t Point&lt;T, N&gt;::size() const {
+  return coord.size();
+}
+/*---------------------------------------------
+  index returns mutable value
+*/
+template&lt;typename T, size_t N&gt;
+T& Point&lt;T, N&gt;::operator[](size_t index) {
+  if (index &lt; 0 || coord.size() &lt;= index) {
+    throw &quot;Point&lt;T, N&gt; indexing error&quot;;
+  }
+  return coord[index];
+}
+/*---------------------------------------------
+  index returns immutable value
+*/
+template&lt;typename T, size_t N&gt;
+const T Point&lt;T, N&gt;::operator[](size_t index) const {
+  if (index &lt; 0 || coord.len() &lt;= index) {
+    throw &quot;Point&lt;T, N&gt; indexing error&quot;;
+  }
+  return coord[index];
+}
+
+template&lt;typename T, const size_t N&gt;
+typename Point&lt;T, N&gt;::iterator Point&lt;T, N&gt;::begin() {
+  return coord.begin();
+}
+template&lt;typename T, const size_t N&gt;
+typename Point&lt;T, N&gt;::iterator Point&lt;T, N&gt;::end() {
+  return coord.end();
+}
+template&lt;typename T, const size_t N&gt;
+typename Point&lt;T, N&gt;::const_iterator Point&lt;T, N&gt;::begin() const {
+  return coord.begin();
+}
+template&lt;typename T, const size_t N&gt;
+typename Point&lt;T, N&gt;::const_iterator Point&lt;T, N&gt;::end() const {
+  return coord.end();
+}
+
+/*-----------------------------------------------
+  Fill coor with elements from vector v
+  - if v is smaller fill remainder with default
+    values of T
+  - if v is larger use first N elements of v
+*/
+template&lt;typename T, size_t N&gt;
+void Point&lt;T, N&gt;::init(const std::vector&lt;T&gt;& v) {
+  size_t sz = std::min(N, v.size());
+  for(size_t i=0; i&lt;sz; i++) {
+    coord[i] = v[i];
+  }
+  for(size_t i = v.size(); i&lt;N; i++) {
+    coord[i] = T{0};
+  }
+}
+/*---------------------------------------------
+  returns string datetime
+*/
+template&lt;typename T, size_t N&gt;
+std::string Point&lt;T, N&gt;::timeToString() {
+  std::string ts = tm.toString();
+  return ts;
+}
+/*---------------------------------------------
+  set time to current time
+*/
+template&lt;typename T, size_t N&gt;
+void Point&lt;T, N&gt;::updateTime() {
+  tm = std::time(0);
+}
+/*---------------------------------------------
+  returns current number of seconds in clock's
+  epoch
+*/
+template&lt;typename T, size_t N&gt;
+Time& Point&lt;T, N&gt;::time() {
+  return tm;
+}
+/*-----------------------------------------------
+  PointtN&lt;T&gt; display function
+*/
+template&lt;typename T, size_t N&gt;
+void Point&lt;T, N&gt;::show(const std::string& name) {
+  std::cout &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(_left) &lt;&lt; name &lt;&lt; &quot;: &quot; &lt;&lt; &quot;Point&lt;T, N&gt;&quot;;
+  std::cout &lt;&lt; &quot; {&#92;n&quot;;
+  std::cout &lt;&lt; fold(coord, _left + 2, _width);
+  std::cout &lt;&lt; indent(_left) &lt;&lt; &quot;}&quot;;
+  std::cout &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(_left) &lt;&lt; tm.toString() &lt;&lt; std::endl;
+}
+/*-----------------------------------------------
+  Overload operator&lt;&lt; required for
+  showType(Point&lt;T, N&gt; t, const std::string& nm)
+*/
+template&lt;typename T, size_t N&gt;
+std::ostream& operator&lt;&lt;(std::ostream& out, Point&lt;T, N&gt;& t2) {
+  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(t2.left()) &lt;&lt; &quot;Point&lt;T, N&gt;&quot;;
+  out &lt;&lt; &quot; {&#92;n&quot;;
+  out &lt;&lt; fold(t2.coords(), t2.left() + 2, t2.width());
+  out &lt;&lt; indent(t2.left()) &lt;&lt; &quot;}&quot;;
+  return out;
+}
+</code></pre>
+              </div>
+            </first-item>
+            <splitter-bar id="pointdef-seperator"></splitter-bar>
+            <second-item id="pointdef-second" style="width:40em; background-color:var(--light);" onclick="obubbleup('pointdef-first')">
+              <div class="textwrap noflow">
+                <h4>Point&lt;T, N&gt; Support for Iteration:</h4>
+                <pre class="light">
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-size:1.0em; font-weight:bold;">&lArr; Point Declaration</span>
+
+
+<span style="font-size:1.0em; font-weight:bold;">&lArr; Iterator Declarations</span>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-size:1.0em; font-weight:bold;">&lArr; Iterator method declarations</span>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-size:1.0em; font-weight:bold;">&lArr; Iterator method definitions</span>
+
+                </pre>
+              </div>
+            </second-item>
+          </splitter-container>
+        </div>
+        <div style="height:0.75em;"></div>
+        <h3 id="pointdemo">2.5 Point&lt;T, N&gt; Demonstration</h3>
+        <t-b>
+
+        </t-b>
+        <div class="blockSingle" style="padding:0em;">
+          <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
+          <splitter-container id="container">
+            <first-item id="pointdemo-first" style="width:52%;">
+              <div class="codewrap" onclick="cbubbleup('pointdemo-first')">
+                <pre style="width:200em;"><code class="language-cpp">void demo_custom_type_Point_iteration() {
+  using namespace Analysis;
+  using namespace Points;
+
+  showNote(&quot;iteration over user-defined Point&lt;T, N&gt;&quot;, 45, &quot;&#92;n&quot;);
+
+  /*-- demonstrate Point&lt;double 3&gt; initialization lists --*/
+  showOp(&quot;Point&lt;double, 3&gt; p1 {1.0, 1.5, 2.0, 1.5, 1.0 }&quot;);  // equal to N
+  Point&lt;double, 5&gt; p1 {1.0, 1.5, 2.0, 1.5, 1.0};
+  p1.left() = 0;
+  p1.show(&quot;p1&quot;);
+  std::cout &lt;&lt; &quot;&#92;np1[1] = &quot; &lt;&lt; p1[1];           // indexing
+  std::cout &lt;&lt; &quot;&#92;np1.time().day() = &quot;
+            &lt;&lt; p1.time().day();
+  std::cout &lt;&lt; &quot;&#92;np1.time().seconds() = &quot;
+            &lt;&lt; p1.time().seconds() &lt;&lt; &quot;&#92;n&quot;;
+
+  showOp(&quot;iteration using basic loop&quot;, &quot;&#92;n&quot;);
+  auto itr = p1.begin();
+  while(true) {
+    std::cout &lt;&lt; *itr++ &lt;&lt; &quot; &quot;;
+    if(itr == p1.end()) {
+      break;
+    }
+  }
+  std::cout &lt;&lt; std::endl;
+
+  showOp(&quot;iteration using range-for&quot;, &quot;&#92;n&quot;);
+  for(auto item : p1) {
+    std::cout &lt;&lt; item &lt;&lt; &quot; &quot;;
+  }
+  std::cout &lt;&lt; std::endl;
+
+  showOp(&quot;Point&lt;int, 10&gt; p2 { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }&quot;);
+  Point&lt;int, 10&gt; p2 { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+  p2.left() = 0;
+  p2.show(&quot;p4&quot;);
+}
+</code></pre>
+              </div>
+            </first-item>
+            <splitter-bar id="pointdemo-seperator"></splitter-bar>
+            <second-item id="pointdemo-second" style="width:40em;">
+              <div class="codewrap" onclick="obubbleup('pointdemo-first')">
+                <pre style="width:200em;"><code class="language-shell">  ---------------------------------------------
+    iteration over user-defined Point<T, N>
+  ---------------------------------------------
+
+--- Point<double, 3> p1 {1.0, 1.5, 2.0, 1.5, 1.0 } ---        
+p1: Point<T, N> {
+  1, 1.5, 2, 1.5, 1
+}
+Tue Jun 18 09:25:11 2024 local time zone
+
+p1[1] = 1.5
+p1.time().day() = 18
+p1.time().seconds() = 11
+
+--- iteration using basic loop ---
+1.0 1.5 2.0 1.5 1.0
+
+--- iteration using range-for ---
+1.0 1.5 2.0 1.5 1.0 
+
+--- Point<int, 10> p2 { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 } ---   
+p4: Point<T, N> {
+  1, 2, 3, 4, 5, 6, 7,
+  8, 9, 10
+}
+Tue Jun 18 09:25:11 2024 local time zone
+</code></pre>
+              </div>
+            </second-item>
+          </splitter-container>
+        </div>
+        <div style="height:1em;"></div>
+        <h3 id="analysis">2.6 Analysis Functions</h3>
+        <t-b>
+          This code is very similar to that discussed in
+          &quot;<a target="_blank" href="Bits_IterCpp.html">Bits: Iter C++</a>&quot;.
+        </t-b>
+        <details>
+          <summary class="darkItem">2.6 Analysis and Display Functions&nbsp;</summary>
+          <div class="blockSingle" style="padding:0em;">
+            <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
+            <splitter-container id="container">
+              <first-item id="analysis-first" style="width:70%;">
+                <div class="codewrap" onclick="cbubbleup('analysis-first')" style="max-width:100%;">
+                  <pre style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------
+  Display and Analysis function and globals definitions
+---------------------------------------------------------------------
+*/
+const std::string nl = &quot;&#92;n&quot;;
+/*-------------------------------------------------------------------
+  Mutable globals are a common source of bugs.  We try not
+  to use them, but will use DisplayParams here to control how
+  the insertion operator sends instances to standard output.
+*/
+struct displayParams {
+  size_t left = 2;    // number of spaces to indent
+  size_t width = 7;   // width of display row
+  size_t trunc = 40;  // replace text after trunc with ...
+} DisplayParams;      // global object
+
+/*-----------------------------------------------
+  Overload operator&lt;&lt; required for
+  showType(std::vector&lt;T&gt; v, const std::vector&lt;T&gt;& nm)
+*/
+template&lt;typename T&gt;
+std::ostream& operator&lt;&lt;(std::ostream& out, std::vector&lt;T&gt;& v) {
+  out &lt;&lt; format(v, &quot;vector&lt;T&gt;&quot;, &quot;&quot;, DisplayParams.left, DisplayParams.width);
+  return out;
+}
+/*-----------------------------------------------
+  Display calling name, static class, and size
+*/
+template&lt;typename T&gt;
+void showType(T t, const std::string &callname, const std::string& suffix) {
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; callname;          // show name at call site
+  std::cout &lt;&lt; &quot; type: &quot;
+            &lt;&lt; truncate(DisplayParams.trunc,typeid(t).name());  // show type
+  std::cout &lt;&lt; &quot;&#92;n  size:  &quot; &lt;&lt; sizeof(t);  // show size on stack
+  std::cout &lt;&lt; suffix;
+}
+/*-----------------------------------------------
+  Display emphasized text
+*/
+inline void showNote(
+  const std::string& txt,
+  const size_t width,
+  const std::string& suffix
+) {
+  auto fill = std::string(width, '-');
+  print(fill);
+  print(&quot;  &quot; + txt);
+  print(fill);
+  std::cout &lt;&lt; suffix;
+}
+/*-----------------------------------------------
+  Display emphasized line
+*/
+inline void showOp(const std::string& opstr, const std::string& suffix) {
+  std::cout &lt;&lt; &quot;&#92;n--- &quot; &lt;&lt; opstr &lt;&lt; &quot; ---&quot; &lt;&lt; suffix;
+}
+/*-----------------------------------------------
+  Helper function for formatting output
+  - truncates line to N chars and adds ellipsis
+*/
+inline std::string truncate(size_t N, const char* pStr) {
+  std::string temp(pStr);
+  if(temp.length() &gt; N) {
+    temp.resize(N);
+    return temp + &quot;...&quot;;
+  }
+  return temp;
+}
+/*-----------------------------------------------
+  Helper function for formatting output
+  - generates string of n blanks to offset text
+*/
+inline std::string indent(size_t n) {
+  return std::string(n, ' ');
+}
+/*-----------------------------------------------
+  Helper function for formatting output
+  - folds lines after width elements
+*/
+template&lt;typename T&gt;
+std::string fold(std::vector&lt;T&gt;& v, size_t left, size_t width) {
+  std::stringstream out(&quot;&#92;n&quot;);
+  out &lt;&lt; indent(left);
+  for(size_t i=0; i&lt;v.size(); ++i) {
+    if((i % width) == 0 && i != 0 && i != width - 1) {
+      out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left);
+    }
+    if(i &lt; v.size() - 1) {
+      out &lt;&lt; v[i] &lt;&lt; &quot;, &quot;;
+    }
+    else {
+      out &lt;&lt; v[i] &lt;&lt; &quot;&#92;n&quot;;
+      break;
+    }
+  }
+  return out.str();
+}
+/*-----------------------------------------------
+  Helper function for formatColl
+  - defines out &lt;&lt; std::pair&lt;K,V&gt;
+  - used in formatColl for associative containers
+*/
+template&lt;typename K, typename V&gt;
+std::stringstream& operator&lt;&lt;(
+  std::stringstream& out, const std::pair&lt;K,V&gt;& p
+) {
+  out &lt;&lt; &quot;{&quot; &lt;&lt; p.first &lt;&lt; &quot;, &quot; &lt;&lt; p.second &lt;&lt; &quot;}&quot;;
+  return out;
+}
+/*-----------------------------------------------
+  Format output for Collection types
+  - any type with begin() and end() like
+    all the STL containers.
+  - if nm is larger than empty str displays nm : { + ...
+  - if nm is empty str displays { + ...
+  - if c.size() &lt;= width displays on one line
+  - if c.size() &gt; width displays on folded stack of lines
+*/
+template&lt;typename Coll&gt;
+std::string formatColl(
+  const Coll& c, const std::string& nm = &quot;&quot;, const std::string& suffix = &quot;&quot;,
+  size_t left = 2, size_t width = 7
+) {
+  std::string nameStr;
+  std::string prologue;
+  std::string epilogue;
+  if(nm.size() == 0) {
+    nameStr = &quot;{ &quot;;
+  }
+  else {
+    nameStr = nm + &quot; : { &quot;;
+  }
+  if(c.size() &lt;= width) {
+    prologue = indent(left) + nameStr;
+    epilogue = &quot; }&quot;;
+  }
+  else {
+    prologue = indent(left) + nameStr + &quot;&#92;n&quot; + indent(left + 2);
+    epilogue = &quot;&#92;n&quot; + indent(left) + &quot;}&#92;n&quot;;
+  }
+  std::stringstream out;
+  out &lt;&lt; &quot;&#92;n&quot; + prologue;
+  size_t i = 0;
+  for(const Coll::value_type& elem : c) {
+    if((i % width) == 0 && i != 0 && i != width - 1) {
+      out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left + 2);
+    }
+    if(i &lt; c.size() - 1) {
+      out &lt;&lt; elem &lt;&lt; &quot;, &quot;;
+    }
+    else {
+      out &lt;&lt; elem &lt;&lt; epilogue &lt;&lt; suffix;
+      break;
+    }
+    ++i;
+  }
+  return out.str();
+}
+/*-----------------------------------------------
+  Format output for scalar types like primitives
+*/
+template&lt;typename T&gt;
+std::string formatScalar(
+  const T& t, const std::string& nm, const std::string& suffix,
+  size_t left
+) {
+  std::stringstream out;
+  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm &lt;&lt; &quot;: &quot; &lt;&lt; t &lt;&lt; suffix;
+  return out.str();
+}
+/*-----------------------------------------------
+  Format output for strings
+  - indent and embed in quotation marks
+*/
+template&lt;typename T&gt;
+std::string formatString(
+  const T& t, const std::string& nm, const std::string& suffix,
+  size_t left
+) {
+  std::stringstream out;
+  out &lt;&lt; &quot;&#92;n&quot; &lt;&lt; indent(left) &lt;&lt; nm &lt;&lt; &quot;: &#92;&quot;&quot; &lt;&lt; t &lt;&lt; &quot;&#92;&quot;&quot; &lt;&lt; suffix;
+  return out.str();
+}
+/*-----------------------------------------------
+  Defines is_iterable trait
+  - detects STL containers and user-defined types
+    that provide iteration
+  - uses template metaprogramming, e.g., user code
+    that runs at compile-time
+https://stackoverflow.com/questions/13830158/check-if-a-variable-type-is-iterable
+*/
+template &lt;typename T, typename = void&gt;
+struct is_iterable : std::false_type {};
+
+// this gets used only when we can call
+// std::begin() and std::end() on that type
+template &lt;typename T&gt;
+struct is_iterable&lt;
+  T,
+  std::void_t
+    &lt;decltype(std::begin(std::declval&lt;T&gt;())),
+    decltype(std::end(std::declval&lt;T&gt;()))&gt;
+&gt; : std::true_type {};
+
+template &lt;typename T&gt;
+constexpr bool is_iterable_v = is_iterable&lt;T&gt;::value;
+
+/*-----------------------------------------------
+  Displays almost everything.
+  - strings work better with formatString(...)
+  https://www.cppstories.com/2018/03/ifconstexpr/
+  Iteration is discussed in Bit Cpp_iter
+*/
+template&lt;typename T&gt;
+std::string format(
+  const T& t, const std::string& nm, const std::string& suffix,
+  size_t left, size_t width
+) {
+  if constexpr(is_iterable_v&lt;T&gt;) {  // decision at compile-time
+    return formatColl(t, nm, suffix, left, width);
+  }
+  else {
+    return formatScalar(t, nm, suffix, left);
+  }
+}
+/*-----------------------------------------------
+  Display text after newline and indentation
+*/
+inline void print(const std::string& txt) {
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt;
+}
+/*-----------------------------------------------
+  Display text after newline and indentation
+  - provides trailing newline
+*/
+inline void println(const std::string& txt) {
+  std::cout &lt;&lt; &quot;&#92;n  &quot; &lt;&lt; txt &lt;&lt; &quot;&#92;n&quot;;
+}
+</code></pre>
+                </div>
+              </first-item>
+              <splitter-bar id="analysis-seperator"></splitter-bar>
+              <second-item id="analysis-second" style="width:40em; background-color:var(--light);" onclick="obubbleup('analysis-first')">
+                <div class="textwrap noflow">
+                  <h3>Analysis and Display:</h3>
+                  <pre class="light">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-size:1.25em; font-weight:bold;">&lArr;</span> <c-s>std::vector&lt;T&gt; operator&lt;&lt;</c-s>
+
+
+
+
+
+
+
+<span style="font-size:1.25em; font-weight:bold;">&lArr;</span> <c-s>showType</c-s>
+
+
+
+
+
+
+
+
+
+
+<span style="font-size:1.25em; font-weight:bold;">&lArr;</span> <c-s>showNote</c-s>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-size:1.25em; font-weight:bold;">&lArr;</span> <c-s>showOp</c-s>
+
+
+
+
+
+
+<span style="font-size:1.25em; font-weight:bold;">&lArr;</span> <c-s>truncate</c-s>
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-size:1.25em; font-weight:bold;">&lArr;</span> <c-s>indent</c-s>
+
+
+
+
+
+
+
+
+<span style="font-size:1.25em; font-weight:bold;">&lArr;</span> <c-s>fold</c-s>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-size:1.25em; font-weight:bold;">&lArr;</span> <c-s>std::pair&lt;K,V&gt; operator&lt;&lt;</c-s>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-size:1.25em; font-weight:bold;">&lArr;</span> <c-s>formatColl</c-s>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-size:1.25em; font-weight:bold;">&lArr;</span> <c-s>formatScalar</c-s>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-size:1.25em; font-weight:bold;">&lArr;</span> <c-s>formatString</c-s>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-size:1.25em; font-weight:bold;">&lArr;</span> <c-s>is_iterable</c-s>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-size:1.25em; font-weight:bold;">&lArr;</span> <c-s>format</c-s>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span style="font-size:1.25em; font-weight:bold;">&lArr;</span> <c-s>print</c-s>
+
+
+
+
+
+
+
+<span style="font-size:1.25em; font-weight:bold;">&lArr;</span> <c-s>println</c-s>
+                  </pre>
+                </div>
+              </second-item>
+            </splitter-container>
+          </div>
+        </details>
+        <div style="height:0.75em;"></div>
+        <h3 id="structure">2.7 Program Structure</h3>
+        <t-b>
+
+        </t-b>
+        <details open>
+          <summary class="darkItem">Code Structure&nbsp;</summary>
+          <div class="blockSingle" style="padding:0em;">
+            <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
+            <splitter-container id="container">
+              <first-item id="structure-first" style="width:60%;">
+                <div class="codewrap" onclick="cbubbleup('structure-first')">
+                  <pre style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------
+  Bits_Iter.cpp
+  - defines functions to iterate over collections
+  - depends on Points.h to provide user-defined point class
+  - depends on Analysis.h for several display and analysis functions
+*/
+#include &lt;iostream&gt;         // std::cout
+#include &lt;iomanip&gt;          // std::fixed, std::setprecision
+#include &lt;sstream&gt;          // std::stringstream
+#include &lt;memory&gt;           // std::unique_ptr
+#include &lt;vector&gt;           // vector&lt;T&gt; class
+#include &lt;array&gt;            // array&lt;T&gt; class
+#include &lt;map&gt;              // map&lt;K,V&gt; class
+#include &lt;set&gt;              // set&lt;T&gt; class
+#include &lt;concepts&gt;         // supports C++20 concepts
+#include &lt;algorithm&gt;        // STL algorithms
+#include &quot;AnalysisIter.h&quot;   // Analysis functions
+#include &quot;PointsIter.h&quot;     // PointN&lt;T&gt; class declaration
+
+using namespace Points;
+/*-----------------------------------------------
+  Note:
+  Find all Bits code, including this in
+  https://github.com/JimFawcett/Bits
+  You can clone the repo from this link.
+-----------------------------------------------*/
+/*
+  This demo uses the std::string and std::vector&lt;T&gt; classes
+  and a user-defined class, Point&lt;T, N&gt;, to illustrate how
+  types support indexing and iteration.
+  - Each standard container, C, provides C::iterator,
+    C::const_iterator, C::reverse_iterator, and
+    begin() and end() methods that return iterators to
+    the first and one past the last element of the
+    collection, respectively.
+*/
+void iteratorBasics() {
+  /* code elided */
+}
+template&lt;typename T&gt;
+void indexerVec(const std::vector&lt;T&gt;& v) {
+  /* code elided */
+}
+void executeIndexerVec() {
+  /* code elided */
+}
+template&lt;typename T&gt;
+void iteratorVec(const std::vector&lt;T&gt;& v) {
+  /* code elided */
+}
+void executeIteratorVec() {
+  /* code elided */
+}
+template&lt;typename T&gt;
+void forLoopVec(const std::vector&lt;T&gt;& v) {
+  /* code elided */
+}
+void executeForLoopVec() {
+  /* code elided */
+}
+template&lt;typename T, const size_t N&gt;
+void forLoopPoint(const Point&lt;T, N&gt;& p) {
+  /* code elided */
+}
+void executeForLoopPoint() {
+  /* code elided */
+}
+template&lt;typename T, const size_t N&gt;
+void whilerPoint(const Point&lt;T, N&gt;& p) {
+  /* code elided */
+}
+void executeWhilerPoint() {
+  /* code elided */
+}
+template&lt;typename C&gt;
+void demoWhiler(const C& c) {
+  /* code elided */
+}
+void executeDemoWhiler() {
+  /* code elided */
+}
+template&lt;typename C&gt;
+void whilerGuarded(
+  const C& c, const std::string& name,
+  size_t indent = 2, size_t max = 8
+  ) {
+  /* code elided */
+}
+void executeWhilerGuarded() {
+  /* code elided */
+}
+template&lt;typename C, typename F&gt;
+void forEachOp(C& c, F f) {
+  /* code elided */
+}
+void executeForEachOp() {
+  /* code elided */
+}
+template&lt;typename C&gt;
+inline void showCSL(const C& c, const std::string& nm, size_t max, size_t indent) {
+  /* code elided */
+}
+void executeForEachAlgorithm() {
+  /* code elided */
+}
+/*-------------------------------------------------------------------
+  Demonstration starts here
+*/
+void testFormat();
+
+int main() {
+
+    showNote(&quot;Demonstrate C++ Iteration&quot;, 30, &quot;&#92;n&quot;);
+
+    iteratorBasics();
+
+    showOp(&quot;collection specific iterations&quot;, nl);
+    std::cout &lt;&lt; std::fixed;
+    std::cout &lt;&lt; std::setprecision(1);
+    executeIndexerVec();
+    executeIteratorVec();
+    executeForLoopVec();
+    executeForLoopPoint();
+    executeWhilerPoint();
+    print();
+
+    showOp(&quot;accepts any iterable collection&quot;, nl);
+    executeDemoWhiler();
+    print();
+
+    showOp(&quot;detects non-iterable input at compile-time&quot;, nl);
+    executeWhilerGuarded();
+    print();
+
+    showOp(&quot;using lambda to operate on items&quot;, nl);
+    executeForEachOp();
+    std::cout &lt;&lt; &quot;&#92;n&quot;;
+
+    showOp(&quot;using std::for_each algorithm to modify items&quot;, nl);
+    executeForEachAlgorithm();
+
+    demo_custom_type_Point_iteration();
+
+    // #define TEST
+    #ifdef TEST
+    testFormat();
+    #endif
+
+    print(&quot;&#92;n  That's all Folks!&#92;n&#92;n&quot;);
+}
+void testFormat() {
+  /* code elided */
+}
+</code></pre>
+                </div>
+              </first-item>
+              <splitter-bar id="structure-seperator"></splitter-bar>
+              <second-item id="structure-second" style="width:40em; background-color:var(--light);" onclick="obubbleup('structure-first')">
+                <div class="textwrap noflow">
+                  <h4>Code Structure:</h4>
+                  <pre class="light">
+This program is partitioned into 4 header-only 
+libraries and a demonstration file that uses
+them.
+</pre>
+                  <div style="height:0.75em;"></div>
+<pre class="light">
+The libraries are:
+  - PointsIter.h
+  - Time.h, included in Points.Iter.h
+  - AnalysisIter.h
+and the demonstration file is:
+  - Bits_Iter.cpp
+</pre>
+                  <div style="height:0.75em;"></div>
+<pre class="light">
+PointsIter.h:
+  - defines <cs>Point&lt;N, T&gt;</cs>
+AnalysisIter.h:
+  - defines several functions used to analyze
+    type instances and display them.
+Bits_IterCpp.cpp
+  - includes the libraries
+  - defines several demonstration functions,
+    each of which demonstrates iteration
+    techniques for types in std, std::library,
+    and user-defined type <c-s>Point&lt;T, N&gt;</c-s>
+
+                </pre>
+                </div>
+              </second-item>
+            </splitter-container>
+          </div>
+        </details>
+
+        <div style="height:0.75em;"></div>
+
+
+        <div style="height:0.75em;"></div>
         <h4 id="build">3.0 Build</h4>
         <div style="border:2px solid var(--dark); padding:0.25em; width:max-content;">
           <pre style="width:100%; margin:0em;"><code class="language-term">C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Iter
@@ -799,8 +1970,8 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;Cpp&#92;Cpp_Iter&#92;build
     onLoadSplitter("gencoll");
     onLoadSplitter("pointdef");
     onLoadSplitter("pointdemo");
+    onLoadSplitter("analysis");
     onLoadSplitter("structure");
-    onLoadSplitter("methods");
     onLoadSplitter("fig4");
     onLoadSplitter("fig5");
     onLoadSplitter("fig6");
