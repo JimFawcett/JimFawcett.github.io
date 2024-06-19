@@ -75,7 +75,7 @@ function initializeMenu() {
           <div class='ddLabel darkItem'>Code Tracks</div>\
           <div class='ddItem'><a target='_self' href='../../indexBasic.html'>&nbsp;Basics</a>&nbsp;</div>\
           <div class='ddItem'><a target='_self' href='../../indexCpp.html'>&nbsp;C++</a>&nbsp;</div>\
-          <div class='ddItem'><a target='_self' href='../../indexRust.html'>&nbsp;Rust</a>&nbsp;</div>\
+          <div class='ddItem'><a target='_self' href='../../TOCRust.html'>&nbsp;Rust</a>&nbsp;</div>\
           <div class='ddItem'><a target='_self' href='../../indexCs.html'>&nbsp;C#</a>&nbsp;</div>\
           <div class='ddItem'><a target='_self' href='../../indexBits.html'>&nbsp;Bits</a>&nbsp;</div>\
           <div class='ddItem'><a target='_self' href='../../indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>\

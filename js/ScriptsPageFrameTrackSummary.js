@@ -58,6 +58,18 @@ function loadif() {
   }
 }
 
+function loadifrust() {
+  loc = window.location.href;
+  if (window.self === window.top) {
+    //if (window.location.href = 'TOC.html') { return; }
+    window.location.href = 'TOCRust.html?src=indexRust.html';
+    // temp change 3/6/2024 undone
+  }
+  else {
+    window.top.location.href = 'TOCRust.html';
+  }
+}
+
 function initializeMenu() {
   var topMenu = document.getElementById("navbar");
   if (!isDefined(topMenu)) {
@@ -94,7 +106,8 @@ function initializeMenu() {
           <div class='ddLabel darkItem'>Code Tracks</div>\
           <div class='ddItem'><a href='indexBasic.html'>&nbsp;Basics</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexCpp.html'>&nbsp;C++</a>&nbsp;</div>\
-          <div class='ddItem'><a href='indexRust.html'>&nbsp;Rust</a>&nbsp;</div>\
+          <div class='ddItem'><a target='_parent' onclick='loadifrust()'>&nbsp;Rust</a></div>\
+          <!--<div class='ddItem'><a href='TOCRust.html'>&nbsp;Rust</a>&nbsp;</div>-->\
           <div class='ddItem'><a href='indexCs.html'>&nbsp;C#</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexBits.html'>&nbsp;Bits</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>\
