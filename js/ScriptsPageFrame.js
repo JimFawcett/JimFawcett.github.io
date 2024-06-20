@@ -49,26 +49,114 @@ function getHelp() {
 function loadif() {
   loc = window.location.href;
   if (window.self === window.top) {
-    //if (window.location.href = 'TOC.html') { return; }
     window.location.href = 'TOC.html?src=' + loc;
-    // temp change 3/6/2024 undone
   }
   else {
-    location.reload();
+    window.top.location.href = 'TOC.html?src=' + loc;
+    /*location.reload();*/
+  }
+}
+
+function loadifcpp() {
+  loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCCpp.html?src=indexCpp.html';
+  }
+  else {
+    window.top.location.href = 'TOCCpp.html';
   }
 }
 
 function loadifrust() {
   loc = window.location.href;
   if (window.self === window.top) {
-    //if (window.location.href = 'TOC.html') { return; }
-    window.location.href = 'TOCRust.html?src=' + loc;
-    // temp change 3/6/2024 undone
+    window.location.href = 'TOCRust.html?src=indexRust.html';
   }
   else {
-    location.reload();
+    window.top.location.href = 'TOCRust.html';
   }
 }
+
+function loadifcsharp() {
+  loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCCSharp.html?src=indexCs.html';
+  }
+  else {
+    window.top.location.href = 'TOCCSharp.html';
+  }
+}
+
+function loadifbasic() {
+  loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCBasic.html?src=indexBasic.html';
+  }
+  else {
+    window.top.location.href = 'TOCBasic.html';
+  }
+}
+
+function loadifbits() {
+  loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCBits.html?src=indexBits.html';
+  }
+  else {
+    window.top.location.href = 'TOCBits.html';
+  }
+}
+
+function loadifwebdev() {
+  loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCWebDev.html?src=indexWebDev.html';
+  }
+  else {
+    window.top.location.href = 'TOCWebDev.html';
+  }
+}
+
+function loadifdesign() {
+  loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCDesign.html?src=indexDesign.html';
+  }
+  else {
+    window.top.location.href = 'TOCDesign.html';
+  }
+}
+
+function loadifdeployment() {
+  loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCDeployment.html?src=indexDeployment.html';
+  }
+  else {
+    window.top.location.href = 'TOCDeployment.html';
+  }
+}
+
+function loadifprojects() {
+  loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCProjects.html?src=indexProjects.html';
+  }
+  else {
+    window.top.location.href = 'TOCProjects.html';
+  }
+}
+
+function loadifprototypes() {
+  loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCPrototypes.html?src=indexPrototypes.html';
+  }
+  else {
+    window.top.location.href = 'TOCPrototypes.html';
+  }
+}
+
 
 function initializeMenu() {
   var topMenu = document.getElementById("navbar");
@@ -105,8 +193,10 @@ function initializeMenu() {
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Tracks</div>\
           <div class='ddItem'><a href='indexBasic.html'>&nbsp;Basics</a>&nbsp;</div>\
-          <div class='ddItem'><a href='indexCpp.html'>&nbsp;C++</a>&nbsp;</div>\
-          <div class='ddItem'><a href='TOCRust.html'>&nbsp;Rust</a>&nbsp;</div>\
+          <!--<div class='ddItem'><a href='indexCpp.html'>&nbsp;C++</a>&nbsp;</div>-->\
+          <div class='ddItem'><a target='_parent' onclick='loadifcpp()'>&nbsp;C++</a></div>\
+          <div class='ddItem'><a target='_parent' onclick='loadifrust()'>&nbsp;Rust</a></div>\
+          <!--<div class='ddItem'><a href='TOCRust.html'>&nbsp;Rust</a>&nbsp;</div>-->\
           <div class='ddItem'><a href='indexCs.html'>&nbsp;C#</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexBits.html'>&nbsp;Bits</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>\
