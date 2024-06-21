@@ -187,14 +187,16 @@ function initializeMenu() {
         Tracks&#9662\
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Tracks</div>\
-          <div class='ddItem'><a href='indexBasic.html'>&nbsp;Basics</a>&nbsp;</div>\
-          <div class='ddItem'><a href='indexCpp.html'>&nbsp;C++</a>&nbsp;</div>\
-          <div class='ddItem'><a href='TOCRust.html'>&nbsp;Rust</a>&nbsp;</div>\
-          <div class='ddItem'><a href='indexCs.html'>&nbsp;C#</a>&nbsp;</div>\
-          <div class='ddItem'><a href='Resources/Bits/Bits_Intro.html'>&nbsp;Bits</a>&nbsp;</div>\
-          <div class='ddItem'><a href='indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>\
-          <div class='ddItem'><a href='indexDesign.html'>&nbsp;Design</a>&nbsp;</div>\
-          <div class='ddItem'><a href='indexDeployment.html'>&nbsp;Deployment</a>&nbsp;</div>\
+          <div class='ddItem'><a target='_parent' onclick='loadifbasic()'>&nbsp;Basics</a>&nbsp;</div>\
+          <div class='ddItem'><a target='_parent' onclick='loadifcpp()'>&nbsp;C++</a></div>\
+          <div class='ddItem'><a target='_parent' onclick='loadifrust()'>&nbsp;Rust</a></div>\
+          <div class='ddItem'><a target='_parent' onclick='loadifcsharp()'>&nbsp;C#</a></div>\
+          <div class='ddItem'><a target='_parent' onclick='loadifbits()'>&nbsp;Bits</a></div>\
+          <div class='ddItem'><a target='_parent' onclick='loadifwebdev()'>&nbsp;WebDev</a></div>\
+          <div class='ddItem'><a target='_parent' onclick='loadifdesign()'>&nbsp;Design</a></div>\
+          <div class='ddItem'><a target='_parent' onclick='loadifdeployment()'>&nbsp;Deployment</a></div>\
+          <div class='ddItem'><a target='_parent' onclick='loadifprojects()'>&nbsp;Projects</a></div>\
+          <div class='ddItem'><a target='_parent' onclick='loadifprototypes()'>&nbsp;Prototypes</a></div>\
           <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
