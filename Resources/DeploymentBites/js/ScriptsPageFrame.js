@@ -400,13 +400,14 @@ function initializeMenu() {
      <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Design&nbsp;Bites&nbsp;thread</div>\
+          <div class='ddLabel darkItem'>Deployment&nbsp;Bites&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
             <div class='ddItem'><a href='DeployBites_Git.html'>Git&nbsp;code&nbsp;management</a></div>\
-            <div class='ddItem'><a class='undefined' href='# DeployBites_Github.html'>Github&nbsp;platform</a></div>\
-            <div class='ddItem'><a class='undefined' href='# DeployBites_Containers.html'>Containers</a></div>\
-            <div class='ddItem'><a class='undefined' href='# DeployBites_Cloud.html'>Cloud</a></div>\
-            <div class='ddItem'><a class='undefined' href='# DeployBites_Cloud.html'>Progressive&nbsp;Web&nbsp;apps</a></div>\
+            <div class='ddItem'><a class='undef' hrefd='# DeployBites_Github.html'>Github&nbsp;platform</a></div>\
+            <div class='ddItem'><a class='undef' hrefd='# DeployBites_PowerShell.html'>PowerShell</a></div>\
+            <div class='ddItem'><a class='undef' hrefd='# DeployBites_Containers.html'>Containers</a></div>\
+            <div class='ddItem'><a class='undef' hrefd='# DeployBites_Cloud.html'>Cloud</a></div>\
+            <div class='ddItem'><a class='undef' hrefd='# DeployBites_Cloud.html'>Progressive&nbsp;Web&nbsp;apps</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\

@@ -8,7 +8,8 @@ function initializePages() {
   /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
     /*pgbtn.style.display = "flex";*/
-    pagesMenu.innerHTML = "<menu-elem class='ddItems pageElem'><a href='CppStoryRepo.html'>Cpp&nbsp;Story&nbsp;Repo&nbsp;</a></menu-elem>\
+    pagesMenu.innerHTML = "<div class='ddLabel darkItem'>C++ Story Thread</div>\
+          <menu-elem class='ddItems pageElem'><a href='CppStoryRepo.html'>Cpp&nbsp;Story&nbsp;Repo&nbsp;</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='CppStory_Prologue.html'>Prologue</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='CppStory_Models.html'>Models</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='CppStory_Survey.html'>Survey</a>&nbsp;</menu-elem>\
@@ -21,7 +22,7 @@ function initializePages() {
           <menu-elem class='ddItems pageElem'><a href='CppStory_Libraries.html'>Libraries</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='CppStory_LibraryStreams.html'>Streams</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='CppStory_LibrarySTL.html'>STL</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='CppStory_Interesting.html'>Other Topics</a>&nbsp;</menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='CppStory_Interesting.html'>References</a>&nbsp;</menu-elem>\
           <menu-elem>&nbsp;</menu-elem>\
           <menu-elem>&nbsp;</menu-elem>";
   }

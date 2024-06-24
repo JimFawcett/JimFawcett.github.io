@@ -416,16 +416,16 @@ function initializeMenu() {
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Track&nbsp;Summary&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a href='indexBasic.html'>&nbsp;Basic</a></div>\
-            <div class='ddItem'><a href='indexCpp.html'>&nbsp;C++</a></div>\
-            <div class='ddItem'><a href='indexRust.html'>&nbsp;Rust</a></div>\
-            <div class='ddItem'><a href='indexCs.html'>&nbsp;C#</a></div>\
-            <div class='ddItem'><a href='indexBits.html'>&nbsp;Bits</a></div>\
-            <div class='ddItem'><a href='indexWebDev.html'>&nbsp;Web&nbsp;Development</a></div>\
-            <div class='ddItem'><a href='indexDesign.html'>&nbsp;Design</a></div>\
-            <div class='ddItem'><a href='indexDeployment.html'>&nbsp;Deployment</a></div>\
-            <div class='ddItem'><a href='indexProjects.html'>&nbsp;Projects</a>&nbsp;</div>\
-            <div class='ddItem'><a href='indexPrototypes.html'>&nbsp;Prototypes</a>&nbsp;</div>\
+            <div class='ddItem'><a onclick='loadifbasic()' href='indexBasic.html'>&nbsp;Basic</a></div>\
+            <div class='ddItem'><a onclick='loadifcpp()' href='indexCpp.html'>&nbsp;C++</a></div>\
+            <div class='ddItem'><a onclick='loadifrust()' href='indexRust.html'>&nbsp;Rust</a></div>\
+            <div class='ddItem'><a onclick='loadifcsharp()' href='indexCs.html'>&nbsp;C#</a></div>\
+            <div class='ddItem'><a onclick='loadifbits()' href='indexBits.html'>&nbsp;Bits</a></div>\
+            <div class='ddItem'><a onclick='loadifwebdev()' href='indexWebDev.html'>&nbsp;Web&nbsp;Development</a></div>\
+            <div class='ddItem'><a onclick='loadifdesign()' href='indexDesign.html'>&nbsp;Design</a></div>\
+            <div class='ddItem'><a onclick='loadifdeployment()' href='indexDeployment.html'>&nbsp;Deployment</a></div>\
+            <div class='ddItem'><a onclick='loadifprojects()' href='indexProjects.html'>&nbsp;Projects</a>&nbsp;</div>\
+            <div class='ddItem'><a onclick='loadifprototypes()' href='indexPrototypes.html'>&nbsp;Prototypes</a>&nbsp;</div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\

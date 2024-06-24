@@ -8,7 +8,8 @@ function initializePages() {
   /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
     /*pgbtn.style.display = "flex";*/
-    pagesMenu.innerHTML = "<menu-elem class='ddItems pageElem'><a href='RustStoryRepo.html'>Rust&nbsp;Story&nbsp;Repo&nbsp;</a></menu-elem>\
+    pagesMenu.innerHTML = "<div class='ddLabel darkItem'>Rust Story Thread</div>\
+          <menu-elem class='ddItems pageElem'><a href='RustStoryRepo.html'>Rust&nbsp;Story&nbsp;Repo&nbsp;</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustStory_Prologue.html'>Prologue</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustStory_Models.html'>Models</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustStory_Data.html'>Data</a>&nbsp;</menu-elem>\
