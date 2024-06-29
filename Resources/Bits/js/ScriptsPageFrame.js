@@ -25,7 +25,7 @@ function loadif() {
     window.location.href = '../../TOC.html?src=' + loc;
   }
   else {
-    window.top.location.href = '../../TOC.html?src=' + loc;
+    window.top.location.href = '../../TOC.html?src=index.html';
     /*location.reload();*/
   }
 }
@@ -71,12 +71,9 @@ function loadifbasic() {
 }
 
 function loadifbits() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = '../../TOCBits.html?src=indexBits.html';
-  }
-  else {
-    window.top.location.href = '../../TOCBits.html';
+    window.location.href = '../../TOCBits.html?src=' + loc;
   }
 }
 

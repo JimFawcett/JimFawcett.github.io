@@ -13,6 +13,7 @@ function initializePages() {
           <menu-elem class='ddItems pageElem'><a href='../../indexCpp.html'>Cpp&nbsp;Track&nbsp;Summary</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='CppBites_Intro.html'>Intro</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='CppBites_Survey.html'>Survey</a></menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='CppBites_STR.html'>STR</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Model</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Memory</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Types</a></menu-elem>\

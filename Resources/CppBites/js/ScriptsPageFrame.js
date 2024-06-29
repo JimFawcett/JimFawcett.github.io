@@ -30,12 +30,9 @@ function loadif() {
 }
 
 function loadifcpp() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = '../../TOCCpp.html?src=indexCpp.html';
-  }
-  else {
-    window.top.location.href = '../../TOCCpp.html';
+    window.location.href = '../../TOCCpp.html?src=' + loc;
   }
 }
 
@@ -405,7 +402,21 @@ function initializeMenu() {
             <div style='height:0.0em;'></div>\
             <div class='ddItem'><a href='CppBites_Intro.html'>Introduction</a></div>\
             <div class='ddItem'><a href='CppBites_Survey.html'>Survey</a></div>\
-            <div class='ddItem'><a class='undefined' href='# CppBites_Survey.html'>more coming</a></div>\
+            <div class='ddItem'><a href='CppBites_STR.html'>STR</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Core Model</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Core Memory</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Core Types</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Core Classes</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Class Anatomy</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Core Templates</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Core STL</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Modern Model</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Modern C++11</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Modern C++14</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Modern C++17</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Modern C++20</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Modern C++23</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>more coming</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\

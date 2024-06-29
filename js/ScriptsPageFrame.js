@@ -52,7 +52,7 @@ function loadif() {
     window.location.href = 'TOC.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOC.html?src=' + loc;
+    window.top.location.href = 'TOC.html?src=index.html';
     /*location.reload();*/
   }
 }

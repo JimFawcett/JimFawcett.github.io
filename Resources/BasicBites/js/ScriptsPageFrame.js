@@ -61,12 +61,9 @@ function loadifcsharp() {
 }
 
 function loadifbasic() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = '../../TOCBasic.html?src=indexBasic.html';
-  }
-  else {
-    window.top.location.href = '../../TOCBasic.html';
+    window.location.href = '../../TOCBasic.html?src=' + loc;
   }
 }
 
