@@ -73,7 +73,13 @@ function loadifbasic() {
 function loadifbits() {
   var loc = window.location.href;
   if (window.self === window.top) {
+    /*alert('top');*/
     window.location.href = '../../TOCBits.html?src=' + loc;
+  }
+  else {
+    /*alert('not top');*/
+    /*window.top.location.href = loc;*/
+    window.top.location.href = loc;
   }
 }
 
@@ -188,7 +194,7 @@ function initializeMenu() {
           <div class='ddItem'><a target='_parent' onclick='loadifcpp()'>&nbsp;C++</a></div>\
           <div class='ddItem'><a target='_parent' onclick='loadifrust()'>&nbsp;Rust</a></div>\
           <div class='ddItem'><a target='_parent' onclick='loadifcsharp()'>&nbsp;C#</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifbits()'>&nbsp;Bits</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCBits.html'>&nbsp;Bits</a></div>\
           <div class='ddItem'><a target='_parent' onclick='loadifwebdev()'>&nbsp;WebDev</a></div>\
           <div class='ddItem'><a target='_parent' onclick='loadifdesign()'>&nbsp;Design</a></div>\
           <div class='ddItem'><a target='_parent' onclick='loadifdeployment()'>&nbsp;Deployment</a></div>\
