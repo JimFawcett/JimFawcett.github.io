@@ -45,7 +45,6 @@ function getHelp() {
   //window.open("Help.html", "help", "popup=1, height=700, width=600");
   window.open("Help.html", "_blank");
 }
-
 function loadif() {
   var loc = window.location.href;
   if (window.self === window.top) {
@@ -59,7 +58,7 @@ function loadif() {
 }
 
 function loadifcpp() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOCCpp.html?src=indexCpp.html';
   }
