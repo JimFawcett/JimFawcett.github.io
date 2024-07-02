@@ -164,7 +164,8 @@ function initializeMenu() {
         <div class='dropdown'>\
             <div style='height:0.25em;'></div>\
             <div class='ddItem'><a target='_self' href='../../index.html'>Home</a></div>\
-            <div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>\
+            <div class='ddItem'><a target='_parent' href='../../TOC.html'>Site Explorer</a></div>\
+            <!--<div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>-->\
             <div class='ddItem'><a target='_self' href='../../SiteMap.html'>SiteMap</a></div>\
             <div class='ddItem'><a target='_self' href='../../SiteDemo.html'>SiteDemo</a></div>\
             <div class='ddItem'><a target='_self' href='../../SiteDesign.html'>SiteDesign</a></div>\
