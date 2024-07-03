@@ -403,15 +403,16 @@ function initializeMenu() {
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Basic&nbsp;Bites&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
+            <div class='ddItem'><a href='../../indexBasic.html'>Basic&nbsp;Track</a></div>\
             <div class='ddItem'><a href='BasicBites_Platform.html'>Platform</a></div>\
-            <div class='ddItem'><a href='BasicBites_PlatformMemory.html'>Platform memory</a></div>\
-            <div class='ddItem'><a href='BasicBites_PlatformSched.html'>Platform sched</a></div>\
-            <div class='ddItem'><a href='BasicBites_PlatformIO.html'>Platform IO</a></div>\
-            <div class='ddItem'><a href='BasicBites_PlatformSysRescr.html'>Platform Resources</a></div>\
+            <div class='ddItem'><a href='BasicBites_PlatformMemory.html'>&nbsp;&nbsp;memory</a></div>\
+            <div class='ddItem'><a href='BasicBites_PlatformSched.html'>&nbsp;&nbsp;scheduling</a></div>\
+            <div class='ddItem'><a href='BasicBites_PlatformIO.html'>&nbsp;&nbsp;IO</a></div>\
+            <div class='ddItem'><a href='BasicBites_PlatformSysRescr.html'>&nbsp;&nbsp;Resources</a></div>\
             <div class='ddItem'><a href='BasicBites_Programming.html'>Programming</a></div>\
-            <div class='ddItem'><a href='BasicBites_ProgExec.html'>Prog Exec</a></div>\
-            <div class='ddItem'><a href='BasicBites_ProgTypes.html'>Prog Types</a></div>\
-            <div class='ddItem'><a href='BasicBites_ProgFunctions.html'>Prog Functions</a></div>\
+            <div class='ddItem'><a href='BasicBites_ProgExec.html'>&nbsp;&nbsp;Execution</a></div>\
+            <div class='ddItem'><a href='BasicBites_ProgTypes.html'>&nbsp;&nbsp;Types</a></div>\
+            <div class='ddItem'><a href='BasicBites_ProgFunctions.html'>&nbsp;&nbsp;Functions</a></div>\
             <div class='ddItem'><a class='undefined' href='# BasicBites_Programming.html'>more later</a></div>\
           <div style='height:2em;'></div>\
         </div>\
