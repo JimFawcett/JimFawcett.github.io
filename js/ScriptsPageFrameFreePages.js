@@ -20,18 +20,19 @@ function isDefined(elem) {
 //  window.location.href = 'TOC.html?src=' + loc;
 //}
 function loadif() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOC.html?src=' + loc;
+    window.location.href = 'TOC.html?src=index.html';
   }
   else {
-    window.top.location.href = 'TOC.html?src=' + loc;
+    window.top.location.href = 'TOC.html';
+    /*window.top.location.href = 'TOC.html?src=index.html';*/
     /*location.reload();*/
   }
 }
 
 function loadifcpp() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOCCpp.html?src=indexCpp.html';
   }
@@ -123,10 +124,10 @@ function loadifprojects() {
 function loadifprototypes() {
   loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCPrototypes.html?src=indexPrototypes.html';
+    window.location.href = 'TOCPrototypes.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOCPrototypes.html';
+    window.top.location.href = loc;
   }
 }
 /* run menu builders at startup */
