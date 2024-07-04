@@ -143,2158 +143,2169 @@
           </hgroup>
         </header>
 
-  <h3 id="prologue">8.0 Prologue</h3>
-    <t-b>
-      Implementing C++ templates required compilers to develop a meta language that executes at compile-time.
-      It manipulates types and constants to build function and class templates - entities that generate
-      functions and classes, directed by types that are supplied by an application.
-    </t-b>
-    <t-b>
-      The result is a two phase compilation process:
-      <indent-block>
-        <ol class="tight indent">
-          <li>
-            compile template code with unspecified template parameter <c-s>A</c-s>: 
-            <indent-block class="pad5">
-              <c-s>template&lt;class A&gt; class X { ... };</c-s>
-            </indent-block>          </li>
-          <li>compile instantiations of the template with a defined type <c-s>AppClass</c-s>: 
-            <indent-block class="pad5">
-              <c-s>X&ltAppClass&gt x;</c-s>
-            </indent-block>
-          </li>
-        </ol>
-      </indent-block>
-      Template Metaprograms run during the second compilation phase.
-    </t-b>
-    <t-b class="indents">
-      <details>
-        <summary class="labelStyle darkItem">Quick Starter Example</summary>
-        <div class="pad15">
-          This code example is modeled after a discussion on stackoverflow.com: 
-          <a href="https://stackoverflow.com/questions/1198260/how-can-you-iterate-over-the-elements-of-an-stdtuple">
-              iterate over elements of a std::tuple
-          </a>
-        </div>
-        <div style="padding-bottom:1em;">
-          Like other functional languages, Template MetaProgramming (TMP) implements loops with
-          recursion.  It has to do that because there are no variables at compile-time, e.g., no
-          way to change a loop iterator&apos;s value.
-        </div>
-        <defn-outerblock>
-          <defn-block>
-            <defn-head>TMP Code: display items in a std::tuple</defn-head>
-            <defn-code>
-#include &lt;iostream&gt;
-#include &lt;typeinfo&gt;
-#include &lt;tuple&gt;
-#include "../Display/Display.h"
-
-namespace Chap7 {
-
-  // recursive showTuple definition
-  template&lt;size_t I = 0, typename... Tp&gt;
-  void showTuple(std::tuple&lt;Tp...&gt;&amp; t) {
-    std::cout &lt;&lt; std::get&lt;I&gt;(t) &lt;&lt; " ";    // get Ith item
-    if constexpr (I + 1 != sizeof...(Tp))  // I = I + 1
-      showTuple&lt;I + 1&gt;(t);
-  }
-}
-
-// if constexpr (pred) { /* code to conditionally compile */ }
-// - pred == true  => block is compiled so recurse
-// - pred == false => block is not compiled, stops recursion
-            </defn-code>
-          </defn-block>
-          <defn-block>
-            <defn-head>Using code:</defn-head>
-            <defn-code>
-int main() {
-
-  displayTitle("Demonstrate TMP");
-
-  std::tuple t{ 1, 2.5, 'a', "a string" };
-  std::cout &lt;&lt; "\n  ";
-  Chap7::showTuple(t);
-
-  std::cout &lt;&lt; "\n\n";
-}
-            </defn-code>
-            <defn-head class="defnBorderTop">Output:</defn-head>
-            <defn-code>
-  Demonstrate TMP
- =================  
-
-  1 2.5 a a string
-            </defn-code>
-          </defn-block>
-        </defn-outerblock>
-        <s-1em></s-1em>
-      </details>
-    </t-b>
-    <t-b>
-      This simple example
-      illustrates the power of template metaprogramming. In just a few lines of code, we enable display of the
-      contents of std::tuple. The same technique works for STL containers, 
-      <span class="notice">both sequential and associative</span>, even though the
-      sequential containers hold items with one <c-s>value_type</c-s> while associative containers hold items 
-      with both <c-s>key_type</c-s> and <c-s>value_type</c-s>.
-    </t-b>
-    <h3 id="varfunc">8.1 Variadic Functions</h3>
-    <t-b>
-      A variadic function takes an arbitrary
-      finite number of arguments.  Variadic function templates build a sequence of functions one for each parameter
-      arity, up to the largest number of arguments used in an application program.  Only those functions that are
-      actually called are compiled into code in the second phase translation.
-    </t-b>
-    <t-b>
-      Variadic functions are a classic Template MetaProgramming (TMP) construct. Each function is defined in terms of
-      the function with one fewer arguments.  A template function overload for a single argument is provided, and C++
-      guarantees that that specialization will be compiled if matched.  That specialization is used to stop
-      recursion.
-    </t-b>
-    <indent-blocks>
-    <details>
-      <summary class="labelStyle darkItem">Example: Variadic Function displaying its arguments</summary>
-      <s-halfEm></s-halfEm>
-      <defn-outerBlock>
-        <defn-block>
-          <defn-head>Code: Variadic Function</defn-head>
-          <defn-code>
-#include &lt;iostream&gt;
-#include &lt;string&gt;
-#include "../Display/Display.h"
-
-/*-- Helper function --*/
-
-std::string strTrunc(
-  const std::string&amp; src, size_t Max = 50
-) {
-  if (src.size() &gt; Max) {
-    return src.substr(0, Max - 4) + " ...";
-  }
-  else {
-    return src;
-  }
-}
-
-/*-- Templ specializ'n stops recursive eval --*/
-
-template&lt;typename T&gt;
-void f(T t)
-{
-  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
-    &lt;&lt; strTrunc(typeid(t).name(), 40)
-    &lt;&lt; std::endl;
-}
-
-/*-- Recursive definition of template function --
-   Args is a "parameter pack
-   https://en.cppreference.com
-*/
-template&lt;typename T, typename... Args&gt;
-void f(T t, Args... args)
-{
-  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
-    &lt;&lt; typeid(t).name() &lt;&lt; std::endl;
-  f(args...);
-}
-          </defn-code>
-        </defn-block>
-        <defn-block>
-          <defn-head>Using Code</defn-head>
-          <defn-code>
-int main()
-{
-  std::cout &lt;&lt;
-    "\n  Demonstrate Variatic Functions";
-  std::cout &lt;&lt;
-    "\n ================================\n";
-
-  displayDemo("-- function with 5 args --\n");
-  f(
-    1, 3.5, 'z',
-    "a literal string",
-    std::string("a std::string")
-  );
-  putline();
-  displayDemo("-- function with 2 args --\n");
-  f('q', "only two args");
-
-  std::cout &lt;&lt; "\n\n";
-  return 0;
-}
-          </defn-code>
-          <defn-head class="defnBorderTop">Output</defn-head>
-          <defn-code>
- Demonstrate Variatic Functions
-================================
-
- -- function with 5 args --
-
- 1 : int
-
- 3.5 : double
-
- z : char
-
- a literal string : char const *
-
- a std::string : 
-   class std::basic_string&lt;char,struct  ...
-
-
- -- function with 2 args --
-
- q : char
-
- only two args : char const *
-          </defn-code>
-        </defn-block>
-      </defn-outerBlock>
-    </details>
-    </indent-blocks>
-    <t-b>
-      Here&apos;s a somewhat more useful function that can display the contents of either sequential or
-      associative STL containers.
-    </t-b>    
-        <div>
-      <details>
-        <summary class="labelStyle darkItem">Example: Recursive display</summary>
+        <h3 id="prologue">8.0 Prologue</h3>
         <t-b>
-          This is a nice example of a template function that gains a lot of versatility from
-          accepting an arbitrary number of parameters (variadic) and overloading the insertion operator
-          <cl-s>operator<<</cl-s> to extend its functionality from sequential containers with scalar
-          <cl-s>value_type</cl-s>s to associative containers with <cl-s>value_type</cl-s>s that are 
-          <cl-s>std::pair&lt;Key, Value&gt;</cl-s>s.
-        </t-b>
-        <indent-block class="pad10">
-          <a href="https://eli.thegreenplace.net/2014/variadic-templates-in-c/">Code Source</a> - Eli Bendersky
-        </indent-block>
-        <defn-outerBlock>
-          <defn-block>
-            <defn-head>Code: display function</defn-head>
-            <defn-code>
-#include &lt;iostream&gt;
-
-template &lt;
-  template &lt; typename, typename... &gt; class ContainerType,
-  typename ValueType, typename... Args
-&gt;
-void print_container(
-  const ContainerType&lt; ValueType, Args... &gt;&amp; c
-) 
-{
-  for (const auto&amp; v : c) {
-    std::cout &lt;&lt; v &lt;&lt; ' ';
-  }
-  std::cout &lt;&lt; '\n';
-}
-
-// Implement &lt;&lt; for pairs: this is needed
-// to print out mappings where range
-// iteration goes over (key, value) pairs.
-
-template &lt;typename T, typename U&gt;
-std::ostream&amp; operator&lt;&lt;(
-  std::ostream&amp; out, 
-  const std::pair&lt;T, U&gt;&amp; p
-) 
-{
-  out &lt;&lt; "{" &lt;&lt; p.first &lt;&lt; ", " 
-      &lt;&lt; p.second &lt;&lt; "}";
-  return out;
-}
-            </defn-code>
-          </defn-block>
-          <defn-block>
-            <defn-head>Using Code</defn-head>
-            <defn-code>
-#include "Chap7Vdisplay.h"
-#include "../Display/Display.h"
-#include <vector>
-#include <unordered_map>
-#include <string>
-
-int main() {
-
-  displayTitle("Demo Variadic Display Function");
-
-  std::vector<int> vInt{ 1,2,3,4 };
-  std::cout << "\n  ";
-  print_container(vInt);
-
-  std::unordered_map<int, std::string> 
-  mIntStr { 
-    {1, "one"}, { 2,"two" }, { 3, "three" }
-  };
-  std::cout << "\n  ";
-  print_container(mIntStr);
-
-  putline(2);
-}
-              </defn-code>
-            <defn-head class="defnBorderTop">Output</defn-head>
-            <defn-code>
- Demo Variadic Display Function
-================================
-
- 1 2 3 4
-
- {1, one} {2, two} {3, three}
-
-            </defn-code>
-          </defn-block>
-        </defn-outerBlock>
-        <t-b>
-          The template specification at the top of the left panel matches the STL containers, e.g.,
-          <cl-s>std::vector&lt;T,&nbsp;Alloc&gt;</cl-s> and <cl-s>std::set&lt;Key,&nbsp;Compare,&nbsp;Alloc&gt;</cl-s>. 
-          That allows us to pass any STL container into the <cl-s>print_container</cl-s> function.
-        </t-b>
-      </details>
-    </div>
-    <t-b>
-      If you&apos;re puzzled by some of the syntax in the examples we&apos;ve looked at so far, the next
-      section should help.
-    </t-b>
-    <h4 id="vfsyn">8.1.1 Variadic Function Syntax</h4>
-    <t-b>
-      The expression <c-s>typename... Args</c-s> is a parameter pack, something close to a list of types. 
-      The only thing you can do with a template parameter pack is to use it in a template declaration to 
-      define an unspecified finite collection of types.
-    </t-b>
-    <t-b>
-      The expression <c-s>Args... args</c-s> is a function parameter pack, a list of values.  The only thing
-      you can do with a function parameter pack is to expand it, or pass to a function.
-    </t-b>
-    <defn-outerBlock>
-      <defn-block>
-        <defn-head>Fragment from 1st Example:</defn-head>
-        <defn-code>
-/*-- Templ specializ'n stops recursive eval --*/
-
-template&lt;typename T&gt;
-void f(T t)
-{
-  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
-    &lt;&lt; strTrunc(typeid(t).name(), 40)
-    &lt;&lt; std::endl;
-}
-
-/*-- Recursive definition of template function --
-   Args is a "parameter pack
-   https://en.cppreference.com
-*/
-template&lt;typename T, typename... Args&gt;
-void f(T t, Args... args)
-{
-  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
-    &lt;&lt; typeid(t).name() &lt;&lt; std::endl;
-  f(args...);
-}
-        </defn-code>
-      </defn-block>
-      <defn-block>
-        <defn-head>Syntax Explained:</defn-head>
-        <defn-body style="width:30rem;">
-          <t-b>
-            Start with the function at the bottom of the left panel:
-            Looking at the template declaration we see <c-s class="notice">typename... Args</c-s>. That&apos;s
-            known as a template parameter pack.
-          </t-b>
-          <t-b>
-            Think of the template declaration parameters as a list of types, with <c-s class="notice">typename t</c-s>
-            being the head of the list and
-            <c-s class="notice">typename... Args</c-s> being the tail.  The ellipsis ... means there
-            are a finite number, possibly zero, of types in the list tail.
-          </t-b>
-          <t-b>
-            The corresponding <c-s class="notice">Args... args</c-s> in the function arguments list is called a 
-            function parameter pack. The function body does what it is supposed to do with t, then executes a
-            tail recursion, stripping off the head of the list.
-          </t-b>
-          <t-b>
-            So, the function executes on the first <c-s>t</c-s> argument,
-            then recursively executes on the remaining list without the t head. For this to work, we need to
-            define what happens with the last item on the list, when the function parameter pack is empty.
-            That&apos;s taken care of by the specialization shown in the top of the left panel. That matches
-            only when the function parameter pack is empty.
-          </t-b>
-        </defn-body>
-      </defn-block>
-    </defn-outerBlock>
-    <t-b>
-      This syntax can be simplified using fold expressions, the next topic.
-    </t-b>
-    <h4 id="foldex">8.1.2 Fold Expressions</h4>
-    <t-b>
-      Fold expressions allow us to delegate recursive parts of the definition of variadic structures 
-      to standard library code instead of implementing recursive functions as illustrated above.  
-      This only works for a relatively small, but useful, subset of functions we may wish to build.
-    </t-b>
-    <t-b>
-      We will look at an example, then explain the syntax.
-    </t-b>
-    <div>
-      <details>
-        <summary class="labelStyle darkItem">Example: folds over binary operator</summary>
-        <s-halfEm></s-halfEm>
-        <defn-outerBlock>
-          <defn-block>
-            <defn-head>Code: folds over binary operator</defn-head>
-            <defn-code>
-template&lt;typename ...Args&gt;
-auto accumulateOrs(Args... args) {
-  return ((args) || ...);
-}
-
-template&lt;typename ...Args&gt;
-auto accumulateAnds(Args... args) {
-  return ((args) &amp;&amp; ...);
-}
-
-template&lt;typename T, typename ...Args&gt;
-auto sum(T t, Args... args) {
-  return (t + ... + args);
-}
-            </defn-code>
-          </defn-block>
-          <defn-block>
-            <defn-head>Using code:</defn-head>
-            <defn-code>
-displayDemo("\n  -- fold on logical operator --");
-std::cout &lt;&lt; std::boolalpha;
-std::cout &lt;&lt; "\n  " &lt;&lt; accumulateOrs(0, 0, 0);
-std::cout &lt;&lt; "\n  " &lt;&lt; accumulateOrs(false, true, false);
-std::cout &lt;&lt; "\n  " &lt;&lt; accumulateAnds(false, true, false);
-
-displayDemo("\n  -- fold on addition operator --");
-std::cout &lt;&lt; "\n  " &lt;&lt; sum(1, 2.5, -2);
-std::string s1 = "first";
-std::string s2 = " and ";
-std::string s3 = "second";
-std::cout &lt;&lt; "\n  " &lt;&lt; sum(s1, s2, s3);
-            </defn-code>
-            <defn-head class="defnBorderTop">Output:</defn-head>
-            <defn-code>
- -- fold on logical operator --
- false
- true
- false
-
- -- fold on addition operator --
- 1.5
- first and second
-            </defn-code>
-          </defn-block>
-        </defn-outerBlock>
-      </details>
-    </div>
-    <s-1em></s-1em>
-    <div>
-      <defn-outerBlock>
-        <defn-block>
-          <defn-head>Code fragment from previous example:</defn-head>
-          <defn-code>
-template&lt;typename ...Args&gt;
-auto accumulateOrs(Args... args) {
-  return ((args) || ...);
-}
-
-template&lt;typename T, typename ...Args&gt;
-auto sum(T t, Args... args) {
-  return (t + ... + args);
-}
-          </defn-code>
-        </defn-block>
-        <defn-block style="max-width:25rem;">
-          <defn-head>Syntax explained:</defn-head>
-          <defn-body>
-            <t-b>
-              The function arguments for <c-s>accumulateOrs</c-s> and <c-s>sum</c-s> are just like the function
-              arguments without fold expressions.
-            </t-b>
-            <t-b>
-              What&apos;s new are the fold expressions:
-              <indent-block>
-                <ol class="tight">
-                  <li>
-                    <c-s>((args) || ...)</c-s>&nbsp;&nbsp;-- unary right fold
-                  </li>
-                  <li>
-                    <c-s>(t + ... + args)</c-s>&nbsp;-- binary left fold
-                  </li>
-                </ol>
-              </indent-block>              
-            </t-b>
-            <t-b>
-              The first expands to <c-s>args1 || args2 || ...</c-s> and the second expands to
-              <c-s>t + args1 + args2 + ...</c-s>.
-            </t-b>
-          </defn-body>
-        </defn-block>
-      </defn-outerBlock>
-    </div>
-    <t-b>
-      This example is a classic use of fold expressions.  Next, we will show, in <c-s>pushToCout1</c-s> 
-      that this simple code structure is often not quite what we want.
-    </t-b>
-    <div>
-      <details>
-        <summary class="labelStyle darkItem">Example: pushToCout1</summary>
-        <s-halfEm></s-halfEm>
-        <t-b>
-          This example folds over the insertion operator <c-s><<</c-s>, but that does not afford us
-          a direct way to add spaces or comma seperation between inserts.  See the results at the
-          bottom of the right panel. Everything is mashed together.
-        </t-b>
-        <s-halfEm></s-halfEm>
-        <defn-outerBlock>
-          <defn-block>
-            <defn-head>Code: push to std::cout</defn-head>
-            <defn-code>
-template&lt;typename ...Args&gt;
-void pushToCout1(Args&amp;&amp;... args) {
-  (std::cout &lt;&lt; ... &lt;&lt; std::forward&lt;Args&gt;(args));
-}
-            </defn-code>
-          </defn-block>
-          <defn-block>
-            <defn-head>Using code:</defn-head>
-            <defn-code>
-displayDemo("-- pushToCout1 -- fold on operator<< --");
-std::cout << "\n  ";
-pushToCout1("argggghhh!", 1, 2.5, 'z');
-std::cout << "\n  ";
-pushToCout1('z', 2.5, 1, "argggghhh!");
-            </defn-code>
-            <defn-head class="defnBorderTop">Output:</defn-head>
-            <defn-code>
- -- pushToCout1 -- fold on operator<< --
- argggghhh!12.5z
- z2.51argggghhh!
-            </defn-code>
-          </defn-block>
-        </defn-outerBlock>
-      </details>
-    </div>
-    <t-b>
-      The next examples, <c-s>pushToCout2</c-s> and <c-s>pushToCout3</c-s> generalize 
-      that a bit by using functions on expanded items from the parameter pack.  This example uses a fixed
-      lambda.  You can customize only by the arguments passed to the lambda.
-    </t-b>
-    <div>
-      <details>
-        <summary class="labelStyle darkItem">Example: pushToCout2 - uses fixed function object</summary>
-        <s-halfEm></s-halfEm>
-        <t-b>
-          This version defines a lambda that operates on each expanded args item by prefixing with &quot;,&nbsp;&quot;.
-          We create the lambda inside a creational function that prepends the prefix by inserting into a <c-s>std::ostringstream</c-s>
-          instance followed by the item.  The purpose of the creational function is to manage the stringstream instance.
+          Implementing C++ templates required compilers to develop a meta language that executes at compile-time.
+          It manipulates types and constants to build function and class templates - entities that generate
+          functions and classes, directed by types that are supplied by an application.
         </t-b>
         <t-b>
-          In the next version we will extend this idea by allowing the user to inject an application specific creational function.
-        </t-b>
-        <defn-outerBlock>
-          <defn-block>
-            <defn-head>Code: push to std::cout ver2</defn-head>
-            <defn-code>
-auto makeHelper(
-  std::string prefix = ", ", 
-  std::string firstPrefix = ""
-) 
-{
-  int debug = 0;
-  auto f = [prefix, firstPrefix](auto a) mutable {
-    static std::ostringstream out2;
-    out2 &lt;&lt; a;
-    std::string temp = firstPrefix + out2.str();
-    out2.str("");
-    firstPrefix = prefix;
-    return temp;
-  };
-  debug++;
-  return f;
-}
-
-template&lt;typename ...Args&gt;
-void pushToCout2(const Args&amp;... args) {
-  static auto f = makeHelper(", ");
-  (std::cout &lt;&lt; ... &lt;&lt; (f(args)));
-}
-            </defn-code>
-          </defn-block>
-          <defn-block>
-            <defn-head>Using code:</defn-head>
-            <defn-code>
-  displayDemo(
-    "\n  -- pushToCout2 -- fold on operator&lt;&lt; --"
-  );
-  std::cout &lt;&lt; "\n  ";
-  pushToCout2("aaaahhhhh!", 1, 2.5, 'z');
-  std::cout &lt;&lt; "\n  ";
-  pushToCout2('z', 2.5, 1, "aaaahhhhh!");
-            </defn-code>
-            <defn-head class="defnBorderTop">Output:</defn-head>
-            <defn-code>
- -- pushToCout2 -- fold on operator<< --
- aaaahhhhh!, 1, 2.5, z
- z, 2.5, 1, aaaahhhhh!
-            </defn-code>
-          </defn-block>
-        </defn-outerBlock>
-      </details>
-    </div>
-    <t-b>
-      The final version, <c-s>pushToCout3</c-s>, improves the design by passing an unspecified lambda into
-      <c-s>pushToCout3</c-s> so an application can provide its own preferred operation.
-    </t-b>
-    <div>
-      <details>
-        <summary class="labelStyle darkItem">Example: pushToCout3 - accepts function object</summary>
-        <s-halfEm></s-halfEm>
-        <defn-outerBlock>
-          <defn-block>
-            <defn-head>Code: push to std::cout ver3</defn-head>
-            <defn-code>
-auto makeHelper(
-  std::string prefix = ", ", 
-  std::string firstPrefix = ""
-) 
-{
-  int debug = 0;
-  auto f = [prefix, firstPrefix](auto a) mutable {
-    static std::ostringstream out2;
-    out2 &lt;&lt; a;
-    std::string temp = firstPrefix + out2.str();
-    out2.str("");
-    firstPrefix = prefix;
-    return temp;
-  };
-  debug++;
-  return f;
-
-template&lt;typename F, typename ...Args&gt;
-void pushToCout3(F f, const Args&amp;... args) {
-  (std::cout &lt;&lt; ... &lt;&lt; (f(args)));
-}
-            </defn-code>
-          </defn-block>
-          <defn-block>
-            <defn-head>Using code:</defn-head>
-            <defn-code>
-  displayDemo(
-    "\n  -- pushToCout3 -- fold on operator&lt;&lt; --"
-  );
-  std::cout &lt;&lt; "\n  ";
-  pushToCout3(makeHelper(), "aaaahhhhh!", 1, 2.5, 'z');
-  std::cout &lt;&lt; "\n  ";
-  pushToCout3(makeHelper(), 'z', 2.5, 1, "aaaahhhhh!");
-            </defn-code>
-            <defn-head class="defnBorderTop">Output:</defn-head>
-            <defn-code>
- -- pushToCout3 -- fold on operator<< --
- aaaahhhhh!, 1, 2.5, z
- z, 2.5, 1, aaaahhhhh!
-            </defn-code>
-          </defn-block>
-        </defn-outerBlock>
-      </details>
-    </div>
-    <t-b>
-      We&apos;ve looked at features provided by C++ to build generic functions aided by template metaprogramming constructs.
-      Now it&apos;s time to turn to template metaprogramming for classes.
-    </t-b>
-    <h3 id="vclass">8.2 Variadic Classes</h3>
-    <t-b>
-      Variadic template classes build instantiations with a finite arbitrary number of class parameters.
-      We specify a list of template parameter types with typename... Args and a list of template function
-      arguments with Args... args.
-    </t-b>
-    <t-b>
-      The first example constructs a derived class that inherits an arbitrary number of unspecified
-      classes.  That supports building a customizable product that can mixin features as needed by
-      an application. Over time we build up a set of base capabilities that are reused for each new
-      product.
-    </t-b>
-    <div>
-      <details>
-        <summary class="labelStyle darkItem">Variadic Template Class Mixins</summary>
-        <s-halfEm></s-halfEm>
-        <photosizer-block src="Pictures/Mixins.jpg" width="300" class="photoSizerBlock right">
-          <span style="font-family:'Comic Sans MS', Tahoma;">
-            Fig 1. Mixin Hierarchy
-          </span>
-        </photosizer-block>
-        <t-b>
-          The top half of the left panel presents code for three test classes <c-s>A</c-s>, <c-s>B</c-s>, and <c-s>C</c-s>.  
-          They have no significance other than supporting the demonstration of mixins.  Class <c-s>D</c-s> is the class that
-          inherits an arbitray number of mixin classes.
-        </t-b>
-        <t-b>
-          A use-case for this structure is the development of code for a product family that has several 
-          different features. So <c-s>A</c-s>, <c-s>B</c-s>, and <c-s>C</c-s> are feature classes and
-          <c-s>D</c-s> represents the core product. Each member of the product family would use different
-          feature classes.
-        </t-b>
-        <t-b>
-          One product member might use <c-s>A</c-s> and <c-s>D</c-s>.  Another might use <c-s>B</c-s> and 
-          <c-s>C</c-s> and <c-s>D</c-s>. This structure supports a very graceful evolution of products.
-          You need a new feature? Add a new feature class and mixin with any existing features needed.
-        </t-b>
-        <defn-outerBlock>
-          <defn-block>
-            <defn-head>Code: Template Mixins</defn-head>
-            <defn-code>
-#include &lt;iostream&gt;
-
-namespace Chap7 {
-
-  class A {
-  public:
-    A() { 
-      std::cout &lt;&lt; "\n  an A here"; 
-    }
-    A(const A&amp; a) { 
-      std::cout &lt;&lt; "\n  copy A here"; 
-    }
-    virtual ~A() {}
-  };
-
-  class B {
-  public:
-    B() { 
-      std::cout &lt;&lt; "\n  a B here"; 
-    }
-    B(const B&amp; b) { 
-      std::cout &lt;&lt; "\n  copy B here"; 
-    }
-    virtual ~B() {}
-  };
-
-  class C {
-  public:
-    C() { 
-      std::cout &lt;&lt; "\n  a C here"; 
-    }
-    C(const C&amp; c) { 
-      std::cout &lt;&lt; "\n  copy C here"; 
-    }
-    virtual ~C() {}
-    void do_C_op() { 
-      std::cout &lt;&lt; 
-        "\n  doing C's operation"; 
-    }
-  };
-
-  <span class=notice>template&lt;typename... Mixins&gt;
-  class D : public Mixins...</span>
-  {
-  private:
-    bool hasMixins = false;
-  public:
-    // D() fails to compile because same as
-    // D(const Mixins&amp; ... mixins)
-    // when there are no mixins
-    // D() { 
-    //   std::cout &lt;&lt; "\n  a D here"; 
-    // }
-
-  <span class="notice">
-    D(const Mixins&amp; ... mixins)
-    : Mixins(mixins)... {
-        if (sizeof...(mixins) == 0)</span>
-        std::cout &lt;&lt; "\n  a D here";
-      else
-      {
-        hasMixins = true;
-        std::cout &lt;&lt; "\n  copy D here";
-      }
-    }
-    virtual ~D() {}
-    void say()
-    {
-      if (!hasMixins)
-        std::cout &lt;&lt; 
-          "\n  class D with no mixins here";
-      else {
-        std::cout &lt;&lt; "\n  " 
-                  &lt;&lt; typeid(this).name();
-        //std::cout &lt;&lt; "\n  " 
-        //  &lt;&lt; typeid(this).raw_name();
-      }
-      C* pC = dynamic_cast&lt;C*&gt;(this);
-      if (pC)
-        pC-&gt;do_C_op();
-      std::cout &lt;&lt; "\n";
-    }
-  };
-}
-            </defn-code>
-          </defn-block>
-          <defn-block>
-            <defn-head>Using Code:</defn-head>
-            <defn-code>
-#include "Chap7VariadicClassMixins.h"
-
-using namespace Chap7;
-
-int main()
-{
-  std::cout &lt;&lt; 
-    "\n  Variadic mixin template classes";
-  std::cout &lt;&lt; 
-    "\n =================================\n";
-
-  A a;
-  B b;
-  C c;
-  D&lt;&gt; d;
-  d.say();
-
-  D&lt;A&gt; dA(a);
-  dA.say();
-
-  D&lt;B, C&gt; dBC(b, c);
-  dBC.say();
-
-  // Will fail to compile 
-  // - incomplete argument list
-  // D&lt;B, C&gt; dBC(b);
-
-  std::cout &lt;&lt; "\n\n";
-  return 0;
-}
-            </defn-code>
-            <defn-head class="defnBorderTop">Output:</defn-head>
-            <defn-code>
- Variadic mixin template classes
-=================================
-
- an A here
- a B here
- a C here
- a D here
- class D with no mixins here
-
- copy A here
- copy D here
- class Chap7::D&lt;class Chap7::A&gt; * __ptr64
-
- copy B here
- copy C here
- copy D here
- class Chap7::D&lt;
-   class Chap7::B,class Chap7::C
- &gt; * __ptr64
- doing C's operation
-            </defn-code>
-          </defn-block>
-        </defn-outerBlock>
-      </details>
-    </div>
-    <t-b>
-      The next example creates a class with an arbitrary number of composed members of unspecified classes.
-      Where the mixin example demonstrated composing functionality from base mixins, this example
-      demonstrates composition of data into a heterogeneous data structure.
-    </t-b>
-    <div>
-      <details>
-        <summary class="labelStyle darkItem">Variadic Template Class Compositions</summary>
-        <t-b>
-          Some of these ideas are explored in: 
-          <a href="https://riptutorial.com/cplusplus/example/19276/variadic-template-data-structures">riptutorial.com</a>
-          [ can we generate getter setter functions? ]
-        </t-b>
-        <photosizer-block src="Pictures/Compositions.jpg" width="300" class="photoSizerBlock right">
-          <span style="font-family:'Comic Sans MS', Tahoma;">
-            Fig 2. Composition Structure
-          </span>
-        </photosizer-block>
-        <t-b>
-          In the left panel we have:
-          <div class="indent">
+          The result is a two phase compilation process:
+          <indent-block>
             <ol class="tight indent">
               <li>
-                Declaration of a generic DataStructure
+                compile template code with unspecified template parameter <c-s>A</c-s>:
+                <indent-block class="pad5">
+                  <c-s>template&lt;class A&gt; class X { ... };</c-s>
+                </indent-block>
               </li>
               <li>
-                Forward declaration of a helper function, used to retrieve data from the structure
-              </li>
-              <li>
-                A specialization of the DataStructure that provides for storage and retrieval of
-                a finite number of composed classes.
-              </li>
-              <li>
-                Definitions of a helper function that gets composed items by index 
-                (similar to the mechanism used by std::tuple)
+                compile instantiations of the template with a defined type <c-s>AppClass</c-s>:
+                <indent-block class="pad5">
+                  <c-s>X&ltAppClass&gt x;</c-s>
+                </indent-block>
               </li>
             </ol>
-          </div>
+          </indent-block>
+          Template Metaprograms run during the second compilation phase.
+        </t-b>
+        <t-b class="indents">
+          <details>
+            <summary class="labelStyle darkItem">Quick Starter Example</summary>
+            <div class="pad15">
+              This code example is modeled after a discussion on stackoverflow.com:
+              <a href="https://stackoverflow.com/questions/1198260/how-can-you-iterate-over-the-elements-of-an-stdtuple">
+                iterate over elements of a std::tuple
+              </a>
+            </div>
+            <div style="padding-bottom:1em;">
+              Like other functional languages, Template MetaProgramming (TMP) implements loops with
+              recursion.  It has to do that because there are no variables at compile-time, e.g., no
+              way to change a loop iterator&apos;s value.
+            </div>
+            <defn-outerblock>
+              <defn-block>
+                <defn-head>TMP Code: display items in a std::tuple</defn-head>
+                <defn-code>
+                  #include &lt;iostream&gt;
+                  #include &lt;typeinfo&gt;
+                  #include &lt;tuple&gt;
+                  #include "../Display/Display.h"
+
+                  namespace Chap7 {
+
+                  // recursive showTuple definition
+                  template&lt;size_t I = 0, typename... Tp&gt;
+                  void showTuple(std::tuple&lt;Tp...&gt;&amp; t) {
+                  std::cout &lt;&lt; std::get&lt;I&gt;(t) &lt;&lt; " ";    // get Ith item
+                  if constexpr (I + 1 != sizeof...(Tp))  // I = I + 1
+                  showTuple&lt;I + 1&gt;(t);
+                  }
+                  }
+
+                  // if constexpr (pred) { /* code to conditionally compile */ }
+                  // - pred == true  => block is compiled so recurse
+                  // - pred == false => block is not compiled, stops recursion
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Using code:</defn-head>
+                <defn-code>
+                  int main() {
+
+                  displayTitle("Demonstrate TMP");
+
+                  std::tuple t{ 1, 2.5, 'a', "a string" };
+                  std::cout &lt;&lt; "\n  ";
+                  Chap7::showTuple(t);
+
+                  std::cout &lt;&lt; "\n\n";
+                  }
+                </defn-code>
+                <defn-head class="defnBorderTop">Output:</defn-head>
+                <defn-code>
+                  Demonstrate TMP
+                  =================
+
+                  1 2.5 a a string
+                </defn-code>
+              </defn-block>
+            </defn-outerblock>
+            <s-1em></s-1em>
+          </details>
         </t-b>
         <t-b>
-          A use case for this is a help system. Suppose we are building a mixin product family like the
-          one in the previous example.  We want to provide a main help for the core product in
-          <c-s>DataStructure</c-s> and then
-          plug in help modules for each product feature class included in the product. Here, we will
-          simply define plug in modules <c-s>A</c-s>, <c-s>B</c-s>, <c-s>C</c-s>, etc. and plug in the
-          ones that match our product.
+          This simple example
+          illustrates the power of template metaprogramming. In just a few lines of code, we enable display of the
+          contents of std::tuple. The same technique works for STL containers,
+          <span class="notice">both sequential and associative</span>, even though the
+          sequential containers hold items with one <c-s>value_type</c-s> while associative containers hold items
+          with both <c-s>key_type</c-s> and <c-s>value_type</c-s>.
         </t-b>
-        <defn-outerblock>
+        <h3 id="varfunc">8.1 Variadic Functions</h3>
+        <t-b>
+          A variadic function takes an arbitrary
+          finite number of arguments.  Variadic function templates build a sequence of functions one for each parameter
+          arity, up to the largest number of arguments used in an application program.  Only those functions that are
+          actually called are compiled into code in the second phase translation.
+        </t-b>
+        <t-b>
+          Variadic functions are a classic Template MetaProgramming (TMP) construct. Each function is defined in terms of
+          the function with one fewer arguments.  A template function overload for a single argument is provided, and C++
+          guarantees that that specialization will be compiled if matched.  That specialization is used to stop
+          recursion.
+        </t-b>
+        <indent-blocks>
+          <details>
+            <summary class="labelStyle darkItem">Example: Variadic Function displaying its arguments</summary>
+            <s-halfEm></s-halfEm>
+            <defn-outerBlock>
+              <defn-block>
+                <defn-head>Code: Variadic Function</defn-head>
+                <defn-code>
+                  #include &lt;iostream&gt;
+                  #include &lt;string&gt;
+                  #include "../Display/Display.h"
+
+                  /*-- Helper function --*/
+
+                  std::string strTrunc(
+                  const std::string&amp; src, size_t Max = 50
+                  ) {
+                  if (src.size() &gt; Max) {
+                  return src.substr(0, Max - 4) + " ...";
+                  }
+                  else {
+                  return src;
+                  }
+                  }
+
+                  /*-- Templ specializ'n stops recursive eval --*/
+
+                  template&lt;typename T&gt;
+                  void f(T t)
+                  {
+                  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
+                  &lt;&lt; strTrunc(typeid(t).name(), 40)
+                  &lt;&lt; std::endl;
+                  }
+
+                  /*-- Recursive definition of template function --
+                  Args is a "parameter pack
+                  https://en.cppreference.com
+                  */
+                  template&lt;typename T, typename... Args&gt;
+                  void f(T t, Args... args)
+                  {
+                  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
+                  &lt;&lt; typeid(t).name() &lt;&lt; std::endl;
+                  f(args...);
+                  }
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Using Code</defn-head>
+                <defn-code>
+                  int main()
+                  {
+                  std::cout &lt;&lt;
+                  "\n  Demonstrate Variatic Functions";
+                  std::cout &lt;&lt;
+                  "\n ================================\n";
+
+                  displayDemo("-- function with 5 args --\n");
+                  f(
+                  1, 3.5, 'z',
+                  "a literal string",
+                  std::string("a std::string")
+                  );
+                  putline();
+                  displayDemo("-- function with 2 args --\n");
+                  f('q', "only two args");
+
+                  std::cout &lt;&lt; "\n\n";
+                  return 0;
+                  }
+                </defn-code>
+                <defn-head class="defnBorderTop">Output</defn-head>
+                <defn-code>
+                  Demonstrate Variatic Functions
+                  ================================
+
+                  -- function with 5 args --
+
+                  1 : int
+
+                  3.5 : double
+
+                  z : char
+
+                  a literal string : char const *
+
+                  a std::string :
+                  class std::basic_string&lt;char,struct  ...
+
+
+                  -- function with 2 args --
+
+                  q : char
+
+                  only two args : char const *
+                </defn-code>
+              </defn-block>
+            </defn-outerBlock>
+          </details>
+        </indent-blocks>
+        <t-b>
+          Here&apos;s a somewhat more useful function that can display the contents of either sequential or
+          associative STL containers.
+        </t-b>
+        <div>
+          <details>
+            <summary class="labelStyle darkItem">Example: Recursive display</summary>
+            <t-b>
+              This is a nice example of a template function that gains a lot of versatility from
+              accepting an arbitrary number of parameters (variadic) and overloading the insertion operator
+              <cl-s>operator<<</cl-s> to extend its functionality from sequential containers with scalar
+              <cl-s>value_type</cl-s>s to associative containers with <cl-s>value_type</cl-s>s that are
+              <cl-s>std::pair&lt;Key, Value&gt;</cl-s>s.
+            </t-b>
+            <indent-block class="pad10">
+              <a href="https://eli.thegreenplace.net/2014/variadic-templates-in-c/">Code Source</a> - Eli Bendersky
+            </indent-block>
+            <defn-outerBlock>
+              <defn-block>
+                <defn-head>Code: display function</defn-head>
+                <defn-code>
+                  #include &lt;iostream&gt;
+
+                  template &lt;
+                  template &lt; typename, typename... &gt; class ContainerType,
+                  typename ValueType, typename... Args
+                  &gt;
+                  void print_container(
+                  const ContainerType&lt; ValueType, Args... &gt;&amp; c
+                  )
+                  {
+                  for (const auto&amp; v : c) {
+                  std::cout &lt;&lt; v &lt;&lt; ' ';
+                  }
+                  std::cout &lt;&lt; '\n';
+                  }
+
+                  // Implement &lt;&lt; for pairs: this is needed
+                  // to print out mappings where range
+                  // iteration goes over (key, value) pairs.
+
+                  template &lt;typename T, typename U&gt;
+                  std::ostream&amp; operator&lt;&lt;(
+                  std::ostream&amp; out,
+                  const std::pair&lt;T, U&gt;&amp; p
+                  )
+                  {
+                  out &lt;&lt; "{" &lt;&lt; p.first &lt;&lt; ", "
+                  &lt;&lt; p.second &lt;&lt; "}";
+                  return out;
+                  }
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Using Code</defn-head>
+                <defn-code>
+                  #include "Chap7Vdisplay.h"
+                  #include "../Display/Display.h"
+                  #include <vector>
+                    #include <unordered_map>
+                      #include <string>
+
+                        int main() {
+
+                        displayTitle("Demo Variadic Display Function");
+
+                        std::vector<int>
+                          vInt{ 1,2,3,4 };
+                          std::cout << "\n  ";
+                          print_container(vInt);
+
+                          std::unordered_map<int, std::string>
+                            mIntStr {
+                            {1, "one"}, { 2,"two" }, { 3, "three" }
+                            };
+                            std::cout << "\n  ";
+                            print_container(mIntStr);
+
+                            putline(2);
+                            }
+                </defn-code>
+                <defn-head class="defnBorderTop">Output</defn-head>
+                <defn-code>
+                  Demo Variadic Display Function
+                  ================================
+
+                  1 2 3 4
+
+                  {1, one} {2, two} {3, three}
+
+                </defn-code>
+              </defn-block>
+            </defn-outerBlock>
+            <t-b>
+              The template specification at the top of the left panel matches the STL containers, e.g.,
+              <cl-s>std::vector&lt;T,&nbsp;Alloc&gt;</cl-s> and <cl-s>std::set&lt;Key,&nbsp;Compare,&nbsp;Alloc&gt;</cl-s>.
+              That allows us to pass any STL container into the <cl-s>print_container</cl-s> function.
+            </t-b>
+          </details>
+        </div>
+        <t-b>
+          If you&apos;re puzzled by some of the syntax in the examples we&apos;ve looked at so far, the next
+          section should help.
+        </t-b>
+        <h4 id="vfsyn">8.1.1 Variadic Function Syntax</h4>
+        <t-b>
+          The expression <c-s>typename... Args</c-s> is a parameter pack, something close to a list of types.
+          The only thing you can do with a template parameter pack is to use it in a template declaration to
+          define an unspecified finite collection of types.
+        </t-b>
+        <t-b>
+          The expression <c-s>Args... args</c-s> is a function parameter pack, a list of values.  The only thing
+          you can do with a function parameter pack is to expand it, or pass to a function.
+        </t-b>
+        <defn-outerBlock>
           <defn-block>
-            <defn-head>Code: Variadic Class Composition</defn-head>
+            <defn-head>Fragment from 1st Example:</defn-head>
             <defn-code>
-template&lt;typename ... T&gt;
-struct DataStructure {};
+              /*-- Templ specializ'n stops recursive eval --*/
 
-template&lt;size_t id, typename T&gt;
-struct GetHelper;
+              template&lt;typename T&gt;
+              void f(T t)
+              {
+              std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
+              &lt;&lt; strTrunc(typeid(t).name(), 40)
+              &lt;&lt; std::endl;
+              }
 
-template&lt;typename T, typename ... Rest&gt;
-struct DataStructure&lt;T, Rest ...&gt;
-{
-  DataStructure(
-    const T&amp; first, const Rest&amp; ... rest
-  )
-    : first(first), rest(rest...)
-  {}
+              /*-- Recursive definition of template function --
+              Args is a "parameter pack
+              https://en.cppreference.com
+              */
+              template&lt;typename T, typename... Args&gt;
+              void f(T t, Args... args)
+              {
+              std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
+              &lt;&lt; typeid(t).name() &lt;&lt; std::endl;
+              f(args...);
+              }
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Syntax Explained:</defn-head>
+            <defn-body style="width:30rem;">
+              <t-b>
+                Start with the function at the bottom of the left panel:
+                Looking at the template declaration we see <c-s class="notice">typename... Args</c-s>. That&apos;s
+                known as a template parameter pack.
+              </t-b>
+              <t-b>
+                Think of the template declaration parameters as a list of types, with <c-s class="notice">typename t</c-s>
+                being the head of the list and
+                <c-s class="notice">typename... Args</c-s> being the tail.  The ellipsis ... means there
+                are a finite number, possibly zero, of types in the list tail.
+              </t-b>
+              <t-b>
+                The corresponding <c-s class="notice">Args... args</c-s> in the function arguments list is called a
+                function parameter pack. The function body does what it is supposed to do with t, then executes a
+                tail recursion, stripping off the head of the list.
+              </t-b>
+              <t-b>
+                So, the function executes on the first <c-s>t</c-s> argument,
+                then recursively executes on the remaining list without the t head. For this to work, we need to
+                define what happens with the last item on the list, when the function parameter pack is empty.
+                That&apos;s taken care of by the specialization shown in the top of the left panel. That matches
+                only when the function parameter pack is empty.
+              </t-b>
+            </defn-body>
+          </defn-block>
+        </defn-outerBlock>
+        <t-b>
+          This syntax can be simplified using fold expressions, the next topic.
+        </t-b>
+        <h4 id="foldex">8.1.2 Fold Expressions</h4>
+        <t-b>
+          Fold expressions allow us to delegate recursive parts of the definition of variadic structures
+          to standard library code instead of implementing recursive functions as illustrated above.
+          This only works for a relatively small, but useful, subset of functions we may wish to build.
+        </t-b>
+        <t-b>
+          We will look at an example, then explain the syntax.
+        </t-b>
+        <div>
+          <details>
+            <summary class="labelStyle darkItem">Example: folds over binary operator</summary>
+            <s-halfEm></s-halfEm>
+            <defn-outerBlock>
+              <defn-block>
+                <defn-head>Code: folds over binary operator</defn-head>
+                <defn-code>
+                  template&lt;typename ...Args&gt;
+                  auto accumulateOrs(Args... args) {
+                  return ((args) || ...);
+                  }
 
-  T first;
-  DataStructure&lt;Rest ... &gt; rest;
+                  template&lt;typename ...Args&gt;
+                  auto accumulateAnds(Args... args) {
+                  return ((args) &amp;&amp; ...);
+                  }
 
-  template&lt;size_t id&gt;
-  auto get()
-  {
-    return GetHelper&lt;
-      id, DataStructure&lt;T, Rest...&gt;
-    &gt;::get(*this);
-  }
-};
+                  template&lt;typename T, typename ...Args&gt;
+                  auto sum(T t, Args... args) {
+                  return (t + ... + args);
+                  }
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Using code:</defn-head>
+                <defn-code>
+                  displayDemo("\n  -- fold on logical operator --");
+                  std::cout &lt;&lt; std::boolalpha;
+                  std::cout &lt;&lt; "\n  " &lt;&lt; accumulateOrs(0, 0, 0);
+                  std::cout &lt;&lt; "\n  " &lt;&lt; accumulateOrs(false, true, false);
+                  std::cout &lt;&lt; "\n  " &lt;&lt; accumulateAnds(false, true, false);
 
-template&lt;typename T, typename ... Rest&gt;
-struct GetHelper&lt;
-  0, DataStructure&lt;T, Rest ... &gt;
-&gt;
-{
-  static T get(
-    DataStructure&lt;T, Rest...&gt;&amp; data
-  )
-  {
-    return data.first;
-  }
-};
+                  displayDemo("\n  -- fold on addition operator --");
+                  std::cout &lt;&lt; "\n  " &lt;&lt; sum(1, 2.5, -2);
+                  std::string s1 = "first";
+                  std::string s2 = " and ";
+                  std::string s3 = "second";
+                  std::cout &lt;&lt; "\n  " &lt;&lt; sum(s1, s2, s3);
+                </defn-code>
+                <defn-head class="defnBorderTop">Output:</defn-head>
+                <defn-code>
+                  -- fold on logical operator --
+                  false
+                  true
+                  false
 
-template&lt;
-  size_t id, typename T, typename ... Rest
-&gt;
-struct GetHelper&lt;
-  id, DataStructure&lt;T, Rest ... &gt;
-&gt;
-{
-  static auto get(
-    DataStructure&lt;T, Rest...&gt;&amp; data
-  )
-  {
-    return GetHelper&lt;
-      id - 1, 
-      DataStructure&lt;Rest ...&gt;
-    &gt;::get(data.rest);
-  }
-};
+                  -- fold on addition operator --
+                  1.5
+                  first and second
+                </defn-code>
+              </defn-block>
+            </defn-outerBlock>
+          </details>
+        </div>
+        <s-1em></s-1em>
+        <div>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Code fragment from previous example:</defn-head>
+              <defn-code>
+                template&lt;typename ...Args&gt;
+                auto accumulateOrs(Args... args) {
+                return ((args) || ...);
+                }
+
+                template&lt;typename T, typename ...Args&gt;
+                auto sum(T t, Args... args) {
+                return (t + ... + args);
+                }
+              </defn-code>
+            </defn-block>
+            <defn-block style="max-width:25rem;">
+              <defn-head>Syntax explained:</defn-head>
+              <defn-body>
+                <t-b>
+                  The function arguments for <c-s>accumulateOrs</c-s> and <c-s>sum</c-s> are just like the function
+                  arguments without fold expressions.
+                </t-b>
+                <t-b>
+                  What&apos;s new are the fold expressions:
+                  <indent-block>
+                    <ol class="tight">
+                      <li>
+                        <c-s>((args) || ...)</c-s>&nbsp;&nbsp;-- unary right fold
+                      </li>
+                      <li>
+                        <c-s>(t + ... + args)</c-s>&nbsp;-- binary left fold
+                      </li>
+                    </ol>
+                  </indent-block>
+                </t-b>
+                <t-b>
+                  The first expands to <c-s>args1 || args2 || ...</c-s> and the second expands to
+                  <c-s>t + args1 + args2 + ...</c-s>.
+                </t-b>
+              </defn-body>
+            </defn-block>
+          </defn-outerBlock>
+        </div>
+        <t-b>
+          This example is a classic use of fold expressions.  Next, we will show, in <c-s>pushToCout1</c-s>
+          that this simple code structure is often not quite what we want.
+        </t-b>
+        <div>
+          <details>
+            <summary class="labelStyle darkItem">Example: pushToCout1</summary>
+            <s-halfEm></s-halfEm>
+            <t-b>
+              This example folds over the insertion operator <c-s><<</c-s>, but that does not afford us
+              a direct way to add spaces or comma seperation between inserts.  See the results at the
+              bottom of the right panel. Everything is mashed together.
+            </t-b>
+            <s-halfEm></s-halfEm>
+            <defn-outerBlock>
+              <defn-block>
+                <defn-head>Code: push to std::cout</defn-head>
+                <defn-code>
+                  template&lt;typename ...Args&gt;
+                  void pushToCout1(Args&amp;&amp;... args) {
+                  (std::cout &lt;&lt; ... &lt;&lt; std::forward&lt;Args&gt;(args));
+                  }
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Using code:</defn-head>
+                <defn-code>
+                  displayDemo("-- pushToCout1 -- fold on operator<< --");
+                  std::cout << "\n  ";
+                  pushToCout1("argggghhh!", 1, 2.5, 'z');
+                  std::cout << "\n  ";
+                  pushToCout1('z', 2.5, 1, "argggghhh!");
+                </defn-code>
+                <defn-head class="defnBorderTop">Output:</defn-head>
+                <defn-code>
+                  -- pushToCout1 -- fold on operator<< --
+                  argggghhh!12.5z
+                  z2.51argggghhh!
+                </defn-code>
+              </defn-block>
+            </defn-outerBlock>
+          </details>
+        </div>
+        <t-b>
+          The next examples, <c-s>pushToCout2</c-s> and <c-s>pushToCout3</c-s> generalize
+          that a bit by using functions on expanded items from the parameter pack.  This example uses a fixed
+          lambda.  You can customize only by the arguments passed to the lambda.
+        </t-b>
+        <div>
+          <details>
+            <summary class="labelStyle darkItem">Example: pushToCout2 - uses fixed function object</summary>
+            <s-halfEm></s-halfEm>
+            <t-b>
+              This version defines a lambda that operates on each expanded args item by prefixing with &quot;,&nbsp;&quot;.
+              We create the lambda inside a creational function that prepends the prefix by inserting into a <c-s>std::ostringstream</c-s>
+              instance followed by the item.  The purpose of the creational function is to manage the stringstream instance.
+            </t-b>
+            <t-b>
+              In the next version we will extend this idea by allowing the user to inject an application specific creational function.
+            </t-b>
+            <defn-outerBlock>
+              <defn-block>
+                <defn-head>Code: push to std::cout ver2</defn-head>
+                <defn-code>
+                  auto makeHelper(
+                  std::string prefix = ", ",
+                  std::string firstPrefix = ""
+                  )
+                  {
+                  int debug = 0;
+                  auto f = [prefix, firstPrefix](auto a) mutable {
+                  static std::ostringstream out2;
+                  out2 &lt;&lt; a;
+                  std::string temp = firstPrefix + out2.str();
+                  out2.str("");
+                  firstPrefix = prefix;
+                  return temp;
+                  };
+                  debug++;
+                  return f;
+                  }
+
+                  template&lt;typename ...Args&gt;
+                  void pushToCout2(const Args&amp;... args) {
+                  static auto f = makeHelper(", ");
+                  (std::cout &lt;&lt; ... &lt;&lt; (f(args)));
+                  }
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Using code:</defn-head>
+                <defn-code>
+                  displayDemo(
+                  "\n  -- pushToCout2 -- fold on operator&lt;&lt; --"
+                  );
+                  std::cout &lt;&lt; "\n  ";
+                  pushToCout2("aaaahhhhh!", 1, 2.5, 'z');
+                  std::cout &lt;&lt; "\n  ";
+                  pushToCout2('z', 2.5, 1, "aaaahhhhh!");
+                </defn-code>
+                <defn-head class="defnBorderTop">Output:</defn-head>
+                <defn-code>
+                  -- pushToCout2 -- fold on operator<< --
+                  aaaahhhhh!, 1, 2.5, z
+                  z, 2.5, 1, aaaahhhhh!
+                </defn-code>
+              </defn-block>
+            </defn-outerBlock>
+          </details>
+        </div>
+        <t-b>
+          The final version, <c-s>pushToCout3</c-s>, improves the design by passing an unspecified lambda into
+          <c-s>pushToCout3</c-s> so an application can provide its own preferred operation.
+        </t-b>
+        <div>
+          <details>
+            <summary class="labelStyle darkItem">Example: pushToCout3 - accepts function object</summary>
+            <s-halfEm></s-halfEm>
+            <defn-outerBlock>
+              <defn-block>
+                <defn-head>Code: push to std::cout ver3</defn-head>
+                <defn-code>
+                  auto makeHelper(
+                  std::string prefix = ", ",
+                  std::string firstPrefix = ""
+                  )
+                  {
+                  int debug = 0;
+                  auto f = [prefix, firstPrefix](auto a) mutable {
+                  static std::ostringstream out2;
+                  out2 &lt;&lt; a;
+                  std::string temp = firstPrefix + out2.str();
+                  out2.str("");
+                  firstPrefix = prefix;
+                  return temp;
+                  };
+                  debug++;
+                  return f;
+
+                  template&lt;typename F, typename ...Args&gt;
+                  void pushToCout3(F f, const Args&amp;... args) {
+                  (std::cout &lt;&lt; ... &lt;&lt; (f(args)));
+                  }
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Using code:</defn-head>
+                <defn-code>
+                  displayDemo(
+                  "\n  -- pushToCout3 -- fold on operator&lt;&lt; --"
+                  );
+                  std::cout &lt;&lt; "\n  ";
+                  pushToCout3(makeHelper(), "aaaahhhhh!", 1, 2.5, 'z');
+                  std::cout &lt;&lt; "\n  ";
+                  pushToCout3(makeHelper(), 'z', 2.5, 1, "aaaahhhhh!");
+                </defn-code>
+                <defn-head class="defnBorderTop">Output:</defn-head>
+                <defn-code>
+                  -- pushToCout3 -- fold on operator<< --
+                  aaaahhhhh!, 1, 2.5, z
+                  z, 2.5, 1, aaaahhhhh!
+                </defn-code>
+              </defn-block>
+            </defn-outerBlock>
+          </details>
+        </div>
+        <t-b>
+          We&apos;ve looked at features provided by C++ to build generic functions aided by template metaprogramming constructs.
+          Now it&apos;s time to turn to template metaprogramming for classes.
+        </t-b>
+        <h3 id="vclass">8.2 Variadic Classes</h3>
+        <t-b>
+          Variadic template classes build instantiations with a finite arbitrary number of class parameters.
+          We specify a list of template parameter types with typename... Args and a list of template function
+          arguments with Args... args.
+        </t-b>
+        <t-b>
+          The first example constructs a derived class that inherits an arbitrary number of unspecified
+          classes.  That supports building a customizable product that can mixin features as needed by
+          an application. Over time we build up a set of base capabilities that are reused for each new
+          product.
+        </t-b>
+        <div>
+          <details>
+            <summary class="labelStyle darkItem">Variadic Template Class Mixins</summary>
+            <s-halfEm></s-halfEm>
+            <photosizer-block src="Pictures/Mixins.jpg" width="300" class="photoSizerBlock right">
+              <span style="font-family:'Comic Sans MS', Tahoma;">
+                Fig 1. Mixin Hierarchy
+              </span>
+            </photosizer-block>
+            <t-b>
+              The top half of the left panel presents code for three test classes <c-s>A</c-s>, <c-s>B</c-s>, and <c-s>C</c-s>.
+              They have no significance other than supporting the demonstration of mixins.  Class <c-s>D</c-s> is the class that
+              inherits an arbitray number of mixin classes.
+            </t-b>
+            <t-b>
+              A use-case for this structure is the development of code for a product family that has several
+              different features. So <c-s>A</c-s>, <c-s>B</c-s>, and <c-s>C</c-s> are feature classes and
+              <c-s>D</c-s> represents the core product. Each member of the product family would use different
+              feature classes.
+            </t-b>
+            <t-b>
+              One product member might use <c-s>A</c-s> and <c-s>D</c-s>.  Another might use <c-s>B</c-s> and
+              <c-s>C</c-s> and <c-s>D</c-s>. This structure supports a very graceful evolution of products.
+              You need a new feature? Add a new feature class and mixin with any existing features needed.
+            </t-b>
+            <defn-outerBlock>
+              <defn-block>
+                <defn-head>Code: Template Mixins</defn-head>
+                <defn-code>
+                  #include &lt;iostream&gt;
+
+                  namespace Chap7 {
+
+                  class A {
+                  public:
+                  A() {
+                  std::cout &lt;&lt; "\n  an A here";
+                  }
+                  A(const A&amp; a) {
+                  std::cout &lt;&lt; "\n  copy A here";
+                  }
+                  virtual ~A() {}
+                  };
+
+                  class B {
+                  public:
+                  B() {
+                  std::cout &lt;&lt; "\n  a B here";
+                  }
+                  B(const B&amp; b) {
+                  std::cout &lt;&lt; "\n  copy B here";
+                  }
+                  virtual ~B() {}
+                  };
+
+                  class C {
+                  public:
+                  C() {
+                  std::cout &lt;&lt; "\n  a C here";
+                  }
+                  C(const C&amp; c) {
+                  std::cout &lt;&lt; "\n  copy C here";
+                  }
+                  virtual ~C() {}
+                  void do_C_op() {
+                  std::cout &lt;&lt;
+                  "\n  doing C's operation";
+                  }
+                  };
+
+                  <span class=notice>
+                    template&lt;typename... Mixins&gt;
+                    class D : public Mixins...
+                  </span>
+                  {
+                  private:
+                  bool hasMixins = false;
+                  public:
+                  // D() fails to compile because same as
+                  // D(const Mixins&amp; ... mixins)
+                  // when there are no mixins
+                  // D() {
+                  //   std::cout &lt;&lt; "\n  a D here";
+                  // }
+
+                  <span class="notice">
+                    D(const Mixins&amp; ... mixins)
+                    : Mixins(mixins)... {
+                    if (sizeof...(mixins) == 0)
+                  </span>
+                  std::cout &lt;&lt; "\n  a D here";
+                  else
+                  {
+                  hasMixins = true;
+                  std::cout &lt;&lt; "\n  copy D here";
+                  }
+                  }
+                  virtual ~D() {}
+                  void say()
+                  {
+                  if (!hasMixins)
+                  std::cout &lt;&lt;
+                  "\n  class D with no mixins here";
+                  else {
+                  std::cout &lt;&lt; "\n  "
+                  &lt;&lt; typeid(this).name();
+                  //std::cout &lt;&lt; "\n  "
+                  //  &lt;&lt; typeid(this).raw_name();
+                  }
+                  C* pC = dynamic_cast&lt;C*&gt;(this);
+                  if (pC)
+                  pC-&gt;do_C_op();
+                  std::cout &lt;&lt; "\n";
+                  }
+                  };
+                  }
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Using Code:</defn-head>
+                <defn-code>
+                  #include "Chap7VariadicClassMixins.h"
+
+                  using namespace Chap7;
+
+                  int main()
+                  {
+                  std::cout &lt;&lt;
+                  "\n  Variadic mixin template classes";
+                  std::cout &lt;&lt;
+                  "\n =================================\n";
+
+                  A a;
+                  B b;
+                  C c;
+                  D&lt;&gt; d;
+                  d.say();
+
+                  D&lt;A&gt; dA(a);
+                  dA.say();
+
+                  D&lt;B, C&gt; dBC(b, c);
+                  dBC.say();
+
+                  // Will fail to compile
+                  // - incomplete argument list
+                  // D&lt;B, C&gt; dBC(b);
+
+                  std::cout &lt;&lt; "\n\n";
+                  return 0;
+                  }
+                </defn-code>
+                <defn-head class="defnBorderTop">Output:</defn-head>
+                <defn-code>
+                  Variadic mixin template classes
+                  =================================
+
+                  an A here
+                  a B here
+                  a C here
+                  a D here
+                  class D with no mixins here
+
+                  copy A here
+                  copy D here
+                  class Chap7::D&lt;class Chap7::A&gt; * __ptr64
+
+                  copy B here
+                  copy C here
+                  copy D here
+                  class Chap7::D&lt;
+                  class Chap7::B,class Chap7::C
+                  &gt; * __ptr64
+                  doing C's operation
+                </defn-code>
+              </defn-block>
+            </defn-outerBlock>
+          </details>
+        </div>
+        <t-b>
+          The next example creates a class with an arbitrary number of composed members of unspecified classes.
+          Where the mixin example demonstrated composing functionality from base mixins, this example
+          demonstrates composition of data into a heterogeneous data structure.
+        </t-b>
+        <div>
+          <details>
+            <summary class="labelStyle darkItem">Variadic Template Class Compositions</summary>
+            <t-b>
+              Some of these ideas are explored in:
+              <a href="https://riptutorial.com/cplusplus/example/19276/variadic-template-data-structures">riptutorial.com</a>
+              [ can we generate getter setter functions? ]
+            </t-b>
+            <photosizer-block src="Pictures/Compositions.jpg" width="300" class="photoSizerBlock right">
+              <span style="font-family:'Comic Sans MS', Tahoma;">
+                Fig 2. Composition Structure
+              </span>
+            </photosizer-block>
+            <t-b>
+              In the left panel we have:
+              <div class="indent">
+                <ol class="tight indent">
+                  <li>
+                    Declaration of a generic DataStructure
+                  </li>
+                  <li>
+                    Forward declaration of a helper function, used to retrieve data from the structure
+                  </li>
+                  <li>
+                    A specialization of the DataStructure that provides for storage and retrieval of
+                    a finite number of composed classes.
+                  </li>
+                  <li>
+                    Definitions of a helper function that gets composed items by index
+                    (similar to the mechanism used by std::tuple)
+                  </li>
+                </ol>
+              </div>
+            </t-b>
+            <t-b>
+              A use case for this is a help system. Suppose we are building a mixin product family like the
+              one in the previous example.  We want to provide a main help for the core product in
+              <c-s>DataStructure</c-s> and then
+              plug in help modules for each product feature class included in the product. Here, we will
+              simply define plug in modules <c-s>A</c-s>, <c-s>B</c-s>, <c-s>C</c-s>, etc. and plug in the
+              ones that match our product.
+            </t-b>
+            <defn-outerblock>
+              <defn-block>
+                <defn-head>Code: Variadic Class Composition</defn-head>
+                <defn-code>
+                  template&lt;typename ... T&gt;
+                  struct DataStructure {};
+
+                  template&lt;size_t id, typename T&gt;
+                  struct GetHelper;
+
+                  template&lt;typename T, typename ... Rest&gt;
+                  struct DataStructure&lt;T, Rest ...&gt;
+                  {
+                  DataStructure(
+                  const T&amp; first, const Rest&amp; ... rest
+                  )
+                  : first(first), rest(rest...)
+                  {}
+
+                  T first;
+                  DataStructure&lt;Rest ... &gt; rest;
+
+                  template&lt;size_t id&gt;
+                  auto get()
+                  {
+                  return GetHelper&lt;
+                  id, DataStructure&lt;T, Rest...&gt;
+                  &gt;::get(*this);
+                  }
+                  };
+
+                  template&lt;typename T, typename ... Rest&gt;
+                  struct GetHelper&lt;
+                  0, DataStructure&lt;T, Rest ... &gt;
+                  &gt;
+                  {
+                  static T get(
+                  DataStructure&lt;T, Rest...&gt;&amp; data
+                  )
+                  {
+                  return data.first;
+                  }
+                  };
+
+                  template&lt;
+                  size_t id, typename T, typename ... Rest
+                  &gt;
+                  struct GetHelper&lt;
+                  id, DataStructure&lt;T, Rest ... &gt;
+                  &gt;
+                  {
+                  static auto get(
+                  DataStructure&lt;T, Rest...&gt;&amp; data
+                  )
+                  {
+                  return GetHelper&lt;
+                  id - 1,
+                  DataStructure&lt;Rest ...&gt;
+                  &gt;::get(data.rest);
+                  }
+                  };
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Using Code:</defn-head>
+                <defn-code>
+                  #include "Chap7VariadicClassComp.h"
+                  #include "../Display/Display.h"
+                  #include &lt;iostream&gt;
+                  #include &lt;vector&gt;
+
+                  int main()
+                  {
+                  displayTitle(
+                  "Variadic Class Data by Composition"
+                  );
+
+                  DataStructure&lt;
+                  int, float, std::string
+                  &gt; data1(1, 2.1, "Hello");
+
+                  std::cout &lt;&lt;
+                  "\n  " &lt;&lt; data1.get&lt;0&gt;();
+                  std::cout &lt;&lt;
+                  "\n  " &lt;&lt; data1.get&lt;1&gt;();
+                  std::cout &lt;&lt;
+                  "\n  " &lt;&lt; data1.get&lt;2&gt;();
+                  putline();
+
+                  DataStructure&lt;
+                  int, float, std::string
+                  &gt; data2{ 2, 3.1, "Hello again" };
+                  std::cout &lt;&lt; "\n  "
+                  &lt;&lt; data2.get&lt;0&gt;();
+                  std::cout &lt;&lt; "\n  "
+                  &lt;&lt; data2.get&lt;1&gt;();
+                  std::cout &lt;&lt; "\n  "
+                  &lt;&lt; data2.get&lt;2&gt;();
+                  putline();
+
+                  DataStructure&lt;std::vector&lt;int&gt;&gt;
+                  data3(std::vector&lt;int&gt;{1, 2, 3, 4, 5});
+                  std::vector&lt;int&gt; out
+                  = data3.get&lt;0&gt;();
+                  std::cout &lt;&lt; "\n  ";
+                  for (auto item : out) {
+                  std::cout &lt;&lt; item &lt;&lt; " ";
+                  }
+                  putline(2);
+                  return 0;
+                  }
+                </defn-code>
+                <defn-head class="defnBorderTop">Output:</defn-head>
+                <defn-code>
+
+                  Variadic Class Data by Composition
+                  ====================================
+
+                  1
+                  2.1
+                  Hello
+
+                  2
+                  3.1
+                  Hello again
+
+                  1 2 3 4 5
+                </defn-code>
+              </defn-block>
+            </defn-outerblock>
+          </details>
+        </div>
+        <div style="height:0.5em;"></div>
+        <h4 id="vcsyn">8.2.1 Variadic Class Syntax</h4>
+        <t-b>
+          Variadic class syntax is the same parameter pack syntax used for functions,
+          simply adapted to the class template syntax.
+        </t-b>
+        <div>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Code fragment from 1st example:</defn-head>
+              <defn-code>
+                <span class=notice>
+                  template&lt;typename... Mixins&gt;
+                  class D : public Mixins...
+                </span>
+                {
+                private:
+                bool hasMixins = false;
+                public:
+                <span class="notice">
+                  D(const Mixins&amp; ... mixins)
+                  : Mixins(mixins)... {
+                  if (sizeof...(mixins) == 0)
+                </span>
+                std::cout &lt;&lt; "\n  a D here";
+                else
+                {
+                hasMixins = true;
+                std::cout &lt;&lt; "\n  copy D here";
+                }
+                }
+                virtual ~D() {}
+                void say()
+                {
+                if (!hasMixins)
+                std::cout &lt;&lt;
+                "\n  class D with no mixins here";
+                else {
+                std::cout &lt;&lt; "\n  "
+                &lt;&lt; typeid(this).name();
+                }
+                C* pC = dynamic_cast&lt;C*&gt;(this);
+                if (pC)
+                pC-&gt;do_C_op();
+                std::cout &lt;&lt; "\n";
+                }
+                };
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Syntax Explained:</defn-head>
+              <defn-body style="max-width:30rem;">
+                <t-b>
+                  The parameter pack <c-s class="notice">typename... Mixins</c-s> declares a list of a finite
+                  arbitrary number of unspecified class types to be used by <c-s>class D</c-s>.
+                </t-b>
+                <t-b>
+                  The second line in the left panel declares that <c-s>D</c-s> inherits from all of those classes.
+                  Other uses of variadic class templates could use them in other
+                  ways.
+                </t-b>
+                <t-b>
+                  The constructor
+                  <indent-block class="pad10">
+                    <c-s class="notice">D(const Mixins&amp; ... mixins) : Mixins(mixins)...</c-s>
+                  </indent-block>
+                  Accepts an initializing value for each mixin class and calls its constructor in an
+                  initialization sequence, the last part of the expression above.
+                </t-b>
+                <t-b>
+                  The ellipsis, &quot;<c-s>...</c-s>&quot; causes an expansion of the parameter packs, e.g.,
+                  <c-s class="notice">Mixins& ... mixins</c-s> expands into a comma separated list of arguments,
+                  <c-s class="notice">Mixin1&amp; mixin1, Mixin2&amp; mixin2, ..</c-s>.
+                </t-b>
+                <t-b>
+                  The term <c-s class="notice">Mixins(mixins)...</c-s> expands into a comma separated list
+                  of <c-s>Mixin1(mixin1), Misin2(mixin2), ..</c-s>.  This is just what we need to create
+                  a valid constructor syntax.
+                </t-b>
+              </defn-body>
+            </defn-block>
+          </defn-outerBlock>
+        </div>
+        <h3 id="ctent">8.3 Compile-Time Entities</h3>
+        <t-b>
+          Implementing templates required C++ compilers to develop a compile-time functional language.
+          That language handles types, type lists, and constant integral values while compiling template code.
+        </t-b>
+        <t-b>
+          The template metaprogramming language (TMPL) needs representations for types, constant integral values
+          and compile-time expressions (an association of a type and a constant value). Let&apos;s see how that
+          can be done.
+        </t-b>
+        <defn-outerBlock class="indents">
+          <defn-block>
+            <defn-head>
+              Type Representation:
+            </defn-head>
+            <defn-code>
+              template&lt;typename T&gt;
+              struct TypeRep {
+              using type = T;
+              };
             </defn-code>
           </defn-block>
           <defn-block>
             <defn-head>Using Code:</defn-head>
             <defn-code>
-#include "Chap7VariadicClassComp.h"
-#include "../Display/Display.h"
-#include &lt;iostream&gt;
-#include &lt;vector&gt;
-
-int main()
-{
-  displayTitle(
-    "Variadic Class Data by Composition"
-  );
-
-  DataStructure&lt;
-    int, float, std::string
-  &gt; data1(1, 2.1, "Hello");
-
-  std::cout &lt;&lt; 
-    "\n  " &lt;&lt; data1.get&lt;0&gt;();
-  std::cout &lt;&lt; 
-    "\n  " &lt;&lt; data1.get&lt;1&gt;();
-  std::cout &lt;&lt; 
-    "\n  " &lt;&lt; data1.get&lt;2&gt;();
-  putline();
-
-  DataStructure&lt;
-    int, float, std::string
-  &gt; data2{ 2, 3.1, "Hello again" };
-  std::cout &lt;&lt; "\n  " 
-            &lt;&lt; data2.get&lt;0&gt;();
-  std::cout &lt;&lt; "\n  " 
-            &lt;&lt; data2.get&lt;1&gt;();
-  std::cout &lt;&lt; "\n  " 
-            &lt;&lt; data2.get&lt;2&gt;();
-  putline();
-
-  DataStructure&lt;std::vector&lt;int&gt;&gt; 
-    data3(std::vector&lt;int&gt;{1, 2, 3, 4, 5});
-  std::vector&lt;int&gt; out 
-    = data3.get&lt;0&gt;();
-  std::cout &lt;&lt; "\n  ";
-  for (auto item : out) {
-    std::cout &lt;&lt; item &lt;&lt; " ";
-  }
-  putline(2);
-  return 0;
-}            </defn-code>
+              std::cout &lt;&lt; "\n  "
+              &lt;&lt; typeid(TypeRep&lt;double&gt;::type).name();
+            </defn-code>
             <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
-
- Variadic Class Data by Composition
-====================================
-
- 1
- 2.1
- Hello
-
- 2
- 3.1
- Hello again
-
- 1 2 3 4 5
+              double
             </defn-code>
           </defn-block>
-        </defn-outerblock>
-      </details>
-    </div>
-    <div style="height:0.5em;"></div>
-    <h4 id="vcsyn">8.2.1 Variadic Class Syntax</h4>
-    <t-b>
-      Variadic class syntax is the same parameter pack syntax used for functions,
-      simply adapted to the class template syntax.
-    </t-b>
-    <div>
-      <defn-outerBlock>
-        <defn-block>
-          <defn-head>Code fragment from 1st example:</defn-head>
-          <defn-code>
-  <span class=notice>template&lt;typename... Mixins&gt;
-  class D : public Mixins...</span>
-  {
-  private:
-    bool hasMixins = false;
-  public:
-    <span class="notice">
-    D(const Mixins&amp; ... mixins)
-    : Mixins(mixins)... {
-        if (sizeof...(mixins) == 0)</span>
-        std::cout &lt;&lt; "\n  a D here";
-      else
-      {
-        hasMixins = true;
-        std::cout &lt;&lt; "\n  copy D here";
-      }
-    }
-    virtual ~D() {}
-    void say()
-    {
-      if (!hasMixins)
-        std::cout &lt;&lt; 
-          "\n  class D with no mixins here";
-      else {
-        std::cout &lt;&lt; "\n  " 
-                  &lt;&lt; typeid(this).name();
-      }
-      C* pC = dynamic_cast&lt;C*&gt;(this);
-      if (pC)
-        pC-&gt;do_C_op();
-      std::cout &lt;&lt; "\n";
-    }
-  };
-          </defn-code>
-        </defn-block>
-        <defn-block>
-          <defn-head>Syntax Explained:</defn-head>
-          <defn-body style="max-width:30rem;">
-            <t-b>
-              The parameter pack <c-s class="notice">typename... Mixins</c-s> declares a list of a finite
-              arbitrary number of unspecified class types to be used by <c-s>class D</c-s>.
-            </t-b>
-            <t-b>
-              The second line in the left panel declares that <c-s>D</c-s> inherits from all of those classes.  
-              Other uses of variadic class templates could use them in other
-              ways.
-            </t-b>
-            <t-b>
-              The constructor 
-              <indent-block class="pad10">
-                <c-s class="notice">D(const Mixins&amp; ... mixins) : Mixins(mixins)...</c-s>
-              </indent-block>
-              Accepts an initializing value for each mixin class and calls its constructor in an
-              initialization sequence, the last part of the expression above.
-            </t-b>
-            <t-b>
-              The ellipsis, &quot;<c-s>...</c-s>&quot; causes an expansion of the parameter packs, e.g.,
-              <c-s class="notice">Mixins& ... mixins</c-s> expands into a comma separated list of arguments,
-              <c-s class="notice">Mixin1&amp; mixin1, Mixin2&amp; mixin2, ..</c-s>.
-            </t-b>
-            <t-b>
-              The term <c-s class="notice">Mixins(mixins)...</c-s> expands into a comma separated list
-              of <c-s>Mixin1(mixin1), Misin2(mixin2), ..</c-s>.  This is just what we need to create
-              a valid constructor syntax.
-            </t-b>
-          </defn-body>
-        </defn-block>
-      </defn-outerBlock>
-    </div>
-    <h3 id="ctent">8.3 Compile-Time Entities</h3>
-    <t-b>
-      Implementing templates required C++ compilers to develop a compile-time functional language.  
-      That language handles types, type lists, and constant integral values while compiling template code.
-    </t-b>
-    <t-b>
-      The template metaprogramming language (TMPL) needs representations for types, constant integral values
-      and compile-time expressions (an association of a type and a constant value). Let&apos;s see how that
-      can be done.
-    </t-b>
-    <defn-outerBlock class="indents">
-      <defn-block>
-        <defn-head>
-          Type Representation:
-        </defn-head>
-        <defn-code>
-template&lt;typename T&gt;
-struct TypeRep {
-  using type = T;
-};
-        </defn-code>
-      </defn-block>
-      <defn-block>
-        <defn-head>Using Code:</defn-head>
-        <defn-code>
-std::cout &lt;&lt; "\n  " 
-          &lt;&lt; typeid(TypeRep&lt;double&gt;::type).name();
-        </defn-code>
-        <defn-head class="defnBorderTop">Output:</defn-head>
-        <defn-code>
-double
-        </defn-code>
-      </defn-block>
-    </defn-outerBlock>
-    <t-b>
-      The declaration <c-s>using type = T;</c-s> creates a <c-s>type</c-s> member in <c-s>TypeRep</c-s> accessed
-      by the expression <c-s>TypeRep&lt;T&gt;::type</c-s>. The code listed in the top panel on the right is
-      generated at compile-time and executed at run-time.
-    </t-b>
-    <t-b>
-      Why do we need this? We&apos;ll see in several examples to come.
-    </t-b>
-    <defn-outerBlock class="indents">
-      <defn-block>
-        <defn-head>
-          Value Representation:
-        </defn-head>
-        <defn-code>
-template&lt;typename T, T v&gt;
-struct ValueRep {
-  static constexpr T value = v;
-};
-        </defn-code>
-      </defn-block>
-      <defn-block>
-        <defn-head>Using Code:</defn-head>
-        <defn-code>
-std::cout &lt;&lt; "\n  " 
-          &lt;&lt; ValueRep&lt;int, 3&gt;::value;
-        </defn-code>
-        <defn-head class="defnBorderTop">Output:</defn-head>
-        <defn-code>
-3
-        </defn-code>
-      </defn-block>
-    </defn-outerBlock>
-    <t-b>
-      Values at compile-time have to be integral constants, e.g., <c-s>ints</c-s>, <c-s>long ints</c-s>, 
-      pointers, etc. The
-      <c-s>constexpr</c-s> qualifier declares that T is one of these.  If not, compilation will fail.
-    </t-b>
-    <defn-outerBlock class="indents">
-      <defn-block>
-        <defn-head>
-          Expression Representation:
-        </defn-head>
-        <defn-code>
-template&lt;typename T, T v&gt;
-struct ExpressionRep {
-  using type = T;
-  static constexpr T value = v;
-  constexpr operator T() { return v; }
-};
-        </defn-code>
-      </defn-block>
-      <defn-block>
-        <defn-head>Using Code:</defn-head>
-        <defn-code>
-std::cout &lt;&lt; "\n  " 
-          &lt;&lt; typeid(ExpressionRep&lt;int, 3&gt;::type).name() 
-          &lt;&lt; ", " &lt;&lt; ExpressionRep&lt;int, 3&gt;::value;
-        </defn-code>
-        <defn-head class="defnBorderTop">Output:</defn-head>
-        <defn-code>
-int, 3
-        </defn-code>
-      </defn-block>
-    </defn-outerBlock>
-    <t-b>
-      All C++ expressions have types and most have values. The template struct <c-s>ExpressionRep</c-s>
-      combines <c-s>TypeRep</c-s> and <c-s>ValueRep</c-s> to represent expressions at compile-time.
-    </t-b>
-    <t-b>
-      It also includes something new - a <c-s>constexpr</c-s> function <c-s>operator T()</c-s> which
-      is a cast that can execute at compile-time.
-    </t-b>
-    <t-b>
-      <c-s>constexpr</c-s> functions must use only types and values that can be represented at compile-time
-      in order to run at compile-time. Otherwise the compiler generates code to execute them at run-time.
-    </t-b>
-    <t-b>
-      Here&apos;s another example that adds two more constexpr functions.
-    </t-b>
-    <defn-outerBlock class="indents">
-      <defn-block>
-        <defn-head>
-          Another Expression Representation:
-        </defn-head>
-        <defn-code>
-template&lt;typename T, T v&gt;
-struct ExpRep2 {
-  using type = T;
-  static constexpr T value = v;
-  constexpr operator T() { return v; }
-  static constexpr T get() { return v; }
-  static constexpr T addOne() { return (v + 1); }
-  static constexpr T subOne() { return (v - 1); }
-};
-        </defn-code>
-      </defn-block>
-      <defn-block>
-        <defn-head>Using Code:</defn-head>
-        <defn-code>
-constexpr int v = 0;
-std::cout &lt;&lt; "\n  " 
-          &lt;&lt; typeid(ExpRep2&lt;size_t, v&gt;).name() 
-          &lt;&lt; ", " 
-          &lt;&lt; ExpRep2&lt;size_t, v&gt;::get();
-std::cout &lt;&lt; "\n  " 
-          &lt;&lt; ExpRep2&lt;int, v&gt;::addOne();
-std::cout &lt;&lt; "\n  " 
-          &lt;&lt; ExpRep2&lt;int, v&gt;();
-std::cout &lt;&lt; "\n  " 
-          &lt;&lt; ExpRep2&lt;int, v&gt;::subOne();
-        </defn-code>
-        <defn-head class="defnBorderTop">Output:</defn-head>
-        <defn-code>
-struct ExpRep2<unsigned __int64,0>, 0
-1
-0
--1
-        </defn-code>
-      </defn-block>
-    </defn-outerBlock>
-    <t-b>
-      The addition of these two constexpr functions are not very useful except to illustrate how
-      compile-time functions work. Again, remember that the compiler generated this result at compile-time
-      and generated code at compile-time to display it at run-time.
-    </t-b>
-    <h4 id="sctent">8.3.1 Standard Compile-Time Entities</h4>
-    <t-b>
-      Standard C++17 defines a number of useful compile-time entities.  Here&apos;s a complete list of
-      entities in the &lt;type_traits&gt; library:
-      <a href="https://en.cppreference.com/w/cpp/header/type_traits">cppreference.com</a>.
-    </t-b>
-    <t-b>
-      One important entity is a standard representation for compile-time expressions, <c-s>integral_constant</c-s>,
-      similar to the ExpressionRep we looked at at the beginning of this section.
+        </defn-outerBlock>
+        <t-b>
+          The declaration <c-s>using type = T;</c-s> creates a <c-s>type</c-s> member in <c-s>TypeRep</c-s> accessed
+          by the expression <c-s>TypeRep&lt;T&gt;::type</c-s>. The code listed in the top panel on the right is
+          generated at compile-time and executed at run-time.
+        </t-b>
+        <t-b>
+          Why do we need this? We&apos;ll see in several examples to come.
+        </t-b>
+        <defn-outerBlock class="indents">
+          <defn-block>
+            <defn-head>
+              Value Representation:
+            </defn-head>
+            <defn-code>
+              template&lt;typename T, T v&gt;
+              struct ValueRep {
+              static constexpr T value = v;
+              };
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code:</defn-head>
+            <defn-code>
+              std::cout &lt;&lt; "\n  "
+              &lt;&lt; ValueRep&lt;int, 3&gt;::value;
+            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+              3
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+        <t-b>
+          Values at compile-time have to be integral constants, e.g., <c-s>ints</c-s>, <c-s>long ints</c-s>,
+          pointers, etc. The
+          <c-s>constexpr</c-s> qualifier declares that T is one of these.  If not, compilation will fail.
+        </t-b>
+        <defn-outerBlock class="indents">
+          <defn-block>
+            <defn-head>
+              Expression Representation:
+            </defn-head>
+            <defn-code>
+              template&lt;typename T, T v&gt;
+              struct ExpressionRep {
+              using type = T;
+              static constexpr T value = v;
+              constexpr operator T() { return v; }
+              };
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code:</defn-head>
+            <defn-code>
+              std::cout &lt;&lt; "\n  "
+              &lt;&lt; typeid(ExpressionRep&lt;int, 3&gt;::type).name()
+              &lt;&lt; ", " &lt;&lt; ExpressionRep&lt;int, 3&gt;::value;
+            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+              int, 3
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+        <t-b>
+          All C++ expressions have types and most have values. The template struct <c-s>ExpressionRep</c-s>
+          combines <c-s>TypeRep</c-s> and <c-s>ValueRep</c-s> to represent expressions at compile-time.
+        </t-b>
+        <t-b>
+          It also includes something new - a <c-s>constexpr</c-s> function <c-s>operator T()</c-s> which
+          is a cast that can execute at compile-time.
+        </t-b>
+        <t-b>
+          <c-s>constexpr</c-s> functions must use only types and values that can be represented at compile-time
+          in order to run at compile-time. Otherwise the compiler generates code to execute them at run-time.
+        </t-b>
+        <t-b>
+          Here&apos;s another example that adds two more constexpr functions.
+        </t-b>
+        <defn-outerBlock class="indents">
+          <defn-block>
+            <defn-head>
+              Another Expression Representation:
+            </defn-head>
+            <defn-code>
+              template&lt;typename T, T v&gt;
+              struct ExpRep2 {
+              using type = T;
+              static constexpr T value = v;
+              constexpr operator T() { return v; }
+              static constexpr T get() { return v; }
+              static constexpr T addOne() { return (v + 1); }
+              static constexpr T subOne() { return (v - 1); }
+              };
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code:</defn-head>
+            <defn-code>
+              constexpr int v = 0;
+              std::cout &lt;&lt; "\n  "
+              &lt;&lt; typeid(ExpRep2&lt;size_t, v&gt;).name()
+              &lt;&lt; ", "
+              &lt;&lt; ExpRep2&lt;size_t, v&gt;::get();
+              std::cout &lt;&lt; "\n  "
+              &lt;&lt; ExpRep2&lt;int, v&gt;::addOne();
+              std::cout &lt;&lt; "\n  "
+              &lt;&lt; ExpRep2&lt;int, v&gt;();
+              std::cout &lt;&lt; "\n  "
+              &lt;&lt; ExpRep2&lt;int, v&gt;::subOne();
+            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+              struct ExpRep2<unsigned __int64,0>
+                , 0
+                1
+                0
+                -1
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+        <t-b>
+          The addition of these two constexpr functions are not very useful except to illustrate how
+          compile-time functions work. Again, remember that the compiler generated this result at compile-time
+          and generated code at compile-time to display it at run-time.
+        </t-b>
+        <h4 id="sctent">8.3.1 Standard Compile-Time Entities</h4>
+        <t-b>
+          Standard C++17 defines a number of useful compile-time entities.  Here&apos;s a complete list of
+          entities in the &lt;type_traits&gt; library:
+          <a href="https://en.cppreference.com/w/cpp/header/type_traits">cppreference.com</a>.
+        </t-b>
+        <t-b>
+          One important entity is a standard representation for compile-time expressions, <c-s>integral_constant</c-s>,
+          similar to the ExpressionRep we looked at at the beginning of this section.
 
-    </t-b>
-    <defn-outerBlock class="indent">
-      <defn-block>
-        <defn-head>
-          std::integral_const&nbsp;&nbsp;&nbsp;&nbsp;
-          <a href="http://www.cplusplus.com/reference/type_traits/integral_constant/">cplusplus.com</a>
-        </defn-head>
-        <defn-code>
-template &lt;class T, T v&gt;
-struct integral_constant {
-  static constexpr T value = v;
-  typedef T value_type;
-  typedef integral_constant&lt;T,v&gt; type;
-  constexpr operator T() const noexcept { return v; }
-  constexpr T operator()() const noexcept { return v; }
-};        
-        </defn-code>
-      </defn-block>
-    </defn-outerBlock>
-    <t-b>
-      This struct serves as the base for a number of representation classes used in TMP. It adds two things
-      to note: a definition of <c-s>type</c-s> that is equivalent to itself and an <c-s>operator()()</c-s>
-      that makes it a functor, i.e., a callable object.
-    </t-b>
-    <t-b>
-      The next example uses <c-s>integral_const</c-s> to define a type trait <c-s>is_void</c-s>.  Remember that
-      <c-s>integral_const</c-s> is a struct that has a value member. We define aliases <c-s>false_type</c-s>
-      and <c-s>true_type</c-s> to be structs containing values that are <c-s>false</c-s> and <c-s>true</c-s>
-      respectively.
-    </t-b>
-    <t-b>
-      We then define a generic version of <c-s>is_void&lt;T&gt;</c-s> that inherits from <c-s>false_type</c-s>
-      so it contains a false value and a 
-      specialization <c-s>is_void&lt;void&gt;</c-s> that inherits from <c-s>true_type</c-s> and so contains a 
-      true value. Now, we can use this trait to test at compile time whether a type is <c-s>void</c-s> or not, 
-      as shown below.
-    </t-b>
-    <defn-outerBlock class="indents">
-      <defn-block>
-        <defn-head>Defining a type trait:</defn-head>
-        <defn-code>
-typedef integral_const&lt;bool, false&gt; false_type;
-typedef integral_const&lt;bool, true&gt; true_type;
+        </t-b>
+        <defn-outerBlock class="indent">
+          <defn-block>
+            <defn-head>
+              std::integral_const&nbsp;&nbsp;&nbsp;&nbsp;
+              <a href="http://www.cplusplus.com/reference/type_traits/integral_constant/">cplusplus.com</a>
+            </defn-head>
+            <defn-code>
+              template &lt;class T, T v&gt;
+              struct integral_constant {
+              static constexpr T value = v;
+              typedef T value_type;
+              typedef integral_constant&lt;T,v&gt; type;
+              constexpr operator T() const noexcept { return v; }
+              constexpr T operator()() const noexcept { return v; }
+              };
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+        <t-b>
+          This struct serves as the base for a number of representation classes used in TMP. It adds two things
+          to note: a definition of <c-s>type</c-s> that is equivalent to itself and an <c-s>operator()()</c-s>
+          that makes it a functor, i.e., a callable object.
+        </t-b>
+        <t-b>
+          The next example uses <c-s>integral_const</c-s> to define a type trait <c-s>is_void</c-s>.  Remember that
+          <c-s>integral_const</c-s> is a struct that has a value member. We define aliases <c-s>false_type</c-s>
+          and <c-s>true_type</c-s> to be structs containing values that are <c-s>false</c-s> and <c-s>true</c-s>
+          respectively.
+        </t-b>
+        <t-b>
+          We then define a generic version of <c-s>is_void&lt;T&gt;</c-s> that inherits from <c-s>false_type</c-s>
+          so it contains a false value and a
+          specialization <c-s>is_void&lt;void&gt;</c-s> that inherits from <c-s>true_type</c-s> and so contains a
+          true value. Now, we can use this trait to test at compile time whether a type is <c-s>void</c-s> or not,
+          as shown below.
+        </t-b>
+        <defn-outerBlock class="indents">
+          <defn-block>
+            <defn-head>Defining a type trait:</defn-head>
+            <defn-code>
+              typedef integral_const&lt;bool, false&gt; false_type;
+              typedef integral_const&lt;bool, true&gt; true_type;
 
-/* generic type is false */
-template&lt;typename T&gt;
-struct is_void : std::false_type {};
+              /* generic type is false */
+              template&lt;typename T&gt;
+              struct is_void : std::false_type {};
 
-/* specialization for void is true */
-template&lt;&gt;
-struct is_void&lt;void&gt; : std::true_type {};
-        </defn-code>
-      </defn-block>
-      <defn-block>
-        <defn-head>Using Code:</defn-head>
-        <defn-code>
-std::cout << "\n  " << is_void&lt;void&gt;::value;
-std::cout << "\n  " << is_void&lt;int&gt;::value;
-        </defn-code>
-        <defn-head class="defnBorderTop">Output:</defn-head>
-        <defn-code>
-true
-false
-        </defn-code>
-      </defn-block>
-    </defn-outerBlock>
-    <t-b>
-      <c-s>std::is_void&lt;T&gt;</c-s> is one of the simplest std type traits.  The example above shows how it
-      is implemented.  All the traits use this approach, but of course some are more complex (see next example).
-    </t-b>
-    <t-b>
-      If you look at the code in <a href="CppStoryRepo.html">CppStory repository</a> in folder Chapter7-TypeTraits,
-      you will see all the code presented here and can run it. It just mimics what the standard library code
-      implements.
-    </t-b>
+              /* specialization for void is true */
+              template&lt;&gt;
+              struct is_void&lt;void&gt; : std::true_type {};
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code:</defn-head>
+            <defn-code>
+              std::cout << "\n  " << is_void&lt;void&gt;::value;
+              std::cout << "\n  " << is_void&lt;int&gt;::value;
+            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+              true
+              false
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+        <t-b>
+          <c-s>std::is_void&lt;T&gt;</c-s> is one of the simplest std type traits.  The example above shows how it
+          is implemented.  All the traits use this approach, but of course some are more complex (see next example).
+        </t-b>
+        <t-b>
+          If you look at the code in <a href="CppStoryRepo.html">CppStory repository</a> in folder Chapter7-TypeTraits,
+          you will see all the code presented here and can run it. It just mimics what the standard library code
+          implements.
+        </t-b>
 
-    <h3 id="typtra">8.4 Type Traits</h3>
-    <t-b>
-      Type traits are template expression classes that test for specific type attributes, like <c-s>is_void</c-s>,
-      above.
-      Examples from the standard <c-s>type_traits</c-s> library are: <c-s>is_void</c-s>, <c-s>is_class</c-s>, and 
-      <c-s>is_rvalue_reference</c-s>.  Here&apos;s a complete list of standard  
-      <a href="https://en.cppreference.com/w/cpp/header/type_traits">type_traits</a>. 
-    </t-b>
-    <t-b>
-      The <c-s>type_traits</c-s> library does not provide traits to detect STL containers, so we will do one
-      for <c-s>std::vector</c-s> in this next example. The code follows closely an example provided in
-      <a href="https://stackoverflow.com/questions/9407367/determine-if-a-type-is-an-stl-container-at-compile-time/31105859#31105859">stackoverflow</a>.
-    </t-b>
-    <defn-outerBlock class="indents">
-      <defn-block>
-        <defn-head>Custom type_trait is_vector</defn-head>
-        <defn-code>
-namespace impl {
-  template&lt;typename T&gt; struct 
-    is_vector : std::false_type {};
-  template &lt;typename... Args&gt; struct 
-    is_vector&lt; 
-      std::vector&lt;Args...&gt;
-    &gt;:std::true_type {};
-}
-template&lt;typename T&gt; struct is_vector {
-  static constexpr bool const value = 
-    impl::is_vector&lt;std::decay_t&lt;T &gt;&gt;::value;
-};
+        <h3 id="typtra">8.4 Type Traits</h3>
+        <t-b>
+          Type traits are template expression classes that test for specific type attributes, like <c-s>is_void</c-s>,
+          above.
+          Examples from the standard <c-s>type_traits</c-s> library are: <c-s>is_void</c-s>, <c-s>is_class</c-s>, and
+          <c-s>is_rvalue_reference</c-s>.  Here&apos;s a complete list of standard
+          <a href="https://en.cppreference.com/w/cpp/header/type_traits">type_traits</a>.
+        </t-b>
+        <t-b>
+          The <c-s>type_traits</c-s> library does not provide traits to detect STL containers, so we will do one
+          for <c-s>std::vector</c-s> in this next example. The code follows closely an example provided in
+          <a href="https://stackoverflow.com/questions/9407367/determine-if-a-type-is-an-stl-container-at-compile-time/31105859#31105859">stackoverflow</a>.
+        </t-b>
+        <defn-outerBlock class="indents">
+          <defn-block>
+            <defn-head>Custom type_trait is_vector</defn-head>
+            <defn-code>
+              namespace impl {
+              template&lt;typename T&gt; struct
+              is_vector : std::false_type {};
+              template &lt;typename... Args&gt; struct
+              is_vector&lt;
+              std::vector&lt;Args...&gt;
+              &gt;:std::true_type {};
+              }
+              template&lt;typename T&gt; struct is_vector {
+              static constexpr bool const value =
+              impl::is_vector&lt;std::decay_t&lt;T &gt;&gt;::value;
+              };
 
-/*-----------------------------------------------------
-  The core part of the definition is in impl namespace.
-  That is then used in the final definition, stripping
-  cvr qualifiers from T with std::decay_t&lt;T&gt;.
+              /*-----------------------------------------------------
+              The core part of the definition is in impl namespace.
+              That is then used in the final definition, stripping
+              cvr qualifiers from T with std::decay_t&lt;T&gt;.
 
-  Namespace impl is needed to avoid an infinite recurse
-  in that final definition fix-up.
------------------------------------------------------*/
-        </defn-code>
-      </defn-block>
-      <defn-block>
-        <defn-head>Using Code:</defn-head>
-        <defn-code>
-displayDemo("--- is_vector ---");
-std::cout &lt;&lt; "\n  " 
-          &lt;&lt; is_vector&lt;
-               std::vector&lt;int&gt;
+              Namespace impl is needed to avoid an infinite recurse
+              in that final definition fix-up.
+              -----------------------------------------------------*/
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code:</defn-head>
+            <defn-code>
+              displayDemo("--- is_vector ---");
+              std::cout &lt;&lt; "\n  "
+              &lt;&lt; is_vector&lt;
+              std::vector&lt;int&gt;
               &gt;::value;
-std::cout &lt;&lt; "\n  " 
-          &lt;&lt; is_vector&lt;
-               std::vector&lt;double&gt;
+              std::cout &lt;&lt; "\n  "
+              &lt;&lt; is_vector&lt;
+              std::vector&lt;double&gt;
               &gt;::value;
-std::cout &lt;&lt; "\n  " 
-          &lt;&lt; is_vector&lt;
-               std::unordered_map&lt;int, std::string&gt;
+              std::cout &lt;&lt; "\n  "
+              &lt;&lt; is_vector&lt;
+              std::unordered_map&lt;int, std::string&gt;
               &gt;::value;
-        </defn-code>
-        <defn-head class="defnBorderTop">Output:</defn-head>
-        <defn-code>
---- is_vector ---
-true
-true
-false
-        </defn-code>
-      </defn-block>
-    </defn-outerBlock>
-    <t-b>
-      We&apos;ve used a variadic template in the example above so that both
-      <c-s>std::vector&lt;T&gt;</c-s> and <c-s>std::vector&lt;T,Allocator&gt;</c-s>
-      would be detected.  Without the variadic template only the first would be detected. Many of the
-      STL containers have several template arguments, so this solution covers all those cases.
-      For each of the STL containers we can define traits using the above code and merely substitute
-      the name of the container for <c-s>vector</c-s>.
-    </t-b>
+            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+              --- is_vector ---
+              true
+              true
+              false
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
+        <t-b>
+          We&apos;ve used a variadic template in the example above so that both
+          <c-s>std::vector&lt;T&gt;</c-s> and <c-s>std::vector&lt;T,Allocator&gt;</c-s>
+          would be detected.  Without the variadic template only the first would be detected. Many of the
+          STL containers have several template arguments, so this solution covers all those cases.
+          For each of the STL containers we can define traits using the above code and merely substitute
+          the name of the container for <c-s>vector</c-s>.
+        </t-b>
 
-    <h3 id="ctsel">8.5 Compile-Time Selections</h3>
-    <t-b>
-      When writing template code, we often have to perform different operations depending on the types
-      of the template parameters.  But when writing the library code we don&apos;t know what types the
-      using application has supplied.
-    </t-b>
-    <t-b>
-      It is quite common that some operation will compile for some types and not other types.  In that
-      case we want to select the code to use based on type traits.  However, we can&apos;t use run-time
-      selection.  When our template code is translated, the compiler can&apos;t know what will happen at
-      run-time so all of the code compiled has to be valid for each type used by the application. But that
-      is unlikely to be the case.
-    </t-b>
-    <t-b>
-      What we need is a compile-time selection process that will only compile code valid for the applied
-      type and ignore code intended for other types. constexpr if works 
-      very well in this situation.
-    </t-b>
-    <defn-outerBlock class="indents">
-      <defn-block>
-        <defn-head>constexpr if</defn-head>
-        <defn-code>
-if constexpr(pred) {
-  /* compiled only if code for pred == true */
-}
-else {
-  /* compiled only if code for pred == false */
-}
-        </defn-code>
-      </defn-block>
-      <defn-block>
-        <defn-head>Example:</defn-head>
-        <defn-code>
-/*--------------------------------- 
-   suppose function has to deal
-   with vectors and stacks 
- */
+        <h3 id="ctsel">8.5 Compile-Time Selections</h3>
+        <t-b>
+          When writing template code, we often have to perform different operations depending on the types
+          of the template parameters.  But when writing the library code we don&apos;t know what types the
+          using application has supplied.
+        </t-b>
+        <t-b>
+          It is quite common that some operation will compile for some types and not other types.  In that
+          case we want to select the code to use based on type traits.  However, we can&apos;t use run-time
+          selection.  When our template code is translated, the compiler can&apos;t know what will happen at
+          run-time so all of the code compiled has to be valid for each type used by the application. But that
+          is unlikely to be the case.
+        </t-b>
+        <t-b>
+          What we need is a compile-time selection process that will only compile code valid for the applied
+          type and ignore code intended for other types. constexpr if works
+          very well in this situation.
+        </t-b>
+        <defn-outerBlock class="indents">
+          <defn-block>
+            <defn-head>constexpr if</defn-head>
+            <defn-code>
+              if constexpr(pred) {
+              /* compiled only if code for pred == true */
+              }
+              else {
+              /* compiled only if code for pred == false */
+              }
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Example:</defn-head>
+            <defn-code>
+              /*---------------------------------
+              suppose function has to deal
+              with vectors and stacks
+              */
 
-/* assumes v is know in code body */
+              /* assumes v is know in code body */
 
-if constexpr(is_vector&lt;T&gt;) {
-  T.push_back(v);
-}
-else {
-  T.push(v);
-}
-      </defn-block>
-    </defn-outerBlock>
-    <t-b>
-      There is another selection mechanism that works differently.  <c-s>std::enable_if&lt;pred&gt;</c-s> is a template
-      struct that will have an embedded type if pred evaluates to true and otherwise will not have an embedded type.
-    </t-b>
-    <t-b>
-      The idea is to use <c-s>std::enable_if&lt;predicate&gt;</c-s> as a template argument.  If the predicate is false overload
-      resolution will fail due to the missing type.  So overload resolution will only succeed for that overload when the
-      predicate condition is true. Otherwise some other overload is chosen if available, or compilation fails.
-    </t-b>
-    <t-b>
-      This example uses code from a <a href="https://eli.thegreenplace.net/2014/sfinae-and-enable_if/">post</a> by Eli Bendersky.
-    </t-b>
-    <defn-outerBlock class="indents">
-      <defn-block>
-        <defn-head>std::enable_if</defn-head>
-        <defn-code>
-template &lt;
-  class T,
-  class std::enable_if&lt;
-    std::is_integral&lt;T&gt;::value, T
-   &gt;::type * = nullptr
-&gt;
-void do_stuff(T&amp; t) {
-  std::cout &lt;&lt; 
-    "\n  doing integral stuff with type " 
-    &lt;&lt; typeid(t).name();
-}
+              if constexpr(is_vector&lt;T&gt;) {
+              T.push_back(v);
+              }
+              else {
+              T.push(v);
+              }
+          </defn-block>
+        </defn-outerBlock>
+        <t-b>
+          There is another selection mechanism that works differently.  <c-s>std::enable_if&lt;pred&gt;</c-s> is a template
+          struct that will have an embedded type if pred evaluates to true and otherwise will not have an embedded type.
+        </t-b>
+        <t-b>
+          The idea is to use <c-s>std::enable_if&lt;predicate&gt;</c-s> as a template argument.  If the predicate is false overload
+          resolution will fail due to the missing type.  So overload resolution will only succeed for that overload when the
+          predicate condition is true. Otherwise some other overload is chosen if available, or compilation fails.
+        </t-b>
+        <t-b>
+          This example uses code from a <a href="https://eli.thegreenplace.net/2014/sfinae-and-enable_if/">post</a> by Eli Bendersky.
+        </t-b>
+        <defn-outerBlock class="indents">
+          <defn-block>
+            <defn-head>std::enable_if</defn-head>
+            <defn-code>
+              template &lt;
+              class T,
+              class std::enable_if&lt;
+              std::is_integral&lt;T&gt;::value, T
+              &gt;::type * = nullptr
+              &gt;
+              void do_stuff(T&amp; t) {
+              std::cout &lt;&lt;
+              "\n  doing integral stuff with type "
+              &lt;&lt; typeid(t).name();
+              }
 
-template &lt;
-  class T,
-  class std::enable_if&lt;
-    std::is_class&lt;T&gt;::value, T
-   &gt;::type * = nullptr
-&gt;
-void do_stuff(T&amp; t) {
-  std::cout &lt;&lt; 
-    "\n  doing class stuff with type " 
-    &lt;&lt; typeid(t).name();
-}
-        </defn-code>
-      </defn-block>
-      <defn-block>
-        <defn-head>Using Code:</defn-head>
-        <defn-code>
-displayDemo("--- enable_if ---");
-class X {};
-X x;
-int i = 42;
-do_stuff(i);
-do_stuff(x);
-std::string s("a string");
-do_stuff(s);
-        </defn-code>
-        <defn-head class="defnBorderTop">Output:</defn-head>
-        <defn-code>
-  --- enable_if ---
-  doing integral stuff with type int
-  doing class stuff with type 
-    class `int __cdecl main(void)'::`2'::X
-  doing class stuff with type 
-    class std::basic_string&lt;char,struct ...
-        </defn-code>
-      </defn-block>
-    </defn-outerBlock>
+              template &lt;
+              class T,
+              class std::enable_if&lt;
+              std::is_class&lt;T&gt;::value, T
+              &gt;::type * = nullptr
+              &gt;
+              void do_stuff(T&amp; t) {
+              std::cout &lt;&lt;
+              "\n  doing class stuff with type "
+              &lt;&lt; typeid(t).name();
+              }
+            </defn-code>
+          </defn-block>
+          <defn-block>
+            <defn-head>Using Code:</defn-head>
+            <defn-code>
+              displayDemo("--- enable_if ---");
+              class X {};
+              X x;
+              int i = 42;
+              do_stuff(i);
+              do_stuff(x);
+              std::string s("a string");
+              do_stuff(s);
+            </defn-code>
+            <defn-head class="defnBorderTop">Output:</defn-head>
+            <defn-code>
+              --- enable_if ---
+              doing integral stuff with type int
+              doing class stuff with type
+              class `int __cdecl main(void)'::`2'::X
+              doing class stuff with type
+              class std::basic_string&lt;char,struct ...
+            </defn-code>
+          </defn-block>
+        </defn-outerBlock>
 
-    <h3 id="tmapps">8.6 TMP Applications</h3>
-    <t-b>
-      Most of the data generated for this story was displayed using functions with a lot of TMP. All of the
-      display functionality was developed in code for project <a href="CppStoryRepo.html">Chapter7-Display</a>.
-      That depends on traits definitions provided by <a href="CppStoryRepo.html">Chapter7-TypeTraits</a>.
-      We&apos;ve shown fragments of that below.
-    </t-b>
-    <details>
-      <summary class="labelStyle darkItem">Demonstration: Custom Type Traits</summary>
-      <s-halfEm></s-halfEm>
-      <indent-blocks>
-        <a href="Resources/Chap7TypeTraits.h.html">Chap7TypeTraits.h</a>,
-        <a href="Resources/Chap7TypeTraits.cpp.html">Chap7TypeTraits.cpp</a><br />
-      </indent-blocks>      <s-halfEm></s-halfEm>
-    <indent-blocks class="clear">
-      <defn-outerBlock>
-        <defn-block>
-          <defn-head>Code Fragment: Chap7TypeTraits.h</defn-head>
-          <defn-code>
-/* ----------------------------------------------
-   define type traits not supplied by 
-   the standard type_traits library 
-*/
+        <h3 id="tmapps">8.6 TMP Applications</h3>
+        <t-b>
+          Most of the data generated for this story was displayed using functions with a lot of TMP. All of the
+          display functionality was developed in code for project <a href="CppStoryRepo.html">Chapter7-Display</a>.
+          That depends on traits definitions provided by <a href="CppStoryRepo.html">Chapter7-TypeTraits</a>.
+          We&apos;ve shown fragments of that below.
+        </t-b>
+        <details>
+          <summary class="labelStyle darkItem">Demonstration: Custom Type Traits</summary>
+          <s-halfEm></s-halfEm>
+          <indent-blocks>
+            <a href="Resources/Chap7TypeTraits.h.html">Chap7TypeTraits.h</a>,
+            <a href="Resources/Chap7TypeTraits.cpp.html">Chap7TypeTraits.cpp</a><br />
+          </indent-blocks>      <s-halfEm></s-halfEm>
+          <indent-blocks class="clear">
+            <defn-outerBlock>
+              <defn-block>
+                <defn-head>Code Fragment: Chap7TypeTraits.h</defn-head>
+                <defn-code>
+                  /* ----------------------------------------------
+                  define type traits not supplied by
+                  the standard type_traits library
+                  */
 
-namespace impl {
+                  namespace impl {
 
-  template&lt;typename T&gt; 
-  struct is_pair :std::false_type {};
-  template &lt;typename... Args&gt; 
-  struct is_pair &lt; std::pair&lt;Args...&gt;&gt; 
-    :std::true_type {};
+                  template&lt;typename T&gt;
+                  struct is_pair :std::false_type {};
+                  template &lt;typename... Args&gt;
+                  struct is_pair &lt; std::pair&lt;Args...&gt;&gt;
+                  :std::true_type {};
 
-  template&lt;typename T&gt; 
-  struct is_tuple :std::false_type {};
-  template &lt;typename... Args&gt; struct is_tuple &lt; 
-    std::tuple&lt;Args...&gt;
-  &gt; :std::true_type {};
+                  template&lt;typename T&gt;
+                  struct is_tuple :std::false_type {};
+                  template &lt;typename... Args&gt; struct is_tuple &lt;
+                  std::tuple&lt;Args...&gt;
+                  &gt; :std::true_type {};
 
-  template&lt;typename T&gt; 
-  struct is_array :std::false_type {};
-  template &lt;typename T, size_t N&gt; 
-  struct is_array &lt; std::array&lt;T, N&gt;&gt; 
-    :std::true_type {};
+                  template&lt;typename T&gt;
+                  struct is_array :std::false_type {};
+                  template &lt;typename T, size_t N&gt;
+                  struct is_array &lt; std::array&lt;T, N&gt;&gt;
+                  :std::true_type {};
 
-  template&lt;typename T&gt; 
-  struct is_basic_string :std::false_type {};
-  template &lt;typename... Args&gt; 
-  struct is_basic_string &lt; 
-    std::basic_string&lt;Args...&gt;
-  &gt; :std::true_type {};
+                  template&lt;typename T&gt;
+                  struct is_basic_string :std::false_type {};
+                  template &lt;typename... Args&gt;
+                  struct is_basic_string &lt;
+                  std::basic_string&lt;Args...&gt;
+                  &gt; :std::true_type {};
 
-  template&lt;typename T&gt; 
-  struct is_vector :std::false_type {};
-  template &lt;typename... Args&gt; 
-  struct is_vector &lt; std::vector&lt;Args...&gt;&gt; 
-    :std::true_type {};
+                  template&lt;typename T&gt;
+                  struct is_vector :std::false_type {};
+                  template &lt;typename... Args&gt;
+                  struct is_vector &lt; std::vector&lt;Args...&gt;&gt;
+                  :std::true_type {};
 
-  template&lt;typename T&gt; 
-  struct is_deque :std::false_type {};
-  template &lt;typename... Args&gt; 
-  struct is_deque &lt; std::deque&lt;Args...&gt;&gt; 
-    :std::true_type {};
+                  template&lt;typename T&gt;
+                  struct is_deque :std::false_type {};
+                  template &lt;typename... Args&gt;
+                  struct is_deque &lt; std::deque&lt;Args...&gt;&gt;
+                  :std::true_type {};
 
-  /* code elided */
+                  /* code elided */
 
-  template&lt;typename T&gt; 
-  struct is_priority_queue :std::false_type {};
-  template &lt;typename... Args&gt; 
-  struct is_priority_queue &lt; 
-    std::priority_queue&lt;Args...&gt;
-  &gt; :std::true_type {};
-}
+                  template&lt;typename T&gt;
+                  struct is_priority_queue :std::false_type {};
+                  template &lt;typename... Args&gt;
+                  struct is_priority_queue &lt;
+                  std::priority_queue&lt;Args...&gt;
+                  &gt; :std::true_type {};
+                  }
 
-template&lt;typename T&gt; struct is_pair {
-  static constexpr bool const value = 
-    impl::is_pair&lt;std::decay_t&lt;T &gt;&gt; ::value;
-};
+                  template&lt;typename T&gt; struct is_pair {
+                  static constexpr bool const value =
+                  impl::is_pair&lt;std::decay_t&lt;T &gt;&gt; ::value;
+                  };
 
-template&lt;typename T&gt; struct is_tuple {
-  static constexpr bool const value = 
-    impl::is_tuple&lt;std::decay_t&lt;T &gt;&gt; ::value;
-};
+                  template&lt;typename T&gt; struct is_tuple {
+                  static constexpr bool const value =
+                  impl::is_tuple&lt;std::decay_t&lt;T &gt;&gt; ::value;
+                  };
 
-template&lt;typename T&gt; 
-struct is_string :std::false_type {};
-template&lt;&gt; struct is_string&lt;std::string&gt; 
-  : std::true_type {};
+                  template&lt;typename T&gt;
+                  struct is_string :std::false_type {};
+                  template&lt;&gt; struct is_string&lt;std::string&gt;
+                  : std::true_type {};
 
-template&lt;typename T&gt; struct is_array {
-  static constexpr bool const value = 
-    impl::is_array&lt;std::decay_t&lt;T &gt;&gt; ::value;
-};
+                  template&lt;typename T&gt; struct is_array {
+                  static constexpr bool const value =
+                  impl::is_array&lt;std::decay_t&lt;T &gt;&gt; ::value;
+                  };
 
-template&lt;typename T&gt; struct is_basic_string {
-  static constexpr bool const value = 
-    impl::is_basic_string&lt;
-      std::decay_t&lt;T &gt;
-    &gt; ::value;
-};
+                  template&lt;typename T&gt; struct is_basic_string {
+                  static constexpr bool const value =
+                  impl::is_basic_string&lt;
+                  std::decay_t&lt;T &gt;
+                  &gt; ::value;
+                  };
 
-template&lt;typename T&gt; struct is_vector {
-  static constexpr bool const value = 
-    impl::is_vector&lt;std::decay_t&lt;T &gt;&gt; ::value;
-};
+                  template&lt;typename T&gt; struct is_vector {
+                  static constexpr bool const value =
+                  impl::is_vector&lt;std::decay_t&lt;T &gt;&gt; ::value;
+                  };
 
-template&lt;typename T&gt; struct is_deque {
-  static constexpr bool const value = 
-    impl::is_deque&lt;std::decay_t&lt;T &gt;&gt; ::value;
-};
+                  template&lt;typename T&gt; struct is_deque {
+                  static constexpr bool const value =
+                  impl::is_deque&lt;std::decay_t&lt;T &gt;&gt; ::value;
+                  };
 
-/* code elided */
+                  /* code elided */
 
-template&lt;typename T&gt; struct is_priority_queue {
-  static constexpr bool const value = 
-    impl::is_priority_queue&lt;
-      std::decay_t&lt;T &gt;
-  &gt; ::value;
-};
+                  template&lt;typename T&gt; struct is_priority_queue {
+                  static constexpr bool const value =
+                  impl::is_priority_queue&lt;
+                  std::decay_t&lt;T &gt;
+                  &gt; ::value;
+                  };
 
-template&lt;typename T&gt;
-using is_seqcont = std::integral_constant&lt;
-  bool,
-  is_array&lt;T&gt;::value ||
-  is_string&lt;T&gt;::value ||
-  is_basic_string&lt;T&gt;::value ||
-  is_vector&lt;T&gt;::value ||
-  is_deque&lt;T&gt;::value ||
-  is_forward_list&lt;T&gt;::value ||
-  is_list&lt;T&gt;::value
-&gt;;
+                  template&lt;typename T&gt;
+                  using is_seqcont = std::integral_constant&lt;
+                  bool,
+                  is_array&lt;T&gt;::value ||
+                  is_string&lt;T&gt;::value ||
+                  is_basic_string&lt;T&gt;::value ||
+                  is_vector&lt;T&gt;::value ||
+                  is_deque&lt;T&gt;::value ||
+                  is_forward_list&lt;T&gt;::value ||
+                  is_list&lt;T&gt;::value
+                  &gt;;
 
-template&lt;typename T&gt;
-using is_assoccont = std::integral_constant&lt;
-  bool,
-  is_set&lt;T&gt;::value ||
-  is_multiset&lt;T&gt;::value ||
-  is_map&lt;T&gt;::value ||
-  is_multimap&lt;T&gt;::value ||
-  is_unordered_set&lt;T&gt;::value ||
-  is_unordered_multiset&lt;T&gt;::value ||
-  is_unordered_map&lt;T&gt;::value ||
-  is_unordered_multimap&lt;T&gt;::value
-&gt;;
+                  template&lt;typename T&gt;
+                  using is_assoccont = std::integral_constant&lt;
+                  bool,
+                  is_set&lt;T&gt;::value ||
+                  is_multiset&lt;T&gt;::value ||
+                  is_map&lt;T&gt;::value ||
+                  is_multimap&lt;T&gt;::value ||
+                  is_unordered_set&lt;T&gt;::value ||
+                  is_unordered_multiset&lt;T&gt;::value ||
+                  is_unordered_map&lt;T&gt;::value ||
+                  is_unordered_multimap&lt;T&gt;::value
+                  &gt;;
 
-template&lt;typename T&gt;
-using is_adaptercont = std::integral_constant&lt;
-  bool,
-  is_stack&lt;T&gt;::value ||
-  is_queue&lt;T&gt;::value ||
-  is_priority_queue&lt;T&gt;::value
-&gt;;
-          </defn-code>
-        </defn-block>
-        <defn-block>
-          <defn-head>Using Code: Chap7TypeTraits.cpp</defn-head>
-          <defn-code>
-#include "Chap7TypeTraits.h"
-#include "../Chapter7-Display/Chap7Display.h"
+                  template&lt;typename T&gt;
+                  using is_adaptercont = std::integral_constant&lt;
+                  bool,
+                  is_stack&lt;T&gt;::value ||
+                  is_queue&lt;T&gt;::value ||
+                  is_priority_queue&lt;T&gt;::value
+                  &gt;;
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Using Code: Chap7TypeTraits.cpp</defn-head>
+                <defn-code>
+                  #include "Chap7TypeTraits.h"
+                  #include "../Chapter7-Display/Chap7Display.h"
 
-/* code elided */
+                  /* code elided */
 
-int main() {
+                  int main() {
 
-  /* code elided */
+                  /* code elided */
 
-  displayDemo("--- is_vector ---");
-  std::cout &lt;&lt; "\n  " 
-            &lt;&lt; is_vector&lt;std::vector&lt;int&gt;&gt;::value;
-  std::cout &lt;&lt; "\n  " 
-            &lt;&lt; is_vector&lt;std::vector&lt;double&gt;&gt;::value;
-  std::cout &lt;&lt; "\n  " 
-            &lt;&lt; is_vector&lt;
-                 std::unordered_map&lt;int, std::string&gt;
-                &gt;::value;
+                  displayDemo("--- is_vector ---");
+                  std::cout &lt;&lt; "\n  "
+                  &lt;&lt; is_vector&lt;std::vector&lt;int&gt;&gt;::value;
+                  std::cout &lt;&lt; "\n  "
+                  &lt;&lt; is_vector&lt;std::vector&lt;double&gt;&gt;::value;
+                  std::cout &lt;&lt; "\n  "
+                  &lt;&lt; is_vector&lt;
+                  std::unordered_map&lt;int, std::string&gt;
+                  &gt;::value;
 
-  displayDemo("--- enable_if ---");
-  class X {};
-  X x;
-  int i = 42;
-  do_stuff(i);
-  do_stuff(x);
-  std::string s("a string");
-  do_stuff(s);
-  std::cout &lt;&lt; "\n\n";
+                  displayDemo("--- enable_if ---");
+                  class X {};
+                  X x;
+                  int i = 42;
+                  do_stuff(i);
+                  do_stuff(x);
+                  std::string s("a string");
+                  do_stuff(s);
+                  std::cout &lt;&lt; "\n\n";
 
-  displayDemo("--- std containers ---");
-  testSTL_Traits(std::array&lt;int, 1&gt;{1});
-  testSTL_Traits(std::string{});
-  testSTL_Traits(std::basic_string&lt;char&gt;{""});
-  testSTL_Traits(std::vector&lt;int&gt;{});
-  testSTL_Traits(std::deque&lt;int&gt;{});
-  testSTL_Traits(std::forward_list&lt;int&gt;{});
-  testSTL_Traits(std::list&lt;int&gt;{});
-  testSTL_Traits(std::set&lt;int&gt;{});
-  testSTL_Traits(std::multiset&lt;int&gt;{});
-  testSTL_Traits(std::map&lt;int,int&gt;{});
-  testSTL_Traits(std::multimap&lt;int,int&gt;{});
-  testSTL_Traits(std::unordered_set&lt;int&gt;{});
-  testSTL_Traits(std::unordered_multiset&lt;int&gt;{});
-  testSTL_Traits(std::unordered_map&lt;int, int&gt;{});
-  testSTL_Traits(std::unordered_multimap&lt;int, int&gt;{});
-  testSTL_Traits(std::stack&lt;int&gt;{});
-  testSTL_Traits(std::queue&lt;int&gt;{});
-  testSTL_Traits(std::priority_queue&lt;int&gt;{});
-  putline(2);
-}
-          </defn-code>
-          <defn-head class="defnBorderTop">Output:</defn-head>
-          <defn-code>
-/* output elided */
+                  displayDemo("--- std containers ---");
+                  testSTL_Traits(std::array&lt;int, 1&gt;{1});
+                  testSTL_Traits(std::string{});
+                  testSTL_Traits(std::basic_string&lt;char&gt;{""});
+                  testSTL_Traits(std::vector&lt;int&gt;{});
+                  testSTL_Traits(std::deque&lt;int&gt;{});
+                  testSTL_Traits(std::forward_list&lt;int&gt;{});
+                  testSTL_Traits(std::list&lt;int&gt;{});
+                  testSTL_Traits(std::set&lt;int&gt;{});
+                  testSTL_Traits(std::multiset&lt;int&gt;{});
+                  testSTL_Traits(std::map&lt;int,int&gt;{});
+                  testSTL_Traits(std::multimap&lt;int,int&gt;{});
+                  testSTL_Traits(std::unordered_set&lt;int&gt;{});
+                  testSTL_Traits(std::unordered_multiset&lt;int&gt;{});
+                  testSTL_Traits(std::unordered_map&lt;int, int&gt;{});
+                  testSTL_Traits(std::unordered_multimap&lt;int, int&gt;{});
+                  testSTL_Traits(std::stack&lt;int&gt;{});
+                  testSTL_Traits(std::queue&lt;int&gt;{});
+                  testSTL_Traits(std::priority_queue&lt;int&gt;{});
+                  putline(2);
+                  }
+                </defn-code>
+                <defn-head class="defnBorderTop">Output:</defn-head>
+                <defn-code>
+                  /* output elided */
 
---- std containers ---
-is sequential container
-is array: class std::array&lt;int,1&gt;
-is sequential container
-is std::string: 
-   class std::basic_string&lt;char,struct std::char ...
-is std::basic_string: 
-   class std::basic_string&lt;char,struct std::char ...
-is sequential container
-is std::string: 
-  class std::basic_string&lt;char,struct std::char_ ...
-is std::basic_string: 
-  class std::basic_string&lt;char,struct std::char_ ...
-is sequential container
-is std::vector: 
-  class std::vector&lt;int,class std::allocator&lt; ...
-is sequential container
-is std::deque: 
-  class std::deque&lt;int,class std::allocator&lt;i ...
-is sequential container
-is std::forward_list: class std::forward_list&lt;in ...
-is sequential container
-is std::list: class std::list&lt;int,class std::all ...
-is associative container
-is std::set: class std::set&lt;int,struct std::less ...
-is associative container
-is std::multiset: class std::multiset&lt;int,struct ...
-is associative container
-is std::map: class std::map&lt;int,int,struct std:: ...
-is associative container
-is std::multimap: class std::multimap&lt;int,int,st ...
-is associative container
-is std::unordered_set: class std::unordered_set&lt; ...
-is associative container
-is std::unordered_multiset: class std::unordered_mu ...
-is associative container
-is std::unordered_map: class std::unordered_map&lt; ...
-is associative container
-is std::unordered_multimap: class std::unordered_mu ...
-is adapter container
-is std::stack: class std::stack&lt;int,class std::d ...
-is adapter container
-is std::queue: class std::queue&lt;int,class std::d ...
-is adapter container
-is std::priority_queue: class std::priority_queue&l ...
-          </defn-code>
-        </defn-block>
-      </defn-outerBlock>
-    </details>
-      <t-b>
-        The custom type traits demonstrated in the previous example were used to build a very flexible
-        display system.  The <c-s>displayValues</c-s> function can accept one or more comma separated
-        arguments due to its variadic design.  It also accepts some of the STL containers, <c-s>std::pair</c-s>s,
-        and <c-s>std::tuple</c-s>s, due to TMP selections in the body of the function.
-      </t-b>
-    <details>
-      <summary class="labelStyle darkItem">Demonstration: Flexible Display using TMP</summary>
-      <s-halfEm></s-halfEm>
-      <a href="Resources/Chap7Display.h.html">Chap7Display.h</a>, 
-      <a href="Resources/Chap7Display.cpp.html">Chap7Display.cpp</a>
-      <s-halfEm></s-halfEm>
-      <defn-outerBlock>
-        <defn-block>
-          <defn-head>Code Fragment: Chap7Display.h</defn-head>
-          <defn-code>
-#include "../Chapter7-TypeTraits/Chap7TypeTraits.h"
-//#include "../CustomTraits/CustomTraits.h"
-#include &lt;iostream&gt;
-#include &lt;typeinfo&gt;
+                  --- std containers ---
+                  is sequential container
+                  is array: class std::array&lt;int,1&gt;
+                  is sequential container
+                  is std::string:
+                  class std::basic_string&lt;char,struct std::char ...
+                  is std::basic_string:
+                  class std::basic_string&lt;char,struct std::char ...
+                  is sequential container
+                  is std::string:
+                  class std::basic_string&lt;char,struct std::char_ ...
+                  is std::basic_string:
+                  class std::basic_string&lt;char,struct std::char_ ...
+                  is sequential container
+                  is std::vector:
+                  class std::vector&lt;int,class std::allocator&lt; ...
+                  is sequential container
+                  is std::deque:
+                  class std::deque&lt;int,class std::allocator&lt;i ...
+                  is sequential container
+                  is std::forward_list: class std::forward_list&lt;in ...
+                  is sequential container
+                  is std::list: class std::list&lt;int,class std::all ...
+                  is associative container
+                  is std::set: class std::set&lt;int,struct std::less ...
+                  is associative container
+                  is std::multiset: class std::multiset&lt;int,struct ...
+                  is associative container
+                  is std::map: class std::map&lt;int,int,struct std:: ...
+                  is associative container
+                  is std::multimap: class std::multimap&lt;int,int,st ...
+                  is associative container
+                  is std::unordered_set: class std::unordered_set&lt; ...
+                  is associative container
+                  is std::unordered_multiset: class std::unordered_mu ...
+                  is associative container
+                  is std::unordered_map: class std::unordered_map&lt; ...
+                  is associative container
+                  is std::unordered_multimap: class std::unordered_mu ...
+                  is adapter container
+                  is std::stack: class std::stack&lt;int,class std::d ...
+                  is adapter container
+                  is std::queue: class std::queue&lt;int,class std::d ...
+                  is adapter container
+                  is std::priority_queue: class std::priority_queue&l ...
+                </defn-code>
+              </defn-block>
+            </defn-outerBlock>
+        </details>
+        <t-b>
+          The custom type traits demonstrated in the previous example were used to build a very flexible
+          display system.  The <c-s>displayValues</c-s> function can accept one or more comma separated
+          arguments due to its variadic design.  It also accepts some of the STL containers, <c-s>std::pair</c-s>s,
+          and <c-s>std::tuple</c-s>s, due to TMP selections in the body of the function.
+        </t-b>
+        <details>
+          <summary class="labelStyle darkItem">Demonstration: Flexible Display using TMP</summary>
+          <s-halfEm></s-halfEm>
+          <a href="Resources/Chap7Display.h.html">Chap7Display.h</a>,
+          <a href="Resources/Chap7Display.cpp.html">Chap7Display.cpp</a>
+          <s-halfEm></s-halfEm>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Code Fragment: Chap7Display.h</defn-head>
+              <defn-code>
+                #include "../Chapter7-TypeTraits/Chap7TypeTraits.h"
+                //#include "../CustomTraits/CustomTraits.h"
+                #include &lt;iostream&gt;
+                #include &lt;typeinfo&gt;
 
-inline auto putline = [](
-  size_t n = 1, const std::string&amp; msg = ""
-) {
-  for (size_t i = 0; i &lt; n; ++i) {
-    std::cout &lt;&lt; "\n";
-  }
-  if (msg.size() &gt; 0)
-    std::cout &lt;&lt; msg;
-};
+                inline auto putline = [](
+                size_t n = 1, const std::string&amp; msg = ""
+                ) {
+                for (size_t i = 0; i &lt; n; ++i) {
+                std::cout &lt;&lt; "\n";
+                }
+                if (msg.size() &gt; 0)
+                std::cout &lt;&lt; msg;
+                };
 
-inline void displayTitle(const std::string&amp; title)
-{
-  std::cout &lt;&lt; "\n  " &lt;&lt; title;
-  std::cout &lt;&lt; "\n " 
-            &lt;&lt; std::string(title.size() + 2, '=') 
-            &lt;&lt; std::endl;
-}
-inline void displaySubtitle(const std::string&amp; title)
-{
-  std::cout &lt;&lt; "\n  " &lt;&lt; title;
-  std::cout &lt;&lt; "\n " 
-            &lt;&lt; std::string(title.size() + 2, '-');
-}
-inline void displayDemo(const std::string&amp; msg)
-{
-  std::cout &lt;&lt; "\n  " &lt;&lt; msg;
-}
+                inline void displayTitle(const std::string&amp; title)
+                {
+                std::cout &lt;&lt; "\n  " &lt;&lt; title;
+                std::cout &lt;&lt; "\n "
+                &lt;&lt; std::string(title.size() + 2, '=')
+                &lt;&lt; std::endl;
+                }
+                inline void displaySubtitle(const std::string&amp; title)
+                {
+                std::cout &lt;&lt; "\n  " &lt;&lt; title;
+                std::cout &lt;&lt; "\n "
+                &lt;&lt; std::string(title.size() + 2, '-');
+                }
+                inline void displayDemo(const std::string&amp; msg)
+                {
+                std::cout &lt;&lt; "\n  " &lt;&lt; msg;
+                }
 
-/*---- display selected type values ----*/
+                /*---- display selected type values ----*/
 
-// https://stackoverflow.com/questions/1198260/
-// how-can-you-iterate-over-the-elements-of-an-stdtuple
+                // https://stackoverflow.com/questions/1198260/
+                // how-can-you-iterate-over-the-elements-of-an-stdtuple
 
-template&lt;std::size_t I = 0, typename... Tp&gt;
-inline typename std::enable_if&lt;
-  I == sizeof...(Tp), void
-&gt;::type
-displayTuple(const std::tuple&lt;Tp...&gt;&amp; t) { }
+                template&lt;std::size_t I = 0, typename... Tp&gt;
+                inline typename std::enable_if&lt;
+                I == sizeof...(Tp), void
+                &gt;::type
+                displayTuple(const std::tuple&lt;Tp...&gt;&amp; t) { }
 
-template&lt;std::size_t I = 0, typename... Tp&gt;
-inline typename std::enable_if &lt;
-  I &lt; sizeof...(Tp), void
-&gt;::type
-  displayTuple(const std::tuple&lt;Tp...&gt; &amp; t)
-{
-  std::cout &lt;&lt; std::get&lt;I&gt;(t) &lt;&lt; " ";
-  displayTuple&lt;I + 1, Tp...&gt;(t);
-}
+                template&lt;std::size_t I = 0, typename... Tp&gt;
+                inline typename std::enable_if &lt;
+                I &lt; sizeof...(Tp), void
+                &gt;::type
+                displayTuple(const std::tuple&lt;Tp...&gt; &amp; t)
+                {
+                std::cout &lt;&lt; std::get&lt;I&gt;(t) &lt;&lt; " ";
+                displayTuple&lt;I + 1, Tp...&gt;(t);
+                }
 
 
-template &lt;typename T&gt;
-void displayValues(
-  const std::initializer_list&lt;T&gt;&amp; lst, 
-  const std::string&amp; msg = "", 
-  std::string prefix = "\n  "
-)
-{
-  for (auto item : lst)
-  {
-    try {
-      if constexpr (
-        std::is_scalar&lt;T&gt;::value || 
-        is_string&lt;T&gt;::value
-      )
-      {
-        std::cout &lt;&lt; prefix &lt;&lt; item;
-      }
-      else if constexpr (is_pair&lt;T&gt;::value)
-      {
-        std::cout &lt;&lt; prefix 
-                  &lt;&lt; "{ " 
-                  &lt;&lt; item.first 
-                  &lt;&lt; ", " 
-                  &lt;&lt; item.second 
-                  &lt;&lt; " }";
-      }
-      else if constexpr (is_tuple&lt;T&gt;::value)
-      {
-        std::cout &lt;&lt; prefix;
-        displayTuple(item);
-      }
-      else if constexpr (is_vector&lt;T&gt;::value)
-      {
-        for (auto elem : item)
-        {
-          displayValues({ elem }, "", prefix);
-          prefix = ", ";
-        }
-      }
-      else if constexpr (
-        is_unordered_map&lt;T&gt;::value
-      )
-      {
-        for (auto elem : item)
-        {
-          std::cout &lt;&lt; prefix 
-                    &lt;&lt; "{ " 
-                    &lt;&lt; elem.first 
-                    &lt;&lt; ", " 
-                    &lt;&lt; elem.second 
-                    &lt;&lt; " }";
-        }
-      }
-      prefix = ", ";
-      if (msg.size() &gt; 0)
-        std::cout &lt;&lt; msg;
-    }
-    catch (std::exception &amp; ex)
-    {
-      std::cout &lt;&lt; "\n  "
+                template &lt;typename T&gt;
+                void displayValues(
+                const std::initializer_list&lt;T&gt;&amp; lst,
+                const std::string&amp; msg = "",
+                std::string prefix = "\n  "
+                )
+                {
+                for (auto item : lst)
+                {
+                try {
+                if constexpr (
+                std::is_scalar&lt;T&gt;::value ||
+                is_string&lt;T&gt;::value
+                )
+                {
+                std::cout &lt;&lt; prefix &lt;&lt; item;
+                }
+                else if constexpr (is_pair&lt;T&gt;::value)
+                {
+                std::cout &lt;&lt; prefix
+                &lt;&lt; "{ "
+                &lt;&lt; item.first
+                &lt;&lt; ", "
+                &lt;&lt; item.second
+                &lt;&lt; " }";
+                }
+                else if constexpr (is_tuple&lt;T&gt;::value)
+                {
+                std::cout &lt;&lt; prefix;
+                displayTuple(item);
+                }
+                else if constexpr (is_vector&lt;T&gt;::value)
+                {
+                for (auto elem : item)
+                {
+                displayValues({ elem }, "", prefix);
+                prefix = ", ";
+                }
+                }
+                else if constexpr (
+                is_unordered_map&lt;T&gt;::value
+                )
+                {
+                for (auto elem : item)
+                {
+                std::cout &lt;&lt; prefix
+                &lt;&lt; "{ "
+                &lt;&lt; elem.first
+                &lt;&lt; ", "
+                &lt;&lt; elem.second
+                &lt;&lt; " }";
+                }
+                }
+                prefix = ", ";
+                if (msg.size() &gt; 0)
+                std::cout &lt;&lt; msg;
+                }
+                catch (std::exception &amp; ex)
+                {
+                std::cout &lt;&lt; "\n  "
                 &lt;&lt; ex.what();
-    }
-  }
-}
+                }
+                }
+                }
 
-/*---- display type sizes ----*/
+                /*---- display type sizes ----*/
 
-template&lt;typename T&gt;
-void displayType(
-  T&amp;&amp; t, 
-  const std::string&amp; 
-  msg = "", bool showSize = true
-)
-{
-  std::cout &lt;&lt; "\n  ";
-  if (showSize)
-    std::cout &lt;&lt; sizeof(t) 
-              &lt;&lt; " = size of ";
-  std::string typeName = typeid(t).name();
-  if (typeName.size() &gt; 75)
-    typeName = typeName.substr(0, 75) + "...";
-  std::cout &lt;&lt; typeName;
-  if (msg.size() &gt; 0)
-    std::cout &lt;&lt; msg;
-}
+                template&lt;typename T&gt;
+                void displayType(
+                T&amp;&amp; t,
+                const std::string&amp;
+                msg = "", bool showSize = true
+                )
+                {
+                std::cout &lt;&lt; "\n  ";
+                if (showSize)
+                std::cout &lt;&lt; sizeof(t)
+                &lt;&lt; " = size of ";
+                std::string typeName = typeid(t).name();
+                if (typeName.size() &gt; 75)
+                typeName = typeName.substr(0, 75) + "...";
+                std::cout &lt;&lt; typeName;
+                if (msg.size() &gt; 0)
+                std::cout &lt;&lt; msg;
+                }
 
-template&lt;typename T&gt;
-void displayOnlyType(
-  const T&amp; t, 
-  const std::string&amp; msg = ""
-)
-{
-  std::cout &lt;&lt; "\n  ";
-  std::string typeName = typeid(t).name();
-  if (typeName.size() &gt; 75)
-    typeName = typeName.substr(0, 75) + "...";
-  std::cout &lt;&lt; typeName;
-  if (msg.size() &gt; 0)
-    std::cout &lt;&lt; msg;
-}
+                template&lt;typename T&gt;
+                void displayOnlyType(
+                const T&amp; t,
+                const std::string&amp; msg = ""
+                )
+                {
+                std::cout &lt;&lt; "\n  ";
+                std::string typeName = typeid(t).name();
+                if (typeName.size() &gt; 75)
+                typeName = typeName.substr(0, 75) + "...";
+                std::cout &lt;&lt; typeName;
+                if (msg.size() &gt; 0)
+                std::cout &lt;&lt; msg;
+                }
 
-template&lt;typename T&gt;
-void displayTypeArgument(
-  const std::string&amp; msg = "", 
-  bool showSize = true
-) 
-{
-  std::cout &lt;&lt; "\n  ";
-  if (showSize)
-    std::cout &lt;&lt; sizeof(T) 
-              &lt;&lt; " = size of ";
-  std::string typeName = typeid(T).name();
-  if (typeName.size() &gt; 50)
-    typeName = typeName.substr(0, 46) + " ...";
-  std::cout &lt;&lt; typeName;
-  if (msg.size() &gt; 0)
-    std::cout &lt;&lt; msg;
-}
+                template&lt;typename T&gt;
+                void displayTypeArgument(
+                const std::string&amp; msg = "",
+                bool showSize = true
+                )
+                {
+                std::cout &lt;&lt; "\n  ";
+                if (showSize)
+                std::cout &lt;&lt; sizeof(T)
+                &lt;&lt; " = size of ";
+                std::string typeName = typeid(T).name();
+                if (typeName.size() &gt; 50)
+                typeName = typeName.substr(0, 46) + " ...";
+                std::cout &lt;&lt; typeName;
+                if (msg.size() &gt; 0)
+                std::cout &lt;&lt; msg;
+                }
 
-/*--- variadic display function ---*/
+                /*--- variadic display function ---*/
 
-// Template specialization that stops 
-// recursive evaluation
+                // Template specialization that stops
+                // recursive evaluation
 
-template&lt;typename T&gt;
-void displayValues(T t)
-{
-  displayValues({ t });
-  std::cout &lt;&lt; "\n";
-}
+                template&lt;typename T&gt;
+                void displayValues(T t)
+                {
+                displayValues({ t });
+                std::cout &lt;&lt; "\n";
+                }
 
-// Recursive definition of template function
-// Args is a "parameter pack
-// https://en.cppreference.com/w/cpp
-// /language/parameter_pack
+                // Recursive definition of template function
+                // Args is a "parameter pack
+                // https://en.cppreference.com/w/cpp
+                // /language/parameter_pack
 
-template&lt;typename T, typename... Args&gt;
-void displayValues(T t, Args... args)
-{
-  displayValues({ t });
-  displayValues(args...);
-}
-          </defn-code>
-        </defn-block>
-        <defn-block>
-          <defn-head>Using Code: Chap7Display.cpp</defn-head>
-          <defn-code>
-#include &lt;tuple&gt;
-#include "Chap7Display.h"
+                template&lt;typename T, typename... Args&gt;
+                void displayValues(T t, Args... args)
+                {
+                displayValues({ t });
+                displayValues(args...);
+                }
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Using Code: Chap7Display.cpp</defn-head>
+              <defn-code>
+                #include &lt;tuple&gt;
+                #include "Chap7Display.h"
 
-int main() {
+                int main() {
 
-  displayTitle("Testing Chap7Display");
+                displayTitle("Testing Chap7Display");
 
-  displayDemo("--- displayTuple ---\n  ");
+                displayDemo("--- displayTuple ---\n  ");
 
-  std::tuple tp{ 1, 2.5 , 'a', "a string" };
-  displayTuple(tp);
-  putline(1, "  ");
-  displayTuple(std::tuple{ 1, 2.5 , 'a', "a string" });
+                std::tuple tp{ 1, 2.5 , 'a', "a string" };
+                displayTuple(tp);
+                putline(1, "  ");
+                displayTuple(std::tuple{ 1, 2.5 , 'a', "a string" });
 
-  displayDemo("\n  --- displayValues ---\n  ");
-  displayValues(
-    1, 3, 4.5, "a string", std::pair{ 1, "one" }
-  );
-  displayValues(
-    std::vector&lt;int&gt;{-1, 0, 1}, 
-    std::unordered_map&lt;int, std::string&gt;{
-      {1, "one"}, { 2, "two" }
-    }
-  );
-  displayValues({ 1.0, 1.5, 2.0, 2.5 });
+                displayDemo("\n  --- displayValues ---\n  ");
+                displayValues(
+                1, 3, 4.5, "a string", std::pair{ 1, "one" }
+                );
+                displayValues(
+                std::vector&lt;int&gt;{-1, 0, 1},
+                std::unordered_map&lt;int, std::string&gt;{
+                {1, "one"}, { 2, "two" }
+                }
+                );
+                displayValues({ 1.0, 1.5, 2.0, 2.5 });
 
-  displayDemo("\n  --- displayType ---\n  ");
-  displayType(1);
-  displayType(2.5);
-  displayType('z');
-  displayType("another string");
+                displayDemo("\n  --- displayType ---\n  ");
+                displayType(1);
+                displayType(2.5);
+                displayType('z');
+                displayType("another string");
 
-  displayDemo("\n  --- displayOnlyType ---\n  ");
-  displayOnlyType(1);
-  displayOnlyType(2.5);
-  displayOnlyType('z');
-  displayOnlyType("another string");
+                displayDemo("\n  --- displayOnlyType ---\n  ");
+                displayOnlyType(1);
+                displayOnlyType(2.5);
+                displayOnlyType('z');
+                displayOnlyType("another string");
 
-  displayDemo("\n  --- displayTypeArgument ---\n  ");
-  displayTypeArgument&lt;int&gt;();
-  displayTypeArgument&lt;double&gt;();
-  displayTypeArgument&lt;char&gt;();
-  displayTypeArgument&lt;std::string&gt;();
+                displayDemo("\n  --- displayTypeArgument ---\n  ");
+                displayTypeArgument&lt;int&gt;();
+                displayTypeArgument&lt;double&gt;();
+                displayTypeArgument&lt;char&gt;();
+                displayTypeArgument&lt;std::string&gt;();
 
-  putline(2);
-}
-          </defn-code>
-          <defn-head class="defnBorderTop"></defn-head>
-          <defn-code>
-  Testing Chap7Display
- ======================
+                putline(2);
+                }
+              </defn-code>
+              <defn-head class="defnBorderTop"></defn-head>
+              <defn-code>
+                Testing Chap7Display
+                ======================
 
-  --- displayTuple ---
-  1 2.5 a a string
-  1 2.5 a a string
+                --- displayTuple ---
+                1 2.5 a a string
+                1 2.5 a a string
 
-  --- displayValues ---
+                --- displayValues ---
 
-  1
-  3
-  4.5
-  a string
-  { 1, one }
+                1
+                3
+                4.5
+                a string
+                { 1, one }
 
-  -1, 0, 1
-  { 1, one }
-  { 2, two }
+                -1, 0, 1
+                { 1, one }
+                { 2, two }
 
-  1, 1.5, 2, 2.5
+                1, 1.5, 2, 2.5
 
-  --- displayType ---
+                --- displayType ---
 
-  4 = size of int
-  8 = size of double
-  1 = size of char
-  15 = size of char const [15]
+                4 = size of int
+                8 = size of double
+                1 = size of char
+                15 = size of char const [15]
 
-  --- displayOnlyType ---
+                --- displayOnlyType ---
 
-  int
-  double
-  char
-  char const [15]
+                int
+                double
+                char
+                char const [15]
 
-  --- displayTypeArgument ---
+                --- displayTypeArgument ---
 
-  4 = size of int
-  8 = size of double
-  1 = size of char
-  40 = size of class std::basic_string&lt;char...
-          </defn-code>
-        </defn-block>
-      </defn-outerBlock>
-          </details>
-    <t-b>
-      It wouldn&apos;t be difficult to make the <c-s>displayValues</c-s> function work for all of the
-      STL containers.  The only reason this code doesn&apos;t is that I built and used it for display before
-      I finished the type traits shown in the first dropdown.
-    </t-b>
+                4 = size of int
+                8 = size of double
+                1 = size of char
+                40 = size of class std::basic_string&lt;char...
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </details>
+        <t-b>
+          It wouldn&apos;t be difficult to make the <c-s>displayValues</c-s> function work for all of the
+          STL containers.  The only reason this code doesn&apos;t is that I built and used it for display before
+          I finished the type traits shown in the first dropdown.
+        </t-b>
 
-    <h3 id="epilogue">8.7 Epilogue</h3>
-    <t-b>
-      I&apos;ve learned a lot preparing this chapter. I&apos;m relatively satisfied with the material as-is.
-      However, I think with some more-informed design it can be simplified and made more readable.  That is
-      on the agenda, but it&apos;s time to move on to other things for a while.
-    </t-b>
-    <h3 id="exer">8.8 Exercises</h3>
-      <div>
-    <div style="width:80%">
-      <ol>
-        <li>
-          Write a numeric formatter that returns the string representation of any
-          of the numeric types and their aggregates, [optionally] in a field with of N 
-          characters. so, the string
-          representation for the floating point number 3.5 in a field of 6 might
-          appear as either &quot;3.5&nbsp;&nbsp;&nbsp;&quot; or as
-          &quot;&nbsp;&nbsp;&nbsp;3.5&quot;.
-          <hr />
-          Extend the formatter to work with strings, where, if the string is longer
-          than the field width, you trucate to the first N characters, then replace
-          the last three characters in the truncated string with "...", so my name
-          in a field of 8 would appear as &quot;Jim F...&quot;.
-          <hr />
-          What makes this a TMP question is that you need to overload on several types, e.g.,
-          double, int[5], ... For example:
-          <defn-code>
- int iarr[]{ 1, 3, 4 };
- format(iarr) --> "[ 1, 3, 4 ]"
-          </defn-code>
-        </li>
-        <li>
-          Write a set of template function overloads:
-          <code-span style="display:block; font-size:large;">
+        <h3 id="epilogue">8.7 Epilogue</h3>
+        <t-b>
+          I&apos;ve learned a lot preparing this chapter. I&apos;m relatively satisfied with the material as-is.
+          However, I think with some more-informed design it can be simplified and made more readable.  That is
+          on the agenda, but it&apos;s time to move on to other things for a while.
+        </t-b>
+        <h3 id="exer">8.8 Exercises</h3>
+        <div>
+          <div style="width:80%">
+            <ol>
+              <li>
+                Write a numeric formatter that returns the string representation of any
+                of the numeric types and their aggregates, [optionally] in a field with of N
+                characters. so, the string
+                representation for the floating point number 3.5 in a field of 6 might
+                appear as either &quot;3.5&nbsp;&nbsp;&nbsp;&quot; or as
+                &quot;&nbsp;&nbsp;&nbsp;3.5&quot;.
+                <hr />
+                Extend the formatter to work with strings, where, if the string is longer
+                than the field width, you trucate to the first N characters, then replace
+                the last three characters in the truncated string with "...", so my name
+                in a field of 8 would appear as &quot;Jim F...&quot;.
+                <hr />
+                What makes this a TMP question is that you need to overload on several types, e.g.,
+                double, int[5], ... For example:
+                <defn-code>
+                  int iarr[]{ 1, 3, 4 };
+                  format(iarr) --> "[ 1, 3, 4 ]"
+                </defn-code>
+              </li>
+              <li>
+                Write a set of template function overloads:
+                <code-span style="display:block; font-size:large;">
 <pre>
   template &lt;typename T&gt;
   void WhoAmI(const T&amp; t)
@@ -2302,215 +2313,215 @@ int main() {
     ...
   }
 </pre>
-          </code-span>
-          that write a message to the console stating that t is one of:
-          <ul class="tight pad10">
-            <li>fundamental type</li>
-            <li>STL sequentioal container</li>
-            <li>STL associative container</li>
+                </code-span>
+                that write a message to the console stating that t is one of:
+                <ul class="tight pad10">
+                  <li>fundamental type</li>
+                  <li>STL sequentioal container</li>
+                  <li>STL associative container</li>
+                </ul>
+              </li>
+            </ol>
+          </div>
+        </div>
+
+
+        <h3 id="refs">8.9 References</h3>
+        As I started writing this chapter it became evident that to make this really effective I need to know more:
+        <indent-block>
+          <ul class="tight">
+            <li>
+              Some of the relatively obscure additions to C++14 and C++17
+            </li>
+            <li>
+              Understand some of the more technical, very good, work already done in this area
+            </li>
+            <li>
+              Some of the functional programming ideas that are common knowledge in that community, but not to me
+            </li>
           </ul>
-        </li>
-      </ol>
-    </div>
-  </div>
-
-
-    <h3 id="refs">8.9 References</h3>
-    As I started writing this chapter it became evident that to make this really effective I need to know more:
-    <indent-block>
-      <ul class="tight">
-        <li>
-          Some of the relatively obscure additions to C++14 and C++17
-        </li>
-        <li>
-          Understand some of the more technical, very good, work already done in this area
-        </li>
-        <li>
-          Some of the functional programming ideas that are common knowledge in that community, but not to me
-        </li>
-      </ul>
-    </indent-block>
-    <t-b>
-      After spending several days digging, I concluded that this is a very deep well. So, I am going to continue
-      working on this chapter, learning as I go, but trying to finish quickly. My intent is to then continue
-      exploring quietly until I know enough to do a very well crafted revision.
-    </t-b>        
-    <t-b>
-      So I&apos;ve collected a set of references I&apos;ve used so far, below.  Some I know to be excellent 
-      resources, some I&apos;m not so sure about.  As I continue to dig, some will disappear, others will appear,
-      so keep posted.
-    </t-b>
-    <ol class="tight">
-      <li>
-        <strong>Templates:</strong>
+        </indent-block>
+        <t-b>
+          After spending several days digging, I concluded that this is a very deep well. So, I am going to continue
+          working on this chapter, learning as I go, but trying to finish quickly. My intent is to then continue
+          exploring quietly until I know enough to do a very well crafted revision.
+        </t-b>
+        <t-b>
+          So I&apos;ve collected a set of references I&apos;ve used so far, below.  Some I know to be excellent
+          resources, some I&apos;m not so sure about.  As I continue to dig, some will disappear, others will appear,
+          so keep posted.
+        </t-b>
         <ol class="tight">
           <li>
-            <a href="https://github.com/CppCon/CppCon2016/blob/master/Tutorials/Template%20Normal%20Programming%2C%20Part%201/Template%20Normal%20Programming%2C%20Part%201%20-%20Arthur%20O'Dwyer%20-%20CppCon%202016.pdf">Template Normal Programming - Part 1 - Arthur O'Dwyer</a>
+            <strong>Templates:</strong>
+            <ol class="tight">
+              <li>
+                <a href="https://github.com/CppCon/CppCon2016/blob/master/Tutorials/Template%20Normal%20Programming%2C%20Part%201/Template%20Normal%20Programming%2C%20Part%201%20-%20Arthur%20O'Dwyer%20-%20CppCon%202016.pdf">Template Normal Programming - Part 1 - Arthur O'Dwyer</a>
+              </li>
+              <li>
+                <a href="https://github.com/CppCon/CppCon2016/blob/master/Tutorials/Template%20Normal%20Programming%2C%20Part%202/Template%20Normal%20Programming%2C%20Part%202%20-%20Arthur%20O'Dwyer%20-%20CppCon%202016.pdf">Template Normal Programming - Part 2 - Arthur O'Dwyer</a>
+              </li>
+              <li>
+                <a href="https://github.com/CppCon/CppCon2018/blob/master/Presentations/class_template_argument_deduction_for_everyone/class_template_argument_deduction_for_everyone__stephan_t_lavavej__cppcon_2018.pdf">Class Template Argument Deduction for Everyone - Stephan T. Lavavej</a>
+              </li>
+              <li>
+                <a href="https://devblogs.microsoft.com/cppblog/how-to-use-class-template-argument-deduction/">How to Use Class Template Argument Deduction - Stephan T. Lavavej</a>
+              </li>
+            </ol>
           </li>
           <li>
-            <a href="https://github.com/CppCon/CppCon2016/blob/master/Tutorials/Template%20Normal%20Programming%2C%20Part%202/Template%20Normal%20Programming%2C%20Part%202%20-%20Arthur%20O'Dwyer%20-%20CppCon%202016.pdf">Template Normal Programming - Part 2 - Arthur O'Dwyer</a>
+            <strong>Template Metaprogramming:</strong>
+            <ol class="tight">
+              <li>
+                <a href="https://arne-mertz.de/2016/11/more-variadic-templates/">More variadic templates - arne-mertz.de</a>
+              </li>
+              <li>
+                <a href="http://ericniebler.com/2014/11/13/tiny-metaprogramming-library/">Tiny Metaprogramming Library - Eric Niebler</a>
+              </li>
+              <li>
+                <a href="https://crascit.com/2015/03/21/practical-uses-for-variadic-templates/">Practical uses for variadic templates - Craig Scott</a>
+              </li>
+              <li>
+                <a href="https://eli.thegreenplace.net/2014/variadic-templates-in-c/">Variadic templates in C++ - Eli Bendersky</a>
+              </li>
+              <li>
+                <a href="https://arne-mertz.de/2016/11/modern-c-features-variadic-templates/">Modern C++ Features - Variadic Templates - Arne Mertz</a>
+              </li>
+              <li>
+                <a href="https://www.modernescpp.com/index.php/c-core-guidelines-rules-for-variadic-templates">C++ Core Guidelines: Rules for Variadic Templates</a>
+              </li>
+              <li>
+                <a href="https://www.codingame.com/playgrounds/2205/7-features-of-c17-that-will-simplify-your-code/introduction">C++17 - fenbf</a>
+              </li>
+              <li>
+                <a href="https://www.codingame.com/playgrounds/2205/7-features-of-c17-that-will-simplify-your-code/constexpr-if">constexpr if - fenbf</a>
+              </li>
+              <li>
+                <a href="https://www.codingame.com/playgrounds/2205/7-features-of-c17-that-will-simplify-your-code/fold-expressions">Fold Expressions - fenbf</a>
+              </li>
+              <li>
+                <a href="https://en.cppreference.com/w/cpp/language/parameter_pack">Parameter pack - cppreference.com</a>
+              </li>
+              <li>
+                <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0341r0.html">parameter packs outside of templates - Mike Spertus</a>
+              </li>
+              <li>
+                <a href="https://www.codeproject.com/Articles/1077852/TypeLists-and-a-TypeList-Toolbox-via-Variadic-Temp">TypeLists and a TypeList Toolbox via Variadic Templates - geoyar</a>
+              </li>
+              <li>
+                <a href="https://www.rangakrish.com/index.php/2018/10/14/c17-stdapply-and-stdinvoke/">C++17 - std::apply() and std::invoke() Rangarajan Krishnamoorthy</a>
+              </li>
+              <li>
+                <a href="https://kevinushey.github.io/blog/2016/01/27/introduction-to-c++-variadic-templates/">Intro to C++ Variadic Templates - Kevin Ushey</a>
+              </li>
+              <li>
+                <a href="https://www.fluentcpp.com/2018/05/15/make-sfinae-pretty-1-what-value-sfinae-brings-to-code/">How to Make SFINAE Pretty - Part 1, Jonathan Boccara</a>
+              </li>
+              <li>
+                <a href="http://stevedewhurst.com/interfaces-Triangle-Developers-Group.pdf">Modern C++ Interfaces - Stephan Dewhurst</a>
+              </li>
+              <li>
+                <a href="https://www.youtube.com/watch?v=PFdWqa68LmA&feature=youtu.be">Modern C++ Interfaces (video) - Stephan Dewhurst</a>
+              </li>
+              <li>
+                <a href="https://en.cppreference.com/w/cpp/header/type_traits">type_traits - cppreference.com</a>
+              </li>
+              <li>
+                <a href="https://www.fluentcpp.com/2020/01/03/dry-comparisons-a-c-library-to-shorten-redundant-if-statements/">any_of</a><br />
+              </li>
+              <li>
+                <a href="https://github.com/CppCon/CppCon2018/blob/master/Presentations/from_metaprogramming_tricks_to_elegance/from_metaprogramming_tricks_to_elegance__vincent_reverdy__cppcon_2018.pdf">tricks to elegance - Vincent Reverdy</a>
+              </li>
+              <li>
+                <a href="https://stackoverflow.com/questions/9407367/determine-if-a-type-is-an-stl-container-at-compile-time/31105859#31105859">is an STL container - stackoverflow</a>
+              </li>
+              <li>
+                <a href="http://www.cplusplus.com/reference/type_traits/">type_traits - cplusplus.com</a>
+              </li>
+              <li>
+                <a href="https://en.cppreference.com/w/cpp/header/type_traits">type_traits - cppreference.com</a>
+              </li>
+            </ol>
           </li>
           <li>
-            <a href="https://github.com/CppCon/CppCon2018/blob/master/Presentations/class_template_argument_deduction_for_everyone/class_template_argument_deduction_for_everyone__stephan_t_lavavej__cppcon_2018.pdf">Class Template Argument Deduction for Everyone - Stephan T. Lavavej</a>
+            <strong>Modern C++</strong>
+            <ol class="tight">
+              <li>
+                <a href="https://github.com/AnthonyCalandra/modern-cpp-features#folding-expressions">modern-cpp-features - Anthony Calandra</a>
+              </li>
+              <li>
+                <a href="https://www.codingame.com/playgrounds/2205/7-features-of-c17-that-will-simplify-your-code/introduction">C++17 - fenbf</a>
+              </li>
+              <li>
+                <a href="https://www.fluentcpp.com/2018/04/06/strong-types-by-struct/">Strong Types by Struct - Vincent Zalzal</a>
+              </li>
+              <li>
+                <a href="https://arne-mertz.de/">Simplify C++ - arne-mertz.de</a>
+              </li>
+              <li>
+                <a href="https://github.com/abseil/abseil-cpp">abseil-cpp</a>
+              </li>
+              <li>
+                <a href="https://devblogs.microsoft.com/oldnewthing/">The Old New Thing - Raymond Chen</a>
+              </li>
+              <li>
+                <a href="https://www.youtube.com/watch?v=bXkWuUe9V2I">(All The) STL Algorithms - Jonathan Boccara</a>
+              </li>
+              <li>
+                <a href="https://www.youtube.com/user/lefticus1">C++ Weekly</a>
+              </li>
+              <li>
+                <a href="https://docs.microsoft.com/en-us/cpp/cpp/lambda-expressions-in-cpp?view=vs-2019">Lambda Expressions in C++ - MSDN</a>
+              </li>
+            </ol>
           </li>
           <li>
-            <a href="https://devblogs.microsoft.com/cppblog/how-to-use-class-template-argument-deduction/">How to Use Class Template Argument Deduction - Stephan T. Lavavej</a>
+            <strong>Functional Programming:</strong>
+            <ol class="tight">
+              <li>
+                <a href="https://mikhail.io/2018/07/monads-explained-in-csharp-again/">Monads explained in C# (again)</a>
+              </li>
+              <li>
+                <a href="https://bartoszmilewski.com/2009/10/21/what-does-haskell-have-to-do-with-c/">What Does Haskell Have to Do with C++?</a>
+              </li>
+              <li>
+                <a href="https://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/">Category Theory for Programmers - Bartosz Milewski</a>
+              </li>
+              <li>
+                <a href="https://www.youtube.com/watch?v=I8LbkfSSR58&list=PLbgaMIhjbmEnaH_LTkxLI7FMa2HsnawM_&index=1">(video playlist) Category Theory for Programmsers - Bartosz Milewski</a>
+              </li>
+              <li>
+                <a href="https://people.cs.umass.edu/~yannis/fc++/fcpp-jfp.pdf">FC++ Library - McNamara &amp; Smaragdakis</a>
+              </li>
+              <li>
+                <a href="http://blog.madhukaraphatak.com/functional-programming-in-c++/">Functional programming in C++ - Madhukara Phatak</a>
+              </li>
+              <li>
+                <a href="https://gist.github.com/phatak-dev/766eccf8c72484ad623b">Phatak Repository</a>
+              </li>
+              <li>
+                <a href="https://www.codeproject.com/Articles/1267996/Functional-Programming-in-Cplusplus">Functional Programming in C++ - Mehreen Tahir</a>
+              </li>
+              <li>
+                <a href="https://www.codeproject.com/Articles/682455/Generic-Lazy-Evaluation-in-Cplusplus">Generic Lazy Evaluation in C++ - Ali AslRousta</a>
+              </li>
+              <li>
+                <a href="https://github.com/GJDuck/libf">LIBF++ 0.2 -- C++ as a Pure Functional Language - GJDuck</a>
+              </li>
+              <li>
+                <a href="https://www.modernescpp.com/index.php/the-definition-of-functional-programming">The Definition of Functional Programming - modernescpp.com</a>
+              </li>
+              <li>
+                <a href="https://www.geeksforgeeks.org/functional-programming-paradigm/">Functional Programming Paradigm - geeksforgeeks.org</a>
+              </li>
+              <li>
+                <a href="https://www.guru99.com/functional-programming-tutorial.html">What is Functional Programming? - Guru99.com</a>
+              </li>
+            </ol>
           </li>
         </ol>
-      </li>
-      <li>
-        <strong>Template Metaprogramming:</strong>
-        <ol class="tight">
-          <li>
-            <a href="https://arne-mertz.de/2016/11/more-variadic-templates/">More variadic templates - arne-mertz.de</a>
-          </li>
-          <li>
-            <a href="http://ericniebler.com/2014/11/13/tiny-metaprogramming-library/">Tiny Metaprogramming Library - Eric Niebler</a>
-          </li>
-          <li>
-            <a href="https://crascit.com/2015/03/21/practical-uses-for-variadic-templates/">Practical uses for variadic templates - Craig Scott</a>
-          </li>
-          <li>
-            <a href="https://eli.thegreenplace.net/2014/variadic-templates-in-c/">Variadic templates in C++ - Eli Bendersky</a>
-          </li>
-          <li>
-            <a href="https://arne-mertz.de/2016/11/modern-c-features-variadic-templates/">Modern C++ Features - Variadic Templates - Arne Mertz</a>
-          </li>
-          <li>
-            <a href="https://www.modernescpp.com/index.php/c-core-guidelines-rules-for-variadic-templates">C++ Core Guidelines: Rules for Variadic Templates</a>
-          </li>
-          <li>
-            <a href="https://www.codingame.com/playgrounds/2205/7-features-of-c17-that-will-simplify-your-code/introduction">C++17 - fenbf</a>
-          </li>
-          <li>
-            <a href="https://www.codingame.com/playgrounds/2205/7-features-of-c17-that-will-simplify-your-code/constexpr-if">constexpr if - fenbf</a>
-          </li>
-          <li>
-            <a href="https://www.codingame.com/playgrounds/2205/7-features-of-c17-that-will-simplify-your-code/fold-expressions">Fold Expressions - fenbf</a>
-          </li>
-          <li>
-            <a href="https://en.cppreference.com/w/cpp/language/parameter_pack">Parameter pack - cppreference.com</a>
-          </li>
-          <li>
-            <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0341r0.html">parameter packs outside of templates - Mike Spertus</a>
-          </li>
-          <li>
-            <a href="https://www.codeproject.com/Articles/1077852/TypeLists-and-a-TypeList-Toolbox-via-Variadic-Temp">TypeLists and a TypeList Toolbox via Variadic Templates - geoyar</a>
-          </li>
-          <li>
-            <a href="https://www.rangakrish.com/index.php/2018/10/14/c17-stdapply-and-stdinvoke/">C++17 - std::apply() and std::invoke() Rangarajan Krishnamoorthy</a>
-          </li>
-          <li>
-            <a href="https://kevinushey.github.io/blog/2016/01/27/introduction-to-c++-variadic-templates/">Intro to C++ Variadic Templates - Kevin Ushey</a>
-          </li>
-          <li>
-            <a href="https://www.fluentcpp.com/2018/05/15/make-sfinae-pretty-1-what-value-sfinae-brings-to-code/">How to Make SFINAE Pretty - Part 1, Jonathan Boccara</a>
-          </li>
-          <li>
-            <a href="http://stevedewhurst.com/interfaces-Triangle-Developers-Group.pdf">Modern C++ Interfaces - Stephan Dewhurst</a>
-          </li>
-          <li>
-            <a href="https://www.youtube.com/watch?v=PFdWqa68LmA&feature=youtu.be">Modern C++ Interfaces (video) - Stephan Dewhurst</a>
-          </li>
-          <li>
-            <a href="https://en.cppreference.com/w/cpp/header/type_traits">type_traits - cppreference.com</a>
-          </li>
-          <li>
-            <a href="https://www.fluentcpp.com/2020/01/03/dry-comparisons-a-c-library-to-shorten-redundant-if-statements/">any_of</a><br />
-          </li>
-          <li>
-            <a href="https://github.com/CppCon/CppCon2018/blob/master/Presentations/from_metaprogramming_tricks_to_elegance/from_metaprogramming_tricks_to_elegance__vincent_reverdy__cppcon_2018.pdf">tricks to elegance - Vincent Reverdy</a>
-          </li>
-          <li>
-            <a href="https://stackoverflow.com/questions/9407367/determine-if-a-type-is-an-stl-container-at-compile-time/31105859#31105859">is an STL container - stackoverflow</a>
-          </li>
-          <li>
-            <a href="http://www.cplusplus.com/reference/type_traits/">type_traits - cplusplus.com</a>
-          </li>
-          <li>
-            <a href="https://en.cppreference.com/w/cpp/header/type_traits">type_traits - cppreference.com</a>
-          </li>
-        </ol>
-      </li>
-      <li>
-        <strong>Modern C++</strong>
-        <ol class="tight">
-          <li>
-            <a href="https://github.com/AnthonyCalandra/modern-cpp-features#folding-expressions">modern-cpp-features - Anthony Calandra</a>
-          </li>
-          <li>
-            <a href="https://www.codingame.com/playgrounds/2205/7-features-of-c17-that-will-simplify-your-code/introduction">C++17 - fenbf</a>
-          </li>
-          <li>
-            <a href="https://www.fluentcpp.com/2018/04/06/strong-types-by-struct/">Strong Types by Struct - Vincent Zalzal</a>
-          </li>
-          <li>
-            <a href="https://arne-mertz.de/">Simplify C++ - arne-mertz.de</a>
-          </li>
-          <li>
-            <a href="https://github.com/abseil/abseil-cpp">abseil-cpp</a>
-          </li>
-          <li>
-            <a href="https://devblogs.microsoft.com/oldnewthing/">The Old New Thing - Raymond Chen</a>
-          </li>
-          <li>
-            <a href="https://www.youtube.com/watch?v=bXkWuUe9V2I">(All The) STL Algorithms - Jonathan Boccara</a>
-          </li>
-          <li>
-            <a href="https://www.youtube.com/user/lefticus1">C++ Weekly</a>
-          </li>
-          <li>
-            <a href="https://docs.microsoft.com/en-us/cpp/cpp/lambda-expressions-in-cpp?view=vs-2019">Lambda Expressions in C++ - MSDN</a>
-          </li>
-        </ol>
-      </li>
-      <li>
-        <strong>Functional Programming:</strong>
-        <ol class="tight">
-          <li>
-            <a href="https://mikhail.io/2018/07/monads-explained-in-csharp-again/">Monads explained in C# (again)</a>
-          </li>
-          <li>
-            <a href="https://bartoszmilewski.com/2009/10/21/what-does-haskell-have-to-do-with-c/">What Does Haskell Have to Do with C++?</a>
-          </li>
-          <li>
-            <a href="https://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/">Category Theory for Programmers - Bartosz Milewski</a>
-          </li>
-          <li>
-            <a href="https://www.youtube.com/watch?v=I8LbkfSSR58&list=PLbgaMIhjbmEnaH_LTkxLI7FMa2HsnawM_&index=1">(video playlist) Category Theory for Programmsers - Bartosz Milewski</a>
-          </li>
-          <li>
-            <a href="https://people.cs.umass.edu/~yannis/fc++/fcpp-jfp.pdf">FC++ Library - McNamara &amp; Smaragdakis</a>
-          </li>
-          <li>
-            <a href="http://blog.madhukaraphatak.com/functional-programming-in-c++/">Functional programming in C++ - Madhukara Phatak</a>
-          </li>
-          <li>
-            <a href="https://gist.github.com/phatak-dev/766eccf8c72484ad623b">Phatak Repository</a>
-          </li>
-          <li>
-            <a href="https://www.codeproject.com/Articles/1267996/Functional-Programming-in-Cplusplus">Functional Programming in C++ - Mehreen Tahir</a>
-          </li>
-          <li>
-            <a href="https://www.codeproject.com/Articles/682455/Generic-Lazy-Evaluation-in-Cplusplus">Generic Lazy Evaluation in C++ - Ali AslRousta</a>
-          </li>
-          <li>
-            <a href="https://github.com/GJDuck/libf">LIBF++ 0.2 -- C++ as a Pure Functional Language - GJDuck</a>
-          </li>
-          <li>
-            <a href="https://www.modernescpp.com/index.php/the-definition-of-functional-programming">The Definition of Functional Programming - modernescpp.com</a>
-          </li>
-          <li>
-            <a href="https://www.geeksforgeeks.org/functional-programming-paradigm/">Functional Programming Paradigm - geeksforgeeks.org</a>
-          </li>
-          <li>
-            <a href="https://www.guru99.com/functional-programming-tutorial.html">What is Functional Programming? - Guru99.com</a>
-          </li>
-        </ol>
-      </li>
-    </ol>
-  </div>
-    <spacer-25></spacer-25>
+        </div>
+        <spacer-25></spacer-25>
       </content>
       <a id="bottom"></a>
       <page-TOC id="pages" style="display:none;">
@@ -2537,14 +2548,14 @@ int main() {
       </page-sections>
     </main>
     <frame-footer>
-      <menu-item style="width:1.0em;">&nbsp;</menu-item>
+      <menu-item style="width:2.0em;">&nbsp;</menu-item>
       <menu-elem id="nextLink2" onclick="bottomMenu.next()">Next</menu-elem>
       <menu-elem id="prevLink2" onclick="bottomMenu.prev()">Prev</menu-elem>
       <menu-elem id="pgbtn" onclick="bottomMenu.pages()">Pages</menu-elem>
       <menu-elem onclick="bottomMenu.sections()">Sections</menu-elem>
       <menu-elem onclick="bottomMenu.about()">About</menu-elem>
       <menu-elem id="kysbtn" onclick="storyHlpMenu.keys()">Keys</menu-elem>
-      <menu-elem style="margin-right:5em">
+      <menu-elem style="margin-right:1em">
         <span id="loc" style="display:inline-block; font-weight:normal"></span>
       </menu-elem>
     </frame-footer>
@@ -2552,7 +2563,7 @@ int main() {
   <script>
     let loc = document.getElementById("loc");
     let fn = window.location.href.split(/\/|\\/).pop();
-    loc.innerHTML = fn;
+    loc.innerHTML = fn + ": ";
   </script>
 </body>
 </html>
