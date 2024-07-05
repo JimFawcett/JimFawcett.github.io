@@ -14,10 +14,6 @@ function isDefined(elem) {
   }
   return true;
 }
-//function loadif() {
-//  loc = window.location.href;
-//  window.location.href = 'TOC.html?src=' + loc;
-//}
 function loadif() {
   loc = window.location.href;
   if (window.self === window.top) {
@@ -41,6 +37,7 @@ function loadifcpp() {
 
 function loadifrust() {
   var loc = window.location.href;
+  //alert(loc);
   if (window.self === window.top) {
     window.location.href = '../../TOCRust.html?src=' + loc;
   }

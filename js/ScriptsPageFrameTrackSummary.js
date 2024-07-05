@@ -51,18 +51,18 @@ function getHelp() {
 //  window.location.href = 'TOC.html?src=' + loc;
 //}
 function loadif() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOC.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOC.html?src=' + loc;
+    window.top.location.href = loc;  /*'TOC.html?src=' + loc;*/
     /*location.reload();*/
   }
 }
 
 function loadifcpp() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOCCpp.html?src=indexCpp.html';
   }
@@ -72,7 +72,7 @@ function loadifcpp() {
 }
 
 function loadifrust() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOCRust.html?src=indexRust.html';
   }
@@ -82,7 +82,7 @@ function loadifrust() {
 }
 
 function loadifcsharp() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOCCSharp.html?src=indexCs.html';
   }
@@ -92,7 +92,7 @@ function loadifcsharp() {
 }
 
 function loadifbasic() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOCBasic.html?src=indexBasic.html';
   }
@@ -102,7 +102,7 @@ function loadifbasic() {
 }
 
 function loadifbits() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOCBits.html?src=indexBits.html';
   }
@@ -112,7 +112,7 @@ function loadifbits() {
 }
 
 function loadifwebdev() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOCWebDev.html?src=indexWebDev.html';
   }
@@ -122,7 +122,7 @@ function loadifwebdev() {
 }
 
 function loadifdesign() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOCDesign.html?src=indexDesign.html';
   }
@@ -132,7 +132,7 @@ function loadifdesign() {
 }
 
 function loadifdeployment() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOCDeployment.html?src=indexDeployment.html';
   }
@@ -142,7 +142,7 @@ function loadifdeployment() {
 }
 
 function loadifprojects() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOCProjects.html?src=indexProjects.html';
   }
@@ -152,7 +152,7 @@ function loadifprojects() {
 }
 
 function loadifprototypes() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOCPrototypes.html?src=indexPrototypes.html';
   }
@@ -196,26 +196,16 @@ function initializeMenu() {
         Tracks&#9662\
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Tracks</div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifbasic()'>&nbsp;Basics</a>&nbsp;</div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifcpp()'>&nbsp;C++</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifrust()'>&nbsp;Rust</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifcsharp()'>&nbsp;C#</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifbits()'>&nbsp;Bits</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifwebdev()'>&nbsp;WebDev</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifdesign()'>&nbsp;Design</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifdeployment()'>&nbsp;Deployment</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifprojects()'>&nbsp;Projects</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifprototypes()'>&nbsp;Prototypes</a></div>\
-          <!--<div class='ddItem'><a href='indexBasic.html'>&nbsp;Basics</a>&nbsp;</div>-->\
-          <!--<div class='ddItem'><a href='indexCpp.html'>&nbsp;C++</a>&nbsp;</div>-->\
-          <!--<div class='ddItem'><a href='TOCRust.html'>&nbsp;Rust</a>&nbsp;</div>-->\
-          <!--<div class='ddItem'><a href='indexCs.html'>&nbsp;C#</a>&nbsp;</div>-->\
-          <!--<div class='ddItem'><a href='indexBits.html'>&nbsp;Bits</a>&nbsp;</div>-->\
-          <!--<div class='ddItem'><a href='indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>-->\
-          <!--<div class='ddItem'><a href='indexDesign.html'>&nbsp;Design</a>&nbsp;</div>-->\
-          <!--<div class='ddItem'><a href='indexDeployment.html'>&nbsp;Deployment</a>&nbsp;</div>-->\
-          <!--<div class='ddItem'><a href='indexProjects.html'>&nbsp;Projects</a>&nbsp;</div>-->\
-          <!--<div class='ddItem'><a href='indexPrototypes.html'>&nbsp;Prototypes</a>&nbsp;</div>-->\
+          <div class='ddItem'><a target='_parent' href='TOCBasic.html'>&nbsp;Basics</a>&nbsp;</div>\
+          <div class='ddItem'><a target='_parent' href='TOCCpp.html'>&nbsp;C++</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCRust.html'>&nbsp;Rust</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCCSharp.html'>&nbsp;C#</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCBits.html'>&nbsp;Bits</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCWebDev.html'>&nbsp;WebDev</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCDesign.html'>&nbsp;Design</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCDeployment.html'>&nbsp;Deployment</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCProjects.html'>&nbsp;Projects</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCPrototypes.html'>&nbsp;Prototypes</a></div>\
           <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
