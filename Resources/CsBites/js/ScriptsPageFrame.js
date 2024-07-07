@@ -30,7 +30,7 @@ function loadif() {
 }
 
 function loadifcpp() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = '../../TOCCpp.html?src=indexCpp.html';
   }
@@ -50,12 +50,12 @@ function loadifrust() {
 }
 
 function loadifcsharp() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = '../../TOCCSharp.html?src=indexCs.html';
+    window.location.href = '../../TOCCSharp.html?src=' + loc;
   }
   else {
-    window.top.location.href = '../../TOCCSharp.html';
+    window.top.location.href = loc;
   }
 }
 
@@ -147,7 +147,6 @@ function getHelp() {
   window.open("../../Help.html", "_blank");
 }
 
-
 //function loadif() {
 //  loc = window.location.href;
 //  if (window.self === window.top) {
@@ -169,12 +168,10 @@ function initializeMenu() {
         <div class='dropdown'>\
             <div style='height:0.25em;'></div>\
             <div class='ddItem'><a href='../../index.html'>Home</a></div>\
-            <div class='ddItem'><a target='_parent' href='../../TOC.html'>Site Explorer</a></div>\
-            <!--<div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>-->\
+            <div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>\
             <div class='ddItem'><a href='../../SiteMap.html'>SiteMap</a></div>\
             <div class='ddItem'><a href='../../SiteDemo.html'>SiteDemo</a></div>\
             <div class='ddItem'><a href='../../SiteDesign.html'>SiteDesign</a></div>\
-            <div class='ddItem'><a href='../../ChatGPT.html'>ChatGPT</a></div>\
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
               <summary>About&nbsp;Site&nbsp;&nbsp;&nbsp;</summary>\
               <div style='margin-left:1.0em;'>\
@@ -200,16 +197,16 @@ function initializeMenu() {
         Tracks&#9662\
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Tracks</div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifbasic()'>&nbsp;Basics</a>&nbsp;</div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifcpp()'>&nbsp;C++</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifrust()'>&nbsp;Rust</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifcsharp()'>&nbsp;C#</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifbits()'>&nbsp;Bits</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifwebdev()'>&nbsp;WebDev</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifdesign()'>&nbsp;Design</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifdeployment()'>&nbsp;Deployment</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifprojects()'>&nbsp;Projects</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifprototypes()'>&nbsp;Prototypes</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCBasic.html'>&nbsp;Basics</a>&nbsp;</div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCCpp.html'>&nbsp;C++</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCRust.html'>&nbsp;Rust</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCCSharp.html'>&nbsp;C#</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCBits.html'>&nbsp;Bits</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCWebDev.html'>&nbsp;WebDev</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCDesign.html'>&nbsp;Design</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCDeployment.html'>&nbsp;Deployment</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCProjects.html'>&nbsp;Projects</a></div>\
+          <div class='ddItem'><a target='_parent' href=.../../TOCPrototypes.html'>&nbsp;Prototypes</a></div>\
           <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
@@ -256,7 +253,8 @@ function initializeMenu() {
           <div class='ddItem'><a href='../../Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a></div>\
           <div class='ddItem'><a href='../PublishingSourceCode.pdf'>Site&nbsp;Presentation</a></div>\
           <div class='ddItem'><a href='../../Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a></div>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+           <div class='ddItem'><a href='../../ChatGPT.html'>ChatGPT</a></div>\
+         <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Design</summary>\
             <div style='margin-left:1.0em;'>\
                 <div class='ddItem ddDetails'><a href='../../Design.html'>Design Process</a></div>\
@@ -281,6 +279,7 @@ function initializeMenu() {
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Rust</summary>\
             <div style='margin-left:1.0em;'>\
+              <div class='ddItem ddDetails'><a href='../RustBites/RustBites_CodeExamples.html'>RustBites Code Examples</a></div>\
               <div class='ddItem ddDetails'><a href='https://github.com/JimFawcett/RustPlaygroundExamples'>RustPlaygroundExamples</a></div>\
               <div class='ddItem ddDetails'><a href='../../IndexPage.html'>Rust Glossary</a></div>\
               <div style='height:0.25em;'></div>\
@@ -399,6 +398,19 @@ function initializeMenu() {
       </div>\
     </div>\
     <div class='menuItem'><a id='help' onclick='getHelp()'>Help</a></div>\
+    <div class='menuItem'>\
+        Pages&#9662\
+        <div class='dropdown'>\
+          <div class='ddLabel darkItem'>C#&nbsp;Bites&nbsp;thread</div>\
+            <div style='height:0.0em;'></div>\
+            <div class='ddItem'><a href='CsBites_Intro.html'>Introduction</a></div>\
+            <div class='ddItem'><a href='CsBites_Execution.html'>Execution</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Data</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Operations</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Generics</a></div>\
+          <div style='height:2em;'></div>\
+        </div>\
+    </div>\
     <div class='menuItem'><a id='prevLink' href='#'>Prev</a></div>\
     <div class='menuItem'><a id='nextLink' href='#'>Next</a></div>\
   </div>\
