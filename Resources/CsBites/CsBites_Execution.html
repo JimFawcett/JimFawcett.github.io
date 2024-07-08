@@ -98,6 +98,9 @@
         </t-b>
         <t-b>
           The purpose of this Bite is to explain how that works and why it was designed that way.
+          All of this demonstration code was build with Visual Studio, Community Edition, version
+          17.11.0, preview 2.1. At the time this was written, that was the latest version of the
+          free <a target="_blank" href="https://visualstudio.microsoft.com/vs/community/">Community Edition</a>.
         </t-b>
         <div style="padding:0.0em 1em; position:relative; top:0em;">
           <div style="float:right; padding:0.0em 1em; position:relative; top:0em;">
@@ -110,7 +113,33 @@
         </div>
         <h3 id="code">1.0 C# Program Code</h3>
         <t-b>
-          stuff here
+          Figure 1. is a screenshot of a C# program, visible in a Visual Studio (VS) edit window.
+          The code was designed to take a first look at how the CLR works. Also shown is a terminal
+          window, opened by building and running the program within Visual Studio. Its contents
+          are what you would expect from the code.
+        </t-b>
+        <t-b>
+          All the program&apos;s facilities reside in the main function. It sends a hello message to the console,
+          does a little bit of arithmetic, and sends the results of that to the console in a formatted
+          string.
+        </t-b>
+        <t-b>
+          The program starts by importing system libraries. Only the first, <c-s>System</c-s>, is needed by
+          this program. The others were supplied by a VS project template. They provide a glimpse of the
+          many useful libraries supplied with VS.
+        </t-b>
+        <t-b>
+          It continues by using <c-s>System.Console.WriteLine</c-s> to send the opening message to standard output,
+          which, by default, is a terminal window.
+        </t-b>
+        <t-b>
+          The program then defines two local integer variables holding values supplied from literal numbers.
+          Those are added and stored in a local variable.
+          All three values are then inserted into a formatted string and sent to the output terminal.
+        </t-b>
+        <t-b>
+          Next, we build the program and disassemble its binary into CIL bytecode, using <c-s>ildasm</c-s>,
+          a tool supplied with the .Net framework that is shipped with VS.
         </t-b>
         <div class="clear"></div>
         <div style="padding:0.0em 1em; position:relative; top:0em;">
@@ -122,27 +151,39 @@
             </photosizer-block>
           </div>
         </div>
-        <h3 id="code">2.0 C# Program Code Disassembly</h3>
+        <h3 id="disa">2.0 C# Program Code Disassembly</h3>
         <t-b>
-          stuff here
+          The disassembly process is simple, as illustrated in Figure 2. In the background you see
+          <c-s>ildasm</c-s> being run from a Developers Command window. That results in a form that
+          contains a tree representation of the program structure.
+        </t-b>
+        <t-b>
+          Clicking expands the project node to show a program node that, when clicked, shows a node for
+          the main function. Finally, clicking on that pops up a window with the CIL representation
+          of <c-s>main</c-s>.
+          With the help of a list of <a target="_blank" href="https://en.wikipedia.org/wiki/List_of_CIL_instructions">CIL opcodes</a> we can start to figure
+          out how the translation process works.
+        </t-b>
+        <t-b>
+          Tools like <c-s>ildasm</c-s> disassembler and JetBrains <c-s>dotPeek</c-s> decompiler work by using
+          .Net reflection. In this example, the program assembly ConsoleApp2.exe is queried by <c-s>ildasm</c-s>
+          using the .Net reflection Application Programmer&apos;s Interface (API), starting with
+          <c-s>System.Object.GetType()</c-s>.
+        </t-b>
+        <t-b>
+          We won&apos;t get into those details here, but will look at the CIL disclosed in Figure 3 and see
+          what that can tells us about the process of running C# in the CLR virtual machine.
         </t-b>
         <div class="clear"></div>
-        <div style="padding:0.0em 1em; position:relative; top:0em;">
-          <div style="float:right; padding:0.0em 1em; position:relative; top:0em;">
+        <div style="padding:0.0em 1em; position:relative; top:0em; float:right;">
+          <div style="padding:0.0em 1em; position:relative; top:0em;">
             <photosizer-block src="pictures/ConsoleApp2_CIL.png" width="400" class="photoSizerBlock">
               <span style="font-family:'Comic Sans MS', Tahoma;">
                 Fig 3. Common Intermediate Language
               </span>
             </photosizer-block>
           </div>
-        </div>
-        <h3 id="code">3.0 CIL Structure</h3>
-        <t-b>
-          stuff here
-        </t-b>
-        <div class="clear"></div>
-        <div style="padding:0.0em 1em; position:relative; top:0em;">
-          <div style="float:right; padding:0.0em 1em; position:relative; top:0em;">
+          <div style="padding:0.0em 1em; position:relative; top:0em;">
             <photosizer-block src="pictures/cil_structure.png" width="300" class="photoSizerBlock">
               <span style="font-family:'Comic Sans MS', Tahoma;">
                 Fig 4. CIL Processing
@@ -150,19 +191,110 @@
             </photosizer-block>
           </div>
         </div>
-        <h3 id="code">4.0 CIL Processing</h3>
+        <h3 id="cil">3.0 CIL Processing</h3>
+        <div style="padding:0.0em 1em; position:relative; top:0em; float:right;">
+        </div>
         <t-b>
-          stuff here
+          CIL is object oriented. <c-s>Main(string[] args)</c-s> is a static method of the <c-s>Program</c-s>
+          object defined in Figure&nbsp;1. The CIL window shows us contents of main as represented in bytecode.
         </t-b>
-
-
+        <t-b>
+          Here are its contents:
+          <ul>
+            <li>
+              It starts by defining <c-s>maxstack</c-s>, the length of the CIL stack for <c-s>Main</c-s>, presumably a fixed buffer based on program analysis.
+            </li>
+            <li>
+              Then defines <c-s>locals</c-s>, an array of local storage for the variables <c-s>a</c-s>, <c-s>b</c-s>, and <c-s>c</c-s>
+              which will be accessed with indexes attached to CIL opcodes.
+            </li>
+            <li>
+              A <c-s>nop</c-s> presumably used for a debugger hook, which probably would not be there if
+              the program was compiled in &quot;Release&quot; mode.
+            </li>
+            <li>
+              A <c-s>ldstr "hello C# world"</c-s> which pushes a reference to the literal string
+              into the CIL stack.
+            </li>
+            <li>
+              The call <c-s>void <wbr />...Console::<wbr />WriteLine<wbr />(string)</c-s> pops the
+              literal string reference from the stack and passes it to the named method.
+            </li>
+            <li>
+              <c-s>ldc.i4.1</c-s> pushes an <c-s>i32 int</c-s> with literal value of <c-s>1</c-s> onto the CIL stack.
+            </li>
+            <li>
+              <c-s>stloc.0</c-s> pops that value and stores it in <c-s>locals</c-s> storage using index of 0.
+            </li>
+            <li>
+              Repeats that process for <c-s>b</c-s>.
+            </li>
+            <li>
+              At this point the stack is empty and <c-s>locals</c-s> holds values for <c-s>a</c-s>
+              and <c-s>b</c-s>
+            </li>
+            <li>
+              the next statements <c-s>ldloc.0</c-s> and <c-s>ldloc.1</c-s> push the local values
+              for <c-s>a</c-s> and <c-s>b</c-s> onto the stack, calls <c-s>add</c-s> which pops off
+              the two locals, adds them, and pushes the result back onto the stack.
+            </li>
+            <li>
+              <c-s>stloc.2</c-s> pops the result and stores it into local storage at index 2.
+            </li>
+            <li>
+              A reference to the literal output format string is pushed onto the stack.
+            </li>
+            <li>
+              The next statements push local variable <c-s>a</c-s> onto the stack, box the value by storing
+              in the managed heap and replacing <c-s>a</c-s> with its boxed reference.
+            </li>
+            <li>
+              That process is repeated for <c-s>b</c-s> and <c-s>c</c-s>.
+            </li>
+            <li>
+              At this point, the CIL stack has the three local variables and and output format string reference
+              on the heap, e.g., four items hence <c-s>maxstack</c-s> has the value 4.
+            </li>
+            <li>
+              finally, <c-s>System.Console::<wbr />WriteLine<wbr />(string,&nbsp;object,&nbsp;object,&nbsp;object)</c-s> is called
+              that uses the stack contents as arguments and displays the result on the terminal.
+            </li>
+            <li>
+              then <c-s>Main</c-s> returns ending the program.
+            </li>
+          </ul>
+        </t-b>
         <div class="clear"></div>
+        <h3 id="concl">4.0 Conclusions</h3>
+        <t-b>
+          Every thing we&apos;ve looked at here was generated by the C# compiler. It doesn&apos;t use any
+          knowledge of the underlying machine architecture: registers, fast cache memory, general store,
+          or cpu instructions.
+        </t-b>
+        <t-b>
+          It is the reponsibility of the CLR to map the virtual machine processing onto the program&apos;s
+          platform using those details with native code.
+          That native code generation happens when the program is loaded for execution.
+        </t-b>
+        <t-b>
+          So the C# compiler is independent of target machine details. Native code generation is handled
+          by the CLR.
+        </t-b>
+        <div style="height:0.25em;"></div>
         <h3 id="refs">5.0 References:</h3>
         <div class="pad10">
           <table style="border-collapse: collapse; width:100%;">
             <tr>
               <th class="darkItem">Reference</th>
               <th class="darkItem">Description</th>
+            </tr>
+            <tr>
+              <td>
+                <a target="_blank" href="https://www.jetbrains.com/decompiler/">dotPeek - JetBrains decompiler</a>
+              </td>
+              <td>
+                Tool for translating between assemblies &lt;--&gt; CIL &lt;--&gt; C# source
+              </td>
             </tr>
             <tr>
               <td class="lightItem">
@@ -204,10 +336,10 @@
         <sec-elem style="width:0.0em">&nbsp;</sec-elem>
         <menu-elem class="secElem"><a href="#bottom">bottom</a></menu-elem>
         <menu-elem><a href="#refs">refs</a></menu-elem>
-        <menu-elem><a href="#starting">starting</a></menu-elem>
-        <menu-elem><a href="#lows">lows</a></menu-elem>
-        <menu-elem><a href="#highs">highs</a></menu-elem>
-        <menu-elem><a href="#why">why?</a></menu-elem>
+        <menu-elem><a href="#concl">conclusion</a></menu-elem>
+        <menu-elem><a href="#cil">cil</a></menu-elem>
+        <menu-elem><a href="#disa">disassem</a></menu-elem>
+        <menu-elem><a href="#code">code</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
         <div style='margin:0em -1em; text-align:center' class='darkItem'>Sections</div>
       </page-sections>
