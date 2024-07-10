@@ -152,7 +152,7 @@ function initializeMenu() {
     <div class='menuItem'>\
         Site&#9662\
         <div class='dropdown'>\
-            <div style='height:0.25em;'></div>\
+            <div class='darkItem' style='padding:0.25em 0.5em;'>Code Workshop</div>\
             <div class='ddItem'><a href='index.html'>Home</a></div>\
             <div class='ddItem'><a href='TOC.html'>Site Explorer</a></div>\
             <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\

@@ -166,7 +166,7 @@ function initializeMenu() {
     <div class='menuItem'>\
         <div>Site&#9662</div>\
         <div class='dropdown'>\
-            <div style='height:0.25em;'></div>\
+            <div class='darkItem' style='padding:0.25em 0.5em;'>Code Workshop</div>\
             <div class='ddItem'><a href='../../index.html'>Home</a></div>\
             <div class='ddItem'><a target='_parent' href='../../TOC.html'>Site Explorer</a></div>\
             <!--<div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>-->\
