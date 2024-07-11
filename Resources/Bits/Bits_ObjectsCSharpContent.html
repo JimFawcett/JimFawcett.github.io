@@ -428,271 +428,15 @@
           public properties ensures that methods have valid data of their operations. A type
           designer may choose to selectively allow user data modification.
         </t-b>
-        <h3 id="points">1.1 PointsObjects.cs</h3>
         <t-b>
-          <c-s>Point4D</c-s> is a user-defined type representing a point in 4-dimensional space-time.
-          It declares data held by all instances of the type, three floating point coordinates and
-          a <c-s>DateTime</c-s> variable, and methods to create and modify instances.
+          This Bit looks at C# objects, their class definitions, instantiations, and use in program execution.
+          We start with pre-existing library types, then develops a custom type call Point4D. and closes with
+          discussion of the string type.
         </t-b>
         <t-b>
-          The source code is available
-          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/CSharp/Cs_Objects">here</a>.
-          Download the entire Bits repository
-          <a target="_blank" href="https://github.com/JimFawcett/Bits">here</a>.
+          We focus on the differences between value and reference types.
         </t-b>
-        <div class="blockSingle">
-          <div class="codewrap" style="float:left; width:60%;">
-            <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-cpp">
-/*-------------------------------------------------------------------
-  Points.cs
-  - provides definitions for user-defined class Point4D
-*/
-
-using System.Collections;
-using System.Collections.Generic;   // IEnumerable&lt;T&gt;, List&lt;T&gt;
-using Analysis;
-
-namespace Points {
-  /*-----------------------------------------------------------------------
-    Point4D is a basic point class with three integer coordinates and one
-    time coordinate.
-    - It is a reference type because it's instances are created
-      from a class
-    - That affects the way assignments work - see demo in Program.cs
-  */
-  public class Point4D : Analysis.IShow  // reference type with value type members
-  {
-    public Point4D() {
-      /*
-        doesn't need to do anything because its properties have
-        default values
-      */
-    }
-    public Point4D(double xarg, double yarg, double zarg) {
-      x = xarg;
-      y = yarg;
-      z = zarg;
-    }
-    public double x { get; set; } = 0.0;
-    public double y { get; set; } = 0.0;
-    public double z { get; set; } = 0.0;
-    public DateTime dt { get; set; } = DateTime.Now;
-    public int Length { get; } = 4;
-    public int Width { get; set; } = 3;
-    public int Left { get; set; } = 2;
-    public int Indent { get; set; } = 2;
-    /* translates IShow::show to needs of class */
-    public void Show(string name) {
-      PrintSelf(name);
-    }
-    /* Display Point4D structure and state */
-    public void PrintSelf(string name) {
-      string ofstr = Display.Spaces(Left);
-      string instr = Display.Spaces(Indent);
-
-      Console.WriteLine(&quot;{0}{1} {{&quot;, ofstr, name);
-      Console.WriteLine(
-        &quot;{5}x:{1}, y:{2}, z:{3},&#92;n{5}{4}&quot;, name, x, y, z, dt, ofstr + instr
-      );
-      Console.WriteLine(&quot;{0}}}&#92;n&quot;, ofstr);
-    }
-  }
-}</code></pre>
-          </div>
-          <div class="textwrap">
-            <h4>Concept:</h4>
-            <t-b>
-              Point4D represents a point in 3-dimensional space and a time at which
-              something was at that point.
-            </t-b>
-            <t-b>
-              Instances of Point4D could be collected into a List&lt;Point4D&gt; to
-              represent the trajectory of a goal kick or flow marker of blood in an artery.
-            </t-b>
-            <h4>C# class syntax:</h4>
-            <t-b>
-              C# user-defined types are defined with class implementations. All of the methods
-              and properties must be implemented in line within the class declaration.
-            </t-b>
-            <t-b>
-              <c-s>Point4D</c-s> inherits interface <c-s>IShow</c-s> defined in AnalysisObjects.cs. Any
-              function that accepts input through a parameter of type <c-s>IShow</c-s> will accept an
-              instance of any type that implements that interface. <c-s>Point4D</c-s> is obligated to implement
-              the <c-s>Show</c-s> method declared in <c-s>IShow</c-s>.
-            </t-b>
-            <t-b>
-              Mutable properties are declared with <c-s>{&nbsp;get;&nbsp;set;&nbsp;}</c-s> syntax. <c-s>get</c-s>
-              and <c-s>set</c-s> are aliases for methods the compiler will implement.
-            </t-b>
-            <t-b>
-              Designers can provide definitions where special processing is needed. All of the
-              properties shown here are simply copy-in/copy-out operations so compiler generated
-              code works correctly.
-            </t-b>
-            <t-b>
-              Note that the Length property should always return 4, e.g., 3 double coordinates and
-              1 DateTime value, so it has no setter. Of course, since this is constant the designer
-              might simply choose to eliminate that property. It is included here to show how
-              properties that users should not mutate are defined.
-            </t-b>
-          </div>
-        </div>
-        <h4 id="source">1.2 Source Code - Program.cs</h4>
-        <t-b>
-          The code block below illustrates this program&apos;s structure. Subsequent blocks demonstrate
-          each of the major processing acivities used to present C# object syntax and semantics.
-        </t-b>
-        <t-b>
-          The source code is available
-          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/CSharp/Cs_Objects">here</a>.
-          Download the entire Bits repository
-          <a target="_blank" href="https://github.com/JimFawcett/Bits">here</a>.
-        </t-b>
-        <div class="blockSingle">
-          <div class="codewrap" style="float:left; width:60%;">
-            <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-csharp">/*---------------------------------------------------------         
-  Cs_Objects::Program.cs
-  - Demonstrates creation and assignment of objects as well as a few
-    peeks at other operations on objects.
-*/
-using System;
-using System.Collections;
-using System.Collections.Generic;   // IEnumerable&lt;T&gt;, List&lt;T&gt;
-using System.Linq;                  // IEnumerable&lt;T&gt;.ToArray
-using System.Text;                  // StringBuilder
-using Points;                       // defined in Points.cs
-using Analysis;                     // defined in Analysis.cs
-
-/*
-  Static Data Types:
-    value types =&gt; assignment copies value
-    --------------------------------------
-      sbyte, byte, short, int, long, ushort, uint, ulong
-      float, double
-      decimal, char, bool
-      struct
-    Reference types =&gt; assignment copies reference
-    ----------------------------------------------
-      object, string, array, class
-    ----------------------------------------------
-      strings are immutable, so any change requires copy on write.
-      That simulates value behavior.
-*/
-namespace CSharpObjects
-{
-  /*
-    Demonstration composite value type.
-    - St is a value type because it is implemented with
-      a struct and all its data members are value types.
-  */
-  public struct St {
-    public St(int ai, double bi, char ci) {
-      a=ai; b=bi; c=ci;
-    }
-    public void Show(string name) {
-      Console.WriteLine(
-        &quot;  {0} {{ a:{1}, b:{2}, c:{3} }}&quot;, name, a, b, c
-      );
-    }
-    /*
-     These data members are public instead of public properties.
-     - we don't need that ceremony because St is simply a data
-       composer. It doesn't have any significant behavior.
-    */
-    public int a;
-    public double b;
-    public char c;
-  }
-
-  /*-- Object demonstration begins here --*/
-  class Program
-  {
-    const string nl = &quot;&#92;n&quot;;
-    
-    static void DemoLibraryTypes() {
-      /*-- definintion elided --*/
-    }
-    static void DemoSt() {
-      /*-- definition elided --*/
-    }
-    static void DemoPoint4D() {
-      /*-- definition elided --*/
-    }
-    static void DemoString() {
-      /*-- definition elided --*/
-    }
-    static void Main(string[] args)
-    {
-      Display.ShowLabel(&quot; Demonstrate C# objects&quot;);
-
-      DemoLibraryTypes();
-      DemoSt();
-      DemoPoint4D();
-      DemoString();
-
-      Console.WriteLine(&quot;&#92;nThat's all Folks!&#92;n&quot;);
-    }
-  }
-}
-
-</code></pre>
-          </div>
-          <div class="textwrap">
-            <h4>Structure:</h4>
-            <t-b>
-              Code begins with declarations of all dependencies needed for program operation.
-              Like most programs, this one begins defining <c-s>System</c-s> dependencies.
-            </t-b>
-            <t-b>
-              That is followed by declaring dependencies on program defined resources, e.g., the
-              libraies Points and Analysis.
-            </t-b>
-            <t-b>
-              Points defines a reference type Point4D and Analysis defines a set of functions
-              for analysis and display of object properties and actions.
-            </t-b>
-            <h4>Namespaces:</h4>
-            <t-b>
-              Idiomatic use of C# places a program&apos;s definitions in a hierarchal namespace structure
-              used to locate types and operations within a complex set of code facilities.
-            </t-b>
-            <t-b>
-              C# uses the dotnet standard libraries to support program operations.  These facilities
-              are very large and complex. Namespaces are a valuable resource for finding and using
-              the libraries.
-            </t-b>
-            <t-b>
-              The <c-s>CSharpObjects</c-s> namespace helps to distinguish program names from the
-              many thousands of names used in included dependencies.
-            </t-b>
-            <h4>struct St</h4>
-            <t-b>
-              St is a program-defined value type used to illustrate the semantics of construction
-              and assignment for value types.
-            </t-b>
-            <t-b>
-              Because St is a simple data composer its members are all declared public. If the
-              members had complex structures or defined behaviors then they should be declared to
-              be encapsulated properties, as was done for <c-s>Point4D</c-s>.
-            </t-b>
-            <h4>Program Class:</h4>
-            <t-b>
-              The program defines four functions that illustrate syntax and semantics for:
-              standard library reference types, St value type, Point4D reference type, and
-              immutable string behavior.
-            </t-b>
-            <t-b>
-              These are each called in main to illustrate how the various C# types behave.
-            </t-b>
-            <t-b>
-              This structure also illustrates how complex code can be partitioned into simpler
-              parts that are easier to understance and maintain that a single monolithic code
-              block.
-            </t-b>
-          </div>
-        </div>
-        <div style="height:1em;"></div>
-        <h3 id="demolib">1.2.1 Demonstrate Library Types</h3>
+        <h3 id="demolib">1.1 Demonstrate Library Types</h3>
         <t-b>
           Illustrated here are three of the most important C# data structures:
           <c-s>String</c-s>, <c-s>List&lt;double&gt;</c-s>, and <c-s>Dictionary&lt;int,&nbsp;String&gt;</c-s>.
@@ -805,7 +549,7 @@ d1: [ {0,zero} {1,one} {2,two} {3,three} ]
           </splitter-container>
         </div>
         <div style="height:1em;"></div>
-        <h3 id="demoval">1.2.2 Demonstrate Value Type</h3>
+        <h3 id="demoval">1.2 Demonstrate Value Type</h3>
         <t-b>
           Value types consist of the primitive types, structs, and enumerations. Assignment and construction
           from another instance result in copies of the source instance to the destinatin, all in stack
@@ -887,7 +631,127 @@ s2 is not same object as s1
           </splitter-container>
         </div>
         <div style="height:1em;"></div>
-        <h3 id="demoref">1.2.3 Demonstrate Reference Type</h3>
+        <h3 id="points">1.3 PointsObjects.cs</h3>
+        <t-b>
+          <c-s>Point4D</c-s> is a user-defined type representing a point in 4-dimensional space-time.
+          It declares data held by all instances of the type, three floating point coordinates and
+          a <c-s>DateTime</c-s> variable, and methods to create and modify instances.
+        </t-b>
+        <t-b>
+          The source code is available
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/CSharp/Cs_Objects">here</a>.
+          Download the entire Bits repository
+          <a target="_blank" href="https://github.com/JimFawcett/Bits">here</a>.
+        </t-b>
+        <h3 id="pointsdef">1.3.1 Point4D Reference Type Definition</h3>
+        <t-b>
+          The Point4D class is defined in this code block. It is a reference type because it&apos;s
+          defined with a class.
+        </t-b>
+        <t-b>
+          Note that all its data members are
+          defined as C# properties. That provides encapsulation of the data while providing
+          simple public member syntax.
+        </t-b>
+        <div class="blockSingle">
+          <div class="codewrap" style="float:left; width:65%;">
+            <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-cpp">
+/*-------------------------------------------------------------------
+  Points.cs
+  - provides definitions for user-defined class Point4D
+*/
+
+using System.Collections;
+using System.Collections.Generic;   // IEnumerable&lt;T&gt;, List&lt;T&gt;
+using Analysis;
+
+namespace Points {
+  /*-----------------------------------------------------------------------
+    Point4D is a basic point class with three integer coordinates and one
+    time coordinate.
+    - It is a reference type because it's instances are created
+      from a class
+    - That affects the way assignments work - see demo in Program.cs
+  */
+  public class Point4D : Analysis.IShow  // reference type with value type members
+  {
+    public Point4D() {
+      /*
+        doesn't need to do anything because its properties have
+        default values
+      */
+    }
+    public Point4D(double xarg, double yarg, double zarg) {
+      x = xarg;
+      y = yarg;
+      z = zarg;
+    }
+    public double x { get; set; } = 0.0;
+    public double y { get; set; } = 0.0;
+    public double z { get; set; } = 0.0;
+    public DateTime dt { get; set; } = DateTime.Now;
+    public int Length { get; } = 4;
+    public int Width { get; set; } = 3;
+    public int Left { get; set; } = 2;
+    public int Indent { get; set; } = 2;
+    /* translates IShow::show to needs of class */
+    public void Show(string name) {
+      PrintSelf(name);
+    }
+    /* Display Point4D structure and state */
+    public void PrintSelf(string name) {
+      string ofstr = Display.Spaces(Left);
+      string instr = Display.Spaces(Indent);
+
+      Console.WriteLine(&quot;{0}{1} {{&quot;, ofstr, name);
+      Console.WriteLine(
+        &quot;{5}x:{1}, y:{2}, z:{3},&#92;n{5}{4}&quot;, name, x, y, z, dt, ofstr + instr
+      );
+      Console.WriteLine(&quot;{0}}}&#92;n&quot;, ofstr);
+    }
+  }
+}</code></pre>
+          </div>
+          <div class="textwrap">
+            <h4>Concept:</h4>
+            <t-b>
+              Point4D represents a point in 3-dimensional space and a time at which
+              something was at that point.
+            </t-b>
+            <t-b>
+              Instances of Point4D could be collected into a List&lt;Point4D&gt; to
+              represent the trajectory of a goal kick or flow marker of blood in an artery.
+            </t-b>
+            <h4>C# class syntax:</h4>
+            <t-b>
+              C# user-defined types are defined with class implementations. All of the methods
+              and properties must be implemented in line within the class declaration.
+            </t-b>
+            <t-b>
+              <c-s>Point4D</c-s> inherits interface <c-s>IShow</c-s> defined in AnalysisObjects.cs. Any
+              function that accepts input through a parameter of type <c-s>IShow</c-s> will accept an
+              instance of any type that implements that interface. <c-s>Point4D</c-s> is obligated to implement
+              the <c-s>Show</c-s> method declared in <c-s>IShow</c-s>.
+            </t-b>
+            <t-b>
+              Mutable properties are declared with <c-s>{&nbsp;get;&nbsp;set;&nbsp;}</c-s> syntax. <c-s>get</c-s>
+              and <c-s>set</c-s> are aliases for methods the compiler will implement.
+            </t-b>
+            <t-b>
+              Designers can provide definitions where special processing is needed. All of the
+              properties shown here are simply copy-in/copy-out operations so compiler generated
+              code works correctly.
+            </t-b>
+            <t-b>
+              Note that the Length property should always return 4, e.g., 3 double coordinates and
+              1 DateTime value, so it has no setter. Of course, since this is constant the designer
+              might simply choose to eliminate that property. It is included here to show how
+              properties that users should not mutate are defined.
+            </t-b>
+          </div>
+        </div>
+        <div style="height:0.75em;"></div>
+        <h3 id="demoref">1.3.2 Demonstrate Point4D Reference Type</h3>
         <t-b>
           Reference types consist of handles pointing to instances in the managed heap. Assignment and Construction
           from source instances makes copies of the handles, but not the instances, from source to destination. That
@@ -1062,7 +926,7 @@ val2 is same object as val1
           </splitter-container>
         </div>
         <div style="height:1em;"></div>
-        <h3 id="demostring">1.2.4 Demonstrate String</h3>
+        <h3 id="demostring">1.4 Demonstrate String</h3>
         <t-b>
           Strings are immutable reference types.  Modification of a string results in a new heap
           instance of the original string with the specified changes.
@@ -1135,8 +999,8 @@ str2: immutable string
             </second-item>
           </splitter-container>
         </div>
-
-        <h4 id="funcs">1.3 Source Code - AnalysisObjects.cs</h4>
+        <div style="height:0.75em;"></div>
+        <h4 id="funcs">1.5 Source Code - AnalysisObjects.cs</h4>
         <t-b>
           AnalysisObjects.cs contains functions for analyzing type and properties of objects,
           and for reducing code clutter for display operations.
@@ -1146,9 +1010,11 @@ str2: immutable string
           in the <a target="_blank" href="Bits_GenericCSharp.html">Generic Bit</a>, coming up
           next. You don&apos;t need to understand those functions in full to understand how C# objects work.
         </t-b>
-        <div class="blockSingle">
-          <div class="codewrap" style="float:left; width:65%;">
-            <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-cpp">
+        <details>
+          <summary class="darkItem">Analysis and Display Methods</summary>
+          <div class="blockSingle">
+            <div class="codewrap" style="float:left; width:65%;">
+              <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-cpp">
 /*---------------------------------------------------------
   Cs_Data::AnalysisData.cs
     - class Anal contains static functions that analyze
@@ -1417,78 +1283,235 @@ namespace Analysis
     }
   }
 }</code></pre>
+            </div>
+            <div class="textwrap">
+              <h4>File Structure:</h4>
+              <t-b>
+                AnalysisObjects.cs defines a namespace &quot;<c-s>Analysis</c-s>&quot; which defines
+                an interface for displaying user-defined objects and two classes,
+                &quot;<c-s>Anal</c-s>&quot; and &quot;<c-s>Display</c-s>&quot; for analyzing object
+                types and properties and for displaying values, respectively.
+              </t-b>
+              <h4>Interface:</h4>
+              <t-b>
+                <c-s>IShow</c-s> declares one method and four properties that implementors must
+                provide. It guarantees display properties for all user-defined types that
+                implement it.
+              </t-b>
+              <t-b>
+                The method <c-s>ShowTypeShowable&lt;T&gt;</c-s> can accept any type that implements
+                the <c-s>IShow</c-s> interface. This abstraction over behavior allows us to build
+                flexible code that reduces duplication and is easier to understand.
+              </t-b>
+              <h4>Anal Class:</h4>
+              <t-b>
+                The method <c-s>ShowType&lt;T&gt;</c-s> uses simple reflection to display type
+                information, value, and size. Some quite sophisticated reflection is hidden within
+                the <c-s>GetManagedSize</c-s> method it calls.
+              </t-b>
+              <t-b>
+                <c-s>IsSameObj&lt;T&gt;</c-s> uses <c-s>System.ReferenceEquals</c-s> to determine if
+                two handles point to the same instance in the managed heap. It is used to demonstrate
+                the behavior of references when constructed from a source object and when assigned.
+              </t-b>
+              <t-b>
+                <c-s>ToStringAddressFromHandle&lt;T&gt(T t)</c-s> evaluates the managed heap address
+                to which t binds. It is used to confirm the results of <c-s>IsSameObj&lt;T&gt;</c-s>.
+              </t-b>
+              <t-b>
+                <c-s>ToStringAddress&lt;T&gt:</c-s> extracts the address of a value type and
+                returns a string representation of the address. It was used in earlier versions
+                of this code, but is not used now.  It is here to illustrate two things: how to
+                find the address of value instances in stack memory and use of unsafe blocks.
+              </t-b>
+              <t-b>
+                This function must be declared unsafe because it uses a pointer, but does so in a
+                safe way, e.g., simply returns a string representation.
+              </t-b>
+              <h4>Display Class:</h4>
+              <t-b>
+                Most of the functions in <c-s>Display</c-s> are easy to understand. Focusing on the
+                less obvious, <c-s>Iterate&lt;T&gt;</c-s> uses reflection to display the fields and
+                methods of <c-s>T</c-s>.  It isn&apos;t used in this demo, but is included to help
+                you explore various types used in the RemoteExecution operations.
+              </t-b>
+              <t-b>
+                Method <c-s>ShowTypeShowable&lt;T&gt;</c-s> illustrates how types are restricted to
+                those that implement <c-s>IShow</c-s> with the constraint
+                &quot;<c-s>where T:Ishow</c-s>&quot;.
+              </t-b>
+              <t-b>
+                The methods <c-s>ShowIntArray</c-s>, <c-s>ShowDoubleList</c-s>, and
+                <c-s>ShowDictionary</c-s> all use for-loop iteration to display collection
+                contents.
+              </t-b>
+              <t-b>
+                We will show in <a target="_blank" href="Bits_GenericCSharp.html">Generic C#</a>
+                and <a class="undefined" target="_blank" href="#">Iter C#</a> more general methods
+                to display collection contents
+                that accept many different types of arguments by using standard library defined
+                interfaces.
+              </t-b>
+            </div>
+          </div>
+        </details>
+        <div style="height:0.75em;"></div>
+        <h4 id="source">1.6 Demo Execution - Program.cs</h4>
+        <t-b>
+          The code block below illustrates this program&apos;s structure. Subsequent blocks demonstrate
+          each of the major processing acivities used to present C# object syntax and semantics.
+        </t-b>
+        <t-b>
+          The source code is available
+          <a target="_blank" href="https://github.com/JimFawcett/Bits/tree/master/CSharp/Cs_Objects">here</a>.
+          Download the entire Bits repository
+          <a target="_blank" href="https://github.com/JimFawcett/Bits">here</a>.
+        </t-b>
+        <div class="blockSingle">
+          <div class="codewrap" style="float:left; width:60%;">
+            <pre style="font-size:1.0em; margin-right:0.75em;"><code class="language-csharp">/*---------------------------------------------------------         
+  Cs_Objects::Program.cs
+  - Demonstrates creation and assignment of objects as well as a few
+    peeks at other operations on objects.
+*/
+using System;
+using System.Collections;
+using System.Collections.Generic;   // IEnumerable&lt;T&gt;, List&lt;T&gt;
+using System.Linq;                  // IEnumerable&lt;T&gt;.ToArray
+using System.Text;                  // StringBuilder
+using Points;                       // defined in Points.cs
+using Analysis;                     // defined in Analysis.cs
+
+/*
+  Static Data Types:
+    value types =&gt; assignment copies value
+    --------------------------------------
+      sbyte, byte, short, int, long, ushort, uint, ulong
+      float, double
+      decimal, char, bool
+      struct
+    Reference types =&gt; assignment copies reference
+    ----------------------------------------------
+      object, string, array, class
+    ----------------------------------------------
+      strings are immutable, so any change requires copy on write.
+      That simulates value behavior.
+*/
+namespace CSharpObjects
+{
+  /*
+    Demonstration composite value type.
+    - St is a value type because it is implemented with
+      a struct and all its data members are value types.
+  */
+  public struct St {
+    public St(int ai, double bi, char ci) {
+      a=ai; b=bi; c=ci;
+    }
+    public void Show(string name) {
+      Console.WriteLine(
+        &quot;  {0} {{ a:{1}, b:{2}, c:{3} }}&quot;, name, a, b, c
+      );
+    }
+    /*
+     These data members are public instead of public properties.
+     - we don't need that ceremony because St is simply a data
+       composer. It doesn't have any significant behavior.
+    */
+    public int a;
+    public double b;
+    public char c;
+  }
+
+  /*-- Object demonstration begins here --*/
+  class Program
+  {
+    const string nl = &quot;&#92;n&quot;;
+    
+    static void DemoLibraryTypes() {
+      /*-- definintion elided --*/
+    }
+    static void DemoSt() {
+      /*-- definition elided --*/
+    }
+    static void DemoPoint4D() {
+      /*-- definition elided --*/
+    }
+    static void DemoString() {
+      /*-- definition elided --*/
+    }
+    static void Main(string[] args)
+    {
+      Display.ShowLabel(&quot; Demonstrate C# objects&quot;);
+
+      DemoLibraryTypes();
+      DemoSt();
+      DemoPoint4D();
+      DemoString();
+
+      Console.WriteLine(&quot;&#92;nThat's all Folks!&#92;n&quot;);
+    }
+  }
+}
+
+</code></pre>
           </div>
           <div class="textwrap">
-            <h4>File Structure:</h4>
+            <h4>Structure:</h4>
             <t-b>
-              AnalysisObjects.cs defines a namespace &quot;<c-s>Analysis</c-s>&quot; which defines
-              an interface for displaying user-defined objects and two classes,
-              &quot;<c-s>Anal</c-s>&quot; and &quot;<c-s>Display</c-s>&quot; for analyzing object
-              types and properties and for displaying values, respectively.
-            </t-b>
-            <h4>Interface:</h4>
-            <t-b>
-              <c-s>IShow</c-s> declares one method and four properties that implementors must 
-              provide. It guarantees display properties for all user-defined types that
-              implement it.
+              Code begins with declarations of all dependencies needed for program operation.
+              Like most programs, this one begins defining <c-s>System</c-s> dependencies.
             </t-b>
             <t-b>
-              The method <c-s>ShowTypeShowable&lt;T&gt;</c-s> can accept any type that implements
-              the <c-s>IShow</c-s> interface. This abstraction over behavior allows us to build
-              flexible code that reduces duplication and is easier to understand.
-            </t-b>
-            <h4>Anal Class:</h4>
-            <t-b>
-              The method <c-s>ShowType&lt;T&gt;</c-s> uses simple reflection to display type 
-              information, value, and size. Some quite sophisticated reflection is hidden within
-              the <c-s>GetManagedSize</c-s> method it calls.
+              That is followed by declaring dependencies on program defined resources, e.g., the
+              libraies Points and Analysis.
             </t-b>
             <t-b>
-              <c-s>IsSameObj&lt;T&gt;</c-s> uses <c-s>System.ReferenceEquals</c-s> to determine if
-              two handles point to the same instance in the managed heap. It is used to demonstrate
-              the behavior of references when constructed from a source object and when assigned.
+              Points defines a reference type Point4D and Analysis defines a set of functions
+              for analysis and display of object properties and actions.
+            </t-b>
+            <h4>Namespaces:</h4>
+            <t-b>
+              Idiomatic use of C# places a program&apos;s definitions in a hierarchal namespace structure
+              used to locate types and operations within a complex set of code facilities.
             </t-b>
             <t-b>
-              <c-s>ToStringAddressFromHandle&lt;T&gt(T t)</c-s> evaluates the managed heap address
-              to which t binds. It is used to confirm the results of <c-s>IsSameObj&lt;T&gt;</c-s>.
+              C# uses the dotnet standard libraries to support program operations.  These facilities
+              are very large and complex. Namespaces are a valuable resource for finding and using
+              the libraries.
             </t-b>
             <t-b>
-              <c-s>ToStringAddress&lt;T&gt:</c-s> extracts the address of a value type and
-              returns a string representation of the address. It was used in earlier versions
-              of this code, but is not used now.  It is here to illustrate two things: how to
-              find the address of value instances in stack memory and use of unsafe blocks.
+              The <c-s>CSharpObjects</c-s> namespace helps to distinguish program names from the
+              many thousands of names used in included dependencies.
+            </t-b>
+            <h4>struct St</h4>
+            <t-b>
+              St is a program-defined value type used to illustrate the semantics of construction
+              and assignment for value types.
             </t-b>
             <t-b>
-              This function must be declared unsafe because it uses a pointer, but does so in a
-              safe way, e.g., simply returns a string representation.
+              Because St is a simple data composer its members are all declared public. If the
+              members had complex structures or defined behaviors then they should be declared to
+              be encapsulated properties, as was done for <c-s>Point4D</c-s>.
             </t-b>
-            <h4>Display Class:</h4>
+            <h4>Program Class:</h4>
             <t-b>
-              Most of the functions in <c-s>Display</c-s> are easy to understand. Focusing on the
-              less obvious, <c-s>Iterate&lt;T&gt;</c-s> uses reflection to display the fields and
-              methods of <c-s>T</c-s>.  It isn&apos;t used in this demo, but is included to help
-              you explore various types used in the RemoteExecution operations.
-            </t-b>
-            <t-b>
-              Method <c-s>ShowTypeShowable&lt;T&gt;</c-s> illustrates how types are restricted to
-              those that implement <c-s>IShow</c-s> with the constraint 
-              &quot;<c-s>where T:Ishow</c-s>&quot;.
+              The program defines four functions that illustrate syntax and semantics for:
+              standard library reference types, St value type, Point4D reference type, and
+              immutable string behavior.
             </t-b>
             <t-b>
-              The methods <c-s>ShowIntArray</c-s>, <c-s>ShowDoubleList</c-s>, and
-              <c-s>ShowDictionary</c-s> all use for-loop iteration to display collection
-              contents.
+              These are each called in main to illustrate how the various C# types behave.
             </t-b>
             <t-b>
-              We will show in <a target="_blank" href="Bits_GenericCSharp.html">Generic C#</a>
-              and <a class="undefined" target="_blank" href="#">Iter C#</a> more general methods
-              to display collection contents
-              that accept many different types of arguments by using standard library defined
-              interfaces.
+              This structure also illustrates how complex code can be partitioned into simpler
+              parts that are easier to understance and maintain that a single monolithic code
+              block.
             </t-b>
           </div>
         </div>
-        <h4 id="build">3.0 Build</h4>
+        <div style="height:1em;"></div>
+        <h4 id="build">2.0 Build</h4>
         <t-b>
           The left panel shows this project built with the dotnet CLI. The CLI interface has
           commands: build, run, clean, new, format, ...  You can see all of the commands using
@@ -1544,60 +1567,60 @@ C:&#92;github&#92;JimFawcett&#92;Bits&#92;CSharp&#92;Cs_Objects
 
 
 </code></pre>
-            </div>
-            </div>
-          <h3 id="ide">4.0 VS Code View</h3>
-          <t-b>
-            The code for this demo is available in
-            <a target="_blank" href="https://github.com/JimFawcett/Bits">github.com/JimFawcett/Bits</a>. If you click on
-            the Code dropdown you can clone the repository of all code for these demos to your local drive.
-            Then, it is easy to bring up any example, in any of the languages, in VS Code.
-          </t-b>
-          <t-b>
-            Here, we do that for CSharp\CSharp_Objects.
-          </t-b>
-          <photosizer-block src="pictures/VS_Code_CSharp_Objects.JPG" width="800" class="photoSizerBlock left"
-                            style="overflow-x:auto;">
-            <span style="font-family:'Comic Sans MS';">Figure 1. VS Code IDE - C# Objects</span>
-          </photosizer-block>
-          <photosizer-block src="pictures/LaunchJSON_CSharp_Objects.JPG" width="800" class="photoSizerBlock left"
-                            style="overflow-x:auto;">
-            <span style="font-family:'Comic Sans MS';">Figure 2. C# Launch.JSON</span>
-          </photosizer-block>
-          <photosizer-block src="pictures/VS_Code_Debugging_CSharp_Objects.JPG" width="800" class="photoSizerBlock left"
-                            style="overflow-x:auto;">
-            <span style="font-family:'Comic Sans MS';">Figure 3. Debugging C# Objects</span>
-          </photosizer-block>
-          <!--<photosizer-block src="pictures/VS_Code_Cpp_Plugins.jpg" width="700" class="photoSizerBlock left">
+          </div>
+        </div>
+        <h3 id="ide">3.0 VS Code View</h3>
+        <t-b>
+          The code for this demo is available in
+          <a target="_blank" href="https://github.com/JimFawcett/Bits">github.com/JimFawcett/Bits</a>. If you click on
+          the Code dropdown you can clone the repository of all code for these demos to your local drive.
+          Then, it is easy to bring up any example, in any of the languages, in VS Code.
+        </t-b>
+        <t-b>
+          Here, we do that for CSharp\CSharp_Objects.
+        </t-b>
+        <photosizer-block src="pictures/VS_Code_CSharp_Objects.JPG" width="800" class="photoSizerBlock left"
+                          style="overflow-x:auto;">
+          <span style="font-family:'Comic Sans MS';">Figure 1. VS Code IDE - C# Objects</span>
+        </photosizer-block>
+        <photosizer-block src="pictures/LaunchJSON_CSharp_Objects.JPG" width="800" class="photoSizerBlock left"
+                          style="overflow-x:auto;">
+          <span style="font-family:'Comic Sans MS';">Figure 2. C# Launch.JSON</span>
+        </photosizer-block>
+        <photosizer-block src="pictures/VS_Code_Debugging_CSharp_Objects.JPG" width="800" class="photoSizerBlock left"
+                          style="overflow-x:auto;">
+          <span style="font-family:'Comic Sans MS';">Figure 3. Debugging C# Objects</span>
+        </photosizer-block>
+        <!--<photosizer-block src="pictures/VS_Code_Cpp_Plugins.jpg" width="700" class="photoSizerBlock left">
     <span style="font-family:'Comic Sans MS';">Figure 3. C++ Plugins</span>
   </photosizer-block>-->
 
-          <div style="height:0.75em;" class="clear"></div>
-          <h3 id="refs">3.0 References</h3>
-          <table class="indent">
-            <tr>
-              <th class="darkItem">Reference</th>
-              <th class="darkItem">Description</th>
-            </tr>
-            <tr>
-              <td>
-                <a target="_blank" href="https://www.w3schools.com/cs/index.php">C# Tutorial - w3schools</a>
-              </td>
-              <td>
-                Interactive examples
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <a target="_blank" href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/">C# Reference - Microsoft</a>
-              </td>
-              <td>
-                Relatively complete informal language reference
-              </td>
-            </tr>
-          </table>
-          <div style="height:10em;"></div>
-</content>
+        <div style="height:0.75em;" class="clear"></div>
+        <h3 id="refs">4.0 References</h3>
+        <table class="indent">
+          <tr>
+            <th class="darkItem">Reference</th>
+            <th class="darkItem">Description</th>
+          </tr>
+          <tr>
+            <td>
+              <a target="_blank" href="https://www.w3schools.com/cs/index.php">C# Tutorial - w3schools</a>
+            </td>
+            <td>
+              Interactive examples
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a target="_blank" href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/">C# Reference - Microsoft</a>
+            </td>
+            <td>
+              Relatively complete informal language reference
+            </td>
+          </tr>
+        </table>
+        <div style="height:10em;"></div>
+      </content>
       <a id="bottom"></a>
       <page-TOC id="pages" style="display:none;">
       </page-TOC>
