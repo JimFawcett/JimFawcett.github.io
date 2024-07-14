@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <!--
-  Bits_GenericCSharpContent.html
+  Bits_IterCSharpContent.html
 -->
 <head>
   <title>Bits_Generic C#</title>
@@ -65,7 +65,7 @@
     <main id="main">
       <div id="about">about</div>
       <div id="page">Bits: Generic C#</div>
-      <div id="modified">07/11/2024</div>
+      <div id="modified">07/13/2024</div>
       <div id="hlp"></div>
       <a id="top"></a>
       <content>
@@ -78,32 +78,36 @@
           <a target="_blank" class="repoLink" href="https://github.com/JimFawcett/Bits">Bits Repo Code</a>
           <a target="_blank" class="repoLink" href="../../BitsRepo.html" style="margin-right:7.5em;">Bits Repo Docs</a>
           <hgroup id="pagetitle">
-            <h1 id="title">Bits: Generic C#</h1>
+            <h1 id="title">Bits: Iter C#</h1>
             <h3 id="subtitle" class="indent">
-              generic library and user-defined types
+              Iterate through library and user-defined types
             </h3>
           </hgroup>
         </header>
         <!-- <t-b style="border:2px solid red; padding:0.5em 1.5em;">
-          This page is a prototype used to decide which language features to emphasize. It will
-          be replaced with a final version soon.
-        </t-b> -->
+    This page is a prototype used to decide which language features to emphasize. It will
+    be replaced with a final version soon.
+  </t-b> -->
         <t-b style="border:1px solid maroon; padding:0.25em 1em 0.5em 1em;">
           <h4 style="margin:0em 0em 0.25em 0em;">Synopsis:</h4>
-          This page demonstrates uses of C# generic functions and types.
+          This page demonstrates uses of C# iteration.
           <hr class="spread" />
           <ul>
             <li>
-              C# generics support definition of class and method patterns, which can
-              be instantiated for a variety of different concrete types.
+              C# iteration acts on types that implement the <c-s>IEnumerable</c-s> and
+              <c-s>IEnumerable&lt;T&gt;</c-s> interfaces. These include:
+              <div class="inset">
+                <c-s>List&lt;T&gt;, Dictionary&lt;K, V&gt;, string</c-s>, and user-defined
+                types that implement the <c-s>IEnumerable</c-s> interfaces.
+              </div>
             </li>
             <li>
-              Each instantiation must use types that provide all the facilities used
-              in the pattern.
+              C# arrays do not explicitly implement the <c-s>IEnumerable&lt;T&gt;</c-s> interface,
+              but the CLR code generation process implicitly creates methods needed for enumeration.
             </li>
             <li>
-              The pattern can provide constraints on its type parameters that guarantee methods
-              and properties required by the pattern.
+              The C# <c-s>foreach</c-s> loop implicitly uses methods of the enumeration interfaces to
+              simplify iteration through collections.
             </li>
           </ul>
           <div style="height:0.5em;"></div>
@@ -112,125 +116,69 @@
           <summary class="darkItem">Demo Notes&nbsp;&nbsp;</summary>
           <t-b><hr /></t-b>
           <t-b>
-            All of the languages covered in this demonstration support generics with the exception
-            of JavaScript.
+            All of the languages covered in this demonstrtion support iteration using iterators.
           </t-b>
           <t-b>
-            Three of the languages: C++, Rust, and C# provide generics.  Python provides a typing module
-            that provides type hints, checked with a static analysis tool.  Each generic function or class
-            is a pattern for defining functions and classes of a specific type.  Thus a generic is a
-            pattern for making patterns.
+            C# iterators are provided by enumerable containers and implement a public interface with the method
+            <c-s style="white-space:nowrap;">bool MoveNext();</c-s> and property <c-s style="white-space:nowrap;">T Current { get; }</c-s>.
           </t-b>
           <t-b>
-            Python and JavaScript, are dynamically typed and already support defining
-            functions and classes for multiple types, e.g., no need for generics.
-          </t-b>
-          <t-b>
-            This demonstration illustrates use of generic functions and classes, which for C++, Rust, and C#,
-            are processed by the compiler.
+            This demonstration illustrates use of iterators with a series of functions that provide code,
+            in several forms, for iterating through containers. It includes demos for library types and
+            for a user-defined point class.
           </t-b>
           <t-b><hr /></t-b>
         </details>
-        <h3 id="generics">1.0 Generics and Constraints</h3>
+        <h3 id="enumer">1.0 Enumeration</h3>
         <t-b>
-          Generics are patterns for functions and classes that use placeholder generic types, like <c-s>T</c-s>
-          below. The patterns become
-          specific functions and classes when the placeholders are replaced with specific defined types.
-        </t-b>
-        <t-b>
-          <hr />
-        </t-b>
-        <t-b>
-          <strong>Generic functions</strong> use the syntax:
-          <div class="inset">
-            <div style="float:right;margin-right:1em;">Examples in <a target="_blank" href="#funcsdef">Section 2.6.1</a></div>
+          <hr class="spread" />
+          Enumeration over C# collections is based on two interfaces. The first provides access
+          to an enumeration object:
+          <div style="padding:0.75em 1.5em;">
             <c-s>
-              public Tr F&lt;T&gt (T t, ...) where T: C1, C2, ... {<br />
-              &nbsp;&nbsp;&nbsp;/* implementing code using T */<br />
+              public interface IEnumerable&lt;T&gt; : IEnumerable, IDisposable<br />
+              {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;IEnumerator&lt;T&gt; GetEnumerator();<br />
               }
             </c-s>
           </div>
-          <c-s>C1, C2</c-s>, ... are constraints that place requirements on the generic parameter T,
-          as shown below.  <c-s>Tr</c-s> is a return type that may be a generic parameter.
+          The base <c-s>IEnumerable</c-s> interface declares the same <c-s>GetEnumerator()</c-s> method,
+          but that returns a non-generic enumerator.
+          Deriving from this base supports access to enumerators for either generic or non-generic
+          collections.
         </t-b>
         <t-b>
-          If the body of F invokes methods on T that are not required by
-          specified traits then compilation may fail. We say that constraits are bounds on T because
-          they narrow the range of valid generic parameters.
-        </t-b>
-        <t-b>
-          <hr />
-        </t-b>
-        <t-b>
-          <strong>C# Constraints</strong> are declarations that require a generic parameter to satisfy some
-          set of conditions:
-          <div class="inset">
+          The Second interface provides methods to step through, and return values from,
+          enumerable collections.
+          <div style="padding:0.75em 1.5em;">
             <c-s>
-              <table class="tight">
-                <tr>
-                  <td>where T: BC</td>
-                  <td>// derive from or equal to class BC</td>
-                </tr>
-                <tr>
-                  <td>where T: IF</td>
-                  <td>// implement interface IF</td>
-                </tr>
-                <tr>
-                  <td>where T: class</td>
-                  <td>// must be a reference type</td>
-                </tr>
-                <tr>
-                  <td>where T: struct</td>
-                  <td>// must be value type</td>
-                </tr>
-                <tr>
-                  <td>where T: new()</td>
-                  <td>// can be created with new()</td>
-                </tr>
-                <tr>
-                  <td>...</td>
-                  <td></td>
-                </tr>
-              </table>
-            </c-s>
-          </div>
-          Common interfaces include:
-          <c-s>IEnumerable&lt;T&gt;, IComparable&lt;T&gt;, IEquatable&lt;T&gt;, ICollection&lt;T&gt;</c-s>, ...
-        </t-b>
-        <t-b>
-          <hr />
-        </t-b>
-        <t-b>
-          <strong>Generic classes</strong> are defined with the syntax:
-          <div class="inset">
-            <c-s>
-              public class SomeType&lt;T&gt;<br />
-              &nbsp;&nbsp;&nbsp;&nbsp;where T: C1, C2, ...<br />
+              public interface IEnumerator&lt;T&gt; : IEnumerator, IDisposable<br />
               {<br />
-              &nbsp;&nbsp;&nbsp;&nbsp;SomeType(T arg1, ...) {<br />
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/* code to initialize instance */<br />
-              &nbsp;&nbsp;&nbsp;&nbsp;}<br />
-              &nbsp;&nbsp;&nbsp;&nbsp;/* code declaring additional SomeType methods and data */<br />
-              }<br />
-              <br />
+              &nbsp;&nbsp;&nbsp;T Current { get; }<br />
+              &nbsp;&nbsp;&nbsp;bool MoveNext();<br />
+              &nbsp;&nbsp;&nbsp;void Reset();<br />
+              }
             </c-s>
           </div>
+          Deriving from the non-generic base interface, <c-s>IEnumerator</c-s>, supports stepping through
+          both generic and non-generic collections.
+          <hr class="spread" />
         </t-b>
+        <div style="height:0.0em;"></div>
         <h3 id="code">2.0 Source Code</h3>
         <t-b>
           Examples below show how to use library and user defined types with emphasis on
           illustrating syntax and basic operations.
         </t-b>
         <t-b>
-          These demonstrations of generic C# code are partitioned into modules Program.cs, Stats.cs, Points.cs,
-          and Analysis.cs. Discussion of each of these will be
+          These demonstrations of iteration in C# code are partitioned into modules Program.cs, PointsIter.cs, 
+          and AnalysisIter.cs.  Discussion of each of these will be
           presented in separate sections of the page, below, accessed from links in the left panel.
         </t-b>
-
-        <div style="height:0.75em;"></div>
+        <div style="height:0.0em;"></div>
         <h3 id="stdlib">2.1 Standard Generic Library Types</h3>
         <t-b>
-          Standard generic types are defined in the
+          Standard <c-s>IEnumerable&lt;T&gt;</c-s> types are defined in the
           <a target="_blank" href="https://learn.microsoft.com/en-us/dotnet/standard/class-library-overview">.Net Standard Library</a>
           and include many more than shown here. We have selected three frequently used types for
           demonstration: arrays, lists, and dictionaries. You can find details of the others from the <a href="#refs">references</a>.
@@ -1512,7 +1460,7 @@ namespace CSharpGenerics
                 <t-b class="indents">
                   This code block shows how Program.cs imple-<br />
                   ments all of the demonstrations in this<br />
-                  Generic C# Bit. 
+                  Generic C# Bit.
                 </t-b>
                 <t-b>
                   Code details, shown elsewhere, have been<br />
