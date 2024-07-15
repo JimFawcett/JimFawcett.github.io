@@ -400,7 +400,7 @@ function initializeMenu() {
             <div class='ddItem'><a href='Bits_DataCSharp.html'>Data</a></div>\
             <div class='ddItem'><a href='Bits_ObjectsCSharp.html'>Objects</a></div>\
             <div class='ddItem'><a href='Bits_GenericCSharp.html'>Generics</a></div>\
-            <div class='ddItem undefined'><a href='# Bits_IterCSharp.html'>Iteration</a></div>\
+            <div class='ddItem'><a href='Bits_IterCSharp.html'>Iteration</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\

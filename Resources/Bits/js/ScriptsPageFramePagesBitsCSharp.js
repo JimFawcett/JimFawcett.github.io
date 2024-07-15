@@ -17,7 +17,7 @@ function initializePages() {
           <menu-elem class='ddItems pageElem'><a href='Bits_DataCSharp.html'>Data</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='Bits_ObjectsCSharp.html'>Objects</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='Bits_GenericCSharp.html'>Generics</a>&nbsp;</menu-elem>\
-          <menu-elem class='ddItems pageElem undef'><a href='# Bits_IterCSharp.html'>Iteration</a>&nbsp;</menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='Bits_IterCSharp.html'>Iteration</a>&nbsp;</menu-elem>\
           <menu-elem>&nbsp;</menu-elem>\
           <menu-elem>&nbsp;</menu-elem>";
   }
