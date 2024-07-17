@@ -225,9 +225,82 @@
           Deriving from the non-generic base interface, <c-s>IEnumerable</c-s>, supports indexing
           both generic and non-generic collections.
         </t-b>
-
-
-        <div style="height:0.0em;"></div>
+        <h3 id="lambdas">1.2 Lambda Expressions</h3>
+        <t-b>
+          A lambda expression defines an anonymous function of the form:
+          <div class="inset">
+            <c-s>(a1, a2, ...) => { e1; e2; ... }</c-s>
+          </div>
+          where <c-s>a1, a1, ...</c-s> are arguments and <c-s>e1, e2, ...</c-s> are expressions, each
+          of which is terminated with a semicolon, making them statements.
+          The return type of a lambda expression is inferred.
+        </t-b>
+        <t-b>
+          If there is only a single input argument the left-hand parentheses may be omitted. If there is
+          only a single statement, the right-hand braces may be omitted.
+        </t-b>
+        <t-b>
+          An example is:
+          <div class="inset">
+            x => x * x;
+          </div>
+        </t-b>
+        <t-b>
+          During compilation, lamda expressions are converted to private methods
+        </t-b>
+        <h3 id="deleg">1.3 Delegates</h3>
+        <t-b>
+          A <c-s>delegate</c-s> type defines a proxy for some lambda or method:
+          <div class="inset">
+            <c-s>delegate R DelegateName(T t, U u, ...)</c-s>
+          </div>
+          defines a proxy for any method that accepts arguments of type <c-s>T, U, ...</c-s> and returns a value
+          of type <c-s>R</c-s>.
+          It is instantiated by assigning to it the name of some function or lambda with the same signature:
+          <div class="inset">
+            <c-s>int Square(int x) => x * x;</c-s><br />
+            <c-s>delegate int DoOp(int x);</c-s><br />
+            <c-s>DoOp = Square</c-s>
+          </div>
+          Sometime later:
+          <div class="inset">
+            <c-s>var sqrd = DoOp(5);</c-s>
+          </div>
+        </t-b>
+        <tb>
+          Delegates are often used for event handling or plug-ins for processing
+          that is published as a utility, supporting user defined operations. The utility defines 
+          and exposes a delegate as part of its public interface.
+          Then users supply a specific operation invoked by the delegate.
+        </tb>
+        <h3 id="stddel">1.3.1 Standard Delegates</h3>
+        <t-b>
+          The .Net std library defines many delegates. Here we list a few of the most common:
+          <div class="inset">
+            <table>
+              <tr>
+                <td><c-s>Action</c-s></td>
+                <td>
+                  Proxy for methods that take no parameters and return nothing.
+                </td>
+              </tr>
+              <tr>
+                <td><c-s>Action&lt;T&gt;</c-s></td>
+                <td>
+                  Represents methods that take a single argument and return nothing.
+                </td>
+              </tr>
+              <tr>
+                <td><c-s>Func&lt;T,&nbsp;R&gt;</c-s></td>
+                <td>
+                  Proxy for methods that accept an argument of type <c-s>T</c-s> and return
+                  a value of type <c-s>R</c-s>.
+                </td>
+              </tr>
+            </table>
+          </div>
+        </t-b>
+        <div style="height:0.25em;"></div>
         <h3 id="code">2.0 Source Code</h3>
         <t-b>
           Examples below show how to use library and user defined types with emphasis on
@@ -355,7 +428,7 @@ static void EnumStdTypes() {
         </div>
         <div style="height:1em;"></div>
         <div style="height:1em"></div>
-        <h3 id="userdef">1.2 User-defined Custom Types</h3>
+        <h3 id="userdef">2.2 User-defined Custom Types</h3>
         <t-b>
           C# defines custom types with the &quot;<c-s>class</c-s>&quot; keyword. Classes are
           patterns for laying out instances in memory and define operations for the instance
@@ -368,7 +441,7 @@ static void EnumStdTypes() {
         </t-b>
         <div style="height:0.25em;"></div>
 
-        <h3 id="pointdef">1.2.1 BasicPoint&lt;T&gt; and Point&lt;T&gt; Definitions</h3>
+        <h3 id="pointdef">2.2.1 BasicPoint&lt;T&gt; and Point&lt;T&gt; Definitions</h3>
         <t-b>
           <c-s>Point&lt;T&gt;</c-s> is similar to the generic types <c-s>Point&lt;T, N&gt;</c-s> defined
           for C++ and Rust. There is one fundamental difference; the C++ template and Rust generic point
@@ -612,7 +685,7 @@ namespace Points {
         </div>
         <div style="height:0.75em;"></div>
 
-        <h3 id="pointdemo">1.2.2 BasicPoint&lt;T&gt; and Point&lt;T&gt; Demonstration</h3>
+        <h3 id="pointdemo">2.2.2 BasicPoint&lt;T&gt; and Point&lt;T&gt; Demonstration</h3>
         <t-b class="indents">
           For this demonstration either <c-s>BasicPoint&lt;T&gt;</c-s> or <c-s>Point&lt;T&gt;</c-s>
           can be used interchangeably; all we need is to satisfy the <c-s>IEnumeration&lt;T&gt;</c-s>
@@ -705,13 +778,23 @@ static void EnumPoint() {
           </splitter-container>
         </div>
         <div style="height:1em;"></div>
-        <h3 id="genfunc">1.3 Generic Functions Definition</h3>
+        <h3 id="genfunc">2.3 Generic Functions Definition</h3>
         <t-b>
-
+          Generic functions need to bound their generic parameters with constraints ensuring
+          that all methods called on any of them are actually implemented by the argument&apos;s
+          types. If that isn&apos;t done, compilation will fail.
         </t-b>
-        <h3 id="indexer">1.3.1 Generic Indexer</h3>
         <t-b>
-
+          The demonstrations below show how that is done for a variety of useful cases. Each
+          example starts with the definition of a generic function that does some form
+          of enumeration, followed by an executor function that shows how the demonstration function can be
+          used.
+        </t-b>
+        <h3 id="indexer">2.3.1 Generic Indexer</h3>
+        <t-b>
+          This first demonstration displays elements of a collection using indexing.  That
+          requires only the <c-s>ICollection&lt;T&gt;</c-s> and <c-s>IList&lt;T&gt;</c-s>
+          interfaces.
         </t-b>
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
@@ -724,7 +807,7 @@ static void EnumPoint() {
   - works for all sequential indexable containers
 */
 static void GenericIndexer&lt;C, T&gt;(C coll)
-    where C:IEnumerable, ICollection&lt;T&gt;, IList&lt;T&gt;
+    where C:ICollection&lt;T&gt;, IList&lt;T&gt;
 {
   Console.Write(&quot;  {0}&quot;, coll[0]);
   for(int i=1; i &lt; coll.Count(); ++i) {
@@ -800,9 +883,10 @@ static void executeGenericIndexer() {
           </splitter-container>
         </div>
         <div style="height:0.75em;"></div>
-        <h3 id="enumer">1.3.2 Generic Enumeration</h3>
+        <h3 id="enumer">2.3.2 Generic Enumeration</h3>
         <t-b>
-          The right panel is also pre styling with terminal colors, intended for output display.
+          The function <c-s>GenericEnumerator&lt;T&gt;(IEnumerable&lt;T&gt; enm)</c-s> accepts only
+          enumerables and so needs no additional constraints.
         </t-b>
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
@@ -881,10 +965,10 @@ static void executeGenericEnumerator() {
 
 
 
-
 --------------------------------------------------
   GenericEnumerator<T>(IEnumerable<T> enm)
 --------------------------------------------------
+
 
 --- enumerate over int[] ---
   1, 2, 3, 4, 5
@@ -894,14 +978,24 @@ static void executeGenericEnumerator() {
 --- enumerate over String ---
   a,  , s, t, r, i, n, g
 
+
+
 --- enumerate over List&lt;double&gt; ---
   1, 2.25, 3.5, 2.75, 1
+
+
 
 --- enumerate over Dictionary&lt;String, int&gt; ---
   [zero, 0], [one, 1], [two, 2]
 
+
+
+
+
 --- enumerate over BasicPoint&lt;int&gt; ---
   1, 2, 3, 2, 1
+
+
 
 --- enumerate over Point&lt;int&gt; ---
   1, 2, 3, 2, 1
@@ -912,9 +1006,11 @@ static void executeGenericEnumerator() {
           </splitter-container>
         </div>
         <div style="height:1em;"></div>
-        <h3 id="foreach">1.3.3 Generic ForEach</h3>
+        <h3 id="foreach">2.3.3 Generic ForEach</h3>
         <t-b>
-          The right panel is also pre styling with terminal colors, intended for output display.
+          The example below uses a <c-s>foreach</c-s> loop that applies a lambda to each element of its input
+          enumerable. The lambda has the type <c-s>Action&lt;T&gt;</c-s> which is a standard delegate
+          taking a single argument and has no return value.
         </t-b>
         <div class="blockSingle" style="padding:0em;">
           <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
@@ -1089,7 +1185,7 @@ static void ExecuteGenericForEach() {
           </splitter-container>
         </div>
         <div style="height:1em;"></div>
-        <h3 id="genmod">1.3.4 Generic Modifier</h3>
+        <h3 id="genmod">2.3.4 Generic Modifier</h3>
         <t-b>
 
         </t-b>
@@ -1112,8 +1208,10 @@ static IEnumerable&lt;T&gt; GenericModifier&lt;T&gt;(
   &nbsp;&nbsp;IEnumerable&lt;T&gt; enm, Func&lt;T,T&gt; lambda) 
 {
   /*
-    IEnumerable&lt;T&gt; is immutable so make new modified collection
-    using Linq Select method
+    lambda makes copies of input enumerable&apos;s elements,
+    so lambda&apos;s modifications don&apos;t affect input.
+    Instead we make new modified collection using
+    Linq Select method.
   */
   return enm.Select(lambda);
 }
@@ -1184,6 +1282,8 @@ static void ExecuteGenericModifier() {
 
 
 
+
+
 --------------------------------------------------
   IEnumerable<T> GenericModifier<T>(
     Ienumerable<T> enm, Func<T,T> lambda
@@ -1229,17 +1329,28 @@ Modified:
         <div style="height:1em;"></div>
 
 
-
+        <h3 id="analysis">2.4 Analysis Library</h3>
         <t-b>
-          The Analysis library provides 14 methods, of which 9 are generic. They illustrate
-          the power of generics to provide reusable, configurable code.
+          A number of analysis and display methods have been used throughout the examples above.
+          All of them have been discussed in earlier Bits in this sequence, so we do not show
+          them by default.
         </t-b>
-        <div class="blockSingle" style="padding:0em;">
-          <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
-          <splitter-container id="container">
-            <first-item id="analysis-first" style="width:60%;">
-              <div class="codewrap" onclick="cbubbleup('analysis-first')">
-                <pre style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------
+        <t-b>
+          They are here so that you can easily find their definitions if you need that information
+          to understand example code.
+        </t-b>
+        <details>
+          <summary style="border:2px solid var(--dark);">Analysis and Display Functions</summary>
+          <t-b>
+            The Analysis library provides 14 methods, of which 9 are generic. They illustrate
+            the power of generics to provide reusable, configurable code.
+          </t-b>
+          <div class="blockSingle" style="padding:0em;">
+            <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
+            <splitter-container id="container">
+              <first-item id="analysis-first" style="width:60%;">
+                <div class="codewrap" onclick="cbubbleup('analysis-first')">
+                  <pre style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------
   Analysis.cs
   - provides several type analysis and display methods in the
     class Display
@@ -1490,55 +1601,56 @@ namespace Analysis {
   }
 }
 </code></pre>
-              </div>
-            </first-item>
-            <splitter-bar id="analysis-seperator"></splitter-bar>
-            <second-item id="analysis-second" style="width:40em; background-color:var(--light);" onclick="obubbleup('analysis-first')">
-              <div class="textwrap noflow">
-                <h3>Generic Methods:</h3>
-                <t-b>
-                  C# does not support free functions. Instead,<br />
-                  methods are defined in a class.
-                </t-b>
-                <t-b>
-                  However, static methods of classes play the<br />
-                  same role as free functions in other languages.
-                </t-b>
-                <div style="height:20em;"></div>
-                <span style="font-size:1.75em; font-weight:bold;">&lArr;</span> <c-s>interface IShow:</c-s><br />
-                <t-b>
-                  Allows function:
-                  <div class="inset">
-                    <c-s>ShowTypeShowable&lt;T&gt;(T t, ...)</c-s>
-                  </div>
-                  to accept any type <c-s>T</c-s> that implements <c-s>IShow</c-s>.
-                </t-b>
-                <t-b>
-                  Generic functions provide abstraction over<br />
-                  types that improves developer productivity,<br />
-                  code readability and maintainability.
-                </t-b>
-                <div style="height:72em;"></div>
-                <span style="font-size:1.75em; font-weight:bold;">&lArr;</span>
-                <c-s>ShowTypeEnum&lt;T&gt;(IEnumerable&lt;T&gt; t, ...)</c-s><br />
-                <t-b>
-                  Can display any <c-s>IEnumerable&lt;T&gt;</c-s> type, e.g.<br />
-                  <c-s>Array&lt;T&gt;, List&lt;T&gt;, Point&lt;T&gt;</c-s>.
-                </t-b>
-                <div style="height:56em;"></div>
-                <span style="font-size:1.75em; font-weight:bold;">&lArr;</span> <c-s>ShowTypeShowable(T t, ...)</c-s><br />
-              </div>
-            </second-item>
-          </splitter-container>
-        </div>
-        <div style="height:0.75em;"></div>
-        <h3 id="complex">1.2.8 Complex Generic Methods</h3>
+                </div>
+              </first-item>
+              <splitter-bar id="analysis-seperator"></splitter-bar>
+              <second-item id="analysis-second" style="width:40em; background-color:var(--light);" onclick="obubbleup('analysis-first')">
+                <div class="textwrap noflow">
+                  <h3>Generic Methods:</h3>
+                  <t-b>
+                    C# does not support free functions. Instead,<br />
+                    methods are defined in a class.
+                  </t-b>
+                  <t-b>
+                    However, static methods of classes play the<br />
+                    same role as free functions in other languages.
+                  </t-b>
+                  <div style="height:20em;"></div>
+                  <span style="font-size:1.75em; font-weight:bold;">&lArr;</span> <c-s>interface IShow:</c-s><br />
+                  <t-b>
+                    Allows function:
+                    <div class="inset">
+                      <c-s>ShowTypeShowable&lt;T&gt;(T t, ...)</c-s>
+                    </div>
+                    to accept any type <c-s>T</c-s> that implements <c-s>IShow</c-s>.
+                  </t-b>
+                  <t-b>
+                    Generic functions provide abstraction over<br />
+                    types that improves developer productivity,<br />
+                    code readability and maintainability.
+                  </t-b>
+                  <div style="height:72em;"></div>
+                  <span style="font-size:1.75em; font-weight:bold;">&lArr;</span>
+                  <c-s>ShowTypeEnum&lt;T&gt;(IEnumerable&lt;T&gt; t, ...)</c-s><br />
+                  <t-b>
+                    Can display any <c-s>IEnumerable&lt;T&gt;</c-s> type, e.g.<br />
+                    <c-s>Array&lt;T&gt;, List&lt;T&gt;, Point&lt;T&gt;</c-s>.
+                  </t-b>
+                  <div style="height:56em;"></div>
+                  <span style="font-size:1.75em; font-weight:bold;">&lArr;</span> <c-s>ShowTypeShowable(T t, ...)</c-s><br />
+                </div>
+              </second-item>
+            </splitter-container>
+          </div>
+          <div style="height:0.75em;"></div>
+        </details>
+        <h3 id="complex">2.4.1 Complex Generic Methods</h3>
         <t-b>
           The dropdown below provides code for interesting generic methods, some of which use advanced
           techniques. They are useful know, but none are used in this demonstration.
         </t-b>
         <details>
-          <summary class="darkItem">Complex Methods</summary>
+          <summary style="border:2px solid var(--dark);">Complex Methods</summary>
           <div class="blockSingle" style="padding:0em;">
             <input type="button" value="RemoteExecute" class="remotebutton" onclick="remote1()" />
             <splitter-container id="container">
@@ -1816,11 +1928,11 @@ public static int GetManagedSize(Type type)
         </details>
         <div style="height:0.75em;"></div>
 
-        <h3 id="structure">1.3 Program Structure</h3>
+        <h3 id="structure">2.5 Program Structure</h3>
         <t-b class="indents">
-          The code below, Program.cs, imports libraries: Points, Analysis, and Stats.
+          The code below, Program.cs, imports libraries: Points and Analysis.
           Using those facilities it orchestrates all the demonstrations shown here
-          by calling in <c-s>Main</c-s> three methods developed above <c-s>Main</c-s>.
+          by calling in <c-s>Main</c-s> methods developed above <c-s>Main</c-s>.
         </t-b>
         <t-b>
           Details
@@ -1833,66 +1945,113 @@ public static int GetManagedSize(Type type)
             <first-item id="structure-first" style="width:60%;">
               <div class="codewrap" onclick="cbubbleup('structure-first')">
                 <pre style="width:200em;"><code class="language-cpp">/*-------------------------------------------------------------------
-  Cs_Generic::Program.cs
-  - demonstrates creating and using std library generic types:
-      array, List&lt;T&gt;, Dictionary&lt;K,V&gt;
-  - demonstrates creating and using user-defined generic types:
-      Demo&lt;T&gt;, Stats&lt;T&gt;, and Point&lt;T, N&gt;
-  - depends on PointsGeneric.cs to provide user-defined Point class
-  - depends on Stats.cs to provide user-defined Stats class
-  - depends on AnalysisGeneric.cs for several display and analysis
-    functions
+  Cs_Iter::Program.cs
+  - Demonstrates IEnumerable interface and iteration
 */
 using System;
 using System.Collections;
 using System.Collections.Generic;   // IEnumerable&lt;T&gt;, List&lt;T&gt;
-using System.Linq;                  // IEnumerable&lt;T&gt;.ToArray
+using System.Linq;                  // IEnumerable&lt;T&gt;.ToArray, select
 using System.Text;                  // StringBuilder
 using Points;                       // defined in Points.cs
 using Analysis;                     // defined in Analysis.cs
-using Stats;                        // defined in Stats.cs
-/*-----------------------------------------------
-Note:
-Find all Bits code, including this in
-https://github.com/JimFawcett/Bits
-You can clone the repo from this link.
------------------------------------------------*/
-namespace CSharpGenerics
-{
-  /* definition of Hello&lt;T&gt; code elided */
 
-  /*-- Generic demonstration begins here --*/
+/*-----------------------------------------------
+  Note:
+  Find all Bits code, including this in
+  https://github.com/JimFawcett/Bits
+  You can clone the repo from this link.
+-----------------------------------------------*/
+/*
+  This demo uses Indexing and Enumerator to iterate
+  through std collections:
+  - String, List&lt;T&gt;, Dictionary&lt;K,V&gt;
+  and through user-defined type:
+  - BasicPoint&lt;T&gt;
+*/
+namespace CSharpIter
+{
+  using Analysis;
 
   class Program
   {
-    const string nl = &quot;&#92;n&quot;;
-
-    static void ShowList&lt;T&gt;(List&lt;T&gt; lst) {
+    /*-----------------------------------------------------
+      Enumerate standard library types
+    */
+    static void EnumStdTypes() {
       /* code elided */
     }
-
-    static void Demonstrate_Std_Library_Types() {
+    /*-----------------------------------------------------
+      Enumerate Point&lt;T&gt;
+      - all of the examples here work with either
+        BasicPoint&lt;T&gt; or Point&lt;T&gt;
+    */
+    static void EnumPoint() {
       /* code elided */
     }
-    static void Demonstrate_User_defined_Types() {
+    /*-----------------------------------------------------
+      void GenericIndexer&lt;T&gt;(List&lt;T&gt;)
+      - Display list items with indexing
+      - works for all sequential indexable containers
+    */
+    static void GenericIndexer&lt;C, T&gt;(C coll)
+       where C:IEnumerable, ICollection&lt;T&gt;, IList&lt;T&gt;
+    {
       /* code elided */
     }
-    static void Demostrate_generic_functions() {
+    static void executeGenericIndexer() {
       /* code elided */
     }
+    /*-----------------------------------------------------
+      void GenericEnumerator&lt;T&gt;(IEnumerable&lt;T&gt; enm)
+      - Display list items with enumerator
+    */
+    static void GenericEnumerator&lt;T&gt;(IEnumerable&lt;T&gt; enm) {
+      /* code elided */
+    }
+    static void executeGenericEnumerator() {
+      /* code elided */
+    }
+    /*-----------------------------------------------------
+      void GenericForEach&lt;T&gt;(IEnumerable&lt;T&gt; enm)
+      - Display list items with foreach
+    */
+    static void GenericForEach&lt;T&gt;(IEnumerable&lt;T&gt; enm, Action&lt;T&gt; lambda) {
+      /* code elided */
+    }
+    static void ExecuteGenericForEach() {
+      /* code elided */
+    }
+    /*-----------------------------------------------------
+      IEnumerable&lt;T&gt; GenericModifier&lt;T&gt;(IEnumerable&lt;T&gt; enm, Func&lt;T,T&gt; lambda)
+      - return modified IEnumerable&lt;T&gt; transformed by lambda Func&lt;T,T&gt;
+      - uses Linq Select
+    */
+    static IEnumerable&lt;T&gt; GenericModifier&lt;T&gt;(IEnumerable&lt;T&gt; enm, Func&lt;T,T&gt; lambda) {
+      /* code elided */
+    }
+    static void ExecuteGenericModifier() {
+      /* code elided */
+    }
+    /*-----------------------------------------------------
+      Begin demonstration
+    */
     static void Main(string[] args)
     {
-      Display.ShowLabel(&quot; Demonstrate C# generics&quot;);
+      Display.ShowLabel(&quot; Demonstrate C# iteration&quot;);
 
-      Demonstrate_Std_Library_Types();
-      Demonstrate_User_defined_Types();
-      Demostrate_generic_functions();
+      EnumStdTypes();
+      EnumPoint();
+      executeListIndexer();
+      executeGenericIndexer();
+      executeGenericEnumerator();
+      ExecuteGenericForEach();
+      ExecuteGenericModifier();
 
       Console.WriteLine(&quot;&#92;nThat's all Folks!&#92;n&quot;);
     }
   }
-}
-</code></pre>
+}</code></pre>
               </div>
             </first-item>
             <splitter-bar id="structure-seperator"></splitter-bar>
