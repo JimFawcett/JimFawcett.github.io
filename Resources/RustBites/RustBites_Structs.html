@@ -141,7 +141,7 @@
       <nav id="navbar"></nav>
     </frame-header>
     <main>
-      <div id="about">about</div>
+      <div id="about" onclick="location.reload()">about</div>
       <div id="modified">04/28/2022</div>
       <div id="page">RustBites - Structs</div>
       <div id="hlp"></div>
@@ -156,781 +156,785 @@
             <h3 id="subtitle" class="indent">methods, traits, dispatching, graph, examples</h3>
           </hgroup>
         </header>
-    <t-b>
-      Rust uses structs to represent objects, e.g., an aggregate managing data with a set of 
-      methods.  This is very similar to the way C++ uses classes to define objects.
-    </t-b>
-    <t-b>
-      In the first section we will implement methods for structs, turning them into user-defined 
-      types.  This is a big step forward.  It allows us to structure our programs around data 
-      that the program manages, rather than simply using a lot of operation fragments to manage 
-      public data.
-    </t-b>
-    <t-b>
-      Methods allow us to build abstractions that are consistent with our problem domain or 
-      lower-level abstractions that help us organize the implementation.
-      <s-halfEm></s-halfEm>
-    </t-b>
-    <div>
-      <ol>
-        <li id="methods" style="padding-top:0.25em;">
-          <h2>Methods:</h2>
-          <t-b>
-            First, let&apos;s start with a simple demo that illustrates how to endow a struct 
-            with methods.
-          </t-b>
-          <div>
-            <defn-outerBlock>
-              <defn-block>
-                <defn-head>methods::main.rs</defn-head>
-                <defn-code style="font-size:0.9em;">
-fn demo_basic() {
-
-  print!("\n  -- demo_basic --");
-  
-  #[derive(Debug)]
-  pub struct Demo { value: i32 }
-  impl Demo {
-      pub fn new() -&gt; Demo {
-          Demo {
-              value:0
-          }
-      }
-      pub fn set_value(&amp;mut self, v: i32) {
-          self.value = v;
-      }
-      pub fn get_value(&amp;self) -&gt; i32 {
-          self.value
-      }
-  }
-
-  let mut d = Demo::new();
-  d.set_value(42);
-  print!("\n  d = {:?}", d);
-  print!("\n  d.value = {:?}", d.get_value());
-}
-                </defn-code>
-              </defn-block>
-              <defn-block style="width:25em">
-                <defn-head>Output:</defn-head>
-                <defn-code style="font-size:0.9em;">
--- demo_basic --
-d = Demo { value: 42 }
-d.value = 42
-              </defn-code>
-              <defn-head class="defnBorderTop">Comments:</defn-head>
-              <defn-body style="font-size:0.9em;">
-                <t-b>
-                  For the struct Demo we are defining an associated function, <c-s>new()</c-s>, 
-                  that is invoked as <c-s>Demo::new()</c-s>.
-                </t-b>
-                <t-b>
-                  We also define two methods, <c-s>set_value(&mut self, v: i32)</c-s>, 
-                  and <c-s>get_value(&self) -> i32</c-s>.
-                </t-b>
-                <t-b>
-                  Methods always pass <c-s>&self</c-s> or <c-s>&mut self</c-s> as the first argument in the definition.
-                  That is not used for invocations, as you see at the bottom of the left panel.
-                </t-b>
-              </defn-body>
-              </defn-block>
-            </defn-outerBlock>
-          </div>
-          <t-b>
-            The example below provides a user-defined type, Point&lt;T&gt;, that is closer to what 
-            you will see in production code than the previous example, but uses the same techniques.
-          </t-b>
-          <div>
-            <details>
-              <summary class="darkItem">Method Example - Point&lt;T&gt;:</summary>
-              <s-halfEm></s-halfEm>
-              <defn-outerBlock>
-                <defn-block>
-                  <defn-head>methods.main.rs</defn-head>
-                  <defn-code>
-fn demo_point() {
-
-    print!("\n  -- demo_point --");
-
-    use std::fmt::*;
-
-    #[derive(Debug, Default)]
-    pub struct Point&lt;T&gt; 
-    where T:Default + Debug {
-        x:T, y:T, z:T
-    }
-    impl<T> Point&lt;T&gt; where T:Default + Debug + Clone {
-        pub fn new() -> Point&lt;T&gt; {
-            Point {
-                x:std::default::Default::default(), 
-                y:std::default::Default::default(), 
-                z:std::default::Default::default() 
-            }
-        }
-        pub fn default() -> Point&lt;T&gt; {
-            Point::new()
-        }
-        pub fn get_coordinates(&self) -> [T; 3] {
-            [self.x.clone(), self.y.clone(), self.z.clone()]
-        }
-        pub fn set_coordinates(&mut self, coor: &[T; 3]) {
-            self.x = coor[0].clone();
-            self.y = coor[1].clone();
-            self.z = coor[2].clone();
-        } 
-    }
-    let mut pt = Point::<i32>::new();
-    pt.set_coordinates(&[1, 2, 3]);
-    print!("\n  pt = {:?}", &pt);
-    print!("\n  coordinates are: {:?}", &pt.get_coordinates());
-    pt.set_coordinates(&[3, 2, 1]);
-    print!("\n  pt = {:?}", pt);
-    print!("\n  coordinates are: {:?}", pt.get_coordinates());
-}
-                  </defn-code>
-                </defn-block>
-                <defn-block style="width:25em;">
-                  <defn-head>Outputs:</defn-head>
-                  <defn-code>
--- demo_point --
-pt = Point { x: 1, y: 2, z: 3 }
-coordinates are: [1, 2, 3]
-pt = Point { x: 3, y: 2, z: 1 }
-coordinates are: [3, 2, 1]
-
-That's all Folks!
-                    </defn-code>
-                  <defn-head class="defnBorderTop">Comments:</defn-head>
-                  <defn-body style="font-size:0.9em;">
-                    <ol class="tight">
-                      <li>
-                        Note that Debug and Default are derived traits for Point&lt;T&gt;.
-                      </li>
-                      <li>
-                        impl&lt;T&gt; has a generic parameter to match Point&lt;T&gt;.
-                      </li>
-                      <li>
-                        <c-s>new()</c-s> and <c-s>default()</c-s> are associated functions.
-                      </li>
-                      <li>
-                        <c-s>get_coordinates(&self) -&gt; [T; 3]</c-s> and 
-                        <c-s>set_coordinates(&mut self, coor: &[T; 3])</c-s> are methods.
-                      </li>
-                      <li>
-                        In <c-s>set_coordinates</c-s> we used clones of the array elements to set the 
-                        coordinate values because Rust does not allow moving elements out of 
-                        an array.
-                      </li>
-                      <li>
-                        Using arrays is not the only interface that could work, but it&apos;s 
-                        efficient, and provides a nice example of when and how to pass arrays.
-                      </li>
-                    </ol>
-                  </defn-body>
-                </defn-block>
-              </defn-outerBlock>
-            </details>
-            <t-b>
-              User-defined types become really useful when we couple them with traits. The next section
-              extends the Point&lt;T&gt; type with SpaceTime&lt;T&gt; and Display traits and provides 
-              motivation for the use of traits. 
-              <s-halfEm></s-halfEm>
-            </t-b>
-          </div>
-        </li>
-        <li id="traits" style="padding-top:0.25em;">
-          <h2>Traits:</h2>
-          <t-b>
-            We presented a lot of introductory material for Traits in the
-            <a target="_blank" href="RustBites_Traits.html">Generics and Traits</a> Bite.  If you haven&apos;t
-            looked at that yet, now is a good time to do so.
-          </t-b>
-          <t-b>
-            In the example, below, we extend the Point&lt;T&gt; type with traits SpaceTime&lt;T&gt; 
-            and Display. SpaceTime&lt;T&gt; declares an interface for accessing 3-dimensional space 
-            coordinates and date time information from a Point&lt;T&gt; or any other type that 
-            implements the trait.
-          </t-b>
-          <t-b>
-            Here&apos;s the SpaceTime&lt;T&gt; definition:
-          </t-b>
-          <t-b>
-            <defn-block>
-              <defn-head>
-                SpaceTime&lt;T&gt;
-              </defn-head>
-              <defn-code style="font-size:0.9em;">
-  pub trait SpaceTime&lt;T&gt; {
-    fn get_coordinates(&amp;self) -&gt; [T; 3];
-    fn set_coordinates(&amp;mut self, coor: &amp;[T; 3]);
-    fn set_time(&amp;mut self, st: DateTime&lt;Local&gt;);
-    fn get_time(&amp;self) -&gt; DateTime&lt;Local&gt;;
-    fn get_time_string(&amp;self) -&gt; String;
-}
-              </defn-code>
-            </defn-block>
-          </t-b>
-          <t-b>
-            A Point&lt;T&gt; that implements this trait could be used to annotate 
-            data from an astronomical observatory.  A system for such annotation would probably 
-            use several different types of points to mark different types of observables.  The 
-            trait allows any of those point types to make their space and time information 
-            available to mapping and display functions.
-          </t-b>
-          <t-b>
-            That works because the functions accept a SpaceTime&lt;T&gt; trait object rather 
-            than a specific point type.  So traits allow us to build very flexible software 
-            based on use rather than implementation details.
-          </t-b>
-          <div>
-            <details>
-              <summary class="darkItem">Example: Point&lt;T&gt; with SpaceTime & Display Traits</summary>
-              <s-halfEm></s-halfEm>
-              <defn-outerBlock>
-                <defn-block>
-                  <defn-head>point::lib.rs</defn-head>
-                  <defn-code>
-/////////////////////////////////////////////////////////////
-// point::lib.rs - Demo Traits                             //
-//                                                         //
-// Jim Fawcett, https://JimFawcett.github.io, 24 Jun 2020  //
-/////////////////////////////////////////////////////////////
-/*
-    Point represents points in 3-dimensional space and time.
-    Example hypothetical applications:
-    - Aircraft flight navigation systems
-    - Airport and Marine port area management systems
-    - Autonomous vehicle control
-    - Drawing applications
-    Point implements a SpaceTime trait.  That allows a 
-    function to use space and time information from any 
-    object that implements the SpaceTime&lt;T&gt;trait.  
-    
-    For example, in an Aircraft, points might be used 
-    as fundamental data structure for capturing instrument 
-    information, navigation computations, and in flight 
-    recording.  
-    
-    Each of these applications might use different internal 
-    data, e.g., ids, other information, ... but a function 
-    that accepts a SpaceTime trait object can extract that 
-    information from any of them.
-*/
-use chrono::offset::Local;
-use chrono::DateTime;
-use chrono::{Datelike, Timelike};
-use std::fmt::*;
-
-/*-----------------------------------------------------------
-  declare SpaceTime&lt;T&gt; trait
-  - note that this trait is generic  
-*/
-pub trait SpaceTime&lt;T&gt; {
-    fn get_coordinates(&amp;self) -&gt; [T; 3];
-    fn set_coordinates(&amp;mut self, coor: &amp;[T; 3]);
-    fn set_time(&amp;mut self, st: DateTime&lt;Local&gt;);
-    fn get_time(&amp;self) -&gt; DateTime&lt;Local&gt;;
-    fn get_time_string(&amp;self) -&gt; String;
-}
-/*-- define Point&lt;T&gt; type --*/
-#[derive(Debug)]
-pub struct Point&lt;T&gt; 
-where T:Default + Debug {
-    x:T, y:T, z:T, t:DateTime&lt;Local&gt;, n:String,
-}
-/*-- implement Time trait --*/
-impl&lt;T&gt; SpaceTime&lt;T&gt; for Point&lt;T&gt;
-where T:Default + Debug + Clone {
-    fn set_time(&amp;mut self, st: DateTime&lt;Local&gt;) {
-        self.t = st;
-    }
-    fn get_time(&amp;self) -&gt; DateTime&lt;Local&gt; {
-        self.t
-    }
-    fn get_time_string(&amp;self) -&gt; String {
-        let year = self.t.year().to_string();
-        let mon = self.t.month().to_string();
-        let day = self.t.day().to_string();
-        let hour = self.t.hour().to_string();
-        let min = self.t.minute().to_string();
-        let sec = self.t.second().to_string();
-        let dt = format!(
-            "{}::{:0&gt;2}::{:0&gt;2} {:0&gt;2}::{:0&gt;2}::{:0&gt;2}", 
-            year, mon, day, hour, min, sec
-        );
-        dt
-    }
-    /*-- set coordinates from array slice --*/
-    fn set_coordinates(&amp;mut self, coor: &amp;[T; 3]) {
-        self.x = coor[0].clone();
-        self.y = coor[1].clone();
-        self.z = coor[2].clone();
-    }
-    /*-- return array of three spatial coordinates --*/
-    fn get_coordinates(&amp;self) -&gt; [T; 3] {
-        [self.x.clone(), self.y.clone(), self.z.clone()]
-    }
-    /*-- time is returned with Time::get_time() --*/ 
-}
-/*-- implement Display trait --*/
-impl&lt;T&gt; Display for Point&lt;T&gt;
-where T:Default + Debug + Clone {
-    fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter) 
-       -&gt; std::fmt::Result {
-        write!(
-            f, "{{ {:?}, {:?}, {:?}, {}, {:?} }}", 
-            &amp;self.x, &amp;self.y, &amp;self.z, 
-            &amp;self.get_time_string(), &amp;self.n
-        )
-    }
-}
-/*-- implement Point methods --*/
-impl&lt;T&gt; Point&lt;T&gt; where T:Default + Debug + Clone {
-    pub fn new() -&gt; Point&lt;T&gt; {
-        Point {
-            x:std::default::Default::default(), 
-            y:std::default::Default::default(), 
-            z:std::default::Default::default(),
-            t:Local::now(),
-            n:String::default()
-        }
-    }
-    pub fn default() -&gt; Point&lt;T&gt; {
-        Point::new()
-    }
-    pub fn set_name(&amp;mut self, name: &amp;str) {
-        self.n = name.to_string();
-    }
-    pub fn get_name(&amp;self) -&gt; &amp;str {
-        &amp;self.n
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn construct () {
-        let pt = Point::&lt;i32&gt;::new();
-        assert_eq!(pt.get_coordinates(), [0, 0, 0]);
-    }
-    #[test]
-    fn set_coor() {
-        let mut pt = Point::&lt;i32&gt;::new();
-        pt.set_coordinates(&amp;[1, 2, 3]);
-        assert_eq!(pt.get_coordinates(), [1, 2, 3]);
-    }
-    #[test]
-    fn get_time() {
-        use chrono::{Duration};
-        let two_sec = Duration::seconds(2);
-        let ts_start = Local::now() - two_sec;
-        let pt = Point::&lt;i32&gt;::new();
-        let ts_now = pt.get_time();
-        let ts_stop = Local::now() + two_sec;
-        assert!(ts_start &lt; ts_now);
-        assert!(ts_now &lt; ts_stop);
-    }
-}
-                  </defn-code>
-                </defn-block>
-                <defn-block>
-                  <defn-head>Using Code - point::test1.rs</defn-head>
-                  <defn-code>
-/////////////////////////////////////////////////////////////
-// point::test1.rs - Demo Point&lt;T&gt; with SpaceTime and      //
-//                   Display Traits                        //
-//                                                         //
-// Jim Fawcett, https://JimFawcett.github.io, 24 Jun 2020  //
-/////////////////////////////////////////////////////////////
-
-#![allow(dead_code)]
-use point::{*};
-use point::SpaceTime;
-use chrono::{Local};
-use std::fmt::*;
-
-/*-----------------------------------------------------------
-  function accepting SpaceTime&lt;T&gt; trait object 
-  - Does not depend on a specific type for pt, just the
-    SpaceTime&lt;T&gt; trait - like an interface.
-  - Can't use name. That's not part of trait.
-*/
-fn use_space_time_info&lt;T:Debug&gt;(pt : &amp;dyn SpaceTime&lt;T&gt;) {
-    print!("\n  -- using SpaceTime trait object --");
-    print!(
-      "\n  -- display coords & time w/ Display format --"
-    );
-    print!(
-      "\n  coordinates are: {:?}", &amp;pt.get_coordinates()
-    );
-    print!("\n  point time is: {}", &amp;pt.get_time_string());
-}
-/*-----------------------------------------------------------
-  Exercise Point&lt;i32&gt; and Point&lt;f64&gt; funtionality
-*/
-fn main() {
-
-    print!("\n  Demonstrating Point Type");
-    print!("\n ==========================");
-
-    print!(
-      "\n  -- create Point&lt;i32&gt; "
-      "& display w/ Display format --"
-    );
-    let mut pt = Point::&lt;i32&gt;::new();
-    pt.set_coordinates(&amp;[1, 2, 3]);
-    pt.set_time(Local::now());
-    pt.set_name("pt");
-    print!("\n  pt = {}", &amp;pt);
-    println!();
-
-    use_space_time_info(&amp;pt);
-    println!();
-
-    print!(
-      "\n  -- mutate coordinates & display again --"
-    );
-    pt.set_coordinates(&amp;[3, 2, 1]);
-    pt.set_name("mutated pt");
-    print!("\n  pt = {}", pt);
-    print!(
-      "\n  coordinates are: {:?}", pt.get_coordinates()
-    );
-    println!();
-
-    print!("\n  -- display point with Debug format --");
-    print!("\n  pt in Debug format: {:?}", pt);
-    println!();
-
-    print!("\n  -- creating Point&lt;f64&gt; --");
-    let mut ptd = Point::&lt;f64&gt;::new();
-    ptd.set_coordinates(&amp;[0.5, -0.5, 1.75]);
-    ptd.set_name("ptd");
-    print!("\n  ptd = {}", ptd);
-    use_space_time_info(&amp;ptd);
-
-    print!("\n\n  That's all Folks!\n\n");
-}
-                  </defn-code>
-                  <defn-head class="defnBorderTop">Output:</defn-head>
-                  <defn-code>
-Demonstrating Point Type
-==========================
-  -- create Point<i32> and display with Display format --
-  pt = { 1, 2, 3, 2020::06::25 16::55::36, "pt" }
-
-  -- using SpaceTime trait object --
-  -- display coordinates and time with Display format --
-  coordinates are: [1, 2, 3]
-  point time is: 2020::06::25 16::55::36
-
-  -- mutate coordinates and display again --
-  pt = { 3, 2, 1, 2020::06::25 16::55::36, "mutated pt" }
-  coordinates are: [3, 2, 1]
-
-  -- display point with Debug format --
-  pt in Debug format: Point { 
-    x: 3, y: 2, z: 1, 
-    t: 2020-06-25T16:55:36.838484600-04:00, 
-    n: "mutated pt" }
-
-  -- creating Point<f64> --
-  ptd = { 0.5, -0.5, 1.75, 2020::06::25 16::55::36, "ptd" }
-  -- using SpaceTime trait object --
-  -- display coordinates and time with Display format --
-  coordinates are: [0.5, -0.5, 1.75]
-  point time is: 2020::06::25 16::55::36
-
-  That's all Folks!
-                  </defn-code>
-                </defn-block>
-              </defn-outerBlock>
-            </details>
-          </div>
-          <t-b>
-            <s-halfEm></s-halfEm>
-          </t-b>
-        </li>
-        <li id="binding" style="padding-top:0.25em;" >
-          <h2>Static vs. Dynamic Binding</h2>
-          <t-b>
-            Dispatching method arguments statically is just what we have been doing in all of the earlier Bites.
-            Binding of call to compiled method code happens at compile time.
-          </t-b>
-          <t-b>
-            Dynamic dispatching binds method calls to compiled code at run time.  Which object is passed to the
-            function isn't known until run time, so the binding has to happen then.  This binding is effected via 
-            a dyn object that contains two pointers, one to the object being passed, and one to a virtual pointer 
-            table (vtable). 
-          </t-b>
-          <t-b>
-            Each type that implements a trait constructs a vtable during the compilation of the impl trait for type 
-            part of its definition.  That compilation phase knows where the code for each of the type&apos;s Methods
-            is stored and constructs a table with pointers to each of those code blocks, e.g. the vtable.
-          </t-b>
-          <t-b>
-            When a function is specified to accept a trait object - do_draw&apos;s item in the right panel below - it is passed a 
-            reference to a dyn with pointer to the item and another pointer to the item&apos;s type&apos;s vtable.
-          </t-b>
-          <t-b>
-            Here&apos;s what the code looks like:
-          </t-b>
-          <div>
-            <defn-outerBlock>
-              <defn-block>
-                <defn-head>Static Dispatch Function</defn-head>
-                <defn-code style="font-size:0.9em;">
-struct SomeVisualItem { /* contents elided */ }
-impl SomeVisualItem {
-  fn draw(&self) { /* code elided */ }
-}
-                </defn-code>
-                <defn-head class="defnBorderTop">Invocation</defn-head>
-                <defn-code style="font-size:0.9em;">
-let svi = SomeVisualItem { /* content elided */ };
-svi.draw();
-                </defn-code>
-              </defn-block>
-              <defn-block>
-                <defn-head>Dynamic Dispatch Function</defn-head>
-                <defn-code style="font-size:0.9em;">
-trait Draw { fn draw(&self); }
-
-struct SomeVisualItem { /* contents elided */ }
-impl Draw for SomeVisualItem {
-  fn draw(&self) { /* code elided */ }
-}
-
-fn do_draw(item: &dyn Draw) {
-  item.draw();
-}
-                </defn-code>
-                <defn-head class="defnBorderTop">Invocation</defn-head>
-                <defn-code style="font-size:0.9em;">
-let svi = SomeVisualItem { /* content elided */ };
-do_draw(&svi); 
-// works for any type implementing Draw trait
-                </defn-code>
-              </defn-block>
-            </defn-outerBlock>
-          </div>
-          <t-b>
-            The Example code below represents a graphics editor that is drawing on some form of canvas.
-            It defines three graphics shapes that each implement a Draw trait - rectangles, circles, 
-            and textboxes.  An application would 
-            define many additional types, but only three are used here to keep things as simple as 
-            practical.
-          </t-b>
-          <t-b>
-            An editor will construct a draw_list of all the defined graphics objects and, when instructed, 
-            iterate through its list calling a do_draw function using dynamic dispatching.  In this way, 
-            the editor does not need to know anything about the graphics objects other than they implement 
-            the Draw trait.
-          </t-b>
-          <t-b>
-            <div>
-              <details>
-                <summary class="darkItem">Examples: static and dynamic dispatch</summary>
-                <s-halfEm></s-halfEm>
+        <t-b>
+          Rust uses structs to represent objects, e.g., an aggregate managing data with a set of
+          methods.  This is very similar to the way C++ uses classes to define objects.
+        </t-b>
+        <t-b>
+          In the first section we will implement methods for structs, turning them into user-defined
+          types.  This is a big step forward.  It allows us to structure our programs around data
+          that the program manages, rather than simply using a lot of operation fragments to manage
+          public data.
+        </t-b>
+        <t-b>
+          Methods allow us to build abstractions that are consistent with our problem domain or
+          lower-level abstractions that help us organize the implementation.
+          <s-halfEm></s-halfEm>
+        </t-b>
+        <div>
+          <ol>
+            <li id="methods" style="padding-top:0.25em;">
+              <h2>Methods:</h2>
+              <t-b>
+                First, let&apos;s start with a simple demo that illustrates how to endow a struct
+                with methods.
+              </t-b>
+              <div>
                 <defn-outerBlock>
                   <defn-block>
-                    <defn-head>dispatch::main.rs</defn-head>
-                    <defn-code>
-///////////////////////////////////////////////////////////////
-// dispatch - demo static and dynamic fn arg dispatching     //
-//                                                           //
-// Jim Fawcett, https://JimFawcett.github.com, 27 Jun 2020   //
-///////////////////////////////////////////////////////////////
+                    <defn-head>methods::main.rs</defn-head>
+                    <defn-code style="font-size:0.9em;">
+                      fn demo_basic() {
 
-#![allow(dead_code)]
+                      print!("\n  -- demo_basic --");
 
-trait Draw {
-    fn draw(&amp;self);
-}
-/*-- define Rectangle --*/
-#[derive(Debug)]
-struct Point { x:i32, y:i32 }
-type Corner = Point;
-#[derive(Debug)]
-struct Rect { ll:Corner, ur:Corner }
-impl Draw for Rect {
-    fn draw(&amp;self) {
-        print!("\n  drawing Rect:\n  {:?}", &amp;self);
-    }
-}
-/*-- define Circle --*/
-#[derive(Debug)]
-struct Circle { orig:Point, rad:i32 }
-impl Draw for Circle {
-    fn draw(&amp;self) {
-        print!("\n  drawing Circle:\n  {:?}", &amp;self);
-    }
-}
-/*-- define TextBox --*/
-#[derive(Debug)]
-struct TextBox { region:Rect, text:String }
-impl Draw for TextBox {
-    fn draw(&amp;self) {
-        print!("\n  drawing TextBox:\n  {:?}", &amp;self);
-    }
-}
-/*-- dynamic dispatch of trait objects --*/
-fn do_draw(item:&amp;dyn Draw) {
-    item.draw();
-}
+                      #[derive(Debug)]
+                      pub struct Demo { value: i32 }
+                      impl Demo {
+                      pub fn new() -&gt; Demo {
+                      Demo {
+                      value:0
+                      }
+                      }
+                      pub fn set_value(&amp;mut self, v: i32) {
+                      self.value = v;
+                      }
+                      pub fn get_value(&amp;self) -&gt; i32 {
+                      self.value
+                      }
+                      }
+
+                      let mut d = Demo::new();
+                      d.set_value(42);
+                      print!("\n  d = {:?}", d);
+                      print!("\n  d.value = {:?}", d.get_value());
+                      }
+                    </defn-code>
+                  </defn-block>
+                  <defn-block style="width:25em">
+                    <defn-head>Output:</defn-head>
+                    <defn-code style="font-size:0.9em;">
+                      -- demo_basic --
+                      d = Demo { value: 42 }
+                      d.value = 42
+                    </defn-code>
+                    <defn-head class="defnBorderTop">Comments:</defn-head>
+                    <defn-body style="font-size:0.9em;">
+                      <t-b>
+                        For the struct Demo we are defining an associated function, <c-s>new()</c-s>,
+                        that is invoked as <c-s>Demo::new()</c-s>.
+                      </t-b>
+                      <t-b>
+                        We also define two methods, <c-s>set_value(&mut self, v: i32)</c-s>,
+                        and <c-s>get_value(&self) -> i32</c-s>.
+                      </t-b>
+                      <t-b>
+                        Methods always pass <c-s>&self</c-s> or <c-s>&mut self</c-s> as the first argument in the definition.
+                        That is not used for invocations, as you see at the bottom of the left panel.
+                      </t-b>
+                    </defn-body>
+                  </defn-block>
+                </defn-outerBlock>
+              </div>
+              <t-b>
+                The example below provides a user-defined type, Point&lt;T&gt;, that is closer to what
+                you will see in production code than the previous example, but uses the same techniques.
+              </t-b>
+              <div>
+                <details>
+                  <summary class="darkItem">Method Example - Point&lt;T&gt;:</summary>
+                  <s-halfEm></s-halfEm>
+                  <defn-outerBlock>
+                    <defn-block>
+                      <defn-head>methods.main.rs</defn-head>
+                      <defn-code>
+                        fn demo_point() {
+
+                        print!("\n  -- demo_point --");
+
+                        use std::fmt::*;
+
+                        #[derive(Debug, Default)]
+                        pub struct Point&lt;T&gt;
+                        where T:Default + Debug {
+                        x:T, y:T, z:T
+                        }
+                        impl<T>
+                          Point&lt;T&gt; where T:Default + Debug + Clone {
+                          pub fn new() -> Point&lt;T&gt; {
+                          Point {
+                          x:std::default::Default::default(),
+                          y:std::default::Default::default(),
+                          z:std::default::Default::default()
+                          }
+                          }
+                          pub fn default() -> Point&lt;T&gt; {
+                          Point::new()
+                          }
+                          pub fn get_coordinates(&self) -> [T; 3] {
+                          [self.x.clone(), self.y.clone(), self.z.clone()]
+                          }
+                          pub fn set_coordinates(&mut self, coor: &[T; 3]) {
+                          self.x = coor[0].clone();
+                          self.y = coor[1].clone();
+                          self.z = coor[2].clone();
+                          }
+                          }
+                          let mut pt = Point::<i32>
+                            ::new();
+                            pt.set_coordinates(&[1, 2, 3]);
+                            print!("\n  pt = {:?}", &pt);
+                            print!("\n  coordinates are: {:?}", &pt.get_coordinates());
+                            pt.set_coordinates(&[3, 2, 1]);
+                            print!("\n  pt = {:?}", pt);
+                            print!("\n  coordinates are: {:?}", pt.get_coordinates());
+                            }
+                      </defn-code>
+                    </defn-block>
+                    <defn-block style="width:25em;">
+                      <defn-head>Outputs:</defn-head>
+                      <defn-code>
+                        -- demo_point --
+                        pt = Point { x: 1, y: 2, z: 3 }
+                        coordinates are: [1, 2, 3]
+                        pt = Point { x: 3, y: 2, z: 1 }
+                        coordinates are: [3, 2, 1]
+
+                        That's all Folks!
+                      </defn-code>
+                      <defn-head class="defnBorderTop">Comments:</defn-head>
+                      <defn-body style="font-size:0.9em;">
+                        <ol class="tight">
+                          <li>
+                            Note that Debug and Default are derived traits for Point&lt;T&gt;.
+                          </li>
+                          <li>
+                            impl&lt;T&gt; has a generic parameter to match Point&lt;T&gt;.
+                          </li>
+                          <li>
+                            <c-s>new()</c-s> and <c-s>default()</c-s> are associated functions.
+                          </li>
+                          <li>
+                            <c-s>get_coordinates(&self) -&gt; [T; 3]</c-s> and
+                            <c-s>set_coordinates(&mut self, coor: &[T; 3])</c-s> are methods.
+                          </li>
+                          <li>
+                            In <c-s>set_coordinates</c-s> we used clones of the array elements to set the
+                            coordinate values because Rust does not allow moving elements out of
+                            an array.
+                          </li>
+                          <li>
+                            Using arrays is not the only interface that could work, but it&apos;s
+                            efficient, and provides a nice example of when and how to pass arrays.
+                          </li>
+                        </ol>
+                      </defn-body>
+                    </defn-block>
+                  </defn-outerBlock>
+                </details>
+                <t-b>
+                  User-defined types become really useful when we couple them with traits. The next section
+                  extends the Point&lt;T&gt; type with SpaceTime&lt;T&gt; and Display traits and provides
+                  motivation for the use of traits.
+                  <s-halfEm></s-halfEm>
+                </t-b>
+              </div>
+            </li>
+            <li id="traits" style="padding-top:0.25em;">
+              <h2>Traits:</h2>
+              <t-b>
+                We presented a lot of introductory material for Traits in the
+                <a target="_blank" href="RustBites_Traits.html">Generics and Traits</a> Bite.  If you haven&apos;t
+                looked at that yet, now is a good time to do so.
+              </t-b>
+              <t-b>
+                In the example, below, we extend the Point&lt;T&gt; type with traits SpaceTime&lt;T&gt;
+                and Display. SpaceTime&lt;T&gt; declares an interface for accessing 3-dimensional space
+                coordinates and date time information from a Point&lt;T&gt; or any other type that
+                implements the trait.
+              </t-b>
+              <t-b>
+                Here&apos;s the SpaceTime&lt;T&gt; definition:
+              </t-b>
+              <t-b>
+                <defn-block>
+                  <defn-head>
+                    SpaceTime&lt;T&gt;
+                  </defn-head>
+                  <defn-code style="font-size:0.9em;">
+                    pub trait SpaceTime&lt;T&gt; {
+                    fn get_coordinates(&amp;self) -&gt; [T; 3];
+                    fn set_coordinates(&amp;mut self, coor: &amp;[T; 3]);
+                    fn set_time(&amp;mut self, st: DateTime&lt;Local&gt;);
+                    fn get_time(&amp;self) -&gt; DateTime&lt;Local&gt;;
+                    fn get_time_string(&amp;self) -&gt; String;
+                    }
+                  </defn-code>
+                </defn-block>
+              </t-b>
+              <t-b>
+                A Point&lt;T&gt; that implements this trait could be used to annotate
+                data from an astronomical observatory.  A system for such annotation would probably
+                use several different types of points to mark different types of observables.  The
+                trait allows any of those point types to make their space and time information
+                available to mapping and display functions.
+              </t-b>
+              <t-b>
+                That works because the functions accept a SpaceTime&lt;T&gt; trait object rather
+                than a specific point type.  So traits allow us to build very flexible software
+                based on use rather than implementation details.
+              </t-b>
+              <div>
+                <details>
+                  <summary class="darkItem">Example: Point&lt;T&gt; with SpaceTime & Display Traits</summary>
+                  <s-halfEm></s-halfEm>
+                  <defn-outerBlock>
+                    <defn-block>
+                      <defn-head>point::lib.rs</defn-head>
+                      <defn-code>
+                        /////////////////////////////////////////////////////////////
+                        // point::lib.rs - Demo Traits                             //
+                        //                                                         //
+                        // Jim Fawcett, https://JimFawcett.github.io, 24 Jun 2020  //
+                        /////////////////////////////////////////////////////////////
+                        /*
+                        Point represents points in 3-dimensional space and time.
+                        Example hypothetical applications:
+                        - Aircraft flight navigation systems
+                        - Airport and Marine port area management systems
+                        - Autonomous vehicle control
+                        - Drawing applications
+                        Point implements a SpaceTime trait.  That allows a
+                        function to use space and time information from any
+                        object that implements the SpaceTime&lt;T&gt;trait.
+
+                        For example, in an Aircraft, points might be used
+                        as fundamental data structure for capturing instrument
+                        information, navigation computations, and in flight
+                        recording.
+
+                        Each of these applications might use different internal
+                        data, e.g., ids, other information, ... but a function
+                        that accepts a SpaceTime trait object can extract that
+                        information from any of them.
+                        */
+                        use chrono::offset::Local;
+                        use chrono::DateTime;
+                        use chrono::{Datelike, Timelike};
+                        use std::fmt::*;
+
+                        /*-----------------------------------------------------------
+                        declare SpaceTime&lt;T&gt; trait
+                        - note that this trait is generic
+                        */
+                        pub trait SpaceTime&lt;T&gt; {
+                        fn get_coordinates(&amp;self) -&gt; [T; 3];
+                        fn set_coordinates(&amp;mut self, coor: &amp;[T; 3]);
+                        fn set_time(&amp;mut self, st: DateTime&lt;Local&gt;);
+                        fn get_time(&amp;self) -&gt; DateTime&lt;Local&gt;;
+                        fn get_time_string(&amp;self) -&gt; String;
+                        }
+                        /*-- define Point&lt;T&gt; type --*/
+                        #[derive(Debug)]
+                        pub struct Point&lt;T&gt;
+                        where T:Default + Debug {
+                        x:T, y:T, z:T, t:DateTime&lt;Local&gt;, n:String,
+                        }
+                        /*-- implement Time trait --*/
+                        impl&lt;T&gt; SpaceTime&lt;T&gt; for Point&lt;T&gt;
+                        where T:Default + Debug + Clone {
+                        fn set_time(&amp;mut self, st: DateTime&lt;Local&gt;) {
+                        self.t = st;
+                        }
+                        fn get_time(&amp;self) -&gt; DateTime&lt;Local&gt; {
+                        self.t
+                        }
+                        fn get_time_string(&amp;self) -&gt; String {
+                        let year = self.t.year().to_string();
+                        let mon = self.t.month().to_string();
+                        let day = self.t.day().to_string();
+                        let hour = self.t.hour().to_string();
+                        let min = self.t.minute().to_string();
+                        let sec = self.t.second().to_string();
+                        let dt = format!(
+                        "{}::{:0&gt;2}::{:0&gt;2} {:0&gt;2}::{:0&gt;2}::{:0&gt;2}",
+                        year, mon, day, hour, min, sec
+                        );
+                        dt
+                        }
+                        /*-- set coordinates from array slice --*/
+                        fn set_coordinates(&amp;mut self, coor: &amp;[T; 3]) {
+                        self.x = coor[0].clone();
+                        self.y = coor[1].clone();
+                        self.z = coor[2].clone();
+                        }
+                        /*-- return array of three spatial coordinates --*/
+                        fn get_coordinates(&amp;self) -&gt; [T; 3] {
+                        [self.x.clone(), self.y.clone(), self.z.clone()]
+                        }
+                        /*-- time is returned with Time::get_time() --*/
+                        }
+                        /*-- implement Display trait --*/
+                        impl&lt;T&gt; Display for Point&lt;T&gt;
+                        where T:Default + Debug + Clone {
+                        fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter)
+                        -&gt; std::fmt::Result {
+                        write!(
+                        f, "{{ {:?}, {:?}, {:?}, {}, {:?} }}",
+                        &amp;self.x, &amp;self.y, &amp;self.z,
+                        &amp;self.get_time_string(), &amp;self.n
+                        )
+                        }
+                        }
+                        /*-- implement Point methods --*/
+                        impl&lt;T&gt; Point&lt;T&gt; where T:Default + Debug + Clone {
+                        pub fn new() -&gt; Point&lt;T&gt; {
+                        Point {
+                        x:std::default::Default::default(),
+                        y:std::default::Default::default(),
+                        z:std::default::Default::default(),
+                        t:Local::now(),
+                        n:String::default()
+                        }
+                        }
+                        pub fn default() -&gt; Point&lt;T&gt; {
+                        Point::new()
+                        }
+                        pub fn set_name(&amp;mut self, name: &amp;str) {
+                        self.n = name.to_string();
+                        }
+                        pub fn get_name(&amp;self) -&gt; &amp;str {
+                        &amp;self.n
+                        }
+                        }
+
+                        #[cfg(test)]
+                        mod tests {
+                        use super::*;
+                        #[test]
+                        fn construct () {
+                        let pt = Point::&lt;i32&gt;::new();
+                        assert_eq!(pt.get_coordinates(), [0, 0, 0]);
+                        }
+                        #[test]
+                        fn set_coor() {
+                        let mut pt = Point::&lt;i32&gt;::new();
+                        pt.set_coordinates(&amp;[1, 2, 3]);
+                        assert_eq!(pt.get_coordinates(), [1, 2, 3]);
+                        }
+                        #[test]
+                        fn get_time() {
+                        use chrono::{Duration};
+                        let two_sec = Duration::seconds(2);
+                        let ts_start = Local::now() - two_sec;
+                        let pt = Point::&lt;i32&gt;::new();
+                        let ts_now = pt.get_time();
+                        let ts_stop = Local::now() + two_sec;
+                        assert!(ts_start &lt; ts_now);
+                        assert!(ts_now &lt; ts_stop);
+                        }
+                        }
+                      </defn-code>
+                    </defn-block>
+                    <defn-block>
+                      <defn-head>Using Code - point::test1.rs</defn-head>
+                      <defn-code>
+                        /////////////////////////////////////////////////////////////
+                        // point::test1.rs - Demo Point&lt;T&gt; with SpaceTime and      //
+                        //                   Display Traits                        //
+                        //                                                         //
+                        // Jim Fawcett, https://JimFawcett.github.io, 24 Jun 2020  //
+                        /////////////////////////////////////////////////////////////
+
+                        #![allow(dead_code)]
+                        use point::{*};
+                        use point::SpaceTime;
+                        use chrono::{Local};
+                        use std::fmt::*;
+
+                        /*-----------------------------------------------------------
+                        function accepting SpaceTime&lt;T&gt; trait object
+                        - Does not depend on a specific type for pt, just the
+                        SpaceTime&lt;T&gt; trait - like an interface.
+                        - Can't use name. That's not part of trait.
+                        */
+                        fn use_space_time_info&lt;T:Debug&gt;(pt : &amp;dyn SpaceTime&lt;T&gt;) {
+                        print!("\n  -- using SpaceTime trait object --");
+                        print!(
+                        "\n  -- display coords & time w/ Display format --"
+                        );
+                        print!(
+                        "\n  coordinates are: {:?}", &amp;pt.get_coordinates()
+                        );
+                        print!("\n  point time is: {}", &amp;pt.get_time_string());
+                        }
+                        /*-----------------------------------------------------------
+                        Exercise Point&lt;i32&gt; and Point&lt;f64&gt; funtionality
+                        */
+                        fn main() {
+
+                        print!("\n  Demonstrating Point Type");
+                        print!("\n ==========================");
+
+                        print!(
+                        "\n  -- create Point&lt;i32&gt; "
+                        "& display w/ Display format --"
+                        );
+                        let mut pt = Point::&lt;i32&gt;::new();
+                        pt.set_coordinates(&amp;[1, 2, 3]);
+                        pt.set_time(Local::now());
+                        pt.set_name("pt");
+                        print!("\n  pt = {}", &amp;pt);
+                        println!();
+
+                        use_space_time_info(&amp;pt);
+                        println!();
+
+                        print!(
+                        "\n  -- mutate coordinates & display again --"
+                        );
+                        pt.set_coordinates(&amp;[3, 2, 1]);
+                        pt.set_name("mutated pt");
+                        print!("\n  pt = {}", pt);
+                        print!(
+                        "\n  coordinates are: {:?}", pt.get_coordinates()
+                        );
+                        println!();
+
+                        print!("\n  -- display point with Debug format --");
+                        print!("\n  pt in Debug format: {:?}", pt);
+                        println!();
+
+                        print!("\n  -- creating Point&lt;f64&gt; --");
+                        let mut ptd = Point::&lt;f64&gt;::new();
+                        ptd.set_coordinates(&amp;[0.5, -0.5, 1.75]);
+                        ptd.set_name("ptd");
+                        print!("\n  ptd = {}", ptd);
+                        use_space_time_info(&amp;ptd);
+
+                        print!("\n\n  That's all Folks!\n\n");
+                        }
+                      </defn-code>
+                      <defn-head class="defnBorderTop">Output:</defn-head>
+                      <defn-code>
+                        Demonstrating Point Type
+                        ==========================
+                        -- create Point<i32>
+                          and display with Display format --
+                          pt = { 1, 2, 3, 2020::06::25 16::55::36, "pt" }
+
+                          -- using SpaceTime trait object --
+                          -- display coordinates and time with Display format --
+                          coordinates are: [1, 2, 3]
+                          point time is: 2020::06::25 16::55::36
+
+                          -- mutate coordinates and display again --
+                          pt = { 3, 2, 1, 2020::06::25 16::55::36, "mutated pt" }
+                          coordinates are: [3, 2, 1]
+
+                          -- display point with Debug format --
+                          pt in Debug format: Point {
+                          x: 3, y: 2, z: 1,
+                          t: 2020-06-25T16:55:36.838484600-04:00,
+                          n: "mutated pt" }
+
+                          -- creating Point<f64>
+                            --
+                            ptd = { 0.5, -0.5, 1.75, 2020::06::25 16::55::36, "ptd" }
+                            -- using SpaceTime trait object --
+                            -- display coordinates and time with Display format --
+                            coordinates are: [0.5, -0.5, 1.75]
+                            point time is: 2020::06::25 16::55::36
+
+                            That's all Folks!
+                      </defn-code>
+                    </defn-block>
+                  </defn-outerBlock>
+                </details>
+              </div>
+              <t-b>
+                <s-halfEm></s-halfEm>
+              </t-b>
+            </li>
+            <li id="binding" style="padding-top:0.25em;">
+              <h2>Static vs. Dynamic Binding</h2>
+              <t-b>
+                Dispatching method arguments statically is just what we have been doing in all of the earlier Bites.
+                Binding of call to compiled method code happens at compile time.
+              </t-b>
+              <t-b>
+                Dynamic dispatching binds method calls to compiled code at run time.  Which object is passed to the
+                function isn't known until run time, so the binding has to happen then.  This binding is effected via
+                a dyn object that contains two pointers, one to the object being passed, and one to a virtual pointer
+                table (vtable).
+              </t-b>
+              <t-b>
+                Each type that implements a trait constructs a vtable during the compilation of the impl trait for type
+                part of its definition.  That compilation phase knows where the code for each of the type&apos;s Methods
+                is stored and constructs a table with pointers to each of those code blocks, e.g. the vtable.
+              </t-b>
+              <t-b>
+                When a function is specified to accept a trait object - do_draw&apos;s item in the right panel below - it is passed a
+                reference to a dyn with pointer to the item and another pointer to the item&apos;s type&apos;s vtable.
+              </t-b>
+              <t-b>
+                Here&apos;s what the code looks like:
+              </t-b>
+              <div>
+                <defn-outerBlock>
+                  <defn-block>
+                    <defn-head>Static Dispatch Function</defn-head>
+                    <defn-code style="font-size:0.9em;">
+                      struct SomeVisualItem { /* contents elided */ }
+                      impl SomeVisualItem {
+                      fn draw(&self) { /* code elided */ }
+                      }
+                    </defn-code>
+                    <defn-head class="defnBorderTop">Invocation</defn-head>
+                    <defn-code style="font-size:0.9em;">
+                      let svi = SomeVisualItem { /* content elided */ };
+                      svi.draw();
                     </defn-code>
                   </defn-block>
                   <defn-block>
-                    <defn-head>Using Code</defn-head>
-                    <defn-code>
-fn main() {
+                    <defn-head>Dynamic Dispatch Function</defn-head>
+                    <defn-code style="font-size:0.9em;">
+                      trait Draw { fn draw(&self); }
 
-  print!("\n  -- static dispatch --");
-  let r = Rect { ll:Corner {x:1,y:0}, ur:Corner {x:2,y:5} };
-  r.draw();
+                      struct SomeVisualItem { /* contents elided */ }
+                      impl Draw for SomeVisualItem {
+                      fn draw(&self) { /* code elided */ }
+                      }
 
-  print!("\n  -- dynamic dispatch --");
-  do_draw(&amp;r);
-  
-  print!("\n  -- dynamic dispatch of draw_list --");
-  let mut draw_list = Vec::&lt;&amp;dyn Draw&gt;::new();
-  let r1 = 
-    Rect{ 
-      ll:Corner {x:42, y:-42}, ur:Corner {x:-13, y:14} 
-    };
-  let r2 = 
-    Rect{ 
-      ll:Corner {x:81, y:53}, ur:Corner {x:35, y:36} 
-    };
-  let c1 = Circle{ orig:Point{x:5,y:19}, rad:3 };
-  let t1 = 
-  TextBox{ 
-    region:Rect{
-      ll:Corner{x:20,y:30}, ur:Corner{x:40, y:50}
-    }, 
-    text:"some text".to_string()};
-  draw_list.push(&amp;r1);
-  draw_list.push(&amp;r2);
-  draw_list.push(&amp;c1);
-  draw_list.push(&amp;t1);
-  
-  for item in draw_list {
-      do_draw(item);
-  }
-  print!("\n\n  That's all Folks!\n\n");
-}
+                      fn do_draw(item: &dyn Draw) {
+                      item.draw();
+                      }
                     </defn-code>
-                    <defn-head class="defnBorderTop">Output:</defn-head>
-                    <defn-code>
--- static dispatch --
-drawing Rect:
-Rect { ll: Point { x: 1, y: 0 }, ur: Point { x: 2, y: 5 } }
-
--- dynamic dispatch --
-drawing Rect:
-Rect { ll: Point { x: 1, y: 0 }, ur: Point { x: 2, y: 5 } }
-
--- dynamic dispatch of draw_list --
-
-drawing Rect:
-Rect { 
-  ll: Point { x: 42, y: -42 }, ur: Point { x: -13, y: 14 } 
-}  
-
-drawing Rect:       
-Rect { 
-  ll: Point { x: 81, y: 53 }, ur: Point { x: 35, y: 36 } 
-}
-
-drawing Circle:
-Circle { orig: Point { x: 5, y: 19 }, rad: 3 }
-
-drawing TextBox:
-TextBox { 
-  region: Rect { 
-    ll: Point { x: 20, y: 30 }, ur: Point { x: 40, y: 50 } 
-  }, 
-  text: "some text" 
-}
-
-That's all Folks!
-                  </defn-code>
+                    <defn-head class="defnBorderTop">Invocation</defn-head>
+                    <defn-code style="font-size:0.9em;">
+                      let svi = SomeVisualItem { /* content elided */ };
+                      do_draw(&svi);
+                      // works for any type implementing Draw trait
+                    </defn-code>
                   </defn-block>
                 </defn-outerBlock>
-              </details>
-            </div>
-          </t-b>
-          <t-b>
-            You have to use a bit of imagination as you look at the dispatching example.  We aren&apos;t drawing on a canvas, 
-            of course.  Just writing out information to the console.  But you see that all of the information necessary 
-            to draw on a canvas is handed to the draw method, via its instance&apos;s state.
-          </t-b>
-          <t-b>
-            So, in a galaxy not to far away, Rust generates 
-            <a target="_blank" href="https://www.hellorust.com/demos/canvas/index.html">webassembly code</a> to use this information to draw on a web browser 
-            canvas.
-            <s-halfEm></s-halfEm>
-          </t-b>
-        </li>
-        <li id="graph" style="padding-top:0.25em;">
-          <h2>Graph Example</h2>
-          <t-b>
-            A directed graph, consisting of vertices connected with directed edges, is a useful example to illustrate how the 
-            Rust memory model affects our design strategies.
-          </t-b>
-          <t-b>
-            If we try to implement the graph with references - not hard to do in C# for example - we will almost immediately 
-            violate the Rust ownership rules.  Rust demands that a mutable pointer to any data item has exclusive access. But 
-            a directed graph may have several edge references to a vertex and we may wish to mutate the vertice&apos;s state.
-          </t-b>
-          <t-b>
-            It turns out that we can put the vertices in a Vec&lt;Vertex&gt; and access them through Vec indices.  That doesn&apos;t 
-            violate the ownership rules.  Each vertex is owned by the Vec&lt;Vertex&gt; - let&apos;s call it an adjacency list.
-            Access to a vertex through another vertex&apos;s edge is just an index operation with no additional reference 
-            needed.
-          </t-b>
-          <t-b>
-            There are design issues to be worked out, e.g., how to efficiently delete vertices, ... But those are all "business as 
-            usual" problems.
-          </t-b>
-          <t-b>
-            <defn-block style="width:50em;">
-              <defn-body>
-                This is a placeholder for example code.  I will be turning to other things for awhile, so it will take some time 
-                before Rust code appears here.  In the mean time, you can look at a Directed Graph class I built in C++ that uses
-                this strategy.
-                <s-1em></s-1em> 
-                It has an adjacency list of vertices with each vertex holding an edge that is a pair of an edge type E instance and an 
-                index for the vertex it &quot;points&quot; to.  The code is in the 
-                <a target="_blank" href="../../CppGraph.html">CppGraph</a> C++ Repository.
-              </defn-body>
-            </defn-block>
-            <s-halfEm></s-halfEm>
-          </t-b>
-        </li>
-        <li id="exercises" style="padding-top:0.25em;">
-          <h2>Exercises:</h2>
-          <div>
-            <ol class="tight">
-              <li>
-                Change the storage type, in the Point&lt;T&gt; example above, to a Vec.
-                Run the same demonstrations as the example. 
-              </li>
-              <li>
-                Develop a user-defined type, Person, with fields for name, age, and 
-                name of occupation. Implement useful functions and methods for the Person 
-                type. Demonstrate it in operation.
-              </li>
-              <li>
-                Create a user-defined type representing Teams, using the Person class 
-                you developed in the first exercise.
-              </li>
-            </ol>
-          </div>
-        </li>
-      </ol>
-    </div>
+              </div>
+              <t-b>
+                The Example code below represents a graphics editor that is drawing on some form of canvas.
+                It defines three graphics shapes that each implement a Draw trait - rectangles, circles,
+                and textboxes.  An application would
+                define many additional types, but only three are used here to keep things as simple as
+                practical.
+              </t-b>
+              <t-b>
+                An editor will construct a draw_list of all the defined graphics objects and, when instructed,
+                iterate through its list calling a do_draw function using dynamic dispatching.  In this way,
+                the editor does not need to know anything about the graphics objects other than they implement
+                the Draw trait.
+              </t-b>
+              <t-b>
+                <div>
+                  <details>
+                    <summary class="darkItem">Examples: static and dynamic dispatch</summary>
+                    <s-halfEm></s-halfEm>
+                    <defn-outerBlock>
+                      <defn-block>
+                        <defn-head>dispatch::main.rs</defn-head>
+                        <defn-code>
+                          ///////////////////////////////////////////////////////////////
+                          // dispatch - demo static and dynamic fn arg dispatching     //
+                          //                                                           //
+                          // Jim Fawcett, https://JimFawcett.github.com, 27 Jun 2020   //
+                          ///////////////////////////////////////////////////////////////
+
+                          #![allow(dead_code)]
+
+                          trait Draw {
+                          fn draw(&amp;self);
+                          }
+                          /*-- define Rectangle --*/
+                          #[derive(Debug)]
+                          struct Point { x:i32, y:i32 }
+                          type Corner = Point;
+                          #[derive(Debug)]
+                          struct Rect { ll:Corner, ur:Corner }
+                          impl Draw for Rect {
+                          fn draw(&amp;self) {
+                          print!("\n  drawing Rect:\n  {:?}", &amp;self);
+                          }
+                          }
+                          /*-- define Circle --*/
+                          #[derive(Debug)]
+                          struct Circle { orig:Point, rad:i32 }
+                          impl Draw for Circle {
+                          fn draw(&amp;self) {
+                          print!("\n  drawing Circle:\n  {:?}", &amp;self);
+                          }
+                          }
+                          /*-- define TextBox --*/
+                          #[derive(Debug)]
+                          struct TextBox { region:Rect, text:String }
+                          impl Draw for TextBox {
+                          fn draw(&amp;self) {
+                          print!("\n  drawing TextBox:\n  {:?}", &amp;self);
+                          }
+                          }
+                          /*-- dynamic dispatch of trait objects --*/
+                          fn do_draw(item:&amp;dyn Draw) {
+                          item.draw();
+                          }
+                        </defn-code>
+                      </defn-block>
+                      <defn-block>
+                        <defn-head>Using Code</defn-head>
+                        <defn-code>
+                          fn main() {
+
+                          print!("\n  -- static dispatch --");
+                          let r = Rect { ll:Corner {x:1,y:0}, ur:Corner {x:2,y:5} };
+                          r.draw();
+
+                          print!("\n  -- dynamic dispatch --");
+                          do_draw(&amp;r);
+
+                          print!("\n  -- dynamic dispatch of draw_list --");
+                          let mut draw_list = Vec::&lt;&amp;dyn Draw&gt;::new();
+                          let r1 =
+                          Rect{
+                          ll:Corner {x:42, y:-42}, ur:Corner {x:-13, y:14}
+                          };
+                          let r2 =
+                          Rect{
+                          ll:Corner {x:81, y:53}, ur:Corner {x:35, y:36}
+                          };
+                          let c1 = Circle{ orig:Point{x:5,y:19}, rad:3 };
+                          let t1 =
+                          TextBox{
+                          region:Rect{
+                          ll:Corner{x:20,y:30}, ur:Corner{x:40, y:50}
+                          },
+                          text:"some text".to_string()};
+                          draw_list.push(&amp;r1);
+                          draw_list.push(&amp;r2);
+                          draw_list.push(&amp;c1);
+                          draw_list.push(&amp;t1);
+
+                          for item in draw_list {
+                          do_draw(item);
+                          }
+                          print!("\n\n  That's all Folks!\n\n");
+                          }
+                        </defn-code>
+                        <defn-head class="defnBorderTop">Output:</defn-head>
+                        <defn-code>
+                          -- static dispatch --
+                          drawing Rect:
+                          Rect { ll: Point { x: 1, y: 0 }, ur: Point { x: 2, y: 5 } }
+
+                          -- dynamic dispatch --
+                          drawing Rect:
+                          Rect { ll: Point { x: 1, y: 0 }, ur: Point { x: 2, y: 5 } }
+
+                          -- dynamic dispatch of draw_list --
+
+                          drawing Rect:
+                          Rect {
+                          ll: Point { x: 42, y: -42 }, ur: Point { x: -13, y: 14 }
+                          }
+
+                          drawing Rect:
+                          Rect {
+                          ll: Point { x: 81, y: 53 }, ur: Point { x: 35, y: 36 }
+                          }
+
+                          drawing Circle:
+                          Circle { orig: Point { x: 5, y: 19 }, rad: 3 }
+
+                          drawing TextBox:
+                          TextBox {
+                          region: Rect {
+                          ll: Point { x: 20, y: 30 }, ur: Point { x: 40, y: 50 }
+                          },
+                          text: "some text"
+                          }
+
+                          That's all Folks!
+                        </defn-code>
+                      </defn-block>
+                    </defn-outerBlock>
+                  </details>
+                </div>
+              </t-b>
+              <t-b>
+                You have to use a bit of imagination as you look at the dispatching example.  We aren&apos;t drawing on a canvas,
+                of course.  Just writing out information to the console.  But you see that all of the information necessary
+                to draw on a canvas is handed to the draw method, via its instance&apos;s state.
+              </t-b>
+              <t-b>
+                So, in a galaxy not to far away, Rust generates
+                <a target="_blank" href="https://www.hellorust.com/demos/canvas/index.html">webassembly code</a> to use this information to draw on a web browser
+                canvas.
+                <s-halfEm></s-halfEm>
+              </t-b>
+            </li>
+            <li id="graph" style="padding-top:0.25em;">
+              <h2>Graph Example</h2>
+              <t-b>
+                A directed graph, consisting of vertices connected with directed edges, is a useful example to illustrate how the
+                Rust memory model affects our design strategies.
+              </t-b>
+              <t-b>
+                If we try to implement the graph with references - not hard to do in C# for example - we will almost immediately
+                violate the Rust ownership rules.  Rust demands that a mutable pointer to any data item has exclusive access. But
+                a directed graph may have several edge references to a vertex and we may wish to mutate the vertice&apos;s state.
+              </t-b>
+              <t-b>
+                It turns out that we can put the vertices in a Vec&lt;Vertex&gt; and access them through Vec indices.  That doesn&apos;t
+                violate the ownership rules.  Each vertex is owned by the Vec&lt;Vertex&gt; - let&apos;s call it an adjacency list.
+                Access to a vertex through another vertex&apos;s edge is just an index operation with no additional reference
+                needed.
+              </t-b>
+              <t-b>
+                There are design issues to be worked out, e.g., how to efficiently delete vertices, ... But those are all "business as
+                usual" problems.
+              </t-b>
+              <t-b>
+                <defn-block style="width:50em;">
+                  <defn-body>
+                    This is a placeholder for example code.  I will be turning to other things for awhile, so it will take some time
+                    before Rust code appears here.  In the mean time, you can look at a Directed Graph class I built in C++ that uses
+                    this strategy.
+                    <s-1em></s-1em>
+                    It has an adjacency list of vertices with each vertex holding an edge that is a pair of an edge type E instance and an
+                    index for the vertex it &quot;points&quot; to.  The code is in the
+                    <a target="_blank" href="../../CppGraph.html">CppGraph</a> C++ Repository.
+                  </defn-body>
+                </defn-block>
+                <s-halfEm></s-halfEm>
+              </t-b>
+            </li>
+            <li id="exercises" style="padding-top:0.25em;">
+              <h2>Exercises:</h2>
+              <div>
+                <ol class="tight">
+                  <li>
+                    Change the storage type, in the Point&lt;T&gt; example above, to a Vec.
+                    Run the same demonstrations as the example.
+                  </li>
+                  <li>
+                    Develop a user-defined type, Person, with fields for name, age, and
+                    name of occupation. Implement useful functions and methods for the Person
+                    type. Demonstrate it in operation.
+                  </li>
+                  <li>
+                    Create a user-defined type representing Teams, using the Person class
+                    you developed in the first exercise.
+                  </li>
+                </ol>
+              </div>
+            </li>
+          </ol>
+        </div>
         <div style="height:5rem;"></div>
       </content>
       <a id="bottom"></a>
@@ -945,7 +949,7 @@ That's all Folks!
         <menu-elem class="secElem"><a href="#traits">traits</a></menu-elem>
         <menu-elem class="secElem"><a href="#methods">methods</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
-        <div style='margin:0em -1em; padding-bottom:0.25em; text-align:center' class='darkItem'>Sections</div>
+        <div class='darkItem popupHeader' style="padding:0.25em 2.0em;" onclick="location.reload()">Sections</div>
       </page-sections>
     </main>
     <frame-footer>

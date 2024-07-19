@@ -141,7 +141,7 @@
       <nav id="navbar"></nav>
     </frame-header>
     <main>
-      <div id="about">about</div>
+      <div id="about" onclick="location.reload()">about</div>
       <div id="modified">04/28/2022</div>
       <div id="page">RustBites - LifeCycle</div>
       <div id="hlp"></div>
@@ -158,7 +158,7 @@
         </header>
         <t-b>
           In this LifeCycle Bite our goal is to understand the processes a Rust object goes through
-          during its life time.  The first part of the code we will look at focuses on creating a 
+          during its life time.  The first part of the code we will look at focuses on creating a
           test type that helps demonstrate what happens as an object is created, used, moved, and
           goes out of scope.
         </t-b>
@@ -173,7 +173,7 @@
           <div class="indent pad5">
             <c-s>struct TestLifeCycle { count: u32, }</c-s>
           </div>
-          We want instances of this type to announce their creation, cloning, and destruction.  That 
+          We want instances of this type to announce their creation, cloning, and destruction.  That
           is effected with the functions:
           <s-halfEm></s-halfEm>
           <div class="indent pad5">
@@ -195,7 +195,8 @@
                 <td>drop function, e.g., destructor, releases resources held by object when it goes out of scope</td>
               </tr>
               <tr>
-                <td style="white-space:nowrap;"><c-s>value(&self) -> u32&nbsp;&nbsp;</c-s></td><td>value getter returns object&apos;s state</td>
+                <td style="white-space:nowrap;"><c-s>value(&self) -> u32&nbsp;&nbsp;</c-s></td>
+                <td>value getter returns object&apos;s state</td>
               </tr>
             </table>
           </div>
@@ -204,142 +205,142 @@
           The code, in the left panel in this dropdown, implements these functions for TestLifeCycle, and the code
           in the right panel exercises tests on instances of this type.
         </t-b>
-      <!--</div>-->
+        <!--</div>-->
 
-      <details>
-        <summary class="darkItem">Test Code&nbsp;&nbsp;</summary>
-        <table>
-          <tr>
-            <td><img src="CodeSamples/life_cycle/TestLifeCycleCode.jpg" style="width:45vw;"></td>
-            <td><img src="CodeSamples/life_cycle/main.jpg" style="width:30vw;"></td>
-          </tr>
-        </table>
-      </details>
-      <bb-55>
-        <t-b>
-          All of the remaining codes are various demonstration tests and their outputs, to show you what happens
-          during the lifecycle of an object in Rust.
-        </t-b>
-        <t-b>
-          Demonstrate Creation and Drop is a short test that shows that a Move type, like <c-s>TestLifeCycle</c-s>, can be dropped before it
-          leaves its scope of definition by calling std::ops::Drop::drop.  The output shows the drop.
-          If you comment out the drop call you will see the drop annunciation after the &quot;leaving demo_drop scope&quot;
-          printout. 
-        </t-b>
-        <t-b>
-          Drop, like a C++ destructor, returns any resources that the type holds when it goes out of scope.  
-          <c-s>TestLifeCycle</c-s> doesn&apos;t hold
-          any resources on the heap, but became a Move type because it implements the Drop trait, as if it did
-          hold resources that needed to be released. The Drop trait is Rust&apos;s mechanism for distinguishing a 
-          Move type from a Copy type.
-          <div id="create"></div>
-        </t-b>
-      </bb-55>
-      <details>
-        <summary class="darkItem">Demonstrate Creation and Drop&nbsp;&nbsp;</summary>
-        <table>
-          <tr>
-            <td><img src="CodeSamples/life_cycle/demo_drop.jpg" style="width:45vw;"></td>
-            <td><img src="CodeSamples/life_cycle/demo_drop_output.jpg" style="width:30vw;"></td>
-          </tr>
-        </table>
-      </details>
-      <div id="order"></div>
-      <bb-55>
-        <t-b>
-          Demonstrate Order of Destruction shows that objects are dropped (destroyed) in the reverse order of
-          their creation.  Things are done that way in case there are dependencies between objects - not the case 
-          here.  The demonstration also shows what happens when we rebind a type, as we did for the _third 
-          object.
-        </t-b>
-        <t-b>
-          Rust calls this &quot;shadowing&quot;. A shadowed object is not accessible after its identifier 
-          is bound to a new instance.  However, as this demonstration shows, the object isn&apos;t dropped when it 
-          is shadowed, but waits until the thread of execution leaves the scope where it was defined.
-        </t-b>
-        </bb-55>
-      <details>
-        <summary class="darkItem">Demonstrate Order of Destruction&nbsp;&nbsp;</summary>
-        <table>
-          <tr>
-            <td><img src="CodeSamples/life_cycle/order_of_destruction.jpg" style="width:44vw;"></td>
-            <td><img src="CodeSamples/life_cycle/order_of_destruction_output.jpg" style="width:30vw;"></td>
-          </tr>
-        </table>
-      </details>
-      <div id="coll"></div>
-      <bb-55>
-        <t-b>
-          Collection Creation and Drop uses a <c-s>Vec&lt;TestLifeCycle&gt;</c-s> to collect several <c-s>TestLifeCycle</c-s>
-          objects and show how they are created and destroyed.  What this shows is that dropping is a recursive
-          activity.  When the vector is dropped each of its elements is dropped.  It also shows how a parameterized 
-          constructor can provide unique state for each instance.
-        </t-b>
-        <t-b>
-          Note that, if we don't explicitly call drop on an instance of a Move type, it will be implicitly dropped when it 
-          goes out of scope.
-        </t-b>
-        <div id="coll"></div>
-        </bb-55>
-      <details>
-        <summary class="darkItem">Demonstrate Collecton Creation and Drop&nbsp;&nbsp;</summary>
-        <table>
-          <tr>
-            <td><img src="CodeSamples/life_cycle/demo_collection_drop.jpg" style="width:45vw;"></td>
-            <td><img src="CodeSamples/life_cycle/demo_collection_drop_output.jpg" style="width:30vw;"></td>
-          </tr>
-        </table>
-      </details>
-      <div id="move"></div>
-      <bb-55>
-        <t-b>
-          The Move demo illustrates a move operation:
-          <div class="indent pad5">
-            <c-s>let tlc1 = TestLifeCycle::param_new(42);</c-s><br />
-            <c-s>let tlc2 = tlc1; &nbsp;// move here</c-s>
-          </div>
-          There are two important things to note from the output.  First, the move did not result in 
-          an immediate drop.  That didn&apos;t happen until <c-s>tlc2</c-s> went out of scope.
-          The second, related, thing to notice is that only one drop occurs.  That&apos;s because <c-s>tlc1</c-s>&apos;s 
-          resources were moved to <c-s>tlc2</c-s>, so no drop was needed for <c-s>tlc1</c-s>. This validates Figure 1, from 
-          <a target="_blank" href="RustBites_Data.html">RustBites Data</a>.
-
-        </t-b>
-      </bb-55>
-      <details>
-        <summary class="darkItem">Demonstrate Move&nbsp;&nbsp;</summary>
-        <div>
-          <table style="table-layout:fixed;">
+        <details>
+          <summary class="darkItem">Test Code&nbsp;&nbsp;</summary>
+          <table>
             <tr>
-              <td><img src="CodeSamples/life_cycle/demo_move.jpg" style="width:45vw;"></td>
-              <td><img src="CodeSamples/life_cycle/demo_move_output.jpg" style="width:40vw;"></td>
+              <td><img src="CodeSamples/life_cycle/TestLifeCycleCode.jpg" style="width:45vw;"></td>
+              <td><img src="CodeSamples/life_cycle/main.jpg" style="width:30vw;"></td>
             </tr>
           </table>
+        </details>
+        <bb-55>
+          <t-b>
+            All of the remaining codes are various demonstration tests and their outputs, to show you what happens
+            during the lifecycle of an object in Rust.
+          </t-b>
+          <t-b>
+            Demonstrate Creation and Drop is a short test that shows that a Move type, like <c-s>TestLifeCycle</c-s>, can be dropped before it
+            leaves its scope of definition by calling std::ops::Drop::drop.  The output shows the drop.
+            If you comment out the drop call you will see the drop annunciation after the &quot;leaving demo_drop scope&quot;
+            printout.
+          </t-b>
+          <t-b>
+            Drop, like a C++ destructor, returns any resources that the type holds when it goes out of scope.
+            <c-s>TestLifeCycle</c-s> doesn&apos;t hold
+            any resources on the heap, but became a Move type because it implements the Drop trait, as if it did
+            hold resources that needed to be released. The Drop trait is Rust&apos;s mechanism for distinguishing a
+            Move type from a Copy type.
+            <div id="create"></div>
+          </t-b>
+        </bb-55>
+        <details>
+          <summary class="darkItem">Demonstrate Creation and Drop&nbsp;&nbsp;</summary>
+          <table>
+            <tr>
+              <td><img src="CodeSamples/life_cycle/demo_drop.jpg" style="width:45vw;"></td>
+              <td><img src="CodeSamples/life_cycle/demo_drop_output.jpg" style="width:30vw;"></td>
+            </tr>
+          </table>
+        </details>
+        <div id="order"></div>
+        <bb-55>
+          <t-b>
+            Demonstrate Order of Destruction shows that objects are dropped (destroyed) in the reverse order of
+            their creation.  Things are done that way in case there are dependencies between objects - not the case
+            here.  The demonstration also shows what happens when we rebind a type, as we did for the _third
+            object.
+          </t-b>
+          <t-b>
+            Rust calls this &quot;shadowing&quot;. A shadowed object is not accessible after its identifier
+            is bound to a new instance.  However, as this demonstration shows, the object isn&apos;t dropped when it
+            is shadowed, but waits until the thread of execution leaves the scope where it was defined.
+          </t-b>
+        </bb-55>
+        <details>
+          <summary class="darkItem">Demonstrate Order of Destruction&nbsp;&nbsp;</summary>
+          <table>
+            <tr>
+              <td><img src="CodeSamples/life_cycle/order_of_destruction.jpg" style="width:44vw;"></td>
+              <td><img src="CodeSamples/life_cycle/order_of_destruction_output.jpg" style="width:30vw;"></td>
+            </tr>
+          </table>
+        </details>
+        <div id="coll"></div>
+        <bb-55>
+          <t-b>
+            Collection Creation and Drop uses a <c-s>Vec&lt;TestLifeCycle&gt;</c-s> to collect several <c-s>TestLifeCycle</c-s>
+            objects and show how they are created and destroyed.  What this shows is that dropping is a recursive
+            activity.  When the vector is dropped each of its elements is dropped.  It also shows how a parameterized
+            constructor can provide unique state for each instance.
+          </t-b>
+          <t-b>
+            Note that, if we don't explicitly call drop on an instance of a Move type, it will be implicitly dropped when it
+            goes out of scope.
+          </t-b>
+          <div id="coll"></div>
+        </bb-55>
+        <details>
+          <summary class="darkItem">Demonstrate Collecton Creation and Drop&nbsp;&nbsp;</summary>
+          <table>
+            <tr>
+              <td><img src="CodeSamples/life_cycle/demo_collection_drop.jpg" style="width:45vw;"></td>
+              <td><img src="CodeSamples/life_cycle/demo_collection_drop_output.jpg" style="width:30vw;"></td>
+            </tr>
+          </table>
+        </details>
+        <div id="move"></div>
+        <bb-55>
+          <t-b>
+            The Move demo illustrates a move operation:
+            <div class="indent pad5">
+              <c-s>let tlc1 = TestLifeCycle::param_new(42);</c-s><br />
+              <c-s>let tlc2 = tlc1; &nbsp;// move here</c-s>
+            </div>
+            There are two important things to note from the output.  First, the move did not result in
+            an immediate drop.  That didn&apos;t happen until <c-s>tlc2</c-s> went out of scope.
+            The second, related, thing to notice is that only one drop occurs.  That&apos;s because <c-s>tlc1</c-s>&apos;s
+            resources were moved to <c-s>tlc2</c-s>, so no drop was needed for <c-s>tlc1</c-s>. This validates Figure 1, from
+            <a target="_blank" href="RustBites_Data.html">RustBites Data</a>.
+
+          </t-b>
+        </bb-55>
+        <details>
+          <summary class="darkItem">Demonstrate Move&nbsp;&nbsp;</summary>
+          <div>
+            <table style="table-layout:fixed;">
+              <tr>
+                <td><img src="CodeSamples/life_cycle/demo_move.jpg" style="width:45vw;"></td>
+                <td><img src="CodeSamples/life_cycle/demo_move_output.jpg" style="width:40vw;"></td>
+              </tr>
+            </table>
           </div>
-      </details>
-      <bb-55>
-        <t-b>
-          There are two major observation we need to make that are not shown in any of the code:  
-        </t-b>
-        <under-construction style="font-size:1.1em;">
-          Copy types are not dropped.  They have no resources to drop.
-        </under-construction>
-        <t-b>  
-          Endowing a copy type with a drop turns it into a Move type, as we saw with the
-          <c-s>TestLifeCycle</c-s> type.  Without the Drop implementation <c-s>TestLifeCycle</c-s> would be a Copy 
-          type.
-        </t-b>
-        <under-construction style="font-size:1.1em;">
-          If you create a type that holds a Move type component that makes it a Move type.  
-        </under-construction>          
-        <t-b>
-          For example, if we 
-          had given <c-s>TestLifeCycle </c-s> a String member, perhaps a name, that would have turned it into 
-          a Move type even without the Drop implementation.  The compiler would have dropped it simply by dropping 
-          each of its Move elements, like a name <c-s>String</c-s> for <c-s>TestLifeCycle</c-s> if it had one. 
-          This is similar to C++ member-wise destruction in compiler generated destructors.
-        </t-b>
-        <div style="height:12em;"></div>
+        </details>
+        <bb-55>
+          <t-b>
+            There are two major observation we need to make that are not shown in any of the code:
+          </t-b>
+          <under-construction style="font-size:1.1em;">
+            Copy types are not dropped.  They have no resources to drop.
+          </under-construction>
+          <t-b>
+            Endowing a copy type with a drop turns it into a Move type, as we saw with the
+            <c-s>TestLifeCycle</c-s> type.  Without the Drop implementation <c-s>TestLifeCycle</c-s> would be a Copy
+            type.
+          </t-b>
+          <under-construction style="font-size:1.1em;">
+            If you create a type that holds a Move type component that makes it a Move type.
+          </under-construction>
+          <t-b>
+            For example, if we
+            had given <c-s>TestLifeCycle </c-s> a String member, perhaps a name, that would have turned it into
+            a Move type even without the Drop implementation.  The compiler would have dropped it simply by dropping
+            each of its Move elements, like a name <c-s>String</c-s> for <c-s>TestLifeCycle</c-s> if it had one.
+            This is similar to C++ member-wise destruction in compiler generated destructors.
+          </t-b>
+          <div style="height:12em;"></div>
       </content>
       <a id="bottom"></a>
       <page-TOC id="pages" style="display:none;">
@@ -353,7 +354,7 @@
         <menu-elem class="secElem"><a href="#create">create</a></menu-elem>
         <menu-elem class="secElem"><a href="#test">test</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
-        <div style='margin:0em -1em; padding-bottom:0.25em; text-align:center' class='darkItem'>Sections</div>
+        <div class='darkItem popupHeader' style="padding:0.25em 2.0em;" onclick="location.reload()">Sections</div>
       </page-sections>
     </main>
     <frame-footer>

@@ -192,7 +192,7 @@
       <nav id="navbar"></nav>
     </frame-header>
     <main>
-      <div id="about">about</div>
+      <div id="about" onclick="location.reload()">about</div>
       <div id="modified">06/03/2023</div>
       <div id="page">RustBites - Iterators</div>
       <div id="hlp"></div>
@@ -207,728 +207,746 @@
             <h3 id="subtitle" class="indent">stepping through collections</h3>
           </hgroup>
         </header>
-       <a id="intro"></a>
-       <h2>Introduction</h2>
-    <t-b>
-      Rust iterators are types that implement the <c-s>Iterator</c-s> trait.  
-      That requires them to provide a method:
-      <div class="indent pad5">
-        <c-s>next(&self) -> Option&lt;Self::Item&gt;</c-s>
-      </div>
-      for stepping through collections. The returned value is either <c-s>Some(item)</c-s> or 
-      <c-s>None</c-s> if no more items are available.  
-      Iterators always have an associated type: Item, and a number of member functions, shown in Table 2., below.
-    </t-b>
-    <t-b>
-      Many collections implement the <c-s>IntoIterator</c-s> trait.  That requires them to provide:
-      <div class="indent pad5">
-        <c-s>into_iter(self) -> Self::IntoIter</c-s>
-      </div>
-      where IntoIter is an alias for Iterator&lt;Item = Self::Item&gt;.
-      That call consumes the collection and returns an iterator.
-    </t-b>
-    <t-b>
-      the Item type is a reference to the type of the collection elements.  For iterators that are returned from
-      <c-s>into_iter</c-s> the collection is consumed and its items are moved out of the Option returned by 
-      <c-s>next(&self)</c-s>.
-    </t-b>
-    <div style="height: 0.15rem;"></div>
-    <t-b><hr class="spread" /></t-b>
-    <a id="functions"></a>
-    <h2>Functions that accept and return Iterators</h2>
-    <t-b>
-      In the blocks below are two functions that accept iterators and exercise them.  The function on the left
-      uses the iterator directly and retrieves the item with <c-s>unwrap()</c-s>.  On the right is a function
-      that accepts an IntoIterator and uses a for loop to step through and implicitly unwrap the elements.
-    </t-b>
-    <t-b>
-      <div class="indent">
-        <defn-OuterBlock>
-          <defn-block>
-            <defn-head>Basic Iteration</defn-head>
-            <defn-code>
-fn do_iter&lt;T&gt;(iter: &mut T) 
-  where T: Iterator + Debug, T::Item: Debug {
-    print!("\n  ");
-    loop {
-        let item = iter.next();
-        if item.is_none() {
-            break;
-        }
-        print!("{:?} ", item.unwrap());
-    }
-}
-            </defn-code>
-            <defn-body class="defnBorderTop">
-              The iterator&apos;s function <c-s>next()</c-s> returns an Option&lt;Item&gt;.<br />
-              While there are items it returns <c-s>Some(item)</c-s> else <c-s>None</c-s>.
-            </defn-body>
-          </defn-block>
-          <defn-block>
-            <defn-head>Idiomatic iteration</defn-head>
-            <defn-code>
-fn do_idiomatic_iter&lt;T&gt;(t:T) 
-  where T: IntoIterator, T::Item: Debug {
-    print!("\n  ");
-    for item in t {
-        print!("{:?} ", item);
-    }
-}
-
-
-
-
-            </defn-code>
-            <defn-body class="defnBorderTop">
-              Rust for loops are simply wrappers for an<br />appropriate iterator.
-            </defn-body>
-          </defn-block>
-        </defn-OuterBlock>
+        <a id="intro"></a>
+        <h2>Introduction</h2>
+        <t-b>
+          Rust iterators are types that implement the <c-s>Iterator</c-s> trait.
+          That requires them to provide a method:
+          <div class="indent pad5">
+            <c-s>next(&self) -> Option&lt;Self::Item&gt;</c-s>
+          </div>
+          for stepping through collections. The returned value is either <c-s>Some(item)</c-s> or
+          <c-s>None</c-s> if no more items are available.
+          Iterators always have an associated type: Item, and a number of member functions, shown in Table 2., below.
+        </t-b>
+        <t-b>
+          Many collections implement the <c-s>IntoIterator</c-s> trait.  That requires them to provide:
+          <div class="indent pad5">
+            <c-s>into_iter(self) -> Self::IntoIter</c-s>
+          </div>
+          where IntoIter is an alias for Iterator&lt;Item = Self::Item&gt;.
+          That call consumes the collection and returns an iterator.
+        </t-b>
+        <t-b>
+          the Item type is a reference to the type of the collection elements.  For iterators that are returned from
+          <c-s>into_iter</c-s> the collection is consumed and its items are moved out of the Option returned by
+          <c-s>next(&self)</c-s>.
+        </t-b>
+        <div style="height: 0.15rem;"></div>
+        <t-b><hr class="spread" /></t-b>
+        <a id="functions"></a>
+        <h2>Functions that accept and return Iterators</h2>
+        <t-b>
+          In the blocks below are two functions that accept iterators and exercise them.  The function on the left
+          uses the iterator directly and retrieves the item with <c-s>unwrap()</c-s>.  On the right is a function
+          that accepts an IntoIterator and uses a for loop to step through and implicitly unwrap the elements.
+        </t-b>
         <t-b>
           <div class="indent">
-            <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=0fd39d1d6629d52d42e225f292d06db4">
-              iter() does not consume collection, into_iter() does.
+            <defn-OuterBlock>
+              <defn-block>
+                <defn-head>Basic Iteration</defn-head>
+                <defn-code>
+                  fn do_iter&lt;T&gt;(iter: &mut T)
+                  where T: Iterator + Debug, T::Item: Debug {
+                  print!("\n  ");
+                  loop {
+                  let item = iter.next();
+                  if item.is_none() {
+                  break;
+                  }
+                  print!("{:?} ", item.unwrap());
+                  }
+                  }
+                </defn-code>
+                <defn-body class="defnBorderTop">
+                  The iterator&apos;s function <c-s>next()</c-s> returns an Option&lt;Item&gt;.<br />
+                  While there are items it returns <c-s>Some(item)</c-s> else <c-s>None</c-s>.
+                </defn-body>
+              </defn-block>
+              <defn-block>
+                <defn-head>Idiomatic iteration</defn-head>
+                <defn-code>
+                  fn do_idiomatic_iter&lt;T&gt;(t:T)
+                  where T: IntoIterator, T::Item: Debug {
+                  print!("\n  ");
+                  for item in t {
+                  print!("{:?} ", item);
+                  }
+                  }
+
+
+
+
+                </defn-code>
+                <defn-body class="defnBorderTop">
+                  Rust for loops are simply wrappers for an<br />appropriate iterator.
+                </defn-body>
+              </defn-block>
+            </defn-OuterBlock>
+            <t-b>
+              <div class="indent">
+                <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=0fd39d1d6629d52d42e225f292d06db4">
+                  iter() does not consume collection, into_iter() does.
+                </a>
+              </div>
+            </t-b>
+          </div>
+        </t-b>
+        <div style="height: 0.25rem;"></div>
+        <t-b>
+          The code below was provided by
+          <a target="_blank" href="https://users.rust-lang.org/t/rust-is-very-aggressive-towards-beginners/57125">
+            Matt Brubeck
+          </a>
+          in a reply to a post on users.rust-lang.org.
+        </t-b>
+        <t-b>
+          The block on the left shows how to return an iterator
+          from a custom type. That iterator is simply a rebranding of the Vec member&apos;s iterator.
+          The block on the right shows how to implement a custom iterator for a custom type.
+        </t-b>
+        <t-b class="indent">
+          <defn-OuterBlock>
+            <defn-block>
+              <defn-head>Return iterator from custom type</defn-head>
+              <defn-code>
+                struct MyStruct {
+                items: Vec&lt;String&gt;
+                }
+
+                impl MyStruct {
+                fn strings(&self)
+                -> impl Iterator&lt;Item = &String&gt; {
+                self.items.iter()
+                }
+                }
+
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head>Create custom iterator type</defn-head>
+              <defn-code>
+                struct MyStruct {
+                items: Vec&lt;String&gt;
+                }
+
+                impl MyStruct {
+                fn strings(&self) -> MyIterator&lt;'_&gt; {
+                MyIterator {
+                index: 0, items: &self.items
+                }
+                }
+                }
+
+                struct MyIterator&lt;'a&gt; {
+                index: usize,
+                items: &'a [String],
+                }
+
+                impl&lt;'a&gt; Iterator for MyIterator&lt;'a&gt; {
+                type Item = &'a String;
+
+                fn next(&mut self)
+                -> Option&lt;&'a String&gt; {
+                let item = self.items.get(self.index);
+                self.index += 1;
+                item
+                }
+                }
+
+              </defn-code>
+            </defn-block>
+          </defn-OuterBlock>
+        </t-b>
+        <div style="height: 0.25rem;"></div>
+        <t-b><hr class="spread" /></t-b>
+        <a id="collections"></a>
+        <h2>Iterating over Collections</h2>
+        <t-b>
+          Most Rust collections implement at least one of three methods that return iterators:
+          <div class="indent">
+            <table>
+              <tr>
+                <th>invoke</th>
+                <th>operation</th>
+                <th>signature</th>
+                <th>returned iterator implements</th>
+              </tr>
+              <tr>
+                <td>iter()</td>
+                <td>Iterates over &T</td>
+                <td>fn iter(&self) -> Iter&lt;'a, T&gt;</td>
+                <td>fn next(&self) -> Option&lt;&T&gt;</td>
+              </tr>
+              <tr>
+                <td>iter_mut()</td>
+                <td>Iterates over &mut T</td>
+                <td>fn&nbsp;iter_mut(&self)&nbsp;->&nbsp;IterMut&lt;'a,&nbsp;T&gt;</td>
+                <td>fn&nbsp;next(&mut&nbsp;self)&nbsp;->&nbsp;Option&lt;&mut&nbsp;T&gt;</td>
+              </tr>
+              <tr>
+                <td>into_iter()</td>
+                <td>Iterates&nbsp;over,&nbsp;consumes&nbsp;T</td>
+                <td>into_iter(self) -> IntoIterator&lt;T&gt;</td>
+                <td>fn next(self) -> Option&lt;T&gt;</td>
+              </tr>
+            </table>
+          </div>
+          These functions expect items which all have the same size.
+          <t-b>
+            <div style="margin-left:-1rem;">
+              <ul class="tight">
+                <li>
+                  <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=41cc5c9396ce8104f59c4faff43e07fc">
+                    demonstrate iterator and element types
+                  </a>
+                </li>
+                <li>
+                  <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=a07dace160f8c097a2d14e51be4fb4d3">
+                    demonstrate consequences of iterator types
+                  </a>
+                </li>
+                <li>
+                  <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=e815823faba82e172b12a2d605bdd1bf">
+                    iterating over collections using functions that accept iterators
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </t-b>
+        </t-b>
+        <div style="height: 0.25rem;"></div>
+        <t-b><hr class="spread" /></t-b>
+        <a id="strings"></a>
+        <h2>Iterating over Strings</h2>
+        <t-b>
+          Since types of <c-s>String</c-s> and <c-s>&str</c-s> contain utf-8 characters, their items may have
+          sizes that vary from 1 to 4 bytes.  So their iterators have to search for character boundaries.
+        </t-b>
+        <t-b>
+          <div class="indent">
+            <h4>Table 1. utf-8 character boundaries</h4>
+            <table>
+              <tr>
+                <th>char size</th>
+                <th>indicator</th>
+              </tr>
+              <tr>
+                <td>1 byte, e.g. ASCII</td>
+                <td>byte starts with bit 0</td>
+              </tr>
+              <tr>
+                <td>2 bytes</td>
+                <td>First byte starts with bits 110</td>
+              </tr>
+              <tr>
+                <td>3 bytes</td>
+                <td>First byte starts with bits 1110</td>
+              </tr>
+              <tr>
+                <td>4 bytes</td>
+                <td>First byte starts with bits 11110</td>
+              </tr>
+              <tr>
+                <td>not first byte</td>
+                <td>byte starts with bits 10</td>
+              </tr>
+            </table>
+          </div>
+        </t-b>
+        <t-b>
+          For that reason, instances of std::String and primitive str provide iterators:
+          <ul class="tight">
+            <li>
+              <c-s>chars(&self) -> Chars&lt;'_&gt;</c-s>
+              <div class="indent pad5">
+                <c-s>Chars&lt;'_&gt;</c-s> implements <c-s>next(&self) -> Option&lt;char&gt;</c-s>
+              </div>
+            </li>
+            <li>
+              <c-s>char_indices(&self) -> CharIndices&lt;'_&gt;</c-s>
+              <div class="indent pad5">
+                <c-s>CharIndices&lt;'_&gt;</c-s> implements <c-s>next(&self) -> Option&lt;(usize, char)&gt;</c-s>
+              </div>
+            </li>
+            <li>
+              <c-s>bytes(&self) -> Bytes&lt;'_&gt;</c-s>
+              <div class="indent pad5">
+                <c-s>Bytes&lt;'_&gt;</c-s> implements <c-s>next(&self) -> Option&lt;u8&gt;</c-s>
+              </div>
+            </li>
+          </ul>
+        </t-b>
+        <t-b>
+          The type <c-s>char</c-s> is not what <c-s>String</c-s> and <c-s>str</c-s> hold.  The type char consists of
+          4 bytes which can hold any of the <c-s>String</c-s> and <c-s>str</c-s> characters.  So, a Vec&lt;char&gt;
+          would be expected to usually be up to four times larger than a std::String with the same logical contents.
+        </t-b>
+        <t-b>
+          <div class="indent">
+            <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=ba54eaaf19da0f9b01cbb7421a7cd2ed">
+              iterating over ASCII and non-ASCII strings
+            </a><br />
+            <!--<a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=461d230d1841bcdec6d33709f66870f9">
+          revised examples
+        </a>-->
+          </div>
+        </t-b>
+        <div style="height: 0.25rem;"></div>
+        <t-b><hr class="spread" /></t-b>
+        <a id="adapters"></a>
+        <h2>Iterator Adapters</h2>
+        <t-b>
+          Iterator adapters are methods that select and/or modify elements of a collection and may then collect them into
+          an instance of a new specified collection type by coping, cloning, or referencing the original collection.
+        </t-b>
+        <t-b>
+          <div class="indents">
+            <h4>Table 2. - Iterator Methods</h4>
+            <table style="width:calc(100vw - 7rem);">
+              <tr>
+                <th>Member function</th>
+                <th>Operation</th>
+                <th>Note</th>
+              </tr>
+              <tr>
+                <td class="no-wrap"><strong>next</strong>(&mut self) -> Option&lt;Self::Item&gt;</td>
+                <td>Return next element in collection via Option</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="no-wrap"><strong>count</strong>(self) -> usize</td>
+                <td>Returns number of iterations</td>
+                <td>Terminal,&nbsp;consumes&nbsp;iterator</td>
+              </tr>
+              <tr>
+                <td class="no-wrap"><strong>last</strong>(self) -> Option&lt;Self::Item&gt;</td>
+                <td>Returns last item via Option</td>
+                <td>Terminal, consumes iterator</td>
+              </tr>
+              <tr>
+                <td class="no-wrap"><strong>nth</strong>(&mut self, n: usize) -> Option&lt;Self::Item&gt;</td>
+                <td>Returns nth element</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="no-wrap"><strong>step-by</strong>(self, step: usize) ->StepBy&lt;Self&gt;</td>
+                <td>
+                  Creates new iterator starting at same point, but
+                  stepping by given amount at each iteration.
+                </td>
+                <td>Consumes original iterator</td>
+              </tr>
+              <tr>
+                <td class="no-wrap"><strong>skip</strong>(self, n: usize) -> Skip&lt;Self&gt;</td>
+                <td>Creates an iterator that skips the first n elements</td>
+                <td>Consumes original iterator</td>
+              </tr>
+              <tr>
+                <td class="no-wrap">
+                  <strong>
+                    skip_while
+                  </strong>&lt;P&gt;(self, p: P) -> Skip_while&lt;Self, P&gt;<br />
+                  &nbsp;&nbsp;where P: FnMut(&Self::Item) -> bool
+                </td>
+                <td>
+                  Creates an iterator that skips elements if predicate is true.  Returns after first false.
+                </td>
+                <td>Consumes original iterator</td>
+              </tr>
+              <tr>
+                <td class="no-wrap"><strong>take</strong>(self, n:usize) -> Take&lt;Self&gt;</td>
+                <td>Creates an iterator that returns first n elements</td>
+                <td>Consumes original iterator</td>
+              </tr>
+              <tr>
+                <td class="no-wrap">
+                  <strong>find</strong>&lt;P&gt;(&mut self, predicate: P) -> Option&lt;Self::Item&gt;<br />
+                  &nbsp;&nbsp;where P: FnMut(&Self::Item) -> bool
+                </td>
+                <td>Searches for first element that satisfies predicate.</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="no-wrap">
+                  <strong>enumerate</strong>(self) -> Enumerate&lt;Self&gt;<br />
+                  &nbsp;&nbsp;&lt;=&gt; Option&lt;(usize, &Item)&gt;
+                </td>
+                <td>Returns (i, val) where i is current index and val is the value of the current item.</td>
+                <td>Consumes original iterator</td>
+              </tr>
+              <tr>
+                <td class="no-wrap"><strong>map</strong>&lt;B, F&gt;(self, f: F) -> Map&lt;Self, F&gt;</td>
+                <td>
+                  Takes a closure and creates an iterator that calls the closure
+                  on each element
+                </td>
+                <td>Consumes original iterator</td>
+              </tr>
+              <tr>
+                <td class="no-wrap">
+                  <strong>filter</strong>&lt;P&gt;(self, predicate: P) - > Filter&lt;Self, P&gt;<br />
+                  &nbsp;&nbsp;where P: FnMut(&Self::Item) -> bool
+                </td>
+                <td>
+                  Creates an iterator which takes a closure to decide if element
+                  should be included in result
+                </td>
+                <td>Consumes original iterator</td>
+              </tr>
+              <tr>
+                <td class="no-wrap"><strong>collect</strong>&lt;B&gt;(self) -> B</td>
+                <td>Transforms iterator into collection</td>
+                <td>Terminal, consumes iterator</td>
+              </tr>
+              <tr>
+                <td class="no-wrap">
+                  <strong>any</strong>&lt;F&gt;(&mut self, f: F) -> bool<br />
+                  &nbsp;&nbsp;where F: FnMut(Self::Item) -> bool
+                </td>
+                <td>Tests if any element of iterator matches a predicate</td>
+                <td>Terminal</td>
+              </tr>
+              <tr>
+                <td class="no-wrap">
+                  <strong>all</strong>&lt;F&gt;(&mut self, f: F) -> bool<br />
+                  &nbsp;&nbsp;where F: FnMut(Self::Item) -> bool
+                </td>
+                <td>Tests if every element of iterator matches a predicate</td>
+                <td>Terminal</td>
+              </tr>
+              <tr>
+                <td class="no-wrap">
+                  <strong>for_each</strong>&lt;F&gt;(self, f: F)<br />
+                  &nbsp;&nbsp;where F: FnMut(Self::Item)
+                </td>
+                <td>Calls closure on each element of iterator</td>
+                <td>Terminal, consumes iterator</td>
+              </tr>
+              <tr>
+                <td class="no-wrap">
+                  <strong>position</strong>&lt;P&gt;(&mut self, p: P) -> Option&lt;usize&gt;<br />
+                  &nbsp;&nbsp;where F: FnMut(Self::Item) -> bool
+                </td>
+                <td>Returns index of first match</td>
+                <td>Terminal</td>
+              </tr>
+              <tr>
+                <td class="no-wrap">
+                  <strong>product</strong>&lt;P&gt;(self) -> P<br />
+                  &nbsp;&nbsp;where P: Product&lt;Self::Item&gt;
+                </td>
+                <td>Returns product of all elements, else 1 if empty</td>
+                <td>Terminal</td>
+              </tr>
+              <tr>
+                <td class="no-wrap">
+                  <strong>sum</strong>&lt;S&gt;(self) -> S<br />
+                  &nbsp;&nbsp;where S: Sum&lt;Self::Item&gt;
+                </td>
+                <td>Returns sum of all elements, else 0 if empty</td>
+                <td>Terminal</td>
+              </tr>
+              <tr>
+                <td class="no-wrap"><strong>by_ref</strong>(&mut self) -> &mut Self</td>
+                <td>
+                  Supports using these adapters while retaining ownership
+                  of the original iterator
+                </td>
+                <td>Avoids consuming original</td>
+              </tr>
+              <tr>
+                <td class="no-wrap">
+                  <strong>copied</strong>&lt;'a, T&gt;(self) -> Copied&lt;Self&gt;<br />
+                  &nbsp;&nbsp;where Self: Itertor&lt;Item = &'a T&gt;,<br />
+                  &nbsp;&nbsp;T: 'a + Copy;
+                </td>
+                <td>
+                  Creates iterator which copies all of its elements
+                </td>
+                <td>Consumes original iterator</td>
+              </tr>
+              <tr>
+                <td class="no-wrap">
+                  <strong>cloned</strong>&lt;'a, T&gt;(self) -> Cloned&lt;Self&gt;<br />
+                  &nbsp;&nbsp;where Self: Itertor&lt;Item = &'a T&gt;,<br />
+                  &nbsp;&nbsp;T: 'a + Clone;
+                </td>
+                <td>
+                  Creates iterator which clones all of its elements
+                </td>
+                <td>Consumes original iterator</td>
+              </tr>
+              <tr>
+                <th> </th>
+                <th> </th>
+                <th> </th>
+              </tr>
+              <tr>
+                <td style="height:2rem;">More adapter functions ...</td>
+                <td><a target="_blank" href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">std::iter::Iterator</a></td>
+              </tr>
+              <tr>
+                <th>&nbsp;</th>
+                <th> </th>
+                <th> </th>
+              </tr>
+            </table>
+          </div>
+        </t-b>
+        <div style="height:0.25rem;"></div>
+        <t-b>
+          <div class="indent">
+            <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=31a41e76f3356c3931d6dd7bbf4c3ce3">
+              playground examples of iterator methods
             </a>
           </div>
         </t-b>
-      </div>
-    </t-b>
-    <div style="height: 0.25rem;"></div>
-    <t-b>
-      The code below was provided by 
-      <a target="_blank" href="https://users.rust-lang.org/t/rust-is-very-aggressive-towards-beginners/57125">
-        Matt Brubeck</a>
-      in a reply to a post on users.rust-lang.org.  
-    </t-b>
-    <t-b>
-      The block on the left shows how to return an iterator
-      from a custom type. That iterator is simply a rebranding of the Vec member&apos;s iterator.
-      The block on the right shows how to implement a custom iterator for a custom type.
-    </t-b>
-    <t-b class="indent">
-        <defn-OuterBlock>
-          <defn-block>
-            <defn-head>Return iterator from custom type</defn-head>
-            <defn-code>
-struct MyStruct {
-    items: Vec&lt;String&gt;
-}
+        <div style="height: 0.25rem;"></div>
+        <t-b><hr class="spread" /></t-b>
+        <a id="loops"></a>
+        <h2>For loops</h2>
+        <t-b>
+          Rust&apos;s for loops are evidently closely related to iterators.  The code shown below, taken from
+          <a target="_blank" href="https://doc.rust-lang.org/std/keyword.for.html">Rust keyword for</a> documentation, with minor
+          changes, illustrates that.
+        </t-b>
+        <t-b>
+          <div class="indent">
+            <defn-OuterBlock>
+              <defn-block>
+                <defn-head>for loop code</defn-head>
+                <defn-code>
+                  #![allow(unused)]
 
-impl MyStruct {
-    fn strings(&self) 
-        -> impl Iterator&lt;Item = &String&gt; {
-        self.items.iter()
-    }
-}
+                  fn code(i:usize) { print!(" {}", i)}
 
-            </defn-code>
-          </defn-block>
-          <defn-block>
-            <defn-head>Create custom iterator type</defn-head>
-          <defn-code>
-struct MyStruct {
-    items: Vec&lt;String&gt;
-}
+                  fn main() {
+                  let iterator = 0..2;
+                  for loop_variable in iterator {
+                  code(loop_variable)
+                  }
+                  }
 
-impl MyStruct {
-    fn strings(&self) -> MyIterator&lt;'_&gt; {
-        MyIterator { 
-            index: 0, items: &self.items 
-        }
-    }
-}
 
-struct MyIterator&lt;'a&gt; {
-    index: usize,
-    items: &'a [String],
-}
 
-impl&lt;'a&gt; Iterator for MyIterator&lt;'a&gt; {
-    type Item = &'a String;
-    
-    fn next(&mut self) 
-        -> Option&lt;&'a String&gt; {
-        let item = self.items.get(self.index);
-        self.index += 1;
-        item
-    }
-}
 
-          </defn-code>
-            </defn-block>
-        </defn-OuterBlock>
-    </t-b>
-    <div style="height: 0.25rem;"></div>
-    <t-b><hr class="spread" /></t-b>
-    <a id="collections"></a>
-    <h2>Iterating over Collections</h2>
-    <t-b>
-      Most Rust collections implement at least one of three methods that return iterators:
-      <div class="indent">
-      <table>
-        <tr>
-          <th>invoke</th><th>operation</th><th>signature</th><th>returned iterator implements</th>
-        </tr>
-        <tr>
-          <td>iter()</td>
-          <td>Iterates over &T</td>
-          <td>fn iter(&self) -> Iter&lt;'a, T&gt;</td>
-          <td>fn next(&self) -> Option&lt;&T&gt;</td>
-        </tr>
-        <tr>
-          <td>iter_mut()</td>
-          <td>Iterates over &mut T</td>
-          <td>fn&nbsp;iter_mut(&self)&nbsp;->&nbsp;IterMut&lt;'a,&nbsp;T&gt;</td>
-          <td>fn&nbsp;next(&mut&nbsp;self)&nbsp;->&nbsp;Option&lt;&mut&nbsp;T&gt;</td>
-        </tr>
-        <tr>
-          <td>into_iter()</td>
-          <td>Iterates&nbsp;over,&nbsp;consumes&nbsp;T</td>
-          <td>into_iter(self) -> IntoIterator&lt;T&gt;</td>
-          <td>fn next(self) -> Option&lt;T&gt;</td>
-        </tr>
-      </table>
-      </div>
-      These functions expect items which all have the same size.
-      <t-b>
-        <div style="margin-left:-1rem;">
-          <ul class="tight">
-            <li>
-              <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=41cc5c9396ce8104f59c4faff43e07fc">
-                demonstrate iterator and element types
-              </a>
-            </li>
-            <li>
-              <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=a07dace160f8c097a2d14e51be4fb4d3">
-                demonstrate consequences of iterator types
-              </a>
-            </li>
-            <li>
-              <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=e815823faba82e172b12a2d605bdd1bf">
-                iterating over collections using functions that accept iterators
-              </a>
-            </li>
-          </ul>
-        </div>
-      </t-b>
-    </t-b>
-    <div style="height: 0.25rem;"></div>
-    <t-b><hr class="spread" /></t-b>
-    <a id="strings"></a>
-    <h2>Iterating over Strings</h2>
-    <t-b>
-      Since types of <c-s>String</c-s> and <c-s>&str</c-s> contain utf-8 characters, their items may have
-      sizes that vary from 1 to 4 bytes.  So their iterators have to search for character boundaries.
-    </t-b>
-    <t-b>
-      <div class="indent">
-        <h4>Table 1. utf-8 character boundaries</h4>
-        <table>
-          <tr>
-            <th>char size</th><th>indicator</th>
-          </tr>
-          <tr>
-            <td>1 byte, e.g. ASCII</td><td>byte starts with bit 0</td>
-          </tr>
-          <tr>
-            <td>2 bytes</td><td>First byte starts with bits 110</td>
-          </tr>
-          <tr>
-            <td>3 bytes</td><td>First byte starts with bits 1110</td>
-          </tr>
-          <tr>
-            <td>4 bytes</td><td>First byte starts with bits 11110</td>
-          </tr>
-          <tr>
-            <td>not first byte</td><td>byte starts with bits 10</td>
-          </tr>
-        </table>
-      </div>
-    </t-b>
-    <t-b>
-      For that reason, instances of std::String and primitive str provide iterators:
-      <ul class="tight">
-        <li>
-          <c-s>chars(&self) -> Chars&lt;'_&gt;</c-s>
-          <div class="indent pad5">
-            <c-s>Chars&lt;'_&gt;</c-s> implements <c-s>next(&self) -> Option&lt;char&gt;</c-s>
+
+
+
+
+
+                </defn-code>
+                <defn-head class="defnBorderTop">Output</defn-head>
+                <defn-code>
+                  0 1
+                </defn-code>
+                <defn-head class="defnBorderTop" style="border-bottom:none;">
+                  <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=92e189882058479fda5cd042b4ffb807">
+                    code in playground
+                  </a>
+                </defn-head>
+              </defn-block>
+              <defn-block>
+                <defn-head>for loop converts to this code</defn-head>
+                <defn-code>
+                  #![allow(unused)]
+
+                  fn code(i:usize) { print!("{} ", i) }
+
+                  fn main() {
+                  let iterator = 0..2;
+                  {
+                  let mut _iter =
+                  std::iter::IntoIterator::into_iter(iterator);
+                  loop {
+                  match _iter.next() {
+                  Some(loop_variable) => {
+                  code(loop_variable)
+                  },
+                  None => break,
+                  }
+                  }
+                  }
+                  }
+                </defn-code>
+                <defn-head class="defnBorderTop">Output</defn-head>
+                <defn-code>
+                  0 1
+                </defn-code>
+                <defn-head class="defnBorderTop" style="border-bottom:none;">
+                  <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=8a1873a09f09d64118270a3717b6b5f4">
+                    code in playground
+                  </a>
+                  <div style="height:0.25rem;"></div>
+                </defn-head>
+              </defn-block>
+            </defn-OuterBlock>
           </div>
-        </li>
-        <li>
-          <c-s>char_indices(&self) -> CharIndices&lt;'_&gt;</c-s>
-          <div class="indent pad5">
-            <c-s>CharIndices&lt;'_&gt;</c-s> implements <c-s>next(&self) -> Option&lt;(usize, char)&gt;</c-s>
-          </div>
-        </li>
-        <li>
-          <c-s>bytes(&self) -> Bytes&lt;'_&gt;</c-s>
-          <div class="indent pad5">
-            <c-s>Bytes&lt;'_&gt;</c-s> implements <c-s>next(&self) -> Option&lt;u8&gt;</c-s>
-          </div>
-        </li>
-      </ul>
-    </t-b>
-    <t-b>
-      The type <c-s>char</c-s> is not what <c-s>String</c-s> and <c-s>str</c-s> hold.  The type char consists of
-      4 bytes which can hold any of the <c-s>String</c-s> and <c-s>str</c-s> characters.  So, a Vec&lt;char&gt;
-      would be expected to usually be up to four times larger than a std::String with the same logical contents.
-    </t-b>
-    <t-b>
-      <div class="indent">
-        <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=ba54eaaf19da0f9b01cbb7421a7cd2ed">
-          iterating over ASCII and non-ASCII strings
-        </a><br />
-        <!--<a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=461d230d1841bcdec6d33709f66870f9">
-          revised examples
-        </a>-->
-      </div>
-    </t-b>
-    <div style="height: 0.25rem;"></div>
-    <t-b><hr class="spread" /></t-b>
-    <a id="adapters"></a>
-    <h2>Iterator Adapters</h2>
-    <t-b>
-      Iterator adapters are methods that select and/or modify elements of a collection and may then collect them into
-      an instance of a new specified collection type by coping, cloning, or referencing the original collection.
-    </t-b>
-    <t-b>
-      <div class="indents">
-      <h4>Table 2. - Iterator Methods</h4>
-      <table style="width:calc(100vw - 7rem);">
-        <tr>
-          <th>Member function</th>
-          <th>Operation</th>
-          <th>Note</th>
-        </tr>
-        <tr>
-          <td class="no-wrap"><strong>next</strong>(&mut self) -> Option&lt;Self::Item&gt;</td>
-          <td>Return next element in collection via Option</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td class="no-wrap"><strong>count</strong>(self) -> usize</td>
-          <td>Returns number of iterations</td>
-          <td>Terminal,&nbsp;consumes&nbsp;iterator</td>
-        </tr>
-        <tr>
-          <td class="no-wrap"><strong>last</strong>(self) -> Option&lt;Self::Item&gt;</td>
-          <td>Returns last item via Option</td>
-          <td>Terminal, consumes iterator</td>
-        </tr>
-        <tr>
-          <td class="no-wrap"><strong>nth</strong>(&mut self, n: usize) -> Option&lt;Self::Item&gt;</td>
-          <td>Returns nth element</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td class="no-wrap"><strong>step-by</strong>(self, step: usize) ->StepBy&lt;Self&gt;</td>
-          <td>
-            Creates new iterator starting at same point, but
-            stepping by given amount at each iteration.
-          </td>
-          <td>Consumes original iterator</td>
-        </tr>
-        <tr>
-          <td class="no-wrap"><strong>skip</strong>(self, n: usize) -> Skip&lt;Self&gt;</td>
-          <td>Creates an iterator that skips the first n elements</td>
-          <td>Consumes original iterator</td>
-        </tr>
-        <tr>
-          <td class="no-wrap"><strong>
-            skip_while</strong>&lt;P&gt;(self, p: P) -> Skip_while&lt;Self, P&gt;<br />
-            &nbsp;&nbsp;where P: FnMut(&Self::Item) -> bool
-          </td>
-          <td>
-            Creates an iterator that skips elements if predicate is true.  Returns after first false.
-          </td>
-          <td>Consumes original iterator</td>
-        </tr>
-        <tr>
-          <td class="no-wrap"><strong>take</strong>(self, n:usize) -> Take&lt;Self&gt;</td>
-          <td>Creates an iterator that returns first n elements</td>
-          <td>Consumes original iterator</td>
-        </tr>
-        <tr>
-          <td class="no-wrap">
-            <strong>find</strong>&lt;P&gt;(&mut self, predicate: P) -> Option&lt;Self::Item&gt;<br />
-            &nbsp;&nbsp;where P: FnMut(&Self::Item) -> bool
-          </td>
-          <td>Searches for first element that satisfies predicate.</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td class="no-wrap">
-            <strong>enumerate</strong>(self) -> Enumerate&lt;Self&gt;<br />
-            &nbsp;&nbsp;&lt;=&gt; Option&lt;(usize, &Item)&gt;
-          </td>
-          <td>Returns (i, val) where i is current index and val is the value of the current item.</td>
-          <td>Consumes original iterator</td>
-        </tr>
-        <tr>
-          <td class="no-wrap"><strong>map</strong>&lt;B, F&gt;(self, f: F) -> Map&lt;Self, F&gt;</td>
-          <td>
-            Takes a closure and creates an iterator that calls the closure
-            on each element
-          </td>
-          <td>Consumes original iterator</td>
-        </tr>
-        <tr>
-          <td class="no-wrap">
-            <strong>filter</strong>&lt;P&gt;(self, predicate: P) - > Filter&lt;Self, P&gt;<br />
-            &nbsp;&nbsp;where P: FnMut(&Self::Item) -> bool
-          </td>
-          <td>
-            Creates an iterator which takes a closure to decide if element
-            should be included in result
-          </td>
-          <td>Consumes original iterator</td>
-        </tr>
-        <tr>
-          <td class="no-wrap"><strong>collect</strong>&lt;B&gt;(self) -> B</td>
-          <td>Transforms iterator into collection</td>
-          <td>Terminal, consumes iterator</td>
-        </tr>
-        <tr>
-          <td class="no-wrap">
-            <strong>any</strong>&lt;F&gt;(&mut self, f: F) -> bool<br />
-            &nbsp;&nbsp;where F: FnMut(Self::Item) -> bool
-          </td>
-          <td>Tests if any element of iterator matches a predicate</td>
-          <td>Terminal</td>
-        </tr>
-        <tr>
-          <td class="no-wrap">
-            <strong>all</strong>&lt;F&gt;(&mut self, f: F) -> bool<br />
-            &nbsp;&nbsp;where F: FnMut(Self::Item) -> bool
-          </td>
-          <td>Tests if every element of iterator matches a predicate</td>
-          <td>Terminal</td>
-        </tr>
-        <tr>
-          <td class="no-wrap">
-            <strong>for_each</strong>&lt;F&gt;(self, f: F)<br />
-            &nbsp;&nbsp;where F: FnMut(Self::Item)
-          </td>
-          <td>Calls closure on each element of iterator</td>
-          <td>Terminal, consumes iterator</td>
-        </tr>
-        <tr>
-          <td class="no-wrap">
-            <strong>position</strong>&lt;P&gt;(&mut self, p: P) -> Option&lt;usize&gt;<br />
-            &nbsp;&nbsp;where F: FnMut(Self::Item) -> bool
-          </td>
-          <td>Returns index of first match</td>
-          <td>Terminal</td>
-        </tr>
-        <tr>
-          <td class="no-wrap">
-            <strong>product</strong>&lt;P&gt;(self) -> P<br />
-            &nbsp;&nbsp;where P: Product&lt;Self::Item&gt;
-          </td>
-          <td>Returns product of all elements, else 1 if empty</td>
-          <td>Terminal</td>
-        </tr>
-        <tr>
-          <td class="no-wrap">
-            <strong>sum</strong>&lt;S&gt;(self) -> S<br />
-            &nbsp;&nbsp;where S: Sum&lt;Self::Item&gt;
-          </td>
-          <td>Returns sum of all elements, else 0 if empty</td>
-          <td>Terminal</td>
-        </tr>
-        <tr>
-          <td class="no-wrap"><strong>by_ref</strong>(&mut self) -> &mut Self</td>
-          <td>
-            Supports using these adapters while retaining ownership
-            of the original iterator
-          </td>
-          <td>Avoids consuming original</td>
-        </tr>
-        <tr>
-          <td class="no-wrap">
-            <strong>copied</strong>&lt;'a, T&gt;(self) -> Copied&lt;Self&gt;<br />
-            &nbsp;&nbsp;where Self: Itertor&lt;Item = &'a T&gt;,<br />
-            &nbsp;&nbsp;T: 'a + Copy;
-          </td>
-          <td>
-            Creates iterator which copies all of its elements
-          </td>
-          <td>Consumes original iterator</td>
-        </tr>
-        <tr>
-          <td class="no-wrap">
-            <strong>cloned</strong>&lt;'a, T&gt;(self) -> Cloned&lt;Self&gt;<br />
-            &nbsp;&nbsp;where Self: Itertor&lt;Item = &'a T&gt;,<br />
-            &nbsp;&nbsp;T: 'a + Clone;
-          </td>
-          <td>
-            Creates iterator which clones all of its elements
-          </td>
-          <td>Consumes original iterator</td>
-        </tr>
-        <tr>
-          <th> </th><th> </th><th> </th>
-        </tr>
-        <tr>
-          <td style="height:2rem;">More adapter functions ...</td>
-          <td><a target="_blank" href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">std::iter::Iterator</a></td>
-        </tr>
-        <tr>
-          <th>&nbsp;</th><th> </th><th> </th>
-        </tr>
-      </table>
-      </div>
-    </t-b>
-    <div style="height:0.25rem;"></div>
-    <t-b>
-      <div class="indent">
-        <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=31a41e76f3356c3931d6dd7bbf4c3ce3">
-          playground examples of iterator methods
-        </a>
-      </div>
-    </t-b>
-    <div style="height: 0.25rem;"></div>
-    <t-b><hr class="spread" /></t-b>
-    <a id="loops"></a>
-    <h2>For loops</h2>
-    <t-b>
-      Rust&apos;s for loops are evidently closely related to iterators.  The code shown below, taken from
-      <a target="_blank" href="https://doc.rust-lang.org/std/keyword.for.html">Rust keyword for</a> documentation, with minor
-      changes, illustrates that.
-    </t-b>
-    <t-b>
-      <div class="indent">
-        <defn-OuterBlock>
-          <defn-block>
-            <defn-head>for loop code</defn-head>
-            <defn-code>
-#![allow(unused)]
+        </t-b>
+        <t-b>
+          Rust for loops accept iterators and anything that implements the IntoIterator trait, providing the
+          into_iter() method.
+        </t-b>
 
-fn code(i:usize) { print!(" {}", i)}
+        <div style="height: 0.25rem;"></div>
+        <t-b><hr class="spread" /></t-b>
+        <a id="ranges"></a>
+        <h2>Ranges</h2>
+        <t-b>
+          A range is an instance of <a target="_blank" href="https://doc.rust-lang.org/std/ops/struct.Range.html">std::ops::Range</a>,
+          e.g.:
+          <t-b>
+            <div class="indent">
+              <defn-OuterBlock>
+                <defn-block>
+                  <defn-head>Range Definition</defn-head>
+                  <defn-code>
+                    pub struct Range<Idx>
+                      {
+                      pub start: Idx,
+                      pub end: Idx,
+                      }
+                  </defn-code>
+                </defn-block>
+                <defn-block>
+                  <defn-head>Example:</defn-head>
+                  <defn-code>
+                    1..7
+                  </defn-code>
+                </defn-block>
+              </defn-OuterBlock>
+            </div>
+          </t-b>
+          <t-b>
+            with instances start..end, e.g.: 1..7 which includes the values 1, 2, 3, 4, 5, 6.
+          </t-b>
+          <t-b>
+            Ranges implement methods <c-s>contains</c-s> and <c-s>is_empty</c-s>.  They also implement many traits
+            including Iterator and IntoIterator.  So for loops can use Ranges directly.
+          </t-b>
+          <t-b class="indent">
+            <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=11d9ea0dec8da14fae86ca933434f35d">
+              Ranges in playground
+            </a>
+          </t-b>
+          <div style="height: 0.25rem;"></div>
+          <t-b><hr class="spread" /></t-b>
+          <a id="slices"></a>
+          <h2>Slices</h2>
+          <t-b>
+            A <a target="_blank" href="https://doc.rust-lang.org/std/slice/index.html">std::slice</a> is a non-owning view into a
+            contiguous sequence, [T].  It consists of a reference into the sequence and a length
+          </t-b>
+          <t-b>
+            <div class="indent">
+              <defn-block>
+                <defn-head>Examples of Slices</defn-head>
+                <defn-code>
+                  let v = vec![1, 2, 3, 4, 5];
+                  let vslice = &v[1..];
 
-fn main() {
-    let iterator = 0..2;
-    for loop_variable in iterator {
-        code(loop_variable)
-    }
-}
+                  let sarray: [&str] = ["zero", "one", "two"];
+                  let aslice: &[&str] = &sarray[0..2];
 
-
-
-
-
-
-
-            
-            
-            </defn-code>
-            <defn-head class="defnBorderTop">Output</defn-head>
-            <defn-code>
- 0 1
-            </defn-code>
-            <defn-head class="defnBorderTop" style="border-bottom:none;">
-              <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=92e189882058479fda5cd042b4ffb807">
-                code in playground
+                  let bytearr: [u8] = [0, 1, 2];
+                  let bslice = &bytearr;
+                </defn-code>
+              </defn-block>
+            </div>
+          </t-b>
+          <t-b>
+            Slices implement traits: Iter, IterMut, Concat, Join, ...
+          </t-b>
+          <t-b>
+            <div class="indent">
+              <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=71e37521a57822615245009c599040fd">
+                slice playground code
               </a>
-            </defn-head>
-          </defn-block>
-          <defn-block>
-            <defn-head>for loop converts to this code</defn-head>
-            <defn-code>
-#![allow(unused)]
-
-fn code(i:usize) { print!("{} ", i) }
-
-fn main() {
-    let iterator = 0..2;
-    {
-        let mut _iter = 
-              std::iter::IntoIterator::into_iter(iterator);
-        loop {
-            match _iter.next() {
-                Some(loop_variable) => {
-                    code(loop_variable)
-                },
-                None => break,
-            }
-        }
-    }
-}
-            </defn-code>
-            <defn-head class="defnBorderTop">Output</defn-head>
-            <defn-code>
-0 1 
-            </defn-code>
-            <defn-head class="defnBorderTop" style="border-bottom:none;">
-              <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=8a1873a09f09d64118270a3717b6b5f4">
-                code in playground
-              </a>
-              <div style="height:0.25rem;"></div>
-            </defn-head>
-          </defn-block>
-        </defn-OuterBlock>
-      </div>
-    </t-b>
-    <t-b>
-      Rust for loops accept iterators and anything that implements the IntoIterator trait, providing the 
-      into_iter() method.
-    </t-b>
-
-    <div style="height: 0.25rem;"></div>
-    <t-b><hr class="spread" /></t-b>
-    <a id="ranges"></a>
-    <h2>Ranges</h2>
-    <t-b>
-      A range is an instance of <a target="_blank" href="https://doc.rust-lang.org/std/ops/struct.Range.html">std::ops::Range</a>,
-      e.g.:
-    <t-b>
-      <div class="indent">
-        <defn-OuterBlock>
-          <defn-block>
-            <defn-head>Range Definition</defn-head>
-            <defn-code>
-  pub struct Range<Idx> {    
-    pub start: Idx,
-    pub end: Idx,
-  }
-            </defn-code>
-          </defn-block>
-          <defn-block>
-            <defn-head>Example:</defn-head>
-            <defn-code>
-  1..7
-            </defn-code>
-          </defn-block>
-        </defn-OuterBlock>
-      </div>
-    </t-b>
-    <t-b>
-      with instances start..end, e.g.: 1..7 which includes the values 1, 2, 3, 4, 5, 6.
-    </t-b>
-    <t-b>
-      Ranges implement methods <c-s>contains</c-s> and <c-s>is_empty</c-s>.  They also implement many traits
-      including Iterator and IntoIterator.  So for loops can use Ranges directly.
-    </t-b>
-    <t-b class="indent">
-      <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=11d9ea0dec8da14fae86ca933434f35d">
-        Ranges in playground
-      </a>
-    </t-b>
-    <div style="height: 0.25rem;"></div>
-    <t-b><hr class="spread" /></t-b>
-    <a id="slices"></a>
-    <h2>Slices</h2>
-    <t-b>
-      A <a target="_blank" href="https://doc.rust-lang.org/std/slice/index.html">std::slice</a> is a non-owning view into a 
-      contiguous sequence, [T].  It consists of a reference into the sequence and a length
-    </t-b>
-    <t-b>
-      <div class="indent">
-        <defn-block>
-          <defn-head>Examples of Slices</defn-head>
-          <defn-code>
-  let v = vec![1, 2, 3, 4, 5];
-  let vslice = &v[1..];
-
-  let sarray: [&str] = ["zero", "one", "two"];
-  let aslice: &[&str] = &sarray[0..2];
-
-  let bytearr: [u8] = [0, 1, 2];
-  let bslice = &bytearr;
-          </defn-code>
-        </defn-block>
-      </div>
-    </t-b>
-    <t-b>
-      Slices implement traits: Iter, IterMut, Concat, Join, ...
-    </t-b>
-    <t-b>
-      <div class="indent">
-        <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=71e37521a57822615245009c599040fd">
-          slice playground code
-        </a>
-      </div>
-    </t-b>
-    <div style="height: 0.25rem;"></div>
-    <t-b><hr class="spread" /></t-b>
-    <a id="refs"></a>
-    <h2>References</h2>
-    <t-b class="indent">
-      <table>
-        <tr>
-          <th>Link</th><th>Description</th>
-        </tr>
-        <tr>
-          <td>
-            <a target="_blank" href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">std::iter::Iterator</a>
-          </td>
-          <td>
-            Documentation for Iterator from the std library
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a target="_blank" href="https://doc.rust-lang.org/std/iter/trait.IntoIterator.html">std::iter::IntoIterator</a>
-          </td>
-          <td>
-            Documentation for IntoIterator from the std library
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a target="_blank" href="https://blog.thoughtram.io/iterators-in-rust/">Iterators in Rust - Thoughtram</a>
-          </td>
-          <td>
-            Article with clear descriptions and example code
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a target="_blank" href="https://github.com/rustomax/rust-iterators">rustomax/rust-iterators</a>
-          </td>
-          <td>
-            Github readme file with examples of ranges and iterator adapters
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a target="_blank" href="https://dev.to/dandyvica/yarit-yet-another-rust-iterators-tutorial-46dk">Yet Another rust iterators tutorial</a>
-          </td>
-          <td>
-            Article with clear basics and examples of custom iterators
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a target="_blank" href="https://danielkeep.github.io/itercheat_baked.html">Rust iterator cheat sheet</a>
-          </td>
-          <td>
-            Lots of details
-            <div style="height:0.25rem;"></div>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a target="_blank" href="https://doc.rust-lang.org/std/keyword.for.html">keyword for</a>
-          </td>
-          <td>Rust documentation on for loops</td>
-        </tr>
-        <tr>
-          <td>
-            <a target="_blank" href="https://doc.rust-lang.org/std/ops/struct.Range.html">std::ops::Range</a>
-          </td>
-          <td>Rust documentation for ranges</td>
-        </tr>
-        <tr>
-          <td>
-            <a target="_blank" href="https://doc.rust-lang.org/std/slice/index.html">std::slice</a>
-          </td>
-          <td>Rust documentation for slices</td>
-        </tr>
-      </table>
-    </t-b>
-    <div style="height:2.25rem;"></div>
-    <a id="bottom"></a>
+            </div>
+          </t-b>
+          <div style="height: 0.25rem;"></div>
+          <t-b><hr class="spread" /></t-b>
+          <a id="refs"></a>
+          <h2>References</h2>
+          <t-b class="indent">
+            <table>
+              <tr>
+                <th>Link</th>
+                <th>Description</th>
+              </tr>
+              <tr>
+                <td>
+                  <a target="_blank" href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">std::iter::Iterator</a>
+                </td>
+                <td>
+                  Documentation for Iterator from the std library
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <a target="_blank" href="https://doc.rust-lang.org/std/iter/trait.IntoIterator.html">std::iter::IntoIterator</a>
+                </td>
+                <td>
+                  Documentation for IntoIterator from the std library
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <a target="_blank" href="https://blog.thoughtram.io/iterators-in-rust/">Iterators in Rust - Thoughtram</a>
+                </td>
+                <td>
+                  Article with clear descriptions and example code
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <a target="_blank" href="https://github.com/rustomax/rust-iterators">rustomax/rust-iterators</a>
+                </td>
+                <td>
+                  Github readme file with examples of ranges and iterator adapters
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <a target="_blank" href="https://dev.to/dandyvica/yarit-yet-another-rust-iterators-tutorial-46dk">Yet Another rust iterators tutorial</a>
+                </td>
+                <td>
+                  Article with clear basics and examples of custom iterators
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <a target="_blank" href="https://danielkeep.github.io/itercheat_baked.html">Rust iterator cheat sheet</a>
+                </td>
+                <td>
+                  Lots of details
+                  <div style="height:0.25rem;"></div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <a target="_blank" href="https://doc.rust-lang.org/std/keyword.for.html">keyword for</a>
+                </td>
+                <td>Rust documentation on for loops</td>
+              </tr>
+              <tr>
+                <td>
+                  <a target="_blank" href="https://doc.rust-lang.org/std/ops/struct.Range.html">std::ops::Range</a>
+                </td>
+                <td>Rust documentation for ranges</td>
+              </tr>
+              <tr>
+                <td>
+                  <a target="_blank" href="https://doc.rust-lang.org/std/slice/index.html">std::slice</a>
+                </td>
+                <td>Rust documentation for slices</td>
+              </tr>
+            </table>
+          </t-b>
+          <div style="height:2.25rem;"></div>
+          <a id="bottom"></a>
       </content>
       <a id="bottom"></a>
       <page-TOC id="pages" style="display:none;">
@@ -946,7 +964,7 @@ fn main() {
         <menu-elem class="secElem"><a href="#functions">functions</a></menu-elem>
         <menu-elem class="secElem"><a href="#intro">intro</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
-        <div style='margin:0em -1em; padding-bottom:0.25em; text-align:center' class='darkItem'>Sections</div>
+        <div class='darkItem popupHeader' style="padding:0.25em 2.0em;" onclick="location.reload()">Sections</div>
       </page-sections>
     </main>
     <frame-footer>

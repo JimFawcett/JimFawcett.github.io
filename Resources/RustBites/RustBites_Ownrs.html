@@ -142,7 +142,7 @@
       <nav id="navbar"></nav>
     </frame-header>
     <main>
-      <div id="about">about</div>
+      <div id="about" onclick="location.reload()">about</div>
       <div id="modified">04/28/2022</div>
       <div id="page">RustBites - Ownership</div>
       <div id="hlp"></div>
@@ -157,348 +157,348 @@
             <h3 id="subtitle" class="indent">rules, exercises, conclusions</h3>
           </hgroup>
         </header>
-      <t-b>
-        Rust ownership policy is a set of rules that apply to read, write, allocation, and disposal operations on data.  
-        These rules, enforced by the Rust compiler, are responsible for Rust's memory safety.  
-      </t-b>
-      <t-b>
-        <a target="_blank" href="RustBites_Intmut.html">Interior Mutablity</a> shares responsibility for situations
-        where the compiler&apos;s static analysis is insufficient to prove that some code is indeed 
-        correct, especially for threading applications.  We will look at that in a subsequent Bite.
-        Now we focus on the results of static analysis by Rust&apos;s compilation tools.
-      </t-b>
-      <s-halfEm></s-halfEm>
-      <a id="rules"></a>
-      <h2>1. Ownership Rules:</h2>
-      <t-b>
-        Ownership rules are, in principle, quite simple, essentially RwLock semantics:
-        <a-notice class="tight" style="padding-left:0rem;">
-          <ul class="tight" style="margin-left:1rem;">
-            <li>There is only one owner for every data item</li>
-            <li>Ownership can be transferred with move operations</li>
-            <li>Ownership can be borrowed by creating references</li>
-            <li>Any number of readers may have access to a data value simultaneously &nbsp;&nbsp;</li>
-            <li>Writers get exclusive access to a value - no other readers or writers</li>
-          </ul>
-        </a-notice>
-      </t-b>
-      <t-b>
-        What are readers and writers?
-        <ul class="tight" style="margin-left:1rem;">
-          <li>
-            Any variable bound to a value with no mut qualifier is a reader.
-            <ul class="tight" style="margin-left:1em;">
-              <li>
-                Owner: <c-s>let s = String::from("a string");</c-s>
-              </li>
-              <li>
-                References to the data: <c-s> let t = &s;</c-s>
-              </li>
-            </ul> 
-          </li>
-          <li>
-            Any variable bound to a value with a mut qualifier is a writer.
-            <ul class="tight" style="margin-left:1em;">
-              <li>
-                Owner: <c-s>let mut u = String::from("a string");</c-s>
-              </li>
-              <li>
-                References to the data: <c-s> let v = &mut u;</c-s>
-              </li>
-            </ul> 
-          </li>
-          <li>
-            References are called borrows because they block the owner u&apos;s 
-            ability to mutate its owned resource.
-            <ul class="tight" style="margin-left:1em;">
-              <li>
-                While mutable reference, v, is active, owner, u, is not allowed
-                to mutate its owned value - that&apos;s borrowed by v.
-              </li>
-              <li>
-                There can only be one mutable reference, since the 
-                ability to write is exclusive.  That's why a mutable reference blocks the 
-                the owner&apos;s ability to mutate.
-              </li>
+        <t-b>
+          Rust ownership policy is a set of rules that apply to read, write, allocation, and disposal operations on data.
+          These rules, enforced by the Rust compiler, are responsible for Rust's memory safety.
+        </t-b>
+        <t-b>
+          <a target="_blank" href="RustBites_Intmut.html">Interior Mutablity</a> shares responsibility for situations
+          where the compiler&apos;s static analysis is insufficient to prove that some code is indeed
+          correct, especially for threading applications.  We will look at that in a subsequent Bite.
+          Now we focus on the results of static analysis by Rust&apos;s compilation tools.
+        </t-b>
+        <s-halfEm></s-halfEm>
+        <a id="rules"></a>
+        <h2>1. Ownership Rules:</h2>
+        <t-b>
+          Ownership rules are, in principle, quite simple, essentially RwLock semantics:
+          <a-notice class="tight" style="padding-left:0rem;">
+            <ul class="tight" style="margin-left:1rem;">
+              <li>There is only one owner for every data item</li>
+              <li>Ownership can be transferred with move operations</li>
+              <li>Ownership can be borrowed by creating references</li>
+              <li>Any number of readers may have access to a data value simultaneously &nbsp;&nbsp;</li>
+              <li>Writers get exclusive access to a value - no other readers or writers</li>
             </ul>
-          </li>
-          <li>
-            References are active from the time they are created (with a let statement)
-            until they go out of scope.
-            <div>
+          </a-notice>
+        </t-b>
+        <t-b>
+          What are readers and writers?
+          <ul class="tight" style="margin-left:1rem;">
+            <li>
+              Any variable bound to a value with no mut qualifier is a reader.
               <ul class="tight" style="margin-left:1em;">
                 <li>
-                  References can be dropped.  What that does is interesting, but not very useful.
+                  Owner: <c-s>let s = String::from("a string");</c-s>
                 </li>
                 <li>
-                  Dropping an immutable reference does nothing.  reference is valid after the drop.  
-                </li>
-                <li>
-                  Dropping a mutable reference <strong>moves</strong> the reference, but not the 
-                  referend, to Drop&apos;s stackframe.  That makes the mutable reference unavailable (been moved).
+                  References to the data: <c-s> let t = &s;</c-s>
                 </li>
               </ul>
-            </div>
-          </li>
-          <li>
-            Nuances:
-            <ul class="tight" style="margin-left:1em;">
-              <li>
-                No practical process can exactly divide all programs into safe and not-safe code.  The borrow-checker is conservative.
-                If it can&apos;t prove that a program is safe it will not build the program.
-              </li>
-              <li>
-                The rules stated above have some qualifications that allow more programs to build safely.  These
-                are known by the Rust community as non-lexical lifetime rules - see 
-                <a target="_blank" href="https://doc.rust-lang.org/edition-guide/rust-2018/ownership-and-lifetimes/non-lexical-lifetimes.html">
-                  Rust 2018 edition-guide
-                </a>
-                <ul class="tight" style="margin-left:2em">
+            </li>
+            <li>
+              Any variable bound to a value with a mut qualifier is a writer.
+              <ul class="tight" style="margin-left:1em;">
+                <li>
+                  Owner: <c-s>let mut u = String::from("a string");</c-s>
+                </li>
+                <li>
+                  References to the data: <c-s> let v = &mut u;</c-s>
+                </li>
+              </ul>
+            </li>
+            <li>
+              References are called borrows because they block the owner u&apos;s
+              ability to mutate its owned resource.
+              <ul class="tight" style="margin-left:1em;">
+                <li>
+                  While mutable reference, v, is active, owner, u, is not allowed
+                  to mutate its owned value - that&apos;s borrowed by v.
+                </li>
+                <li>
+                  There can only be one mutable reference, since the
+                  ability to write is exclusive.  That's why a mutable reference blocks the
+                  the owner&apos;s ability to mutate.
+                </li>
+              </ul>
+            </li>
+            <li>
+              References are active from the time they are created (with a let statement)
+              until they go out of scope.
+              <div>
+                <ul class="tight" style="margin-left:1em;">
                   <li>
-                    An expression with non-mutable reference to x, inside the scope where a mutable reference
-                    to x is defined,
-                    will compile if no other expression argument supports mutation of x.
+                    References can be dropped.  What that does is interesting, but not very useful.
                   </li>
                   <li>
-                    A non-mutable reference to x may be defined and used in the scope where a mutable reference
-                    to x is defined, provided that the mutable reference is not used after the non-mutable 
-                    reference is declared.
+                    Dropping an immutable reference does nothing.  reference is valid after the drop.
+                  </li>
+                  <li>
+                    Dropping a mutable reference <strong>moves</strong> the reference, but not the
+                    referend, to Drop&apos;s stackframe.  That makes the mutable reference unavailable (been moved).
                   </li>
                 </ul>
-              </li>
-              <li>
-                These rule relaxations still maintain the &quot;no aliases when mutating&quot; invariant.
-              </li>
-              <li>
-                There is one other case: It may be that during program operation a variable will never be
-                mutated at the same time that an alias to the variable exists, even though the scope rules
-                above are violated.  In this case a RefCell&lt;T&gt; may be created.  That appears to the
-                compiler to be non-mutable, but a mutable reference can be extracted from it.  
-                The RefCell tracks references and mutation in time.
-                If our reasoning about the timing of mutation and aliasing is incorrect, the
-                RefCell will panic and program operation terminates, preventing undefined behavior.
-              </li>
-            </ul>
+              </div>
+            </li>
+            <li>
+              Nuances:
+              <ul class="tight" style="margin-left:1em;">
+                <li>
+                  No practical process can exactly divide all programs into safe and not-safe code.  The borrow-checker is conservative.
+                  If it can&apos;t prove that a program is safe it will not build the program.
+                </li>
+                <li>
+                  The rules stated above have some qualifications that allow more programs to build safely.  These
+                  are known by the Rust community as non-lexical lifetime rules - see
+                  <a target="_blank" href="https://doc.rust-lang.org/edition-guide/rust-2018/ownership-and-lifetimes/non-lexical-lifetimes.html">
+                    Rust 2018 edition-guide
+                  </a>
+                  <ul class="tight" style="margin-left:2em">
+                    <li>
+                      An expression with non-mutable reference to x, inside the scope where a mutable reference
+                      to x is defined,
+                      will compile if no other expression argument supports mutation of x.
+                    </li>
+                    <li>
+                      A non-mutable reference to x may be defined and used in the scope where a mutable reference
+                      to x is defined, provided that the mutable reference is not used after the non-mutable
+                      reference is declared.
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  These rule relaxations still maintain the &quot;no aliases when mutating&quot; invariant.
+                </li>
+                <li>
+                  There is one other case: It may be that during program operation a variable will never be
+                  mutated at the same time that an alias to the variable exists, even though the scope rules
+                  above are violated.  In this case a RefCell&lt;T&gt; may be created.  That appears to the
+                  compiler to be non-mutable, but a mutable reference can be extracted from it.
+                  The RefCell tracks references and mutation in time.
+                  If our reasoning about the timing of mutation and aliasing is incorrect, the
+                  RefCell will panic and program operation terminates, preventing undefined behavior.
+                </li>
+              </ul>
           </ul>
-      </t-b>
-      <t-b style="margin-bottom:0px;">
-        In the dropdown, below, you will find examples of all these rules in action, with violations
-        in comment blocks.  We will discuss the valid code in this example.
-      </t-b>
-      <s-1em></s-1em>
-      <t-b class="top">
-        <details>
-          <summary class="darkItem">Examples of Ownership&nbsp;&nbsp;</summary>
-          <bb-55>
-            <div class="indent pad5">
-              <ol class="tight">
-                <li>
-                  In the first block, Blk #1, in main we see two active readers - O.K.
-                </li>
-                <li>
-                  In the second block, Blk #2, we see one writer - O.K.
-                </li>
-                <li>
-                  In the last uncommented block, before the function call, Blk #3, we see reference v borrowing u&apos;s 
-                  ability to mutate, so there is only one writer - O.K.
-                </li>
-                <li>
-                  In the function we see a reference to u mutating.  This is not a violation because the 
-                  reference, &mut String, goes out of scope at the end of the function.
-                </li>
-                <li>
-                  The commented blocks will be discussed in the next examples.
-                </li>
-              </ol>
-            </div>
+        </t-b>
+        <t-b style="margin-bottom:0px;">
+          In the dropdown, below, you will find examples of all these rules in action, with violations
+          in comment blocks.  We will discuss the valid code in this example.
+        </t-b>
+        <s-1em></s-1em>
+        <t-b class="top">
+          <details>
+            <summary class="darkItem">Examples of Ownership&nbsp;&nbsp;</summary>
+            <bb-55>
+              <div class="indent pad5">
+                <ol class="tight">
+                  <li>
+                    In the first block, Blk #1, in main we see two active readers - O.K.
+                  </li>
+                  <li>
+                    In the second block, Blk #2, we see one writer - O.K.
+                  </li>
+                  <li>
+                    In the last uncommented block, before the function call, Blk #3, we see reference v borrowing u&apos;s
+                    ability to mutate, so there is only one writer - O.K.
+                  </li>
+                  <li>
+                    In the function we see a reference to u mutating.  This is not a violation because the
+                    reference, &mut String, goes out of scope at the end of the function.
+                  </li>
+                  <li>
+                    The commented blocks will be discussed in the next examples.
+                  </li>
+                </ol>
+              </div>
             </bb-55>
             <defn-outerBlock>
-            <defn-block>
-              <defn-head>ownership::main.rs</defn-head>
-              <defn-code>
-/////////////////////////////////////////////////////////////
-// ownership::main.rs - demonstrates Rust ownership        //
-//                                                         //
-// Jim Fawcett, https://JimFawcett.github.com, 07 Jun 2020 //
-/////////////////////////////////////////////////////////////
+              <defn-block>
+                <defn-head>ownership::main.rs</defn-head>
+                <defn-code>
+                  /////////////////////////////////////////////////////////////
+                  // ownership::main.rs - demonstrates Rust ownership        //
+                  //                                                         //
+                  // Jim Fawcett, https://JimFawcett.github.com, 07 Jun 2020 //
+                  /////////////////////////////////////////////////////////////
 
-/*-- only one writer in function scope --*/
-fn mutate_and_show(t:&amp;mut String) {
-    t.clear();
-    t.push_str("new value");
-    print!("\n  t in function = {:?}", t);
-}
+                  /*-- only one writer in function scope --*/
+                  fn mutate_and_show(t:&amp;mut String) {
+                  t.clear();
+                  t.push_str("new value");
+                  print!("\n  t in function = {:?}", t);
+                  }
 
-fn main() {
-    // Blk #1
-    /*-- multiple readers: O.K. --*/
-    let s = String::from("immutable string");
-    let t = &amp;s;
-    print!("\n  s = {:?}", s);
-    print!("\n  t = {:?}", t);
+                  fn main() {
+                  // Blk #1
+                  /*-- multiple readers: O.K. --*/
+                  let s = String::from("immutable string");
+                  let t = &amp;s;
+                  print!("\n  s = {:?}", s);
+                  print!("\n  t = {:?}", t);
 
-    // Blk #2
-    /*-- one writer: O.K. --*/
-    let mut u = String::from("mutable string");
-    u.push_str(" u");
-    print!("\n  u = {:?}", u);
+                  // Blk #2
+                  /*-- one writer: O.K. --*/
+                  let mut u = String::from("mutable string");
+                  u.push_str(" u");
+                  print!("\n  u = {:?}", u);
 
-    /*----------------------------------------------------- 
-        attempting to add reader v with active writer u
-        not O.K. 
-    */
-    // let v = &amp;u;
-    // u.push_str("modfied by u");
-    // print!("\n  v = {:?}", v);
-    
-    // Blk #3
-    /*-- mutable v borrows u's ability to write, O.K. --*/
-    let v = &amp;mut u;
-    v.push_str(" referenced by v");
-    print!("\n  v = {:?}", v);
+                  /*-----------------------------------------------------
+                  attempting to add reader v with active writer u
+                  not O.K.
+                  */
+                  // let v = &amp;u;
+                  // u.push_str("modfied by u");
+                  // print!("\n  v = {:?}", v);
 
-    /*-- attempting to use second writer, not O.K. --*/
-    // u.push_str(" and modifed again by u");
-    // print!("\n  u = {:?}", u);
-    // print!("\n  v = {:?}", v);
+                  // Blk #3
+                  /*-- mutable v borrows u's ability to write, O.K. --*/
+                  let v = &amp;mut u;
+                  v.push_str(" referenced by v");
+                  print!("\n  v = {:?}", v);
 
-    /*-----------------------------------------------------
-        can mutate u in function since ref v is not accessible 
-    */
-    mutate_and_show(&amp;mut u);
+                  /*-- attempting to use second writer, not O.K. --*/
+                  // u.push_str(" and modifed again by u");
+                  // print!("\n  u = {:?}", u);
+                  // print!("\n  v = {:?}", v);
 
-    /*------------------------------------------------------
-        attempting to use v after borrowing u in function call.
-        Not O.K.
-        */
-    //  v.push_str(" modified by v");
+                  /*-----------------------------------------------------
+                  can mutate u in function since ref v is not accessible
+                  */
+                  mutate_and_show(&amp;mut u);
 
-    println!("\n\n  That's all Folks!\n\n");
-}
-              </defn-code>
-            </defn-block>
-            <defn-block>
-              <defn-head>Output:</defn-head>
-              <defn-code>
-cargo run
-  Running `target\debug\ownership.exe`
+                  /*------------------------------------------------------
+                  attempting to use v after borrowing u in function call.
+                  Not O.K.
+                  */
+                  //  v.push_str(" modified by v");
 
-s = "immutable string"
-t = "immutable string"
-u = "mutable string u"
-v = "mutable string u referenced by v"
-t in function = "new value"
+                  println!("\n\n  That's all Folks!\n\n");
+                  }
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Output:</defn-head>
+                <defn-code>
+                  cargo run
+                  Running `target\debug\ownership.exe`
 
-That's all Folks!
-              </defn-code>
-            </defn-block>
-          </defn-outerBlock>
-        </details>
-      </t-b>
-      <t-b>
-        The example below shows that you can&apos;t mutate an owner with an active reader, Even 
-        though it is declared mut.
-        Note that the compiler error messages tell you exactly what the problem is and where
-        it occured.
-      </t-b>      
-      <t-b>
-        <details>
-          <summary class="darkItem">Example: First Commented Error Block</summary>
-          <table>
-            <tr>
-              <td><img src="CodeSamples/ownership/NotOk_1.jpg" style="width:90vw;"></td>
-            </tr>
-          </table>
-        </details>
-      </t-b>
-      <t-b>
-        This second example shows that you can&apos;t have two active writers for the same data.
-        The compiler error messages are again quite clear about the problems.
-      </t-b>
-      <t-b>
-        <details>
-          <summary class="darkItem">Example: Second Commented Error Block</summary>
-          <table>
-            <tr>
-              <td><img src="CodeSamples/ownership/NotOk_2.jpg" style="width:90vw;"></td>
-            </tr>
-          </table>
-        </details>
-      </t-b>
-      <t-b>
-        The last example shows attempt to mutably borrow the owner u twice, e.g., two writers.
-      </t-b>
-      <t-b>
-        <details>
-          <summary class="darkItem">Example: Third Commented Error Block</summary>
-          <table>
-            <tr>
-              <td><img src="CodeSamples/ownership/NotOk_3.jpg" style="width:90vw;"></td>
-            </tr>
-          </table>
-        </details>
-      </t-b>
-      <t-b>
-        <a-notice>
-          These examples may seem complicated, but references are most often used to pass arguments
-          to functions by reference, which is actually quite simple.
-        </a-notice>
-      </t-b>
-      <s-halfEm></s-halfEm>
-      <a id="exercises"></a>
-      <h2>2. Exercises:</h2>
-      <t-b>
-        <strong>Note:</strong>
-        <div class="pad5">
-          In order to build and run with cargo from the Visual Studio Code terminal you need to open 
-          VS Code in the package folder for the code you want to build and run.  That's the folder where 
-          the package cargo.toml file resides.
-        </div>
-      </t-b>
-      <ol>
-        <li>
-          Create an instance of a Vec&lt;String&gt;. Show that you can mutate using the owner identifier
-          and using a reference.
-          <ul class="tight">
-            <li>Verify that it was mutated as expected.</li>
-          </ul>
-        </li>
-        <li>
-          Pass a reference to your Vec to a function that displays the Vec contents.
-          <!-- <ul>
-            <li>Can you prove that it was moved?</li>
-            <li>Can you show that the moved-from is invalid?</li>
-          </ul> -->
-        </li>
-        <li>
-          Add to the Code of the previous exercise code that attempts to violate ownership
-          rules in as many unique ways as possible, but be DRY.
-          <ul class="tight">
-            <li>Write code that fixes each problem based on the compiler error messages</li>
-          </ul>
-          <!-- Hint: use the compiler messages. -->
-        </li>
-      </ol>
-    
-      <s-halfEm></s-halfEm>
-      <a id="conclusions"></a>
-      <h2>3. Conclusions:</h2>
-      <t-b>
-        The Rust ownership rules are simple in principle, but following the simple rules is not always
-        simple.  They can fail in several ways, sometimes at unexpected places.  Fortunately the compiler
-        almost always provides very clear error messages, and occasionally even suggests solutions.
-      </t-b>
-      <t-b>
-        At first you may struggle a bit to get things to compile, but if you fix the problems reported by 
-        the compiler, you can quickly move on.  After a little practice you will find the process becomes
-        very manageable.
-      </t-b>
-      <t-b>
-        A good way to minimize ownership problems in your code is to create references, when you need them,
-        in local scopes, usually by defining a function that passes its arguments by reference.  The LifeTime
-        of the references last from function entry until the thread of execution leaves the 
-        function.
-      </t-b>
+                  s = "immutable string"
+                  t = "immutable string"
+                  u = "mutable string u"
+                  v = "mutable string u referenced by v"
+                  t in function = "new value"
+
+                  That's all Folks!
+                </defn-code>
+              </defn-block>
+            </defn-outerBlock>
+          </details>
+        </t-b>
+        <t-b>
+          The example below shows that you can&apos;t mutate an owner with an active reader, Even
+          though it is declared mut.
+          Note that the compiler error messages tell you exactly what the problem is and where
+          it occured.
+        </t-b>
+        <t-b>
+          <details>
+            <summary class="darkItem">Example: First Commented Error Block</summary>
+            <table>
+              <tr>
+                <td><img src="CodeSamples/ownership/NotOk_1.jpg" style="width:90vw;"></td>
+              </tr>
+            </table>
+          </details>
+        </t-b>
+        <t-b>
+          This second example shows that you can&apos;t have two active writers for the same data.
+          The compiler error messages are again quite clear about the problems.
+        </t-b>
+        <t-b>
+          <details>
+            <summary class="darkItem">Example: Second Commented Error Block</summary>
+            <table>
+              <tr>
+                <td><img src="CodeSamples/ownership/NotOk_2.jpg" style="width:90vw;"></td>
+              </tr>
+            </table>
+          </details>
+        </t-b>
+        <t-b>
+          The last example shows attempt to mutably borrow the owner u twice, e.g., two writers.
+        </t-b>
+        <t-b>
+          <details>
+            <summary class="darkItem">Example: Third Commented Error Block</summary>
+            <table>
+              <tr>
+                <td><img src="CodeSamples/ownership/NotOk_3.jpg" style="width:90vw;"></td>
+              </tr>
+            </table>
+          </details>
+        </t-b>
+        <t-b>
+          <a-notice>
+            These examples may seem complicated, but references are most often used to pass arguments
+            to functions by reference, which is actually quite simple.
+          </a-notice>
+        </t-b>
+        <s-halfEm></s-halfEm>
+        <a id="exercises"></a>
+        <h2>2. Exercises:</h2>
+        <t-b>
+          <strong>Note:</strong>
+          <div class="pad5">
+            In order to build and run with cargo from the Visual Studio Code terminal you need to open
+            VS Code in the package folder for the code you want to build and run.  That's the folder where
+            the package cargo.toml file resides.
+          </div>
+        </t-b>
+        <ol>
+          <li>
+            Create an instance of a Vec&lt;String&gt;. Show that you can mutate using the owner identifier
+            and using a reference.
+            <ul class="tight">
+              <li>Verify that it was mutated as expected.</li>
+            </ul>
+          </li>
+          <li>
+            Pass a reference to your Vec to a function that displays the Vec contents.
+            <!-- <ul>
+          <li>Can you prove that it was moved?</li>
+          <li>Can you show that the moved-from is invalid?</li>
+        </ul> -->
+          </li>
+          <li>
+            Add to the Code of the previous exercise code that attempts to violate ownership
+            rules in as many unique ways as possible, but be DRY.
+            <ul class="tight">
+              <li>Write code that fixes each problem based on the compiler error messages</li>
+            </ul>
+            <!-- Hint: use the compiler messages. -->
+          </li>
+        </ol>
+
+        <s-halfEm></s-halfEm>
+        <a id="conclusions"></a>
+        <h2>3. Conclusions:</h2>
+        <t-b>
+          The Rust ownership rules are simple in principle, but following the simple rules is not always
+          simple.  They can fail in several ways, sometimes at unexpected places.  Fortunately the compiler
+          almost always provides very clear error messages, and occasionally even suggests solutions.
+        </t-b>
+        <t-b>
+          At first you may struggle a bit to get things to compile, but if you fix the problems reported by
+          the compiler, you can quickly move on.  After a little practice you will find the process becomes
+          very manageable.
+        </t-b>
+        <t-b>
+          A good way to minimize ownership problems in your code is to create references, when you need them,
+          in local scopes, usually by defining a function that passes its arguments by reference.  The LifeTime
+          of the references last from function entry until the thread of execution leaves the
+          function.
+        </t-b>
         <div style="height:5rem;"></div>
       </content>
       <a id="bottom"></a>
@@ -511,7 +511,7 @@ That's all Folks!
         <menu-elem class="secElem"><a href="#exercises">exercises</a></menu-elem>
         <menu-elem class="secElem"><a href="#rules">rules</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
-        <div style='margin:0em -1em; padding-bottom:0.25em; text-align:center' class='darkItem'>Sections</div>
+        <div class='darkItem popupHeader' style="padding:0.25em 2.0em;" onclick="location.reload()">Sections</div>
       </page-sections>
     </main>
     <frame-footer>

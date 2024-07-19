@@ -201,7 +201,7 @@ ib<!DOCTYPE html>
       <nav id="navbar"></nav>
     </frame-header>
     <main>
-      <div id="about">about</div>
+      <div id="about" onclick="location.reload()">about</div>
       <div id="modified">05/19/2022</div>
       <div id="page">RustBites - RegEx</div>
       <div id="hlp"></div>
@@ -217,674 +217,677 @@ ib<!DOCTYPE html>
           </hgroup>
         </header>
         <!--<div style="height:1.5em;"></div>-->
-    <t-b>
-      <div style="width:90%; margin-left:2em;">
-        &quot;Some people, when confronted with a problem, think "I know, I'll use regular expressions." 
-        Now they have two problems.&quot;<br />
-        - Jamie Zawinski
-      </div>
-    </t-b>
-    <t-b><hr class="spread" /></t-b>
-    <t-b>
-      A regular expression is a String-based pattern that matches other Strings or parts of Strings.  Patterns are
-      constructed from a little language, discussed in Section 3.  A program in that language is compiled by
-      a regular expression compiler.  The result is used to search text for matches.
-    </t-b>
-    <t-b>
-      Rust does not have a regular expression library, but the there is a widely used regex library posted on
-      <a href="https://crates.io/search?q=regex">crates.io</a> that we will use in this Bite.
-      The compiler, <c-s>regex::RegEx</c-s>, expects syntax similar to that used in the string processing language 
-      Perl.  <c-s>RegEx</c-s> has a number of methods, discussed in Section 2., that support finding matches and
-      retrieving text fragments.
-    </t-b>
-    <a id="intro"></a>
-    <h2>1.0&nbsp;&nbsp;Introduction</h2>
-    <t-b>
-      <div class="indent">
-        <defn-OuterBlock>
-          <defn-block>
-            <defn-head>Example</defn-head>
-            <defn-code>
-fn re_check(re: &str, text: &str) -> bool {
-    /* panics if re is invalid */
-    let re: Regex = Regex::new(re).unwrap();
-    re.is_match(text)
-}
-
-fn show_re_test(re: &str, text: &str) {
-    if re_check(re, text) {
-        print!(
-            "\n  RegEx: {:?} matches text: {:?}", 
-            re, text
-        )
-    }    
-    else {
-        print!(
-            "\n  RegEx: {:?} does'nt match text: {:?}", 
-            re, text
-        )
-    }
-}
-
-fn main() {
-    let re = 
-        Regex::new(r"^\d{4}-\d{2}-\d{2}$").unwrap();
-    assert!(re.is_match("2014-01-01"));
-
-    let re = "abc";
-    let text1 = "123abc987";
-    show_re_test(re, text1);
-    let text2 = "123000987";
-    show_re_test(re, text2);
-    
-    let re = r"([a-z]+)|([A-Z][A-Z])";
-    let text3 = "???abc";
-    show_re_test(re, text3);
-    let text4 = "???A@@@";
-    show_re_test(re, text4);
-    let text4 = "???AK@@@";
-    show_re_test(re, text4);
-    let text5 = r"123";
-    show_re_test(re, text5);
-}
-            </defn-code>
-          </defn-block>
-          <defn-block>
-            <defn-head>Result</defn-head>
-            <defn-code>
-  RegEx: "abc" 
-      matches text: "123abc987"
-  RegEx: "abc" 
-      does not match text: "123000987"
-  RegEx: "([a-z]+)|([A-Z][A-Z])" 
-      matches text: "???abc"
-  RegEx: "([a-z]+)|([A-Z][A-Z])" 
-      does not match text: "???A@@@"
-  RegEx: "([a-z]+)|([A-Z][A-Z])" 
-      matches text: "???AK@@@"
-  RegEx: "([a-z]+)|([A-Z][A-Z])" 
-      does not match text: "123"
-            </defn-code>
-          </defn-block>
-        </defn-OuterBlock>
-      </div>
-    </t-b>
-    <t-b class="indent">
-      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=def5cce838cf257ac8b62e1dd00e94d2">
-        matching in rust playground
-      </a>
-    </t-b>
-    <t-b>
-      The code used in this example will be discussed in the next two sections.
-    </t-b>
-    <a id="syntax"></a>
-    <h2>2.0&nbsp;&nbsp;Regular Expression Syntax Summary</h2>
-    <t-b>
-      A short list of syntax, extracted from the regex crate, is provided in Table 1.  This should be all that 
-      is needed for most applications.
-    </t-b>
-    <t-b class="indent" style="width:calc(100vw - 6rem);">
-      <div style="display:flex">
-        <div>
-      <h4>Table&nbsp;1.&nbsp;-&nbsp;Regular&nbsp;Expression&nbsp;Syntax</h4>
-      <table>
-        <tr>
-          <th>syntax</th><th>meaning</th>
-        </tr>
-        <tr>
-          <td>.</td>
-          <td>
-            any&nbsp;character&nbsp;except&nbsp;new&nbsp;line
-          </td>
-        </tr>
-        <tr>
-          <td>\d</td>
-          <td>
-            digit
-          </td>
-        </tr>
-        <tr>
-          <td>\D</td>
-          <td>
-            not digit
-          </td>
-        </tr>
-        <tr>
-          <td>\s</td>
-          <td>
-            white space
-          </td>
-        </tr>
-        <tr>
-          <td>\S</td>
-          <td>
-            not white space
-          </td>
-        </tr>
-        <tr>
-          <td>\w</td>
-          <td>
-            word character
-          </td>
-        </tr>
-        <tr>
-          <td>\W</td>
-          <td>
-            not word character
-          </td>
-        </tr>
-        <tr>
-          <td>[xyz]</td>
-          <td>
-            character class matching either x, y, or z
-          </td>
-        </tr>
-        <tr>
-          <td>[^xyz]</td>
-          <td>
-            character class matching any char except x, y, or z
-          </td>
-        </tr>
-        <tr>
-          <td>[b-q]</td>
-          <td>
-            character class matching any char in b-q range inclusive
-          </td>
-        </tr>
-        <tr>
-          <td>[0-7&&[^4]]</td>
-          <td>
-            matches any char in range 0-7 except 4
-          </td>
-        </tr>
-        <tr>
-          <td>xy</td>
-          <td>
-            concatenation - x followed by y
-          </td>
-        </tr>
-        <tr>
-          <td>x|y</td>
-          <td>
-            x or y
-          </td>
-        </tr>
-        <tr>
-          <td>x*</td>
-          <td>
-            zero or more of x
-          </td>
-        </tr>
-        <tr>
-          <td>x+</td>
-          <td>
-            one or more of x
-          </td>
-        </tr>
-        <tr>
-          <td>x?</td>
-          <td>
-            zero or one of x
-          </td>
-        </tr>
-        <tr>
-          <td>x{n}</td>
-          <td>
-            n repetitions of x
-          </td>
-        </tr>
-        <tr>
-          <td>x{m,n}</td>
-          <td>
-            at least m but no more than n repetitions of x
-          </td>
-        </tr>
-        <tr>
-          <td>^</td>
-          <td>
-            beginning of text
-          </td>
-        </tr>
-        <tr>
-          <td>$</td>
-          <td>
-            end of text
-          </td>
-        </tr>
-        <tr>
-          <td>(...)</td>
-          <td>
-            capture group
-          </td>
-        </tr>
-      </table>
+        <t-b>
+          <div style="width:90%; margin-left:2em;">
+            &quot;Some people, when confronted with a problem, think "I know, I'll use regular expressions."
+            Now they have two problems.&quot;<br />
+            - Jamie Zawinski
           </div>
-        <div style="margin-left:1em;">
-          <h4>Table 2. - Examples</h4>
-          <table style="width: calc(100vw-0rem);">
+        </t-b>
+        <t-b><hr class="spread" /></t-b>
+        <t-b>
+          A regular expression is a String-based pattern that matches other Strings or parts of Strings.  Patterns are
+          constructed from a little language, discussed in Section 3.  A program in that language is compiled by
+          a regular expression compiler.  The result is used to search text for matches.
+        </t-b>
+        <t-b>
+          Rust does not have a regular expression library, but the there is a widely used regex library posted on
+          <a href="https://crates.io/search?q=regex">crates.io</a> that we will use in this Bite.
+          The compiler, <c-s>regex::RegEx</c-s>, expects syntax similar to that used in the string processing language
+          Perl.  <c-s>RegEx</c-s> has a number of methods, discussed in Section 2., that support finding matches and
+          retrieving text fragments.
+        </t-b>
+        <a id="intro"></a>
+        <h2>1.0&nbsp;&nbsp;Introduction</h2>
+        <t-b>
+          <div class="indent">
+            <defn-OuterBlock>
+              <defn-block>
+                <defn-head>Example</defn-head>
+                <defn-code>
+                  fn re_check(re: &str, text: &str) -> bool {
+                  /* panics if re is invalid */
+                  let re: Regex = Regex::new(re).unwrap();
+                  re.is_match(text)
+                  }
+
+                  fn show_re_test(re: &str, text: &str) {
+                  if re_check(re, text) {
+                  print!(
+                  "\n  RegEx: {:?} matches text: {:?}",
+                  re, text
+                  )
+                  }
+                  else {
+                  print!(
+                  "\n  RegEx: {:?} does'nt match text: {:?}",
+                  re, text
+                  )
+                  }
+                  }
+
+                  fn main() {
+                  let re =
+                  Regex::new(r"^\d{4}-\d{2}-\d{2}$").unwrap();
+                  assert!(re.is_match("2014-01-01"));
+
+                  let re = "abc";
+                  let text1 = "123abc987";
+                  show_re_test(re, text1);
+                  let text2 = "123000987";
+                  show_re_test(re, text2);
+
+                  let re = r"([a-z]+)|([A-Z][A-Z])";
+                  let text3 = "???abc";
+                  show_re_test(re, text3);
+                  let text4 = "???A@@@";
+                  show_re_test(re, text4);
+                  let text4 = "???AK@@@";
+                  show_re_test(re, text4);
+                  let text5 = r"123";
+                  show_re_test(re, text5);
+                  }
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Result</defn-head>
+                <defn-code>
+                  RegEx: "abc"
+                  matches text: "123abc987"
+                  RegEx: "abc"
+                  does not match text: "123000987"
+                  RegEx: "([a-z]+)|([A-Z][A-Z])"
+                  matches text: "???abc"
+                  RegEx: "([a-z]+)|([A-Z][A-Z])"
+                  does not match text: "???A@@@"
+                  RegEx: "([a-z]+)|([A-Z][A-Z])"
+                  matches text: "???AK@@@"
+                  RegEx: "([a-z]+)|([A-Z][A-Z])"
+                  does not match text: "123"
+                </defn-code>
+              </defn-block>
+            </defn-OuterBlock>
+          </div>
+        </t-b>
+        <t-b class="indent">
+          <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=def5cce838cf257ac8b62e1dd00e94d2">
+            matching in rust playground
+          </a>
+        </t-b>
+        <t-b>
+          The code used in this example will be discussed in the next two sections.
+        </t-b>
+        <a id="syntax"></a>
+        <h2>2.0&nbsp;&nbsp;Regular Expression Syntax Summary</h2>
+        <t-b>
+          A short list of syntax, extracted from the regex crate, is provided in Table 1.  This should be all that
+          is needed for most applications.
+        </t-b>
+        <t-b class="indent" style="width:calc(100vw - 6rem);">
+          <div style="display:flex">
+            <div>
+              <h4>Table&nbsp;1.&nbsp;-&nbsp;Regular&nbsp;Expression&nbsp;Syntax</h4>
+              <table>
+                <tr>
+                  <th>syntax</th>
+                  <th>meaning</th>
+                </tr>
+                <tr>
+                  <td>.</td>
+                  <td>
+                    any&nbsp;character&nbsp;except&nbsp;new&nbsp;line
+                  </td>
+                </tr>
+                <tr>
+                  <td>\d</td>
+                  <td>
+                    digit
+                  </td>
+                </tr>
+                <tr>
+                  <td>\D</td>
+                  <td>
+                    not digit
+                  </td>
+                </tr>
+                <tr>
+                  <td>\s</td>
+                  <td>
+                    white space
+                  </td>
+                </tr>
+                <tr>
+                  <td>\S</td>
+                  <td>
+                    not white space
+                  </td>
+                </tr>
+                <tr>
+                  <td>\w</td>
+                  <td>
+                    word character
+                  </td>
+                </tr>
+                <tr>
+                  <td>\W</td>
+                  <td>
+                    not word character
+                  </td>
+                </tr>
+                <tr>
+                  <td>[xyz]</td>
+                  <td>
+                    character class matching either x, y, or z
+                  </td>
+                </tr>
+                <tr>
+                  <td>[^xyz]</td>
+                  <td>
+                    character class matching any char except x, y, or z
+                  </td>
+                </tr>
+                <tr>
+                  <td>[b-q]</td>
+                  <td>
+                    character class matching any char in b-q range inclusive
+                  </td>
+                </tr>
+                <tr>
+                  <td>[0-7&&[^4]]</td>
+                  <td>
+                    matches any char in range 0-7 except 4
+                  </td>
+                </tr>
+                <tr>
+                  <td>xy</td>
+                  <td>
+                    concatenation - x followed by y
+                  </td>
+                </tr>
+                <tr>
+                  <td>x|y</td>
+                  <td>
+                    x or y
+                  </td>
+                </tr>
+                <tr>
+                  <td>x*</td>
+                  <td>
+                    zero or more of x
+                  </td>
+                </tr>
+                <tr>
+                  <td>x+</td>
+                  <td>
+                    one or more of x
+                  </td>
+                </tr>
+                <tr>
+                  <td>x?</td>
+                  <td>
+                    zero or one of x
+                  </td>
+                </tr>
+                <tr>
+                  <td>x{n}</td>
+                  <td>
+                    n repetitions of x
+                  </td>
+                </tr>
+                <tr>
+                  <td>x{m,n}</td>
+                  <td>
+                    at least m but no more than n repetitions of x
+                  </td>
+                </tr>
+                <tr>
+                  <td>^</td>
+                  <td>
+                    beginning of text
+                  </td>
+                </tr>
+                <tr>
+                  <td>$</td>
+                  <td>
+                    end of text
+                  </td>
+                </tr>
+                <tr>
+                  <td>(...)</td>
+                  <td>
+                    capture group
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div style="margin-left:1em;">
+              <h4>Table 2. - Examples</h4>
+              <table style="width: calc(100vw-0rem);">
+                <tr>
+                  <th>Example</th>
+                  <th>Action</th>
+                </tr>
+                <tr>
+                  <td>
+                    [A-Z]
+                  </td>
+                  <td>
+                    matches C in "a Capital letter"
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Rust
+                  </td>
+                  <td>
+                    matches any string containing &quot;Rust&quot;
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    abc{3}
+                  </td>
+                  <td>
+                    matches&nbsp;&quot;this&nbsp;is&nbsp;an&nbsp;example&nbsp;-&nbsp;abccc&nbsp;-&quot;
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    a(bc)*
+                  </td>
+                  <td>
+                    matches a, abc, abcbc, ...
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    fn|struct
+                  </td>
+                  <td>
+                    matches "fn funct()", "struct X {}"
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <a href="https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285">RE Tutorial - Factory Mind</a><br />
+                    has many executable examples.
+                    <div style="height:0.5em;"></div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </t-b>
+        <t-b class="indent">
+          <a href="https://docs.rs/regex/1.4.5/regex/index.html#syntax">more complete list of syntax</a>
+        </t-b>
+        <a id="regex"></a>
+        <h2>3.0&nbsp;&nbsp;Regex</h2>
+        <t-b>
+          The crate, regex&nbsp;ver&nbsp;1.4.5, available from <a href="https://crates.io/crates/regex">crates.io</a>
+          is used exclusively in this Bite.
+        </t-b>
+        <t-b>
+          It&apos;s primary struct, regex::Regex, is a processor for regular expressions that compiles a regular expression
+          into a state machine.  Using that it can:
+          <div class="pad5">
+            <ul class="tight" style="margin-left:2em;">
+              <li>check if a regular expression matches a given text string, as shown above</li>
+              <li>return capture groups that describe possibly multiple matches in a given string</li>
+              <li>split text based on capture groups</li>
+              <li>replace text</li>
+            </ul>
+          </div>
+          Searching text with a Regex instance is guaranteed to be linear in the size of the text.  Compiling
+          regular expressions requires a non-trivial amount of time, so repeated invocations should not recompile
+          unless the pattern changes.
+        </t-b>
+        <t-b>
+          <div class="indent">
+            <defn-OuterBlock>
+              <defn-block>
+                <defn-head>Partial Declarations from regex crate</defn-head>
+                <defn-code>
+                  #[derive(Copy, Clone, Debug, Eq, PartialEq)]
+                  pub struct Match<'t> {
+                  text: &'t str,
+                  start: usize,
+                  end: usize,
+                  }
+
+                  pub struct Regex(Exec);
+
+                  /* compiles reg express'n, result can be used repeatedly */
+                  pub fn new(re: &str) -> Result<Regex, Error>
+
+                    /* cheapest way to detect a match */
+                    pub fn is_match(&self, text: &str) -> bool
+
+                    /* returns start and end of first match if it exists */
+                    pub fn find&lt;'t&gt;(&self, text: &'t str) -> Option&lt;Match&lt;'t&gt;&gt;
+
+                    /* returns iterator for successive non-overlapping matches */
+                    pub fn find_iter<'r, 't>(&'r self, text: &'t str) -> Matches<'r, 't>
+
+                    /* returns capture groups for first match in text */
+                    pub fn captures&lt;'t&gt;(&self, text: &'t str) -> Option&lt;Captures&lt;'t&gt;&gt;
+
+                    /* returns iterator over all non-overlapping capture groups */
+                    pub fn captures_iter&lt;'r, 't&gt;(
+                    &'r self,
+                    text: &'t str,
+                    ) -> CaptureMatches&lt;'r, 't&gt;
+
+                    /* returns iterator of substrings of matching text */
+                    pub fn split&lt;'r, 't&gt;(&'r self, text: &'t str) -> Split&lt;'r, 't&gt;
+
+                    /* replaces first match with replacement */
+                    pub fn replace&lt;'t, R: Replacer&gt;(
+                    &self,
+                    text: &'t str,
+                    rep: R,
+                    ) -> Cow&lt;'t, str&gt;
+
+                    /* replaces all non-overlapping matches in text with replacement */
+                    pub fn replace_all&lt;'t, R: Replacer&gt;(
+                    &self,
+                    text: &'t str,
+                    rep: R,
+                    ) -> Cow&lt;'t, str&gt;
+
+                </defn-code>
+              </defn-block>
+            </defn-OuterBlock>
+            <t-b>
+              Contents of the preceding block show the structure and methods of <c-s>regex::Regex</c-s>.  The
+              next block gives examples of their use, and Section 3.0 discusses regular expression pattern
+              syntax and semantics.
+            </t-b>
+            <defn-OuterBlock>
+              <defn-block>
+                <defn-head>Example Use</defn-head>
+                <defn-code>
+                  use regex::{Regex, Match, Captures};
+
+                  fn check(pattern: &str, text: &str, pred:bool) {
+                  if pred {
+                  print!(
+                  "\n  pattern: {:?}  matches text: {:?}",
+                  pattern, text
+                  );
+                  }
+                  else {
+                  print!(
+                  "\n  pattern: {:?} !matches text: {:?}",
+                  pattern, text
+                  );
+                  }
+                  }
+
+                  fn range(pattern: &str, text: &str, mat: &Option<Match>
+                    ) {
+                    if let Some(mt) = mat {
+                    print!(
+                    "\n  find pattern {:?} in text {:?}:",
+                    pattern, text
+                    );
+                    print!("  match in [{}, {})", mt.start(), mt.end());
+                    }
+                    else {
+                    print!("\n  no match");
+                    }
+                    }
+
+                    fn range_iter(pattern: &str, text: &str, mat: Match) {
+                    print!(
+                    "\n  find pattern {:?} in text {:?}:",
+                    pattern, text
+                    );
+                    print!("  match in [{}, {})", mat.start(), mat.end());
+                    }
+
+                    fn test_match() {
+                    print!("\n  -- test_match --");
+                    let pattern = r"[a-q]{3,4}$";
+                    let re = Regex::new(pattern).unwrap();
+                    let text = "12cde";
+                    let pred = re.is_match(text);
+                    check(pattern, text, pred);
+
+                    let text = "12cdefg";
+                    let pred = re.is_match(text);
+                    check(pattern, text, pred);
+
+                    let text = "12cd";
+                    let pred = re.is_match(text);
+                    check(pattern, text, pred);
+
+                    let text = "12cd3e";
+                    let pred = re.is_match(text);
+                    check(pattern, text, pred);
+
+                    let text = "12cds";
+                    let pred = re.is_match(text);
+                    check(pattern, text, pred);
+                    }
+
+                    fn test_find() {
+                    print!("\n  -- test_find --");
+                    let pattern = r"abc";
+                    let re = Regex::new(pattern).unwrap();
+                    let text = "123abc456";
+                    let op: Option&lt;Match&gt; = re.find(text);
+                    range(pattern, text, &op);
+                    }
+
+                    fn test_find_iter() {
+                    print!("\n  -- test_find_iter --");
+                    let pattern = r"abc";
+                    let re = Regex::new(pattern).unwrap();
+                    let text = "123abc456abc789";
+                    let matches = re.find_iter(text);
+                    for mat in matches {
+                    range_iter(pattern, text, mat);
+                    }
+                    }
+
+                    fn test_captures() {
+                    print!("\n  -- test_captures --");
+                    let text = "123abc456def789";
+                    let pattern = "\
+                    ([a-z]{3}|[0-9]{3})\
+                    ([a-z]{3}|[0-9]{3})\
+                    ([a-z]{3}|[0-9]{3})\
+                    ([a-z]{3}|[0-9]{3})\
+                    ([a-z]{3}|[0-9]{3})\
+                    ";
+                    // These don't work as you might expect.
+                    // Capture doesn&apos;t work well with repetitions.
+                    // let pattern = r"([a-z]{3}|[0-9]{3}){5}";
+                    // let pattern = r"(([a-z]{3})([0-9]{3}))+";
+                    // let pattern = r"((?:\d+)+)+";
+
+                    let re = Regex::new(pattern).unwrap();
+                    let captures: Option&lt;Captures&gt; = re.captures(text);
+                    print!("\n  captures: {:?}", captures);
+                    let caps = captures.unwrap();
+                    for i in 0..caps.len() {
+                    print!("\n  captures[{}] = {:?}", i, &caps.get(i));
+                    let cap = &caps.get(i).unwrap();
+                    print!(
+                    "\n  cap = {:?}, {}, {}",
+                    cap.as_str(), cap.start(), cap.end()
+                    );
+                    }
+                    }
+
+                    fn main() {
+                    test_match();
+                    test_find();
+                    test_find_iter();
+                    test_captures();
+                    }
+
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Output</defn-head>
+                <defn-code>
+                  -- test_match --
+                  pattern: "[a-q]{3,4}$"  matches text: "12cde"
+                  pattern: "[a-q]{3,4}$"  matches text: "12cdefg"
+                  pattern: "[a-q]{3,4}$" !matches text: "12cd"
+                  pattern: "[a-q]{3,4}$" !matches text: "12cd3e"
+                  pattern: "[a-q]{3,4}$" !matches text: "12cds"
+
+                  -- test_find --
+                  find pattern "abc" in text "123abc456":  match in [3, 6)
+                  -- test_find_iter --
+                  find pattern "abc" in text "123abc456abc789":
+                  match in [3, 6)
+                  find pattern "abc" in text "123abc456abc789":
+                  match in [9, 12)
+                  -- test_captures --
+                  captures: Some(
+                  Captures({
+                  0: Some("123abc456def"),
+                  1: Some("123"),
+                  2: Some("abc"),
+                  3: Some("456"),
+                  4: Some("def")
+                  })
+                  )
+
+                  captures[0] = Some(
+                  Match {
+                  text: "123abc456def789", start: 0, end: 12
+                  }
+                  )
+                  cap = "123abc456def", 0, 12
+
+                  captures[1] = Some(
+                  Match {
+                  text: "123abc456def789", start: 0, end: 3
+                  }
+                  )
+                  cap = "123", 0, 3
+
+                  captures[2] = Some(
+                  Match {
+                  text: "123abc456def789", start: 3, end: 6
+                  }
+                  )
+                  cap = "abc", 3, 6
+
+                  captures[3] = Some(
+                  Match {
+                  text: "123abc456def789", start: 6, end: 9
+                  }
+                  )
+                  cap = "456", 6, 9
+
+                  captures[4] = Some(
+                  Match {
+                  text: "123abc456def789", start: 9, end: 12
+                  }
+                  )
+                  cap = "def", 9, 12
+
+                  captures[5] = Some(
+                  Match {
+                  text: "123abc456def789", start: 12, end: 15
+                  }
+                  )
+                  cap = "789", 12, 15
+                </defn-code>
+              </defn-block>
+            </defn-OuterBlock>
+          </div>
+        </t-b>
+        <t-b class="indent">
+          <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=2f071dbdfda7b4b5c13a329103f813d3">
+            code in playground
+          </a>
+        </t-b>
+        <a id="epilogue"></a>
+        <h2>4.0&nbsp;&nbsp;Epilogue:</h2>
+        <t-b>
+          For many applications all you need is <c-s>RegEx::is_match(&self) -> bool</c-s>.  That simply returns true
+          after finding the first match, or false if there are no matches.  That is efficient and flexible.
+        </t-b>
+        <t-b>
+          Make sure that you only compile the pattern once, using <c-s>RegEx::new(pattern)</c-s>.  You should recompile
+          only if the pattern changes.
+        </t-b>
+        <a id="refs"></a>
+        <h2>5.0&nbsp;&nbsp;References:</h2>
+        <t-b class="indent">
+          <table style="font-size:1em;">
             <tr>
-              <th>Example</th>
-              <th>Action</th>
+              <th>Link</th>
+              <th>Description</th>
             </tr>
             <tr>
               <td>
-                [A-Z]
+                <a href="https://docs.rs/regex/1.4.5/regex/index.html#syntax">Regular Expression Syntax</a>
               </td>
               <td>
-                matches C in "a Capital letter" 
+                Nice organization of regular expression pattern language syntax
               </td>
             </tr>
             <tr>
               <td>
-                Rust
+                <a href="https://docs.rs/regex/1.4.5/regex/struct.Regex.html">regex::Regex</a>
               </td>
               <td>
-                matches any string containing &quot;Rust&quot;
+                Documentation for Regex and its methods.
               </td>
             </tr>
             <tr>
               <td>
-                abc{3}
+                <a href="https://docs.rs/regex/1.4.5/regex/index.html">Crate regex</a>
               </td>
               <td>
-                matches&nbsp;&quot;this&nbsp;is&nbsp;an&nbsp;example&nbsp;-&nbsp;abccc&nbsp;-&quot;
+                Regex crate documentation.
               </td>
             </tr>
             <tr>
               <td>
-                a(bc)*
+                <a href="https://blog.codinghorror.com/regular-expressions-now-you-have-two-problems/">Jeff Atwood&apos;s Blog</a>
               </td>
               <td>
-                matches a, abc, abcbc, ...
+                Establishes the arena, provides advice and several very good links.
               </td>
             </tr>
             <tr>
               <td>
-                fn|struct
+                <a href="https://en.wikipedia.org/wiki/Regular_expression">Regular expression - Wikipedia</a>
               </td>
               <td>
-                matches "fn funct()", "struct X {}"
+                Quite extensive discussion of theory, syntax, and semantics.
               </td>
             </tr>
             <tr>
-              <td colspan="2">
-                <a href="https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285">RE Tutorial - Factory Mind</a><br />
-                has many executable examples.
-                <div style="height:0.5em;"></div>
+              <td>
+                <a href="https://cheatography.com/davechild/cheat-sheets/regular-expressions/pdf_bw/">RE Cheat Sheet - Dave Child</a>
+              </td>
+              <td>
+                Nice compact summary.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <a href="https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285">RE Tutorial - Factory Mind</a>
+              </td>
+              <td>
+                Clear and fairly brief.
+                <div style="height:0.25em;"></div>
               </td>
             </tr>
           </table>
-        </div>
-      </div>
-    </t-b>
-    <t-b class="indent">
-      <a href="https://docs.rs/regex/1.4.5/regex/index.html#syntax">more complete list of syntax</a>
-    </t-b>
-    <a id="regex"></a>
-    <h2>3.0&nbsp;&nbsp;Regex</h2>
-    <t-b>
-      The crate, regex&nbsp;ver&nbsp;1.4.5, available from <a href="https://crates.io/crates/regex">crates.io</a> 
-      is used exclusively in this Bite.
-    </t-b>
-    <t-b>
-      It&apos;s primary struct, regex::Regex, is a processor for regular expressions that compiles a regular expression
-      into a state machine.  Using that it can:
-      <div class="pad5">
-        <ul class="tight" style="margin-left:2em;">
-          <li>check if a regular expression matches a given text string, as shown above</li>
-          <li>return capture groups that describe possibly multiple matches in a given string</li>
-          <li>split text based on capture groups</li>
-          <li>replace text</li>
-        </ul>
-      </div>
-      Searching text with a Regex instance is guaranteed to be linear in the size of the text.  Compiling
-      regular expressions requires a non-trivial amount of time, so repeated invocations should not recompile 
-      unless the pattern changes.
-    </t-b>
-    <t-b>
-      <div class="indent">
-        <defn-OuterBlock>
-          <defn-block>
-            <defn-head>Partial Declarations from regex crate</defn-head>
-            <defn-code>
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub struct Match<'t> {
-    text: &'t str,
-    start: usize,
-    end: usize,
-}
-
-pub struct Regex(Exec);
-
-    /* compiles reg express'n, result can be used repeatedly */
-    pub fn new(re: &str) -> Result<Regex, Error> 
-
-    /* cheapest way to detect a match */
-    pub fn is_match(&self, text: &str) -> bool
-              
-    /* returns start and end of first match if it exists */
-    pub fn find&lt;'t&gt;(&self, text: &'t str) -> Option&lt;Match&lt;'t&gt;&gt;
-
-    /* returns iterator for successive non-overlapping matches */
-    pub fn find_iter<'r, 't>(&'r self, text: &'t str) -> Matches<'r, 't> 
-
-    /* returns capture groups for first match in text */
-    pub fn captures&lt;'t&gt;(&self, text: &'t str) -> Option&lt;Captures&lt;'t&gt;&gt;
-
-    /* returns iterator over all non-overlapping capture groups */
-    pub fn captures_iter&lt;'r, 't&gt;(
-        &'r self,
-        text: &'t str,
-    ) -> CaptureMatches&lt;'r, 't&gt; 
-
-    /* returns iterator of substrings of matching text */
-    pub fn split&lt;'r, 't&gt;(&'r self, text: &'t str) -> Split&lt;'r, 't&gt;
-
-    /* replaces first match with replacement */
-    pub fn replace&lt;'t, R: Replacer&gt;(
-        &self,
-        text: &'t str,
-        rep: R,
-    ) -> Cow&lt;'t, str&gt;
-
-    /* replaces all non-overlapping matches in text with replacement */
-    pub fn replace_all&lt;'t, R: Replacer&gt;(
-        &self,
-        text: &'t str,
-        rep: R,
-    ) -> Cow&lt;'t, str&gt;
-
-            </defn-code>
-          </defn-block>
-        </defn-OuterBlock>
-        <t-b>
-          Contents of the preceding block show the structure and methods of <c-s>regex::Regex</c-s>.  The
-          next block gives examples of their use, and Section 3.0 discusses regular expression pattern
-          syntax and semantics.
         </t-b>
-        <defn-OuterBlock>
-          <defn-block>
-            <defn-head>Example Use</defn-head>
-            <defn-code>
-use regex::{Regex, Match, Captures};
-
-fn check(pattern: &str, text: &str, pred:bool) {
-    if pred {
-        print!(
-            "\n  pattern: {:?}  matches text: {:?}", 
-            pattern, text
-        );
-    }
-    else {
-        print!(
-            "\n  pattern: {:?} !matches text: {:?}", 
-            pattern, text
-        );
-    }
-}
-
-fn range(pattern: &str, text: &str, mat: &Option<Match>) {
-    if let Some(mt) = mat {
-        print!(
-            "\n  find pattern {:?} in text {:?}:", 
-            pattern, text
-        );
-        print!("  match in [{}, {})", mt.start(), mt.end());
-    }
-    else {
-        print!("\n  no match");
-    }
-}
-
-fn range_iter(pattern: &str, text: &str, mat: Match) {
-    print!(
-        "\n  find pattern {:?} in text {:?}:", 
-        pattern, text
-    );
-    print!("  match in [{}, {})", mat.start(), mat.end());
-}
-
-fn test_match() {
-    print!("\n  -- test_match --");
-    let pattern = r"[a-q]{3,4}$";
-    let re = Regex::new(pattern).unwrap();
-    let text = "12cde";
-    let pred = re.is_match(text);
-    check(pattern, text, pred);
-
-    let text = "12cdefg";
-    let pred = re.is_match(text);
-    check(pattern, text, pred);
-
-    let text = "12cd";
-    let pred = re.is_match(text);
-    check(pattern, text, pred);
-
-    let text = "12cd3e";
-    let pred = re.is_match(text);
-    check(pattern, text, pred);
-
-    let text = "12cds";
-    let pred = re.is_match(text);
-    check(pattern, text, pred);
-}
-
-fn test_find() {
-    print!("\n  -- test_find --");
-    let pattern = r"abc";
-    let re = Regex::new(pattern).unwrap();
-    let text = "123abc456";
-    let op: Option&lt;Match&gt; = re.find(text);
-    range(pattern, text, &op);
-}
-
-fn test_find_iter() {
-    print!("\n  -- test_find_iter --");
-    let pattern = r"abc";
-    let re = Regex::new(pattern).unwrap();
-    let text = "123abc456abc789";
-    let matches = re.find_iter(text);
-    for mat in matches {
-        range_iter(pattern, text, mat);
-    }
-}
-
-fn test_captures() {
-    print!("\n  -- test_captures --");
-    let text = "123abc456def789";
-    let pattern = "\
-        ([a-z]{3}|[0-9]{3})\
-        ([a-z]{3}|[0-9]{3})\
-        ([a-z]{3}|[0-9]{3})\
-        ([a-z]{3}|[0-9]{3})\
-        ([a-z]{3}|[0-9]{3})\
-    ";
-    // These don't work as you might expect.
-    // Capture doesn&apos;t work well with repetitions.
-    // let pattern = r"([a-z]{3}|[0-9]{3}){5}";
-    // let pattern = r"(([a-z]{3})([0-9]{3}))+";
-    // let pattern = r"((?:\d+)+)+";
-    
-    let re = Regex::new(pattern).unwrap();
-    let captures: Option&lt;Captures&gt; = re.captures(text);
-    print!("\n  captures: {:?}", captures);
-    let caps = captures.unwrap();
-    for i in 0..caps.len() {
-        print!("\n  captures[{}] = {:?}", i, &caps.get(i));
-        let cap = &caps.get(i).unwrap();
-        print!(
-            "\n  cap = {:?}, {}, {}", 
-            cap.as_str(), cap.start(), cap.end()
-        );
-    }
-}
-
-fn main() {
-    test_match();
-    test_find();
-    test_find_iter();
-    test_captures();
-}            
-              
-              </defn-code>
-          </defn-block>
-          <defn-block>
-            <defn-head>Output</defn-head>
-            <defn-code>
-  -- test_match --
-  pattern: "[a-q]{3,4}$"  matches text: "12cde"
-  pattern: "[a-q]{3,4}$"  matches text: "12cdefg"
-  pattern: "[a-q]{3,4}$" !matches text: "12cd"
-  pattern: "[a-q]{3,4}$" !matches text: "12cd3e"
-  pattern: "[a-q]{3,4}$" !matches text: "12cds"
-
-  -- test_find --
-  find pattern "abc" in text "123abc456":  match in [3, 6)
-  -- test_find_iter --
-  find pattern "abc" in text "123abc456abc789":  
-               match in [3, 6)
-  find pattern "abc" in text "123abc456abc789":  
-               match in [9, 12)
-  -- test_captures --
-  captures: Some(
-      Captures({
-          0: Some("123abc456def"), 
-          1: Some("123"), 
-          2: Some("abc"), 
-          3: Some("456"), 
-          4: Some("def")
-      })
-  )
-
-  captures[0] = Some(
-      Match { 
-          text: "123abc456def789", start: 0, end: 12 
-      }
-  )
-  cap = "123abc456def", 0, 12
-
-  captures[1] = Some(
-      Match { 
-          text: "123abc456def789", start: 0, end: 3 
-      }
-  )
-  cap = "123", 0, 3
-
-  captures[2] = Some(
-      Match { 
-          text: "123abc456def789", start: 3, end: 6 
-      }
-  )
-  cap = "abc", 3, 6
-
-  captures[3] = Some(
-      Match { 
-          text: "123abc456def789", start: 6, end: 9 
-      }
-  )
-  cap = "456", 6, 9
-
-  captures[4] = Some(
-      Match { 
-          text: "123abc456def789", start: 9, end: 12
-      }
-  )
-  cap = "def", 9, 12
-
-  captures[5] = Some(
-      Match { 
-          text: "123abc456def789", start: 12, end: 15 
-      }
-  )
-  cap = "789", 12, 15            
-            </defn-code>
-          </defn-block>
-        </defn-OuterBlock>
-      </div>
-    </t-b>
-    <t-b class="indent">
-      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=2f071dbdfda7b4b5c13a329103f813d3">
-        code in playground
-      </a>
-    </t-b>
-    <a id="epilogue"></a>
-    <h2>4.0&nbsp;&nbsp;Epilogue:</h2>
-    <t-b>
-      For many applications all you need is <c-s>RegEx::is_match(&self) -> bool</c-s>.  That simply returns true
-      after finding the first match, or false if there are no matches.  That is efficient and flexible.
-    </t-b>
-    <t-b>
-      Make sure that you only compile the pattern once, using <c-s>RegEx::new(pattern)</c-s>.  You should recompile
-      only if the pattern changes.
-    </t-b>
-    <a id="refs"></a>
-    <h2>5.0&nbsp;&nbsp;References:</h2>
-    <t-b class="indent">
-      <table style="font-size:1em;">
-        <tr>
-          <th>Link</th><th>Description</th>
-        </tr>
-        <tr>
-          <td>
-            <a  href="https://docs.rs/regex/1.4.5/regex/index.html#syntax">Regular Expression Syntax</a>
-          </td>
-          <td>
-            Nice organization of regular expression pattern language syntax
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="https://docs.rs/regex/1.4.5/regex/struct.Regex.html">regex::Regex</a>
-          </td>
-          <td>
-            Documentation for Regex and its methods.
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="https://docs.rs/regex/1.4.5/regex/index.html">Crate regex</a>
-          </td>
-          <td>
-            Regex crate documentation.
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="https://blog.codinghorror.com/regular-expressions-now-you-have-two-problems/">Jeff Atwood&apos;s Blog</a>
-          </td>
-          <td>
-            Establishes the arena, provides advice and several very good links.
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="https://en.wikipedia.org/wiki/Regular_expression">Regular expression - Wikipedia</a>
-          </td>
-          <td>
-            Quite extensive discussion of theory, syntax, and semantics.
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="https://cheatography.com/davechild/cheat-sheets/regular-expressions/pdf_bw/">RE Cheat Sheet - Dave Child</a>
-          </td>
-          <td>
-            Nice compact summary.
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285">RE Tutorial - Factory Mind</a>
-          </td>
-          <td>
-            Clear and fairly brief.
-            <div style="height:0.25em;"></div>
-          </td>
-        </tr>
-      </table>
-    </t-b>
-    <div style="height:5em;"></div>
-    <a id="bottom"></a>
+        <div style="height:5em;"></div>
+        <a id="bottom"></a>
       </content>
       <page-TOC id="pages" style="display:none;">
       </page-TOC>
@@ -897,7 +900,7 @@ fn main() {
         <menu-elem class="secElem"><a href="#syntax">syntax</a></menu-elem>
         <menu-elem class="secElem"><a href="#intro">intro</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
-        <div style='margin:0em -1em; padding-bottom:0.25em; text-align:center' class='darkItem'>Sections</div>
+        <div class='darkItem popupHeader' style="padding:0.25em 2.0em;" onclick="location.reload()">Sections</div>
       </page-sections>
     </main>
     <frame-footer>

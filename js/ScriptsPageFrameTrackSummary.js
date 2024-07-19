@@ -405,7 +405,7 @@ function initializeMenu() {
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Track&nbsp;Summary&nbsp;thread</div>\
+          <div class='ddLabel darkItem'>Rust&nbsp;Story&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
             <div class='ddItem'><a onclick='loadifbasic()' href='indexBasic.html'>&nbsp;Basic</a></div>\
             <div class='ddItem'><a onclick='loadifcpp()' href='indexCpp.html'>&nbsp;C++</a></div>\

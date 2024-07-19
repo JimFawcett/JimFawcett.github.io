@@ -101,7 +101,7 @@
       <nav id="navbar"></nav>
     </frame-header>
     <main>
-      <div id="about">about</div>
+      <div id="about" onclick="location.reload()">about</div>
       <div id="modified">05/04/2022</div>
       <div id="page">RustBites - Data Operations</div>
       <div id="hlp"></div>
@@ -368,389 +368,389 @@
               </div>
             </div>
 
-              <div class="indent">
-                <t-b>
-                  Borrows are non-owning references pointing to an identifier.
-                </t-b>
-                <ul class="tight" style="margin-left:0em;">
-                  <li>
-                    Copies happen implicitly when an identifier is bound to a Copy type:
-                    <div class="indent pad5">
-                      <c-s>let i = 3;  let j = i;  &nbsp;&nbsp;// copy</c-s>
-                    </div>
-                    or when one copy type is assigned to another:
-                    <div class="indent pad5">
-                      <c-s>j = i + 1;  &nbsp;&nbsp;// copy</c-s>
-                    </div>
-                  </li>
-                  <li>
-                    Borrows happen when binding references to other identifiers:
-                    <div class="indent pad5">
-                      <c-s>let r = &amp;i  &nbsp;&nbsp;// borrow;</c-s>
-                    </div>
-                    A reference, like <c-s>&amp;i</c-s>, is just a pointer to the memory location
-                    bound to i.  It cannot be reset, and is subject to Rust ownership rules, which
-                    we will discuss soon, in a later <a target="_blank" href="RustBites_Ownrs.html">Bite</a>.
-                  </li>
-                </ul>
-              </div>
-              <s-halfem></s-halfem>
-              <a id="traits"></a>
-              <div>
-                <h3>7. Copy, Move, and Clone Traits</h3>
-                <div class="indent">
-                  <div style="width:calc(100vw - 12rem);">
-                    <div class="right">
-                      <photosizer-block src="pictures/strCopy2.png" width="450" class="photoSizerBlock" style="margin-top:0;">
-                        <span style="
-              display: inline-block;
-              font-weight: bold;
-              font-family: 'Comic Sans MS', Tahoma;
-              background-color: #ddd;
-              width: 100%;
-              padding: 5px 0px;
-            ">
-                          Figure 2. Str Copy
-                        </span>
-                      </photosizer-block>
-                    </div>
-                    <div class="clear right">
-                      <photosizer-block src="../../Pictures/StringMove.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
-                        <span style="
-              display: inline-block;
-              font-weight: bold;
-              font-family: 'Comic Sans MS', Tahoma;
-              background-color: #ddd;
-              width: 100%;
-              padding: 5px 0px;
-            ">
-                          Figure 3. String Move
-                        </span>
-                      </photosizer-block>
-                      <!-- <div style="width:calc(100vw - 12rem);"> -->
-                      <photosizer-block src="../../Pictures/StringClone.jpg" width="400" class="photoSizerBlock right" style="margin-top:0;">
-                        <span style="
-              display: inline-block;
-              font-weight: bold;
-              font-family: 'Comic Sans MS', Tahoma;
-              background-color: #ddd;
-              width: 100%;
-              padding: 5px 0px;
-            ">
-                          Figure 4. String Clone
-                        </span>
-                      </photosizer-block>
-                    </div>
+            <div class="indent">
+              <t-b>
+                Borrows are non-owning references pointing to an identifier.
+              </t-b>
+              <ul class="tight" style="margin-left:0em;">
+                <li>
+                  Copies happen implicitly when an identifier is bound to a Copy type:
+                  <div class="indent pad5">
+                    <c-s>let i = 3;  let j = i;  &nbsp;&nbsp;// copy</c-s>
                   </div>
-                  <t-b>
-                    Traits are like interface contracts.  They specify a behavior that a type must implement
-                    if it has that trait.
-                  </t-b>
-                  <t-b>
-                    Copy types are types that implement the Copy trait.
-                    <ul class="tight" style="margin-left:2em;">
-                      <li>
-                        To be eligible for the Copy trait
-                        they must be blittable.
-                      </li>
-                      <li>
-                        The <c-s>str</c-s> type represents immutable literal strings. Each is
-                        stored in static memory with program lifetime. They are always accessed
-                        with a reference, e.g., <c-s>s:&amp;str = "a literal string"</c-s>. So
-                        the reference is copied, as shown in Figure 2.
-                      </li>
-                    </ul>
-                  </t-b>
-                  <t-b>
-                    Move types are types that don&apos;t implement the Copy trait.
-                    <ul class="tight" style="margin-left:2em;">
-                      <li>
-                        Move types are non-blittable, with one exception.
-                      </li>
-                      <li>
-                        Adding the Drop trait makes a Move type, even if blittable.
-                      </li>
-                      <li>
-                        When the thread of execution leaves a scope all move types, declared in that scope, are dropped, returning their
-                        resources with Drop::drop().  That&apos;s similar to a C++ destructor invocation.
-                      </li>
-                    </ul>
-                  </t-b>
-                  <t-b>
-                    Clone types are types that implement the Clone trait.
-                    <ul class="tight" style="margin-left:2em;">
-                      <li>
-                        Data types with the Clone trait provide a clone() member function that creates
-                        a new instance of the type that has the same structure and copies of any resources
-                        held by the cloner.
-                      </li>
-                      <li>
-                        Examples of Clone types are the collections, e.g., Strings, Vecs, VecDeques, Maps, ...
-                      </li>
-                    </ul>
-                  </t-b>
-                  <a id="move_clone"></a>
-                  <s-halfEm></s-halfEm>
-                </div>
-                <h3>8. Move and Clone</h3>
-                <ul>
-                  <li>
-                    A <strong>move</strong> transfers a Move type's heap resources to another instance of that type.
-                    <ul class="tight" style="margin-left:0em;">
-                      <li>
-                        The String, <s-s>s</s-s>, shown in Figure 2. is moved to <c-s>t</c-s>
-                        with the statement:
-                        <ul class="tight" style="margin-left:0em;">
-                          <li><c-s>let t = s; &nbsp;&nbsp;// s is now invalid</c-s></li>
-                        </ul>
-                      </li>
-                      <li>
-                        Move transfers ownership of resources.
-                      </li>
-                    </ul>
-                    <s-halfEm></s-halfEm>
-                  </li>
-                  <li>
-                    A <strong>clone</strong> copies a Move type&apos;s heap resources to a new instance of that type.
-                    <ul class="tight" style="margin-left:0em;">
-                      <li>
-                        The String, <s-s>s</s-s>, shown in Figure 3. is cloned with the statement:
-                        <ul class="tight" style="margin-left:0em;">
-                          <li><c-s>let t = s.clone(); &nbsp;&nbsp;// s is still valid</c-s></li>
-                        </ul>
-                      </li>
-                      <li>
-                        Clone operation copies resources to the target.
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
-              </div>
-              <s-halfEm></s-halfEm>
-              <a id="mutation"></a>
-              <h3>9. Mutation</h3>
-              <div class="indent">
-                By default, Rust data is immutable - it can&apos;t be changed. Code has to opt in
-                to mutation in order to change the value of an identifier.  We do that with the
-                <c-s>mut</c-s> qualifier.
-                <ul class="tight" style="margin-left:2em;">
-                  <li>
-                    Immutable data:
-                    <div class="indent pad5">
-                      <c-s>
-                        let i = 1;<br>
-                        // i += 1;  won't compile
-                      </c-s>
-                    </div>
-                  </li>
-                  <li>
-                    Mutable data:
-                    <div class="indent pad5">
-                      <c-s>
-                        let mut j = 1;<br>
-                        j += 1; // compiles since j is mutable
-                      </c-s>
-                    </div>
-                  </li>
-                </ul>
-                <t-b class="top">
-                  Mutability of data is an important part of Rust&apos;s
-                  <a target="_blank" href="RustBites_Ownrs.html">ownership</a> policies, designed to ensure memory safety.
-                </t-b>
-              </div>
-              <s-halfEm></s-halfEm>
-              <a id="traits_prev"></a>
-              <h3>10. Traits Preview:</h3>
-              <div class="indent">
-                <t-b>
-                  A trait specifies one or more function signatures that a type with that trait is obligated
-                  to implement.  Marker traits, like copy, are an exception, declaring no signature.  But they
-                  affect code generated by the compiler.
-                  Traits are used to constrain generic parameter types and to support
-                  dynamic dispatching in polymorphic designs.
-                </t-b>
-                <t-b>
-                  std::marker::Copy and std::clone::Clone are Traits defined by the standard library. There
-                  are many more, some of which we will meet in later Bites. Move is not one of them.
-                </t-b>
-                <t-b>
-                  I've included Move in this table because in some ways it acts like a trait.  The fact is
-                  that data is moved when constructing or assigning if and only if it is not Copy. So I
-                  think of Move as a trait even though you cannot use it to constrain generic types (more on
-                  that in the <a target="_blank" href="RustBites_Functs.html">Functs</a> Bite).
-                </t-b>
-                <div class="indents">
-                  <table border="1" style="padding:0px;">
-                    <tr>
-                      <th>Trait</th>
-                      <th>Applies to:</th>
-                      <th>Examples</th>
-                      <th>Consequences</th>
-                    </tr>
-                    <tr>
-                      <td>Copy</td>
-                      <td>
-                        Single contiguous memory block<br />
-                        ==> blittable
-                      </td>
-                      <td>
-                        ints, floats,
-                        aggregates of Copy types
-                      </td>
-                      <td>
-                        Copys value from one memory location to another.
-                        <strong>Source valid after copy</strong>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>&quot;Move&quot;</td>
-                      <td>
-                        non-contiguous block<br />
-                        ==> not blittable
-                      </td>
-                      <td>
-                        Strings, Vecs, VecDeques, ...<br />
-                        stack-based aggregates managing instances in the heap
-                      </td>
-                      <td>
-                        Transfers data ownership to another identifier.<br />
-                        <strong>Source invalid after move</strong><br />
-                        Attempt to use &quot;Moved&quot; variable is compile error.
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Clone</td>
-                      <td>most types</td>
-                      <td>
-                        Structs, Strings, Vecs, VecDeques, ...
-                      </td>
-                      <td>
-                        Makes copy of resources for another identifier.
-                        <strong>Source valid after clone</strong>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-                <t-b class="bottom">
-                </t-b>
-              </div>
-              <s-halfEm></s-halfEm>
-              <a id="format"></a>
-              <h3>11. Formatting Data</h3>
-              <div class="indent">
-                <t-b>
-                  Much of the data generated in Rust code will windup being formatted for display
-                  or for building strings.  We do that with print! and format! macros, that take
-                  format specifications like this:
-                </t-b>
-                <t-b>
-                  <defn-block>
-                    <defn-head>Format Specifiers:</defn-head>
-                    <defn-code style="font-size:0.9em;">
-let arg1 = "abc";
-let arg2 = 123
-let s: String = format!("\n  {:?} and {}", arg1, arg2);
-                    </defn-code>
-                  </defn-block>
-                </t-b>
-                <t-b>
-                  The last line contains a format operation using the format! macro. The &quot;<c-s>{xx}</c-s>&quot;
-                  are placeholders for format specifications.  The first, <c-s>{:?}</c-s> specifies the
-                  value of arg1 is to be formatted using the debug specifier, e.g., a relatively simple
-                  format known to most Rust library and user-defined types.  The second, <c-s>{}</c-s>
-                  specifies that a custom display format is to be used - because it doesn&apos;t hold a
-                  specifier.
-                </t-b>
-                <t-b>
-                  There are a lot of predefined specifiers and options described in
-                  <a target="_blank" href="https://doc.rust-lang.org/std/fmt/">std::fmt</a> crate.  We will use these
-                  as needed in each of the remaining
-                  <a target="_blank" href="../../RustBiteByByte.html">Bites</a>
-                  without further clarification.
-                </t-b>
-              </div>
-              <s-halfem></s-halfem>
-              <a id="concl"></a>
-              <h3>12. Conclusions:</h3>
-              <div class="indent">
-                <t-b>
-                  <div style="border:2px solid darkred; padding:0em 1.5em; width:max-content; max-width:55em;">
-                    <t-b>
-                      The notions of Move, Copy, Clone, Borrow, and Drop are central to the Rust memory model and Rust's guarantees
-                      about memory and data race safety. We will see more about that in the <a target="_blank" href="RustBites_Ownrs.html">ownership</a>
-                      Bite.
-                    </t-b>
-                    <t-b>
-                      Binding and mutation provide Rust's interface to data values.  Combining all of these things allows Rust to
-                      support a scope-based value model for data without the complexity of building multiple constructors (copy, move, conversion),
-                      user-defined assignment operators, and
-                      destructors.
-                    </t-b>
+                  or when one copy type is assigned to another:
+                  <div class="indent pad5">
+                    <c-s>j = i + 1;  &nbsp;&nbsp;// copy</c-s>
                   </div>
-                </t-b>
-              </div>
-              <s-halfem></s-halfem>
-              <a id="exer"></a>
-              <h3>13. Exercises:</h3>
-              <div class="indent">
-                <t-b>
-                  <strong>Note:</strong>
-                  <div class="pad5">
-                    In order to build and run with cargo from the Visual Studio Code terminal you need to open
-                    VS Code in the package folder for the code you want to build and run.  That's the folder where
-                    the package cargo.toml file resides.
+                </li>
+                <li>
+                  Borrows happen when binding references to other identifiers:
+                  <div class="indent pad5">
+                    <c-s>let r = &amp;i  &nbsp;&nbsp;// borrow;</c-s>
                   </div>
-                </t-b>
-                <ol>
-                  <li>
-                    Create an instance of a blittable type and show when it is copied.
-                    <ul>
-                      <li>Can you prove that it was copied?</li>
-                    </ul>
-                  </li>
-                  <li>
-                    Create an instance of a non-blittable type and show when it is moved.
-                    <ul>
-                      <li>Can you prove that it was moved?</li>
-                      <li>Can you show that the moved-from is invalid?</li>
-                    </ul>
-                  </li>
-                  <li>
-                    Repeat the second exercise but clone the non-blittable type instead
-                    of moving it.
-                    <ul>
-                      <li>Can you show that the cloner is still valid?</li>
-                    </ul>
-                    <!-- Hint: use the compiler messages. -->
-                  </li>
-                </ol>
-                <a id="sln"></a>
-                <s-1em></s-1em>
-              </div>
-              <h3><a id="sln"></a>14. Solution for Exercise #1</h3>
-              <div class="indent">
-                <t-b class="indents">
-                  <details>
-                    <summary>Solution</summary>
-                    <s-halfEm></s-halfEm>
-                    <div>
-                      &nbsp;&nbsp;Addresses are different, values are the same => copy.  &nbsp;&nbsp;voila!
-                      <table style="width:60%;">
-                        <tr>
-                          <td><img src="CodeSamples/bite_data_ex1/code.jpg" style="width:40em;"></td>
-                          <td><img src="CodeSamples/bite_data_ex1/output.jpg" style="width:25em;"></td>
-                        </tr>
-                      </table>
-                    </div>
-                  </details>
-                </t-b>
-                <t-b>
-                  Note that lines 5 and 6 are all you need to complete the main question.  The remaining
-                  lines address the &quot;Can you prove ...&quot; addendum.
-                </t-b>
-              </div>
+                  A reference, like <c-s>&amp;i</c-s>, is just a pointer to the memory location
+                  bound to i.  It cannot be reset, and is subject to Rust ownership rules, which
+                  we will discuss soon, in a later <a target="_blank" href="RustBites_Ownrs.html">Bite</a>.
+                </li>
+              </ul>
             </div>
-</t-b>
+            <s-halfem></s-halfem>
+            <a id="traits"></a>
+            <div>
+              <h3>7. Copy, Move, and Clone Traits</h3>
+              <div class="indent">
+                <div style="width:calc(100vw - 12rem);">
+                  <div class="right">
+                    <photosizer-block src="pictures/strCopy2.png" width="450" class="photoSizerBlock" style="margin-top:0;">
+                      <span style="
+              display: inline-block;
+              font-weight: bold;
+              font-family: 'Comic Sans MS', Tahoma;
+              background-color: #ddd;
+              width: 100%;
+              padding: 5px 0px;
+            ">
+                        Figure 2. Str Copy
+                      </span>
+                    </photosizer-block>
+                  </div>
+                  <div class="clear right">
+                    <photosizer-block src="../../Pictures/StringMove.jpg" width="400" class="photoSizerBlock" style="margin-top:0;">
+                      <span style="
+              display: inline-block;
+              font-weight: bold;
+              font-family: 'Comic Sans MS', Tahoma;
+              background-color: #ddd;
+              width: 100%;
+              padding: 5px 0px;
+            ">
+                        Figure 3. String Move
+                      </span>
+                    </photosizer-block>
+                    <!-- <div style="width:calc(100vw - 12rem);"> -->
+                    <photosizer-block src="../../Pictures/StringClone.jpg" width="400" class="photoSizerBlock right" style="margin-top:0;">
+                      <span style="
+              display: inline-block;
+              font-weight: bold;
+              font-family: 'Comic Sans MS', Tahoma;
+              background-color: #ddd;
+              width: 100%;
+              padding: 5px 0px;
+            ">
+                        Figure 4. String Clone
+                      </span>
+                    </photosizer-block>
+                  </div>
+                </div>
+                <t-b>
+                  Traits are like interface contracts.  They specify a behavior that a type must implement
+                  if it has that trait.
+                </t-b>
+                <t-b>
+                  Copy types are types that implement the Copy trait.
+                  <ul class="tight" style="margin-left:2em;">
+                    <li>
+                      To be eligible for the Copy trait
+                      they must be blittable.
+                    </li>
+                    <li>
+                      The <c-s>str</c-s> type represents immutable literal strings. Each is
+                      stored in static memory with program lifetime. They are always accessed
+                      with a reference, e.g., <c-s>s:&amp;str = "a literal string"</c-s>. So
+                      the reference is copied, as shown in Figure 2.
+                    </li>
+                  </ul>
+                </t-b>
+                <t-b>
+                  Move types are types that don&apos;t implement the Copy trait.
+                  <ul class="tight" style="margin-left:2em;">
+                    <li>
+                      Move types are non-blittable, with one exception.
+                    </li>
+                    <li>
+                      Adding the Drop trait makes a Move type, even if blittable.
+                    </li>
+                    <li>
+                      When the thread of execution leaves a scope all move types, declared in that scope, are dropped, returning their
+                      resources with Drop::drop().  That&apos;s similar to a C++ destructor invocation.
+                    </li>
+                  </ul>
+                </t-b>
+                <t-b>
+                  Clone types are types that implement the Clone trait.
+                  <ul class="tight" style="margin-left:2em;">
+                    <li>
+                      Data types with the Clone trait provide a clone() member function that creates
+                      a new instance of the type that has the same structure and copies of any resources
+                      held by the cloner.
+                    </li>
+                    <li>
+                      Examples of Clone types are the collections, e.g., Strings, Vecs, VecDeques, Maps, ...
+                    </li>
+                  </ul>
+                </t-b>
+                <a id="move_clone"></a>
+                <s-halfEm></s-halfEm>
+              </div>
+              <h3>8. Move and Clone</h3>
+              <ul>
+                <li>
+                  A <strong>move</strong> transfers a Move type's heap resources to another instance of that type.
+                  <ul class="tight" style="margin-left:0em;">
+                    <li>
+                      The String, <s-s>s</s-s>, shown in Figure 2. is moved to <c-s>t</c-s>
+                      with the statement:
+                      <ul class="tight" style="margin-left:0em;">
+                        <li><c-s>let t = s; &nbsp;&nbsp;// s is now invalid</c-s></li>
+                      </ul>
+                    </li>
+                    <li>
+                      Move transfers ownership of resources.
+                    </li>
+                  </ul>
+                  <s-halfEm></s-halfEm>
+                </li>
+                <li>
+                  A <strong>clone</strong> copies a Move type&apos;s heap resources to a new instance of that type.
+                  <ul class="tight" style="margin-left:0em;">
+                    <li>
+                      The String, <s-s>s</s-s>, shown in Figure 3. is cloned with the statement:
+                      <ul class="tight" style="margin-left:0em;">
+                        <li><c-s>let t = s.clone(); &nbsp;&nbsp;// s is still valid</c-s></li>
+                      </ul>
+                    </li>
+                    <li>
+                      Clone operation copies resources to the target.
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            <s-halfEm></s-halfEm>
+            <a id="mutation"></a>
+            <h3>9. Mutation</h3>
+            <div class="indent">
+              By default, Rust data is immutable - it can&apos;t be changed. Code has to opt in
+              to mutation in order to change the value of an identifier.  We do that with the
+              <c-s>mut</c-s> qualifier.
+              <ul class="tight" style="margin-left:2em;">
+                <li>
+                  Immutable data:
+                  <div class="indent pad5">
+                    <c-s>
+                      let i = 1;<br>
+                      // i += 1;  won't compile
+                    </c-s>
+                  </div>
+                </li>
+                <li>
+                  Mutable data:
+                  <div class="indent pad5">
+                    <c-s>
+                      let mut j = 1;<br>
+                      j += 1; // compiles since j is mutable
+                    </c-s>
+                  </div>
+                </li>
+              </ul>
+              <t-b class="top">
+                Mutability of data is an important part of Rust&apos;s
+                <a target="_blank" href="RustBites_Ownrs.html">ownership</a> policies, designed to ensure memory safety.
+              </t-b>
+            </div>
+            <s-halfEm></s-halfEm>
+            <a id="traits_prev"></a>
+            <h3>10. Traits Preview:</h3>
+            <div class="indent">
+              <t-b>
+                A trait specifies one or more function signatures that a type with that trait is obligated
+                to implement.  Marker traits, like copy, are an exception, declaring no signature.  But they
+                affect code generated by the compiler.
+                Traits are used to constrain generic parameter types and to support
+                dynamic dispatching in polymorphic designs.
+              </t-b>
+              <t-b>
+                std::marker::Copy and std::clone::Clone are Traits defined by the standard library. There
+                are many more, some of which we will meet in later Bites. Move is not one of them.
+              </t-b>
+              <t-b>
+                I've included Move in this table because in some ways it acts like a trait.  The fact is
+                that data is moved when constructing or assigning if and only if it is not Copy. So I
+                think of Move as a trait even though you cannot use it to constrain generic types (more on
+                that in the <a target="_blank" href="RustBites_Functs.html">Functs</a> Bite).
+              </t-b>
+              <div class="indents">
+                <table border="1" style="padding:0px;">
+                  <tr>
+                    <th>Trait</th>
+                    <th>Applies to:</th>
+                    <th>Examples</th>
+                    <th>Consequences</th>
+                  </tr>
+                  <tr>
+                    <td>Copy</td>
+                    <td>
+                      Single contiguous memory block<br />
+                      ==> blittable
+                    </td>
+                    <td>
+                      ints, floats,
+                      aggregates of Copy types
+                    </td>
+                    <td>
+                      Copys value from one memory location to another.
+                      <strong>Source valid after copy</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>&quot;Move&quot;</td>
+                    <td>
+                      non-contiguous block<br />
+                      ==> not blittable
+                    </td>
+                    <td>
+                      Strings, Vecs, VecDeques, ...<br />
+                      stack-based aggregates managing instances in the heap
+                    </td>
+                    <td>
+                      Transfers data ownership to another identifier.<br />
+                      <strong>Source invalid after move</strong><br />
+                      Attempt to use &quot;Moved&quot; variable is compile error.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Clone</td>
+                    <td>most types</td>
+                    <td>
+                      Structs, Strings, Vecs, VecDeques, ...
+                    </td>
+                    <td>
+                      Makes copy of resources for another identifier.
+                      <strong>Source valid after clone</strong>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <t-b class="bottom">
+              </t-b>
+            </div>
+            <s-halfEm></s-halfEm>
+            <a id="format"></a>
+            <h3>11. Formatting Data</h3>
+            <div class="indent">
+              <t-b>
+                Much of the data generated in Rust code will windup being formatted for display
+                or for building strings.  We do that with print! and format! macros, that take
+                format specifications like this:
+              </t-b>
+              <t-b>
+                <defn-block>
+                  <defn-head>Format Specifiers:</defn-head>
+                  <defn-code style="font-size:0.9em;">
+                    let arg1 = "abc";
+                    let arg2 = 123
+                    let s: String = format!("\n  {:?} and {}", arg1, arg2);
+                  </defn-code>
+                </defn-block>
+              </t-b>
+              <t-b>
+                The last line contains a format operation using the format! macro. The &quot;<c-s>{xx}</c-s>&quot;
+                are placeholders for format specifications.  The first, <c-s>{:?}</c-s> specifies the
+                value of arg1 is to be formatted using the debug specifier, e.g., a relatively simple
+                format known to most Rust library and user-defined types.  The second, <c-s>{}</c-s>
+                specifies that a custom display format is to be used - because it doesn&apos;t hold a
+                specifier.
+              </t-b>
+              <t-b>
+                There are a lot of predefined specifiers and options described in
+                <a target="_blank" href="https://doc.rust-lang.org/std/fmt/">std::fmt</a> crate.  We will use these
+                as needed in each of the remaining
+                <a target="_blank" href="../../RustBiteByByte.html">Bites</a>
+                without further clarification.
+              </t-b>
+            </div>
+            <s-halfem></s-halfem>
+            <a id="concl"></a>
+            <h3>12. Conclusions:</h3>
+            <div class="indent">
+              <t-b>
+                <div style="border:2px solid darkred; padding:0em 1.5em; width:max-content; max-width:55em;">
+                  <t-b>
+                    The notions of Move, Copy, Clone, Borrow, and Drop are central to the Rust memory model and Rust's guarantees
+                    about memory and data race safety. We will see more about that in the <a target="_blank" href="RustBites_Ownrs.html">ownership</a>
+                    Bite.
+                  </t-b>
+                  <t-b>
+                    Binding and mutation provide Rust's interface to data values.  Combining all of these things allows Rust to
+                    support a scope-based value model for data without the complexity of building multiple constructors (copy, move, conversion),
+                    user-defined assignment operators, and
+                    destructors.
+                  </t-b>
+                </div>
+              </t-b>
+            </div>
+            <s-halfem></s-halfem>
+            <a id="exer"></a>
+            <h3>13. Exercises:</h3>
+            <div class="indent">
+              <t-b>
+                <strong>Note:</strong>
+                <div class="pad5">
+                  In order to build and run with cargo from the Visual Studio Code terminal you need to open
+                  VS Code in the package folder for the code you want to build and run.  That's the folder where
+                  the package cargo.toml file resides.
+                </div>
+              </t-b>
+              <ol>
+                <li>
+                  Create an instance of a blittable type and show when it is copied.
+                  <ul>
+                    <li>Can you prove that it was copied?</li>
+                  </ul>
+                </li>
+                <li>
+                  Create an instance of a non-blittable type and show when it is moved.
+                  <ul>
+                    <li>Can you prove that it was moved?</li>
+                    <li>Can you show that the moved-from is invalid?</li>
+                  </ul>
+                </li>
+                <li>
+                  Repeat the second exercise but clone the non-blittable type instead
+                  of moving it.
+                  <ul>
+                    <li>Can you show that the cloner is still valid?</li>
+                  </ul>
+                  <!-- Hint: use the compiler messages. -->
+                </li>
+              </ol>
+              <a id="sln"></a>
+              <s-1em></s-1em>
+            </div>
+            <h3><a id="sln"></a>14. Solution for Exercise #1</h3>
+            <div class="indent">
+              <t-b class="indents">
+                <details>
+                  <summary>Solution</summary>
+                  <s-halfEm></s-halfEm>
+                  <div>
+                    &nbsp;&nbsp;Addresses are different, values are the same => copy.  &nbsp;&nbsp;voila!
+                    <table style="width:60%;">
+                      <tr>
+                        <td><img src="CodeSamples/bite_data_ex1/code.jpg" style="width:40em;"></td>
+                        <td><img src="CodeSamples/bite_data_ex1/output.jpg" style="width:25em;"></td>
+                      </tr>
+                    </table>
+                  </div>
+                </details>
+              </t-b>
+              <t-b>
+                Note that lines 5 and 6 are all you need to complete the main question.  The remaining
+                lines address the &quot;Can you prove ...&quot; addendum.
+              </t-b>
+            </div>
+          </div>
+        </t-b>
         <div style="height:5em;"></div>
         <a id="bottom"></a>
       </content>
@@ -773,7 +773,7 @@ let s: String = format!("\n  {:?} and {}", arg1, arg2);
         <menu-elem class="secElem"><a href="#types">types</a></menu-elem>
         <menu-elem class="secElem"><a href="#goal">goal</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
-        <div style='margin:0em -1em; padding-bottom:0.25em; text-align:center' class='darkItem'>Sections</div>
+        <div class='darkItem popupHeader' style="padding:0.25em 2.0em;" onclick="location.reload()">Sections</div>
       </page-sections>
     </main>
     <frame-footer>

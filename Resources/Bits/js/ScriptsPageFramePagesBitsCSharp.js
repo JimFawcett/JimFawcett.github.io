@@ -8,7 +8,7 @@ function initializePages() {
   //var pgbtn = document.getElementById("pgbtn");
   if (isDefined(pagesMenu)) {
     //pgbtn.style.display = "flex";
-    pagesMenu.innerHTML = "<div class='ddLabel darkItem'>Bits Pages</div>\
+    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='location.reload()'>Pages</div>\
           <menu-elem class='ddItems pageElem'><a target='_parent' href='../../TOC.html?src=indexBits.html'>Bits Track Summary</a>&nbsp;</menu-elem >\
           <menu-elem class='ddItems pageElem'><a href='../../TOC.html?src=BitsRepo.html'>BitsRepo</a>&nbsp;</menu-elem >\
           <menu-elem class='ddItems pageElem'><a href='../../TOC.html?src=Resources/Bits/Bits_Intro.html'>Introduction</a>&nbsp;</menu-elem >\

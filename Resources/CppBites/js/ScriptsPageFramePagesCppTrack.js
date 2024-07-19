@@ -8,7 +8,7 @@ function initializePages() {
   var pgbtn = document.getElementById("pgbtn");
   if (isDefined(pagesMenu)) {
     pgbtn.style.display = "flex";
-    pagesMenu.innerHTML = "<div class='ddLabel darkItem'>C++ Bites Thread</div>\
+    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='location.reload()'>Pages</div>\
           <menu-elem class='ddItems pageElem undefined'><a href='../../CppBiteByByte.html'>Cpp&nbsp;Bites&nbsp;Repo&nbsp;</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='../../indexCpp.html'>Cpp&nbsp;Track&nbsp;Summary</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='CppBites_Intro.html'>Intro</a></menu-elem>\
@@ -18,7 +18,6 @@ function initializePages() {
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Memory</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Types</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Classes</a></menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='CppBites_STR.html'>Class&nbsp;Anatomy</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;Templates</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Core&nbsp;STL</a></menu-elem>\
           <menu-elem class='ddItems pageElem undefined'><a href='#'>Modern&nbsp;Model</a></menu-elem>\

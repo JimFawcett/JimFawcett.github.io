@@ -8,7 +8,7 @@ function initializePages() {
   /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
     /*pgbtn.style.display = "flex";*/
-    pagesMenu.innerHTML = "<div class='ddLabel darkItem'>Track Summary Thread</div>\
+    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='location.reload()'>Pages</div>\
           <menu-elem class='ddItems pageElem'><a target='_parent' href='TOCBasic.html?src=indexBasic.html'>Basic</a>&nbsp;</menu-elem >\
           <menu-elem class='ddItems pageElem'><a target='_parent' href='TOCCpp.html?src=indexCpp.html'>C++</a>&nbsp;</menu-elem >\
           <menu-elem class='ddItems pageElem'><a target='_parent' href='TOCRust.html?src=indexRust.html'>Rust</a>&nbsp;</menu-elem >\
