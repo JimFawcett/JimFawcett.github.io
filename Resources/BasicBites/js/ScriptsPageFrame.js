@@ -206,7 +206,7 @@ function initializeMenu() {
           <div class='ddItem'><a target='_parent' href='../../TOCDesign.html'>&nbsp;Design</a></div>\
           <div class='ddItem'><a target='_parent' href='../../TOCDeployment.html'>&nbsp;Deployment</a></div>\
           <div class='ddItem'><a target='_parent' href='../../TOCProjects.html'>&nbsp;Projects</a></div>\
-          <div class='ddItem'><a target='_parent' href=.../../TOCPrototypes.html'>&nbsp;Prototypes</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCPrototypes.html'>&nbsp;Prototypes</a></div>\
           <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\

@@ -404,10 +404,10 @@ function initializeMenu() {
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Site&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a href='index.html'>Home</a></div>\
-            <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
-            <div class='ddItem'><a href='SiteDemo.html'>SiteDemo</a></div>\
-            <div class='ddItem'><a href='SiteDesign.html'>SiteDesign</a></div>\
+            <div class='ddItem'><a href='SiteGlossary.html'>Glossary</a></div>\
+            <div class='ddItem'><a href='SiteReferences.html'>References</a></div>\
+            <div class='ddItem'><a href='SiteAdditions.html'>Additions</a></div>\
+            <div class='ddItem'><a href='Help.html'>Help</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\
@@ -637,6 +637,7 @@ bottomMenu.about = function () {
       menu.style.display = "block";
     }
   }
+  /*menu.onclick = "location.reload()";*/
 }
 
 //bottomMenu.showHelp = function () {
