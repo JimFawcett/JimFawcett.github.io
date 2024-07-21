@@ -185,17 +185,23 @@ storyHlpMenu.keys = function () {
 }
 
 storyHlpMenu.about = function () {
-  var date = document.getElementById("modified").innerText;
-  var menu = document.getElementById("about");
   var page = document.getElementById("page");
-  menu.innerHTML = "copyright(&#xA9;) Jim Fawcett, 2021-2024" + "<br />"
-    + page.textContent + "<br />" + "Page last modified: " + date;
+  var date = document.getElementById("modified");
+  var menu = document.getElementById("about");
+  menu.innerHTML = "About this page:" + "<br />";
+  menu.innerHTML += "copyright(&#xA9;) Jim Fawcett, 2022-2024";
+  if (isDefined(page)) {
+    menu.innerHTML += "<br />" + page.innerText;
+  }
+  if (isDefined(date)) {
+    menu.innerHTML += "<br />" + "Page last modified: " + date.innerText;
+  }
   if (isDefined(menu)) {
-    if (menu.style.display !== "flex") {
-      menu.style.display = "flex";
+    if (menu.style.display === "block") {
+      menu.style.display = "none";
     }
     else {
-      menu.style.display = "none";
+      menu.style.display = "block";
     }
   }
 }
