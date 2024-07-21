@@ -16,7 +16,7 @@ storyHlpMenu.helpMenu = function() {
   var hlpMenu = document.getElementById("hlp");
   hlpMenu.innerHTML = '<table id="keys">\
     <tr>\
-      <td colspan=2 style="text-align:center; border-bottom:1px solid var(--light);">Key Commands</td>\
+      <td colspan=2 style="text-align:center; border-bottom:1px solid var(--light); cursor:pointer;" onclick="location.reload()">Key Commands</td>\
     </tr>\
     <tr>\
       <td class="key" onclick="storyHlpMenu.toggleTOC()">Esc</td>\
