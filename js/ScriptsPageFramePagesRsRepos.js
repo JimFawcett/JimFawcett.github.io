@@ -8,7 +8,7 @@ function initializePages() {
   /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
     /*pgbtn.style.display = "flex";*/
-    pagesMenu.innerHTML = "<div style='width:100%; text-align:center' class='darkItem'>Rust Repositories</div>\
+    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='location.reload()'>Rust Repositories</div>\
           <menu-elem class='ddItems pageElem'><a href='RustLogger.html'>Logger&nbsp;</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustTextFinder.html'>TextFinder</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='RustBlockingQueue.html'>BlockingQueue</a>&nbsp;</menu-elem>\

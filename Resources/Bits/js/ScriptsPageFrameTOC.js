@@ -220,11 +220,11 @@ function initializeMenu() {
         Tracks&#9662\
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Tracks</div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifbasic()'>&nbsp;Basics</a>&nbsp;</div>\
+          <div class='ddItem'><a target='_parent' onclick='loadifbits()'>&nbsp;Bits</a></div>\
           <div class='ddItem'><a target='_parent' onclick='loadifcpp()'>&nbsp;C++</a></div>\
           <div class='ddItem'><a target='_parent' onclick='loadifrust()'>&nbsp;Rust</a></div>\
           <div class='ddItem'><a target='_parent' onclick='loadifcsharp()'>&nbsp;C#</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifbits()'>&nbsp;Bits</a></div>\
+          <div class='ddItem'><a target='_parent' onclick='loadifbasic()'>&nbsp;Basics</a>&nbsp;</div>\
           <div class='ddItem'><a target='_parent' onclick='loadifwebdev()'>&nbsp;WebDev</a></div>\
           <div class='ddItem'><a target='_parent' onclick='loadifdesign()'>&nbsp;Design</a></div>\
           <div class='ddItem'><a target='_parent' onclick='loadifdeployment()'>&nbsp;Deployment</a></div>\

@@ -188,11 +188,11 @@ function initializeMenu() {
         Tracks&#9662\
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Tracks</div>\
-          <div class='ddItem'><a target='_parent' href='TOCBasic.html'>&nbsp;Basics</a>&nbsp;</div>\
+          <div class='ddItem'><a target='_parent' href='TOCBits.html'>&nbsp;Bits</a></div>\
           <div class='ddItem'><a target='_parent' href='TOCCpp.html'>&nbsp;C++</a></div>\
           <div class='ddItem'><a target='_parent' href='TOCRust.html'>&nbsp;Rust</a></div>\
           <div class='ddItem'><a target='_parent' href='TOCCSharp.html'>&nbsp;C#</a></div>\
-          <div class='ddItem'><a target='_parent' href='TOCBits.html'>&nbsp;Bits</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCBasic.html'>&nbsp;Basics</a>&nbsp;</div>\
           <div class='ddItem'><a target='_parent' href='TOCWebDev.html'>&nbsp;WebDev</a></div>\
           <div class='ddItem'><a target='_parent' href='TOCDesign.html'>&nbsp;Design</a></div>\
           <div class='ddItem'><a target='_parent' href='TOCDeployment.html'>&nbsp;Deployment</a></div>\

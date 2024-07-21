@@ -192,11 +192,11 @@ function initializeMenu() {
         Tracks&#9662\
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Tracks</div>\
-          <div class='ddItem'><a href='indexBasic.html'>&nbsp;Basics</a>&nbsp;</div>\
+          <div class='ddItem'><a href='indexBits.html'>&nbsp;Bits</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexCpp.html'>&nbsp;C++</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexRust.html'>&nbsp;Rust</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexCs.html'>&nbsp;C#</a>&nbsp;</div>\
-          <div class='ddItem'><a href='indexBits.html'>&nbsp;Bits</a>&nbsp;</div>\
+          <div class='ddItem'><a href='indexBasic.html'>&nbsp;Basics</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexDesign.html'>&nbsp;Design</a>&nbsp;</div>\
           <div class='ddItem'><a href='indexDeployment.html'>&nbsp;Deployment</a>&nbsp;</div>\

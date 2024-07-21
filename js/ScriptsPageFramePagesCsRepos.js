@@ -8,7 +8,7 @@ function initializePages() {
   /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
     /*pgbtn.style.display = "flex";*/
-    pagesMenu.innerHTML = "<div style='width:100%; text-align:center' class='darkItem'>C# Repositories</div>\
+    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='location.reload()'>C# Repositories</div>\
           <menu-elem class='ddItems pageElem'><a href='Diff_WPF.html'>Diff_WPF</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='CsBlockingQueue.html'>CsBlockingQueue</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='CsNavigator.html'>CsNavigator</a>&nbsp;</menu-elem>\

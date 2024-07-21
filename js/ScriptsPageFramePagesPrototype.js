@@ -7,7 +7,7 @@ function initializePages() {
 
   var pagesMenu = document.getElementById("pages");
   if (isDefined(pagesMenu)) {
-    pagesMenu.innerHTML = "<div class='ddLabel darkItem'>Prototype Thread</div>\
+    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='location.reload()'>Pages</div>\
           <menu-elem class='ddItems pageElem'><a href='PageFramePrototype.html'>PageFrame&nbsp;Prototype</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='ThreadPagePrototype.html'>Thread&nbsp;Page&nbsp;Prototype</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='FreePagePrototype.html'>Free&nbsp;Page&nbsp;Prototype</a>&nbsp;</menu-elem>\
