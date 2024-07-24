@@ -1,5 +1,5 @@
 /*
- * ScriptsPageFrame.js
+ * ScriptsPageFrameBits.js
  * - Builds top menu so only one place to change for adding or removing link
  * - Builds bottom Pages menu since all pages in thread have same sibling pages
  * - Builds About popup, used by all pages
@@ -405,18 +405,18 @@ function initializeMenu() {
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Tracks&nbsp;thread</div>\
+          <div class='ddLabel darkItem' style='text-align:center;'>Bits&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a onclick='loadifbasic()' href='indexBasic.html'>&nbsp;Basic</a></div>\
-            <div class='ddItem'><a onclick='loadifcpp()' href='indexCpp.html'>&nbsp;C++</a></div>\
-            <div class='ddItem'><a onclick='loadifrust()' href='indexRust.html'>&nbsp;Rust</a></div>\
-            <div class='ddItem'><a onclick='loadifcsharp()' href='indexCs.html'>&nbsp;C#</a></div>\
-            <div class='ddItem'><a onclick='loadifbits()' href='indexBits.html'>&nbsp;Bits</a></div>\
-            <div class='ddItem'><a onclick='loadifwebdev()' href='indexWebDev.html'>&nbsp;Web&nbsp;Development</a></div>\
-            <div class='ddItem'><a onclick='loadifdesign()' href='indexDesign.html'>&nbsp;Design</a></div>\
-            <div class='ddItem'><a onclick='loadifdeployment()' href='indexDeployment.html'>&nbsp;Deployment</a></div>\
-            <div class='ddItem'><a onclick='loadifprojects()' href='indexProjects.html'>&nbsp;Projects</a>&nbsp;</div>\
-            <div class='ddItem'><a onclick='loadifprototypes()' href='indexPrototypes.html'>&nbsp;Prototypes</a>&nbsp;</div>\
+            <div class='ddItem'><a target='_parent' href='TOCBits.html?src=indexBits.html'>Bits&nbsp;Track&nbsp;Summary&nbsp;</a></div>\
+            <div class='ddItem'><a target='_parent' href='TOCBits.html?src=BitsRepo.html'>Bits&nbsp;Repo</a></div>\
+            <div class='ddItem'><a href='Resources/Bits/Bits_Intro.html'>Introduction</a></div>\
+            <div class='ddItem'><a href='Resources/Bits/Bits_Tooling.html'>Tooling</a></div>\
+            <div class='ddItem'><a target='parent' href='Resources/Bits/Bits_HelloCpp.html'>Hello</a></div>\
+            <div class='ddItem'><a target='parent' href='Resources/Bits/Bits_DataCpp.html'>Data</a></div>\
+            <div class='ddItem'><a target='parent' href='Resources/Bits/Bits_ObjectsCpp.html'>Objects</a></div>\
+            <div class='ddItem'><a target='parent' href='Resources/Bits/Bits_GenericCpp.html'>Generics</a></div>\
+            <div class='ddItem'><a target='parent' href='Resources/Bits/Bits_IterCpp.html'>Iteration</a></div>\
+            <div class='ddItem'><a class='undefined' target='parent' href='javascript:;'>Libraries</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\

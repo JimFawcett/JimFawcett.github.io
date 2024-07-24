@@ -25,7 +25,7 @@ function loadif() {
     window.location.href = '../../TOC.html?src=' + loc;
   }
   else {
-    window.top.location.href = '../../TOC.html?src=' + loc;
+    window.top.location.href = '../../TOC.html?src=index.html';
     /*location.reload();*/
   }
 }
@@ -71,12 +71,15 @@ function loadifbasic() {
 }
 
 function loadifbits() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = '../../TOCBits.html?src=indexBits.html';
+    /*alert('top');*/
+    window.location.href = '../../TOCBits.html?src=' + loc;
   }
   else {
-    window.top.location.href = '../../TOCBits.html';
+    /*alert('not top');*/
+    /*window.top.location.href = loc;*/
+    window.top.location.href = loc;
   }
 }
 
@@ -162,7 +165,7 @@ function initializeMenu() {
     <div class='menuItem'>\
         <div>Site&#9662</div>\
         <div class='dropdown'>\
-            <div style='height:0.25em;'></div>\
+            <div class='darkItem' style='padding:0.25em 0.5em;'>Code Workshop</div>\
             <div class='ddItem'><a target='_self' href='../../index.html'>Home</a></div>\
             <div class='ddItem'><a target='_parent' href='../../TOC.html'>Site Explorer</a></div>\
             <!--<div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>-->\
@@ -188,7 +191,7 @@ function initializeMenu() {
         Tracks&#9662\
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Tracks</div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifbits()'>&nbsp;Bits</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCBits.html'>&nbsp;Bits</a></div>\
           <div class='ddItem'><a target='_parent' onclick='loadifcpp()'>&nbsp;C++</a></div>\
           <div class='ddItem'><a target='_parent' onclick='loadifrust()'>&nbsp;Rust</a></div>\
           <div class='ddItem'><a target='_parent' onclick='loadifcsharp()'>&nbsp;C#</a></div>\
@@ -392,17 +395,17 @@ function initializeMenu() {
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Code&nbsp;Bits&nbsp;thread</div>\
+          <div class='ddLabel darkItem' style='text-align:center'>Bits&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a target='_parent' href='../../TOCBits.html?src=indexBits.html'>Bits&nbsp;Track&nbsp;Summary</a></div>\
+            <div class='ddItem'><a target='_parent' href='../../TOCBits.html?src=indexCpp.html'>Bits&nbsp;Track&nbsp;Summary</a></div>\
             <div class='ddItem'><a target='_parent' href='../../TOCBits.html?src=BitsRepo.html'>Bits&nbsp;Repository</a></div>\
             <div class='ddItem'><a target='_parent' href='../../TOCBits.html?src=Resources/Bits/Bits_Intro.html'>Introduction</a></div>\
             <div class='ddItem'><a target='_parent' href='../../TOCBits.html?src=Resources/Bits/Bits_Tooling.html'>Tooling</a></div>\
-            <div class='ddItem'><a target='_parent' href='Bits_HelloRust.html'>Hello world</a></div>\
-            <div class='ddItem'><a target='_parent' href='Bits_DataRust.html'>Data</a></div>\
-            <div class='ddItem'><a target='_parent' href='Bits_ObjectsRust.html'>Objects</a></div>\
-            <div class='ddItem'><a target='_parent' href='Bits_GenericRust.html'>Generics</a></div>\
-            <div class='ddItem'><a target='_parent' href='Bits_IterRust.html'>Iteration</a></div>\
+            <div class='ddItem'><a target='_parent' href='Bits_HelloCpp.html'>Hello world</a></div>\
+            <div class='ddItem'><a target='_parent' href='Bits_DataCpp.html'>Data</a></div>\
+            <div class='ddItem'><a target='_parent' href='Bits_ObjectsCpp.html'>Objects</a></div>\
+            <div class='ddItem'><a target='_parent' href='Bits_GenericCpp.html'>Generics</a></div>\
+            <div class='ddItem'><a target='_parent' href='Bits_IterCpp.html'>Iteration</a></div>\
             <div class='ddItem'><a target='_parent' class='undefined' href='javascript:;'>Libraries</a></div>\
           <div style='height:2em;'></div>\
         </div>\
@@ -494,7 +497,8 @@ bottomMenu.pages = function () {
 
 bottomMenu.sections = function () {
   var menu = document.getElementById("sections");
-  document.getElementById("pages").style.display = "none";
+  /*document.getElementById("sections").style.display = "none";*/
+  var pageStyle = menu.style.display;
   if (isDefined(menu)) {
     if (menu.style.display == "flex")
       menu.style.display = "none";

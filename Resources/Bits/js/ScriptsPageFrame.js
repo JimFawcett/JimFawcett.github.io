@@ -397,13 +397,15 @@ function initializeMenu() {
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code&nbsp;Bits&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a href='Bits_Intro.html'>Introduction</a></div>\
-            <div class='ddItem'><a href='Bits_Tooling.html'>Tooling</a></div>\
-            <div class='ddItem'><a href='Bits_HelloCpp.html'>Hello world</a></div>\
-            <div class='ddItem'><a href='Bits_DataCpp.html'>Data</a></div>\
-            <div class='ddItem'><a href='Bits_ObjectsCpp.html'>Objects</a></div>\
-            <div class='ddItem'><a href='Bits_GenericCpp.html'>Generics</a></div>\
-            <div class='ddItem'><a href='Bits_IterCpp.html'>Iteration</a></div>\
+            <div class='ddItem'><a target='_parent' href='../../TOCCpp.html?src=indexCpp.html'>Bits&nbsp;Track&nbsp;Summary</a></div>\
+            <div class='ddItem'><a target='_parent' href='../../TOCCpp.html?src=BitsRepo.html'>Bits&nbsp;Repository</a></div>\
+            <div class='ddItem'><a target='_parent' href='../../TOCCpp.html?src=Resources/Bits/Bits_Intro.html'>Introduction</a></div>\
+            <div class='ddItem'><a target='_parent' href='../../TOCCpp.html?src=Resources/Bits/Bits_Tooling.html'>Tooling</a></div>\
+            <div class='ddItem'><a target='_parent' href='Bits_HelloCpp.html'>Hello world</a></div>\
+            <div class='ddItem'><a target='_parent' href='Bits_DataCpp.html'>Data</a></div>\
+            <div class='ddItem'><a target='_parent' href='Bits_ObjectsCpp.html'>Objects</a></div>\
+            <div class='ddItem'><a target='_parent' href='Bits_GenericCpp.html'>Generics</a></div>\
+            <div class='ddItem'><a target='_parent' href='Bits_IterCpp.html'>Iteration</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\

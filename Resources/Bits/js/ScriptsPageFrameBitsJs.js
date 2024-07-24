@@ -393,14 +393,16 @@ function initializeMenu() {
         Pages&#9662\
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code&nbsp;Bits&nbsp;thread</div>\
-            <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a href='Bits_Intro.html'>Introduction</a></div>\
-            <div class='ddItem'><a href='Bits_Tooling.html'>Tooling</a></div>\
-            <div class='ddItem'><a href='Bits_HelloJs.html'>Hello world</a></div>\
-            <div class='ddItem'><a href='Bits_DataJs.html'>Data</a></div>\
-            <div class='ddItem'><a href='Bits_ObjectsJs.html'>Objects</a></div>\
-            <div class='ddItem undefined'><a href='# Bits_GenericJs.html'>Generics</a></div>\
-            <div class='ddItem undefined'><a href='# Bits_IterJs.html'>Iteration</a></div>\
+            <div class='ddItem'><a target='_parent' href='../../TOCBits.html?src=indexBits.html'>Bits&nbsp;Track&nbsp;Summary</a></div>\
+            <div class='ddItem'><a target='_parent' href='../../TOCBits.html?src=BitsRepo.html'>Bits&nbsp;Repository</a></div>\
+            <div class='ddItem'><a target='_parent' href='../../TOCBits.html?src=Resources/Bits/Bits_Intro.html'>Introduction</a></div>\
+            <div class='ddItem'><a target='_parent' href='../../TOCBits.html?src=Resources/Bits/Bits_Tooling.html'>Tooling</a></div>\
+            <div class='ddItem'><a target='_parent' href='Bits_HelloJs.html'>Hello world</a></div>\
+            <div class='ddItem'><a target='_parent' href='Bits_DataJs.html'>Data</a></div>\
+            <div class='ddItem'><a target='_parent' href='Bits_ObjectsJs.html'>Objects</a></div>\
+            <div class='ddItem undefined'><a target='_parent' href='Bits_GenericJs.html'>Generics</a></div>\
+            <div class='ddItem undefined'><a target='_parent' href='Bits_IterJs.html'>Iteration</a></div>\
+            <div class='ddItem'><a target='_parent' class='undefined' href='javascript:;'>Libraries</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\
