@@ -473,6 +473,34 @@ function initializeNextPrev() {
   }
 }
 
+    var key = window.location.href.replace(/^.*[/\\]/, '').replace(/#.*/, '');
+
+    function saveScrollPosition() {
+      const element = document.getElementById('main');
+      //const key = window.location.href.replace(/^.*[/\\]/, '').replace(/#.*/, '');
+      const scrollPosition = element.scrollTop;
+      localStorage.setItem(key, scrollPosition);
+    }
+
+    function restoreScrollPosition() {
+      const element = document.getElementById('main');
+      //const key = window.location.replace(/^.*[/\\]/, '').replace(/#.*/, '');
+      const savedPosition = localStorage.getItem(key);
+      if (savedPosition !== null) {
+        element.scrollTop = parseInt(savedPosition, 10);
+      }
+    }
+
+    function unloadKeyValue() {
+      //alert('unloading key');
+      //const key = window.location.href.replace(/^.*[/\\]/, '').replace(/#.*/, '');
+      localStorage.removeItem(key);
+    }
+
+    window.addEventListener('beforeunload', () => { unloadKeyValue(); });
+
+
+
 var bottomMenu = new Object();
 
 bottomMenu.next = function () {
