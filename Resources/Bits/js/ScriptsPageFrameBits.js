@@ -14,6 +14,7 @@ function isDefined(elem) {
   }
   return true;
 }
+//
 
 //function loadif() {
 //  loc = window.location.href;
