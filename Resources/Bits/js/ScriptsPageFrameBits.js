@@ -143,6 +143,16 @@ function initialize() {
   storyHlpMenu.helpMenu();
 }
 
+function scrollUp() {
+  const gridItemLeft = document.querySelector('.grid-item-left');
+  if (gridItemLeft) {
+    gridItemLeft.scrollTop = 0;
+  }
+};
+function load() {
+  initialize();
+  scrollUp();
+}
 /* create top menu */
 //function loadif() {
 //  loc = window.location.href;

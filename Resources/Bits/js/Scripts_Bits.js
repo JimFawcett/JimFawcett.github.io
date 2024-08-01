@@ -35,7 +35,17 @@ function toggleInfoRel(src, dst, adj = 0) {
     txtcont.style.display = "none";
   }
 }
+function scrollUp() {
+  const gridItemLeft = document.querySelector('.grid-item-left');
+  if (gridItemLeft) {
+    gridItemLeft.scrollTop = 0;
+  }
+};
 function load() {
   initialize();
-    //actions.keysMenu();
+  scrollUp();
 }
+//function load() {
+//  initialize();
+//    //actions.keysMenu();
+//}
