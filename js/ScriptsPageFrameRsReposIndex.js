@@ -269,6 +269,7 @@ function initializeMenu() {
             <div class='ddItem'><a href='RustByteRecord.html'>Rust&nbsp;Byte&nbsp;Record&nbsp;</a></div>\
             <div class='ddItem'><a href='RustBasicDemos.html'>Rust&nbsp;Basic&nbsp;Demos</a></div>\
             <div class='ddItem'><a href='RustErrorHandling.html'>Rust&nbsp;Error&nbsp;Handling&nbsp;</a></div>\
+            <div class='ddItem undef'><a hrefd='RustThreading.html'>Rust&nbsp;Threading&nbsp;</a></div>\
             <div class='ddItem'><a href='RustModels.html'>Rust&nbsp;Models&nbsp;</a></div>\
             <div class='ddItem'><a href='RustLibraryDemos.html'>Rust&nbsp;Librarys&nbsp;Demos&nbsp;</a></div>\
             <div style='height:2em;'></div>\

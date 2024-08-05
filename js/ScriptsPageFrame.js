@@ -45,6 +45,15 @@ function getHelp() {
   //window.open("Help.html", "help", "popup=1, height=700, width=600");
   window.open("Help.html", "_blank");
 }
+function closeQuickStatus() {
+  let qstat = document.getElementsByClassName("quickStatus");
+  if (qstat) {
+    let det = qstat[0].parentElement;
+    det.removeAttribute('open');
+    let dummy = true;
+  }
+}
+
 function loadif() {
   var loc = window.location.href;
   if (window.self === window.top) {
