@@ -271,10 +271,10 @@ function initializeMenu() {
           <div class='ddLabel darkItem'>Other&nbsp;Repositories&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
             <div class='ddItem'><a href='CommCompare.html'>Comm Compare</a></div>\
-            <div class='ddItem'><a href='BasicBiteByByte.html'>Basic Bites Repo</a></div>\
-            <div class='ddItem'><a href='DesignBites.html'>Design Bites Repo</a></div>\
-            <div class='ddItem'><a href='BitsRepo.html'>Bits Repo</a></div>\
-            <div class='ddItem'><a href='IdiomsAndPatterns.html'>Idioms &amp; Patterns Repo (depricated)</a></div>\
+            <div class='ddItem'><a href='BasicBiteByByte.html'>Basic Bites</a></div>\
+            <div class='ddItem'><a href='DesignBites.html'>Design Bites</a></div>\
+            <div class='ddItem'><a href='BitsRepo.html'>Bits</a></div>\
+            <div class='ddItem'><a href='IdiomsAndPatterns.html'>Idioms &amp; Patterns (depricated)</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\
