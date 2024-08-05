@@ -8,7 +8,7 @@ function initializePages() {
   var pgbtn = document.getElementById("pgbtn");
   if (isDefined(pagesMenu)) {
     pgbtn.style.display = "flex";
-    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='location.reload()'>Design Bites</div>\
+    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='bottomMenu.pages()'>Design Bites</div>\
           <menu-elem class='ddItems pageElem'><a href='../../DesignBites.html'>Design&nbsp;Bites&nbsp;Repo</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='../../indexDesign.html'>Design&nbsp;Track&nbsp;Summary</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='DesignBites_Intro.html'>Intro</a></menu-elem>\

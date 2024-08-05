@@ -8,7 +8,7 @@ function initializePages() {
   /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
     /*pgbtn.style.display = "flex";*/
-    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='location.reload()'>Cpp Repositories</div>\
+    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='bottomMenu.pages()'>C++ Repositories</div>\
           <menu-elem class='ddItems pageElem'><a href='CppUtilities.html'>CppUtilities</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='FileUtilities.html'>FileUtilities</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='Testing.html'>Testing</a>&nbsp;</menu-elem>\
@@ -61,6 +61,5 @@ function initializePages() {
     if (isDefined(pgbtn)) {
       pgbtn.style.display = "none";
     }
-  }
   }
 }

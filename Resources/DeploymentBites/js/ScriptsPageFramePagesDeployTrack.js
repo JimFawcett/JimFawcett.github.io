@@ -8,7 +8,7 @@ function initializePages() {
   /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
     /*pgbtn.style.display = "flex";*/
-    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='location.reload()'>Deploy Bites</div>\
+    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='bottomMenu.pages()'>Deploy Bites</div>\
           <menu-elem class='ddItems pageElem undef'><a href='Javascript:;'>Deploy&nbsp;Bites&nbsp;Repo</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='../../indexDeployment.html'>Deployment&nbsp;Track&nbsp;Summary</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='DeployBites_Git.html'>Git code mgmt</a></menu-elem>\

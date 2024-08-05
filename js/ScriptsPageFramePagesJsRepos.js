@@ -8,7 +8,7 @@ function initializePages() {
   /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
     /*pgbtn.style.display = "flex";*/
-    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='location.reload()'>JavaScript Repos</div>\
+    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='bottomMenu.pages()'>JavaScript Repos</div>\
           <menu-elem class='ddItems pageElem'><a href='WebComponents.html'>WebComponents</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='WebLibraries.html'>WebLibraries</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='SitePages.html'>SitePages</a>&nbsp;</menu-elem>\

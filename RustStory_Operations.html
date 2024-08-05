@@ -86,7 +86,7 @@
       <nav id="navbar"></nav>
     </frame-header>
     <main>
-      <div id="about">about</div>
+      <div id="about" onclick="this.style.display = 'none'">about</div>
       <div id="page">RustStory Operations</div>
       <div id="modified">9/15/2022</div>
       <div id="hlp"></div>
@@ -101,2238 +101,2249 @@
           </hgroup>
         </header>
 
-    <div id="hlp" style="display:none;">
-    </div>
-    <a id="prologue"></a>
-    <h2>3.0 Prologue</h2>
-    <t-b>
-      Rust provides a rich set of operations on program data: 
-      functions, methods, closures, error handling, iterators, 
-      and enumeration matching,
-      that support an expressive design language for building fast and robust software.
-    </t-b>
-    <t-b>
-      In this chapter we discuss all of these and explore their consequences with example code.
-    </t-b>
-    <a id="functions"></a>
-    <h2>3.1 Functions</h2>
-    <t-b>
-      The syntax for Rust functions looks like this:
-      <defn-code style="font-size:medium;">
-  fn somefunction(ArgType1 t1, ArgType2 t2, ...) -> ReturnType { ... }
-      </defn-code>
-      Often the return type is omitted when the compiler can infer the type by the return expression.  Statements are units of
-      execution and end with a &quot;semicolon&quot;.  Expressions compile to some value and do not have a terminating semicolon.
-    </t-b>
-    <t-b>
-      The returned value of a function is the value of the last expression.  If the function code body ends with a statement,
-      the function returns &quot;()&quot;, called the unit, signifying nothing (Null in some other languages). Rust functions
-      allow a return statement but that is not required and is almost never used.
-    </t-b>
-    <t-b>
-      Function arguments play a role similar to other languages, but with some interesting differences.  Primitive types, e.g. int,
-      float, ..., are passed by value or reference.  The primitives and aggregates of primitives are copied when passed by value.
-      when passed by reference a reference is created on the function&apos;s stackframe pointing back to the caller&apos;s value,
-      and if the data is mutable any changes made to it within the function body will be visible to the caller.  So far, this is
-      just like C++, C#, and many others.
-    </t-b>
-    <t-b>
-      Non-primitive data like strings and vectors are move types, so when passed by value they are not copied but moved,
-      which is efficient - usually only copying a pointer - but the caller&apos;s value will become invalid.  Passing by reference
-      places a reference in the function&apos;s stackframe pointing back to the caller&apos;s value, so no move and the caller
-      value will remain valid after the call.
-    </t-b>
-    <div style="height:0.5em;"></div>
-    <t-b>
-      <indent-block>
-        <defn-outerBlock>
-          <defn-block>
-            <defn-head>Pass by Value</defn-head>
-            <defn-code>
-/*-----------------------------------------------
-   Pass by value moves the argument into the
-   function's stack frame, so invalid after call
-*/
-fn pass_by_value_str(s:String) {  // move
-  show_type(&s);   // def in display::lib.rs
-  show_value(&s);  // def in display::lib.rs
-}
-
-            </defn-code>
-            <defn-head class="defnBorderTop">Pass by Reference</defn-head>
-            <defn-code>
-/*-----------------------------------------------
-   Pass by ref borrows the argument. Borrow
-   moved into the function's stack frame.  
-   Borrow ends at end of function call, so 
-   param is valid after call
-*/
-fn pass_by_ref_str(rs:&String) {  // borrow
-  show_type(&rs);   // def in display::lib.rs
-  show_value(&rs);  // def in display::lib.rs
-}
-            </defn-code>
-          </defn-block>
-          <defn-block>
-            <defn-head>Pass by value Using Code:</defn-head>
-            <defn-code>
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("Pass string by value");
-  let mut s = "xyz".to_string();
-  let s1 = s.clone();
-  pass_by_value_str(s1);  // moves s1
-  ////////////////////////////////////////////////
-  // next statement fails to compile - s1 moved
-  // println!(s1);
-            </defn-code>
-            <defn-head class="defnBorderTop">Pass by reference Using Code:</defn-head>
-            <defn-code>
-  /*-------------------------------------------*/
-  separator(48);
-  sub_title("Pass string by reference");
-  pass_by_ref_str(&s);
-  s.push('a');
-  pass_by_ref(&s);  // borrows s
-  s.push('b');
-  show("\n  after pushing a and b, s = ",&s);
-            </defn-code>
-          </defn-block>
-        </defn-outerBlock>
-      </indent-block>
-    </t-b>
-    <t-b class="indent">
-      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=245f7bd87ae75a543589d154e043e1a5">
-        code in playground includes <c-s>show_type</c-s> and <c-s>show_value</c-s>.
-      </a>
-    </t-b>
-    <t-b>
-      They look similar to JavaScript functions with added type specifications.  However, their use is
-      more complicated due to Rust&apos;s rules for mutation and borrowing.  The rules affect:
-      <indent-block class="pad5">
-        <ol class="tight">
-          <li>
-            How you supply function arguments, e.g., the type signatures used.
-          </li>
-          <li>
-            What you are allowed to do inside a function body.
-          </li>
-          <li>
-            What signatures you use for return types.
-          </li>
-        </ol>
-      </indent-block>
-      The bad news is this can get complicated.  The good news is the Rust compiler&apos;s borrow
-      checker does a great job telling you about problems and how to fix them.
-    </t-b>
-    <t-b>
-      In the details dropdown, below, you will find simple demo examples of supplying arguments to
-      functions, returning values and references, and processing input data in function bodies.
-    </t-b>
-    <t-b>
-      There are examples of type specific functions and generic functions. Most are simple demos,
-      only valuable for the usage examples provided.  There are, however, a few functions with
-      lasting value.  One example shows how to gracefully accept either String or str instances.
-    </t-b>
-    <t-b>
-      Another provides a facility to run test functions and report their results.  This
-      &quot;Executor&quot; uses the std::panic library to simulate a try-catch block. That is,
-      if a tested function panics, the stack unwind process is intercepted and a simple
-      error message is displayed.  So, a tested function&apos;s panic is not an Executor panic.
-      It is simply an event to report.
-    </t-b>
-    <t-b>
-      <details style="user-select:text;">
-        <summary class="labelStyle darkItem">Function Code Examples:</summary>
-      <div tabindex="1" style="width:calc(100vw - 6rem); overflow-x:auto;">
-        <table style="overflow-x:auto;">
-          <tr>
-            <th class="darkItem">Function Code</th>
-            <th class="darkItem">Using Code</th>
-            <th class="darkItem">Output</th>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-/*-----------------------------------------------
-   Accepts String by value, moves argument s
-   - s invalid after invocation
-   - could use s.clone() as argument to
-     avoid invalidating s
-*/
-fn show_str1(s:String) {  // move
-  print!("{}",&amp;s);
-}
-            </td>
-            <td class="lightItem defn-code">
-show_str1("\n  first test".to_string());
-
-            </td>
-            <td class="lightItem defn-code">
-first test
-            </td>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-/*-----------------------------------------------
-   Accepts String by reference, borrows argument s
-   - won&apos;t accept string literal
-*/
-fn show_str2(s:&amp;String) {  // borrow
-  print!("{}",&amp;s);
-}
-            </td>
-            <td class="lightItem defn-code">
-  show_str2(&amp;"\n  second test".to_string());
-
-            </td>
-            <td class="lightItem defn-code">
-  second test
-            </td>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-/*-----------------------------------------------
-   Accepts str by reference
-   - won&apos;t accept String instance st
-   - will accept &st
-*/
-fn show_str3(s:&amp;str) {  // borrow
-  print!("{}",&amp;s);
-}
-            </td>
-            <td class="lightItem defn-code">
-  show_str3("\n  third test");
-
-            </td>
-            <td class="lightItem defn-code">
-  third test
-            </td>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-/*-----------------------------------------------
-   Returns String, moves internally created String
-   to caller&apos;s scope
-*/
-fn return_str1() -&gt; String {
-  let s = "test string 1".to_string();
-  s  // moves s
-}
-            </td>
-            <td class="lightItem defn-code">
-  let mut s = return_str1();
-  s.push_str(" with more stuff");
-  let mut s1 = "\n  ".to_string();
-  s1.push_str(&amp;s);
-  shows(s1);
-  
-            </td>
-            <td class="lightItem defn-code">
-  test string 1 with more stuff
-            </td>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-/*-----------------------------------------------
-   Returns str reference
-   - it only makes sense to return a reference
-     to a passed in ref or a static ref
-   - compiler should prevent anything else
-*/
-fn return_str2() -&gt; &amp;'static str {
-  let s = "test string 2";
-  s
-}
-            </td>
-            <td class="lightItem defn-code">
-  let s = return_str2();
-  let mut st = s.to_string();
-  st.push_str(" with more stuff");
-  let mut s1 = "\n  ".to_string();
-  s1.push_str(&amp;st);
-  shows(s1);
-  
-            </td>
-            <td class="lightItem defn-code">
-  test string 2 with more stuff
-            </td>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-/*-----------------------------------------------
-   Returns String reference
-   - it only makes sense to return a reference
-     to a passed in ref or a static ref
-   - compiler should prevent anything else
-*/
-fn return_str3(s:&amp;mut String) -&gt; &amp;mut String {
-  s.push('Z');
-  s
-}
-            </td>
-            <td class="lightItem defn-code">
-  let mut s = String::from("test string 4");
-  let rs = return_str3(&amp;mut s);
-  rs.push_str(" with more stuff");
-  let mut s1 = "\n  ".to_string();
-  s1.push_str(&amp;rs);
-  shows(s1);
-  
-            </td>
-            <td class="lightItem defn-code">
-  test string 4Z with more stuff
-            </td>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-/*-----------------------------------------------
-   Pass by value moves the argument into the
-   function's stack frame, so invalid after call
-*/
-fn pass_by_value_str(s:String) {  // move
-  show_type(&amp;s);   // defined in display lib
-  show_value(&amp;s);  // defined in display lib
-}
-            </td>
-            <td class="lightItem defn-code">
-  let mut s = "xyz".to_string();
-  let s1 = s.clone();
-  pass_by_value_str(s1);  // moves s1
-  ////////////////////////////////////////////////
-  // next statement fails to compile - s1 moved
-  // pass_by_value(s1);
-
-            </td>
-            <td class="lightItem defn-code">
-  TypeId: alloc::string::String, size: 12
-  value: "xyz"
-            </td>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-/*-----------------------------------------------
-   Pass by ref borrows the argument into the
-   function's stack frame.  Borrow ends at end
-   of function stack frame, so param is valid 
-   after call
-*/
-fn pass_by_ref_str(rs:&amp;String) {  // borrow
-  show_type(&amp;rs);   // defined in display lib
-  show_value(&amp;rs);  // defined in display lib
-}
-            </td>
-            <td class="lightItem defn-code">
-  pass_by_ref_str(&amp;s);
-  s.push('a');
-  pass_by_ref(&amp;s);  // borrows s
-  s.push('b');
-  show("\n  after pushing a and b, s = ",&amp;s);
-
-            </td>
-            <td class="lightItem defn-code">
-  TypeId: &alloc::string::String, size: 4
-  value: "xyz"
-  TypeId: &alloc::string::String, size: 4
-  value: "xyza"
-  after pushing a and b, s = "xyzab"
-            </td>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-/*-----------------------------------------------
-   Generic pass by value moves argument into the
-   function's stack frame, so invalid after call
-*/
-fn pass_by_value&lt;T&gt;(t:T) where T:Debug {
-  show_type(&amp;t);
-  show_value(&amp;t);
-}
-            </td>
-            <td class="lightItem defn-code">
-  let mut s = "xyz".to_string();
-  let s1 = s.clone();
-  pass_by_value(s1);
-  ////////////////////////////////////////////////
-  // next statement fails to compile - s1 moved
-  // pass_by_value(s1);
-
-            </td>
-            <td class="lightItem defn-code">
-  TypeId: alloc::string::String, size: 12
-  value: "xyz"
-            </td>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-/*-----------------------------------------------
-   Generic pass by ref borrows argument into the
-   function's stack frame.  Borrow ends at end
-   of function stack frame, so param is valid 
-   after call
-*/
-fn pass_by_ref&lt;T&gt;(rt:&amp;T) where T:Debug {
-  show_type(&amp;rt);
-  show_value(&amp;rt);
-}
-            </td>
-            <td class="lightItem defn-code">
-  pass_by_ref(&amp;s);
-  s.push('a');
-  pass_by_ref(&amp;s);
-
-            </td>
-            <td class="lightItem defn-code">
-  TypeId: &alloc::string::String, size: 4
-  value: "xyz"
-  TypeId: &alloc::string::String, size: 4
-  value: "xyza"
-            </td>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-/*-----------------------------------------------
-   Illustrates lifetime 
-   - type specific so no annotation needed
-*/
-fn lifetime(rs:&amp;String) -&gt; String {
-  show("\n  rs = ",rs); 
-  show_type(rs);
-  // replace doesn't attempt to mutate rs
-  let s = rs.replace("z","a");
-  show("\n  s = ",&amp;s);  
-  show_type(&amp;s);
-  shows("\n  returning string s by value (a move)");
-  s  // return by value moves string to destination
-}
-            </td>
-            <td class="lightItem defn-code">
-  let mut s = "xyz".to_string();
-  show("\n  s = ",&amp;s);
-  shows("\n  calling lifetime");
-  separator(30);
-  let r = &amp;mut lifetime(&amp;mut s);
-  separator(30);
-  shows("\n  returned from lifetime");
-  show("\n  s = ",&amp;s);
-  show("\n  r = ",&amp;r);
-  show_type(&amp;r);
-  r.push('b');
-  show("\n  after pushing b, r = ",&amp;r);
-  s.push('b');
-  show("\n  after pushing b, s = ",&amp;s);
-
-            </td>
-            <td class="lightItem defn-code">
-  s = "xyz"
-  calling lifetime
- -------------------------------
-  rs = "xyz"
-  TypeId: alloc::string::String, size: 12
-  s = "xya"
-  TypeId: alloc::string::String, size: 12
-  returning string s by value (a move)
- -------------------------------
-  returned from lifetime
-  s = "xyz"
-  r = "xya"
-  TypeId: &mut alloc::string::String, size: 4
-  after pushing b, r = "xyab"
-  after pushing b, s = "xyzb"
-            </td>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-/*-----------------------------------------------
-   Illustrates lifetime for generic.
-   - Borrow checker needs help to analyze lifetime
-     of T
-*/
-fn lifetime2&lt;'a, T&gt;(rt:&amp;'a T) -&gt; &amp;'a T where T:Debug {
-  // Lifetime annotation, 'a, enables borrow checker
-  // to ensures that T lives at least as long as rt, 
-  // its reference.
-  show_type(&amp;rt);
-  show_value(&amp;rt);
-  rt  // the only time it makes sense to return
-      // a reference is when returning a possibly
-      // modified input reference
-}
-
-            </td>
-            <td class="lightItem defn-code">
-  let mut s = "xyz".to_string();
-  show("\n  s = ",&amp;s);
-  let r = &amp;mut lifetime2(&amp;mut s);
-  show_type(&amp;r);
-  show("\n  r = ",&amp;r);
-
-            </td>
-            <td class="lightItem defn-code">
-  s = "xyz"
-  TypeId: &alloc::string::String, size: 4
-  value: "xyz"
-  TypeId: &mut &alloc::string::String, size: 4
-  r = "xyz"
-            </td>
-          </tr>
-          <tr>
-            <th class="darkItem">Useful functions</th>
-            <th class="darkItem"></th>
-            <th class="darkItem"></th>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-/*-----------------------------------------------
-   Accepts either String or str
-*/
-fn shows&lt;S: Into&lt;String&gt;&gt;(s:S) {
-  print!("{}",s.into());
-}
-            </td>
-            <td class="lightItem defn-code">
-  sub_title("shows&lt;S: Into&lt;String&gt;&gt;(s:S)");
-  shows("This accepts either String or str");
-            </td>
-            <td class="lightItem defn-code">
-  shows&lt;S: Into&lt;String&gt;&gt;(s:S)
- -----------------------------
-  This accepts either String or str
-            </td>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-  function pointer defined in using code
-            </td>
-            <td class="lightItem defn-code">
-  sub_title("Function pointer");
-  let fun = pass_by_ref;   // define fun ptr
-  let mut s = "xyz".to_string();
-  fun(&amp;s);
-  s.push('a');
-  fun(&amp;s);
-            <td class="lightItem defn-code">
-  Function pointer
- ------------------
-  TypeId: &alloc::string::String, size: 4
-  value: "xyz"
-  TypeId: &alloc::string::String, size: 4
-  value: "xyza"
-            </td>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-  lambda defined in using code
-
-  // Illustrates both lambda and fun ptr
-  let put = |st|{ print!("{}", st); };
-  put("\n  returning s by value"); 
-
-            </td>
-            <td class="lightItem defn-code">
-  sub_title("lambdas");
-  let l = |s:&amp;str| { 
-    show_type(&amp;s); show_value(&amp;s); 
-  };
-  l("xyz");
-  let s = String::from("abc");
-  l(&amp;s);
-
-            </td>
-            <td class="lightItem defn-code">
-  lambdas
- ---------
-  TypeId: &str, size: 8
-  value: "xyz"
-  TypeId: &str, size: 8
-  value: "abc"
-            </td>
-          </tr>
-          <tr>
-            <td class="lightItem defn-code">
-/*-----------------------------------------------
-   Higher order function
-   - tester accepts test functions and executes them
-   - traps test function panic and continues
-*/
-use std::panic;  // catch_unwind panic
-
-fn tester(f:fn() -&gt; bool, name:&amp;str) -&gt; bool {
-  let rslt = panic::catch_unwind(|| { f() });  
-  // line above simulates execution in try-catch
-  match rslt {
-    Ok(true) =&gt; print!("\n  {} passed", name),
-    Ok(false) =&gt; 
-      { print!("\n  {} failed", name); return false; },
-    Err(_) =&gt; 
-      { print!("\n  {} paniced", name); return false; }
-  }
-  return true;
-}
-
-/* hide panic notification */
-fn set_my_hook() {
-  panic::set_hook(Box::new(|_|{ print!(" ");}));
-  // Box needed to give lambda lifetime beyond 
-  // this call, e.g., stores in heap
-}
-
-fn always_fails() -&gt; bool {
-  false
-}
-
-fn always_succeeds() -&gt; bool {
-  true
-}
-
-#[allow(unreachable_code)]
-fn always_panics() -&gt; bool {
-  panic!("always panics");
-  return false;
-}
-
-            </td>
-            <td class="lightItem defn-code">
-  sub_title("higher_order_function");
-  set_my_hook();
-
-  let rstl = 
-    tester(always_fails, "always_fails");
-  print!("\t\tresult = {}", rstl);
-  let rstl = 
-    tester(always_succeeds, "always_passes");
-  print!("\t\tresult = {}", rstl);
-  let rstl = 
-    tester(always_panics, "always_panics");
-  print!("\t\tresult = {}\n", rstl);
-
-  /* show intercepted panic and continued */
-  use std::io::{Write};
-  let one_second = 
-    std::time::Duration::from_millis(1000);
-  for i in 0..5 { 
-    print!("\n  tick {}\t", 5 - i); 
-    std::io::stdout().flush().unwrap();
-    std::thread::sleep(one_second);
-  };
-  print!("\n\n  BOOM!\t");
-  putlinen(2);
-}
-            </td>
-            <td class="lightItem defn-code">
-  higher_order_function
- -----------------------
-  always_fails failed     result = false
-  always_passes passed    result = true
-  always_panics paniced   result = false
-
-  tick 5
-  tick 4
-  tick 3
-  tick 2
-  tick 1
-
-  BOOM!
-
-            </td>
-          </tr>
-        </table>
-      </div>
-      </details>
-    </t-b>
-    <t-b class="mbz">
-      Idiomatic Rust seems to often use functions in places where a C++ developer would be likely
-      to use a class method.  Rust does support methods bound to structs, which we will explore
-      below.
-    </t-b>
-
-    <div style="height:1em;"></div>
-    <a id="funptr"></a>
-    <h3>3.1.1 Function Pointers</h3>
-    <t-b>
-      Function pointers are instances of the type std::fn that point to code, not data.
-      Plain function pointers can only point to safe functions or closures that don&apos;t
-      capture an environment.
-    </t-b>
-    <t-b>
-      In the example, below, fun is a function pointer that invokes pass_by_ref.
-    </t-b>
-    <t-b>
-      <defn-block class="indent">
-        <defn-head>Function Pointer Example</defn-head>
-        <defn-code>
-/*-----------------------------------------------
-   pass_by_ref is a plain function that calls plain 
-   functions in RustBasicDemos::display library.
-*/
-fn pass_by_ref&lt;T&gt;(rt:&amp;T) where T:Debug {
-  show_type(&amp;rt);
-  show_value(&amp;rt);
-}
-
-let fun = pass_by_ref;  // define funptr
-let mut s = "xyz".to_string();
-fun(&amp;s);
-s.push('a');
-fun(&amp;s);
-
-        </defn-code>
-      </defn-block>
-    </t-b>
-    <t-b style="margin-bottom:0px;">
-      We use function pointers as aliases that provide domain specific names for library functions
-      or provide short names for longer generic function names.
-    </t-b>
-
-    <div style="height:1em;"></div>
-    <a id="closures"></a>
-    <h3>3.1.2 Closures</h3>
-    <t-b>
-      Closures, also called lambda expressions or lambdas, are anonymous functions that implement 
-      one of these traits:
-      <indent-block class="pad5">
-        <ol class="tight">
-          <li>
-            FnOnce is implemented automatically by closures that may consume (move and use) 
-            captured variables.
-          </li>
-          <li>
-            Fn is automatically implemented by closures which take only immutable references to
-            captured data or don&apos;t capture anything.  FnOnce and FnMut are super traits so
-            closures that implement Fn can be used where FnOnce or FnMut are expected.
-          </li>
-          <li>
-            <n-s>FnMut</n-s> is implemented automatically by closures which take mutable references
-            to captured variables. FnOnce is a super trait so closures that implement FnMut can
-            be used where FnOnce is expected.
-          </li>
-        </ol>
-      </indent-block>
-    </t-b>
-    <t-b class="mbz">
-      <indent-block class="pad5">
-        <defn-block>
-          <defn-head>Closure syntax:</defn-head>
-          <defn-code>
-  let x:i32 = 3;  // immutable capture, below
-  let cl = |val:i32| { 
-    print!("\n  val = {}, x = {}, val + x = {}", val, x, val + x) 
-  };
-  cl(7);
+        <div id="hlp" style="display:none;">
+        </div>
+        <a id="prologue"></a>
+        <h2>3.0 Prologue</h2>
+        <t-b>
+          Rust provides a rich set of operations on program data:
+          functions, methods, closures, error handling, iterators,
+          and enumeration matching,
+          that support an expressive design language for building fast and robust software.
+        </t-b>
+        <t-b>
+          In this chapter we discuss all of these and explore their consequences with example code.
+        </t-b>
+        <a id="functions"></a>
+        <h2>3.1 Functions</h2>
+        <t-b>
+          The syntax for Rust functions looks like this:
+          <defn-code style="font-size:medium;">
+            fn somefunction(ArgType1 t1, ArgType2 t2, ...) -> ReturnType { ... }
           </defn-code>
-          <defn-head class="defnBorderTop">Output:</defn-head>
-          <defn-code>
-  val = 7, x = 3, val + x = 10
-          </defn-code>
-        </defn-block>
-      </indent-block>
-      <t-b class="mbz">
-        Closures are used where small special purpose functions are needed, but then discarded.
-        Typically used for filters.
-      </t-b>
-      <t-b>
-        Here are some examples:
-      </t-b>
-      <t-b>
-        <div>
-          <details>
-            <summary class="labelStyle darkItem">Closure Examples:</summary>
+          Often the return type is omitted when the compiler can infer the type by the return expression.  Statements are units of
+          execution and end with a &quot;semicolon&quot;.  Expressions compile to some value and do not have a terminating semicolon.
+        </t-b>
+        <t-b>
+          The returned value of a function is the value of the last expression.  If the function code body ends with a statement,
+          the function returns &quot;()&quot;, called the unit, signifying nothing (Null in some other languages). Rust functions
+          allow a return statement but that is not required and is almost never used.
+        </t-b>
+        <t-b>
+          Function arguments play a role similar to other languages, but with some interesting differences.  Primitive types, e.g. int,
+          float, ..., are passed by value or reference.  The primitives and aggregates of primitives are copied when passed by value.
+          when passed by reference a reference is created on the function&apos;s stackframe pointing back to the caller&apos;s value,
+          and if the data is mutable any changes made to it within the function body will be visible to the caller.  So far, this is
+          just like C++, C#, and many others.
+        </t-b>
+        <t-b>
+          Non-primitive data like strings and vectors are move types, so when passed by value they are not copied but moved,
+          which is efficient - usually only copying a pointer - but the caller&apos;s value will become invalid.  Passing by reference
+          places a reference in the function&apos;s stackframe pointing back to the caller&apos;s value, so no move and the caller
+          value will remain valid after the call.
+        </t-b>
+        <div style="height:0.5em;"></div>
+        <t-b>
+          <indent-block>
             <defn-outerBlock>
               <defn-block>
-                <defn-head>Helper Functions</defn-head>
+                <defn-head>Pass by Value</defn-head>
                 <defn-code>
-/*-----------------------------------------------
-  Function consume accepts predicate closure
-  - executes closure and returns its value
-  - accepts function pointers too
-*/
-fn consume&lt;F: FnOnce() -&gt; bool&gt;(cl:F) -&gt; bool 
-where F: FnOnce() -&gt; bool {
-  cl()
-}
-/*-----------------------------------------------
-  Function answer accepts bool and displays value
-*/
-fn answer(ans:bool) {
-    if ans == true {
-        print!("\n  answer is true");
-    }
-    else {
-        print!("\n  answer is false");
-    }
-}
-/*-----------------------------------------------
-  pure predicate functions
-*/
-fn always_true() -&gt; bool { true }
-fn always_false() -&gt; bool { false }
+                  /*-----------------------------------------------
+                  Pass by value moves the argument into the
+                  function's stack frame, so invalid after call
+                  */
+                  fn pass_by_value_str(s:String) {  // move
+                  show_type(&s);   // def in display::lib.rs
+                  show_value(&s);  // def in display::lib.rs
+                  }
 
                 </defn-code>
-                <defn-head class="defnBorderTop">Output:</defn-head>
+                <defn-head class="defnBorderTop">Pass by Reference</defn-head>
                 <defn-code>
-   -- demo closures --
- =======================
-  val = 7, x = 3, val + x = 10
-
-  count = 1, sum = 3
-  count = 2, sum = 3
-  count = 3, sum = 3
-
-  answer is true
-  answer is false
-  answer is true
-  answer is false
-
+                  /*-----------------------------------------------
+                  Pass by ref borrows the argument. Borrow
+                  moved into the function's stack frame.
+                  Borrow ends at end of function call, so
+                  param is valid after call
+                  */
+                  fn pass_by_ref_str(rs:&String) {  // borrow
+                  show_type(&rs);   // def in display::lib.rs
+                  show_value(&rs);  // def in display::lib.rs
+                  }
                 </defn-code>
               </defn-block>
               <defn-block>
-                <defn-head>main</defn-head>
+                <defn-head>Pass by value Using Code:</defn-head>
                 <defn-code>
-/*-----------------------------------------------
-  Demonstrate executor and closures
-*/
-fn main() {
-
-    main_title(" -- demo closures -- ");
-
-    /*-- immutable closure --------------------*/
-
-    let x:i32 = 3;  // immutable capture, below
-    let cl = |val:i32| { 
-      print!(
-        "\n  val = {}, x = {}, val + x = {}",
-        val, x, val + x
-      ) 
-    };
-    cl(7);
-    let put = putline;  // declaring funptr
-    put();
-
-    /*-- mutable closure ----------------------*/
-
-    let mut count = 0;
-    let mut counter = |offset:i32| {  // mut closure
-        count = count + 1;
-        print!("\n  count = {}, sum = {}", 
-          count, 
-          count + offset
-        )
-    };
-    counter(2);
-    counter(1);
-    counter(0);
-    putline();
-
-    /*-- invariant closure --------------------*/
-
-    let clst = ||{ true };  // invariant closure
-    let clsf = ||{ false }; // invariant closure
-
-    let mut ans = consume(clst);
-    answer(ans);
-    ans = consume(clsf);
-    answer(ans);
-    ans = consume(always_true);
-    answer(ans);
-    ans = consume(always_false);
-    answer(ans);
-    putlinen(2); 
-}
+                  /*-------------------------------------------*/
+                  separator(48);
+                  sub_title("Pass string by value");
+                  let mut s = "xyz".to_string();
+                  let s1 = s.clone();
+                  pass_by_value_str(s1);  // moves s1
+                  ////////////////////////////////////////////////
+                  // next statement fails to compile - s1 moved
+                  // println!(s1);
+                </defn-code>
+                <defn-head class="defnBorderTop">Pass by reference Using Code:</defn-head>
+                <defn-code>
+                  /*-------------------------------------------*/
+                  separator(48);
+                  sub_title("Pass string by reference");
+                  pass_by_ref_str(&s);
+                  s.push('a');
+                  pass_by_ref(&s);  // borrows s
+                  s.push('b');
+                  show("\n  after pushing a and b, s = ",&s);
                 </defn-code>
               </defn-block>
             </defn-outerBlock>
+          </indent-block>
+        </t-b>
+        <t-b class="indent">
+          <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=245f7bd87ae75a543589d154e043e1a5">
+            code in playground includes <c-s>show_type</c-s> and <c-s>show_value</c-s>.
+          </a>
+        </t-b>
+        <t-b>
+          They look similar to JavaScript functions with added type specifications.  However, their use is
+          more complicated due to Rust&apos;s rules for mutation and borrowing.  The rules affect:
+          <indent-block class="pad5">
+            <ol class="tight">
+              <li>
+                How you supply function arguments, e.g., the type signatures used.
+              </li>
+              <li>
+                What you are allowed to do inside a function body.
+              </li>
+              <li>
+                What signatures you use for return types.
+              </li>
+            </ol>
+          </indent-block>
+          The bad news is this can get complicated.  The good news is the Rust compiler&apos;s borrow
+          checker does a great job telling you about problems and how to fix them.
+        </t-b>
+        <t-b>
+          In the details dropdown, below, you will find simple demo examples of supplying arguments to
+          functions, returning values and references, and processing input data in function bodies.
+        </t-b>
+        <t-b>
+          There are examples of type specific functions and generic functions. Most are simple demos,
+          only valuable for the usage examples provided.  There are, however, a few functions with
+          lasting value.  One example shows how to gracefully accept either String or str instances.
+        </t-b>
+        <t-b>
+          Another provides a facility to run test functions and report their results.  This
+          &quot;Executor&quot; uses the std::panic library to simulate a try-catch block. That is,
+          if a tested function panics, the stack unwind process is intercepted and a simple
+          error message is displayed.  So, a tested function&apos;s panic is not an Executor panic.
+          It is simply an event to report.
+        </t-b>
+        <t-b>
+          <details style="user-select:text;">
+            <summary class="labelStyle darkItem">Function Code Examples:</summary>
+            <div tabindex="1" style="width:calc(100vw - 6rem); overflow-x:auto;">
+              <table style="overflow-x:auto;">
+                <tr>
+                  <th class="darkItem">Function Code</th>
+                  <th class="darkItem">Using Code</th>
+                  <th class="darkItem">Output</th>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    /*-----------------------------------------------
+                    Accepts String by value, moves argument s
+                    - s invalid after invocation
+                    - could use s.clone() as argument to
+                    avoid invalidating s
+                    */
+                    fn show_str1(s:String) {  // move
+                    print!("{}",&amp;s);
+                    }
+                  </td>
+                  <td class="lightItem defn-code">
+                    show_str1("\n  first test".to_string());
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    first test
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    /*-----------------------------------------------
+                    Accepts String by reference, borrows argument s
+                    - won&apos;t accept string literal
+                    */
+                    fn show_str2(s:&amp;String) {  // borrow
+                    print!("{}",&amp;s);
+                    }
+                  </td>
+                  <td class="lightItem defn-code">
+                    show_str2(&amp;"\n  second test".to_string());
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    second test
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    /*-----------------------------------------------
+                    Accepts str by reference
+                    - won&apos;t accept String instance st
+                    - will accept &st
+                    */
+                    fn show_str3(s:&amp;str) {  // borrow
+                    print!("{}",&amp;s);
+                    }
+                  </td>
+                  <td class="lightItem defn-code">
+                    show_str3("\n  third test");
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    third test
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    /*-----------------------------------------------
+                    Returns String, moves internally created String
+                    to caller&apos;s scope
+                    */
+                    fn return_str1() -&gt; String {
+                    let s = "test string 1".to_string();
+                    s  // moves s
+                    }
+                  </td>
+                  <td class="lightItem defn-code">
+                    let mut s = return_str1();
+                    s.push_str(" with more stuff");
+                    let mut s1 = "\n  ".to_string();
+                    s1.push_str(&amp;s);
+                    shows(s1);
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    test string 1 with more stuff
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    /*-----------------------------------------------
+                    Returns str reference
+                    - it only makes sense to return a reference
+                    to a passed in ref or a static ref
+                    - compiler should prevent anything else
+                    */
+                    fn return_str2() -&gt; &amp;'static str {
+                    let s = "test string 2";
+                    s
+                    }
+                  </td>
+                  <td class="lightItem defn-code">
+                    let s = return_str2();
+                    let mut st = s.to_string();
+                    st.push_str(" with more stuff");
+                    let mut s1 = "\n  ".to_string();
+                    s1.push_str(&amp;st);
+                    shows(s1);
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    test string 2 with more stuff
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    /*-----------------------------------------------
+                    Returns String reference
+                    - it only makes sense to return a reference
+                    to a passed in ref or a static ref
+                    - compiler should prevent anything else
+                    */
+                    fn return_str3(s:&amp;mut String) -&gt; &amp;mut String {
+                    s.push('Z');
+                    s
+                    }
+                  </td>
+                  <td class="lightItem defn-code">
+                    let mut s = String::from("test string 4");
+                    let rs = return_str3(&amp;mut s);
+                    rs.push_str(" with more stuff");
+                    let mut s1 = "\n  ".to_string();
+                    s1.push_str(&amp;rs);
+                    shows(s1);
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    test string 4Z with more stuff
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    /*-----------------------------------------------
+                    Pass by value moves the argument into the
+                    function's stack frame, so invalid after call
+                    */
+                    fn pass_by_value_str(s:String) {  // move
+                    show_type(&amp;s);   // defined in display lib
+                    show_value(&amp;s);  // defined in display lib
+                    }
+                  </td>
+                  <td class="lightItem defn-code">
+                    let mut s = "xyz".to_string();
+                    let s1 = s.clone();
+                    pass_by_value_str(s1);  // moves s1
+                    ////////////////////////////////////////////////
+                    // next statement fails to compile - s1 moved
+                    // pass_by_value(s1);
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    TypeId: alloc::string::String, size: 12
+                    value: "xyz"
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    /*-----------------------------------------------
+                    Pass by ref borrows the argument into the
+                    function's stack frame.  Borrow ends at end
+                    of function stack frame, so param is valid
+                    after call
+                    */
+                    fn pass_by_ref_str(rs:&amp;String) {  // borrow
+                    show_type(&amp;rs);   // defined in display lib
+                    show_value(&amp;rs);  // defined in display lib
+                    }
+                  </td>
+                  <td class="lightItem defn-code">
+                    pass_by_ref_str(&amp;s);
+                    s.push('a');
+                    pass_by_ref(&amp;s);  // borrows s
+                    s.push('b');
+                    show("\n  after pushing a and b, s = ",&amp;s);
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    TypeId: &alloc::string::String, size: 4
+                    value: "xyz"
+                    TypeId: &alloc::string::String, size: 4
+                    value: "xyza"
+                    after pushing a and b, s = "xyzab"
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    /*-----------------------------------------------
+                    Generic pass by value moves argument into the
+                    function's stack frame, so invalid after call
+                    */
+                    fn pass_by_value&lt;T&gt;(t:T) where T:Debug {
+                    show_type(&amp;t);
+                    show_value(&amp;t);
+                    }
+                  </td>
+                  <td class="lightItem defn-code">
+                    let mut s = "xyz".to_string();
+                    let s1 = s.clone();
+                    pass_by_value(s1);
+                    ////////////////////////////////////////////////
+                    // next statement fails to compile - s1 moved
+                    // pass_by_value(s1);
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    TypeId: alloc::string::String, size: 12
+                    value: "xyz"
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    /*-----------------------------------------------
+                    Generic pass by ref borrows argument into the
+                    function's stack frame.  Borrow ends at end
+                    of function stack frame, so param is valid
+                    after call
+                    */
+                    fn pass_by_ref&lt;T&gt;(rt:&amp;T) where T:Debug {
+                    show_type(&amp;rt);
+                    show_value(&amp;rt);
+                    }
+                  </td>
+                  <td class="lightItem defn-code">
+                    pass_by_ref(&amp;s);
+                    s.push('a');
+                    pass_by_ref(&amp;s);
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    TypeId: &alloc::string::String, size: 4
+                    value: "xyz"
+                    TypeId: &alloc::string::String, size: 4
+                    value: "xyza"
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    /*-----------------------------------------------
+                    Illustrates lifetime
+                    - type specific so no annotation needed
+                    */
+                    fn lifetime(rs:&amp;String) -&gt; String {
+                    show("\n  rs = ",rs);
+                    show_type(rs);
+                    // replace doesn't attempt to mutate rs
+                    let s = rs.replace("z","a");
+                    show("\n  s = ",&amp;s);
+                    show_type(&amp;s);
+                    shows("\n  returning string s by value (a move)");
+                    s  // return by value moves string to destination
+                    }
+                  </td>
+                  <td class="lightItem defn-code">
+                    let mut s = "xyz".to_string();
+                    show("\n  s = ",&amp;s);
+                    shows("\n  calling lifetime");
+                    separator(30);
+                    let r = &amp;mut lifetime(&amp;mut s);
+                    separator(30);
+                    shows("\n  returned from lifetime");
+                    show("\n  s = ",&amp;s);
+                    show("\n  r = ",&amp;r);
+                    show_type(&amp;r);
+                    r.push('b');
+                    show("\n  after pushing b, r = ",&amp;r);
+                    s.push('b');
+                    show("\n  after pushing b, s = ",&amp;s);
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    s = "xyz"
+                    calling lifetime
+                    -------------------------------
+                    rs = "xyz"
+                    TypeId: alloc::string::String, size: 12
+                    s = "xya"
+                    TypeId: alloc::string::String, size: 12
+                    returning string s by value (a move)
+                    -------------------------------
+                    returned from lifetime
+                    s = "xyz"
+                    r = "xya"
+                    TypeId: &mut alloc::string::String, size: 4
+                    after pushing b, r = "xyab"
+                    after pushing b, s = "xyzb"
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    /*-----------------------------------------------
+                    Illustrates lifetime for generic.
+                    - Borrow checker needs help to analyze lifetime
+                    of T
+                    */
+                    fn lifetime2&lt;'a, T&gt;(rt:&amp;'a T) -&gt; &amp;'a T where T:Debug {
+                    // Lifetime annotation, 'a, enables borrow checker
+                    // to ensures that T lives at least as long as rt,
+                    // its reference.
+                    show_type(&amp;rt);
+                    show_value(&amp;rt);
+                    rt  // the only time it makes sense to return
+                    // a reference is when returning a possibly
+                    // modified input reference
+                    }
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    let mut s = "xyz".to_string();
+                    show("\n  s = ",&amp;s);
+                    let r = &amp;mut lifetime2(&amp;mut s);
+                    show_type(&amp;r);
+                    show("\n  r = ",&amp;r);
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    s = "xyz"
+                    TypeId: &alloc::string::String, size: 4
+                    value: "xyz"
+                    TypeId: &mut &alloc::string::String, size: 4
+                    r = "xyz"
+                  </td>
+                </tr>
+                <tr>
+                  <th class="darkItem">Useful functions</th>
+                  <th class="darkItem"></th>
+                  <th class="darkItem"></th>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    /*-----------------------------------------------
+                    Accepts either String or str
+                    */
+                    fn shows&lt;S: Into&lt;String&gt;&gt;(s:S) {
+                    print!("{}",s.into());
+                    }
+                  </td>
+                  <td class="lightItem defn-code">
+                    sub_title("shows&lt;S: Into&lt;String&gt;&gt;(s:S)");
+                    shows("This accepts either String or str");
+                  </td>
+                  <td class="lightItem defn-code">
+                    shows&lt;S: Into&lt;String&gt;&gt;(s:S)
+                    -----------------------------
+                    This accepts either String or str
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    function pointer defined in using code
+                  </td>
+                  <td class="lightItem defn-code">
+                    sub_title("Function pointer");
+                    let fun = pass_by_ref;   // define fun ptr
+                    let mut s = "xyz".to_string();
+                    fun(&amp;s);
+                    s.push('a');
+                    fun(&amp;s);
+                  <td class="lightItem defn-code">
+                    Function pointer
+                    ------------------
+                    TypeId: &alloc::string::String, size: 4
+                    value: "xyz"
+                    TypeId: &alloc::string::String, size: 4
+                    value: "xyza"
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    lambda defined in using code
+
+                    // Illustrates both lambda and fun ptr
+                    let put = |st|{ print!("{}", st); };
+                    put("\n  returning s by value");
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    sub_title("lambdas");
+                    let l = |s:&amp;str| {
+                    show_type(&amp;s); show_value(&amp;s);
+                    };
+                    l("xyz");
+                    let s = String::from("abc");
+                    l(&amp;s);
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    lambdas
+                    ---------
+                    TypeId: &str, size: 8
+                    value: "xyz"
+                    TypeId: &str, size: 8
+                    value: "abc"
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+                    /*-----------------------------------------------
+                    Higher order function
+                    - tester accepts test functions and executes them
+                    - traps test function panic and continues
+                    */
+                    use std::panic;  // catch_unwind panic
+
+                    fn tester(f:fn() -&gt; bool, name:&amp;str) -&gt; bool {
+                    let rslt = panic::catch_unwind(|| { f() });
+                    // line above simulates execution in try-catch
+                    match rslt {
+                    Ok(true) =&gt; print!("\n  {} passed", name),
+                    Ok(false) =&gt;
+                    { print!("\n  {} failed", name); return false; },
+                    Err(_) =&gt;
+                    { print!("\n  {} paniced", name); return false; }
+                    }
+                    return true;
+                    }
+
+                    /* hide panic notification */
+                    fn set_my_hook() {
+                    panic::set_hook(Box::new(|_|{ print!(" ");}));
+                    // Box needed to give lambda lifetime beyond
+                    // this call, e.g., stores in heap
+                    }
+
+                    fn always_fails() -&gt; bool {
+                    false
+                    }
+
+                    fn always_succeeds() -&gt; bool {
+                    true
+                    }
+
+                    #[allow(unreachable_code)]
+                    fn always_panics() -&gt; bool {
+                    panic!("always panics");
+                    return false;
+                    }
+
+                  </td>
+                  <td class="lightItem defn-code">
+                    sub_title("higher_order_function");
+                    set_my_hook();
+
+                    let rstl =
+                    tester(always_fails, "always_fails");
+                    print!("\t\tresult = {}", rstl);
+                    let rstl =
+                    tester(always_succeeds, "always_passes");
+                    print!("\t\tresult = {}", rstl);
+                    let rstl =
+                    tester(always_panics, "always_panics");
+                    print!("\t\tresult = {}\n", rstl);
+
+                    /* show intercepted panic and continued */
+                    use std::io::{Write};
+                    let one_second =
+                    std::time::Duration::from_millis(1000);
+                    for i in 0..5 {
+                    print!("\n  tick {}\t", 5 - i);
+                    std::io::stdout().flush().unwrap();
+                    std::thread::sleep(one_second);
+                    };
+                    print!("\n\n  BOOM!\t");
+                    putlinen(2);
+                    }
+                  </td>
+                  <td class="lightItem defn-code">
+                    higher_order_function
+                    -----------------------
+                    always_fails failed     result = false
+                    always_passes passed    result = true
+                    always_panics paniced   result = false
+
+                    tick 5
+                    tick 4
+                    tick 3
+                    tick 2
+                    tick 1
+
+                    BOOM!
+
+                  </td>
+                </tr>
+              </table>
+            </div>
           </details>
-        </div>
-      </t-b>
-    </t-b>
-    <t-b class="mbz">
-      These examples present closures with immutable capture, mutable capture, and no capture.  Also
-      included is an example of a function that accepts either closures or function pointers and executes
-      them.
-    </t-b>
+        </t-b>
+        <t-b class="mbz">
+          Idiomatic Rust seems to often use functions in places where a C++ developer would be likely
+          to use a class method.  Rust does support methods bound to structs, which we will explore
+          below.
+        </t-b>
 
-    <s-halfEm></s-halfEm>
-    <a id="errors"></a>
-    <h3>3.1.3 Function Error Handling</h3>
-    <t-b>
-      Rust functions with operations that may fail, e.g., opening a file, should return one of two
-      kinds of result wrappers, std::Result&lt;T,E&gt; or std::Option&lt;T&gt;.  These are both
-      enumerations:
-      <indent-block class="pad5">
-        <defn-outerBlock>
-          <defn-block>
-            <defn-head>Result:</defn-head>
+        <div style="height:1em;"></div>
+        <a id="funptr"></a>
+        <h3>3.1.1 Function Pointers</h3>
+        <t-b>
+          Function pointers are instances of the type std::fn that point to code, not data.
+          Plain function pointers can only point to safe functions or closures that don&apos;t
+          capture an environment.
+        </t-b>
+        <t-b>
+          In the example, below, fun is a function pointer that invokes pass_by_ref.
+        </t-b>
+        <t-b>
+          <defn-block class="indent">
+            <defn-head>Function Pointer Example</defn-head>
             <defn-code>
-enum Result&lt;T, E&gt; {
-  Ok(T),
-  Err(E),
-}
+              /*-----------------------------------------------
+              pass_by_ref is a plain function that calls plain
+              functions in RustBasicDemos::display library.
+              */
+              fn pass_by_ref&lt;T&gt;(rt:&amp;T) where T:Debug {
+              show_type(&amp;rt);
+              show_value(&amp;rt);
+              }
+
+              let fun = pass_by_ref;  // define funptr
+              let mut s = "xyz".to_string();
+              fun(&amp;s);
+              s.push('a');
+              fun(&amp;s);
+
             </defn-code>
           </defn-block>
-          <defn-block>
-            <defn-head>Option:</defn-head>
-            <defn-code>
-enum Option&lt;T&gt; {
-  Some(T),
-  None,
-}
-            </defn-code>
-          </defn-block>
-        </defn-outerBlock>
-      </indent-block>
-      <indent-block class="pad5">
-        <ol class="tights">
-          <li>
-            <n-s>Option&lt;T&gt;</n-s> is an enumeration that contains either Some(result:T) or None. Option&lt;T&gt;
-            has methods:
-            <div class="pad5">
-              <ul class="tight">
-                <li>
-                  is_some() -> bool
-                </li>
-                <li>
-                  is_none() -> bool
-                </li>
-                <li>
-                  contains&lt;U&gt;(x:&U) -> bool
-                </li>
-                <li>
-                  expect(msg: &str) -> T<br />
-                  Unwraps option returning content of Some or panics with msg
-                </li>
-                <li>
-                  unwrap() -> T<br />
-                  Returns value of Some or panics
-                </li>
-                <li>
-                  take(&mut self) -> Option&lt;T&gt;<br />
-                  Returns the Option value, leaving None in its place. Provides a way to access Move types
-                  from aggregates - simply wrap the elements in an Option&lt;T&gt; then use take() as needed.
-                </li>
-                <li>
-                  map&lt;U, F&gt;(f:F) -> Option&lt;U&gt; where F: FnOnce(T) -> U<br />
-                  Applies f to value of Some.
-                </li>
-                <li>
-                  iter() -> Iter&lt;T&gt;<br />
-                  Returns iterator over value of Some if available
-                </li>
-                <li>
-                  filter&lt;P&gt;(predicate: P) -> Option&lt;T&gt; where P: FnOnce(&amp;T) -> bool<br />
-                  Returns None if no value else calls predicate with unwrapped value and returns.
-                </li>
-                <li>
-                  Many more functions: <a href="https://doc.rust-lang.org/std/option/enum.Option.html">std::Option</a>.
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li>
-            <n-s>enum Result&lt;T, E&gt;</n-s> is an enumeration that contains either Ok(result) or Err(err).
-            Result&lt;T, E&gt; has methods:
-            <div class="pad5">
-              <ul class="tight">
-                <li>
-                  is_ok() -> bool
-                </li>
-                <li>
-                  is_err() -> bool
-                </li>
-                <li>
-                  ok() -> Option&lt;T&gt;
-                </li>
-                <li>
-                  err() -> Option&lt;E&gt;
-                </li>
-                <li>
-                  unwrap() -> T, will return result if available or panic
-                </li>
-                <li>
-                  unwrap_err() -> E, will return error if available or panic
-                </li>
-                <li>
-                  unwrap_or_else&lt;F&gt;(op:F) -> T where F: FnOnce(E) -> T<br />
-                  Returns result if available, else calls op(err)
-                </li>
-                <li>
-                  expect(msg: &str) -> T, unwraps result if available else panics with msg
-                </li>
-                <li>
-                  map&lt;U, F&gt;(op: F) -> Result&lt;U, E&gt; where F: FnOnce(T) -> U<br />
-                  op is a lambda that replaces t:T with a computed value
-                </li>
-                <li>
-                  iter() -> Iter&lt;T&gt;<br />
-                  Returns iterator over Some value if it exists.
-                </li>
-                <li>
-                  Many more functions: <a href="https://doc.rust-lang.org/std/result/enum.Result.html">std::Result</a>.
-                </li>
-              </ul>
-            </div>
-          </li>
-        </ol>
-      </indent-block>
-      <t-b style="margin-top:0px;">
-        The difference between these is that Result can pass information about the error back
-        to the caller. Returning Option signals that failure to return a result is not an error.
-      </t-b>
-    </t-b>
-    <t-b>
-      <indent-blocks>
-        <details>
-          <summary class="labelStyle darkItem">Result and Option Syntax Examples:</summary>
-          <t-b>
-            These examples show how Result&lt;T,E&gt; and Option&lt;T&gt; work using a simulated
-            error event that is passed as a bool.  Part of the example uses .expect(e:Err) which
-            panics if an error occurred (e.g., we entered false).  That is not what you would
-            do for production code.  There you want to report the error but continue to operate,
-            so using matching is a sensible choice.
-          </t-b>
-          <defn-outerBlock>
+        </t-b>
+        <t-b style="margin-bottom:0px;">
+          We use function pointers as aliases that provide domain specific names for library functions
+          or provide short names for longer generic function names.
+        </t-b>
+
+        <div style="height:1em;"></div>
+        <a id="closures"></a>
+        <h3>3.1.2 Closures</h3>
+        <t-b>
+          Closures, also called lambda expressions or lambdas, are anonymous functions that implement
+          one of these traits:
+          <indent-block class="pad5">
+            <ol class="tight">
+              <li>
+                FnOnce is implemented automatically by closures that may consume (move and use)
+                captured variables.
+              </li>
+              <li>
+                Fn is automatically implemented by closures which take only immutable references to
+                captured data or don&apos;t capture anything.  FnOnce and FnMut are super traits so
+                closures that implement Fn can be used where FnOnce or FnMut are expected.
+              </li>
+              <li>
+                <n-s>FnMut</n-s> is implemented automatically by closures which take mutable references
+                to captured variables. FnOnce is a super trait so closures that implement FnMut can
+                be used where FnOnce is expected.
+              </li>
+            </ol>
+          </indent-block>
+        </t-b>
+        <t-b class="mbz">
+          <indent-block class="pad5">
             <defn-block>
-              <defn-head>Functions returning Result or Option</defn-head>
+              <defn-head>Closure syntax:</defn-head>
               <defn-code>
-use display::{*};
-
-fn demo_result&lt;'a&gt;(p: bool) -&gt; Result&lt;&amp;'a str, &amp;'a str&gt; {
-    print!("\n  value of input predicate is {}", p);
-    if p {
-        return Ok("it's ok");
-    } 
-    else {
-        return Err("not ok");
-    }
-}
-
-fn demo_option&lt;'a&gt;(p:bool) -&gt; Option&lt;&amp;'a str&gt; {
-    print!("\n  value of input predicate is {}", p);
-    if p {
-        return Some("something just for you!");
-    }
-    else {
-        return None;
-    }
-}
+                let x:i32 = 3;  // immutable capture, below
+                let cl = |val:i32| {
+                print!("\n  val = {}, x = {}, val + x = {}", val, x, val + x)
+                };
+                cl(7);
               </defn-code>
               <defn-head class="defnBorderTop">Output:</defn-head>
               <defn-code>
-    -- demo Result --
- -----------------------
--- using match
-  value of input predicate is true
-    result is it's ok
-  value of input predicate is false
-    result is not ok
-
--- using expect
-  value of input predicate is true
-    result is it's ok
-
-    -- demo Option --
- -----------------------
---using match
-  value of input predicate is true
-    something just for you!
-  value of input predicate is false
-    sorry, nothing here
-
---using unwrap
-  value of input predicate is true
-    something just for you!
-
-  That's all folks!
+                val = 7, x = 3, val + x = 10
               </defn-code>
             </defn-block>
-            <defn-block>
-              <defn-head>Using code:</defn-head>
-              <defn-code>
-  use display::{*};
-
-  sub_title("  -- demo Result --  ");
-  shows("\n-- using match");
-
-  let r = demo_result(true);
-  match r {
-      Ok(rslt) =&gt; print!("\n  result is {}", rslt),
-      Err(rslt) =&gt; print!("\n  result is {}", rslt)
-  }
-  let r = demo_result(false);
-  match r {
-      Ok(rslt) =&gt; print!("\n  result is {}", rslt),
-      Err(rslt) =&gt; print!("\n  result is {}", rslt)
-  }
-  shows("\n\n-- using expect");
-
-  let r = demo_result(true)
-    .expect("predicate was false");
-  print!("\n    result is {}", r);
-  /////////////////////////////////////////////
-  // uncomment to see panic
-  // let _r = demo_result(false)
-  //   .expect("predicate was false");
-  putline();
-
-  sub_title("  -- demo Option --  ");
-  shows("\n--using match");
-
-  let r = demo_option(true);
-  match r {
-      Some(rslt) =&gt; print!("\n    {}", rslt),
-      None =&gt; print!("\n    sorry, nothing here")
-  }
-  let r = demo_option(false);
-  match r {
-      Some(rslt) =&gt; print!("\n    {}", rslt),
-      None =&gt; print!("\n    sorry, nothing here")
-  }
-  shows("\n\n--using unwrap");
-
-  let r = demo_option(true).unwrap();
-  print!("\n    {}", r);
-  /////////////////////////////////////////////
-  // uncomment to see panic
-  // let _r = demo_option(false).unwrap();
-
-  print!("\n\n  That's all folks!\n\n");
-              </defn-code>
-            </defn-block>
-          </defn-outerBlock>
-        </details>
-      </indent-blocks>
-    </t-b>
-    <t-b>
-      Let&apos;s follow up with a practical example, handling file open errors, being careful to avoid panics:
-    </t-b>
-    <t-b>
-      <div>
-        <details>
-          <summary class="labelStyle darkItem">File Error Handling</summary>
-          <defn-outerBlock>
-            <defn-block>
-              <defn-head>File Open Code</defn-head>
-              <defn-code>
-use std::io::prelude::*;
-use std::fs::File;
-use display::{*};
-
-#[allow(dead_code)]
-fn open_file_for_read(file_name:&amp;str) 
-     -&gt;Result&lt;File, std::io::Error&gt; {
-    use std::fs::OpenOptions;
-    let rfile = OpenOptions::new()
-               .read(true)
-               .open(file_name);
-    rfile
-}
-
-#[allow(dead_code)]
-use std::io::{Error, ErrorKind};
-fn read_file_to_string(mut f:File) 
-     -&gt; Result&lt;String, std::io::Error&gt; {
-  let mut contents = String::new();
-  let bytes_rslt = f.read_to_string(&amp;mut contents);
-  if bytes_rslt.is_ok() {
-    Ok(contents)
-  }
-  else {
-      Err(Error::new(ErrorKind::Other, "read error"))
-  }
-}
-              </defn-code>
-            </defn-block>
-            <defn-block>
-              <defn-head>Using Code</defn-head>
-              <defn-code>
-    /*-----------------------------------------------------
-       - Choose name of a file in the error_probes crate
-         root directory to show successful operation.  
-       - Choose one that does not exist to show failure 
-         operation.
-    */
-    let file:File;
-    let file_name = "foobar.txt";
-    let rslt = open_file_for_read(file_name);
-    if rslt.is_ok() {
-      print!("\n  file {:?} opened successfully", file_name);
-      file = rslt.unwrap();
-      let s = read_file_to_string(file);
-      if s.is_ok() {
-          print!("\n  contents: \"{}\"", s.unwrap());
-      }
-    }
-    else {
-        print!("\n  failed to open file {:?}", file_name);
-    }
-
-              </defn-code>
-              <defn-head class="defnBorderTop">Output:</defn-head>
-              <defn-code>
-  file "foobar.txt" opened successfully
-  contents: "This is foobar.txt"
-              </defn-code>
-            </defn-block>
-          </defn-outerBlock>
-          <t-b>
-            Note that, in the code above, unwrap() has been applied only where we know 
-            it won&apos;t panic. This way we gracefully handle errors and can still
-            continue processing.
+          </indent-block>
+          <t-b class="mbz">
+            Closures are used where small special purpose functions are needed, but then discarded.
+            Typically used for filters.
           </t-b>
           <t-b>
-            You can test open failure handling by commenting out the .create(true) in
-            file_open_for_write and 
-            deleting first_test.txt file from the crate directory.
+            Here are some examples:
           </t-b>
           <t-b>
-            The Rust operator ? provides a convenient way to handle errors at the call site and
-            then elevate to parent call site with an appropriate Result&lt;T, E&gt;. See this 
-            <a href="https://doc.rust-lang.org/edition-guide/rust-2018/error-handling-and-panics/the-question-mark-operator-for-easier-error-handling.html">
-              for an example
-            </a>.
-          </t-b>
-        </details>
-      </div>
-    </t-b>
-    <t-b>
-      You may find additional details provided in <a href="Resources/RustErrorHandling.pdf">RustErrorHandling.pdf</a> 
-      useful for helping you to write effective error handling code. Topics include panics, trapping panics, returning
-      results, and console and file I/O.
-    </t-b>
-    <t-b>
-      Next3, we turn to a very useful construct, iterators, as implemented in Rust.
-    </t-b>
-    <div style="height:0.5em"></div>
-    <a id="iters"></a>
-    <h2>3.2 Iterators</h2>
-    <t-b>
-      Rust collections like Vec, String, and Map provide 
-      <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">iterators</a> 
-      used to step over and operate on
-      elements from the collection. 
-      <indent-block class="pad5">
-        <defn-block>
-          <defn-head>Iterating over Vec of integers</defn-head>
-          <defn-code>
-let v = vec![1, -1, 2, -2, 3, -3];
-print!("\n  ");
-let it = v.iter();
-for val in it {
-    print!("{} ", val);
-}
-          </defn-code>
-          <defn-head class="defnBorderTop">Output:</defn-head>
-          <defn-code>
-1 -1 2 -2 3 -3
-          </defn-code>
-        </defn-block>
-      </indent-block>
-      You can also provide iterators for your own custom types by defining
-      an Iterator trait for the type.  The only requirement is that it provide a method next() that
-      returns an option with Some(item) or None, where item is the next element in the collection:
-      <indent-block class="pad5">
-        <c-s>fn next(&mut self) -> Option&lt;Self::Item&gt;</c-s>
-      </indent-block>
-      You can manually step through a collection by calling next() on an iterator instance, 
-      <c-s>it.next()</c-s>
-      which returns <span style="white-space:nowrap";>Option&lt;T&gt;(item).</span>
-    </t-b>
-
-    <a id="iterops"></a>
-    <h3>3.2.1 Operations with Iterators</h3>
-    <t-b>
-      The standard iterators provide a <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">set of adapters</a>, 
-      including:
-      <indent-block class="pad5">
-        <ol class="tight">
-          <li>
-            <strong>map</strong>: <c-s>fn map&lt;B,F&gt;(self, f:F) -> Map&lt;self, F&gt;</c-s> where
-            <c-s>F: FnMut(Self::Item) -> B</c-s><br />
             <div>
-              Here, the map function takes a closure <c-s>f:F</c-s> that accepts an instance of the associated type
-              <c-s>Item</c-s>
-              and returns some computed value of type <c-s>B</c-s>.  The associated type <c-s>Item</c-s> is the type
-              of elements of the collection.
-            </div>
-          </li>
-          <li>
-            <strong>filter</strong>: <c-s>fn filter&lt;P&gt;(self, predicate: P) -> Filter&lt;Self, P&gt;</c-s>
-            where <c-s>P: FnMut(&Self::Item) -> bool</c-s>
-            <div>
-              Filter function takes a predicate closure <c-s>P</c-s> that determines whether an element of the
-              collection is sent to the output.
-            </div>
-          </li>
-          <li>
-            <strong>collection</strong>: <c-s>fn collect&lt;B&gt;(self) -> B</c-s> 
-            where <c-s>B: FromIterator&lt;Self::Item&gt;</c-s>
-            <div>
-              Turns an iterable collection into a different collection.
-            </div>
-          </li>
-        </ol>
-      </indent-block>
-    </t-b>
-    <t-b>
-      Here&apos;s a set of examples of iterator and adapter use:
-    </t-b>
-    <t-b>
-      <div>
-        <details>
-          <summary class="labelStyle darkItem">Iterator Examples:</summary>
-          <defn-outerBlock>
-            <defn-block>
-              <defn-head>Helper functions</defn-head>
-              <defn-code>
-use display::{*};
-
-#[allow(dead_code)]
-fn show_prefix(p:&amp;str) {
-    print!("{}", p);
-}
-#[allow(dead_code)]
-/*-- note: Iterator has an associated type, Item --*/
-fn show_csl&lt;T&gt;(mut t:T) 
-   where T:Iterator, T::Item:std::fmt::Debug, {
-     print!("{:?}", t.next().unwrap());  // no leading comma
-     for val in t {
-         print!(", {:?}", val);          // leading comma
-   }
-}
-#[allow(dead_code)]
-/*-- note: Iterator has an associated type, Item --*/
-fn display_csl&lt;T&gt;(mut t:T) 
-   where T:Iterator, T::Item:std::fmt::Display, {
-     print!("{}", t.next().unwrap());  // no leading comma
-     for val in t {
-         print!(", {}", val);          // leading comma
-   }
-}
-#[allow(dead_code)]
-fn show_pcsl&lt;T&gt;(t:T) 
-   where T:Iterator, T::Item:std::fmt::Debug,  {
-     show_prefix("\n  ");
-     show_csl(t);
-}
-#[allow(dead_code)]
-fn display_pcsl&lt;T&gt;(t:T) 
-   where T:Iterator, T::Item:std::fmt::Display,  {
-     show_prefix("\n  ");
-     display_csl(t);
-}
-              </defn-code>
-              <defn-head class="defnBorderTop">Output:</defn-head>
-              <defn-code>
-  Demonstrating Iterators
- =========================
-
--- demo iter over vec of ints --
-  1 -1 2 -2 3 -3
--- demo comma separated display --
-  1, -1, 2, -2, 3, -3
-
--- demo iter over instance of map type --
-  ("two", 2) ("zero", 0) ("one", 1) ("three", 3)   
-
--- demo iter over array of floats --
-  1 2.2 3.3 4.4 5.5
--- demo comma separated display --
-  1.0, 2.2, 3.3, 4.4, 5.5
-
--- demo iter over array of strs --
-  "one", "two", "three", "four"
--- demo using Display trait instead of Debug --    
-  one, two, three, four
-
--- demo map function modifying items --
-  "onez" "twoz" "threez" "fourz"
-
--- demo collect items into Vec --
-  ["onez", "twoz", "threez", "fourz"]
-
-  That's all Folks!
-              </defn-code>
-            </defn-block>
-            <defn-block>
-              <defn-head>Iteration Code</defn-head>
-              <defn-code>
-  main_title("Demonstrating Iterators");
-  putline();
-    
-  shows("\n-- demo iter over vec of ints --");
-  let v = vec![1, -1, 2, -2, 3, -3];
-  print!("\n  ");
-  let it = v.iter();
-  for val in it {
-      print!("{} ", val);
-  }
-  shows("\n-- demo comma separated display --");
-  show_pcsl(v.iter());
-  putline();
-
-  shows("\n-- demo iter over instance of map type --");
-  show_prefix("\n  ");
-  use std::collections::HashMap;
-  let mut map:HashMap&lt;&amp;str, i32&gt; = HashMap::new();
-  map.entry("zero").or_insert(0);
-  map.entry("one").or_insert(1);
-  map.entry("two").or_insert(2);
-  map.entry("three").or_insert(3);
-  let it_map = map.iter();
-  for val in it_map {
-      print!("{:?} ", val);
-  }
-  putline();
-
-  shows("\n-- demo iter over array of floats --");
-  let a = [1.0, 2.2, 3.3, 4.4, 5.5];
-  print!("\n  ");
-  let ita = a.iter();
-  for val in ita {
-      print!("{} ", val);
-  }
-  shows("\n-- demo comma separated display --");
-  let iter = a.iter();
-  show_pcsl(iter);
-  putline();
-
-  shows("\n-- demo iter over array of strs --");
-  let mut s = [ "one", "two", "three", "four" ];
-  show_pcsl(s.iter());
-  shows(
-    "\n-- demo using Display trait instead of Debug --"
-  );
-  display_pcsl(s.iter());
-  putline();
-
-  shows("\n-- demo map function modifying items --");
-  show_prefix("\n  ");
-    
-  let iter = s.iter_mut().map(|item| { 
-      let mut mod_item:String = item.to_string();
-      mod_item.push('z');
-      mod_item   // returning String, not str
-  });
-
-  for val in iter {
-      print!("{:?} ",val);
-  }
-  putline();
-
-  shows("\n-- demo collect items into Vec --");
-  let iter = s.iter_mut().map(|item| { 
-      let mut mod_item:String = item.to_string();
-      mod_item.push('z');
-      mod_item   // returning String, not str
-  });
-  let v:Vec::&lt;String&gt; = iter.collect();
-  print!("\n  {:?}", v);
-  putline();
-
-  println!("\n  That's all Folks!\n");
-              </defn-code>
-            </defn-block>
-          </defn-outerBlock>
-        </details>
-      </div>
-    </t-b>
-    <t-b>
-      In the next section we look briefly at structs and traits, focusing on implementation of methods.
-      In the next chapter we will dig more deeply into structs and their implementation of types.
-    </t-b>
-
-    <div style="height:0.5em;"></div>
-    <a id="methods"></a>
-    <h3>3.3 Structs and Methods</h3>
-    <t-b>
-      Rust structs, like enums, come in three forms:
-      <indent-block class="pad5">
-        <ol class="tight">
-          <li>
-            <n-s>StructExprStruct</n-s>
-            <div class="pad5">
-              <defn-code style="font-size:1.05em;">struct Person1 {
-    name:String, occup:String, id:u32,
-}</defn-code>
-            </div>
-          </li>
-          <li>
-            <n-s>StructExprTuple</n-s>
-            <div class="pad5">
-              <defn-code style="font-size:1.05em;">struct Person2 (
-    String, String, u32
-);</defn-code>
-            </div>
-          </li>
-          <li>
-            <n-s>StructExprUnit</n-s>
-            <div class="pad5">
-              <defn-code style="font-size:1.05em;">struct Person3;</defn-code>
-            </div>
-          </li>
-        </ol>
-      </indent-block>
-    </t-b>
-    <t-b>
-      Struct methods are analogous to class methods in C++. They are implemented in an &quot;impl&quot;
-      block decorated with the struct type name, like this:
-    </t-b>
-    <t-b>
-      <div>
-        <defn-block>
-          <defn-head>Method implementation</defn-head>
-          <defn-code>
-struct Person1 {
-    name:String, occup:String, id:u32,
-}
-impl Person1 {
-    fn show(&self) {
-        print!("\n  Person1: {:?}", &self);
-    }
-}
-          </defn-code>
-        </defn-block>
-      </div>
-    </t-b>
-    <t-b>
-      Here, the method <c-s>Person1::show</c-s> is simply delegating its responsibility to the
-      <c-s>print!</c-s> macro. The <c-s>self:Self</c-s> plays the same role as the <c-s>this</c-s>
-      pointer in C++.
-    </t-b>
-    <t-b>
-      The examples below illustrate both method implementation and the implementation of traits, which we
-      discuss in the next subsection.
-    </t-b>
-    <t-b>
-      <div>
-        <details>
-          <summary class="labelStyle darkItem">Method Implementation Examples:</summary>
-          <defn-outerBlock>
-            <defn-block>
-              <defn-head>Method implementations:</defn-head>
-              <defn-code>
-#[allow(unused_imports)]
-use display::{*};
-use std::fmt;
-
-/*-- basic demo --*/
-#[derive(Debug)]
-struct Person1 {
-    name:String, occup:String, id:u32,
-}
-#[allow(dead_code)]
-impl Person1 {
-    fn show(&self) {
-        print!("\n  Person1: {:?}", &self);
-    }
-}
-#[derive(Debug)]
-struct Person2 (
-    String, String, u32
-);
-#[allow(dead_code)]
-impl Person2 {
-    fn show(&self) {
-        print!("\n  Person2: {:?}", &self);
-    }
-}
-#[derive(Debug)]
-struct Person3;
-#[allow(dead_code)]
-impl Person3 {
-    fn show(&self) {
-        print!("\n  Person3");
-    }
-}
-
-/*-- enums used for Demo1 and Demo2 --*/
-#[derive(Debug, PartialEq, Copy, Clone)]
-#[allow(dead_code)]
-pub enum Level { Basic, Intermediate, Advanced }
-#[derive(Debug, PartialEq, Copy, Clone)]
-#[allow(dead_code)]
-pub enum Topic { Rust, Cpp, Design, }
-
-/*-- Struct Demo1 has private data --*/
-#[derive(Debug)]
-pub struct Demo1 {
-    name: String,
-    level: Level,
-    topic: Topic,
-}
-/*-- implement methods for Demo1 --*/
-#[allow(dead_code)]
-impl Demo1 {
-    pub fn new() -> Self {  // set default values
-        Self {
-            name:String::from(""),
-            level: Level::Basic,
-            topic: Topic::Rust,
-        }
-    }
-    pub fn set_name(&mut self, s:&str) { 
-        self.name = s.to_string(); 
-    }
-    pub fn get_name(&self) -> &String {
-        &self.name
-    }
-    pub fn set_level(&mut self, l:Level) {
-        self.level = l;
-    }
-    pub fn get_level(&self) -> &Level {
-        &self.level
-    }
-    pub fn set_topic(&mut self, t:Topic) {
-        self.topic = t;
-    }
-    pub fn get_topic(&self) -> &Topic {
-        &self.topic
-    }
-}
-
-/*-- struct Demo2 has public data --*/
-#[derive(Debug)]
-pub struct Demo2 {
-    pub name: String,
-    pub level: Level,
-    pub topic: Topic,
-}
-/*-- implement Display trait for Demo2 --*/
-#[allow(dead_code)]
-impl fmt::Display for Demo2 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) ->
-         fmt::Result {
-           write!(
-             f, 
-             "Demo2 {
-               { name: \"{}\", 
-                 level: {:?}, 
-                 topic: {:?} 
-                }
-             }", 
-          self.name, self.level, self.topic)
-    }
-}
-/*-- implement Default trait for Demo2 --*/
-impl Default for Demo2 {
-    fn default() -> Self {
-        Self {
-            name: String::from(""),
-            level: Level::Basic,
-            topic: Topic::Rust,
-        }
-    }
-}
-/*-- implement init method for Demo2 --*/
-impl Demo2 {
-    pub fn init(self) -> Demo2 {
-      Demo2 {
-        name: self.name,
-        level: self.level,
-        topic: self.topic,
-      }
-    }
-}
-              </defn-code>
-            </defn-block>
-            <defn-block>
-              <defn-head>Using Code:</defn-head>
-              <defn-code>
-sub_title("Demonstrating Basic Structs");
-let p1 = Person1 { 
-    name:"Jim".to_string(), 
-    occup:"dev".to_string(), 
-    id:42 
-};
-p1.show();
-let p2 = Person2 { 
-    0:"Jim".to_string(),
-    1:"dev".to_string(),
-    2:42
-};
-p2.show();
-let p3 = Person3;
-p3.show();
-putline();
-    
-sub_title("Demonstrating Demo1 Struct");
-let mut demo1 = Demo1::new();
-demo1.set_name("Demo1 probe");
-print!("\n  {:?}", demo1);
-print!(
-  "\n  Demo1 level = {:?}", 
-  demo1.get_level()
-);
-putline();
-
-sub_title("Demonstrating Demo2 Struct");
-let mut demo2 = Demo2 {
-    name: String::from("Jim's Demo2"),
-    ..Default::default()
-}.init();
-
-print!(
-  "\n  Using Debug format\n    {:?}", 
-  demo2
-);
-print!(
-  "\n  setting level to Intermediate:"
-);
-demo2.level = Level::Intermediate;
-print!(
-  "\n  Using Display format\n    {}", 
-  demo2
-);
-putline();    
-
-println!("\n\n  That's all Folks!\n");
-              </defn-code>
-              <defn-head class="defnBorderTop">Output:</defn-head>
-              <defn-code>
-  Demonstrating Basic Structs
- -----------------------------
-  Person1: Person1 { 
-    name: "Jim", 
-    occup: "dev",
-    id: 42 
-  }
-  Person2: Person2("Jim", "dev", 42)
-  Person3
-
-  Demonstrating Demo1 Struct
- ----------------------------
-  Demo1 { 
-    name: "Demo1 probe", 
-    level: Basic, 
-    topic: Rust 
-  }
-  Demo1 level = Basic
-
-  Demonstrating Demo2 Struct
- ----------------------------
-  Using Debug format
-    Demo2 { 
-      name: "Jim\'s Demo2", 
-      level: Basic, 
-      topic: Rust 
-    }
-  setting level to Intermediate:
-  Using Display format
-    Demo2 { 
-      name: "Jim's Demo2", 
-      level: Intermediate, 
-      topic: Rust 
-    }        
-
-  That's all Folks!
-              </defn-code>
-            </defn-block>
-          </defn-outerBlock>
-        </details>
-      </div>
-    </t-b>
-    <t-b class="mbz">
-      Note that a struct may have any finite number of impl blocks.
-    </t-b>
-    <div style="height:1em;"></div>
-    <a id="traits"></a>
-    <h3>3.3.1 Traits</h3>
-    <t-b>
-      &quot;Traits are the abstract mechanism for adding 
-      functionality to types and establishing relationships between them.&quot; 
-      <span style="white-space:nowrap;">- Steve Donovan, 
-      <a href="https://stevedonovan.github.io/rustifications/2018/09/08/common-rust-traits.html">Rustifications</a></span>.  
-    </t-b>
-    <t-b>
-      Traits have two uses:
-      <indent-block class="pad5">
-        <ol class="tight">
-          <li>
-            They act like interfaces, defining a contract for use, e.g.:
-            <div class="pad5">
-              <defn-code style="font-size:1.0em;">trait Speaker {
-    fn salutation(&self) -> String;
-}</defn-code>
-            </div>
-            <div class="pad5">
               <details>
-                <summary class="labelStyle darkItem">Interfaces Example:</summary>
-                <t-b>
-                  <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=d695d69de1565758249393266bcc60e5">
-                    Code in Rust playground
-                  </a>
-                </t-b>
+                <summary class="labelStyle darkItem">Closure Examples:</summary>
+                <defn-outerBlock>
+                  <defn-block>
+                    <defn-head>Helper Functions</defn-head>
+                    <defn-code>
+                      /*-----------------------------------------------
+                      Function consume accepts predicate closure
+                      - executes closure and returns its value
+                      - accepts function pointers too
+                      */
+                      fn consume&lt;F: FnOnce() -&gt; bool&gt;(cl:F) -&gt; bool
+                      where F: FnOnce() -&gt; bool {
+                      cl()
+                      }
+                      /*-----------------------------------------------
+                      Function answer accepts bool and displays value
+                      */
+                      fn answer(ans:bool) {
+                      if ans == true {
+                      print!("\n  answer is true");
+                      }
+                      else {
+                      print!("\n  answer is false");
+                      }
+                      }
+                      /*-----------------------------------------------
+                      pure predicate functions
+                      */
+                      fn always_true() -&gt; bool { true }
+                      fn always_false() -&gt; bool { false }
+
+                    </defn-code>
+                    <defn-head class="defnBorderTop">Output:</defn-head>
+                    <defn-code>
+                      -- demo closures --
+                      =======================
+                      val = 7, x = 3, val + x = 10
+
+                      count = 1, sum = 3
+                      count = 2, sum = 3
+                      count = 3, sum = 3
+
+                      answer is true
+                      answer is false
+                      answer is true
+                      answer is false
+
+                    </defn-code>
+                  </defn-block>
+                  <defn-block>
+                    <defn-head>main</defn-head>
+                    <defn-code>
+                      /*-----------------------------------------------
+                      Demonstrate executor and closures
+                      */
+                      fn main() {
+
+                      main_title(" -- demo closures -- ");
+
+                      /*-- immutable closure --------------------*/
+
+                      let x:i32 = 3;  // immutable capture, below
+                      let cl = |val:i32| {
+                      print!(
+                      "\n  val = {}, x = {}, val + x = {}",
+                      val, x, val + x
+                      )
+                      };
+                      cl(7);
+                      let put = putline;  // declaring funptr
+                      put();
+
+                      /*-- mutable closure ----------------------*/
+
+                      let mut count = 0;
+                      let mut counter = |offset:i32| {  // mut closure
+                      count = count + 1;
+                      print!("\n  count = {}, sum = {}",
+                      count,
+                      count + offset
+                      )
+                      };
+                      counter(2);
+                      counter(1);
+                      counter(0);
+                      putline();
+
+                      /*-- invariant closure --------------------*/
+
+                      let clst = ||{ true };  // invariant closure
+                      let clsf = ||{ false }; // invariant closure
+
+                      let mut ans = consume(clst);
+                      answer(ans);
+                      ans = consume(clsf);
+                      answer(ans);
+                      ans = consume(always_true);
+                      answer(ans);
+                      ans = consume(always_false);
+                      answer(ans);
+                      putlinen(2);
+                      }
+                    </defn-code>
+                  </defn-block>
+                </defn-outerBlock>
+              </details>
+            </div>
+          </t-b>
+        </t-b>
+        <t-b class="mbz">
+          These examples present closures with immutable capture, mutable capture, and no capture.  Also
+          included is an example of a function that accepts either closures or function pointers and executes
+          them.
+        </t-b>
+
+        <s-halfEm></s-halfEm>
+        <a id="errors"></a>
+        <h3>3.1.3 Function Error Handling</h3>
+        <t-b>
+          Rust functions with operations that may fail, e.g., opening a file, should return one of two
+          kinds of result wrappers, std::Result&lt;T,E&gt; or std::Option&lt;T&gt;.  These are both
+          enumerations:
+          <indent-block class="pad5">
+            <defn-outerBlock>
+              <defn-block>
+                <defn-head>Result:</defn-head>
+                <defn-code>
+                  enum Result&lt;T, E&gt; {
+                  Ok(T),
+                  Err(E),
+                  }
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>Option:</defn-head>
+                <defn-code>
+                  enum Option&lt;T&gt; {
+                  Some(T),
+                  None,
+                  }
+                </defn-code>
+              </defn-block>
+            </defn-outerBlock>
+          </indent-block>
+          <indent-block class="pad5">
+            <ol class="tights">
+              <li>
+                <n-s>Option&lt;T&gt;</n-s> is an enumeration that contains either Some(result:T) or None. Option&lt;T&gt;
+                has methods:
+                <div class="pad5">
+                  <ul class="tight">
+                    <li>
+                      is_some() -> bool
+                    </li>
+                    <li>
+                      is_none() -> bool
+                    </li>
+                    <li>
+                      contains&lt;U&gt;(x:&U) -> bool
+                    </li>
+                    <li>
+                      expect(msg: &str) -> T<br />
+                      Unwraps option returning content of Some or panics with msg
+                    </li>
+                    <li>
+                      unwrap() -> T<br />
+                      Returns value of Some or panics
+                    </li>
+                    <li>
+                      take(&mut self) -> Option&lt;T&gt;<br />
+                      Returns the Option value, leaving None in its place. Provides a way to access Move types
+                      from aggregates - simply wrap the elements in an Option&lt;T&gt; then use take() as needed.
+                    </li>
+                    <li>
+                      map&lt;U, F&gt;(f:F) -> Option&lt;U&gt; where F: FnOnce(T) -> U<br />
+                      Applies f to value of Some.
+                    </li>
+                    <li>
+                      iter() -> Iter&lt;T&gt;<br />
+                      Returns iterator over value of Some if available
+                    </li>
+                    <li>
+                      filter&lt;P&gt;(predicate: P) -> Option&lt;T&gt; where P: FnOnce(&amp;T) -> bool<br />
+                      Returns None if no value else calls predicate with unwrapped value and returns.
+                    </li>
+                    <li>
+                      Many more functions: <a href="https://doc.rust-lang.org/std/option/enum.Option.html">std::Option</a>.
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <n-s>enum Result&lt;T, E&gt;</n-s> is an enumeration that contains either Ok(result) or Err(err).
+                Result&lt;T, E&gt; has methods:
+                <div class="pad5">
+                  <ul class="tight">
+                    <li>
+                      is_ok() -> bool
+                    </li>
+                    <li>
+                      is_err() -> bool
+                    </li>
+                    <li>
+                      ok() -> Option&lt;T&gt;
+                    </li>
+                    <li>
+                      err() -> Option&lt;E&gt;
+                    </li>
+                    <li>
+                      unwrap() -> T, will return result if available or panic
+                    </li>
+                    <li>
+                      unwrap_err() -> E, will return error if available or panic
+                    </li>
+                    <li>
+                      unwrap_or_else&lt;F&gt;(op:F) -> T where F: FnOnce(E) -> T<br />
+                      Returns result if available, else calls op(err)
+                    </li>
+                    <li>
+                      expect(msg: &str) -> T, unwraps result if available else panics with msg
+                    </li>
+                    <li>
+                      map&lt;U, F&gt;(op: F) -> Result&lt;U, E&gt; where F: FnOnce(T) -> U<br />
+                      op is a lambda that replaces t:T with a computed value
+                    </li>
+                    <li>
+                      iter() -> Iter&lt;T&gt;<br />
+                      Returns iterator over Some value if it exists.
+                    </li>
+                    <li>
+                      Many more functions: <a href="https://doc.rust-lang.org/std/result/enum.Result.html">std::Result</a>.
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ol>
+          </indent-block>
+          <t-b style="margin-top:0px;">
+            The difference between these is that Result can pass information about the error back
+            to the caller. Returning Option signals that failure to return a result is not an error.
+          </t-b>
+        </t-b>
+        <t-b>
+          <indent-blocks>
+            <details>
+              <summary class="labelStyle darkItem">Result and Option Syntax Examples:</summary>
+              <t-b>
+                These examples show how Result&lt;T,E&gt; and Option&lt;T&gt; work using a simulated
+                error event that is passed as a bool.  Part of the example uses .expect(e:Err) which
+                panics if an error occurred (e.g., we entered false).  That is not what you would
+                do for production code.  There you want to report the error but continue to operate,
+                so using matching is a sensible choice.
+              </t-b>
               <defn-outerBlock>
                 <defn-block>
-                  <defn-head>Implementing Code:</defn-head>
+                  <defn-head>Functions returning Result or Option</defn-head>
                   <defn-code>
-trait Speaker {
-    fn salutation(&self) -> String;
-}
-///////////////////////////////////////////////////////////
-// The following structs act like classes that implement
-// a Speaker interface
+                    use display::{*};
 
-#[derive(Debug,Copy,Clone)]
-pub struct Presenter;
-impl Speaker for Presenter {
-    fn salutation(&self) -> String {
-      "Hello, today we will discuss ...".to_string()
-    }
-} 
+                    fn demo_result&lt;'a&gt;(p: bool) -&gt; Result&lt;&amp;'a str, &amp;'a str&gt; {
+                    print!("\n  value of input predicate is {}", p);
+                    if p {
+                    return Ok("it's ok");
+                    }
+                    else {
+                    return Err("not ok");
+                    }
+                    }
 
-#[derive(Debug)]
-pub struct Friend {
-    pub name : String,
-}
-impl Speaker for Friend {
-    fn salutation(&self) -> String {
-      let mut s = String::from(
-        "Hi good buddy, its me, "
-      );
-      let nm = self.name.as_str();
-      s.push_str(nm);
-      return s;
-    }
-}
-impl Friend {
-    pub fn new(name : String) -> Self {
-        Self {
-            name,
-        }  // no semicolon so self
-    }      // is returned
-}
+                    fn demo_option&lt;'a&gt;(p:bool) -&gt; Option&lt;&amp;'a str&gt; {
+                    print!("\n  value of input predicate is {}", p);
+                    if p {
+                    return Some("something just for you!");
+                    }
+                    else {
+                    return None;
+                    }
+                    }
+                  </defn-code>
+                  <defn-head class="defnBorderTop">Output:</defn-head>
+                  <defn-code>
+                    -- demo Result --
+                    -----------------------
+                    -- using match
+                    value of input predicate is true
+                    result is it's ok
+                    value of input predicate is false
+                    result is not ok
 
-#[derive(Debug,Copy,Clone)]
-pub struct TeamLead;
-impl Speaker for TeamLead {
-    fn salutation(&self) -> String {
-      "Hi, I have a task for you 
-       ...".to_string()
-    }
-} 
+                    -- using expect
+                    value of input predicate is true
+                    result is it's ok
+
+                    -- demo Option --
+                    -----------------------
+                    --using match
+                    value of input predicate is true
+                    something just for you!
+                    value of input predicate is false
+                    sorry, nothing here
+
+                    --using unwrap
+                    value of input predicate is true
+                    something just for you!
+
+                    That's all folks!
+                  </defn-code>
+                </defn-block>
+                <defn-block>
+                  <defn-head>Using code:</defn-head>
+                  <defn-code>
+                    use display::{*};
+
+                    sub_title("  -- demo Result --  ");
+                    shows("\n-- using match");
+
+                    let r = demo_result(true);
+                    match r {
+                    Ok(rslt) =&gt; print!("\n  result is {}", rslt),
+                    Err(rslt) =&gt; print!("\n  result is {}", rslt)
+                    }
+                    let r = demo_result(false);
+                    match r {
+                    Ok(rslt) =&gt; print!("\n  result is {}", rslt),
+                    Err(rslt) =&gt; print!("\n  result is {}", rslt)
+                    }
+                    shows("\n\n-- using expect");
+
+                    let r = demo_result(true)
+                    .expect("predicate was false");
+                    print!("\n    result is {}", r);
+                    /////////////////////////////////////////////
+                    // uncomment to see panic
+                    // let _r = demo_result(false)
+                    //   .expect("predicate was false");
+                    putline();
+
+                    sub_title("  -- demo Option --  ");
+                    shows("\n--using match");
+
+                    let r = demo_option(true);
+                    match r {
+                    Some(rslt) =&gt; print!("\n    {}", rslt),
+                    None =&gt; print!("\n    sorry, nothing here")
+                    }
+                    let r = demo_option(false);
+                    match r {
+                    Some(rslt) =&gt; print!("\n    {}", rslt),
+                    None =&gt; print!("\n    sorry, nothing here")
+                    }
+                    shows("\n\n--using unwrap");
+
+                    let r = demo_option(true).unwrap();
+                    print!("\n    {}", r);
+                    /////////////////////////////////////////////
+                    // uncomment to see panic
+                    // let _r = demo_option(false).unwrap();
+
+                    print!("\n\n  That's all folks!\n\n");
+                  </defn-code>
+                </defn-block>
+              </defn-outerBlock>
+            </details>
+          </indent-blocks>
+        </t-b>
+        <t-b>
+          Let&apos;s follow up with a practical example, handling file open errors, being careful to avoid panics:
+        </t-b>
+        <t-b>
+          <div>
+            <details>
+              <summary class="labelStyle darkItem">File Error Handling</summary>
+              <defn-outerBlock>
+                <defn-block>
+                  <defn-head>File Open Code</defn-head>
+                  <defn-code>
+                    use std::io::prelude::*;
+                    use std::fs::File;
+                    use display::{*};
+
+                    #[allow(dead_code)]
+                    fn open_file_for_read(file_name:&amp;str)
+                    -&gt;Result&lt;File, std::io::Error&gt; {
+                    use std::fs::OpenOptions;
+                    let rfile = OpenOptions::new()
+                    .read(true)
+                    .open(file_name);
+                    rfile
+                    }
+
+                    #[allow(dead_code)]
+                    use std::io::{Error, ErrorKind};
+                    fn read_file_to_string(mut f:File)
+                    -&gt; Result&lt;String, std::io::Error&gt; {
+                    let mut contents = String::new();
+                    let bytes_rslt = f.read_to_string(&amp;mut contents);
+                    if bytes_rslt.is_ok() {
+                    Ok(contents)
+                    }
+                    else {
+                    Err(Error::new(ErrorKind::Other, "read error"))
+                    }
+                    }
+                  </defn-code>
+                </defn-block>
+                <defn-block>
+                  <defn-head>Using Code</defn-head>
+                  <defn-code>
+                    /*-----------------------------------------------------
+                    - Choose name of a file in the error_probes crate
+                    root directory to show successful operation.
+                    - Choose one that does not exist to show failure
+                    operation.
+                    */
+                    let file:File;
+                    let file_name = "foobar.txt";
+                    let rslt = open_file_for_read(file_name);
+                    if rslt.is_ok() {
+                    print!("\n  file {:?} opened successfully", file_name);
+                    file = rslt.unwrap();
+                    let s = read_file_to_string(file);
+                    if s.is_ok() {
+                    print!("\n  contents: \"{}\"", s.unwrap());
+                    }
+                    }
+                    else {
+                    print!("\n  failed to open file {:?}", file_name);
+                    }
+
+                  </defn-code>
+                  <defn-head class="defnBorderTop">Output:</defn-head>
+                  <defn-code>
+                    file "foobar.txt" opened successfully
+                    contents: "This is foobar.txt"
+                  </defn-code>
+                </defn-block>
+              </defn-outerBlock>
+              <t-b>
+                Note that, in the code above, unwrap() has been applied only where we know
+                it won&apos;t panic. This way we gracefully handle errors and can still
+                continue processing.
+              </t-b>
+              <t-b>
+                You can test open failure handling by commenting out the .create(true) in
+                file_open_for_write and
+                deleting first_test.txt file from the crate directory.
+              </t-b>
+              <t-b>
+                The Rust operator ? provides a convenient way to handle errors at the call site and
+                then elevate to parent call site with an appropriate Result&lt;T, E&gt;. See this
+                <a href="https://doc.rust-lang.org/edition-guide/rust-2018/error-handling-and-panics/the-question-mark-operator-for-easier-error-handling.html">
+                  for an example
+                </a>.
+              </t-b>
+            </details>
+          </div>
+        </t-b>
+        <t-b>
+          You may find additional details provided in <a href="Resources/RustErrorHandling.pdf">RustErrorHandling.pdf</a>
+          useful for helping you to write effective error handling code. Topics include panics, trapping panics, returning
+          results, and console and file I/O.
+        </t-b>
+        <t-b>
+          Next3, we turn to a very useful construct, iterators, as implemented in Rust.
+        </t-b>
+        <div style="height:0.5em"></div>
+        <a id="iters"></a>
+        <h2>3.2 Iterators</h2>
+        <t-b>
+          Rust collections like Vec, String, and Map provide
+          <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">iterators</a>
+          used to step over and operate on
+          elements from the collection.
+          <indent-block class="pad5">
+            <defn-block>
+              <defn-head>Iterating over Vec of integers</defn-head>
+              <defn-code>
+                let v = vec![1, -1, 2, -2, 3, -3];
+                print!("\n  ");
+                let it = v.iter();
+                for val in it {
+                print!("{} ", val);
+                }
+              </defn-code>
+              <defn-head class="defnBorderTop">Output:</defn-head>
+              <defn-code>
+                1 -1 2 -2 3 -3
+              </defn-code>
+            </defn-block>
+          </indent-block>
+          You can also provide iterators for your own custom types by defining
+          an Iterator trait for the type.  The only requirement is that it provide a method next() that
+          returns an option with Some(item) or None, where item is the next element in the collection:
+          <indent-block class="pad5">
+            <c-s>fn next(&mut self) -> Option&lt;Self::Item&gt;</c-s>
+          </indent-block>
+          You can manually step through a collection by calling next() on an iterator instance,
+          <c-s>it.next()</c-s>
+          which returns <span style="white-space:nowrap" ;>Option&lt;T&gt;(item).</span>
+        </t-b>
+
+        <a id="iterops"></a>
+        <h3>3.2.1 Operations with Iterators</h3>
+        <t-b>
+          The standard iterators provide a <a href="https://doc.rust-lang.org/std/iter/trait.Iterator.html">set of adapters</a>,
+          including:
+          <indent-block class="pad5">
+            <ol class="tight">
+              <li>
+                <strong>map</strong>: <c-s>fn map&lt;B,F&gt;(self, f:F) -> Map&lt;self, F&gt;</c-s> where
+                <c-s>F: FnMut(Self::Item) -> B</c-s><br />
+                <div>
+                  Here, the map function takes a closure <c-s>f:F</c-s> that accepts an instance of the associated type
+                  <c-s>Item</c-s>
+                  and returns some computed value of type <c-s>B</c-s>.  The associated type <c-s>Item</c-s> is the type
+                  of elements of the collection.
+                </div>
+              </li>
+              <li>
+                <strong>filter</strong>: <c-s>fn filter&lt;P&gt;(self, predicate: P) -> Filter&lt;Self, P&gt;</c-s>
+                where <c-s>P: FnMut(&Self::Item) -> bool</c-s>
+                <div>
+                  Filter function takes a predicate closure <c-s>P</c-s> that determines whether an element of the
+                  collection is sent to the output.
+                </div>
+              </li>
+              <li>
+                <strong>collection</strong>: <c-s>fn collect&lt;B&gt;(self) -> B</c-s>
+                where <c-s>B: FromIterator&lt;Self::Item&gt;</c-s>
+                <div>
+                  Turns an iterable collection into a different collection.
+                </div>
+              </li>
+            </ol>
+          </indent-block>
+        </t-b>
+        <t-b>
+          Here&apos;s a set of examples of iterator and adapter use:
+        </t-b>
+        <t-b>
+          <div>
+            <details>
+              <summary class="labelStyle darkItem">Iterator Examples:</summary>
+              <defn-outerBlock>
+                <defn-block>
+                  <defn-head>Helper functions</defn-head>
+                  <defn-code>
+                    use display::{*};
+
+                    #[allow(dead_code)]
+                    fn show_prefix(p:&amp;str) {
+                    print!("{}", p);
+                    }
+                    #[allow(dead_code)]
+                    /*-- note: Iterator has an associated type, Item --*/
+                    fn show_csl&lt;T&gt;(mut t:T)
+                    where T:Iterator, T::Item:std::fmt::Debug, {
+                    print!("{:?}", t.next().unwrap());  // no leading comma
+                    for val in t {
+                    print!(", {:?}", val);          // leading comma
+                    }
+                    }
+                    #[allow(dead_code)]
+                    /*-- note: Iterator has an associated type, Item --*/
+                    fn display_csl&lt;T&gt;(mut t:T)
+                    where T:Iterator, T::Item:std::fmt::Display, {
+                    print!("{}", t.next().unwrap());  // no leading comma
+                    for val in t {
+                    print!(", {}", val);          // leading comma
+                    }
+                    }
+                    #[allow(dead_code)]
+                    fn show_pcsl&lt;T&gt;(t:T)
+                    where T:Iterator, T::Item:std::fmt::Debug,  {
+                    show_prefix("\n  ");
+                    show_csl(t);
+                    }
+                    #[allow(dead_code)]
+                    fn display_pcsl&lt;T&gt;(t:T)
+                    where T:Iterator, T::Item:std::fmt::Display,  {
+                    show_prefix("\n  ");
+                    display_csl(t);
+                    }
+                  </defn-code>
+                  <defn-head class="defnBorderTop">Output:</defn-head>
+                  <defn-code>
+                    Demonstrating Iterators
+                    =========================
+
+                    -- demo iter over vec of ints --
+                    1 -1 2 -2 3 -3
+                    -- demo comma separated display --
+                    1, -1, 2, -2, 3, -3
+
+                    -- demo iter over instance of map type --
+                    ("two", 2) ("zero", 0) ("one", 1) ("three", 3)
+
+                    -- demo iter over array of floats --
+                    1 2.2 3.3 4.4 5.5
+                    -- demo comma separated display --
+                    1.0, 2.2, 3.3, 4.4, 5.5
+
+                    -- demo iter over array of strs --
+                    "one", "two", "three", "four"
+                    -- demo using Display trait instead of Debug --
+                    one, two, three, four
+
+                    -- demo map function modifying items --
+                    "onez" "twoz" "threez" "fourz"
+
+                    -- demo collect items into Vec --
+                    ["onez", "twoz", "threez", "fourz"]
+
+                    That's all Folks!
+                  </defn-code>
+                </defn-block>
+                <defn-block>
+                  <defn-head>Iteration Code</defn-head>
+                  <defn-code>
+                    main_title("Demonstrating Iterators");
+                    putline();
+
+                    shows("\n-- demo iter over vec of ints --");
+                    let v = vec![1, -1, 2, -2, 3, -3];
+                    print!("\n  ");
+                    let it = v.iter();
+                    for val in it {
+                    print!("{} ", val);
+                    }
+                    shows("\n-- demo comma separated display --");
+                    show_pcsl(v.iter());
+                    putline();
+
+                    shows("\n-- demo iter over instance of map type --");
+                    show_prefix("\n  ");
+                    use std::collections::HashMap;
+                    let mut map:HashMap&lt;&amp;str, i32&gt; = HashMap::new();
+                    map.entry("zero").or_insert(0);
+                    map.entry("one").or_insert(1);
+                    map.entry("two").or_insert(2);
+                    map.entry("three").or_insert(3);
+                    let it_map = map.iter();
+                    for val in it_map {
+                    print!("{:?} ", val);
+                    }
+                    putline();
+
+                    shows("\n-- demo iter over array of floats --");
+                    let a = [1.0, 2.2, 3.3, 4.4, 5.5];
+                    print!("\n  ");
+                    let ita = a.iter();
+                    for val in ita {
+                    print!("{} ", val);
+                    }
+                    shows("\n-- demo comma separated display --");
+                    let iter = a.iter();
+                    show_pcsl(iter);
+                    putline();
+
+                    shows("\n-- demo iter over array of strs --");
+                    let mut s = [ "one", "two", "three", "four" ];
+                    show_pcsl(s.iter());
+                    shows(
+                    "\n-- demo using Display trait instead of Debug --"
+                    );
+                    display_pcsl(s.iter());
+                    putline();
+
+                    shows("\n-- demo map function modifying items --");
+                    show_prefix("\n  ");
+
+                    let iter = s.iter_mut().map(|item| {
+                    let mut mod_item:String = item.to_string();
+                    mod_item.push('z');
+                    mod_item   // returning String, not str
+                    });
+
+                    for val in iter {
+                    print!("{:?} ",val);
+                    }
+                    putline();
+
+                    shows("\n-- demo collect items into Vec --");
+                    let iter = s.iter_mut().map(|item| {
+                    let mut mod_item:String = item.to_string();
+                    mod_item.push('z');
+                    mod_item   // returning String, not str
+                    });
+                    let v:Vec::&lt;String&gt; = iter.collect();
+                    print!("\n  {:?}", v);
+                    putline();
+
+                    println!("\n  That's all Folks!\n");
+                  </defn-code>
+                </defn-block>
+              </defn-outerBlock>
+            </details>
+          </div>
+        </t-b>
+        <t-b>
+          In the next section we look briefly at structs and traits, focusing on implementation of methods.
+          In the next chapter we will dig more deeply into structs and their implementation of types.
+        </t-b>
+
+        <div style="height:0.5em;"></div>
+        <a id="methods"></a>
+        <h3>3.3 Structs and Methods</h3>
+        <t-b>
+          Rust structs, like enums, come in three forms:
+          <indent-block class="pad5">
+            <ol class="tight">
+              <li>
+                <n-s>StructExprStruct</n-s>
+                <div class="pad5">
+                  <defn-code style="font-size:1.05em;">
+                    struct Person1 {
+                    name:String, occup:String, id:u32,
+                    }
+                  </defn-code>
+                </div>
+              </li>
+              <li>
+                <n-s>StructExprTuple</n-s>
+                <div class="pad5">
+                  <defn-code style="font-size:1.05em;">
+                    struct Person2 (
+                    String, String, u32
+                    );
+                  </defn-code>
+                </div>
+              </li>
+              <li>
+                <n-s>StructExprUnit</n-s>
+                <div class="pad5">
+                  <defn-code style="font-size:1.05em;">struct Person3;</defn-code>
+                </div>
+              </li>
+            </ol>
+          </indent-block>
+        </t-b>
+        <t-b>
+          Struct methods are analogous to class methods in C++. They are implemented in an &quot;impl&quot;
+          block decorated with the struct type name, like this:
+        </t-b>
+        <t-b>
+          <div>
+            <defn-block>
+              <defn-head>Method implementation</defn-head>
+              <defn-code>
+                struct Person1 {
+                name:String, occup:String, id:u32,
+                }
+                impl Person1 {
+                fn show(&self) {
+                print!("\n  Person1: {:?}", &self);
+                }
+                }
+              </defn-code>
+            </defn-block>
+          </div>
+        </t-b>
+        <t-b>
+          Here, the method <c-s>Person1::show</c-s> is simply delegating its responsibility to the
+          <c-s>print!</c-s> macro. The <c-s>self:Self</c-s> plays the same role as the <c-s>this</c-s>
+          pointer in C++.
+        </t-b>
+        <t-b>
+          The examples below illustrate both method implementation and the implementation of traits, which we
+          discuss in the next subsection.
+        </t-b>
+        <t-b>
+          <div>
+            <details>
+              <summary class="labelStyle darkItem">Method Implementation Examples:</summary>
+              <defn-outerBlock>
+                <defn-block>
+                  <defn-head>Method implementations:</defn-head>
+                  <defn-code>
+                    #[allow(unused_imports)]
+                    use display::{*};
+                    use std::fmt;
+
+                    /*-- basic demo --*/
+                    #[derive(Debug)]
+                    struct Person1 {
+                    name:String, occup:String, id:u32,
+                    }
+                    #[allow(dead_code)]
+                    impl Person1 {
+                    fn show(&self) {
+                    print!("\n  Person1: {:?}", &self);
+                    }
+                    }
+                    #[derive(Debug)]
+                    struct Person2 (
+                    String, String, u32
+                    );
+                    #[allow(dead_code)]
+                    impl Person2 {
+                    fn show(&self) {
+                    print!("\n  Person2: {:?}", &self);
+                    }
+                    }
+                    #[derive(Debug)]
+                    struct Person3;
+                    #[allow(dead_code)]
+                    impl Person3 {
+                    fn show(&self) {
+                    print!("\n  Person3");
+                    }
+                    }
+
+                    /*-- enums used for Demo1 and Demo2 --*/
+                    #[derive(Debug, PartialEq, Copy, Clone)]
+                    #[allow(dead_code)]
+                    pub enum Level { Basic, Intermediate, Advanced }
+                    #[derive(Debug, PartialEq, Copy, Clone)]
+                    #[allow(dead_code)]
+                    pub enum Topic { Rust, Cpp, Design, }
+
+                    /*-- Struct Demo1 has private data --*/
+                    #[derive(Debug)]
+                    pub struct Demo1 {
+                    name: String,
+                    level: Level,
+                    topic: Topic,
+                    }
+                    /*-- implement methods for Demo1 --*/
+                    #[allow(dead_code)]
+                    impl Demo1 {
+                    pub fn new() -> Self {  // set default values
+                    Self {
+                    name:String::from(""),
+                    level: Level::Basic,
+                    topic: Topic::Rust,
+                    }
+                    }
+                    pub fn set_name(&mut self, s:&str) {
+                    self.name = s.to_string();
+                    }
+                    pub fn get_name(&self) -> &String {
+                    &self.name
+                    }
+                    pub fn set_level(&mut self, l:Level) {
+                    self.level = l;
+                    }
+                    pub fn get_level(&self) -> &Level {
+                    &self.level
+                    }
+                    pub fn set_topic(&mut self, t:Topic) {
+                    self.topic = t;
+                    }
+                    pub fn get_topic(&self) -> &Topic {
+                    &self.topic
+                    }
+                    }
+
+                    /*-- struct Demo2 has public data --*/
+                    #[derive(Debug)]
+                    pub struct Demo2 {
+                    pub name: String,
+                    pub level: Level,
+                    pub topic: Topic,
+                    }
+                    /*-- implement Display trait for Demo2 --*/
+                    #[allow(dead_code)]
+                    impl fmt::Display for Demo2 {
+                    fn fmt(&self, f: &mut fmt::Formatter<'_>) ->
+                    fmt::Result {
+                    write!(
+                    f,
+                    "Demo2 {
+                    { name: \"{}\",
+                    level: {:?},
+                    topic: {:?}
+                    }
+                    }",
+                    self.name, self.level, self.topic)
+                    }
+                    }
+                    /*-- implement Default trait for Demo2 --*/
+                    impl Default for Demo2 {
+                    fn default() -> Self {
+                    Self {
+                    name: String::from(""),
+                    level: Level::Basic,
+                    topic: Topic::Rust,
+                    }
+                    }
+                    }
+                    /*-- implement init method for Demo2 --*/
+                    impl Demo2 {
+                    pub fn init(self) -> Demo2 {
+                    Demo2 {
+                    name: self.name,
+                    level: self.level,
+                    topic: self.topic,
+                    }
+                    }
+                    }
                   </defn-code>
                 </defn-block>
                 <defn-block>
                   <defn-head>Using Code:</defn-head>
                   <defn-code>
-let presenter : Presenter = Presenter;
-let joe : Friend = Friend::new("Joe".to_string());
-let sue : Friend = Friend::new("Sue".to_string());
-let team_lead : TeamLead = TeamLead;
+                    sub_title("Demonstrating Basic Structs");
+                    let p1 = Person1 {
+                    name:"Jim".to_string(),
+                    occup:"dev".to_string(),
+                    id:42
+                    };
+                    p1.show();
+                    let p2 = Person2 {
+                    0:"Jim".to_string(),
+                    1:"dev".to_string(),
+                    2:42
+                    };
+                    p2.show();
+                    let p3 = Person3;
+                    p3.show();
+                    putline();
 
-let mut v :Vec<&dyn Speaker> = Vec::new();
-v.push(&presenter);
-v.push(&joe);
-v.push(&sue);
-v.push(&team_lead);
+                    sub_title("Demonstrating Demo1 Struct");
+                    let mut demo1 = Demo1::new();
+                    demo1.set_name("Demo1 probe");
+                    print!("\n  {:?}", demo1);
+                    print!(
+                    "\n  Demo1 level = {:?}",
+                    demo1.get_level()
+                    );
+                    putline();
 
-for speaker in v.iter() {
-    print!("\n  {:?}",speaker.salutation());
-}
+                    sub_title("Demonstrating Demo2 Struct");
+                    let mut demo2 = Demo2 {
+                    name: String::from("Jim's Demo2"),
+                    ..Default::default()
+                    }.init();
+
+                    print!(
+                    "\n  Using Debug format\n    {:?}",
+                    demo2
+                    );
+                    print!(
+                    "\n  setting level to Intermediate:"
+                    );
+                    demo2.level = Level::Intermediate;
+                    print!(
+                    "\n  Using Display format\n    {}",
+                    demo2
+                    );
+                    putline();
+
+                    println!("\n\n  That's all Folks!\n");
                   </defn-code>
                   <defn-head class="defnBorderTop">Output:</defn-head>
                   <defn-code>
--- demo polymorphic struct instances --
+                    Demonstrating Basic Structs
+                    -----------------------------
+                    Person1: Person1 {
+                    name: "Jim",
+                    occup: "dev",
+                    id: 42
+                    }
+                    Person2: Person2("Jim", "dev", 42)
+                    Person3
 
-"Hello, today we will discuss ..."
-"Hi good buddy, its me, Joe"
-"Hi good buddy, its me, Sue"
-"Hi, I have a task for you ..."
+                    Demonstrating Demo1 Struct
+                    ----------------------------
+                    Demo1 {
+                    name: "Demo1 probe",
+                    level: Basic,
+                    topic: Rust
+                    }
+                    Demo1 level = Basic
 
+                    Demonstrating Demo2 Struct
+                    ----------------------------
+                    Using Debug format
+                    Demo2 {
+                    name: "Jim\'s Demo2",
+                    level: Basic,
+                    topic: Rust
+                    }
+                    setting level to Intermediate:
+                    Using Display format
+                    Demo2 {
+                    name: "Jim's Demo2",
+                    level: Intermediate,
+                    topic: Rust
+                    }
+
+                    That's all Folks!
                   </defn-code>
                 </defn-block>
               </defn-outerBlock>
-              </details>
-            </div>
-          </li>
-          <li>
-            They act as generic constraints, enforcing compile failure if a generic argument does not
-            satisfy a required trait, e.g.:
-            <div class="pad5">
-              <defn-code style="font-size:1.0em;">fn demo_ref&lt;T&gt;(t:&T) where T:Debug  {
-    show_type(t);
-    show_value(t);
-}</defn-code>
-            </div>
-          </li>
-        </ol>
-      </indent-block>
-    </t-b>
-    <t-b>
-      There are a number of commonly used traits defined in the std library:
-      <div class="pad5">
-        <ul class="tights">
-          <li>
-            <n-s>Debug</n-s> and <n-s>Display</n-s> for displaying values on the console and in
-            formatted strings.
-          </li>
-          <li>
-            <n-s>Copy</n-s> can only be implemented by blitable types.  If you implement <n-s>Copy</n-s>
-            then you must also implement <n-s>Clone</n-s>.  However, you can implement <n-s>Clone</n-s>
-            for types that are not blittable. Many of the Rust containers implement <n-s>Clone</n-s>.
-          </li>
-          <li>
-            <n-s>ToString</n-s> for values convertable to strings.
-          </li>
-          <li>
-            <n-s>Default</n-s> used to set default values.
-          </li>
-          <li>
-            <n-s>From</n-s> and <n-s>Into</n-s> for conversions. If you implement <n-s>From</n-s>
-            then <n-s>Into</n-s> is implemented by the compiler.
-          </li>
-          <li>
-            The std library implements <n-s>FromStr</n-s> for numeric types.
-          </li>
-        </ul>
-      </div>
-      Many of these traits can be implemented by derivation, e.g., <c-s>#[derive(Debug, Clone, ...)]</c-s>.
-      The Interfaces Examples, above, has examples of this use.
-    </t-b>
-    <t-b>
-      You will find more useful traits discussed in the Steve Donovan citation in the quote at the top 
-      of this section.
-    </t-b>
+            </details>
+          </div>
+        </t-b>
+        <t-b class="mbz">
+          Note that a struct may have any finite number of impl blocks.
+        </t-b>
+        <div style="height:1em;"></div>
+        <a id="traits"></a>
+        <h3>3.3.1 Traits</h3>
+        <t-b>
+          &quot;Traits are the abstract mechanism for adding
+          functionality to types and establishing relationships between them.&quot;
+          <span style="white-space:nowrap;">
+            - Steve Donovan,
+            <a href="https://stevedonovan.github.io/rustifications/2018/09/08/common-rust-traits.html">Rustifications</a>
+          </span>.
+        </t-b>
+        <t-b>
+          Traits have two uses:
+          <indent-block class="pad5">
+            <ol class="tight">
+              <li>
+                They act like interfaces, defining a contract for use, e.g.:
+                <div class="pad5">
+                  <defn-code style="font-size:1.0em;">
+                    trait Speaker {
+                    fn salutation(&self) -> String;
+                    }
+                  </defn-code>
+                </div>
+                <div class="pad5">
+                  <details>
+                    <summary class="labelStyle darkItem">Interfaces Example:</summary>
+                    <t-b>
+                      <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=d695d69de1565758249393266bcc60e5">
+                        Code in Rust playground
+                      </a>
+                    </t-b>
+                    <defn-outerBlock>
+                      <defn-block>
+                        <defn-head>Implementing Code:</defn-head>
+                        <defn-code>
+                          trait Speaker {
+                          fn salutation(&self) -> String;
+                          }
+                          ///////////////////////////////////////////////////////////
+                          // The following structs act like classes that implement
+                          // a Speaker interface
 
-    <div style="height:0.25em;"></div>
-    <a id="enums"></a>
-    <h2>3.4 Enumerations and Matching</h2>
-    <t-b>
-      We saw, in the previous chapter, how enumerations are defined.  Here, we are concerned with common
-      uses, especially with matching.  Here&apos;s the matching syntax:
-    </t-b>
-    <t-b>
-      <div>
-        <defn-outerBlock>
-          <defn-block>
-            <defn-head>Explicit match syntax</defn-head>
-            <defn-code>
-let value = Name::Jack;
-match value {
-  Name::John => print!("\n  I am John"),
-  Name::Jim  => print!("\n  I am Jim"),
-  Name::Jack => print!("\n  I am Jack")
-}
-            </defn-code>
-          </defn-block>
-          <defn-block>
-            <defn-head>if else match syntax</defn-head>
-            <defn-code>
-let value = Name::Jack;
-if let Name::Jim = value {
-  print!("\n  I am Jim");
-}
-else {
-  print!("\n  I am not Jim");
-}
-            </defn-code>
-          </defn-block>
-        </defn-outerBlock>
-      </div>
-    </t-b>
-    <t-b>
-      The second &quot;=&quot; token in the <n-s>if else syntax</n-s> block is not an assignment.  It is a match operator.
-    </t-b>
-    <t-b>
-      Some of the enumeration syntax for <n-s>matching</n-s> and <n-s>if let</n-s> can be verbose.
-      Here&apos;s examples that show how to use the enumeration types:
-    </t-b>
-    <t-b>
-      <div>
-        <details>
-          <summary class="labelStyle darkItem">Enumeration and Matching Examples:</summary>
-          <defn-outerBlock>
-            <defn-block>
-              <defn-head>Enumeration Code</defn-head>
-              <defn-code>
-use display::{*};
-use std::fmt::{Debug};
+                          #[derive(Debug,Copy,Clone)]
+                          pub struct Presenter;
+                          impl Speaker for Presenter {
+                          fn salutation(&self) -> String {
+                          "Hello, today we will discuss ...".to_string()
+                          }
+                          }
 
-#[allow(dead_code)]
-#[derive(Debug)]
-enum Name { John, Jim=42, Jack }
+                          #[derive(Debug)]
+                          pub struct Friend {
+                          pub name : String,
+                          }
+                          impl Speaker for Friend {
+                          fn salutation(&self) -> String {
+                          let mut s = String::from(
+                          "Hi good buddy, its me, "
+                          );
+                          let nm = self.name.as_str();
+                          s.push_str(nm);
+                          return s;
+                          }
+                          }
+                          impl Friend {
+                          pub fn new(name : String) -> Self {
+                          Self {
+                          name,
+                          }  // no semicolon so self
+                          }      // is returned
+                          }
 
-#[allow(dead_code)]
-#[derive(Debug)]
-enum NameTuple { 
-    John(String, u32), 
-    Jim(String, u32), 
-    Jack(String, u32) 
-}
+                          #[derive(Debug,Copy,Clone)]
+                          pub struct TeamLead;
+                          impl Speaker for TeamLead {
+                          fn salutation(&self) -> String {
+                          "Hi, I have a task for you
+                          ...".to_string()
+                          }
+                          }
+                        </defn-code>
+                      </defn-block>
+                      <defn-block>
+                        <defn-head>Using Code:</defn-head>
+                        <defn-code>
+                          let presenter : Presenter = Presenter;
+                          let joe : Friend = Friend::new("Joe".to_string());
+                          let sue : Friend = Friend::new("Sue".to_string());
+                          let team_lead : TeamLead = TeamLead;
 
-#[allow(dead_code)]
-#[derive(Debug)]
-enum NameStruct {
-    John { occup:String, id:u32 },
-    Jim  { occup:String, id:u32 },
-    Jack { occup:String, id:u32 }
-}
-fn main() {
+                          let mut v :Vec<&dyn Speaker>
+                            = Vec::new();
+                            v.push(&presenter);
+                            v.push(&joe);
+                            v.push(&sue);
+                            v.push(&team_lead);
 
-    main_title("Demonstrating enum_probes");
-    print!("\n  - enumerations, match, if let");
-    putline();
+                            for speaker in v.iter() {
+                            print!("\n  {:?}",speaker.salutation());
+                            }
+                        </defn-code>
+                        <defn-head class="defnBorderTop">Output:</defn-head>
+                        <defn-code>
+                          -- demo polymorphic struct instances --
 
-    /*-- enum discriminant with explicit matching --*/
+                          "Hello, today we will discuss ..."
+                          "Hi good buddy, its me, Joe"
+                          "Hi good buddy, its me, Sue"
+                          "Hi, I have a task for you ..."
 
-    sub_title("  -- enum discriminant --  ");
-    let test = Name::Jim;
-    match test {
-        Name::John =&gt; {
-            let john_discriminant = Name::John as u32;
-            print!(
-            "\n  I am John. my discriminant is {:?}", 
-            john_discriminant
-        )},
-        Name::Jim =&gt; {
-            let jim_discriminant = Name::Jim as u32;
-            print!(
-            "\n  I am Jim. my discriminant is {:?}", 
-            jim_discriminant
-        )},
-        Name::Jack =&gt; {
-            let jack_discriminant = Name::Jack as u32;
-            print!(
-            "\n  I am Jack. my discriminant is {:?}", 
-            jack_discriminant
-        )},
-    }
-    putline();
+                        </defn-code>
+                      </defn-block>
+                    </defn-outerBlock>
+                  </details>
+                </div>
+              </li>
+              <li>
+                They act as generic constraints, enforcing compile failure if a generic argument does not
+                satisfy a required trait, e.g.:
+                <div class="pad5">
+                  <defn-code style="font-size:1.0em;">
+                    fn demo_ref&lt;T&gt;(t:&T) where T:Debug  {
+                    show_type(t);
+                    show_value(t);
+                    }
+                  </defn-code>
+                </div>
+              </li>
+            </ol>
+          </indent-block>
+        </t-b>
+        <t-b>
+          There are a number of commonly used traits defined in the std library:
+          <div class="pad5">
+            <ul class="tights">
+              <li>
+                <n-s>Debug</n-s> and <n-s>Display</n-s> for displaying values on the console and in
+                formatted strings.
+              </li>
+              <li>
+                <n-s>Copy</n-s> can only be implemented by blitable types.  If you implement <n-s>Copy</n-s>
+                then you must also implement <n-s>Clone</n-s>.  However, you can implement <n-s>Clone</n-s>
+                for types that are not blittable. Many of the Rust containers implement <n-s>Clone</n-s>.
+              </li>
+              <li>
+                <n-s>ToString</n-s> for values convertable to strings.
+              </li>
+              <li>
+                <n-s>Default</n-s> used to set default values.
+              </li>
+              <li>
+                <n-s>From</n-s> and <n-s>Into</n-s> for conversions. If you implement <n-s>From</n-s>
+                then <n-s>Into</n-s> is implemented by the compiler.
+              </li>
+              <li>
+                The std library implements <n-s>FromStr</n-s> for numeric types.
+              </li>
+            </ul>
+          </div>
+          Many of these traits can be implemented by derivation, e.g., <c-s>#[derive(Debug, Clone, ...)]</c-s>.
+          The Interfaces Examples, above, has examples of this use.
+        </t-b>
+        <t-b>
+          You will find more useful traits discussed in the Steve Donovan citation in the quote at the top
+          of this section.
+        </t-b>
 
-    let test1 = Name::John;
-    let test2 = Name::Jim;
-    let test3 = Name::Jack;
+        <div style="height:0.25em;"></div>
+        <a id="enums"></a>
+        <h2>3.4 Enumerations and Matching</h2>
+        <t-b>
+          We saw, in the previous chapter, how enumerations are defined.  Here, we are concerned with common
+          uses, especially with matching.  Here&apos;s the matching syntax:
+        </t-b>
+        <t-b>
+          <div>
+            <defn-outerBlock>
+              <defn-block>
+                <defn-head>Explicit match syntax</defn-head>
+                <defn-code>
+                  let value = Name::Jack;
+                  match value {
+                  Name::John => print!("\n  I am John"),
+                  Name::Jim  => print!("\n  I am Jim"),
+                  Name::Jack => print!("\n  I am Jack")
+                  }
+                </defn-code>
+              </defn-block>
+              <defn-block>
+                <defn-head>if else match syntax</defn-head>
+                <defn-code>
+                  let value = Name::Jack;
+                  if let Name::Jim = value {
+                  print!("\n  I am Jim");
+                  }
+                  else {
+                  print!("\n  I am not Jim");
+                  }
+                </defn-code>
+              </defn-block>
+            </defn-outerBlock>
+          </div>
+        </t-b>
+        <t-b>
+          The second &quot;=&quot; token in the <n-s>if else syntax</n-s> block is not an assignment.  It is a match operator.
+        </t-b>
+        <t-b>
+          Some of the enumeration syntax for <n-s>matching</n-s> and <n-s>if let</n-s> can be verbose.
+          Here&apos;s examples that show how to use the enumeration types:
+        </t-b>
+        <t-b>
+          <div>
+            <details>
+              <summary class="labelStyle darkItem">Enumeration and Matching Examples:</summary>
+              <defn-outerBlock>
+                <defn-block>
+                  <defn-head>Enumeration Code</defn-head>
+                  <defn-code>
+                    use display::{*};
+                    use std::fmt::{Debug};
 
-    if let Name::Jack = test1 {
-        print!("\n  I am John");
-    }
-    else {
-        print!("\n  I am not John");
-    }
-    if let Name::Jack = test2 {
-        print!("\n  I am Jim");
-    }
-    else {
-        print!("\n  I am not Jim");
-    }
-    if let Name::Jack = test3 {
-        print!("\n  I am Jack");
-    }
-    else {
-        print!("\n  I am not Jack");
-    }
-    putline();
+                    #[allow(dead_code)]
+                    #[derive(Debug)]
+                    enum Name { John, Jim=42, Jack }
 
-    /*-- enum tuple with if let matching --*/
+                    #[allow(dead_code)]
+                    #[derive(Debug)]
+                    enum NameTuple {
+                    John(String, u32),
+                    Jim(String, u32),
+                    Jack(String, u32)
+                    }
 
-    sub_title("  -- enum tuple --  ");
-    let value = NameTuple::John("pilot".to_string(), 52);
-    if let NameTuple::John(occup, id) = value {
-        print!(
-            "
-  my name is John
-  occupupation is {}
-  id is {}", occup, id
-        );
-    }
-    putline();
+                    #[allow(dead_code)]
+                    #[derive(Debug)]
+                    enum NameStruct {
+                    John { occup:String, id:u32 },
+                    Jim  { occup:String, id:u32 },
+                    Jack { occup:String, id:u32 }
+                    }
+                    fn main() {
 
-    /*-- enum struct  with match and all else --*/
+                    main_title("Demonstrating enum_probes");
+                    print!("\n  - enumerations, match, if let");
+                    putline();
 
-    sub_title("  -- enum struct --  ");
-    let value = NameStruct::Jack { 
-      occup:"plumber".to_string(), id:32 
-    };
-    match value {
-        NameStruct::Jack {occup, id} =&gt; 
-          print!("\n Jack - occup: {}, id: {}", occup, id),
-        _ =&gt; print!("\n  not Jack")
-    }
-    putline();
+                    /*-- enum discriminant with explicit matching --*/
 
-    println!("\n\nThat's all Folks!\n");
-}
-              </defn-code>
-            </defn-block>
-            <defn-block>
-              <defn-head>Output:</defn-head>
-              <defn-code>
-  Demonstrating enum_probes
- ===========================
-  - enumerations, match, if let
+                    sub_title("  -- enum discriminant --  ");
+                    let test = Name::Jim;
+                    match test {
+                    Name::John =&gt; {
+                    let john_discriminant = Name::John as u32;
+                    print!(
+                    "\n  I am John. my discriminant is {:?}",
+                    john_discriminant
+                    )},
+                    Name::Jim =&gt; {
+                    let jim_discriminant = Name::Jim as u32;
+                    print!(
+                    "\n  I am Jim. my discriminant is {:?}",
+                    jim_discriminant
+                    )},
+                    Name::Jack =&gt; {
+                    let jack_discriminant = Name::Jack as u32;
+                    print!(
+                    "\n  I am Jack. my discriminant is {:?}",
+                    jack_discriminant
+                    )},
+                    }
+                    putline();
 
-    -- enum discriminant --
- -----------------------------
-  I am Jim. my discriminant is 42
+                    let test1 = Name::John;
+                    let test2 = Name::Jim;
+                    let test3 = Name::Jack;
 
-  I am not John
-  I am not Jim
-  I am Jack
+                    if let Name::Jack = test1 {
+                    print!("\n  I am John");
+                    }
+                    else {
+                    print!("\n  I am not John");
+                    }
+                    if let Name::Jack = test2 {
+                    print!("\n  I am Jim");
+                    }
+                    else {
+                    print!("\n  I am not Jim");
+                    }
+                    if let Name::Jack = test3 {
+                    print!("\n  I am Jack");
+                    }
+                    else {
+                    print!("\n  I am not Jack");
+                    }
+                    putline();
 
-    -- enum tuple --
- ----------------------
-  my name is John
-  occupupation is pilot
-  id is 52
+                    /*-- enum tuple with if let matching --*/
 
-    -- enum struct --
- -----------------------
- Jack - occup: plumber, id: 32
+                    sub_title("  -- enum tuple --  ");
+                    let value = NameTuple::John("pilot".to_string(), 52);
+                    if let NameTuple::John(occup, id) = value {
+                    print!(
+                    "
+                    my name is John
+                    occupupation is {}
+                    id is {}", occup, id
+                    );
+                    }
+                    putline();
+
+                    /*-- enum struct  with match and all else --*/
+
+                    sub_title("  -- enum struct --  ");
+                    let value = NameStruct::Jack {
+                    occup:"plumber".to_string(), id:32
+                    };
+                    match value {
+                    NameStruct::Jack {occup, id} =&gt;
+                    print!("\n Jack - occup: {}, id: {}", occup, id),
+                    _ =&gt; print!("\n  not Jack")
+                    }
+                    putline();
+
+                    println!("\n\nThat's all Folks!\n");
+                    }
+                  </defn-code>
+                </defn-block>
+                <defn-block>
+                  <defn-head>Output:</defn-head>
+                  <defn-code>
+                    Demonstrating enum_probes
+                    ===========================
+                    - enumerations, match, if let
+
+                    -- enum discriminant --
+                    -----------------------------
+                    I am Jim. my discriminant is 42
+
+                    I am not John
+                    I am not Jim
+                    I am Jack
+
+                    -- enum tuple --
+                    ----------------------
+                    my name is John
+                    occupupation is pilot
+                    id is 52
+
+                    -- enum struct --
+                    -----------------------
+                    Jack - occup: plumber, id: 32
 
 
-That's all Folks!
-              </defn-code>
-            </defn-block>
-          </defn-outerBlock>
-        </details>
-      </div>
-    </t-b>
-    <t-b>
-      Both forms of matching are widely used in Rust code.  If you work some code examples until you
-      are comfortable with these operations, you will find it much easier to understand the Rust literature.
-    </t-b>
+                    That's all Folks!
+                  </defn-code>
+                </defn-block>
+              </defn-outerBlock>
+            </details>
+          </div>
+        </t-b>
+        <t-b>
+          Both forms of matching are widely used in Rust code.  If you work some code examples until you
+          are comfortable with these operations, you will find it much easier to understand the Rust literature.
+        </t-b>
 
-    <div style="height:0.25em;"></div>
-    <a id="epilogue"></a>
-    <h2>3.5 Epilogue</h2>
-    <t-b>
-      Rust has a rich set of operations that make it very expressive, once you become familiar with their
-      idomatic use. They do make the learning process interesting (The good news is ..., the bad news is ...).
-    </t-b>
+        <div style="height:0.25em;"></div>
+        <a id="epilogue"></a>
+        <h2>3.5 Epilogue</h2>
+        <t-b>
+          Rust has a rich set of operations that make it very expressive, once you become familiar with their
+          idomatic use. They do make the learning process interesting (The good news is ..., the bad news is ...).
+        </t-b>
 
-    <a id="exercises"></a>
-    <h2>3.6 Exercises</h2>
-    <indent-block class="pad5">
-      <ol class="tights">
-        <li>
-          Write a function heading that accepts a str and displays it on the console with a hypenated line
-          above and below.  The lines should be two characters longer that the string with the string
-          presented one character indented from the start of the lines above and below.
-        </li>
-        <li>
-          Write a closure that does the same thing. Can you write the closure in a single line of code?
-        </li>
-        <li>
-          Repeat the last exercise, but supply a prefix that is used on all three lines, i.e., &quot;\n  &quot;.
-        </li>
-        <li>
-          Write a function that prompts for, and accepts, an integer provided by the user. Return a Result
-          from the function that returns Ok(42) or Err("you didn&apos;t enter 42"), and display the result
-          without inducing a panic.
-        </li>
-        <li>
-          Write a function that displays a collection of values on the console, separated by commas.
-          Make sure you don&apos;t have a leading or final trailing comma.
-        </li>
-        <li>
-          Repeat the last exercise using an iterator.
-        </li>
-        <li>
-          For the struct you implemented in the exercises for the Data chapter, add a method that
-          displays the struct in some pleasing format on the console.
-        </li>
-        <li>
-          For this struct, implement the Clone trait and demonstrate that it works.
-        </li>
-      </ol>
-    </indent-block>
-    
-    <a id="refs"></a>
-    <h2>3.7 References</h2>
-    
+        <a id="exercises"></a>
+        <h2>3.6 Exercises</h2>
+        <indent-block class="pad5">
+          <ol class="tights">
+            <li>
+              Write a function heading that accepts a str and displays it on the console with a hypenated line
+              above and below.  The lines should be two characters longer that the string with the string
+              presented one character indented from the start of the lines above and below.
+            </li>
+            <li>
+              Write a closure that does the same thing. Can you write the closure in a single line of code?
+            </li>
+            <li>
+              Repeat the last exercise, but supply a prefix that is used on all three lines, i.e., &quot;\n  &quot;.
+            </li>
+            <li>
+              Write a function that prompts for, and accepts, an integer provided by the user. Return a Result
+              from the function that returns Ok(42) or Err("you didn&apos;t enter 42"), and display the result
+              without inducing a panic.
+            </li>
+            <li>
+              Write a function that displays a collection of values on the console, separated by commas.
+              Make sure you don&apos;t have a leading or final trailing comma.
+            </li>
+            <li>
+              Repeat the last exercise using an iterator.
+            </li>
+            <li>
+              For the struct you implemented in the exercises for the Data chapter, add a method that
+              displays the struct in some pleasing format on the console.
+            </li>
+            <li>
+              For this struct, implement the Clone trait and demonstrate that it works.
+            </li>
+          </ol>
+        </indent-block>
+
+        <a id="refs"></a>
+        <h2>3.7 References</h2>
+
         <table style="width:calc(100vw - 12rem);">
-      <tr>
-        <th class="darkItem">Reference Link</th>
-        <th class="darkItem">Description</th>
-      </tr>
-      <tr>
-        <td class="lightItem">
-          <a href="https://doc.rust-lang.org/reference/index.html">Rust Reference</a>
-        </td>
-        <td class="lightItem">
-          Rust Reference is the official language definition - surprisingly readable.
-        </td>
-      </tr>
-      <tr>
-        <td class="lightItem">
-          <a href="https://hermanradtke.com/2015/05/06/creating-a-rust-function-that-accepts-string-or-str.html">
-            Functions that accept both String and str
-          </a>
-        </td>
-        <td class="lightItem">
-          Creating a Rust function that accepts String or &str - Herman Radtke
-        </td>
-      </tr>
-      <tr>
-        <td class="lightItem">
-          <a href="https://hermanradtke.com/2015/05/29/creating-a-rust-function-that-returns-string-or-str.html">
-            Functions that return either String or str
-          </a>
-        </td>
-        <td class="lightItem">
-          Creating a Rust function that returns a &str or String - Herman Radtke
-        </td>
-      </tr>
-      <tr>
-        <td class="lightItem">
-          <a href="https://hermanradtke.com/2015/01/14/getters-functions-in-rust.html">
-            Avoiding borrow problems with Getter functions
-          </a>
-        </td>
-        <td class="lightItem">
-          Getter Functions In Rust - Herman Radtke
-        </td>
-      </tr>
-      <tr>
-        <td class="lightItem">
-          <a href="https://hermanradtke.com/2016/09/12/rust-using-and_then-and-map-combinators-on-result-type.html">
-            and_then,&nbsp;map&nbsp;combinators
-          </a>
-        </td>
-        <td class="lightItem">
-          Using option and result effectively - Herman Radtke
-        </td>
-      </tr>
-      <tr>
-        <td class="lightItem">
-          <a href="https://stevedonovan.github.io/rustifications/2018/09/08/common-rust-traits.html">
-            Common Traits
-          </a>
-        </td>
-        <td class="lightItem">
-          Clear descriptions of many of the common Rust traits
-        </td>
-      </tr>
-      <tr>
-        <td class="lightItem">
-          <a href="https://hermanradtke.com/2015/06/22/effectively-using-iterators-in-rust.html">
-            Iter, IntoIter, Map/Reduce
-          </a>
-        </td>
-        <td class="lightItem">
-          Effectively Using Iterators in Rust - Herman Radtke
-        </td>
-      </tr>
-      <tr>
-        <td class="lightItem">
-          <a href="https://hermanradtke.com/2015/06/09/strategies-for-solving-cannot-move-out-of-borrowing-errors-in-rust.html">
-            Ending borrow
-          </a>
-        </td>
-        <td class="lightItem">
-          Strategies for solving 'cannot move out of' borrowing errors in Rust - Herman Radtke
-        </td>
-      </tr>
-      <tr>
-        <td class="lightItem">
-          <a href="https://www.linuxjournal.com/content/getting-started-rust-working-files-and-doing-file-io">
-            Working with Files and Doing File I/O
-          </a>
-        </td>
-        <td class="lightItem">
-          Linux Journal - Mihalis Tsoukalos, June 20, 2019
-        </td>
-      </tr>
-    </table>
+          <tr>
+            <th class="darkItem">Reference Link</th>
+            <th class="darkItem">Description</th>
+          </tr>
+          <tr>
+            <td class="lightItem">
+              <a href="https://doc.rust-lang.org/reference/index.html">Rust Reference</a>
+            </td>
+            <td class="lightItem">
+              Rust Reference is the official language definition - surprisingly readable.
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem">
+              <a href="https://hermanradtke.com/2015/05/06/creating-a-rust-function-that-accepts-string-or-str.html">
+                Functions that accept both String and str
+              </a>
+            </td>
+            <td class="lightItem">
+              Creating a Rust function that accepts String or &str - Herman Radtke
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem">
+              <a href="https://hermanradtke.com/2015/05/29/creating-a-rust-function-that-returns-string-or-str.html">
+                Functions that return either String or str
+              </a>
+            </td>
+            <td class="lightItem">
+              Creating a Rust function that returns a &str or String - Herman Radtke
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem">
+              <a href="https://hermanradtke.com/2015/01/14/getters-functions-in-rust.html">
+                Avoiding borrow problems with Getter functions
+              </a>
+            </td>
+            <td class="lightItem">
+              Getter Functions In Rust - Herman Radtke
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem">
+              <a href="https://hermanradtke.com/2016/09/12/rust-using-and_then-and-map-combinators-on-result-type.html">
+                and_then,&nbsp;map&nbsp;combinators
+              </a>
+            </td>
+            <td class="lightItem">
+              Using option and result effectively - Herman Radtke
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem">
+              <a href="https://stevedonovan.github.io/rustifications/2018/09/08/common-rust-traits.html">
+                Common Traits
+              </a>
+            </td>
+            <td class="lightItem">
+              Clear descriptions of many of the common Rust traits
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem">
+              <a href="https://hermanradtke.com/2015/06/22/effectively-using-iterators-in-rust.html">
+                Iter, IntoIter, Map/Reduce
+              </a>
+            </td>
+            <td class="lightItem">
+              Effectively Using Iterators in Rust - Herman Radtke
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem">
+              <a href="https://hermanradtke.com/2015/06/09/strategies-for-solving-cannot-move-out-of-borrowing-errors-in-rust.html">
+                Ending borrow
+              </a>
+            </td>
+            <td class="lightItem">
+              Strategies for solving 'cannot move out of' borrowing errors in Rust - Herman Radtke
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem">
+              <a href="https://www.linuxjournal.com/content/getting-started-rust-working-files-and-doing-file-io">
+                Working with Files and Doing File I/O
+              </a>
+            </td>
+            <td class="lightItem">
+              Linux Journal - Mihalis Tsoukalos, June 20, 2019
+            </td>
+          </tr>
+        </table>
 
       </content>
       <a id="bottom"></a>
@@ -2354,6 +2365,7 @@ That's all Folks!
         <menu-elem class="secElem"><a href="#functions">functions</a></menu-elem>
         <menu-elem class="secElem"><a href="#prologue">prologue</a></menu-elem>
         <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
+        <div class='darkItem popupHeader' style="padding:0.25em 2.0em;" onclick="this.parentElement.style.display='none'">Sections</div>
       </page-sections>
     </main>
     <frame-footer>

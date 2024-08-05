@@ -8,7 +8,7 @@ function initializePages() {
   /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
     /*pgbtn.style.display = "flex";*/
-    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='location.reload()'>C# Bites Repo</div>\
+    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='bottomMenu.pages()'>C# Bites Repo</div>\
           <menu-elem class='ddItems pageElem'><a href='indexCs.html'>C#&nbsp;Track&nbsp;Summary</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a class='undefined' href='Javascript:;'>Introduction</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a class='undefined' href='Javascript:;'>...</a></menu-elem>\

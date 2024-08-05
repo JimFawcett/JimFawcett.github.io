@@ -8,7 +8,7 @@ function initializePages() {
   /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
     pagesMenu.style.overflowX = "hidden";
-    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='location.reload()'>Site Resource Pages</div>\
+    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='bottomMenu.pages()'>Site Resource Pages</div>\
         <menu-elem class='ddItems pageElem'><a href='index.html'>Home</a></menu-elem>\
         <menu-elem class='ddItems pageElem'><a href='https://github.com/JimFawcett'>github&nbsp;Repository</a></menu-elem>\
         <menu-elem class='ddItems pageElem'><a href='SiteGlossary.html'>Glossary</a></menu-elem>\

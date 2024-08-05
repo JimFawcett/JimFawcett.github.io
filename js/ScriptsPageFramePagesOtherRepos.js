@@ -8,7 +8,7 @@ function initializePages() {
   /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
     /*pgbtn.style.display = "flex";*/
-    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='location.reload()'>Other Repositories</div>\
+    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='bottomMenu.pages()'>Other Repositories</div>\
           <menu-elem class='ddItems pageElem'><a href='CommCompare.html'>CommCompare</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='BasicBiteByByte.html'>BasicBites</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='DesignBites.html'>DesignBites</a>&nbsp;</menu-elem>\
