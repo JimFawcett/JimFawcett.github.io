@@ -48,8 +48,12 @@ function getHelp() {
 function closeQuickStatus() {
   let qstat = document.getElementsByClassName("quickStatus");
   if (qstat) {
-    let det = qstat[0].parentElement;
-    det.removeAttribute('open');
+    for (item of qstat) {
+      let det = item.parentElement;
+      det.removeAttribute('open');
+    }
+    //let det = qstat[0].parentElement;
+    //det.removeAttribute('open');
     let dummy = true;
   }
 }
