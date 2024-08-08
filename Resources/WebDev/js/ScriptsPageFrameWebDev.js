@@ -508,7 +508,7 @@ bottomMenu.pages = function () {
     else
       menu.style.display = "flex";
   }
-};
+}
 
 bottomMenu.sections = function () {
   var menu = document.getElementById("sections");
