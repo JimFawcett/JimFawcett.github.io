@@ -8,17 +8,13 @@ function initializePages() {
   /*var pgbtn = document.getElementById("pgbtn");*/
   if (isDefined(pagesMenu)) {
     /*pgbtn.style.display = "flex";*/
-    pagesMenu.innerHTML = "<div class='ddLabel darkItem popupHeader' onclick='bottomMenu.pages()'>&nbsp;&nbsp;&nbsp;Basic Bites Thread&nbsp;&nbsp;&nbsp;</div>\
-          <menu-elem class='ddItems pageElem'><a href='../../indexBasic.html'>Basic Track</a></menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='BasicBites_Platform.html'>Platform</a></menu-elem>\
-          <menu-elem class='ddItems pageElem'>&nbsp;&nbsp;<a href='BasicBites_PlatformMemory.html'>Memory</a></menu-elem>\
-          <menu-elem class='ddItems pageElem'>&nbsp;&nbsp;<a href='BasicBites_PlatformSched.html'>Scheduling</a></menu-elem>\
-          <menu-elem class='ddItems pageElem'>&nbsp;&nbsp;<a href='BasicBites_PlatformIO.html'>IO</a></menu-elem>\
-          <menu-elem class='ddItems pageElem'>&nbsp;&nbsp;<a href='BasicBites_PlatformSysRescr.html'>Resources</a></menu-elem>\
-          <menu-elem class='ddItems pageElem'><a href='BasicBites_Programming.html'>Programming</a></menu-elem>\
-          <menu-elem class='ddItems pageElem'>&nbsp;&nbsp;<a href='BasicBites_ProgExec.html'>Execution</a></menu-elem>\
-          <menu-elem class='ddItems pageElem'>&nbsp;&nbsp;<a href='BasicBites_ProgTypes.html'>Types</a></menu-elem>\
-          <menu-elem class='ddItems pageElem'>&nbsp;&nbsp;<a href='BasicBites_ProgFunctions.html'>Functions</a></menu-elem>\
+    pagesMenu.innerHTML = "<div class='ddLabel darkItem popupHeader' onclick='bottomMenu.pages()'>&nbsp;&nbsp;&nbsp;WebDev&nbsp;Bites&nbsp;Thread&nbsp;&nbsp;&nbsp;</div>\
+          <menu-elem class='ddItems pageElem'><a href='../../indexWebDev.html'>WebDev Track</a></menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='WebDev_Survey.html'>Survey</a></menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='WebDev_ShowDiag.html'>[show diagram]</a></menu-elem>\
+          <menu-elem class='ddItems pageElem undef'><a hrefd='WebDev_Messages.html'>Messages</a></menu-elem>\
+          <menu-elem class='ddItems pageElem undef'><a hrefd='WebDev_queryString.html'>queryString</a></menu-elem>\
+          <menu-elem class='ddItems pageElem undef'><a hrefd='WebDev_quickStatus.html'>quickStatus</a></menu-elem>\
           <menu-elem class='ddItems pageElem undef'><a hrefd='javascript:;'>more later</a></menu-elem>\
           <menu-elem>&nbsp;</menu-elem>";
   }

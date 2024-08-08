@@ -404,8 +404,8 @@ function initializeMenu() {
           <div class='ddLabel darkItem'>WebDev&nbsp;thread&nbsp;</div>\
             <div style='height:0.0em;'></div>\
             <div class='ddItem'><a href='../../indexWebDev.html'>WebDev&nbsp;Track</a></div>\
-            <div class='ddItem'><a href='WebDev_Survey.html'>Survet</a></div>\
-            <div class='ddItem'><a class='undefined' href='javascript:;'>[show diagram]</a></div>\
+            <div class='ddItem'><a href='WebDev_Survey.html'>Survey</a></div>\
+            <div class='ddItem'><a href='WebDev_ShowDiag.html'>[show diagram]</a></div>\
             <div class='ddItem'><a class='undefined' href='javascript:;'>Windows Msgs</a></div>\
             <div class='ddItem'><a class='undefined' href='javascript:;'>queryString</a></div>\
             <div class='ddItem'><a class='undefined' href='javascript:;'>quickStatus</a></div>\
