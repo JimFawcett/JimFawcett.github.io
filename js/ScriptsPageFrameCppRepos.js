@@ -25,6 +25,8 @@ function initialize() {
 }
 
 function getHelp() {
+  let d = false;
+  //alert('get help');
   //window.open("Help.html", "help", "popup=1, height=700, width=600");
   window.open("Help.html", "_blank");
 }

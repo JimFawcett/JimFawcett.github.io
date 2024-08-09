@@ -148,6 +148,7 @@ function initialize() {
 }
 
 function getHelp() {
+  
   //window.open("Help.html", "help", "popup=1, height=700, width=600");
   window.open("Help.html", "_blank");
 }
@@ -273,7 +274,7 @@ function initializeMenu() {
             <div style='height:2em;'></div>\
         </div>\
     </div>\
-    <div class='menuItem'><a id='help' onclick='getHelp()'>Help</a></div>\
+    <div class='menuItem'><a id='help' href='Help.html' target='_blank'>Help</a></div>\
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
