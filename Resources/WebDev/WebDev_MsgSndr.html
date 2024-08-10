@@ -98,8 +98,8 @@
     }
   </script> -->
   <script>
+    /*-- send request message to iframe child MsgRsvr --*/
     function postMsg(data) {
-      /*-- send message to iframe content --*/
       /* msg should be 'sections' or 'reply' */
       let ifrm = document.getElementById("pgframe");
       ifrm.contentWindow.postMessage(data, '*');
@@ -107,6 +107,16 @@
       let rply = document.getElementById('rply');
       rply.innerHTML = "No Reply";
     }
+    /*-- receive message from iframe child MsgRcvr --*/
+    /*-----------------------------------------------------
+      The onmessage(event) function is a message handler 
+      installed by JavaScript runtime in a message event
+      listener. It is invoked when a message is posted 
+      by another window.
+
+      The function supplies application specific processing
+      for each type of message used by the application.
+    -----------------------------------------------------*/
     window.onmessage = function (evnt) {
       console.log('msg: ', evnt.data);
       let rply = document.getElementById('rply');
@@ -114,14 +124,27 @@
     }
   </script>
   <style>
-    #github .MsgButton {
+    #github .msgButton {
       cursor: pointer;
       padding: 0.25em 0.75em;
       font-size: 1em;
       border: 2px solid var(--dark);
     }
-    #github .request {
-
+    #github .replyDisplay {
+      padding: 0.25em 0.75em;
+      font-size: 1em;
+      border: 2px solid var(--dark);
+    }
+    #github .iFrame {
+      height: 30em;
+      width: 99%;
+      border: 2px solid var(--dark);
+    }
+    #github .codeHeader {
+      background-color: var(--light);
+      padding: 0.10em 1.25em 0.15em 1.25em;
+      font-weight: bold;
+      font-size: 1em;
     }
   </style>
 </head>
@@ -162,59 +185,108 @@
           iframe. Clicking the button &quot;Send Message&quot; posts a JavaScript message to the child window.
         </t-b>
         <div style="height:0.25em;"></div>
-        <div class="indent">
+        <div>
           <t-b>
             <div style="display:flex; flex-direction:row; gap:1em;">
-              <button onclick="postMsg('sections')" style="cursor:pointer; padding:0.25em 0.75em; font-size:1em; border:2px solid var(--dark);">Send Message &apos;sections&apos;</button>
-              <button onclick="postMsg('request')" style="cursor:pointer; padding:0.25em 0.75em; font-size:1em; border:2px solid var(--dark);">Send Message &apos;request&apos;</button>
-              <div id="rply" style="padding:0.25em 0.75em; font-size:1em; border:2px solid var(--dark);">No Reply</div>
+              <button onclick="postMsg('sections')" class="msgButton">Send Message &apos;sections&apos;</button>
+              <button onclick="postMsg('request')" class="msgButton">Send Message &apos;request&apos;</button>
+              <div id="rply" class="replyDisplay">No Reply</div>
             </div>
           </t-b>
           <div style="height:0.75em;"></div>
           <div>
-            <iframe id="pgframe" style="height:30em; width:100%; border:2px solid var(--dark);" src="WebDev_MsgRcvr.html" name="rtcnt"></iframe>
+            <iframe id="pgframe" class="iFrame" src="WebDev_MsgRcvr.html" name="rtcnt"></iframe>
           </div>
         </div>
 
-        <div style="height:0.250em;"></div>
-        <div style="height:0.75em;"></div>
+        <div style="height:1.00em;"></div>
         <div class="blockSingle" style="padding:0em;">
           <div style="padding:0.25em 1.5em; height:max-content;">
-            <div style="float:left; font-weight:bold; font-size:1em;">JavaScript</div>
-            <div style="float:right; font-weight:bold; font-size:1em;">HTML Markup</div>
+            <div style="float:left; font-weight:bold; font-size:1em;">MsgSndr</div>
+            <div style="float:right; font-weight:bold; font-size:1em;">MsgRcvr</div>
           </div>
           <div style="clear:both"></div>
           <splitter-container id="container">
             <first-item id="toggle-first" style="width:50%;">
               <div class="codewrap" onclick="cbubbleup('toggle-first')">
+                <div class="codeHeader">JavaScript</div>
                 <pre><code class="language-javascript">&lt;script&gt;
-  /*-- Toggle display of child element --*/
-  function toggleShow(id, width) {
-    let showit = document.getElementById(id);
-    if (showit) {
-      if (showit.style.display === 'none') {
-        showit.style.display = 'block';
-        showit.firstElementChild.style.width = width + "px";
-      }
-      else {
-        /*-- Return image to its original size on close --*/
-        showit.firstElementChild.style.width = width + "px";
-        showit.style.display = 'None';
-      }
-    }
-    else {
-      //alert('showit not defined');
-    }
+  /*-- send request message to iframe child MsgRsvr --*/
+  function postMsg(data) {
+    /* msg should be 'sections' or 'reply' */
+    let ifrm = document.getElementById("pgframe");
+    ifrm.contentWindow.postMessage(data, '*');
+    /*-- clear display --*/
+    let rply = document.getElementById('rply');
+    rply.innerHTML = "No Reply";
   }
-  /*-- increase size of Image --*/
-  function bigger(img) {
-    img.style.width = (img.clientWidth * 1.25) + "px";
+  /*-- receive message from iframe child MsgRcvr --*/
+  /*-----------------------------------------------------
+    The onmessage(event) function is a message handler 
+    installed by JavaScript runtime in a message event
+    listener. It is invoked when a message is posted 
+    by another window.
+  -----------------------------------------------------*/
+  window.onmessage = function (evnt) {
+    console.log('msg: ', evnt.data);
+    /*-- post text to display --*/
+    let rply = document.getElementById('rply');
+    rply.innerHTML = "Received Reply";
   }
-&lt;script&gt;
+&lt;/script&gt;
 </code></pre>
-<div style="padding:0.25em 1em; background-color:var(--light);">HTML Markup</div>
-<pre><code class="language-javascript">
-  /*-- stuff --*/
+<div class="codeHeader">HTML Markup</div>
+<pre><code class="language-html">&lt;div&gt;
+  &lt;t-b&gt;
+    &lt;div style=&quot;display:flex; flex-direction:row; gap:1em;&quot;&gt;
+      &lt;button onclick=&quot;postMsg('sections')&quot; class=&quot;msgButton&quot;&gt;
+        Send Message &apos;sections&apos;
+      &lt;/button&gt;
+      &lt;button onclick=&quot;postMsg('request')&quot; class=&quot;msgButton&quot;&gt;
+        Send Message &apos;request&apos;
+      &lt;/button&gt;
+      &lt;div id=&quot;rply&quot; class=&quot;replyDisplay&quot;&gt;No Reply&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/t-b&gt;
+  &lt;div style=&quot;height:0.75em;&quot;&gt;&lt;/div&gt;
+  &lt;div&gt;
+    &lt;iframe 
+      id=&quot;pgframe&quot; 
+      class=&quot;iFrame&quot; 
+      src=&quot;WebDev_MsgRcvr.html&quot; 
+      name=&quot;rtcnt&quot;&gt;
+    &lt;/iframe&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+<div class="codeHeader">CSS</div>
+<pre><code class="language-term">&lt;style&gt;
+  #github .msgButton {
+    cursor: pointer;
+    padding: 0.25em 0.75em;
+    font-size: 1em;
+    border: 2px solid var(--dark);
+  }
+
+  #github .replyDisplay {
+    padding: 0.25em 0.75em;
+    font-size: 1em;
+    border: 2px solid var(--dark);
+  }
+
+  #github .iFrame {
+    height: 30em;
+    width: 99%;
+    border: 2px solid var(--dark);
+  }
+
+  #github .codeHeader {
+    background-color: var(--light);
+    padding: 0.15em 1.25em;
+    font-weight: bold;
+    font-size: 1em;
+  }
+&lt;/style&gt;
 </code></pre>
               </div>
             </first-item>
