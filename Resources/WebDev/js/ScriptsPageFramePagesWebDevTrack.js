@@ -12,7 +12,7 @@ function initializePages() {
           <menu-elem class='ddItems pageElem'><a href='../../indexWebDev.html'>WebDev Track</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='WebDev_Survey.html'>Survey</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='WebDev_ShowDiag.html'>[show diagram]</a></menu-elem>\
-          <menu-elem class='ddItems pageElem undef'><a hrefd='WebDev_Messages.html'>Messages</a></menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='WebDev_WinMsg.html'>Messages</a></menu-elem>\
           <menu-elem class='ddItems pageElem undef'><a hrefd='WebDev_queryString.html'>queryString</a></menu-elem>\
           <menu-elem class='ddItems pageElem undef'><a hrefd='WebDev_quickStatus.html'>quickStatus</a></menu-elem>\
           <menu-elem class='ddItems pageElem undef'><a hrefd='javascript:;'>more later</a></menu-elem>\

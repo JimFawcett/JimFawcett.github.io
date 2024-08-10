@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <!--
-  WebDev_ShowDiag.html
+  WebDev_WinMsg.html
 -->
 <head>
-  <title>WebDev ShowDiagram</title>
+  <title>WebDev WinMsg</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" type="image/x-icon" href="./images/favicon.ico" />
   <link rel="stylesheet" href="css/StylesPageFrameDefaults.css" />
@@ -73,7 +73,7 @@
       initialize();
     }
   </script>
-  <script>
+  <!-- <script>
     /*-- Toggle display of child element --*/
     function toggleShow(id, width) {
       let showit = document.getElementById(id);
@@ -96,13 +96,40 @@
     function bigger(img) {
       img.style.width = (img.clientWidth * 1.25) + "px";
     }
+  </script> -->
+  <script>
+    function postMsg(data) {
+      /*-- send message to iframe content --*/
+      /* msg should be 'sections' or 'reply' */
+      let ifrm = document.getElementById("pgframe");
+      ifrm.contentWindow.postMessage(data, '*');
+      /*-- clear display --*/
+      let rply = document.getElementById('rply');
+      rply.innerHTML = "No Reply";
+    }
+    window.onmessage = function (evnt) {
+      console.log('msg: ', evnt.data);
+      let rply = document.getElementById('rply');
+      rply.innerHTML = "Received Reply";
+    }
   </script>
+  <style>
+    #github .MsgButton {
+      cursor: pointer;
+      padding: 0.25em 0.75em;
+      font-size: 1em;
+      border: 2px solid var(--dark);
+    }
+    #github .request {
+
+    }
+  </style>
 </head>
 
 <body id="github" onload="load()">
 
   <a id="Next" href="WebDev_MsgSndr.html">N</a>
-  <a id="Prev" href="WebDev_Survey.html">P</a>
+  <a id="Prev" href="WebDev_ShowDiag.html">P</a>
 
   <page-frame>
     <frame-header>
@@ -110,8 +137,8 @@
     </frame-header>
     <main id="main">
       <div id="about" onclick="this.style.display = 'none'">about</div>
-      <div id="modified">08/08/2024</div>
-      <div id="page">WebDev Show Diagram</div>
+      <div id="modified">08/09/2024</div>
+      <div id="page">WebDev MsgSndr</div>
       <div id="hlp"></div>
       <a id="top"></a>
       <content>
@@ -121,44 +148,35 @@
           </a>
           <!--<a class="repoLink" href="https://github.com/JimFawcett">JimFawcett Repositories</a>-->
           <hgroup id="pagetitle" onclick="loadifwebdev()" style="cursor:pointer;">
-            <h1 id="title">WebDev Show Diagram</h1>
+            <h1 id="title">WebDev MsgSndr</h1>
             <h3 id="subtitle" class="indent">
-              <span>resizable image dropdown from span</span>
+              <span>communication between parent page and iframe child using JavaScript messages</span>
             </h3>
           </hgroup>
 
         </header>
         <div style="height:1em;"></div>
-        <h3 id="start">1.0 Parent-Child Communication with Messages</h3>
+        <h3 id="start">1.0 Windows Messaging</h3>
         <t-b>
-          This page demonstrates a widget that uses JavaScript and page markup to toggle the
-          display of an image. To toggle the image, click on the markup 
-          <span style="white-space:nowrap;">&quot;[ show DOM diagram ]&quot;</span>, below.
+          This page demonstrates a widget that uses JavaScript and page markup to run JavaScript in a child
+          iframe. Clicking the button &quot;Send Message&quot; posts a JavaScript message to the child window.
         </t-b>
-
-
+        <div style="height:0.25em;"></div>
+        <div class="indent">
+          <t-b>
+            <div style="display:flex; flex-direction:row; gap:1em;">
+              <button onclick="postMsg('sections')" style="cursor:pointer; padding:0.25em 0.75em; font-size:1em; border:2px solid var(--dark);">Send Message &apos;sections&apos;</button>
+              <button onclick="postMsg('request')" style="cursor:pointer; padding:0.25em 0.75em; font-size:1em; border:2px solid var(--dark);">Send Message &apos;request&apos;</button>
+              <div id="rply" style="padding:0.25em 0.75em; font-size:1em; border:2px solid var(--dark);">No Reply</div>
+            </div>
+          </t-b>
+          <div style="height:0.75em;"></div>
+          <div>
+            <iframe id="pgframe" style="height:30em; width:100%; border:2px solid var(--dark);" src="WebDev_MsgRcvr.html" name="rtcnt"></iframe>
+          </div>
+        </div>
 
         <div style="height:0.250em;"></div>
-        <t-b style="width:max-content; border:2px solid var(--dark); padding:0.5em 1em 1em 1em;">
-          HTML consists of nested markup elements with a DocumentElement root. Most
-          elements consists of a tag pair and body.
-          <div class="inset">
-            &lt;tag&gt;"body"&lt;/tag&gt;
-          </div>
-          When a browser loads an HTML page it translates markup elements into JavaScript
-          nodes that contain references to the element&apos;s children and properties for
-          any element attributes. The result is a Document Object Model (DOM) tree&nbsp;
-
-          <!-- toggle widget -->
-          <span onclick="toggleShow('pop1', 600)" style="cursor:pointer; white-space:nowrap;">
-            &nbsp;[ show DOM diagram ]&nbsp;
-          </span>
-
-          <!-- enlarge image -->
-          <div id="pop1" style="display:None; cursor:pointer;">
-            <img onclick="bigger(this)" src="pictures/dom_tree.png" />
-          </div>
-        </t-b>
         <div style="height:0.75em;"></div>
         <div class="blockSingle" style="padding:0em;">
           <div style="padding:0.25em 1.5em; height:max-content;">
@@ -169,7 +187,7 @@
           <splitter-container id="container">
             <first-item id="toggle-first" style="width:50%;">
               <div class="codewrap" onclick="cbubbleup('toggle-first')">
-                <pre><code class="language-cpp">&lt;script&gt;
+                <pre><code class="language-javascript">&lt;script&gt;
   /*-- Toggle display of child element --*/
   function toggleShow(id, width) {
     let showit = document.getElementById(id);
@@ -193,6 +211,10 @@
     img.style.width = (img.clientWidth * 1.25) + "px";
   }
 &lt;script&gt;
+</code></pre>
+<div style="padding:0.25em 1em; background-color:var(--light);">HTML Markup</div>
+<pre><code class="language-javascript">
+  /*-- stuff --*/
 </code></pre>
               </div>
             </first-item>
