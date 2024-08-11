@@ -15,10 +15,17 @@ function isDefined(elem) {
   return true;
 }
 
-//function loadif() {
-//  loc = window.location.href;
-//  window.location.href = 'TOC.html?src=' + loc;
-//}
+function loadbitsintro() {
+  if (window.self === window.top) {
+    let url = window.location.href;
+    window.location.href = url.replace('Content', '');
+  }
+  else {
+    window.top.location.href = '../../TOCBits.html?src=Resources/Bits/Bits_Intro.html';
+  }
+}
+
+
 function loadif() {
   loc = window.location.href;
   if (window.self === window.top) {

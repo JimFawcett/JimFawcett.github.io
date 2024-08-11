@@ -16,10 +16,9 @@ function isDefined(elem) {
 }
 //
 
-//function loadif() {
-//  loc = window.location.href;
-//  window.location.href = 'TOC.html?src=' + loc;
-//}
+function loadbitsintro() {
+  window.location.href = 'TOCBits.html?src=Bits_Intro.html';
+}
 function loadif() {
   loc = window.location.href;
   if (window.self === window.top) {
