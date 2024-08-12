@@ -17,8 +17,12 @@ function isDefined(elem) {
 function closeQuickStatus() {
   let qstat = document.getElementsByClassName("quickStatus");
   if (qstat) {
-    let det = qstat[0].parentElement;
-    det.removeAttribute('open');
+    for (item of qstat) {
+      let det = item.parentElement;
+      det.removeAttribute('open');
+    }
+    //let det = qstat[0].parentElement;
+    //det.removeAttribute('open');
     let dummy = true;
   }
 }
@@ -306,6 +310,7 @@ function initializeMenu() {
             <div class='ddItem'><a href='RustErrorHandling.html'>Rust Error Handling</a></div>\
             <div class='ddItem'><a href='RustModels.html'>Rust Models</a></div>\
             <div class='ddItem'><a href='RustLibraryDemos.html'>Rust Library Demos</a></div>\
+            <div class='ddItem'><a href='RustBiteByByte.html'>Rust Bite by Byte</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\

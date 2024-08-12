@@ -14,24 +14,14 @@ function isDefined(elem) {
   }
   return true;
 }
-
 function closeQuickStatus() {
   let qstat = document.getElementsByClassName("quickStatus");
   if (qstat) {
-    for (item of qstat) {
-      let det = item.parentElement;
-      det.removeAttribute('open');
-    }
-    //let det = qstat[0].parentElement;
-    //det.removeAttribute('open');
+    let det = qstat[0].parentElement;
+    det.removeAttribute('open');
     let dummy = true;
   }
 }
-
-//function loadif() {
-//  loc = window.location.href;
-//  window.location.href = 'TOC.html?src=' + loc;
-//}
 function loadif() {
   loc = window.location.href;
   if (window.self === window.top) {
@@ -54,12 +44,13 @@ function loadifcpp() {
 }
 
 function loadifrust() {
-  loc = window.location.href;
+  var loc = window.location.href;
+  //alert(loc);
   if (window.self === window.top) {
-    window.location.href = '../../TOCRust.html?src=indexRust.html';
+    window.location.href = '../../TOCRust.html?src=' + loc;
   }
   else {
-    window.top.location.href = '../../TOCRust.html';
+    window.top.location.href = loc;
   }
 }
 
@@ -74,12 +65,12 @@ function loadifcsharp() {
 }
 
 function loadifbasic() {
-  var loc = window.location.href;
+  loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = '../../TOCBasic.html?src=' + loc;
+    window.location.href = '../../TOCBasic.html?src=indexBasic.html';
   }
   else {
-    window.top.location.href = loc;
+    window.top.location.href = '../../TOCBasic.html';
   }
 }
 
@@ -142,6 +133,7 @@ function loadifprototypes() {
     window.top.location.href = '../../TOCPrototypes.html';
   }
 }
+
 /* run menu builders at startup */
 
 function initialize() {
@@ -183,6 +175,7 @@ function initializeMenu() {
             <div class='ddItem'><a href='../../index.html'>Home</a></div>\
             <div class='ddItem'><a target='_parent' href='../../TOC.html'>Site Explorer</a></div>\
             <!--<div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>-->\
+            <div class='ddItem'><a href='../../SiteMap.html'>SiteMap</a></div>\
             <div class='ddItem'><a href='../../SiteDemo.html'>SiteDemo</a></div>\
             <div class='ddItem'><a href='../../SiteDesign.html'>SiteDesign</a></div>\
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
@@ -219,7 +212,7 @@ function initializeMenu() {
           <div class='ddItem'><a target='_parent' href='../../TOCDesign.html'>&nbsp;Design</a></div>\
           <div class='ddItem'><a target='_parent' href='../../TOCDeployment.html'>&nbsp;Deployment</a></div>\
           <div class='ddItem'><a target='_parent' href='../../TOCProjects.html'>&nbsp;Projects</a></div>\
-          <div class='ddItem'><a target='_parent' href='../../TOCPrototypes.html'>&nbsp;Prototypes</a></div>\
+          <div class='ddItem'><a target='_parent' href=.../../TOCPrototypes.html'>&nbsp;Prototypes</a></div>\
           <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
@@ -414,19 +407,42 @@ function initializeMenu() {
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Basic&nbsp;Bites&nbsp;thread</div>\
+          <div class='ddLabel darkItem'>Rust&nbsp;Bites&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a href='../../indexBasic.html'>Basic&nbsp;Track</a></div>\
-            <div class='ddItem'><a href='BasicBites_Platform.html'>Platform</a></div>\
-            <div class='ddItem'><a href='BasicBites_PlatformMemory.html'>&nbsp;&nbsp;memory</a></div>\
-            <div class='ddItem'><a href='BasicBites_PlatformSched.html'>&nbsp;&nbsp;scheduling</a></div>\
-            <div class='ddItem'><a href='BasicBites_PlatformIO.html'>&nbsp;&nbsp;IO</a></div>\
-            <div class='ddItem'><a href='BasicBites_PlatformSysRescr.html'>&nbsp;&nbsp;Resources</a></div>\
-            <div class='ddItem'><a href='BasicBites_Programming.html'>Programming</a></div>\
-            <div class='ddItem'><a href='BasicBites_ProgExec.html'>&nbsp;&nbsp;Execution</a></div>\
-            <div class='ddItem'><a href='BasicBites_ProgTypes.html'>&nbsp;&nbsp;Types</a></div>\
-            <div class='ddItem'><a href='BasicBites_ProgFunctions.html'>&nbsp;&nbsp;Functions</a></div>\
-            <div class='ddItem'><a class='undefined' href='# BasicBites_Programming.html'>more later</a></div>\
+            <div class='ddItem'><a href='RustBites_Intro.html'>Introduction</a></div>\
+            <div class='ddItem'><a href='RustBites_CodeExamples.html'>Code Examples</a></div>\
+            <div class='ddItem'><a href='RustBites_GettingStarted.html'>Getting Started</a></div>\
+            <div class='ddItem'><a href='RustBites_Tooling.html'>Tooling</a></div>\
+            <div class='ddItem'><a href='RustBites_UDB.html'>Undef Behavior</a></div>\
+            <div class='ddItem'><a href='RustBites_Safety.html'>Safety</a></div>\
+            <div class='ddItem'><a href='RustBites_Data.html'>Data</a></div>\
+            <div class='ddItem'><a href='RustBites_FlashCards.html'>Flash Cards</a></div>\
+            <div class='ddItem'><a href='RustBites_Facts.html'>Facts</a></div>\
+            <div class='ddItem'><a href='RustBites_Strings.html'>Strings</a></div>\
+            <div class='ddItem'><a href='RustBites_DataStr.html'>Data Structure</a></div>\
+            <div class='ddItem'><a href='RustBites_SmartPtrs.html'>Smart Pointers</a></div>\
+            <div class='ddItem'><a href='RustBites_LifeCycle.html'>Life Cycle</a></div>\
+            <div class='ddItem'><a href='RustBites_Owners.html'>Ownership</a></div>\
+            <div class='ddItem'><a href='RustBites_Traits.html'>Generics &amp; Traits</a></div>\
+            <div class='ddItem'><a href='RustBites_Functs.html'>Functions</a></div>\
+            <div class='ddItem'><a href='RustBites_Structs.html'>Structs</a></div>\
+            <div class='ddItem'><a href='RustBites_LifeTime.html'>Life Time</a></div>\
+            <div class='ddItem'><a href='RustBites_Abstract.html'>Abstractions</a></div>\
+            <div class='ddItem'><a href='RustBites_Enums.html'>Enums</a></div>\
+            <div class='ddItem'><a href='RustBites_ErrHnd.html'>Error Handling</a></div>\
+            <div class='ddItem'><a href='RustBites_Options.html'>Options</a></div>\
+            <div class='ddItem'><a href='RustBites_Conversions.html'>Conversions</a></div>\
+            <div class='ddItem'><a href='RustBites_Collects.html'>Collections</a></div>\
+            <div class='ddItem'><a href='RustBites_Iterator.html'>Iterators</a></div>\
+            <div class='ddItem'><a href='RustBites_Idioms.html'>Idioms</a></div>\
+            <div class='ddItem'><a href='RustBites_Macros.html'>Macros</a></div>\
+            <div class='ddItem'><a href='RustBites_Threads.html'>Threads</a></div>\
+            <div class='ddItem'><a href='RustBites_Synchron.html'>Synchronization</a></div>\
+            <div class='ddItem'><a class='undefined' href='RustBites_Channels.html'>Channels</a></div>\
+            <div class='ddItem'><a class='undefined' href='RustBites_AsyncAwt.html'>AsyncAwait</a></div>\
+            <div class='ddItem'><a class='undefined' href='RustBites_RegEx.html'>Regular Expressions</a></div>\
+            <div class='ddItem'><a href='RustBites_TipsAndTricks.html'>Hacks &amp; Helpers</a></div>\
+            <div class='ddItem'><a href='RustBites_CodeExperiments.html'>Code Experiments</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\

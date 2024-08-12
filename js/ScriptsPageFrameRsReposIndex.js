@@ -188,16 +188,16 @@ function initializeMenu() {
         Tracks&#9662\
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Tracks</div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifbits()'>&nbsp;Bits</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifcpp()'>&nbsp;C++</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifrust()'>&nbsp;Rust</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifcsharp()'>&nbsp;C#</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifbasic()'>&nbsp;Basics</a>&nbsp;</div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifwebdev()'>&nbsp;WebDev</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifdesign()'>&nbsp;Design</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifdeployment()'>&nbsp;Deployment</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifprojects()'>&nbsp;Projects</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifprototypes()'>&nbsp;Prototypes</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCBits.html'>&nbsp;Bits</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCCpp.html'>&nbsp;C++</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCRust.html'>&nbsp;Rust</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCCSharp.html'>&nbsp;C#</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCBasic.html'>&nbsp;Basics</a>&nbsp;</div>\
+          <div class='ddItem'><a target='_parent' href='TOCWebDev.html'>&nbsp;WebDev</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCDesign.html'>&nbsp;Design</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCDeployment.html'>&nbsp;Deployment</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCProjects.html'>&nbsp;Projects</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCPrototypes.html'>&nbsp;Prototypes</a></div>\
           <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
@@ -272,6 +272,7 @@ function initializeMenu() {
             <div class='ddItem undef'><a hrefd='RustThreading.html'>Rust&nbsp;Threading&nbsp;</a></div>\
             <div class='ddItem'><a href='RustModels.html'>Rust&nbsp;Models&nbsp;</a></div>\
             <div class='ddItem'><a href='RustLibraryDemos.html'>Rust&nbsp;Librarys&nbsp;Demos&nbsp;</a></div>\
+            <div class='ddItem'><a href='RustBiteByByte.html'>Rust&nbsp;Bite&nbsp;by&nbsp;Byte&nbsp;</a></div>\
             <div style='height:2em;'></div>\
         </div>\
     </div>\

@@ -14,20 +14,6 @@ function isDefined(elem) {
   }
   return true;
 }
-
-function closeQuickStatus() {
-  let qstat = document.getElementsByClassName("quickStatus");
-  if (qstat) {
-    for (item of qstat) {
-      let det = item.parentElement;
-      det.removeAttribute('open');
-    }
-    //let det = qstat[0].parentElement;
-    //det.removeAttribute('open');
-    let dummy = true;
-  }
-}
-
 //function loadif() {
 //  loc = window.location.href;
 //  window.location.href = 'TOC.html?src=' + loc;
@@ -44,12 +30,12 @@ function loadif() {
 }
 
 function loadifcpp() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = '../../TOCCpp.html?src=indexCpp.html';
+    window.location.href = '../../TOCCpp.html?src=' + loc;
   }
   else {
-    window.top.location.href = '../../TOCCpp.html';
+    window.top.location.href = loc;
   }
 }
 
@@ -74,12 +60,12 @@ function loadifcsharp() {
 }
 
 function loadifbasic() {
-  var loc = window.location.href;
+  loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = '../../TOCBasic.html?src=' + loc;
+    window.location.href = '../../TOCBasic.html?src=indexBasic.html';
   }
   else {
-    window.top.location.href = loc;
+    window.top.location.href = '../../TOCBasic.html';
   }
 }
 
@@ -142,6 +128,7 @@ function loadifprototypes() {
     window.top.location.href = '../../TOCPrototypes.html';
   }
 }
+
 /* run menu builders at startup */
 
 function initialize() {
@@ -179,10 +166,10 @@ function initializeMenu() {
     <div class='menuItem'>\
         <div>Site&#9662</div>\
         <div class='dropdown'>\
-            <div class='darkItem' style='padding:0.25em 0.5em;'>Code Workshop</div>\
+            <div style='height:0.25em;'></div>\
             <div class='ddItem'><a href='../../index.html'>Home</a></div>\
-            <div class='ddItem'><a target='_parent' href='../../TOC.html'>Site Explorer</a></div>\
-            <!--<div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>-->\
+            <div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>\
+            <div class='ddItem'><a href='../../SiteMap.html'>SiteMap</a></div>\
             <div class='ddItem'><a href='../../SiteDemo.html'>SiteDemo</a></div>\
             <div class='ddItem'><a href='../../SiteDesign.html'>SiteDesign</a></div>\
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
@@ -219,7 +206,7 @@ function initializeMenu() {
           <div class='ddItem'><a target='_parent' href='../../TOCDesign.html'>&nbsp;Design</a></div>\
           <div class='ddItem'><a target='_parent' href='../../TOCDeployment.html'>&nbsp;Deployment</a></div>\
           <div class='ddItem'><a target='_parent' href='../../TOCProjects.html'>&nbsp;Projects</a></div>\
-          <div class='ddItem'><a target='_parent' href='../../TOCPrototypes.html'>&nbsp;Prototypes</a></div>\
+          <div class='ddItem'><a target='_parent' href=.../../TOCPrototypes.html'>&nbsp;Prototypes</a></div>\
           <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
@@ -266,8 +253,8 @@ function initializeMenu() {
           <div class='ddItem'><a href='../../Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a></div>\
           <div class='ddItem'><a href='../PublishingSourceCode.pdf'>Site&nbsp;Presentation</a></div>\
           <div class='ddItem'><a href='../../Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a></div>\
-          <div class='ddItem'><a href='../../ChatGPT.html'>ChatGPT</a></div>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+           <div class='ddItem'><a href='../../ChatGPT.html'>ChatGPT</a></div>\
+         <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Design</summary>\
             <div style='margin-left:1.0em;'>\
                 <div class='ddItem ddDetails'><a href='../../Design.html'>Design Process</a></div>\
@@ -414,19 +401,25 @@ function initializeMenu() {
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Basic&nbsp;Bites&nbsp;thread</div>\
+          <div class='ddLabel darkItem'>Cpp&nbsp;Bites&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a href='../../indexBasic.html'>Basic&nbsp;Track</a></div>\
-            <div class='ddItem'><a href='BasicBites_Platform.html'>Platform</a></div>\
-            <div class='ddItem'><a href='BasicBites_PlatformMemory.html'>&nbsp;&nbsp;memory</a></div>\
-            <div class='ddItem'><a href='BasicBites_PlatformSched.html'>&nbsp;&nbsp;scheduling</a></div>\
-            <div class='ddItem'><a href='BasicBites_PlatformIO.html'>&nbsp;&nbsp;IO</a></div>\
-            <div class='ddItem'><a href='BasicBites_PlatformSysRescr.html'>&nbsp;&nbsp;Resources</a></div>\
-            <div class='ddItem'><a href='BasicBites_Programming.html'>Programming</a></div>\
-            <div class='ddItem'><a href='BasicBites_ProgExec.html'>&nbsp;&nbsp;Execution</a></div>\
-            <div class='ddItem'><a href='BasicBites_ProgTypes.html'>&nbsp;&nbsp;Types</a></div>\
-            <div class='ddItem'><a href='BasicBites_ProgFunctions.html'>&nbsp;&nbsp;Functions</a></div>\
-            <div class='ddItem'><a class='undefined' href='# BasicBites_Programming.html'>more later</a></div>\
+            <div class='ddItem'><a href='CppBites_Intro.html'>Introduction</a></div>\
+            <div class='ddItem'><a href='CppBites_Survey.html'>Survey</a></div>\
+            <div class='ddItem'><a href='CppBites_STR.html'>STR</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Core Model</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Core Memory</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Core Types</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Core Classes</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Class Anatomy</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Core Templates</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Core STL</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Modern Model</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Modern C++11</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Modern C++14</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Modern C++17</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Modern C++20</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>Modern C++23</a></div>\
+            <div class='ddItem'><a class='undef' hrefd=''>more coming</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\
