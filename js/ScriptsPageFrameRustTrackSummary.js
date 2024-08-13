@@ -417,14 +417,14 @@ function initializeMenu() {
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>C++&nbsp;Track&nbsp</div>\
+          <div class='ddLabel darkItem'>Rust&nbsp;Track&nbsp</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a target='_parent' href='TOCBits.html?src=indexBits.html'>&nbspTrack&nbsp;Summary&nbsp;</a></div>\
-            <div class='ddItem'><a target='_parent' href='TOCBits.html?src=BitsRepo.html'>&nbsp;Track&nbsp;Repo</a></div>\
-            <div class='ddItem'><a target='_parent' href='TOCBits.html?src=Resources/Bits/Bits_Glossary.html'>&nbsp;Glossary&nbsp;</a></div>\
-            <div class='ddItem'><a target='_parent' href='TOCBits.html?src=Resources/Bits/Bits_References.html'>&nbsp;References&nbsp;</a></div>\
-            <div class='ddItem undefined'><a target='_parent' href='javascript:;'>&nbsp;Flash&nbsp;Cards</a></div>\
-            <div class='ddItem'><a target='_parent' href='TOCBits.html?src=Resources/Bits/Bits_Additions.html'>&nbsp;Additions&nbsp;</a></div>\
+            <div class='ddItem'><a target='_parent' href='TOCRust.html?src=indexRust.html'>Track&nbsp;Summary&nbsp;</a></div>\
+            <div class='ddItem'><a target='_parent' href='TOCRust.html?src=RustBiteByByte.html'>Track&nbsp;Repo</a></div>\
+            <div class='ddItem'><a target='_parent' href='TOCRust.html?src=IndexPage.html'>&nbsp;Glossary&nbsp;</a></div>\
+            <div class='ddItem'><a target='_parent' href='TOCRust.html?src=RustStory_References.html'>&nbsp;References&nbsp;</a></div>\
+            <div class='ddItem'><a target='_parent' href='TOCRust.html?src=Resources/RustBites/RustBites_FlashCards.html'>&nbsp;Flash&nbsp;Cards</a></div>\
+            <div class='ddItem undefined'><a target='_parent' href='javascript:;'>&nbsp;Additions&nbsp;</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\

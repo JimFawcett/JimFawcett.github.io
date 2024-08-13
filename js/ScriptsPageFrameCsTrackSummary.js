@@ -413,19 +413,19 @@ function initializeMenu() {
           <div style='height:2em;'>&nbsp;</div>\
       </div>\
     </div>\
-    <div class='menuItem'><a id='help' onclick='getHelp()'>Help</a></div>\
+    <div class='menuItem'><a id='help' target='_blank' href='TOCCSharp.html?src=Help.html'>Help</a></div>\
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Bits&nbsp;Track&nbsp</div>\
+          <div class='ddLabel darkItem'>C#&nbsp;Track&nbsp</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a target='_parent' href='TOCBits.html?src=indexBits.html'>&nbspTrack&nbsp;Summary&nbsp;</a></div>\
-            <div class='ddItem'><a target='_parent' href='TOCBits.html?src=BitsRepo.html'>&nbsp;Track&nbsp;Repo</a></div>\
-            <div class='ddItem'><a target='_parent' href='TOCBits.html?src=Resources/Bits/Bits_Glossary.html'>&nbsp;Glossary&nbsp;</a></div>\
-            <div class='ddItem'><a target='_parent' href='TOCBits.html?src=Resources/Bits/Bits_References.html'>&nbsp;References&nbsp;</a></div>\
-            <div class='ddItem undefined'><a target='_parent' href='javascript:;'>&nbsp;Flash&nbsp;Cards</a></div>\
-            <div class='ddItem'><a target='_parent' href='TOCBits.html?src=Resources/Bits/Bits_Additions.html'>&nbsp;Additions&nbsp;</a></div>\
-          <div style='height:1em;'></div>\
+            <div class='ddItem'><a target='_parent' href='TOCCSharp.html?src=indexCs.html'>Track&nbsp;Summary&nbsp;</a></div>\
+            <div class='ddItem'><a target='_parent' href='TOCCSharp.html?src=CppBiteByByte.html'>Track&nbsp;Repo</a></div>\
+            <div class='ddItem undefined'><a target='_parent' href='javascript:;'>Glossary&nbsp;</a></div>\
+            <div class='ddItem undefined'><a target='_parent' href='javascript:;'>References&nbsp;</a></div>\
+            <div class='ddItem undefined'><a target='_parent' href='javascript:;'>Flash&nbsp;Cards</a></div>\
+            <div class='ddItem undefined'><a target='_parent' href='javascript:;'>Additions&nbsp;</a></div>\
+          <div style='height:2em;'></div>\
         </div>\
     </div>\
     <div class='menuItem'><a id='prevLink' href='#'>Prev</a></div>\
