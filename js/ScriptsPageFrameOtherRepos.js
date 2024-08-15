@@ -18,126 +18,222 @@ function isDefined(elem) {
 function closeQuickStatus() {
   let qstat = document.getElementsByClassName("quickStatus");
   if (qstat) {
-    let det = qstat[0].parentElement;
-    det.removeAttribute('open');
-    let dummy = true;
+    for (item of qstat) {
+      let det = item.parentElement;
+      det.removeAttribute('open');
+    }
   }
 }
 
-//function loadif() {
-//  loc = window.location.href;
-//  window.location.href = 'TOC.html?src=' + loc;
-//}
 function loadif() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOC.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOC.html?src=' + loc;
-    /*location.reload();*/
+    window.parent.location.href = 'TOC.html?src=' + loc;
   }
 }
-
-function loadifcpp() {
-  loc = window.location.href;
-  if (window.self === window.top) {
-    window.location.href = 'TOCCpp.html?src=indexCpp.html';
-  }
-  else {
-    window.top.location.href = 'TOCCpp.html';
-  }
-}
-
-function loadifrust() {
-  loc = window.location.href;
-  if (window.self === window.top) {
-    window.location.href = 'TOCRust.html?src=indexRust.html';
-  }
-  else {
-    window.top.location.href = 'TOCRust.html';
-  }
-}
-
-function loadifcsharp() {
-  loc = window.location.href;
-  if (window.self === window.top) {
-    window.location.href = 'TOCCSharp.html?src=indexCs.html';
-  }
-  else {
-    window.top.location.href = 'TOCCSharp.html';
-  }
-}
-
-function loadifbasic() {
-  loc = window.location.href;
-  if (window.self === window.top) {
-    window.location.href = 'TOCBasic.html?src=indexBasic.html';
-  }
-  else {
-    window.top.location.href = 'TOCBasic.html';
-  }
-}
-
 function loadifbits() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCBits.html?src=indexBits.html';
+    window.location.href = 'TOCBits.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOCBits.html';
+    window.top.location.href = loc;
   }
 }
-
+function loadifcpp() {
+  var loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCCpp.html?src=' + loc;
+  }
+  else {
+    window.top.location.href = loc;
+  }
+}
+function loadifrust() {
+  var loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCRust.html?src=' + loc;
+  }
+  else {
+    window.top.location.href = loc;
+  }
+}
+function loadifcsharp() {
+  var loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCCSharp.html?src=' + loc;
+  }
+  else {
+    window.top.location.href = loc;
+  }
+}
+function loadifbasic() {
+  var loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCBasic.html?src=' + loc;
+  }
+  else {
+    window.top.location.href = loc;
+  }
+}
 function loadifwebdev() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCWebDev.html?src=indexWebDev.html';
+    window.location.href = 'TOCWebDev.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOCWebDev.html';
+    window.top.location.href = loc;
   }
 }
-
 function loadifdesign() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCDesign.html?src=indexDesign.html';
+    window.location.href = 'TOCDesign.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOCDesign.html';
+    window.top.location.href = loc;
   }
 }
-
 function loadifdeployment() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCDeployment.html?src=indexDeployment.html';
+    window.location.href = 'TOCDeployment.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOCDeployment.html';
+    window.top.location.href = loc;
   }
 }
-
 function loadifprojects() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCProjects.html?src=indexProjects.html';
+    window.location.href = 'TOCProjects.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOCProjects.html';
+    window.top.location.href = loc;
   }
 }
-
 function loadifprototypes() {
-  loc = window.location.href;
+  var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCPrototypes.html?src=indexPrototypes.html';
+    window.location.href = 'TOCPrototypes.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOCPrototypes.html';
+    window.top.location.href = loc;
   }
 }
+//function loadif() {
+//  loc = window.location.href;
+//  if (window.self === window.top) {
+//    window.location.href = 'TOC.html?src=' + loc;
+//  }
+//  else {
+//    window.top.location.href = 'TOC.html?src=' + loc;
+//    /*location.reload();*/
+//  }
+//}
+
+//function loadifcpp() {
+//  loc = window.location.href;
+//  if (window.self === window.top) {
+//    window.location.href = 'TOCCpp.html?src=indexCpp.html';
+//  }
+//  else {
+//    window.top.location.href = 'TOCCpp.html';
+//  }
+//}
+
+//function loadifrust() {
+//  loc = window.location.href;
+//  if (window.self === window.top) {
+//    window.location.href = 'TOCRust.html?src=indexRust.html';
+//  }
+//  else {
+//    window.top.location.href = 'TOCRust.html';
+//  }
+//}
+
+//function loadifcsharp() {
+//  loc = window.location.href;
+//  if (window.self === window.top) {
+//    window.location.href = 'TOCCSharp.html?src=indexCs.html';
+//  }
+//  else {
+//    window.top.location.href = 'TOCCSharp.html';
+//  }
+//}
+
+//function loadifbasic() {
+//  loc = window.location.href;
+//  if (window.self === window.top) {
+//    window.location.href = 'TOCBasic.html?src=indexBasic.html';
+//  }
+//  else {
+//    window.top.location.href = 'TOCBasic.html';
+//  }
+//}
+
+////function loadifbits() {
+////  loc = window.location.href;
+////  if (window.self === window.top) {
+////    window.location.href = 'TOCBits.html?src=indexBits.html';
+////  }
+////  else {
+////    window.top.location.href = 'TOCBits.html';
+////  }
+////}
+
+//function loadifwebdev() {
+//  loc = window.location.href;
+//  if (window.self === window.top) {
+//    window.location.href = 'TOCWebDev.html?src=indexWebDev.html';
+//  }
+//  else {
+//    window.top.location.href = 'TOCWebDev.html';
+//  }
+//}
+
+//function loadifdesign() {
+//  loc = window.location.href;
+//  if (window.self === window.top) {
+//    window.location.href = 'TOCDesign.html?src=indexDesign.html';
+//  }
+//  else {
+//    window.top.location.href = 'TOCDesign.html';
+//  }
+//}
+
+//function loadifdeployment() {
+//  loc = window.location.href;
+//  if (window.self === window.top) {
+//    window.location.href = 'TOCDeployment.html?src=indexDeployment.html';
+//  }
+//  else {
+//    window.top.location.href = 'TOCDeployment.html';
+//  }
+//}
+
+//function loadifprojects() {
+//  loc = window.location.href;
+//  if (window.self === window.top) {
+//    window.location.href = 'TOCProjects.html?src=indexProjects.html';
+//  }
+//  else {
+//    window.top.location.href = 'TOCProjects.html';
+//  }
+//}
+
+//function loadifprototypes() {
+//  loc = window.location.href;
+//  if (window.self === window.top) {
+//    window.location.href = 'TOCPrototypes.html?src=indexPrototypes.html';
+//  }
+//  else {
+//    window.top.location.href = 'TOCPrototypes.html';
+//  }
+//}
 /* run menu builders at startup */
 
 function initialize() {
@@ -168,8 +264,8 @@ function initializeMenu() {
         <div class='dropdown'>\
             <div class='darkItem' style='padding:0.25em 0.5em;'>Code Workshop</div>\
             <div class='ddItem'><a href='index.html'>Home</a></div>\
-            <div class='ddItem'><a target='_parent' href='TOC.html'>Site Explorer</a></div>\
-            <!--<div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>-->\
+            <!--<div class='ddItem'><a target='_parent' href='TOC.html'>Site Explorer</a></div>-->\
+            <div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>\
             <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
             <div class='ddItem'><a href='SiteDemo.html'>SiteDemo</a></div>\
             <div class='ddItem'><a href='SiteDesign.html'>SiteDesign</a></div>\
@@ -198,16 +294,16 @@ function initializeMenu() {
         Tracks&#9662\
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Tracks</div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifbits()'>&nbsp;Bits</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifcpp()'>&nbsp;C++</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifrust()'>&nbsp;Rust</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifcsharp()'>&nbsp;C#</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifbasic()'>&nbsp;Basics</a>&nbsp;</div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifwebdev()'>&nbsp;WebDev</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifdesign()'>&nbsp;Design</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifdeployment()'>&nbsp;Deployment</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifprojects()'>&nbsp;Projects</a></div>\
-          <div class='ddItem'><a target='_parent' onclick='loadifprototypes()'>&nbsp;Prototypes</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCBits.html'>&nbsp;Bits</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCCpp.html'>&nbsp;C++</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCRust.html'>&nbsp;Rust</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCCSharp.html'>&nbsp;C#</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCBasic.html'>&nbsp;Basics</a>&nbsp;</div>\
+          <div class='ddItem'><a target='_parent' href='TOCWebDev.html'>&nbsp;WebDev</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCDesign.html'>&nbsp;Design</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCDeployment.html'>&nbsp;Deployment</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCProjects.html'>&nbsp;Projects</a></div>\
+          <div class='ddItem'><a target='_parent' href='TOCPrototypes.html'>&nbsp;Prototypes</a></div>\
           <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\

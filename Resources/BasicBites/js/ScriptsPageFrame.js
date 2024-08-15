@@ -168,8 +168,8 @@ function initializeMenu() {
         <div class='dropdown'>\
             <div class='darkItem' style='padding:0.25em 0.5em;'>Code Workshop</div>\
             <div class='ddItem'><a href='../../index.html'>Home</a></div>\
-            <div class='ddItem'><a target='_parent' href='../../TOC.html'>Site Explorer</a></div>\
-            <!--<div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>-->\
+            <!--<div class='ddItem'><a target='_parent' href='../../TOC.html'>Site Explorer</a></div>-->\
+            <div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>\
             <div class='ddItem'><a href='../../SiteDemo.html'>SiteDemo</a></div>\
             <div class='ddItem'><a href='../../SiteDesign.html'>SiteDesign</a></div>\
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\

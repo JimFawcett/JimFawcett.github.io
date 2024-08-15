@@ -52,26 +52,37 @@ function closeQuickStatus() {
       let det = item.parentElement;
       det.removeAttribute('open');
     }
-    //let det = qstat[0].parentElement;
-    //det.removeAttribute('open');
-    let dummy = true;
   }
 }
 
-//function loadif() {
-//  loc = window.location.href;
-//  window.location.href = 'TOC.html?src=' + loc;
-//}
 function loadif() {
   var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOC.html?src=' + loc;
   }
   else {
-    window.top.location.href = loc;  /*'TOC.html?src=' + loc;*/
-    /*location.reload();*/
+    window.parent.location.href = 'TOC.html?src=' + loc;
   }
 }
+function loadifbits() {
+  var loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCBits.html?src=' + loc;
+  }
+  else {
+    window.top.location.href = loc;
+  }
+}
+//function loadif() {
+//  var loc = window.location.href;
+//  if (window.self === window.top) {
+//    window.location.href = 'TOC.html?src=' + loc;
+//  }
+//  else {
+//    window.top.location.href = loc;  /*'TOC.html?src=' + loc;*/
+//    /*location.reload();*/
+//  }
+//}
 
 function loadifcpp() {
   var loc = window.location.href;
@@ -113,15 +124,15 @@ function loadifbasic() {
   }
 }
 
-function loadifbits() {
-  var loc = window.location.href;
-  if (window.self === window.top) {
-    window.location.href = 'TOCBits.html?src=indexBits.html';
-  }
-  else {
-    window.top.location.href = 'TOCBits.html';
-  }
-}
+//function loadifbits() {
+//  var loc = window.location.href;
+//  if (window.self === window.top) {
+//    window.location.href = 'TOCBits.html?src=' + loc;
+//  }
+//  else {
+//    window.top.location.href = 'TOCBits.html';
+//  }
+//}
 
 function loadifwebdev() {
   var loc = window.location.href;
@@ -184,8 +195,8 @@ function initializeMenu() {
         <div class='dropdown'>\
             <div class='darkItem' style='padding:0.25em 0.5em;'>Code Workshop</div>\
             <div class='ddItem'><a href='index.html'>Home</a></div>\
-            <div class='ddItem'><a target='_parent' href='TOC.html'>Site Explorer</a></div>\
-            <!--<div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>-->\
+            <!--<div class='ddItem'><a target='_parent' href='TOC.html'>Site Explorer</a></div>-->\
+            <div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>\
             <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
             <div class='ddItem'><a href='SiteDemo.html'>SiteDemo</a></div>\
             <div class='ddItem'><a href='SiteDesign.html'>SiteDesign</a></div>\
