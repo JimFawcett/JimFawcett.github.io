@@ -456,10 +456,26 @@ function initializeNextPrev() {
     page.nxtlnk2.style.display = "none";  // button bottom right menu
   }
   else {
+    //let url = page.nxt.href;
+    //if (url.includes('Bits_Hello')) {
+    //  if (window.self !== window.top) {
+    //    let url = page.nxt.href;
+    //    if (!url.includes('TOC.')) {
+    //      page.nxt.href = "../../TOC.html?src=" + url;
+    //    }
+    //  //  else if (!url.includes('TOCBits')) {
+    //  //    page.nxt.href = "../../TOCBits.html?src=" + url;
+    //  //  }
+    //  }
+    //}
     page.nxtlnk.setAttribute('href', page.nxt.href);
     page.nxtlnk.setAttribute('target', page.nxt.target);
     page.nxtlnk2.setAttribute('href', page.nxt.href);
     page.nxtlnk2.setAttribute('target', page.nxt.target);
+    console.log("next", page.nxt.location);
+    console.log("self", window.self.location);
+    console.log("parent", window.parent.location);
+    console.log("top", window.top.location);
   }
 
   if (page.prv === null) {
@@ -467,10 +483,24 @@ function initializeNextPrev() {
     page.prvlnk2.style.display = "none";  // button bottom right menu
   }
   else {
+    //if (window.self !== window.top) {
+    //  let url = page.prv.href;
+    //  if (!url.includes('TOC.')) {
+    //    page.prv.href = "../../TOC.html?src=" + url;
+    //  }
+    //}
+    //if ((page.prv.href).includes('TOCBits')) {
+    //  page.prv.href = page.prv.href.replace('TOCBits.html?src=', '');
+    //  console.log('fixed', page.prv.href);
+    //}
     page.prvlnk.setAttribute('href', page.prv.href);
     page.prvlnk.setAttribute('target', page.prv.target);
     page.prvlnk2.setAttribute('href', page.prv.href);
     page.prvlnk2.setAttribute('target', page.prv.target);
+    //  console.log("prev", page.prv.location);
+    //  console.log("self", window.self.location);
+    //  console.log("parent", window.parent.location);
+    //  console.log("top", window.top.location);
   }
 }
 
