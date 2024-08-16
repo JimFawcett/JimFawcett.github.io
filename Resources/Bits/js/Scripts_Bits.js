@@ -45,7 +45,20 @@ function load() {
   initialize();
   scrollUp();
 }
-//function load() {
-//  initialize();
-//    //actions.keysMenu();
-//}
+function makeHref(anchor, base) {
+  // console.log(base);
+  // console.log(window.location.href);
+  let comphref = base + window.location.href;
+  // console.log(comphref);
+  anchor.href = comphref;
+  window.location.href = comphref;
+  return false
+}
+function loadifbits() {
+  if (window.location !== window.top) {
+    return false;
+  }
+  else {
+    return makeHref(this, '../../TOCBits.html?src=');
+  }
+}
