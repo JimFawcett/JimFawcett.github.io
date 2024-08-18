@@ -52,124 +52,105 @@ function closeQuickStatus() {
       let det = item.parentElement;
       det.removeAttribute('open');
     }
-    //let det = qstat[0].parentElement;
-    //det.removeAttribute('open');
-    let dummy = true;
   }
 }
-
-//function loadif() {
-//  loc = window.location.href;
-//  window.location.href = 'TOC.html?src=' + loc;
-//}
 function loadif() {
   var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOC.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOC.html?src=' + loc;
-    /*location.reload();*/
+    window.parent.location.href = 'TOC.html?src=' + loc;
   }
 }
-
-function loadifcpp() {
-  var loc = window.location.href;
-  if (window.self === window.top) {
-    window.location.href = 'TOCCpp.html?src=indexCpp.html';
-  }
-  else {
-    window.top.location.href = 'TOCCpp.html';
-  }
-}
-
-function loadifrust() {
-  var loc = window.location.href;
-  if (window.self === window.top) {
-    window.location.href = 'TOCRust.html?src=indexRust.html';
-  }
-  else {
-    window.top.location.href = 'TOCRust.html';
-  }
-}
-
-function loadifcsharp() {
-  var loc = window.location.href;
-  if (window.self === window.top) {
-    window.location.href = 'TOCCSharp.html?src=indexCs.html';
-  }
-  else {
-    window.top.location.href = 'TOCCSharp.html';
-  }
-}
-
-function loadifbasic() {
-  var loc = window.location.href;
-  if (window.self === window.top) {
-    window.location.href = 'TOCBasic.html?src=indexBasic.html';
-  }
-  else {
-    window.top.location.href = 'TOCBasic.html';
-  }
-}
-
 function loadifbits() {
   var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCBits.html?src=indexBits.html';
+    window.location.href = 'TOCBits.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOCBits.html';
+    window.top.location.href = loc;
   }
 }
-
+function loadifcpp() {
+  var loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCCpp.html?src=' + loc;
+  }
+  else {
+    window.top.location.href = loc;
+  }
+}
+function loadifrust() {
+  var loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCRust.html?src=' + loc;
+  }
+  else {
+    window.top.location.href = loc;
+  }
+}
+function loadifcsharp() {
+  var loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCCSharp.html?src=' + loc;
+  }
+  else {
+    window.top.location.href = loc;
+  }
+}
+function loadifbasic() {
+  var loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCBasic.html?src=' + loc;
+  }
+  else {
+    window.top.location.href = loc;
+  }
+}
 function loadifwebdev() {
   var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCWebDev.html?src=indexWebDev.html';
+    window.location.href = 'TOCWebDev.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOCWebDev.html';
+    window.top.location.href = loc;
   }
 }
-
 function loadifdesign() {
   var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCDesign.html?src=indexDesign.html';
+    window.location.href = 'TOCDesign.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOCDesign.html';
+    window.top.location.href = loc;
   }
 }
-
 function loadifdeployment() {
   var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCDeployment.html?src=indexDeployment.html';
+    window.location.href = 'TOCDeployment.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOCDeployment.html';
+    window.top.location.href = loc;
   }
 }
-
 function loadifprojects() {
   var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCProjects.html?src=indexProjects.html';
+    window.location.href = 'TOCProjects.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOCProjects.html';
+    window.top.location.href = loc;
   }
 }
-
 function loadifprototypes() {
   var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCPrototypes.html?src=indexPrototypes.html';
+    window.location.href = 'TOCPrototypes.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOCPrototypes.html';
+    window.top.location.href = loc;
   }
 }
 
@@ -413,18 +394,18 @@ function initializeMenu() {
           <div style='height:2em;'>&nbsp;</div>\
       </div>\
     </div>\
-    <div class='menuItem'><a id='help' target='_blank' href='TOCCSharp.html?src=Help.html'>Help</a></div>\
+    <div class='menuItem'><a id='help' onclick='getHelp()'>Help</a></div>\
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>C#&nbsp;Track&nbsp</div>\
+          <div class='ddLabel darkItem'>Rust&nbsp;Track&nbsp</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a target='_parent' href='TOCCSharp.html?src=indexCs.html'>Track&nbsp;Summary&nbsp;</a></div>\
-            <div class='ddItem'><a target='_parent' href='TOCCSharp.html?src=CppBiteByByte.html'>Track&nbsp;Repo</a></div>\
-            <div class='ddItem undefined'><a target='_parent' href='javascript:;'>Glossary&nbsp;</a></div>\
-            <div class='ddItem undefined'><a target='_parent' href='javascript:;'>References&nbsp;</a></div>\
-            <div class='ddItem undefined'><a target='_parent' href='javascript:;'>Flash&nbsp;Cards</a></div>\
-            <div class='ddItem undefined'><a target='_parent' href='javascript:;'>Additions&nbsp;</a></div>\
+            <div class='ddItem'><a target='_parent' href='TOCWebDev.html?src=indexWebDev.html'>Track&nbsp;Summary&nbsp;</a></div>\
+            <div class='ddItem undef'><a target='_parent' href='javascript:;'>Track&nbsp;Repo</a></div>\
+            <div class='ddItem undef'><a target='_parent' href='javascript:;'>&nbsp;Glossary&nbsp;</a></div>\
+            <div class='ddItem undef'><a target='_parent' href='javascript:;'>&nbsp;References&nbsp;</a></div>\
+            <div class='ddItem undef'><a target='_parent' href='javascript:;'>&nbsp;Flash&nbsp;Cards</a></div>\
+            <div class='ddItem undef'><a target='_parent' href='javascript:;'>&nbsp;Additions&nbsp;</a></div>\
           <div style='height:2em;'></div>\
         </div>\
     </div>\

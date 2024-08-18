@@ -40,7 +40,7 @@ function scrollUp() {
   if (gridItemLeft) {
     gridItemLeft.scrollTop = 0;
   }
-};
+}
 function load() {
   initialize();
   scrollUp();

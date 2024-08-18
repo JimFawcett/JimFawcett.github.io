@@ -52,26 +52,37 @@ function closeQuickStatus() {
       let det = item.parentElement;
       det.removeAttribute('open');
     }
-    //let det = qstat[0].parentElement;
-    //det.removeAttribute('open');
-    let dummy = true;
   }
 }
 
-//function loadif() {
-//  loc = window.location.href;
-//  window.location.href = 'TOC.html?src=' + loc;
-//}
 function loadif() {
   var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOC.html?src=' + loc;
   }
   else {
-    window.top.location.href = 'TOC.html?src=' + loc;
-    /*location.reload();*/
+    window.parent.location.href = 'TOC.html?src=' + loc;
   }
 }
+function loadifbits() {
+  var loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCBits.html?src=' + loc;
+  }
+  else {
+    window.top.location.href = 'TOCBits.html';
+  }
+}
+//function loadif() {
+//  var loc = window.location.href;
+//  if (window.self === window.top) {
+//    window.location.href = 'TOC.html?src=' + loc;
+//  }
+//  else {
+//    window.top.location.href = loc;  /*'TOC.html?src=' + loc;*/
+//    /*location.reload();*/
+//  }
+//}
 
 function loadifcpp() {
   var loc = window.location.href;
@@ -109,19 +120,19 @@ function loadifbasic() {
     window.location.href = 'TOCBasic.html?src=indexBasic.html';
   }
   else {
-    window.top.location.href = 'TOCBasic.html';
+    window.top.location.href = loc;
   }
 }
 
-function loadifbits() {
-  var loc = window.location.href;
-  if (window.self === window.top) {
-    window.location.href = 'TOCBits.html?src=indexBits.html';
-  }
-  else {
-    window.top.location.href = 'TOCBits.html';
-  }
-}
+//function loadifbits() {
+//  var loc = window.location.href;
+//  if (window.self === window.top) {
+//    window.location.href = 'TOCBits.html?src=' + loc;
+//  }
+//  else {
+//    window.top.location.href = 'TOCBits.html';
+//  }
+//}
 
 function loadifwebdev() {
   var loc = window.location.href;
@@ -413,19 +424,19 @@ function initializeMenu() {
           <div style='height:2em;'>&nbsp;</div>\
       </div>\
     </div>\
-    <div class='menuItem'><a id='help' target='_blank' href='TOCCSharp.html?src=Help.html'>Help</a></div>\
+    <div class='menuItem'><a id='help' onclick='getHelp()'>Help</a></div>\
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>C#&nbsp;Track&nbsp</div>\
+          <div class='ddLabel darkItem'>Bits&nbsp;Track&nbsp</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a target='_parent' href='TOCCSharp.html?src=indexCs.html'>Track&nbsp;Summary&nbsp;</a></div>\
-            <div class='ddItem'><a target='_parent' href='TOCCSharp.html?src=CppBiteByByte.html'>Track&nbsp;Repo</a></div>\
-            <div class='ddItem undefined'><a target='_parent' href='javascript:;'>Glossary&nbsp;</a></div>\
-            <div class='ddItem undefined'><a target='_parent' href='javascript:;'>References&nbsp;</a></div>\
-            <div class='ddItem undefined'><a target='_parent' href='javascript:;'>Flash&nbsp;Cards</a></div>\
-            <div class='ddItem undefined'><a target='_parent' href='javascript:;'>Additions&nbsp;</a></div>\
-          <div style='height:2em;'></div>\
+            <div class='ddItem'><a target='_parent' href='TOCBasic.html?src=indexBasic.html'>&nbspTrack&nbsp;Summary&nbsp;</a></div>\
+            <div class='ddItem'><a target='_parent' href='TOCBits.html?src=BasicBiteByByte.html'>&nbsp;Track&nbsp;Repo</a></div>\
+            <div class='ddItem undef'><a target='_parent' href='javascript:;'>&nbsp;Glossary&nbsp;</a></div>\
+            <div class='ddItem undef'><a target='_parent' href='javascript:;'>&nbsp;References&nbsp;</a></div>\
+            <div class='ddItem undef'><a target='_parent' href='javascript:;'>&nbsp;Flash&nbsp;Cards</a></div>\
+            <div class='ddItem undef'><a target='_parent' href='javascript:;'>&nbsp;Additions&nbsp;</a></div>\
+          <div style='height:1em;'></div>\
         </div>\
     </div>\
     <div class='menuItem'><a id='prevLink' href='#'>Prev</a></div>\
@@ -612,7 +623,7 @@ bottomMenu.pages = function () {
     else
       menu.style.display = "flex";
   }
-};
+}
 
 bottomMenu.sections = function () {
   var menu = document.getElementById("sections");
