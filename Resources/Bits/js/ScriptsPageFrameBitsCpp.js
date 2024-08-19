@@ -41,7 +41,7 @@ function loadif() {
     window.location.href = '../../TOC.html?src=' + loc;
   }
   else {
-    window.parent.location.href = '../../TOC.html?src=' + loc;
+    window.top.location.href = '../../TOC.html?src=' + loc;
   }
 }
 function loadifbits() {
