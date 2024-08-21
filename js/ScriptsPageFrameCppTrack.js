@@ -14,10 +14,18 @@ function isDefined(elem) {
   }
   return true;
 }
-//function loadif() {
-//  loc = window.location.href;
-//  window.location.href = 'TOC.html?src=' + loc;
-//}
+function closeQuickStatus() {
+  let qstat = document.getElementsByClassName("quickStatus");
+  if (qstat) {
+    for (item of qstat) {
+      let det = item.parentElement;
+      det.removeAttribute('open');
+    }
+    //let det = qstat[0].parentElement;
+    //det.removeAttribute('open');
+    let dummy = true;
+  }
+}
 function loadif() {
   loc = window.location.href;
   if (window.self === window.top) {
