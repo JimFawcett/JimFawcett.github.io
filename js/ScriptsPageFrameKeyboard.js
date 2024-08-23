@@ -66,12 +66,12 @@ storyHlpMenu.helpMenu = function() {
       <td>increase font 22px</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.normZoomScreen()">U</td>\
-      <td>usual font 18px</td>\
+      <td class="key" onclick="storyHlpMenu.scrollup()">U</td>\
+      <td>page up</td>\
     </tr>\
     <tr>\
-      <td class="key" onclick="storyHlpMenu.decrZoomScreen()">D</td>\
-      <td>decrease font 12px</td>\
+      <td class="key" onclick="storyHlpMenu.scrolldown()">D</td>\
+      <td>page down</td>\
     </tr>\
     <tr>\
       <td colspan=2><div style="height:0.25em;">&nbsp;</div></td>\
@@ -79,6 +79,15 @@ storyHlpMenu.helpMenu = function() {
   </table>';
 }
 
+storyHlpMenu.scrollup = function () {
+  let main = document.getElementById("main");
+  main.scrollBy({ top: -500, left: 0, behavior: "smooth", });
+}
+
+storyHlpMenu.scrolldown = function () {
+  let main = document.getElementById("main");
+  main.scrollBy({ top: 500, left: 0, behavior: "smooth", });
+}
 storyHlpMenu.incrZoomScreen = function () {
   /*alert("-Zoom");*/
   //document.body.style.zoom = "120%";
@@ -246,9 +255,9 @@ function keyAction(keyEvent) {
   if (key === 'E')
     location.hash = "#bottom";
   if (key === 'U')
-    window.scrollBy(0, -200);
+    storyHlpMenu.scrollup();
   if (key === 'D')
-    window.scrollBy(0, 200);
+    storyHlpMenu.scrolldown();
   if (key === 'N') {
     let nxt = document.getElementById("Next");
     if (isDefined(nxt))
@@ -295,15 +304,15 @@ function keyAction(keyEvent) {
   if (key === 'A') {
     storyHlpMenu.about();
   }
-  if (key === 'I') {
-    storyHlpMenu.incrZoomScreen();
-  }
-  if (key === 'U') {
-    storyHlpMenu.normZoomScreen();
-  }
-  if (key === 'D') {
-    storyHlpMenu.decrZoomScreen();
-  }
+  //if (key === 'I') {
+  //  storyHlpMenu.incrZoomScreen();
+  //}
+  //if (key === 'U') {
+  //  storyHlpMenu.normZoomScreen();
+  //}
+  //if (key === 'D') {
+  //  storyHlpMenu.decrZoomScreen();
+  //}
 };
 
 
