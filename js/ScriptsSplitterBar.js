@@ -62,3 +62,98 @@ function dragElement(element, figStr) {
     second.style.width = secondWidth + "px";
   }
 }
+
+/*--------------------------------------------------------------- 
+  Now depricated 
+  onclick widen left code panel 
+*/
+function cwiden() {
+  let out = event.target;
+  let widthr = window.getComputedStyle(out)["width"];
+  let width = parseFloat(widthr);
+  width += 100.0;
+  out.style.width = width.toString() + "px";
+  widthr = window.getComputedStyle(out).width;
+  let debug = null;
+}
+/*--------------------------------------------------------------- 
+  Now depricated
+  onclick widen right output panel 
+  - Can't directly change width of right panel. It's styling
+    fills the remainder of its container.
+  - So, we shrink the left code panel.
+*/
+function owiden() {
+  let out = event.target;
+  let cele = out.parentNode.firstChild.nextSibling;
+  let widthr = window.getComputedStyle(cele)["width"];
+  let width = parseFloat(widthr);
+  width -= 100;
+  cele.style.width = width.toString() + "px";
+  let debug = null;
+}
+/*---------------------------------------------------------------
+  Widen size of first code panel, called from inner pre element
+*/
+function cbubbleup(id) {
+  target = document.getElementById(id);
+  let widthr = window.getComputedStyle(target)["width"];
+  let width = parseFloat(widthr);
+  width += 100.0;
+  target.style.width = width.toString() + "px";
+  widthr = window.getComputedStyle(target).width;
+  let debug = null;
+}
+/*---------------------------------------------------------------
+  Can't wident second panel, it's sized to fill remaining space.
+  So narrow size of first code panel.
+*/
+function obubbleup(id) {
+  target = document.getElementById(id);
+  let widthr = window.getComputedStyle(target)["width"];
+  let width = parseFloat(widthr);
+  width -= 100.0;
+  target.style.width = width.toString() + "px";
+  widthr = window.getComputedStyle(target).width;
+  let debug = null;
+}
+///*---------------------------------------------------------------
+//  Widen size of first code panel, called from inner pre element
+//*/
+//function cbubbleup() {
+//  let target = event.target;
+//  if (target.tagName === "CODE") {  // clicked on text in code el
+//    target = target.parentNode;       // move up to code el
+//  }
+//  let parent = target.parentNode;     // move up to pre el
+//  let gparent = parent.parentNode;    // move up to div.codewrap
+//  let ggparent = gparent.parentNode;  // move up to first-item
+//  let widthr = window.getComputedStyle(ggparent)["width"];
+//  let width = parseFloat(widthr);
+//  width += 100.0;
+//  ggparent.style.width = width.toString() + "px";
+//  widthr = window.getComputedStyle(ggparent).width;
+//  let debug = null;
+//}
+///*---------------------------------------------------------------
+//  Can't wident second panel, it's sized to fill remaining space.
+//  So narrow size of first code panel.
+//*/
+//function obubbleup() {
+//  let target = event.target;
+//  if (target.tagName === "CODE") {  // clicked on text in code el
+//    target = target.parentNode;       // move up to code el
+//  }
+//  let parent = target.parentNode;     // move up to pre el
+//  let gparent = parent.parentNode;    // move up to div.codewrap
+//  let ggparent = gparent.parentNode;  // move up to second-item
+//  let gggparent = ggparent.parentNode;  // move up to container
+//  let newtarget = gggparent.firstChild.nextSibling;  // move to first item
+//  let widthr = window.getComputedStyle(newtarget)["width"];
+//  let width = parseFloat(widthr);
+//  width -= 100.0;
+//  newtarget.style.width = width.toString() + "px";
+//  widthr = window.getComputedStyle(newtarget).width;
+//  let debug = null;
+//}
+
