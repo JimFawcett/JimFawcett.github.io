@@ -1696,7 +1696,7 @@ print!("\n  t = {}", t);
         </t-b>
         <t-b>
           <t-b>
-            <details open>
+            <details>
               <summary class="labelStyle darkItem">Type Declarations:</summary>
 
               <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em);">
@@ -1850,182 +1850,332 @@ e = MS("Computer Engineering")
           <div>
             <details open>
               <summary class="labelStyle darkItem">User Defined Type with Traits:</summary>
-              <defn-outerBlock>
-                <defn-block>
-                  <defn-head>Type Definition:</defn-head>
-                  <defn-code>
-/////////////////////////////////////////////////
-// probe_traits.rs - demo user defined traits
+              <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em);">
+                <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Traits Definition</strong></div>
+                <div style="float:right; margin-right:0.75em; padding:0.25em 0em;"><strong>Test Demo Code</strong></div>
+                <splitter-container id="container" class="clear">
+                  <first-item id="traits-first" style="width:52%;">
+                    <div class="codewrap" onclick="cbubbleup('traits-first')">
+                      <div style="display:flex; flex-direction:column;">
+                        <pre style="width:200em;"><code class="language-cpp">/////////////////////////////////////////////////////////////
+// probe_traits.rs - demo user defined traits              //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 22 Mar 2020  //
+/////////////////////////////////////////////////////////////
 
 use std::fmt::{Debug};
 use display::{*};
 /*-----------------------------------------------
-Note that all trait functions are public
+   Note that all trait functions are public
 */
 
 /*-----------------------------------------------
-Show trait needs Super trait Debug
-- provides default method implementation
+   Show trait needs Super trait Debug
+   - provides default method implementation
 */
 trait Show : Debug {
-fn show(&amp;self) {
-print!("\n  {:?}", &amp;self);
-}
+    fn show(&self) {
+        print!(&quot;&#92;n  {:?}&quot;, &self);
+    }
 }
 /*-----------------------------------------------
-Stucts that use Size must implement fn size
-- no default impl provided
+   Stucts that use Size must implement fn size
+   - no default impl provided
 */
 trait Size {
-fn size(&amp;self) -&gt; usize;
+    fn size(&self) -&gt; usize;
 }
 
 #[derive(Debug, Copy, Clone)]
 pub struct Test { // public type
-x:i32, y:f64, // private data
+    x:i32, y:f64, // private data
 }
 /*-----------------------------------------------
-Implementing traits
+   Implementing traits
 */
 impl Show for Test {}  // using default impl
 impl Size for Test {   // must provide impl
-fn size(&amp;self) -&gt; usize {
-use std::mem;
-mem::size_of::&lt;Test&gt;()
-}
+    fn size(&self) -&gt; usize {
+        std::mem::size_of::&lt;Test&gt;()
+    }
 }
 /*-----------------------------------------------
-Implementing methods
+   Implementing methods
 */
 impl Test {
-pub fn new() -&gt; Self {
-Self {
-x:42,
-y:1.5,
+    pub fn new() -&gt; Self {
+        Self {
+            x:42,
+            y:1.5,
+        }
+    }
+    pub fn get_x(&self) -&gt; i32 {
+        self.x
+    }
+    pub fn set_x(&mut self, v:i32) {
+        self.x = v;
+    }
+    pub fn get_y(&self) -&gt; f64 {
+        self.y
+    }
+    pub fn set_y(&mut self, v:f64) {
+        self.y = v;
+    }
 }
-}
-pub fn get_x(&amp;self) -&gt; i32 {
-self.x
-}
-pub fn set_x(&amp;mut self, v:i32) {
-self.x = v;
-}
-pub fn get_y(&amp;self) -&gt; f64 {
-self.y
-}
-pub fn set_y(&amp;mut self, v:f64) {
-self.y = v;
-}
-}
+
+</code></pre>
+                      </div>
+                    </div>
+                  </first-item>
+                  <splitter-bar id="traits-seperator"></splitter-bar>
+                  <second-item id="traits-second" style="width:40em;">
+                    <div class="codewrap" onclick="obubbleup('traits-first')">
+                      <div style="display:flex; flex-direction:column;">
+                        <pre style="width:200em;"><code class="language-cpp">#[allow(dead_code)]
+pub fn run () {
+    main_title(&quot;Demonstrating probe_traits&quot;);
+    putline();
+
+    sub_title(&quot;using Show trait&quot;);
+    let mut t = Test::new();
+    t.show();
+    putline();
+
+    sub_title(&quot;using getters and setters&quot;);
+    t.set_x(3);
+    t.set_y(-3.5);
+    print!(&quot;&#92;n  x = {}, y = {}&quot;, t.get_x(), t.get_y());
+    putline();
+
+    sub_title(&quot;using Size trait&quot;);
+    print!(&quot;&#92;n  size = Test instance t = {}&quot;, t.size());
+
+    /*-------------------------------------------
+       Implementing Size for built in types!
+    */
+    impl Size for i32 {
+        fn size(&self) -&gt; usize {
+            std::mem::size_of::&lt;i32&gt;() as usize
+        }
+    }
+    impl Size for f64 {
+        fn size(&self) -&gt; usize {
+            std::mem::size_of::&lt;f64&gt;() as usize
+        }
+    }
+
+    let sx = t.x.size();
+    let sy = t.y.size();
+    print!(&quot;&#92;n  size of x = {}, size of y = {}&quot;, sx, sy);
+    print!(&quot;&#92;n  remaining 4 bytes is padding for alignment&quot;);
+    putline();
+
+    sub_title(&quot;exploring struct layout with safe pointers&quot;);
+    let mut t = Test::new();
+    t.show();
+    shows(&quot;&#92;n  Note: Test implements traits:&quot;);
+    shows(&quot;&#92;n        Show, Size, Debug, Copy, Clone&quot;);
+    shows(&quot;&#92;n        Missing 4 bytes is padding for alignment.&#92;n&quot;);
+    let rt = &t as *const Test;
+    let rx = &t.x as *const i32;
+    let ry = &mut t.y as *mut f64;
+    let st = std::mem::size_of::&lt;Test&gt;();
+    let sx = std::mem::size_of::&lt;i32&gt;();
+    let sy = std::mem::size_of::&lt;f64&gt;();
+    print!(&quot;&#92;n  address of t   = {:?}&quot;, rt as i32);
+    print!(&quot;&#92;n  address of t.x = {:?}&quot;, rx as i32);
+    print!(&quot;&#92;n  address of t.y = {:?}&quot;, ry as i32);
+    print!(&quot;&#92;n  size of t      = {:?}&quot;, st);
+    print!(&quot;&#92;n  size of x      = {:?}&quot;, sx);
+    print!(&quot;&#92;n  size of y      = {:?}&quot;, sy);
+    print!(&quot;&#92;n  address of t + st = {:?}&quot;, rt as i32 + st as i32);
+    putline();
+}</code></pre>
+                      </div>
+                    </div>
+                  </second-item>
+                </splitter-container>
+              </div>
+              <div style="height:1em;"></div>
+
+
+
+              <defn-outerBlock>
+                <defn-block>
+                  <defn-head>Type Definition:</defn-head>
+                  <defn-code>
+                    /////////////////////////////////////////////////
+                    // probe_traits.rs - demo user defined traits
+
+                    use std::fmt::{Debug};
+                    use display::{*};
+                    /*-----------------------------------------------
+                    Note that all trait functions are public
+                    */
+
+                    /*-----------------------------------------------
+                    Show trait needs Super trait Debug
+                    - provides default method implementation
+                    */
+                    trait Show : Debug {
+                    fn show(&amp;self) {
+                    print!("\n  {:?}", &amp;self);
+                    }
+                    }
+                    /*-----------------------------------------------
+                    Stucts that use Size must implement fn size
+                    - no default impl provided
+                    */
+                    trait Size {
+                    fn size(&amp;self) -&gt; usize;
+                    }
+
+                    #[derive(Debug, Copy, Clone)]
+                    pub struct Test { // public type
+                    x:i32, y:f64, // private data
+                    }
+                    /*-----------------------------------------------
+                    Implementing traits
+                    */
+                    impl Show for Test {}  // using default impl
+                    impl Size for Test {   // must provide impl
+                    fn size(&amp;self) -&gt; usize {
+                    use std::mem;
+                    mem::size_of::&lt;Test&gt;()
+                    }
+                    }
+                    /*-----------------------------------------------
+                    Implementing methods
+                    */
+                    impl Test {
+                    pub fn new() -&gt; Self {
+                    Self {
+                    x:42,
+                    y:1.5,
+                    }
+                    }
+                    pub fn get_x(&amp;self) -&gt; i32 {
+                    self.x
+                    }
+                    pub fn set_x(&amp;mut self, v:i32) {
+                    self.x = v;
+                    }
+                    pub fn get_y(&amp;self) -&gt; f64 {
+                    self.y
+                    }
+                    pub fn set_y(&amp;mut self, v:f64) {
+                    self.y = v;
+                    }
+                    }
                   </defn-code>
                 </defn-block>
                 <defn-block>
                   <defn-head>Using Code:</defn-head>
                   <defn-code>
-pub fn run () {
-main_title("Demonstrating probe_traits");
-putline();
+                    pub fn run () {
+                    main_title("Demonstrating probe_traits");
+                    putline();
 
-sub_title("using Show trait");
-let mut t = Test::new();
-t.show();
-putline();
+                    sub_title("using Show trait");
+                    let mut t = Test::new();
+                    t.show();
+                    putline();
 
-sub_title("using getters and setters");
-t.set_x(3);
-t.set_y(-3.5);
-print!("\n  x = {}, y = {}", t.get_x(), t.get_y());
-putline();
+                    sub_title("using getters and setters");
+                    t.set_x(3);
+                    t.set_y(-3.5);
+                    print!("\n  x = {}, y = {}", t.get_x(), t.get_y());
+                    putline();
 
-sub_title("using Size trait");
-print!("\n  size = Test instance t = {}", t.size());
+                    sub_title("using Size trait");
+                    print!("\n  size = Test instance t = {}", t.size());
 
-/*-------------------------------------------
-Implementing Size for built in types!
-*/
-impl Size for i32 {
-fn size(&self) -> usize {
-std::mem::size_of::<i32>
-() as usize
-}
-}
-impl Size for f64 {
-fn size(&self) -> usize {
-std::mem::size_of::<f64>
-() as usize
-}
-}
+                    /*-------------------------------------------
+                    Implementing Size for built in types!
+                    */
+                    impl Size for i32 {
+                    fn size(&self) -> usize {
+                    std::mem::size_of::<i32>
+                      () as usize
+                      }
+                      }
+                      impl Size for f64 {
+                      fn size(&self) -> usize {
+                      std::mem::size_of::<f64>
+                        () as usize
+                        }
+                        }
 
-let sx = t.x.size();
-let sy = t.y.size();
-print!("\n  size of x = {}, size of y = {}", sx, sy);
-print!(
-"\n  4 bytes is size of pointer to trait vtable"
-);
-putline();
+                        let sx = t.x.size();
+                        let sy = t.y.size();
+                        print!("\n  size of x = {}, size of y = {}", sx, sy);
+                        print!(
+                        "\n  4 bytes is size of pointer to trait vtable"
+                        );
+                        putline();
 
-sub_title("exploring struct layout with safe pointers");
-let mut t = Test::new();
-t.show();
-shows("\n  Note: Test implements traits:");
-shows("\n        Show, Size, Debug, Copy, Clone");
-shows(
-"\n        Missing 4 bytes is ptr to traits vtable.\n"
-);
-let rt = &t as *const Test;
-let rx = &t.x as *const i32;
-let ry = &mut t.y as *mut f64;
-let st = std::mem::size_of::<Test>
-  ();
-  let sx = std::mem::size_of::<i32>
-    ();
-    let sy = std::mem::size_of::<f64>
-      ();
-      print!("\n  address of t   = {:?}", rt as i32);
-      print!("\n  address of t.x = {:?}", rx as i32);
-      print!("\n  address of t.y = {:?}", ry as i32);
-      print!("\n  size of t      = {:?}", st);
-      print!("\n  size of x      = {:?}", sx);
-      print!("\n  size of y      = {:?}", sy);
-      print!(
-      "\n  address of t + st = {:?}", rt as i32 + st as i32
-      );
-      putline();
-      }
+                        sub_title("exploring struct layout with safe pointers");
+                        let mut t = Test::new();
+                        t.show();
+                        shows("\n  Note: Test implements traits:");
+                        shows("\n        Show, Size, Debug, Copy, Clone");
+                        shows(
+                        "\n        Missing 4 bytes is ptr to traits vtable.\n"
+                        );
+                        let rt = &t as *const Test;
+                        let rx = &t.x as *const i32;
+                        let ry = &mut t.y as *mut f64;
+                        let st = std::mem::size_of::<Test>
+                          ();
+                          let sx = std::mem::size_of::<i32>
+                            ();
+                            let sy = std::mem::size_of::<f64>
+                              ();
+                              print!("\n  address of t   = {:?}", rt as i32);
+                              print!("\n  address of t.x = {:?}", rx as i32);
+                              print!("\n  address of t.y = {:?}", ry as i32);
+                              print!("\n  size of t      = {:?}", st);
+                              print!("\n  size of x      = {:?}", sx);
+                              print!("\n  size of y      = {:?}", sy);
+                              print!(
+                              "\n  address of t + st = {:?}", rt as i32 + st as i32
+                              );
+                              putline();
+                              }
                   </defn-code>
                   <defn-head class="defnBorderTop">Output:</defn-head>
                   <defn-code>
-Demonstrating probe_traits
-============================
+                    Demonstrating probe_traits
+                    ============================
 
-using Show trait
-------------------
-Test { x: 42, y: 1.5 }
+                    using Show trait
+                    ------------------
+                    Test { x: 42, y: 1.5 }
 
-using getters and setters
----------------------------
-x = 3, y = -3.5
+                    using getters and setters
+                    ---------------------------
+                    x = 3, y = -3.5
 
-using Size trait
-------------------
-size = Test instance t = 16
-size of x = 4, size of y = 8
-4 bytes is size of pointer to trait vtable
+                    using Size trait
+                    ------------------
+                    size = Test instance t = 16
+                    size of x = 4, size of y = 8
+                    4 bytes is size of pointer to trait vtable
 
-exploring struct layout with safe pointers
---------------------------------------------
-Test { x: 42, y: 1.5 }
-Note: Test implements traits:
-Show, Size, Debug, Copy, Clone
-Missing 4 bytes is ptr to traits vtable.
+                    exploring struct layout with safe pointers
+                    --------------------------------------------
+                    Test { x: 42, y: 1.5 }
+                    Note: Test implements traits:
+                    Show, Size, Debug, Copy, Clone
+                    Missing 4 bytes is ptr to traits vtable.
 
-address of t   = 8190584
-address of t.x = 8190592
-address of t.y = 8190584
-size of t      = 16
-size of x      = 4
-size of y      = 8
-address of t + st = 8190600
+                    address of t   = 8190584
+                    address of t.x = 8190592
+                    address of t.y = 8190584
+                    size of t      = 16
+                    size of x      = 4
+                    size of y      = 8
+                    address of t + st = 8190600
 
                   </defn-code>
                 </defn-block>
@@ -2818,6 +2968,7 @@ address of t + st = 8190600
     onLoadSplitter("cam");
     onLoadSplitter("mutref");
     onLoadSplitter("tdecl");
+    onLoadSplitter("traits");
   </script>
 </body>
 </html>
