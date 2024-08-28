@@ -145,11 +145,51 @@
           owning instance&apos;s value while suspending the owner&apos;s ability to mutate.  When borrowing
           terminates, the owner&apos;s ability to mutate is restored.
         </t-b>
+        <div class="blockSingle left" style="padding:0em; width:max-content; margin-top:0em;">
+          <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>References are borrows</strong></div>
+          <div style="padding:0.25em;">
+            <div class="codewrap clear" style="padding:0.25em; overflow-x:auto; width:max-content;">
+              <pre style="width:25em;"><code class="language-cpp">/* attempt to mutate after borrow */
+
+let mut s = String::from("s is owner");
+slog(&amp;s);
+
+{
+  let rs = &amp;s;  // borrow s
+  // statement below fails to compile
+  // owner can't mutate after borrow
+  // s += " with stuff";
+  slog(&amp;rs);
+}  // borrow ends here
+
+s += " with stuff";
+slog(&amp;s);
+</code></pre>
+            </div>
+          </div>
+        </div>
+        <t-b>
+          Each data may have any number of immutable references, often referred to as shared references.
+          However, only one mutable reference can be taken to data that has no other references. That&apos;s
+          referred to as a unique reference.
+        </t-b>
+        <t-b>
+          References are often referred to as borrows, as the reference borrows the ability to view or
+          mutate the referend.
+        </t-b>
+        <t-b>
+          When an immutable reference is taken on an instance of some type that instance
+          cannot be mutated until the borrow ends, as shown in the code block to the left.
+        </t-b>
+        <t-b>
+          When a mutable reference is taken, only that reference can mutate the instance until the borrow ends,
+          usually at the end of the scope in which the reference is defined.
+        </t-b>
         <t-b>
           All of these rules are enforced by the Rust compiler.  When a rule is violated, the compiler emits
           a useful error message that helps a designer fix the violation.
         </t-b>
-        <div style="height:0.5em;"></div>
+        <div style="height:1.5em; clear:both;"></div>
         <a id="lifecycle"></a>
         <h2>2.1&nbsp;&nbsp;Data and its Life Cycle</h2>
         <t-b>
@@ -160,8 +200,8 @@
                 <strong>Blittable types:</strong>
                 <div class="pad5">
                   Stored entirely in one contiguous block of stack memory.
-                  <indent-block>
-                    <ul class="tight">
+                  <indent-blocks>
+                    <ul class="tight" style="list-style-type: disc;">
                       <li>
                         Basic Types:
                         <div>
@@ -179,8 +219,11 @@
                           </c-s> if all their items are blittable
                         </div>
                       </li>
+                      <li>
+                        User-Defined Types that have all blittable members and are marked Copy with #[derive(Copy)]
+                      </li>
                     </ul>
-                  </indent-block>
+                  </indent-blocks>
                 </div>
               </li>
               <li>
@@ -188,8 +231,8 @@
                 <div class="pad5">
                   Control block stored in one contiguous block of stack memory with references
                   to data held in the heap.
-                  <indent-block>
-                    <ul class="tight">
+                  <indent-blocks>
+                    <ul class="tight" style="list-style-type: disc;">
                       <li>
                         Std Library Types:
                         <div>
@@ -207,8 +250,11 @@
                           </c-s> if each has at least one non-blittable member
                         </div>
                       </li>
+                      <li>
+                        User-defined types that have at least one non-blittable member
+                      </li>
                     </ul>
-                  </indent-block>
+                  </indent-blocks>
                 </div>
               </li>
             </ol>
@@ -325,6 +371,10 @@
         <t-b>
           When <c-s>s</c-s> and <c-s>t</c-s> go out of scope, the String Drop trait method drop() is called on
           both <c-s>s</c-s> and <c-s>t</c-s> because they each own unique character array allocations.
+        </t-b>
+        <t-b>
+          User defined types can also implement the clone method by deriving the Clone trait, e.g., #[derive(Clone)]
+          just above the type definition.
         </t-b>
         <div class="clear"></div>
         <div style="height:0.5em;"></div>
@@ -655,36 +705,12 @@ fn main() {
           </indent-block>
         </t-b>
         <t-b>
-          <div>
-            <defn-block>
-              <defn-head>References are borrows</defn-head>
-              <defn-code>
-/* attempt to mutate after borrow */
-
-let mut s = String::from("s is owner");
-slog(&amp;s);
-
-{
-  let rs = &amp;s;  // borrow s
-  // statement below fails to compile
-  // owner can't mutate after borrow
-  // s += " with stuff";
-  slog(&amp;rs);
-}  // borrow ends here
-
-s += " with stuff";
-slog(&amp;s);
-              </defn-code>
-            </defn-block>
-          </div>
-        </t-b>
-        <t-b>
           Examples for all of the aggregate types, showing code and output from
           RustBasicDemos: data_types:
         </t-b>
         <t-b>
           <div>
-            <details>
+            <details open>
               <summary class="labelStyle darkItem">Aggregate Types</summary>
               <t-b>
         <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em);">
@@ -694,127 +720,163 @@ slog(&amp;s);
             <first-item id="hello3-first" style="width:52%;">
               <div class="codewrap" onclick="cbubbleup('hello3-first')">
                 <div style="display:flex; flex-direction:column;">
-                  <pre style="width:200em;"><code class="language-cpp">/* Rust arrays: [1,2,3] */
+                  <pre style="width:200em;"><code class="language-rust">/*-- create and display basic aggregates -*/
 
-separator();
-let demo = [1, 2, 3];
-putln(&amp;"let demo = [1, 2, 3];");
-log(&amp;demo);
+fn basic_aggr() {
+  show_title(&quot;Demonstrate Rust Aggregates&quot;);
 
-separator();
-let demo = [(1.5, 2.3), (3.1, 3.9)];
-putln(&amp;"let demo = [(1.5, 2.3), (3.1, 3.9)];");
-log(&amp;demo);
+  /*-- array --*/
+  show_label(&quot;arrays&quot;);
+  show_op(&quot;let mut arr:[i32; 5] = [1, 2, 3, 4, 5]&quot;);
+  let mut arr: [i32; 5] = [1, 2, 3, 4, 5];
+  show_type(&arr);
+  show_value(&arr);
+  show_op(&quot;arr[1] = -2&quot;);
+  arr[1] = -2;
+  show_value(&arr);
+  println!();
 
-/* Rust tuples: (1,'z',3.5) */
+  /*-- slice --*/
+  show_label(&quot;slices&quot;);
+  show_op(&quot;let slc = &mut arr[1..4]&quot;);
+  let slc = &mut arr[1..4];
+  show_type(&slc);
+  show_value(&slc);
+  show_op(&quot;slc[0] = 0&quot;);
+  slc[0] = 0;
+  show_value(&slc);
+  show_op(&quot;value of array is now:&quot;);
+  show_value(&arr);
+  println!();
 
-separator();
-let demo = (1, 2.5, (1,'a'), [1,2,3]);
-putln(&amp;"let demo = (1, 2.5, (1,'a'), [1,2,3]);");
-log(&amp;demo);
+  /*-- tuple --*/
+  show_label(&quot;tuples&quot;);
+  show_op(&quot;let tpl = (42, 'z', &#92;&quot;abc&#92;&quot;, 3.14159)&quot;);
+  #[allow(clippy::approx_constant)]
+  let tpl = (42, 'z', &quot;abc&quot;, 3.14159);
+  show_type(&tpl);
+  show_value(&tpl);
+  show_op(&quot;value of second element is:&quot;);
+  show_value(&tpl.1);
+  println!();
 
-/* Rust Strings: String::from("a string") */
+  /*-- string --*/
+  show_label(&quot;strings&quot;);
+  show_op(&quot;let s = &#92;&quot;a string&#92;&quot;.to_string()&quot;);
+  let mut s = &quot;a string&quot;.to_string();
+  show_type(&s);
+  show_value(&s);
+  show_op(&quot;s.push_str(&#92;&quot; plus more&#92;&quot;)&quot;);
+  s.push_str(&quot; plus more&quot;);
+  show_value(&s);
+  println!();
 
-separator();
-let demo = String::from("a demo String");
-putln(
-  &amp;"let demo = String::from(\"a demo String\");"
-);
-log(&amp;demo);
+  /*-- reference --*/
+  show_label(&quot;references&quot;);
+  show_op(&quot;let r = &s&quot;);
+  let r = &s;
+  show_type(&r);
+  show_value(&r);
+  println!();
 
-/* Rust references:  */
+  /*-- struct --*/
+  show_label(&quot;structures&quot;);
+  #[derive(Debug)]
+  struct DemStr { i:i32, c:char, d:f64, }
+  show_op(&quot;let st = DemStr { i:1, c:'a', d:0.333 }&quot;);
+  let st = DemStr { i:1, c:'a', d:0.333 };
+  show_type(&st);
+  show_value(&st);
+  let second = st.c;
+  show_op(&quot;let second = st.c&quot;);
+  show_value(&second);
+  println!();
 
-separator();
-let mut demo = String::from("a demo String");
-putln(
-  &amp;"let demo = String::from(\"a demo String\");"
-);
-log(&amp;demo);
-let rdemo = &amp;mut demo;
-putln(&amp;"let rdemo = &amp;mut demo;");
-putln(&amp;"redemo.push_str(\" more stuff\")");
-rdemo.push_str(" more stuff");
-// compile fails - this is attemp to make second
-// mutable borrow because push_str takes &amp;self
-// demo.push_str(" still more stuff");
-log(rdemo);
-putln(&amp;"demo.push_str(\" still more stuff\"");
-// this call succeeds only because rdemo
-// is not used below call
-demo.push_str(" still more stuff");
-log(&amp;demo);
-// log(rdemo);  // if this call is uncommented
-                // both calls above fail
-putline();
+  /*-- enum --*/
+  show_label(&quot;enumerations&quot;);
 
-/* attempt to mutate after borrow */
+  #[derive(Debug)]
+  enum LangAge { Recent, Ancient }
 
-let mut s = String::from("s is owner");
-slog(&amp;s);
-{
-  let rs = &amp;s;  // borrow s
-  // statement below fails to compile
-  // owner can't mutate after borrow
-  // s += " with stuff";
-  slog(&amp;rs);
-}  // borrow ends here
-s += " with stuff";
-slog(&amp;s);
-putline();
+  #[derive(Debug)]
+  enum Langs {
+    Rust(LangAge), Fortran(LangAge)
+  }
 
-/*-------------------------------------------
-Rust structs:
-struct Point { x:f64, y:f64, z:f64, t:}
-*/
+  let a_lang = Langs::Rust(LangAge::Recent);
+  show_type(&a_lang);
+  show_value(&a_lang);
 
-separator();
-#[derive(Debug)]
-struct Point {
-  x:f64, y:f64, z:f64, name:String,
+  let old_lang = Langs::Fortran(LangAge::Ancient);
+  show_type(&old_lang);
+  show_value(&old_lang);
+
+  /*-- matching requires handling all branches --*/
+  match a_lang {
+    Langs::Rust(LangAge::Recent) =&gt; { println!(&quot;  Rust is recent&quot;); }
+    Langs::Rust(LangAge::Ancient) =&gt; { println!(&quot;  Rust is ancient&quot;); }
+    Langs::Fortran(LangAge::Recent) =&gt; { println!(&quot;  Fortran is recent&quot;); }
+    Langs::Fortran(LangAge::Ancient) =&gt; { println!(&quot;  Fortran is ancient&quot;); }
+  }
+  /*-------------------------------------------------------
+    if let can examine one branch and provide
+    blanket handling for others
+  */
+  if let Langs::Rust(LangAge::Recent) = a_lang {
+    println!(&quot;  Rust was stablized in 2015&quot;)
+  } else {
+    println!(&quot;  this language isn't very interesting&quot;);
+  }
 }
-let demo = Point {
-  x:1.5, y:2.5, z:3.7,
-  name:String::from("Peter")
-};
-putln(
-  &amp;"struct Point {
-    x:f64, y:f64, z:f64, name:String,
-  }"
-);
-putln(
-  &amp;"let demo = Point {
-    x:1.5, y:2.5, z:3.7,
-    name:String::from(\"Peter\") 
-  };"
-);
-log(&amp;demo);
 
-/* Rust enums: enum POS { bs, ms, phd } */
+fn move_copy() {
+  show_title(&quot;Demonstrate Copy and Move&quot;);
 
-separator();
-#[derive(Debug)]
-#[allow(dead_code)]
-enum POS {
-  BS(String), MS(String), PhD(String),
-};
-let demo = POS::MS(
-  String::from("Computer Engineering")
-);
-putln(
-  &amp;"enum POS {
-    BS(String), MS(String), PhD(String),
-  };"
-);
-putln(
-  &amp;"let demo =
-  POS::MS(
-    String::from(\"Computer Engineering\")
-  );"
-);
-log(&amp;demo);
+  show_label(&quot;copy array of integers&quot;);
+  show_op(&quot;let arri = [ 1, 2, 3, 2, 1]&quot;);
+  let arri = [ 1, 2, 3, 2, 1];
+  show_value(&arri);
+  show_op(&quot;let carri = arri&quot;);
+  let carri = arri;
+  show_value(&carri);
+  // the next statement succeeds because arri was copied
+  // println!(&quot;{arri:?}&quot;);
+  println!();
 
-// code elided
+  show_label(&quot;copy array of &strs&quot;);
+  show_op(&quot;let arri = [ &#92;&quot;1&#92;&quot;, &#92;&quot;2&#92;&quot;, &#92;&quot;3&#92;&quot;, &#92;&quot;2&#92;&quot;, &#92;&quot;1&#92;&quot;]&quot;);
+  let arri = [ &quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;2&quot;, &quot;1&quot;];
+  show_value(&arri);
+  show_op(&quot;let carri = arri&quot;);
+  let carri = arri;
+  show_value(&carri);
+  // the next statement succeeds because arri was copied
+  // println!(&quot;{arri:?}&quot;);
+  println!();
 
+  show_label(&quot;move array of Strings&quot;);
+  show_op(
+    &quot;let arri = [&#92;&quot;1&#92;&quot;.to_owned(), &#92;&quot;2&#92;&quot;.to_owned(),
+    &#92;&quot;3&#92;&quot;.to_owned(), &#92;&quot;2&#92;&quot;.to_owned(), &#92;&quot;1&#92;&quot;.to_owned()])&quot;
+  );
+  /*------------------------------------------------------
+    to_owned() converts copy type &str
+    to move type String
+  */
+  let arri = [
+    &quot;1&quot;.to_owned(), &quot;2&quot;.to_owned(), &quot;3&quot;.to_owned(),
+    &quot;2&quot;.to_owned(), &quot;1&quot;.to_owned()
+  ];
+  show_value(&arri);
+  show_op(&quot;let carri = arri&quot;);
+  let carri = arri;
+  show_value(&carri);
+  // the next statement fails because arri was moved
+  // println!(&quot;{arri:?}&quot;);
+  println!(&quot;  arri moved so no longer valid&#92;n&quot;);
+  println!(&quot;  an aggregate of all copy types is copy&quot;);
+  println!(&quot;  an aggregate with at least one move type element is move&quot;);
+}
 </code></pre>
                 </div>
               </div>
@@ -825,89 +887,85 @@ log(&amp;demo);
                 <div style="display:flex; flex-direction:column;">
                   <pre style="width:200em;"><code class="language-cpp">
 
----------------------------------
- let demo = [1, 2, 3];
- TypeId: [i32; 3], size: 12
- value:  [1, 2, 3]
----------------------------------
- let demo = [(1.5, 2.3), (3.1, 3.9)];
- TypeId: [(f64, f64); 2], size: 32
- value:  [(1.5, 2.3), (3.1, 3.9)]
+-----------------------------
+ Demonstrate Rust Aggregates
+-----------------------------
+
+ arrays
+--------
+--- let mut arr:[i32; 5] = [1, 2, 3, 4, 5] ---
+  TypeId: [i32; 5], size: 20
+  value: [1, 2, 3, 4, 5]
+--- arr[1] = -2 ---
+  value: [1, -2, 3, 4, 5]
 
 
 
----------------------------------
- let demo = (1, 2.5, (1,'a'), [1,2,3]);
- TypeId:
- (i32, f64, (i32, char), [i32; 3]),
- size: 32
- value:  (1, 2.5, (1, 'a'), [1, 2, 3])
-
-
----------------------------------
- let demo = String::from("a demo String");
- TypeId: alloc::string::String, size: 12
- value:  String (13): a demo String
----------------------------------
- let demo = String::from("a demo String");
- TypeId: alloc::string::String, size: 12
- value:  String (13): a demo String
- let rdemo = &mut demo;
- redemo.push_str(" more stuff")
- TypeId: alloc::string::String, size: 12
- value:  String (24): a demo String more stuff
- demo.push_str(" still more stuff"
- TypeId: alloc::string::String, size: 12
- value:  String (41):
- a demo String more stuff still more stuff
-
- TypeId: alloc::string::String, size: 12
- value:  "s is owner"
- TypeId: &alloc::string::String, size: 4
- value:  "s is owner"
- TypeId: alloc::string::String, size: 12
- value:  "s is owner with stuff"
+  
+ slices
+--------
+--- let slc = &mut arr[1..4] ---
+  TypeId: &mut [i32], size: 16
+  value: [-2, 3, 4]
+--- slc[0] = 0 ---
+  value: [0, 3, 4]
+--- value of array is now: ---
+  value: [1, 0, 3, 4, 5]
 
 
 
 
+ tuples
+--------
+--- let tpl = (42, 'z', "abc", 3.14159) ---
+  TypeId: (i32, char, &str, f64), size: 32
+  value: (42, 'z', "abc", 3.14159)
+--- value of second element is: ---
+  value: 'z'
+
+
+
+
+ strings
+---------
+--- let s = "a string".to_string() ---
+  TypeId: alloc::string::String, size: 24
+  value: "a string"
+--- s.push_str(" plus more") ---
+  value: "a string plus more"
+
+
+
+
+ references
+------------
+--- let r = &s ---
+  TypeId: &alloc::string::String, size: 8
+  value: "a string plus more"
+
+
+
+ structures
+------------
+--- let st = DemStr { i:1, c:'a', d:0.333 } ---
+  TypeId: aggr_probes::basic_aggr::DemStr, size: 16
+  value: DemStr { i: 1, c: 'a', d: 0.333 }
+--- let second = st.c ---
+  value: 'a'
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
----------------------------------
- struct Point {
-   x:f64, y:f64, z:f64, name:String,
- }
- let demo = Point {
-   x:1.5, y:2.5, z:3.7,
-   name:String::from("Peter")
- };
- TypeId: data_types::main::Point, size: 40
- value:  Point {
-   x: 1.5, y: 2.5, z: 3.7, name: "Peter"
- }
-
-
-
-
+ enumerations
+--------------
+  TypeId: aggr_probes::basic_aggr::Langs, size: 2
+  value: Rust(Recent)
+  TypeId: aggr_probes::basic_aggr::Langs, size: 2
+  value: Fortran(Ancient)
+  Rust is recent
+  Rust was stablized in 2015
 
 
 
@@ -920,14 +978,58 @@ log(&amp;demo);
 
 
 
----------------------------------
- enum POS {
-   BS(String), MS(String), PhD(String),
- };
- let demo =
- POS::MS(String::from("Computer Engineering"));
- TypeId: data_types::main::POS, size: 16
- value:  MS("Computer Engineering")
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+---------------------------
+ Demonstrate Copy and Move
+---------------------------
+
+ copy array of integers
+------------------------
+--- let arri = [ 1, 2, 3, 2, 1] ---
+  value: [1, 2, 3, 2, 1]
+--- let carri = arri ---
+  value: [1, 2, 3, 2, 1]
+
+
+
+ copy array of &strs
+---------------------
+--- let arri = [ "1", "2", "3", "2", "1"] ---
+  value: ["1", "2", "3", "2", "1"]
+--- let carri = arri ---
+  value: ["1", "2", "3", "2", "1"]
+
+
+
+
+
+
+ move array of Strings
+-----------------------
+--- let arri = ["1".to_owned(), "2".to_owned(),
+    "3".to_owned(), "2".to_owned(), "1".to_owned()]) ---
+  value: ["1", "2", "3", "2", "1"]
+--- let carri = arri ---
+  value: ["1", "2", "3", "2", "1"]
+  arri moved so no longer valid
+
+  an aggregate of all copy types is copy
+  an aggregate with at least one move type element is move
 
 </code></pre>
                 </div>
