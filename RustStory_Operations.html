@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html>
 <!--
-  RustStory_Data.html
+  RustStory_Operations.html
 -->
 <head>
-  <title>RustStory Data</title>
+  <title>RustStory Operations</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!--<link rel="stylesheet" href="css/StylesTemplate.css" />-->
-  <!--<link rel="stylesheet" href="css/StylesDefault.css" />-->
-  <!--<link rel="stylesheet" href="css/StylesBrownTheme.css" />-->
+  <link rel="icon" type="image/x-icon" href="./images/favicon.ico" />
   <link rel="stylesheet" href="css/StylesPhoto.css" />
   <link rel="stylesheet" href="css/StylesSizerComp.css" />
   <!-- PageFrame infrastructure -->
@@ -24,6 +22,12 @@
   <script src="js/ScriptsPageFrameKeyboard.js"></script>
   <!-- No need for Pages script for pages with no next or prev pages -->
   <!--<script src="js/ScriptsPageFramePages.js"></script>-->
+  <link rel="stylesheet" href="css/Styles_BitsContent.css" />
+  <script src="js/Scripts_BitsContent.js"></script>
+  <link rel="stylesheet" href="css/StylesSplitterBar.css" />
+  <script src="js/ScriptsSplitterBar.js"></script>
+  <link rel="stylesheet" href="css/prism.css" />
+  <script src="js/prism.js"></script>
   <style>
     #github .note {
       border: 1px solid var(--dark);
@@ -75,6 +79,11 @@
       }
     </script>
    -->
+    <style>
+      #github .inset {
+        padding:0.25em 0.5em;
+      }
+    </style>
 </head>
 <body id="github" onload="initialize()">
 
@@ -118,9 +127,9 @@
         <h2>3.1 Functions</h2>
         <t-b>
           The syntax for Rust functions looks like this:
-          <defn-code style="font-size:medium;">
-            fn somefunction(ArgType1 t1, ArgType2 t2, ...) -> ReturnType { ... }
-          </defn-code>
+          <div class="inset">
+            <c-s>fn somefunction(ArgType1 t1, ArgType2 t2, ...) -> ReturnType { ... }</c-s>
+          </div>
           Often the return type is omitted when the compiler can infer the type by the return expression.  Statements are units of
           execution and end with a &quot;semicolon&quot;.  Expressions compile to some value and do not have a terminating semicolon.
         </t-b>
@@ -143,59 +152,122 @@
           value will remain valid after the call.
         </t-b>
         <div style="height:0.5em;"></div>
+
+        <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em);">
+          <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Pass by Value function</strong></div>
+          <div style="float:right; margin-right:0.75em; padding:0.25em 0em;"><strong>Code using function</strong></div>
+          <splitter-container id="container" class="clear">
+            <first-item id="fun-first" style="width:52%;">
+              <div class="codewrap" onclick="cbubbleup('fun-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-rust">/*-----------------------------------------------
+  Pass by value moves the argument into the
+  function's stack frame, so invalid after call
+*/
+fn pass_by_value_str(s:String) {  // move
+  show_type(&s);   // def in display::lib.rs
+  show_value(&s);  // def in display::lib.rs
+}
+</code></pre>
+                  <div class="split left">Pass by Reference function</div>
+                  <pre style="width:200em;"><code class="language-rust">/*-------------------------------------------*/
+separator(48);
+sub_title("Pass string by value");
+let mut s = "xyz".to_string();
+let s1 = s.clone();
+pass_by_value_str(s1);  // moves s1
+////////////////////////////////////////////////
+// next statement fails to compile - s1 moved
+// println!(s1);
+</code></pre>
+                </div>
+              </div>
+            </first-item>
+            <splitter-bar id="fun-seperator"></splitter-bar>
+            <second-item id="fun-second" style="width:40em;">
+              <div class="codewrap" onclick="obubbleup('fun-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-rust">/*-----------------------------------------------
+  Pass by ref borrows the argument. Borrow
+  moved into the function's stack frame.
+  Borrow ends at end of function call, so
+  param is valid after call
+*/
+fn pass_by_ref_str(rs:&String) {  // borrow
+  show_type(&rs);   // def in display::lib.rs
+  show_value(&rs);  // def in display::lib.rs
+}
+  </code></pre>
+                  <div class="split"><div class="right">Code using function</div></div>
+                  <pre style="width:200em;"><code class="language-rust">/*-------------------------------------------*/
+separator(48);
+sub_title("Pass string by reference");
+pass_by_ref_str(&s);
+s.push('a');
+pass_by_ref(&s);  // borrows s
+s.push('b');
+show("\n  after pushing a and b, s = ",&s);
+</code></pre>
+                </div>
+              </div>
+            </second-item>
+          </splitter-container>
+        </div>
+        <div style="height:1em;"></div>
+
         <t-b>
           <indent-block>
             <defn-outerBlock>
               <defn-block>
                 <defn-head>Pass by Value</defn-head>
                 <defn-code>
-                  /*-----------------------------------------------
-                  Pass by value moves the argument into the
-                  function's stack frame, so invalid after call
-                  */
-                  fn pass_by_value_str(s:String) {  // move
-                  show_type(&s);   // def in display::lib.rs
-                  show_value(&s);  // def in display::lib.rs
-                  }
+/*-----------------------------------------------
+  Pass by value moves the argument into the
+  function's stack frame, so invalid after call
+*/
+fn pass_by_value_str(s:String) { // move
+  show_type(&s); // def in display::lib.rs
+  show_value(&s); // def in display::lib.rs
+}
 
                 </defn-code>
                 <defn-head class="defnBorderTop">Pass by Reference</defn-head>
                 <defn-code>
-                  /*-----------------------------------------------
-                  Pass by ref borrows the argument. Borrow
-                  moved into the function's stack frame.
-                  Borrow ends at end of function call, so
-                  param is valid after call
-                  */
-                  fn pass_by_ref_str(rs:&String) {  // borrow
-                  show_type(&rs);   // def in display::lib.rs
-                  show_value(&rs);  // def in display::lib.rs
-                  }
+/*-----------------------------------------------
+  Pass by ref borrows the argument. Borrow
+  moved into the function's stack frame.
+  Borrow ends at end of function call, so
+  param is valid after call
+*/
+fn pass_by_ref_str(rs:&String) { // borrow
+  show_type(&rs); // def in display::lib.rs
+  show_value(&rs); // def in display::lib.rs
+}
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Pass by value Using Code:</defn-head>
                 <defn-code>
-                  /*-------------------------------------------*/
-                  separator(48);
-                  sub_title("Pass string by value");
-                  let mut s = "xyz".to_string();
-                  let s1 = s.clone();
-                  pass_by_value_str(s1);  // moves s1
-                  ////////////////////////////////////////////////
-                  // next statement fails to compile - s1 moved
-                  // println!(s1);
+/*-------------------------------------------*/
+separator(48);
+sub_title("Pass string by value");
+let mut s = "xyz".to_string();
+let s1 = s.clone();
+pass_by_value_str(s1);  // moves s1
+////////////////////////////////////////////////
+// next statement fails to compile - s1 moved
+// println!(s1);
                 </defn-code>
                 <defn-head class="defnBorderTop">Pass by reference Using Code:</defn-head>
                 <defn-code>
-                  /*-------------------------------------------*/
-                  separator(48);
-                  sub_title("Pass string by reference");
-                  pass_by_ref_str(&s);
-                  s.push('a');
-                  pass_by_ref(&s);  // borrows s
-                  s.push('b');
-                  show("\n  after pushing a and b, s = ",&s);
+/*-------------------------------------------*/
+separator(48);
+sub_title("Pass string by reference");
+pass_by_ref_str(&s);
+s.push('a');
+pass_by_ref(&s);  // borrows s
+s.push('b');
+show("\n  after pushing a and b, s = ",&s);
                 </defn-code>
               </defn-block>
             </defn-outerBlock>
@@ -253,326 +325,326 @@
                 </tr>
                 <tr>
                   <td class="lightItem defn-code">
-                    /*-----------------------------------------------
-                    Accepts String by value, moves argument s
-                    - s invalid after invocation
-                    - could use s.clone() as argument to
-                    avoid invalidating s
-                    */
-                    fn show_str1(s:String) {  // move
-                    print!("{}",&amp;s);
-                    }
+/*-----------------------------------------------
+  Accepts String by value, moves argument s
+  - s invalid after invocation
+  - could use s.clone() as argument to
+  avoid invalidating s
+*/
+fn show_str1(s:String) {  // move
+  print!("{}",&amp;s);
+}
                   </td>
                   <td class="lightItem defn-code">
-                    show_str1("\n  first test".to_string());
+show_str1("\n  first test".to_string());
 
                   </td>
                   <td class="lightItem defn-code">
-                    first test
+first test
                   </td>
                 </tr>
                 <tr>
                   <td class="lightItem defn-code">
-                    /*-----------------------------------------------
-                    Accepts String by reference, borrows argument s
-                    - won&apos;t accept string literal
-                    */
-                    fn show_str2(s:&amp;String) {  // borrow
-                    print!("{}",&amp;s);
-                    }
+/*-----------------------------------------------
+  Accepts String by reference, borrows argument s
+  - won&apos;t accept string literal
+*/
+fn show_str2(s:&amp;String) {  // borrow
+  print!("{}",&amp;s);
+}
                   </td>
                   <td class="lightItem defn-code">
-                    show_str2(&amp;"\n  second test".to_string());
+show_str2(&amp;"\n  second test".to_string());
 
                   </td>
                   <td class="lightItem defn-code">
-                    second test
+second test
                   </td>
                 </tr>
                 <tr>
                   <td class="lightItem defn-code">
-                    /*-----------------------------------------------
-                    Accepts str by reference
-                    - won&apos;t accept String instance st
-                    - will accept &st
-                    */
-                    fn show_str3(s:&amp;str) {  // borrow
-                    print!("{}",&amp;s);
-                    }
+/*-----------------------------------------------
+  Accepts str by reference
+  - won&apos;t accept String instance st
+  - will accept &st
+*/
+fn show_str3(s:&amp;str) {  // borrow
+  print!("{}",&amp;s);
+}
                   </td>
                   <td class="lightItem defn-code">
-                    show_str3("\n  third test");
+show_str3("\n  third test");
 
                   </td>
                   <td class="lightItem defn-code">
-                    third test
+third test
                   </td>
                 </tr>
                 <tr>
                   <td class="lightItem defn-code">
-                    /*-----------------------------------------------
-                    Returns String, moves internally created String
-                    to caller&apos;s scope
-                    */
-                    fn return_str1() -&gt; String {
-                    let s = "test string 1".to_string();
-                    s  // moves s
-                    }
+/*-----------------------------------------------
+  Returns String, moves internally created String
+  to caller&apos;s scope
+*/
+fn return_str1() -&gt; String {
+  let s = "test string 1".to_string();
+  s  // moves s
+}
                   </td>
                   <td class="lightItem defn-code">
-                    let mut s = return_str1();
-                    s.push_str(" with more stuff");
-                    let mut s1 = "\n  ".to_string();
-                    s1.push_str(&amp;s);
-                    shows(s1);
+let mut s = return_str1();
+s.push_str(" with more stuff");
+let mut s1 = "\n  ".to_string();
+s1.push_str(&amp;s);
+shows(s1);
 
                   </td>
                   <td class="lightItem defn-code">
-                    test string 1 with more stuff
+test string 1 with more stuff
                   </td>
                 </tr>
                 <tr>
                   <td class="lightItem defn-code">
-                    /*-----------------------------------------------
-                    Returns str reference
-                    - it only makes sense to return a reference
-                    to a passed in ref or a static ref
-                    - compiler should prevent anything else
-                    */
-                    fn return_str2() -&gt; &amp;'static str {
-                    let s = "test string 2";
-                    s
-                    }
+/*-----------------------------------------------
+  Returns str reference
+  - it only makes sense to return a reference
+  to a passed in ref or a static ref
+  - compiler should prevent anything else
+*/
+fn return_str2() -&gt; &amp;'static str {
+  let s = "test string 2";
+  s
+}
                   </td>
                   <td class="lightItem defn-code">
-                    let s = return_str2();
-                    let mut st = s.to_string();
-                    st.push_str(" with more stuff");
-                    let mut s1 = "\n  ".to_string();
-                    s1.push_str(&amp;st);
-                    shows(s1);
+let s = return_str2();
+let mut st = s.to_string();
+st.push_str(" with more stuff");
+let mut s1 = "\n  ".to_string();
+s1.push_str(&amp;st);
+shows(s1);
 
                   </td>
                   <td class="lightItem defn-code">
-                    test string 2 with more stuff
+test string 2 with more stuff
                   </td>
                 </tr>
                 <tr>
                   <td class="lightItem defn-code">
-                    /*-----------------------------------------------
-                    Returns String reference
-                    - it only makes sense to return a reference
-                    to a passed in ref or a static ref
-                    - compiler should prevent anything else
-                    */
-                    fn return_str3(s:&amp;mut String) -&gt; &amp;mut String {
-                    s.push('Z');
-                    s
-                    }
+/*-----------------------------------------------
+  Returns String reference
+  - it only makes sense to return a reference
+  to a passed in ref or a static ref
+  - compiler should prevent anything else
+*/
+fn return_str3(s:&amp;mut String) -&gt; &amp;mut String {
+  s.push('Z');
+  s
+}
                   </td>
                   <td class="lightItem defn-code">
-                    let mut s = String::from("test string 4");
-                    let rs = return_str3(&amp;mut s);
-                    rs.push_str(" with more stuff");
-                    let mut s1 = "\n  ".to_string();
-                    s1.push_str(&amp;rs);
-                    shows(s1);
+let mut s = String::from("test string 4");
+let rs = return_str3(&amp;mut s);
+rs.push_str(" with more stuff");
+let mut s1 = "\n  ".to_string();
+s1.push_str(&amp;rs);
+shows(s1);
 
                   </td>
                   <td class="lightItem defn-code">
-                    test string 4Z with more stuff
+test string 4Z with more stuff
                   </td>
                 </tr>
                 <tr>
                   <td class="lightItem defn-code">
-                    /*-----------------------------------------------
-                    Pass by value moves the argument into the
-                    function's stack frame, so invalid after call
-                    */
-                    fn pass_by_value_str(s:String) {  // move
-                    show_type(&amp;s);   // defined in display lib
-                    show_value(&amp;s);  // defined in display lib
-                    }
+/*-----------------------------------------------
+  Pass by value moves the argument into the
+  function's stack frame, so invalid after call
+*/
+fn pass_by_value_str(s:String) {  // move
+  show_type(&amp;s);   // defined in display lib
+  show_value(&amp;s);  // defined in display lib
+}
                   </td>
                   <td class="lightItem defn-code">
-                    let mut s = "xyz".to_string();
-                    let s1 = s.clone();
-                    pass_by_value_str(s1);  // moves s1
-                    ////////////////////////////////////////////////
-                    // next statement fails to compile - s1 moved
-                    // pass_by_value(s1);
+let mut s = "xyz".to_string();
+let s1 = s.clone();
+pass_by_value_str(s1);  // moves s1
+////////////////////////////////////////////////
+// next statement fails to compile - s1 moved
+// pass_by_value(s1);
 
                   </td>
                   <td class="lightItem defn-code">
-                    TypeId: alloc::string::String, size: 12
-                    value: "xyz"
+TypeId: alloc::string::String, size: 12
+value: "xyz"
                   </td>
                 </tr>
                 <tr>
                   <td class="lightItem defn-code">
-                    /*-----------------------------------------------
-                    Pass by ref borrows the argument into the
-                    function's stack frame.  Borrow ends at end
-                    of function stack frame, so param is valid
-                    after call
-                    */
-                    fn pass_by_ref_str(rs:&amp;String) {  // borrow
-                    show_type(&amp;rs);   // defined in display lib
-                    show_value(&amp;rs);  // defined in display lib
-                    }
+/*-----------------------------------------------
+  Pass by ref borrows the argument into the
+  function's stack frame.  Borrow ends at end
+  of function stack frame, so param is valid
+  after call
+*/
+fn pass_by_ref_str(rs:&amp;String) {  // borrow
+  show_type(&amp;rs);   // defined in display lib
+  show_value(&amp;rs);  // defined in display lib
+}
                   </td>
                   <td class="lightItem defn-code">
-                    pass_by_ref_str(&amp;s);
-                    s.push('a');
-                    pass_by_ref(&amp;s);  // borrows s
-                    s.push('b');
-                    show("\n  after pushing a and b, s = ",&amp;s);
+pass_by_ref_str(&amp;s);
+s.push('a');
+pass_by_ref(&amp;s);  // borrows s
+s.push('b');
+show("\n  after pushing a and b, s = ",&amp;s);
 
                   </td>
                   <td class="lightItem defn-code">
-                    TypeId: &alloc::string::String, size: 4
-                    value: "xyz"
-                    TypeId: &alloc::string::String, size: 4
-                    value: "xyza"
-                    after pushing a and b, s = "xyzab"
+TypeId: &alloc::string::String, size: 4
+value: "xyz"
+TypeId: &alloc::string::String, size: 4
+value: "xyza"
+after pushing a and b, s = "xyzab"
                   </td>
                 </tr>
                 <tr>
                   <td class="lightItem defn-code">
-                    /*-----------------------------------------------
-                    Generic pass by value moves argument into the
-                    function's stack frame, so invalid after call
-                    */
-                    fn pass_by_value&lt;T&gt;(t:T) where T:Debug {
-                    show_type(&amp;t);
-                    show_value(&amp;t);
-                    }
+/*-----------------------------------------------
+  Generic pass by value moves argument into the
+  function's stack frame, so invalid after call
+*/
+fn pass_by_value&lt;T&gt;(t:T) where T:Debug {
+  show_type(&amp;t);
+  show_value(&amp;t);
+}
                   </td>
                   <td class="lightItem defn-code">
-                    let mut s = "xyz".to_string();
-                    let s1 = s.clone();
-                    pass_by_value(s1);
-                    ////////////////////////////////////////////////
-                    // next statement fails to compile - s1 moved
-                    // pass_by_value(s1);
+let mut s = "xyz".to_string();
+let s1 = s.clone();
+pass_by_value(s1);
+////////////////////////////////////////////////
+// next statement fails to compile - s1 moved
+// pass_by_value(s1);
 
                   </td>
                   <td class="lightItem defn-code">
-                    TypeId: alloc::string::String, size: 12
-                    value: "xyz"
+TypeId: alloc::string::String, size: 12
+value: "xyz"
                   </td>
                 </tr>
                 <tr>
                   <td class="lightItem defn-code">
-                    /*-----------------------------------------------
-                    Generic pass by ref borrows argument into the
-                    function's stack frame.  Borrow ends at end
-                    of function stack frame, so param is valid
-                    after call
-                    */
-                    fn pass_by_ref&lt;T&gt;(rt:&amp;T) where T:Debug {
-                    show_type(&amp;rt);
-                    show_value(&amp;rt);
-                    }
+/*-----------------------------------------------
+  Generic pass by ref borrows argument into the
+  function's stack frame.  Borrow ends at end
+  of function stack frame, so param is valid
+  after call
+*/
+fn pass_by_ref&lt;T&gt;(rt:&amp;T) where T:Debug {
+  show_type(&amp;rt);
+  show_value(&amp;rt);
+}
                   </td>
                   <td class="lightItem defn-code">
-                    pass_by_ref(&amp;s);
-                    s.push('a');
-                    pass_by_ref(&amp;s);
+pass_by_ref(&amp;s);
+s.push('a');
+pass_by_ref(&amp;s);
 
                   </td>
                   <td class="lightItem defn-code">
-                    TypeId: &alloc::string::String, size: 4
-                    value: "xyz"
-                    TypeId: &alloc::string::String, size: 4
-                    value: "xyza"
+TypeId: &alloc::string::String, size: 4
+value: "xyz"
+TypeId: &alloc::string::String, size: 4
+value: "xyza"
                   </td>
                 </tr>
                 <tr>
                   <td class="lightItem defn-code">
-                    /*-----------------------------------------------
-                    Illustrates lifetime
-                    - type specific so no annotation needed
-                    */
-                    fn lifetime(rs:&amp;String) -&gt; String {
-                    show("\n  rs = ",rs);
-                    show_type(rs);
-                    // replace doesn't attempt to mutate rs
-                    let s = rs.replace("z","a");
-                    show("\n  s = ",&amp;s);
-                    show_type(&amp;s);
-                    shows("\n  returning string s by value (a move)");
-                    s  // return by value moves string to destination
-                    }
+/*-----------------------------------------------
+  Illustrates lifetime
+  - type specific so no annotation needed
+*/
+fn lifetime(rs:&amp;String) -&gt; String {
+  show("\n  rs = ",rs);
+  show_type(rs);
+  // replace doesn't attempt to mutate rs
+  let s = rs.replace("z","a");
+  show("\n  s = ",&amp;s);
+  show_type(&amp;s);
+  shows("\n  returning string s by value (a move)");
+  s  // return by value moves string to destination
+}
                   </td>
                   <td class="lightItem defn-code">
-                    let mut s = "xyz".to_string();
-                    show("\n  s = ",&amp;s);
-                    shows("\n  calling lifetime");
-                    separator(30);
-                    let r = &amp;mut lifetime(&amp;mut s);
-                    separator(30);
-                    shows("\n  returned from lifetime");
-                    show("\n  s = ",&amp;s);
-                    show("\n  r = ",&amp;r);
-                    show_type(&amp;r);
-                    r.push('b');
-                    show("\n  after pushing b, r = ",&amp;r);
-                    s.push('b');
-                    show("\n  after pushing b, s = ",&amp;s);
+let mut s = "xyz".to_string();
+show("\n  s = ",&amp;s);
+shows("\n  calling lifetime");
+separator(30);
+let r = &amp;mut lifetime(&amp;mut s);
+separator(30);
+shows("\n  returned from lifetime");
+show("\n  s = ",&amp;s);
+show("\n  r = ",&amp;r);
+show_type(&amp;r);
+r.push('b');
+show("\n  after pushing b, r = ",&amp;r);
+s.push('b');
+show("\n  after pushing b, s = ",&amp;s);
 
                   </td>
                   <td class="lightItem defn-code">
-                    s = "xyz"
-                    calling lifetime
-                    -------------------------------
-                    rs = "xyz"
-                    TypeId: alloc::string::String, size: 12
-                    s = "xya"
-                    TypeId: alloc::string::String, size: 12
-                    returning string s by value (a move)
-                    -------------------------------
-                    returned from lifetime
-                    s = "xyz"
-                    r = "xya"
-                    TypeId: &mut alloc::string::String, size: 4
-                    after pushing b, r = "xyab"
-                    after pushing b, s = "xyzb"
+s = "xyz"
+calling lifetime
+-------------------------------
+rs = "xyz"
+TypeId: alloc::string::String, size: 12
+s = "xya"
+TypeId: alloc::string::String, size: 12
+returning string s by value (a move)
+-------------------------------
+returned from lifetime
+s = "xyz"
+r = "xya"
+TypeId: &mut alloc::string::String, size: 4
+after pushing b, r = "xyab"
+after pushing b, s = "xyzb"
                   </td>
                 </tr>
                 <tr>
                   <td class="lightItem defn-code">
-                    /*-----------------------------------------------
-                    Illustrates lifetime for generic.
-                    - Borrow checker needs help to analyze lifetime
-                    of T
-                    */
-                    fn lifetime2&lt;'a, T&gt;(rt:&amp;'a T) -&gt; &amp;'a T where T:Debug {
-                    // Lifetime annotation, 'a, enables borrow checker
-                    // to ensures that T lives at least as long as rt,
-                    // its reference.
-                    show_type(&amp;rt);
-                    show_value(&amp;rt);
-                    rt  // the only time it makes sense to return
-                    // a reference is when returning a possibly
-                    // modified input reference
-                    }
+/*-----------------------------------------------
+  Illustrates lifetime for generic.
+  - Borrow checker needs help to analyze lifetime
+    of T
+*/
+fn lifetime2&lt;'a, T&gt;(rt:&amp;'a T) -&gt; &amp;'a T where T:Debug {
+  // Lifetime annotation, 'a, enables borrow checker
+  // to ensures that T lives at least as long as rt,
+  // its reference.
+  show_type(&amp;rt);
+  show_value(&amp;rt);
+  rt  // the only time it makes sense to return
+  // a reference is when returning a possibly
+  // modified input reference
+}
 
                   </td>
                   <td class="lightItem defn-code">
-                    let mut s = "xyz".to_string();
-                    show("\n  s = ",&amp;s);
-                    let r = &amp;mut lifetime2(&amp;mut s);
-                    show_type(&amp;r);
-                    show("\n  r = ",&amp;r);
+let mut s = "xyz".to_string();
+show("\n  s = ",&amp;s);
+let r = &amp;mut lifetime2(&amp;mut s);
+show_type(&amp;r);
+show("\n  r = ",&amp;r);
 
                   </td>
                   <td class="lightItem defn-code">
-                    s = "xyz"
-                    TypeId: &alloc::string::String, size: 4
-                    value: "xyz"
-                    TypeId: &mut &alloc::string::String, size: 4
-                    r = "xyz"
+s = "xyz"
+TypeId: &alloc::string::String, size: 4
+value: "xyz"
+TypeId: &mut &alloc::string::String, size: 4
+r = "xyz"
                   </td>
                 </tr>
                 <tr>
@@ -582,156 +654,156 @@
                 </tr>
                 <tr>
                   <td class="lightItem defn-code">
-                    /*-----------------------------------------------
-                    Accepts either String or str
-                    */
-                    fn shows&lt;S: Into&lt;String&gt;&gt;(s:S) {
-                    print!("{}",s.into());
-                    }
+/*-----------------------------------------------
+  Accepts either String or str
+*/
+fn shows&lt;S: Into&lt;String&gt;&gt;(s:S) {
+  print!("{}",s.into());
+}
                   </td>
                   <td class="lightItem defn-code">
-                    sub_title("shows&lt;S: Into&lt;String&gt;&gt;(s:S)");
-                    shows("This accepts either String or str");
+sub_title("shows&lt;S: Into&lt;String&gt;&gt;(s:S)");
+shows("This accepts either String or str");
                   </td>
                   <td class="lightItem defn-code">
-                    shows&lt;S: Into&lt;String&gt;&gt;(s:S)
-                    -----------------------------
-                    This accepts either String or str
-                  </td>
-                </tr>
-                <tr>
-                  <td class="lightItem defn-code">
-                    function pointer defined in using code
-                  </td>
-                  <td class="lightItem defn-code">
-                    sub_title("Function pointer");
-                    let fun = pass_by_ref;   // define fun ptr
-                    let mut s = "xyz".to_string();
-                    fun(&amp;s);
-                    s.push('a');
-                    fun(&amp;s);
-                  <td class="lightItem defn-code">
-                    Function pointer
-                    ------------------
-                    TypeId: &alloc::string::String, size: 4
-                    value: "xyz"
-                    TypeId: &alloc::string::String, size: 4
-                    value: "xyza"
+shows&lt;S: Into&lt;String&gt;&gt;(s:S)
+-----------------------------
+This accepts either String or str
                   </td>
                 </tr>
                 <tr>
                   <td class="lightItem defn-code">
-                    lambda defined in using code
-
-                    // Illustrates both lambda and fun ptr
-                    let put = |st|{ print!("{}", st); };
-                    put("\n  returning s by value");
-
+function pointer defined in using code
                   </td>
                   <td class="lightItem defn-code">
-                    sub_title("lambdas");
-                    let l = |s:&amp;str| {
-                    show_type(&amp;s); show_value(&amp;s);
-                    };
-                    l("xyz");
-                    let s = String::from("abc");
-                    l(&amp;s);
-
-                  </td>
+sub_title("Function pointer");
+let fun = pass_by_ref;   // define fun ptr
+let mut s = "xyz".to_string();
+fun(&amp;s);
+s.push('a');
+fun(&amp;s);
                   <td class="lightItem defn-code">
-                    lambdas
-                    ---------
-                    TypeId: &str, size: 8
-                    value: "xyz"
-                    TypeId: &str, size: 8
-                    value: "abc"
+Function pointer
+------------------
+TypeId: &alloc::string::String, size: 4
+value: "xyz"
+TypeId: &alloc::string::String, size: 4
+value: "xyza"
                   </td>
                 </tr>
                 <tr>
                   <td class="lightItem defn-code">
-                    /*-----------------------------------------------
-                    Higher order function
-                    - tester accepts test functions and executes them
-                    - traps test function panic and continues
-                    */
-                    use std::panic;  // catch_unwind panic
+lambda defined in using code
 
-                    fn tester(f:fn() -&gt; bool, name:&amp;str) -&gt; bool {
-                    let rslt = panic::catch_unwind(|| { f() });
-                    // line above simulates execution in try-catch
-                    match rslt {
-                    Ok(true) =&gt; print!("\n  {} passed", name),
-                    Ok(false) =&gt;
-                    { print!("\n  {} failed", name); return false; },
-                    Err(_) =&gt;
-                    { print!("\n  {} paniced", name); return false; }
-                    }
-                    return true;
-                    }
-
-                    /* hide panic notification */
-                    fn set_my_hook() {
-                    panic::set_hook(Box::new(|_|{ print!(" ");}));
-                    // Box needed to give lambda lifetime beyond
-                    // this call, e.g., stores in heap
-                    }
-
-                    fn always_fails() -&gt; bool {
-                    false
-                    }
-
-                    fn always_succeeds() -&gt; bool {
-                    true
-                    }
-
-                    #[allow(unreachable_code)]
-                    fn always_panics() -&gt; bool {
-                    panic!("always panics");
-                    return false;
-                    }
+// Illustrates both lambda and fun ptr
+let put = |st|{ print!("{}", st); };
+put("\n  returning s by value");
 
                   </td>
                   <td class="lightItem defn-code">
-                    sub_title("higher_order_function");
-                    set_my_hook();
+sub_title("lambdas");
+let l = |s:&amp;str| {
+  show_type(&amp;s); show_value(&amp;s);
+};
+l("xyz");
+let s = String::from("abc");
+l(&amp;s);
 
-                    let rstl =
-                    tester(always_fails, "always_fails");
-                    print!("\t\tresult = {}", rstl);
-                    let rstl =
-                    tester(always_succeeds, "always_passes");
-                    print!("\t\tresult = {}", rstl);
-                    let rstl =
-                    tester(always_panics, "always_panics");
-                    print!("\t\tresult = {}\n", rstl);
-
-                    /* show intercepted panic and continued */
-                    use std::io::{Write};
-                    let one_second =
-                    std::time::Duration::from_millis(1000);
-                    for i in 0..5 {
-                    print!("\n  tick {}\t", 5 - i);
-                    std::io::stdout().flush().unwrap();
-                    std::thread::sleep(one_second);
-                    };
-                    print!("\n\n  BOOM!\t");
-                    putlinen(2);
-                    }
                   </td>
                   <td class="lightItem defn-code">
-                    higher_order_function
-                    -----------------------
-                    always_fails failed     result = false
-                    always_passes passed    result = true
-                    always_panics paniced   result = false
+lambdas
+---------
+TypeId: &str, size: 8
+value: "xyz"
+TypeId: &str, size: 8
+value: "abc"
+                  </td>
+                </tr>
+                <tr>
+                  <td class="lightItem defn-code">
+/*-----------------------------------------------
+  Higher order function
+  - tester accepts test functions and executes them
+  - traps test function panic and continues
+*/
+use std::panic;  // catch_unwind panic
 
-                    tick 5
-                    tick 4
-                    tick 3
-                    tick 2
-                    tick 1
+fn tester(f:fn() -&gt; bool, name:&amp;str) -&gt; bool {
+  let rslt = panic::catch_unwind(|| { f() });
+  // line above simulates execution in try-catch
+  match rslt {
+    Ok(true) =&gt; print!("\n  {} passed", name),
+    Ok(false) =&gt;
+    { print!("\n  {} failed", name); return false; },
+    Err(_) =&gt;
+    { print!("\n  {} paniced", name); return false; }
+  }
+  return true;
+}
 
-                    BOOM!
+/* hide panic notification */
+fn set_my_hook() {
+  panic::set_hook(Box::new(|_|{ print!(" ");}));
+  // Box needed to give lambda lifetime beyond
+  // this call, e.g., stores in heap
+}
+
+fn always_fails() -&gt; bool {
+  false
+}
+
+fn always_succeeds() -&gt; bool {
+  true
+}
+
+#[allow(unreachable_code)]
+fn always_panics() -&gt; bool {
+  panic!("always panics");
+  return false;
+}
+
+                  </td>
+                  <td class="lightItem defn-code">
+sub_title("higher_order_function");
+set_my_hook();
+
+let rstl =
+  tester(always_fails, "always_fails");
+print!("\t\tresult = {}", rstl);
+let rstl =
+  tester(always_succeeds, "always_passes");
+print!("\t\tresult = {}", rstl);
+let rstl =
+  tester(always_panics, "always_panics");
+print!("\t\tresult = {}\n", rstl);
+
+/* show intercepted panic and continued */
+use std::io::{Write};
+let one_second =
+  std::time::Duration::from_millis(1000);
+for i in 0..5 {
+  print!("\n  tick {}\t", 5 - i);
+  std::io::stdout().flush().unwrap();
+  std::thread::sleep(one_second);
+};
+print!("\n\n  BOOM!\t");
+putlinen(2);
+
+                  </td>
+                  <td class="lightItem defn-code">
+higher_order_function
+-----------------------
+always_fails failed     result = false
+always_passes passed    result = true
+always_panics paniced   result = false
+
+tick 5
+tick 4
+tick 3
+tick 2
+tick 1
+
+BOOM!
 
                   </td>
                 </tr>
@@ -760,20 +832,20 @@
           <defn-block class="indent">
             <defn-head>Function Pointer Example</defn-head>
             <defn-code>
-              /*-----------------------------------------------
-              pass_by_ref is a plain function that calls plain
-              functions in RustBasicDemos::display library.
-              */
-              fn pass_by_ref&lt;T&gt;(rt:&amp;T) where T:Debug {
-              show_type(&amp;rt);
-              show_value(&amp;rt);
-              }
+/*-----------------------------------------------
+  pass_by_ref is a plain function that calls plain
+  functions in RustBasicDemos::display library.
+*/
+fn pass_by_ref&lt;T&gt;(rt:&amp;T) where T:Debug {
+  show_type(&amp;rt);
+  show_value(&amp;rt);
+}
 
-              let fun = pass_by_ref;  // define funptr
-              let mut s = "xyz".to_string();
-              fun(&amp;s);
-              s.push('a');
-              fun(&amp;s);
+let fun = pass_by_ref;  // define funptr
+let mut s = "xyz".to_string();
+fun(&amp;s);
+s.push('a');
+fun(&amp;s);
 
             </defn-code>
           </defn-block>
@@ -813,15 +885,15 @@
             <defn-block>
               <defn-head>Closure syntax:</defn-head>
               <defn-code>
-                let x:i32 = 3;  // immutable capture, below
-                let cl = |val:i32| {
-                print!("\n  val = {}, x = {}, val + x = {}", val, x, val + x)
-                };
-                cl(7);
+let x:i32 = 3;  // immutable capture, below
+let cl = |val:i32| {
+  print!("\n  val = {}, x = {}, val + x = {}", val, x, val + x)
+};
+cl(7);
               </defn-code>
               <defn-head class="defnBorderTop">Output:</defn-head>
               <defn-code>
-                val = 7, x = 3, val + x = 10
+val = 7, x = 3, val + x = 10
               </defn-code>
             </defn-block>
           </indent-block>
@@ -840,103 +912,104 @@
                   <defn-block>
                     <defn-head>Helper Functions</defn-head>
                     <defn-code>
-                      /*-----------------------------------------------
-                      Function consume accepts predicate closure
-                      - executes closure and returns its value
-                      - accepts function pointers too
-                      */
-                      fn consume&lt;F: FnOnce() -&gt; bool&gt;(cl:F) -&gt; bool
-                      where F: FnOnce() -&gt; bool {
-                      cl()
-                      }
-                      /*-----------------------------------------------
-                      Function answer accepts bool and displays value
-                      */
-                      fn answer(ans:bool) {
-                      if ans == true {
-                      print!("\n  answer is true");
-                      }
-                      else {
-                      print!("\n  answer is false");
-                      }
-                      }
-                      /*-----------------------------------------------
-                      pure predicate functions
-                      */
-                      fn always_true() -&gt; bool { true }
-                      fn always_false() -&gt; bool { false }
+/*-----------------------------------------------
+  Function consume accepts predicate closure
+  - executes closure and returns its value
+  - accepts function pointers too
+*/
+fn consume&lt;F: FnOnce() -&gt; bool&gt;(cl:F) -&gt; bool
+where F: FnOnce() -&gt; bool {
+  cl()
+}
+/*-----------------------------------------------
+  Function answer accepts bool and displays value
+*/
+fn answer(ans:bool) {
+  if ans == true {
+    print!("\n  answer is true");
+  }
+  else {
+    print!("\n  answer is false");
+  }
+}
+/*-----------------------------------------------
+  pure predicate functions
+*/
+fn always_true() -&gt; bool { true }
+fn always_false() -&gt; bool { false }
 
                     </defn-code>
                     <defn-head class="defnBorderTop">Output:</defn-head>
                     <defn-code>
-                      -- demo closures --
-                      =======================
-                      val = 7, x = 3, val + x = 10
+-- demo closures --
+=======================
+val = 7, x = 3, val + x = 10
 
-                      count = 1, sum = 3
-                      count = 2, sum = 3
-                      count = 3, sum = 3
+count = 1, sum = 3
+count = 2, sum = 3
+count = 3, sum = 3
 
-                      answer is true
-                      answer is false
-                      answer is true
-                      answer is false
+answer is true
+answer is false
+answer is true
+answer is false
 
                     </defn-code>
                   </defn-block>
                   <defn-block>
                     <defn-head>main</defn-head>
                     <defn-code>
-                      /*-----------------------------------------------
-                      Demonstrate executor and closures
-                      */
-                      fn main() {
+/*-----------------------------------------------
+  Demonstrate executor and closures
+*/
+fn main() {
 
-                      main_title(" -- demo closures -- ");
+  main_title(" -- demo closures -- ");
 
-                      /*-- immutable closure --------------------*/
+  /*-- immutable closure --------------------*/
 
-                      let x:i32 = 3;  // immutable capture, below
-                      let cl = |val:i32| {
-                      print!(
-                      "\n  val = {}, x = {}, val + x = {}",
-                      val, x, val + x
-                      )
-                      };
-                      cl(7);
-                      let put = putline;  // declaring funptr
-                      put();
+  let x:i32 = 3;  // immutable capture, below
+  let cl = |val:i32| {
+    print!(
+      "\n  val = {}, x = {}, val + x = {}",
+      val, x, val + x
+    )
+  };
+  cl(7);
+  let put = putline;  // declaring funptr
+  put();
 
-                      /*-- mutable closure ----------------------*/
+  /*-- mutable closure ----------------------*/
 
-                      let mut count = 0;
-                      let mut counter = |offset:i32| {  // mut closure
-                      count = count + 1;
-                      print!("\n  count = {}, sum = {}",
-                      count,
-                      count + offset
-                      )
-                      };
-                      counter(2);
-                      counter(1);
-                      counter(0);
-                      putline();
+  let mut count = 0;
+  let mut counter = |offset:i32| {  // mut closure
+    count = count + 1;
+    print!(
+      "\n  count = {}, sum = {}",
+      count,
+      count + offset
+    )
+  };
+  counter(2);
+  counter(1);
+  counter(0);
+  putline();
 
-                      /*-- invariant closure --------------------*/
+  /*-- invariant closure --------------------*/
 
-                      let clst = ||{ true };  // invariant closure
-                      let clsf = ||{ false }; // invariant closure
+  let clst = ||{ true };  // invariant closure
+  let clsf = ||{ false }; // invariant closure
 
-                      let mut ans = consume(clst);
-                      answer(ans);
-                      ans = consume(clsf);
-                      answer(ans);
-                      ans = consume(always_true);
-                      answer(ans);
-                      ans = consume(always_false);
-                      answer(ans);
-                      putlinen(2);
-                      }
+  let mut ans = consume(clst);
+  answer(ans);
+  ans = consume(clsf);
+  answer(ans);
+  ans = consume(always_true);
+  answer(ans);
+  ans = consume(always_false);
+  answer(ans);
+  putlinen(2);
+}
                     </defn-code>
                   </defn-block>
                 </defn-outerBlock>
@@ -962,19 +1035,19 @@
               <defn-block>
                 <defn-head>Result:</defn-head>
                 <defn-code>
-                  enum Result&lt;T, E&gt; {
-                  Ok(T),
-                  Err(E),
-                  }
+enum Result&lt;T, E&gt; {
+  Ok(T),
+  Err(E),
+}
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Option:</defn-head>
                 <defn-code>
-                  enum Option&lt;T&gt; {
-                  Some(T),
-                  None,
-                  }
+enum Option&lt;T&gt; {
+  Some(T),
+  None,
+}
                 </defn-code>
               </defn-block>
             </defn-outerBlock>
@@ -1092,108 +1165,108 @@
                 <defn-block>
                   <defn-head>Functions returning Result or Option</defn-head>
                   <defn-code>
-                    use display::{*};
+use display::{*};
 
-                    fn demo_result&lt;'a&gt;(p: bool) -&gt; Result&lt;&amp;'a str, &amp;'a str&gt; {
-                    print!("\n  value of input predicate is {}", p);
-                    if p {
-                    return Ok("it's ok");
-                    }
-                    else {
-                    return Err("not ok");
-                    }
-                    }
+fn demo_result&lt;'a&gt;(p: bool) -&gt; Result&lt;&amp;'a str, &amp;'a str&gt; {
+  print!("\n  value of input predicate is {}", p);
+  if p {
+    return Ok("it's ok");
+  }
+  else {
+    return Err("not ok");
+  }
+}
 
-                    fn demo_option&lt;'a&gt;(p:bool) -&gt; Option&lt;&amp;'a str&gt; {
-                    print!("\n  value of input predicate is {}", p);
-                    if p {
-                    return Some("something just for you!");
-                    }
-                    else {
-                    return None;
-                    }
-                    }
+fn demo_option&lt;'a&gt;(p:bool) -&gt; Option&lt;&amp;'a str&gt; {
+  print!("\n  value of input predicate is {}", p);
+  if p {
+    return Some("something just for you!");
+  }
+  else {
+    return None;
+  }
+}
                   </defn-code>
                   <defn-head class="defnBorderTop">Output:</defn-head>
                   <defn-code>
-                    -- demo Result --
-                    -----------------------
-                    -- using match
-                    value of input predicate is true
-                    result is it's ok
-                    value of input predicate is false
-                    result is not ok
+ -- demo Result --
+-----------------------
+-- using match
+value of input predicate is true
+result is it's ok
+value of input predicate is false
+result is not ok
 
-                    -- using expect
-                    value of input predicate is true
-                    result is it's ok
+-- using expect
+value of input predicate is true
+result is it's ok
 
-                    -- demo Option --
-                    -----------------------
-                    --using match
-                    value of input predicate is true
-                    something just for you!
-                    value of input predicate is false
-                    sorry, nothing here
+ -- demo Option --
+-----------------------
+--using match
+value of input predicate is true
+something just for you!
+value of input predicate is false
+sorry, nothing here
 
-                    --using unwrap
-                    value of input predicate is true
-                    something just for you!
+--using unwrap
+value of input predicate is true
+something just for you!
 
-                    That's all folks!
+That's all folks!
                   </defn-code>
                 </defn-block>
                 <defn-block>
                   <defn-head>Using code:</defn-head>
                   <defn-code>
-                    use display::{*};
+use display::{*};
 
-                    sub_title("  -- demo Result --  ");
-                    shows("\n-- using match");
+sub_title("  -- demo Result --  ");
+shows("\n-- using match");
 
-                    let r = demo_result(true);
-                    match r {
-                    Ok(rslt) =&gt; print!("\n  result is {}", rslt),
-                    Err(rslt) =&gt; print!("\n  result is {}", rslt)
-                    }
-                    let r = demo_result(false);
-                    match r {
-                    Ok(rslt) =&gt; print!("\n  result is {}", rslt),
-                    Err(rslt) =&gt; print!("\n  result is {}", rslt)
-                    }
-                    shows("\n\n-- using expect");
+let r = demo_result(true);
+match r {
+  Ok(rslt) =&gt; print!("\n  result is {}", rslt),
+  Err(rslt) =&gt; print!("\n  result is {}", rslt)
+}
+let r = demo_result(false);
+match r {
+  Ok(rslt) =&gt; print!("\n  result is {}", rslt),
+  Err(rslt) =&gt; print!("\n  result is {}", rslt)
+}
+shows("\n\n-- using expect");
 
-                    let r = demo_result(true)
-                    .expect("predicate was false");
-                    print!("\n    result is {}", r);
-                    /////////////////////////////////////////////
-                    // uncomment to see panic
-                    // let _r = demo_result(false)
-                    //   .expect("predicate was false");
-                    putline();
+let r = demo_result(true)
+  .expect("predicate was false");
+print!("\n    result is {}", r);
+/////////////////////////////////////////////
+// uncomment to see panic
+// let _r = demo_result(false)
+//   .expect("predicate was false");
+putline();
 
-                    sub_title("  -- demo Option --  ");
-                    shows("\n--using match");
+sub_title("  -- demo Option --  ");
+shows("\n--using match");
 
-                    let r = demo_option(true);
-                    match r {
-                    Some(rslt) =&gt; print!("\n    {}", rslt),
-                    None =&gt; print!("\n    sorry, nothing here")
-                    }
-                    let r = demo_option(false);
-                    match r {
-                    Some(rslt) =&gt; print!("\n    {}", rslt),
-                    None =&gt; print!("\n    sorry, nothing here")
-                    }
-                    shows("\n\n--using unwrap");
+let r = demo_option(true);
+match r {
+  Some(rslt) =&gt; print!("\n    {}", rslt),
+  None =&gt; print!("\n    sorry, nothing here")
+}
+let r = demo_option(false);
+match r {
+  Some(rslt) =&gt; print!("\n    {}", rslt),
+  None =&gt; print!("\n    sorry, nothing here")
+}
+shows("\n\n--using unwrap");
 
-                    let r = demo_option(true).unwrap();
-                    print!("\n    {}", r);
-                    /////////////////////////////////////////////
-                    // uncomment to see panic
-                    // let _r = demo_option(false).unwrap();
+let r = demo_option(true).unwrap();
+print!("\n    {}", r);
+/////////////////////////////////////////////
+// uncomment to see panic
+// let _r = demo_option(false).unwrap();
 
-                    print!("\n\n  That's all folks!\n\n");
+print!("\n\n  That's all folks!\n\n");
                   </defn-code>
                 </defn-block>
               </defn-outerBlock>
@@ -1211,64 +1284,64 @@
                 <defn-block>
                   <defn-head>File Open Code</defn-head>
                   <defn-code>
-                    use std::io::prelude::*;
-                    use std::fs::File;
-                    use display::{*};
+use std::io::prelude::*;
+use std::fs::File;
+use display::{*};
 
-                    #[allow(dead_code)]
-                    fn open_file_for_read(file_name:&amp;str)
-                    -&gt;Result&lt;File, std::io::Error&gt; {
-                    use std::fs::OpenOptions;
-                    let rfile = OpenOptions::new()
-                    .read(true)
-                    .open(file_name);
-                    rfile
-                    }
+#[allow(dead_code)]
+fn open_file_for_read(file_name:&amp;str)
+-&gt;Result&lt;File, std::io::Error&gt; {
+  use std::fs::OpenOptions;
+  let rfile = OpenOptions::new()
+    .read(true)
+    .open(file_name);
+  rfile
+}
 
-                    #[allow(dead_code)]
-                    use std::io::{Error, ErrorKind};
-                    fn read_file_to_string(mut f:File)
-                    -&gt; Result&lt;String, std::io::Error&gt; {
-                    let mut contents = String::new();
-                    let bytes_rslt = f.read_to_string(&amp;mut contents);
-                    if bytes_rslt.is_ok() {
-                    Ok(contents)
-                    }
-                    else {
-                    Err(Error::new(ErrorKind::Other, "read error"))
-                    }
-                    }
+#[allow(dead_code)]
+use std::io::{Error, ErrorKind};
+fn read_file_to_string(mut f:File)
+-&gt; Result&lt;String, std::io::Error&gt; {
+  let mut contents = String::new();
+  let bytes_rslt = f.read_to_string(&amp;mut contents);
+  if bytes_rslt.is_ok() {
+    Ok(contents)
+  }
+  else {
+    Err(Error::new(ErrorKind::Other, "read error"))
+  }
+}
                   </defn-code>
                 </defn-block>
                 <defn-block>
                   <defn-head>Using Code</defn-head>
                   <defn-code>
-                    /*-----------------------------------------------------
-                    - Choose name of a file in the error_probes crate
-                    root directory to show successful operation.
-                    - Choose one that does not exist to show failure
-                    operation.
-                    */
-                    let file:File;
-                    let file_name = "foobar.txt";
-                    let rslt = open_file_for_read(file_name);
-                    if rslt.is_ok() {
-                    print!("\n  file {:?} opened successfully", file_name);
-                    file = rslt.unwrap();
-                    let s = read_file_to_string(file);
-                    if s.is_ok() {
-                    print!("\n  contents: \"{}\"", s.unwrap());
-                    }
-                    }
-                    else {
-                    print!("\n  failed to open file {:?}", file_name);
-                    }
+/*-----------------------------------------------------
+  - Choose name of a file in the error_probes crate
+    root directory to show successful operation.
+  - Choose one that does not exist to show failure
+    operation.
+*/
+let file:File;
+let file_name = "foobar.txt";
+let rslt = open_file_for_read(file_name);
+if rslt.is_ok() {
+  print!("\n  file {:?} opened successfully", file_name);
+  file = rslt.unwrap();
+  let s = read_file_to_string(file);
+  if s.is_ok() {
+    print!("\n  contents: \"{}\"", s.unwrap());
+  }
+}
+else {
+  print!("\n  failed to open file {:?}", file_name);
+}
 
                   </defn-code>
                   <defn-head class="defnBorderTop">Output:</defn-head>
                   <defn-code>
-                    file "foobar.txt" opened successfully
-                    contents: "This is foobar.txt"
+file "foobar.txt" opened successfully
+contents: "This is foobar.txt"
                   </defn-code>
                 </defn-block>
               </defn-outerBlock>
@@ -1312,16 +1385,16 @@
             <defn-block>
               <defn-head>Iterating over Vec of integers</defn-head>
               <defn-code>
-                let v = vec![1, -1, 2, -2, 3, -3];
-                print!("\n  ");
-                let it = v.iter();
-                for val in it {
-                print!("{} ", val);
-                }
+let v = vec![1, -1, 2, -2, 3, -3];
+print!("\n  ");
+let it = v.iter();
+for val in it {
+  print!("{} ", val);
+}
               </defn-code>
               <defn-head class="defnBorderTop">Output:</defn-head>
               <defn-code>
-                1 -1 2 -2 3 -3
+1 -1 2 -2 3 -3
               </defn-code>
             </defn-block>
           </indent-block>
@@ -1382,152 +1455,152 @@
                 <defn-block>
                   <defn-head>Helper functions</defn-head>
                   <defn-code>
-                    use display::{*};
+use display::{*};
 
-                    #[allow(dead_code)]
-                    fn show_prefix(p:&amp;str) {
-                    print!("{}", p);
-                    }
-                    #[allow(dead_code)]
-                    /*-- note: Iterator has an associated type, Item --*/
-                    fn show_csl&lt;T&gt;(mut t:T)
-                    where T:Iterator, T::Item:std::fmt::Debug, {
-                    print!("{:?}", t.next().unwrap());  // no leading comma
-                    for val in t {
-                    print!(", {:?}", val);          // leading comma
-                    }
-                    }
-                    #[allow(dead_code)]
-                    /*-- note: Iterator has an associated type, Item --*/
-                    fn display_csl&lt;T&gt;(mut t:T)
-                    where T:Iterator, T::Item:std::fmt::Display, {
-                    print!("{}", t.next().unwrap());  // no leading comma
-                    for val in t {
-                    print!(", {}", val);          // leading comma
-                    }
-                    }
-                    #[allow(dead_code)]
-                    fn show_pcsl&lt;T&gt;(t:T)
-                    where T:Iterator, T::Item:std::fmt::Debug,  {
-                    show_prefix("\n  ");
-                    show_csl(t);
-                    }
-                    #[allow(dead_code)]
-                    fn display_pcsl&lt;T&gt;(t:T)
-                    where T:Iterator, T::Item:std::fmt::Display,  {
-                    show_prefix("\n  ");
-                    display_csl(t);
-                    }
+#[allow(dead_code)]
+fn show_prefix(p:&amp;str) {
+  print!("{}", p);
+}
+#[allow(dead_code)]
+/*-- note: Iterator has an associated type, Item --*/
+fn show_csl&lt;T&gt;(mut t:T)
+where T:Iterator, T::Item:std::fmt::Debug, {
+  print!("{:?}", t.next().unwrap());  // no leading comma
+  for val in t {
+    print!(", {:?}", val);          // leading comma
+  }
+}
+#[allow(dead_code)]
+/*-- note: Iterator has an associated type, Item --*/
+fn display_csl&lt;T&gt;(mut t:T)
+where T:Iterator, T::Item:std::fmt::Display, {
+  print!("{}", t.next().unwrap());  // no leading comma
+  for val in t {
+    print!(", {}", val);          // leading comma
+  }
+}
+#[allow(dead_code)]
+fn show_pcsl&lt;T&gt;(t:T)
+where T:Iterator, T::Item:std::fmt::Debug,  {
+  show_prefix("\n  ");
+  show_csl(t);
+}
+#[allow(dead_code)]
+fn display_pcsl&lt;T&gt;(t:T)
+where T:Iterator, T::Item:std::fmt::Display,  {
+  show_prefix("\n  ");
+  display_csl(t);
+}
                   </defn-code>
                   <defn-head class="defnBorderTop">Output:</defn-head>
                   <defn-code>
-                    Demonstrating Iterators
-                    =========================
+ Demonstrating Iterators
+=========================
 
-                    -- demo iter over vec of ints --
-                    1 -1 2 -2 3 -3
-                    -- demo comma separated display --
-                    1, -1, 2, -2, 3, -3
+-- demo iter over vec of ints --
+1 -1 2 -2 3 -3
+-- demo comma separated display --
+1, -1, 2, -2, 3, -3
 
-                    -- demo iter over instance of map type --
-                    ("two", 2) ("zero", 0) ("one", 1) ("three", 3)
+-- demo iter over instance of map type --
+("two", 2) ("zero", 0) ("one", 1) ("three", 3)
 
-                    -- demo iter over array of floats --
-                    1 2.2 3.3 4.4 5.5
-                    -- demo comma separated display --
-                    1.0, 2.2, 3.3, 4.4, 5.5
+-- demo iter over array of floats --
+1 2.2 3.3 4.4 5.5
+-- demo comma separated display --
+1.0, 2.2, 3.3, 4.4, 5.5
 
-                    -- demo iter over array of strs --
-                    "one", "two", "three", "four"
-                    -- demo using Display trait instead of Debug --
-                    one, two, three, four
+-- demo iter over array of strs --
+"one", "two", "three", "four"
+-- demo using Display trait instead of Debug --
+one, two, three, four
 
-                    -- demo map function modifying items --
-                    "onez" "twoz" "threez" "fourz"
+-- demo map function modifying items --
+"onez" "twoz" "threez" "fourz"
 
-                    -- demo collect items into Vec --
-                    ["onez", "twoz", "threez", "fourz"]
+-- demo collect items into Vec --
+["onez", "twoz", "threez", "fourz"]
 
-                    That's all Folks!
+That's all Folks!
                   </defn-code>
                 </defn-block>
                 <defn-block>
                   <defn-head>Iteration Code</defn-head>
                   <defn-code>
-                    main_title("Demonstrating Iterators");
-                    putline();
+main_title("Demonstrating Iterators");
+putline();
 
-                    shows("\n-- demo iter over vec of ints --");
-                    let v = vec![1, -1, 2, -2, 3, -3];
-                    print!("\n  ");
-                    let it = v.iter();
-                    for val in it {
-                    print!("{} ", val);
-                    }
-                    shows("\n-- demo comma separated display --");
-                    show_pcsl(v.iter());
-                    putline();
+shows("\n-- demo iter over vec of ints --");
+let v = vec![1, -1, 2, -2, 3, -3];
+print!("\n  ");
+let it = v.iter();
+for val in it {
+  print!("{} ", val);
+}
+shows("\n-- demo comma separated display --");
+show_pcsl(v.iter());
+putline();
 
-                    shows("\n-- demo iter over instance of map type --");
-                    show_prefix("\n  ");
-                    use std::collections::HashMap;
-                    let mut map:HashMap&lt;&amp;str, i32&gt; = HashMap::new();
-                    map.entry("zero").or_insert(0);
-                    map.entry("one").or_insert(1);
-                    map.entry("two").or_insert(2);
-                    map.entry("three").or_insert(3);
-                    let it_map = map.iter();
-                    for val in it_map {
-                    print!("{:?} ", val);
-                    }
-                    putline();
+shows("\n-- demo iter over instance of map type --");
+show_prefix("\n  ");
+use std::collections::HashMap;
+let mut map:HashMap&lt;&amp;str, i32&gt; = HashMap::new();
+map.entry("zero").or_insert(0);
+map.entry("one").or_insert(1);
+map.entry("two").or_insert(2);
+map.entry("three").or_insert(3);
+let it_map = map.iter();
+for val in it_map {
+  print!("{:?} ", val);
+}
+putline();
 
-                    shows("\n-- demo iter over array of floats --");
-                    let a = [1.0, 2.2, 3.3, 4.4, 5.5];
-                    print!("\n  ");
-                    let ita = a.iter();
-                    for val in ita {
-                    print!("{} ", val);
-                    }
-                    shows("\n-- demo comma separated display --");
-                    let iter = a.iter();
-                    show_pcsl(iter);
-                    putline();
+shows("\n-- demo iter over array of floats --");
+let a = [1.0, 2.2, 3.3, 4.4, 5.5];
+print!("\n  ");
+let ita = a.iter();
+for val in ita {
+  print!("{} ", val);
+}
+shows("\n-- demo comma separated display --");
+let iter = a.iter();
+show_pcsl(iter);
+putline();
 
-                    shows("\n-- demo iter over array of strs --");
-                    let mut s = [ "one", "two", "three", "four" ];
-                    show_pcsl(s.iter());
-                    shows(
-                    "\n-- demo using Display trait instead of Debug --"
-                    );
-                    display_pcsl(s.iter());
-                    putline();
+shows("\n-- demo iter over array of strs --");
+let mut s = [ "one", "two", "three", "four" ];
+show_pcsl(s.iter());
+shows(
+  "\n-- demo using Display trait instead of Debug --"
+);
+display_pcsl(s.iter());
+putline();
 
-                    shows("\n-- demo map function modifying items --");
-                    show_prefix("\n  ");
+shows("\n-- demo map function modifying items --");
+show_prefix("\n  ");
 
-                    let iter = s.iter_mut().map(|item| {
-                    let mut mod_item:String = item.to_string();
-                    mod_item.push('z');
-                    mod_item   // returning String, not str
-                    });
+let iter = s.iter_mut().map(|item| {
+  let mut mod_item:String = item.to_string();
+  mod_item.push('z');
+  mod_item   // returning String, not str
+});
 
-                    for val in iter {
-                    print!("{:?} ",val);
-                    }
-                    putline();
+for val in iter {
+  print!("{:?} ",val);
+}
+putline();
 
-                    shows("\n-- demo collect items into Vec --");
-                    let iter = s.iter_mut().map(|item| {
-                    let mut mod_item:String = item.to_string();
-                    mod_item.push('z');
-                    mod_item   // returning String, not str
-                    });
-                    let v:Vec::&lt;String&gt; = iter.collect();
-                    print!("\n  {:?}", v);
-                    putline();
+shows("\n-- demo collect items into Vec --");
+let iter = s.iter_mut().map(|item| {
+  let mut mod_item:String = item.to_string();
+  mod_item.push('z');
+  mod_item   // returning String, not str
+});
+let v:Vec::&lt;String&gt; = iter.collect();
+print!("\n  {:?}", v);
+putline();
 
-                    println!("\n  That's all Folks!\n");
+println!("\n  That's all Folks!\n");
                   </defn-code>
                 </defn-block>
               </defn-outerBlock>
@@ -1550,9 +1623,9 @@
                 <n-s>StructExprStruct</n-s>
                 <div class="pad5">
                   <defn-code style="font-size:1.05em;">
-                    struct Person1 {
-                    name:String, occup:String, id:u32,
-                    }
+struct Person1 {
+  name:String, occup:String, id:u32,
+}
                   </defn-code>
                 </div>
               </li>
@@ -1560,9 +1633,9 @@
                 <n-s>StructExprTuple</n-s>
                 <div class="pad5">
                   <defn-code style="font-size:1.05em;">
-                    struct Person2 (
-                    String, String, u32
-                    );
+struct Person2 (
+  String, String, u32
+);
                   </defn-code>
                 </div>
               </li>
@@ -1584,14 +1657,14 @@
             <defn-block>
               <defn-head>Method implementation</defn-head>
               <defn-code>
-                struct Person1 {
-                name:String, occup:String, id:u32,
-                }
-                impl Person1 {
-                fn show(&self) {
-                print!("\n  Person1: {:?}", &self);
-                }
-                }
+struct Person1 {
+  name:String, occup:String, id:u32,
+}
+impl Person1 {
+  fn show(&self) {
+    print!("\n  Person1: {:?}", &self);
+  }
+}
               </defn-code>
             </defn-block>
           </div>
@@ -1613,220 +1686,221 @@
                 <defn-block>
                   <defn-head>Method implementations:</defn-head>
                   <defn-code>
-                    #[allow(unused_imports)]
-                    use display::{*};
-                    use std::fmt;
+#[allow(unused_imports)]
+use display::{*};
+use std::fmt;
 
-                    /*-- basic demo --*/
-                    #[derive(Debug)]
-                    struct Person1 {
-                    name:String, occup:String, id:u32,
-                    }
-                    #[allow(dead_code)]
-                    impl Person1 {
-                    fn show(&self) {
-                    print!("\n  Person1: {:?}", &self);
-                    }
-                    }
-                    #[derive(Debug)]
-                    struct Person2 (
-                    String, String, u32
-                    );
-                    #[allow(dead_code)]
-                    impl Person2 {
-                    fn show(&self) {
-                    print!("\n  Person2: {:?}", &self);
-                    }
-                    }
-                    #[derive(Debug)]
-                    struct Person3;
-                    #[allow(dead_code)]
-                    impl Person3 {
-                    fn show(&self) {
-                    print!("\n  Person3");
-                    }
-                    }
+/*-- basic demo --*/
+#[derive(Debug)]
+struct Person1 {
+  name:String, occup:String, id:u32,
+}
+#[allow(dead_code)]
+impl Person1 {
+  fn show(&self) {
+    print!("\n  Person1: {:?}", &self);
+  }
+}
+#[derive(Debug)]
+struct Person2 (
+  String, String, u32
+);
+#[allow(dead_code)]
+impl Person2 {
+  fn show(&self) {
+    print!("\n  Person2: {:?}", &self);
+  }
+}
+#[derive(Debug)]
+struct Person3;
+#[allow(dead_code)]
+impl Person3 {
+  fn show(&self) {
+    print!("\n  Person3");
+  }
+}
 
-                    /*-- enums used for Demo1 and Demo2 --*/
-                    #[derive(Debug, PartialEq, Copy, Clone)]
-                    #[allow(dead_code)]
-                    pub enum Level { Basic, Intermediate, Advanced }
-                    #[derive(Debug, PartialEq, Copy, Clone)]
-                    #[allow(dead_code)]
-                    pub enum Topic { Rust, Cpp, Design, }
+/*-- enums used for Demo1 and Demo2 --*/
+#[derive(Debug, PartialEq, Copy, Clone)]
+#[allow(dead_code)]
+pub enum Level { Basic, Intermediate, Advanced }
+#[derive(Debug, PartialEq, Copy, Clone)]
+#[allow(dead_code)]
+pub enum Topic { Rust, Cpp, Design, }
 
-                    /*-- Struct Demo1 has private data --*/
-                    #[derive(Debug)]
-                    pub struct Demo1 {
-                    name: String,
-                    level: Level,
-                    topic: Topic,
-                    }
-                    /*-- implement methods for Demo1 --*/
-                    #[allow(dead_code)]
-                    impl Demo1 {
-                    pub fn new() -> Self {  // set default values
-                    Self {
-                    name:String::from(""),
-                    level: Level::Basic,
-                    topic: Topic::Rust,
-                    }
-                    }
-                    pub fn set_name(&mut self, s:&str) {
-                    self.name = s.to_string();
-                    }
-                    pub fn get_name(&self) -> &String {
-                    &self.name
-                    }
-                    pub fn set_level(&mut self, l:Level) {
-                    self.level = l;
-                    }
-                    pub fn get_level(&self) -> &Level {
-                    &self.level
-                    }
-                    pub fn set_topic(&mut self, t:Topic) {
-                    self.topic = t;
-                    }
-                    pub fn get_topic(&self) -> &Topic {
-                    &self.topic
-                    }
-                    }
+/*-- Struct Demo1 has private data --*/
+#[derive(Debug)]
+pub struct Demo1 {
+  name: String,
+  level: Level,
+  topic: Topic,
+}
+/*-- implement methods for Demo1 --*/
+#[allow(dead_code)]
+impl Demo1 {
+  pub fn new() -> Self {  // set default values
+    Self {
+      name:String::from(""),
+      level: Level::Basic,
+      topic: Topic::Rust,
+    }
+  }
+  pub fn set_name(&mut self, s:&str) {
+    self.name = s.to_string();
+  }
+  pub fn get_name(&self) -> &String {
+    &self.name
+  }
+  pub fn set_level(&mut self, l:Level) {
+    self.level = l;
+  }
+  pub fn get_level(&self) -> &Level {
+    &self.level
+  }
+  pub fn set_topic(&mut self, t:Topic) {
+    self.topic = t;
+  }
+  pub fn get_topic(&self) -> &Topic {
+    &self.topic
+  }
+}
 
-                    /*-- struct Demo2 has public data --*/
-                    #[derive(Debug)]
-                    pub struct Demo2 {
-                    pub name: String,
-                    pub level: Level,
-                    pub topic: Topic,
-                    }
-                    /*-- implement Display trait for Demo2 --*/
-                    #[allow(dead_code)]
-                    impl fmt::Display for Demo2 {
-                    fn fmt(&self, f: &mut fmt::Formatter<'_>) ->
-                    fmt::Result {
-                    write!(
-                    f,
-                    "Demo2 {
-                    { name: \"{}\",
-                    level: {:?},
-                    topic: {:?}
-                    }
-                    }",
-                    self.name, self.level, self.topic)
-                    }
-                    }
-                    /*-- implement Default trait for Demo2 --*/
-                    impl Default for Demo2 {
-                    fn default() -> Self {
-                    Self {
-                    name: String::from(""),
-                    level: Level::Basic,
-                    topic: Topic::Rust,
-                    }
-                    }
-                    }
-                    /*-- implement init method for Demo2 --*/
-                    impl Demo2 {
-                    pub fn init(self) -> Demo2 {
-                    Demo2 {
-                    name: self.name,
-                    level: self.level,
-                    topic: self.topic,
-                    }
-                    }
-                    }
+/*-- struct Demo2 has public data --*/
+#[derive(Debug)]
+pub struct Demo2 {
+  pub name: String,
+  pub level: Level,
+  pub topic: Topic,
+}
+/*-- implement Display trait for Demo2 --*/
+#[allow(dead_code)]
+impl fmt::Display for Demo2 {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) ->
+  fmt::Result {
+    write!(
+      f,
+      "Demo2 {
+        { 
+          name: \"{}\",
+          level: {:?},
+          topic: {:?}
+        }
+      }",
+      self.name, self.level, self.topic)
+    }
+  }
+  /*-- implement Default trait for Demo2 --*/
+  impl Default for Demo2 {
+    fn default() -> Self {
+    Self {
+      name: String::from(""),
+      level: Level::Basic,
+      topic: Topic::Rust,
+    }
+  }
+}
+/*-- implement init method for Demo2 --*/
+impl Demo2 {
+  pub fn init(self) -> Demo2 {
+    Demo2 {
+      name: self.name,
+      level: self.level,
+      topic: self.topic,
+    }
+  }
+}
                   </defn-code>
                 </defn-block>
                 <defn-block>
                   <defn-head>Using Code:</defn-head>
                   <defn-code>
-                    sub_title("Demonstrating Basic Structs");
-                    let p1 = Person1 {
-                    name:"Jim".to_string(),
-                    occup:"dev".to_string(),
-                    id:42
-                    };
-                    p1.show();
-                    let p2 = Person2 {
-                    0:"Jim".to_string(),
-                    1:"dev".to_string(),
-                    2:42
-                    };
-                    p2.show();
-                    let p3 = Person3;
-                    p3.show();
-                    putline();
+sub_title("Demonstrating Basic Structs");
+let p1 = Person1 {
+  name:"Jim".to_string(),
+  occup:"dev".to_string(),
+  id:42
+};
+p1.show();
+let p2 = Person2 {
+  0:"Jim".to_string(),
+  1:"dev".to_string(),
+  2:42
+};
+p2.show();
+let p3 = Person3;
+p3.show();
+putline();
 
-                    sub_title("Demonstrating Demo1 Struct");
-                    let mut demo1 = Demo1::new();
-                    demo1.set_name("Demo1 probe");
-                    print!("\n  {:?}", demo1);
-                    print!(
-                    "\n  Demo1 level = {:?}",
-                    demo1.get_level()
-                    );
-                    putline();
+sub_title("Demonstrating Demo1 Struct");
+let mut demo1 = Demo1::new();
+demo1.set_name("Demo1 probe");
+print!("\n  {:?}", demo1);
+print!(
+  "\n  Demo1 level = {:?}",
+  demo1.get_level()
+);
+putline();
 
-                    sub_title("Demonstrating Demo2 Struct");
-                    let mut demo2 = Demo2 {
-                    name: String::from("Jim's Demo2"),
-                    ..Default::default()
-                    }.init();
+sub_title("Demonstrating Demo2 Struct");
+let mut demo2 = Demo2 {
+  name: String::from("Jim's Demo2"),
+  ..Default::default()
+}.init();
 
-                    print!(
-                    "\n  Using Debug format\n    {:?}",
-                    demo2
-                    );
-                    print!(
-                    "\n  setting level to Intermediate:"
-                    );
-                    demo2.level = Level::Intermediate;
-                    print!(
-                    "\n  Using Display format\n    {}",
-                    demo2
-                    );
-                    putline();
+print!(
+  "\n  Using Debug format\n    {:?}",
+  demo2
+);
+print!(
+  "\n  setting level to Intermediate:"
+);
+demo2.level = Level::Intermediate;
+print!(
+  "\n  Using Display format\n    {}",
+  demo2
+);
+putline();
 
-                    println!("\n\n  That's all Folks!\n");
+println!("\n\n  That's all Folks!\n");
                   </defn-code>
                   <defn-head class="defnBorderTop">Output:</defn-head>
                   <defn-code>
-                    Demonstrating Basic Structs
-                    -----------------------------
-                    Person1: Person1 {
-                    name: "Jim",
-                    occup: "dev",
-                    id: 42
-                    }
-                    Person2: Person2("Jim", "dev", 42)
-                    Person3
+ Demonstrating Basic Structs
+-----------------------------
+Person1: Person1 {
+  name: "Jim",
+  occup: "dev",
+  id: 42
+}
+Person2: Person2("Jim", "dev", 42)
+Person3
 
-                    Demonstrating Demo1 Struct
-                    ----------------------------
-                    Demo1 {
-                    name: "Demo1 probe",
-                    level: Basic,
-                    topic: Rust
-                    }
-                    Demo1 level = Basic
+Demonstrating Demo1 Struct
+----------------------------
+Demo1 {
+  name: "Demo1 probe",
+  level: Basic,
+  topic: Rust
+}
+Demo1 level = Basic
 
-                    Demonstrating Demo2 Struct
-                    ----------------------------
-                    Using Debug format
-                    Demo2 {
-                    name: "Jim\'s Demo2",
-                    level: Basic,
-                    topic: Rust
-                    }
-                    setting level to Intermediate:
-                    Using Display format
-                    Demo2 {
-                    name: "Jim's Demo2",
-                    level: Intermediate,
-                    topic: Rust
-                    }
+Demonstrating Demo2 Struct
+----------------------------
+Using Debug format
+Demo2 {
+  name: "Jim\'s Demo2",
+  level: Basic,
+  topic: Rust
+}
+setting level to Intermediate:
+Using Display format
+Demo2 {
+  name: "Jim's Demo2",
+  level: Intermediate,
+  topic: Rust
+}
 
-                    That's all Folks!
+That's all Folks!
                   </defn-code>
                 </defn-block>
               </defn-outerBlock>
@@ -1855,9 +1929,9 @@
                 They act like interfaces, defining a contract for use, e.g.:
                 <div class="pad5">
                   <defn-code style="font-size:1.0em;">
-                    trait Speaker {
-                    fn salutation(&self) -> String;
-                    }
+trait Speaker {
+  fn salutation(&self) -> String;
+}
                   </defn-code>
                 </div>
                 <div class="pad5">
@@ -1872,80 +1946,80 @@
                       <defn-block>
                         <defn-head>Implementing Code:</defn-head>
                         <defn-code>
-                          trait Speaker {
-                          fn salutation(&self) -> String;
-                          }
-                          ///////////////////////////////////////////////////////////
-                          // The following structs act like classes that implement
-                          // a Speaker interface
+trait Speaker {
+  fn salutation(&self) -> String;
+}
+///////////////////////////////////////////////////////////
+// The following structs act like classes that implement
+// a Speaker interface
 
-                          #[derive(Debug,Copy,Clone)]
-                          pub struct Presenter;
-                          impl Speaker for Presenter {
-                          fn salutation(&self) -> String {
-                          "Hello, today we will discuss ...".to_string()
-                          }
-                          }
+#[derive(Debug,Copy,Clone)]
+pub struct Presenter;
+impl Speaker for Presenter {
+  fn salutation(&self) -> String {
+    "Hello, today we will discuss ...".to_string()
+  }
+}
 
-                          #[derive(Debug)]
-                          pub struct Friend {
-                          pub name : String,
-                          }
-                          impl Speaker for Friend {
-                          fn salutation(&self) -> String {
-                          let mut s = String::from(
-                          "Hi good buddy, its me, "
-                          );
-                          let nm = self.name.as_str();
-                          s.push_str(nm);
-                          return s;
-                          }
-                          }
-                          impl Friend {
-                          pub fn new(name : String) -> Self {
-                          Self {
-                          name,
-                          }  // no semicolon so self
-                          }      // is returned
-                          }
+#[derive(Debug)]
+pub struct Friend {
+  pub name : String,
+}
+impl Speaker for Friend {
+  fn salutation(&self) -> String {
+  let mut s = String::from(
+    "Hi good buddy, its me, "
+  );
+  let nm = self.name.as_str();
+  s.push_str(nm);
+  return s;
+  }
+}
+impl Friend {
+  pub fn new(name : String) -> Self {
+    Self {
+      name,
+    }    // no semicolon so self
+  }      // is returned
+}
 
-                          #[derive(Debug,Copy,Clone)]
-                          pub struct TeamLead;
-                          impl Speaker for TeamLead {
-                          fn salutation(&self) -> String {
-                          "Hi, I have a task for you
-                          ...".to_string()
-                          }
-                          }
+#[derive(Debug,Copy,Clone)]
+pub struct TeamLead;
+impl Speaker for TeamLead {
+  fn salutation(&self) -> String {
+    "Hi, I have a task for you
+    ...".to_string()
+  }
+}
                         </defn-code>
                       </defn-block>
                       <defn-block>
                         <defn-head>Using Code:</defn-head>
                         <defn-code>
-                          let presenter : Presenter = Presenter;
-                          let joe : Friend = Friend::new("Joe".to_string());
-                          let sue : Friend = Friend::new("Sue".to_string());
-                          let team_lead : TeamLead = TeamLead;
+let presenter : Presenter = Presenter;
+let joe : Friend = Friend::new("Joe".to_string());
+let sue : Friend = Friend::new("Sue".to_string());
+let team_lead : TeamLead = TeamLead;
 
-                          let mut v :Vec<&dyn Speaker>
-                            = Vec::new();
-                            v.push(&presenter);
-                            v.push(&joe);
-                            v.push(&sue);
-                            v.push(&team_lead);
+let mut v :Vec<&dyn Speaker>
+  = Vec::new();
+v.push(&presenter);
+v.push(&joe);
+v.push(&sue);
+v.push(&team_lead);
 
-                            for speaker in v.iter() {
-                            print!("\n  {:?}",speaker.salutation());
-                            }
-                        </defn-code>
+for speaker in v.iter() {
+    print!("\n  {:?}",speaker.salutation());
+}
+</defn-code>
                         <defn-head class="defnBorderTop">Output:</defn-head>
                         <defn-code>
-                          -- demo polymorphic struct instances --
+-- demo polymorphic struct instances --
 
-                          "Hello, today we will discuss ..."
-                          "Hi good buddy, its me, Joe"
-                          "Hi good buddy, its me, Sue"
-                          "Hi, I have a task for you ..."
+"Hello, today we will discuss ..."
+"Hi good buddy, its me, Joe"
+"Hi good buddy, its me, Sue"
+"Hi, I have a task for you ..."
 
                         </defn-code>
                       </defn-block>
@@ -1958,10 +2032,10 @@
                 satisfy a required trait, e.g.:
                 <div class="pad5">
                   <defn-code style="font-size:1.0em;">
-                    fn demo_ref&lt;T&gt;(t:&T) where T:Debug  {
-                    show_type(t);
-                    show_value(t);
-                    }
+fn demo_ref&lt;T&gt;(t:&T) where T:Debug  {
+  show_type(t);
+  show_value(t);
+}
                   </defn-code>
                 </div>
               </li>
@@ -2017,24 +2091,24 @@
               <defn-block>
                 <defn-head>Explicit match syntax</defn-head>
                 <defn-code>
-                  let value = Name::Jack;
-                  match value {
-                  Name::John => print!("\n  I am John"),
-                  Name::Jim  => print!("\n  I am Jim"),
-                  Name::Jack => print!("\n  I am Jack")
-                  }
+let value = Name::Jack;
+match value {
+  Name::John => print!("\n  I am John"),
+  Name::Jim  => print!("\n  I am Jim"),
+  Name::Jack => print!("\n  I am Jack")
+}
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>if else match syntax</defn-head>
                 <defn-code>
-                  let value = Name::Jack;
-                  if let Name::Jim = value {
-                  print!("\n  I am Jim");
-                  }
-                  else {
-                  print!("\n  I am not Jim");
-                  }
+let value = Name::Jack;
+if let Name::Jim = value {
+  print!("\n  I am Jim");
+}
+else {
+  print!("\n  I am not Jim");
+}
                 </defn-code>
               </defn-block>
             </defn-outerBlock>
@@ -2055,142 +2129,143 @@
                 <defn-block>
                   <defn-head>Enumeration Code</defn-head>
                   <defn-code>
-                    use display::{*};
-                    use std::fmt::{Debug};
+use display::{*};
+use std::fmt::{Debug};
 
-                    #[allow(dead_code)]
-                    #[derive(Debug)]
-                    enum Name { John, Jim=42, Jack }
+#[allow(dead_code)]
+#[derive(Debug)]
+enum Name { John, Jim=42, Jack }
 
-                    #[allow(dead_code)]
-                    #[derive(Debug)]
-                    enum NameTuple {
-                    John(String, u32),
-                    Jim(String, u32),
-                    Jack(String, u32)
-                    }
+#[allow(dead_code)]
+#[derive(Debug)]
+enum NameTuple {
+  John(String, u32),
+  Jim(String, u32),
+  Jack(String, u32)
+}
 
-                    #[allow(dead_code)]
-                    #[derive(Debug)]
-                    enum NameStruct {
-                    John { occup:String, id:u32 },
-                    Jim  { occup:String, id:u32 },
-                    Jack { occup:String, id:u32 }
-                    }
-                    fn main() {
+#[allow(dead_code)]
+#[derive(Debug)]
+enum NameStruct {
+  John { occup:String, id:u32 },
+  Jim  { occup:String, id:u32 },
+  Jack { occup:String, id:u32 }
+}
 
-                    main_title("Demonstrating enum_probes");
-                    print!("\n  - enumerations, match, if let");
-                    putline();
+fn main() {
 
-                    /*-- enum discriminant with explicit matching --*/
+  main_title("Demonstrating enum_probes");
+  print!("\n  - enumerations, match, if let");
+  putline();
 
-                    sub_title("  -- enum discriminant --  ");
-                    let test = Name::Jim;
-                    match test {
-                    Name::John =&gt; {
-                    let john_discriminant = Name::John as u32;
-                    print!(
-                    "\n  I am John. my discriminant is {:?}",
-                    john_discriminant
-                    )},
-                    Name::Jim =&gt; {
-                    let jim_discriminant = Name::Jim as u32;
-                    print!(
-                    "\n  I am Jim. my discriminant is {:?}",
-                    jim_discriminant
-                    )},
-                    Name::Jack =&gt; {
-                    let jack_discriminant = Name::Jack as u32;
-                    print!(
-                    "\n  I am Jack. my discriminant is {:?}",
-                    jack_discriminant
-                    )},
-                    }
-                    putline();
+  /*-- enum discriminant with explicit matching --*/
 
-                    let test1 = Name::John;
-                    let test2 = Name::Jim;
-                    let test3 = Name::Jack;
+  sub_title("  -- enum discriminant --  ");
+  let test = Name::Jim;
+  match test {
+    Name::John =&gt; {
+      let john_discriminant = Name::John as u32;
+      print!(
+      "\n  I am John. my discriminant is {:?}",
+      john_discriminant
+    )},
+    Name::Jim =&gt; {
+      let jim_discriminant = Name::Jim as u32;
+      print!(
+      "\n  I am Jim. my discriminant is {:?}",
+      jim_discriminant
+    )},
+    Name::Jack =&gt; {
+      let jack_discriminant = Name::Jack as u32;
+      print!(
+      "\n  I am Jack. my discriminant is {:?}",
+      jack_discriminant
+    )},
+  }
+  putline();
 
-                    if let Name::Jack = test1 {
-                    print!("\n  I am John");
-                    }
-                    else {
-                    print!("\n  I am not John");
-                    }
-                    if let Name::Jack = test2 {
-                    print!("\n  I am Jim");
-                    }
-                    else {
-                    print!("\n  I am not Jim");
-                    }
-                    if let Name::Jack = test3 {
-                    print!("\n  I am Jack");
-                    }
-                    else {
-                    print!("\n  I am not Jack");
-                    }
-                    putline();
+  let test1 = Name::John;
+  let test2 = Name::Jim;
+  let test3 = Name::Jack;
 
-                    /*-- enum tuple with if let matching --*/
+  if let Name::Jack = test1 {
+    print!("\n  I am John");
+  }
+  else {
+    print!("\n  I am not John");
+  }
+  if let Name::Jack = test2 {
+    print!("\n  I am Jim");
+  }
+  else {
+    print!("\n  I am not Jim");
+  }
+  if let Name::Jack = test3 {
+    print!("\n  I am Jack");
+  }
+  else {
+    print!("\n  I am not Jack");
+  }
+  putline();
 
-                    sub_title("  -- enum tuple --  ");
-                    let value = NameTuple::John("pilot".to_string(), 52);
-                    if let NameTuple::John(occup, id) = value {
-                    print!(
-                    "
-                    my name is John
-                    occupupation is {}
-                    id is {}", occup, id
-                    );
-                    }
-                    putline();
+  /*-- enum tuple with if let matching --*/
 
-                    /*-- enum struct  with match and all else --*/
+  sub_title("  -- enum tuple --  ");
+  let value = NameTuple::John("pilot".to_string(), 52);
+  if let NameTuple::John(occup, id) = value {
+    print!(
+      "
+      my name is John
+      occupupation is {}
+      id is {}", occup, id
+    );
+  }
+  putline();
 
-                    sub_title("  -- enum struct --  ");
-                    let value = NameStruct::Jack {
-                    occup:"plumber".to_string(), id:32
-                    };
-                    match value {
-                    NameStruct::Jack {occup, id} =&gt;
-                    print!("\n Jack - occup: {}, id: {}", occup, id),
-                    _ =&gt; print!("\n  not Jack")
-                    }
-                    putline();
+  /*-- enum struct  with match and all else --*/
 
-                    println!("\n\nThat's all Folks!\n");
-                    }
+  sub_title("  -- enum struct --  ");
+  let value = NameStruct::Jack {
+    occup:"plumber".to_string(), id:32
+  };
+  match value {
+    NameStruct::Jack {occup, id} =&gt;
+    print!("\n Jack - occup: {}, id: {}", occup, id),
+    _ =&gt; print!("\n  not Jack")
+  }
+  putline();
+
+  println!("\n\nThat's all Folks!\n");
+}
                   </defn-code>
                 </defn-block>
                 <defn-block>
                   <defn-head>Output:</defn-head>
                   <defn-code>
-                    Demonstrating enum_probes
-                    ===========================
-                    - enumerations, match, if let
+ Demonstrating enum_probes
+===========================
+- enumerations, match, if let
 
-                    -- enum discriminant --
-                    -----------------------------
-                    I am Jim. my discriminant is 42
+-- enum discriminant --
+-----------------------------
+I am Jim. my discriminant is 42
 
-                    I am not John
-                    I am not Jim
-                    I am Jack
+I am not John
+I am not Jim
+I am Jack
 
-                    -- enum tuple --
-                    ----------------------
-                    my name is John
-                    occupupation is pilot
-                    id is 52
+-- enum tuple --
+----------------------
+my name is John
+occupupation is pilot
+id is 52
 
-                    -- enum struct --
-                    -----------------------
-                    Jack - occup: plumber, id: 32
+-- enum struct --
+-----------------------
+Jack - occup: plumber, id: 32
 
 
-                    That's all Folks!
+That's all Folks!
                   </defn-code>
                 </defn-block>
               </defn-outerBlock>
@@ -2385,6 +2460,9 @@
     let loc = document.getElementById("loc");
     let fn = window.location.href.split(/\/|\\/).pop();
     loc.innerHTML = fn;
+  </script>
+  <script>
+    onLoadSplitter("fun");
   </script>
 </body>
 </html>
