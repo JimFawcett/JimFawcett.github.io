@@ -147,66 +147,271 @@
         </t-b>
         <t-b>
           Non-primitive data like strings and vectors are move types, so when passed by value they are not copied but moved,
-          which is efficient - usually only copying a pointer - but the caller&apos;s value will become invalid.  Passing by reference
+          which is efficient - usually only copying a few bytes - but the caller&apos;s value will become invalid.  Passing by reference
           places a reference in the function&apos;s stackframe pointing back to the caller&apos;s value, so no move and the caller
           value will remain valid after the call.
         </t-b>
         <div style="height:0.5em;"></div>
-
-        <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em);">
-          <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Pass by Value function</strong></div>
-          <div style="float:right; margin-right:0.75em; padding:0.25em 0em;"><strong>Code using function</strong></div>
-          <splitter-container id="container" class="clear">
-            <first-item id="fun-first" style="width:52%;">
-              <div class="codewrap" onclick="cbubbleup('fun-first')">
-                <div style="display:flex; flex-direction:column;">
-                  <pre style="width:200em;"><code class="language-rust">/*-----------------------------------------------
+        <t-b>
+          <defn-outerBlock>
+            <defn-block>
+              <defn-head>Pass by Value</defn-head>
+              <defn-code>
+/*-----------------------------------------------
   Pass by value moves the argument into the
   function's stack frame, so invalid after call
 */
 fn pass_by_value_str(s:String) {  // move
-  show_type(&s);   // def in display::lib.rs
-  show_value(&s);  // def in display::lib.rs
+  /* use s */
 }
-</code></pre>
-                  <div class="split left">Pass by Reference function</div>
-                  <pre style="width:200em;"><code class="language-rust">/*-------------------------------------------*/
-separator(48);
-sub_title("Pass string by value");
-let mut s = "xyz".to_string();
-let s1 = s.clone();
-pass_by_value_str(s1);  // moves s1
-////////////////////////////////////////////////
-// next statement fails to compile - s1 moved
-// println!(s1);
+
+/* s now invalid - attempt to use is compile error */
+              </defn-code>
+            </defn-block>
+            <defn-block>
+              <defn-head class="defnBorderTop">Pass by Reference</defn-head>
+              <defn-code>
+/*-----------------------------------------------
+  Pass by ref borrows the argument. Borrow
+  created in the function's stack frame.
+  Borrow ends at end of function call, so
+  param rs is valid after call
+*/
+fn pass_by_ref_str(rs:&String) {  // borrow
+  /* use rs */
+}
+
+/* rs still valid, o.k. to use */
+              </defn-code>
+            </defn-block>
+          </defn-outerBlock>
+        </t-b>
+        <div style="height:0.25em;"></div>
+        <t-b>
+          There are four combinations of argument type and passing type, each combination with its own behavior:
+        </t-b>
+        <div style="height:0.25em;"></div>
+        <t-b>
+          <table style="table-layout: fixed;">
+            <tr>
+              <th>Function Signature</th><th>Behavior</th>
+            </tr>
+            <tr>
+              <td style="width:20em;">
+                &nbsp;<strong>1. Pass copy type arg by value</strong>
+                <hr style="margin:0.25em 0em;" />
+                &nbsp;Example: e(d:f64)
+              </td>
+              <td>
+                &nbsp;No side effects:<br />&nbsp;argument remains valid after call
+                <hr style="margin:0.25em 0em;" />
+                &nbsp;Example: let d = 3.1415927; e(d);
+              </td>
+            </tr>
+            <tr>
+              <td>
+                &nbsp;<strong>2. Pass copy type arg by ref</strong>
+                <hr style="margin:0.25em 0em;" />
+                &nbsp;Example: f(rd:&f64);
+              </td>
+              <td>
+                &nbsp;Side effects:<br />&nbsp;user sees change of value, argument remains valid
+                <hr style="margin:0.25em 0em;" />
+                &nbsp;Example: let d = 3.1415927; f(&d);
+              </td>
+            </tr>
+            <tr>
+              <td>
+                &nbsp;<strong>3. Pass move type arg by value</strong>
+                <hr style="margin:0.25em 0em;" />
+                &nbsp;Example: g(v:Vec&lt;i32&gt;);
+              </td>
+              <td>
+                &nbsp;Side effects:<br />&nbsp;argument becomes invalid after call
+                <hr style="margin:0.25em 0em;" />
+                &nbsp;Example: let v = vec![1, 2, 3]; g(v):
+              </td>
+            </tr>
+            <tr>
+              <td>
+                &nbsp;<strong>4. Pass move type arg by ref</strong>
+                <hr style="margin:0.25em 0em;" />
+                &nbsp;Example: h(rv:&Vec&lt;i32&gt;)
+              </td>
+              <td>
+                &nbsp;Side effects:<br />&nbsp;caller sees both change in value and change in instance<sup>1</sup>
+                <hr style="margin:0.25em 0em;" />
+                &nbsp;Example: let v = vec![2, 1, 0]; h(rv:&Vec);
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <ol>
+                  <li>
+                    To change instance, function needs to accept reference to Box&lt;T&gt;, e.g.,
+                  <span style="white-space: nowrap;">l(rb:&Box&lt;T&gt;) { ... }</span>
+                  </li>
+                </ol>
+              </td>
+            </tr>
+          </table>
+        </t-b>
+        <div style="height: 0.5em;"></div>
+        <details>
+          <summary class="darkItem">Argument Passing Examples:&nbsp;</summary>
+        <h3>Pass Copy Type argument by Value</h3>
+        <div style="float:left; padding-right:0.5em;">
+          <div class="blockSingle" style="padding:0em; width:max-content; margin-top:0em;">
+            <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Pass by Value, Caller sees no Change</strong></div>
+            <div style="padding:0.25em;">
+              <div class="codewrap clear" style="padding:0.25em; overflow-x:auto; width:max-content;">
+                <pre style="width:35em;"><code class="language-rust">pub fn pass_by_value&lt;T&gt;(mut t:T)
+  where T:Debug + Default 
+{
+  show_op(&quot;in pass_by_value&quot;);
+  show_type(&t);
+  show_value(&t);
+  /*-- demonstrate side effects --*/
+  show_op(&quot;t = T::default()&quot;);
+  t = T::default();
+  show_value(&t);
+  show_op(&quot;leaving function&quot;);
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="height:2em;"></div>
+        <t-b>
+          Pass_by_value&lt;T&gt; copies or moves argument into
+          function's stack frame if the type is copy or move.
+          <ul style="position:relative; left:1.5em;">
+            <li>
+              function displays type and value of the argument    
+            </li>
+            <li>
+              it then changes value to T::default() to illustrate
+              when side effects occur
+            </li>
+            <li>
+              copy types will be valid after the call, but
+              move types will not  
+            </li>
+          </ul>
+        </t-b>
+        <div style="height:0.0em; clear:both; margin:0em;">&nbsp;</div>
+        <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em); margin-top:0.75em;">
+          <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Demonstration Code</strong></div>
+          <div style="float:right; margin-right:0.75em; padding:0.25em 0em;"><strong>Output</strong></div>
+          <splitter-container id="container" class="clear">
+            <first-item id="fun1-first" style="width:52%;">
+              <div class="codewrap" onclick="cbubbleup('fun1-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-rust">show_label(&quot;pass copy type by value, caller doesn't see any changes&quot;);
+let d = 3.1415927;  // literal is copy type
+pass_by_value(d);
+print!(&quot;  value of d is now {d:?}&#92;n&quot;);
+assert_eq!(d, 3.1415927);
+shows(&quot;  no side-effects, passing copy type by value&#92;n&quot;);
+putln();
 </code></pre>
                 </div>
               </div>
             </first-item>
-            <splitter-bar id="fun-seperator"></splitter-bar>
-            <second-item id="fun-second" style="width:40em;">
-              <div class="codewrap" onclick="obubbleup('fun-first')">
+            <splitter-bar id="fun1-seperator"></splitter-bar>
+            <second-item id="fun1-second" style="width:40em;">
+              <div class="codewrap" onclick="obubbleup('fun1-first')">
                 <div style="display:flex; flex-direction:column;">
-                  <pre style="width:200em;"><code class="language-rust">/*-----------------------------------------------
-  Pass by ref borrows the argument. Borrow
-  moved into the function's stack frame.
-  Borrow ends at end of function call, so
-  param is valid after call
-*/
-fn pass_by_ref_str(rs:&String) {  // borrow
-  show_type(&rs);   // def in display::lib.rs
-  show_value(&rs);  // def in display::lib.rs
-}
-  </code></pre>
-                  <div class="split"><div class="right">Code using function</div></div>
-                  <pre style="width:200em;"><code class="language-rust">/*-------------------------------------------*/
-separator(48);
-sub_title("Pass string by reference");
-pass_by_ref_str(&s);
-s.push('a');
-pass_by_ref(&s);  // borrows s
-s.push('b');
-show("\n  after pushing a and b, s = ",&s);
+                  <pre style="width:200em;"><code class="language-term"> pass copy type by value, caller doesn't see any changes
+---------------------------------------------------------
+--- in pass_by_value ---
+  TypeId: f64, size: 8
+  value: 3.1415927
+--- t = T::default() ---
+  value: 0.0
+--- leaving function ---
+  value of d is now 3.1415927
+  no side-effects, passing copy type by value</code></pre>
+                </div>
+              </div>
+            </second-item>
+          </splitter-container>
+        </div>
+        <div style="height:1em;"></div>
+        <h3>Pass Copy Type Argument by Reference</h3>
+        <div style="float:left; padding-right:0.5em;">
+          <div class="blockSingle" style="padding:0em; width:max-content; margin-top:0em;">
+            <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Pass by Ref, Caller sees change of Value</strong></div>
+            <div style="padding:0.25em;">
+              <div class="codewrap clear" style="padding:0.25em; overflow-x:auto; width:max-content;">
+                <pre style="width:35em;"><code class="language-rust">pub fn pass_by_ref&lt;T&gt;
+  where T: std::default::Default + Debug&gt;(rt:&mut T) 
+{
+  show_op(&quot;in pass_by_ref&quot;);
+  show_type(&rt);
+  show_value(&rt);
+  /*-- demonstrate side effects --*/
+  show_op(&quot;*rt = T::default()&quot;);
+  *rt = T::default();
+  show_value(&rt);
+  show_op(&quot;leaving function&quot;);
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="height:0.5em;"></div>
+        <t-b>
+          Pass_by_ref&lt;T&gt; borrows argument.  Borrow
+          moved into the function's stack frame.
+          Borrow ends at end of function call, so
+          param is valid after call
+          <ul style="position:relative; left:1.5em;">
+            <li>
+              function displays type and value of the argument    
+            </li>
+            <li>
+              it then changes value to T::default() to illustrate
+              when side effects occur
+            </li>
+            <li>
+              all types will be valid after the call
+            </li>
+          </ul>
+        </t-b>
+        <div style="height:0.0em; clear:both; margin:0em;">&nbsp;</div>
+        <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em); margin-top:0.75em;">
+          <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Demonstration Code</strong></div>
+          <div style="float:right; margin-right:0.75em; padding:0.25em 0em;"><strong>Output</strong></div>
+          <splitter-container id="container" class="clear">
+            <first-item id="fun2-first" style="width:52%;">
+              <div class="codewrap" onclick="cbubbleup('fun2-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-rust">  show_label(&quot;pass copy type by ref, caller sees any changes&quot;);
+  let mut s = &quot;a string&quot;;  // literal is copy type
+  pass_by_ref(&mut s);
+  print!(&quot;  value of s is now {s:?}&#92;n&quot;);
+  assert_eq!(s, &quot;&quot;);
+  shows(&quot;  side-effects, passing copy type by ref&#92;n&quot;);
+  putln();
+</code></pre>
+                </div>
+              </div>
+            </first-item>
+            <splitter-bar id="fun2-seperator"></splitter-bar>
+            <second-item id="fun2-second" style="width:40em;">
+              <div class="codewrap" onclick="obubbleup('fun2-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-term"> pass copy type by ref, caller sees any changes
+------------------------------------------------
+--- in pass_by_ref ---
+  TypeId: &mut &str, size: 8
+  value: &quot;a string&quot;
+--- *rt = T::default() ---
+  value: &quot;&quot;
+--- leaving function ---
+value of s is now ""
+side-effects, passing copy type by ref
 </code></pre>
                 </div>
               </div>
@@ -214,72 +419,295 @@ show("\n  after pushing a and b, s = ",&s);
           </splitter-container>
         </div>
         <div style="height:1em;"></div>
-
+        <h3>Pass Move Type by Value</h3>
+        <div style="float:left; padding-right:0.5em;">
+          <div class="blockSingle" style="padding:0em; width:max-content; margin-top:0em;">
+            <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Pass by Value, Arg becomes Invalid</strong></div>
+            <div style="padding:0.25em;">
+              <div class="codewrap clear" style="padding:0.25em; overflow-x:auto; width:max-content;">
+                <pre style="width:35em;"><code class="language-rust">pub fn pass_by_value&lt;T&gt;(mut t:T) where T:Debug + Default {
+  show_op(&quot;in pass_by_value&quot;);
+  show_type(&t);
+  show_value(&t);
+  /*-- demonstrate side effects --*/
+  show_op(&quot;t = T::default()&quot;);
+  t = T::default();
+  show_value(&t);
+  show_op(&quot;leaving function&quot;);
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="height:1em;"></div>
         <t-b>
-          <indent-block>
-            <defn-outerBlock>
-              <defn-block>
-                <defn-head>Pass by Value</defn-head>
-                <defn-code>
-/*-----------------------------------------------
-  Pass by value moves the argument into the
-  function's stack frame, so invalid after call
-*/
-fn pass_by_value_str(s:String) { // move
-  show_type(&s); // def in display::lib.rs
-  show_value(&s); // def in display::lib.rs
-}
-
-                </defn-code>
-                <defn-head class="defnBorderTop">Pass by Reference</defn-head>
-                <defn-code>
-/*-----------------------------------------------
-  Pass by ref borrows the argument. Borrow
-  moved into the function's stack frame.
-  Borrow ends at end of function call, so
-  param is valid after call
-*/
-fn pass_by_ref_str(rs:&String) { // borrow
-  show_type(&rs); // def in display::lib.rs
-  show_value(&rs); // def in display::lib.rs
-}
-                </defn-code>
-              </defn-block>
-              <defn-block>
-                <defn-head>Pass by value Using Code:</defn-head>
-                <defn-code>
-/*-------------------------------------------*/
-separator(48);
-sub_title("Pass string by value");
-let mut s = "xyz".to_string();
-let s1 = s.clone();
-pass_by_value_str(s1);  // moves s1
-////////////////////////////////////////////////
-// next statement fails to compile - s1 moved
-// println!(s1);
-                </defn-code>
-                <defn-head class="defnBorderTop">Pass by reference Using Code:</defn-head>
-                <defn-code>
-/*-------------------------------------------*/
-separator(48);
-sub_title("Pass string by reference");
-pass_by_ref_str(&s);
-s.push('a');
-pass_by_ref(&s);  // borrows s
-s.push('b');
-show("\n  after pushing a and b, s = ",&s);
-                </defn-code>
-              </defn-block>
-            </defn-outerBlock>
-          </indent-block>
+          Pass_by_value&lt;T&gt; copies or moves argument into
+          function's stack frame if the type is copy or move.
+          <ul style="position:relative; left:1.5em;">
+            <li>
+              function displays type and value of the argument 
+            </li>
+            <li>
+              it then changes value to T::default() to illustrate
+              when side effects occur
+            </li>
+            <li>
+              copy types will be valid after the call, but
+              move types will not  
+            </li>
+          </ul>
         </t-b>
+        <div style="height:0.0em; clear:both; margin:0em;">&nbsp;</div>
+        <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em); margin-top:0.75em;">
+          <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Demonstration Code</strong></div>
+          <div style="float:right; margin-right:0.75em; padding:0.25em 0em;"><strong>Output</strong></div>
+          <splitter-container id="container" class="clear">
+            <first-item id="fun3-first" style="width:52%;">
+              <div class="codewrap" onclick="cbubbleup('fun3-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-rust">  show_label(&quot;pass move type by value, caller sees invalidation&quot;);
+  let s = &quot;a string&quot;.to_string();  // move type
+  pass_by_value(s);
+  // statement below fails to compile: s moved
+  // print!(&quot;{s}&#92;n&quot;);
+  shows(&quot;  can't access s, been moved&#92;n&quot;);
+  shows(&quot;  side-effects, passing move type by value&#92;n&quot;);
+  putln();
+</code></pre>
+                </div>
+              </div>
+            </first-item>
+            <splitter-bar id="fun3-seperator"></splitter-bar>
+            <second-item id="fun3-second" style="width:40em;">
+              <div class="codewrap" onclick="obubbleup('fun3-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-term"> pass move type by value, caller sees invalidation
+---------------------------------------------------
+--- in pass_by_value ---
+  TypeId: alloc::string::String, size: 24
+  value: &quot;a string&quot;
+--- t = T::default() ---
+  value: &quot;&quot;
+--- leaving function ---
+  can't access s, been moved
+  side-effects, passing move type by value
+</code></pre>
+                </div>
+              </div>
+            </second-item>
+          </splitter-container>
+        </div>
+        <div style="height:1em;"></div>
+        <h3>Pass Move Type by Reference</h3>
+        <div style="float:left; padding-right:0.5em;">
+          <div class="blockSingle" style="padding:0em; width:max-content; margin-top:0em;">
+            <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Pass by Reference, Caller sees change of Value</strong></div>
+            <div style="padding:0.25em;">
+              <div class="codewrap clear" style="padding:0.25em; overflow-x:auto; width:max-content;">
+                <pre style="width:35em;"><code class="language-rust">pub fn pass_by_ref&lt;T&gt;(rt:&mut T)
+  where: T: std::default::Default + Debug 
+{
+  show_op(&quot;in pass_by_ref&quot;);
+  show_type(&rt);
+  show_value(&rt);
+  /*-- demonstrate side effects --*/
+  show_op(&quot;*rt = T::default()&quot;);
+  *rt = T::default();
+  show_value(&rt);
+  show_op(&quot;leaving function&quot;);
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="height:2em;"></div>
+        <t-b>
+          Pass_by_ref&lt;T&gt; borrows argument. Borrow
+          moved into the function's stack frame.
+          Borrow ends at end of function call, so
+          param is valid after call
+          <ul style="position:relative; left:1.5em;">
+            <li>
+              function displays type and value of the argument    
+            </li>
+            <li>
+              it then changes value to T::default() to illustrate
+              when side effects occur
+            </li>
+            <li>
+              all types will be valid after the call
+            </li>
+          </ul>
+        </t-b>
+        <div style="height:0.0em; clear:both; margin:0em;">&nbsp;</div>
+        <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em); margin-top:0.75em;">
+          <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Demonstration Code</strong></div>
+          <div style="float:right; margin-right:0.75em; padding:0.25em 0em;"><strong>Output</strong></div>
+          <splitter-container id="container" class="clear">
+            <first-item id="fun4-first" style="width:52%;">
+              <div class="codewrap" onclick="cbubbleup('fun4-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-rust">  show_label(&quot;pass move type by ref, caller sees change of value&quot;);
+  let mut v = vec![1, 2, 3];  // move type
+  pass_by_ref(&mut v);
+  assert_ne!(v, vec![1, 2, 3]);
+  print!(&quot;  v now has value: {v:?}&#92;n&quot;);
+  shows(&quot;  side-effects, pass move type by ref and change value&#92;n&quot;);
+  putln();
+</code></pre>
+                </div>
+              </div>
+            </first-item>
+            <splitter-bar id="fun4-seperator"></splitter-bar>
+            <second-item id="fun4-second" style="width:40em;">
+              <div class="codewrap" onclick="obubbleup('fun4-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-term"> pass move type by ref, caller sees change of value
+----------------------------------------------------
+--- in pass_by_ref ---
+  TypeId: &mut alloc::vec::Vec&lt;i32&gt;, size: 8
+  value: [1, 2, 3]
+--- *rt = T::default() ---
+  value: []
+--- leaving function ---
+  v now has value: []
+  side-effects, pass move type by ref and change value
+</code></pre>
+                </div>
+              </div>
+            </second-item>
+          </splitter-container>
+        </div>
+        <div style="height:1em;"></div>
+        <h3>Pass Move Type by Reference</h3>
+        <div style=" width:calc(100vw - 25em);">
+        <div style="float:left; padding-right:0.5em;">
+          <div class="blockSingle" style="padding:0em; width:max-content; margin-top:0em;">
+            <div style="float:left;  margin-left:0.75em; padding:0.25em 0em;"><strong>Pass by Reference, Caller sees change of Instance</strong></div>
+            <div style="padding:0.25em;">
+              <div class="codewrap clear" style="padding:0.25em; overflow-x:auto; width:max-content;">
+                <pre style="width:35em;"><code class="language-rust">pub fn pass_move_by_ref_heap_instance&lt;T&gt;(rh:&mut Box&lt;T&gt;)
+  where T: From&lt;String&gt; + Default + Debug
+{
+  show_op(&quot;in pass_move_by_ref_heap_instance&lt;T&gt;&quot;);
+  show_type(&rh);
+  show_value(&rh);
+  print!(&quot;  address of rh is: {:p}&#92;n&quot;, *rh);
+  /*---------------------------------------
+    demonstrate side effects by changing
+    referenced object
+  */
+  show_op(&quot;*rh = Box::new(t)&quot;);
+  let t:T = &quot;a new string&quot;.to_string().into();
+  *rh = Box::new(t);  // change of instance
+  print!(&quot;  address of rh is: {:p}&#92;n&quot;, *rh);
+  show_value(&rh);
+  show_op(&quot;leaving function&quot;);
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="height:1em;"></div>
+        <p>
+          Pass_move_by_ref_heap_instance&lt;T&gt;
+          mutably borrows argument.
+          Borrow ends at end of function call, so
+          rh is valid after call.
+          <ul style="position:relative; left:1.5em;">
+            <li>
+              This function displays type and value of its argument.
+            </li>
+            <li>
+              It then changes value to a T coerced from a
+              String to illustrate when side effects occur.
+            </li>
+            <li>
+              That is always possible for a type that implements
+              Trait From&lt;String&gt; as compiler generates 
+              Into&lt;String&gt; from From&lt;String&gt;, e.g.,
+              it converts a String into a T type. 
+            </li>
+            <li>
+              The function then sets the contents of rh to
+              a Box&lt;T&gt;
+            </li>
+            <li>
+              That has reset the reference to a new heap
+              instance. That works only because Box is a 
+              smart pointer, something more than just a 
+              reference.
+            </li>
+            <li>
+              The change of instance is sandwiched between two 
+              displays of the address associated with the 
+              argument, just to show that the instance really 
+              was changed.
+            </li>
+          </ul>        
+        </p>
+      </div>
+        <div style="height:0em;"></div>
+        <t-b>
+          As you see in the panels below, the &quot;<c-s>smrt_ptr_heap</c-s>&quot;
+          argument is still valid after the function call. That is always the case 
+          when passing arguments by reference.
+        </t-b>
+        <div style="height:0.0em; clear:both; margin:0em;">&nbsp;</div>
+        <div class="blockSingle" style="padding:0em; width:calc(100vw - 9em); margin-top:0.75em;">
+          <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Demonstration Code</strong></div>
+          <div style="float:right; margin-right:0.75em; padding:0.25em 0em;"><strong>Output</strong></div>
+          <splitter-container id="container" class="clear">
+            <first-item id="fun5-first" style="width:52%;">
+              <div class="codewrap" onclick="cbubbleup('fun5-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-rust">show_label(&quot;pass move type by ref, caller sees change of instance&quot;);
+let s = &quot;a string&quot;.to_string();       // move type
+let mut smrt_ptr_heap = Box::new(s);  // s moved into Box
+pass_move_by_ref_heap_instance(&mut smrt_ptr_heap);
+assert_ne!(*smrt_ptr_heap, &quot;a string&quot;.to_string());
+print!(&quot;  smrt_ptr_heap now has value: {:?}&#92;n&quot;, *smrt_ptr_heap);
+print!("  address of smrt_pt_heap is: {:p}\n", smrt_ptr_heap);
+shows(&quot;  side-effects, pass move type by ref and change instance&quot;);
+putln();
+</code></pre>
+                </div>
+              </div>
+            </first-item>
+            <splitter-bar id="fun5-seperator"></splitter-bar>
+            <second-item id="fun5-second" style="width:40em;">
+              <div class="codewrap" onclick="obubbleup('fun5-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-term"> pass move type by ref, caller sees change of instance
+-------------------------------------------------------
+--- in pass_move_by_ref_heap_instance&lt;T&gt; ---
+  TypeId: &mut alloc::boxed::Box&lt;alloc::string::String&gt;, size: 8
+  value: &quot;a string&quot;
+  address of rh is: 0x1f767974810
+--- *rh = Box::new(t) ---
+  address of rh is: 0x1f767974870
+  value: &quot;a new string&quot;
+--- leaving function ---
+  smrt_ptr_heap now has value: &quot;a new string&quot;
+  address of smrt_pt_heap is: 0x1f767974870
+  side-effects, pass move type by ref and change instance
+</code></pre>
+                </div>
+              </div>
+            </second-item>
+          </splitter-container>
+        </div>
+        <div style="height:0.5em;"></div>
         <t-b class="indent">
-          <a href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=245f7bd87ae75a543589d154e043e1a5">
+          <a target="_blank" href="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=245f7bd87ae75a543589d154e043e1a5">
             code in playground includes <c-s>show_type</c-s> and <c-s>show_value</c-s>.
           </a>
         </t-b>
+        <div style="height:1em;"></div>
+      </details>
+
         <t-b>
-          They look similar to JavaScript functions with added type specifications.  However, their use is
+          Rust functions look similar to JavaScript functions with added type specifications.  However, their use is
           more complicated due to Rust&apos;s rules for mutation and borrowing.  The rules affect:
           <indent-block class="pad5">
             <ol class="tight">
@@ -295,7 +723,7 @@ show("\n  after pushing a and b, s = ",&s);
             </ol>
           </indent-block>
           The bad news is this can get complicated.  The good news is the Rust compiler&apos;s borrow
-          checker does a great job telling you about problems and how to fix them.
+          checker does a great job telling you about problems and often how to fix them.
         </t-b>
         <t-b>
           In the details dropdown, below, you will find simple demo examples of supplying arguments to
@@ -1058,7 +1486,7 @@ enum Option&lt;T&gt; {
                 <n-s>Option&lt;T&gt;</n-s> is an enumeration that contains either Some(result:T) or None. Option&lt;T&gt;
                 has methods:
                 <div class="pad5">
-                  <ul class="tight">
+                  <ul class="tight" style="list-style-type: disc;">
                     <li>
                       is_some() -> bool
                     </li>
@@ -1103,7 +1531,7 @@ enum Option&lt;T&gt; {
                 <n-s>enum Result&lt;T, E&gt;</n-s> is an enumeration that contains either Ok(result) or Err(err).
                 Result&lt;T, E&gt; has methods:
                 <div class="pad5">
-                  <ul class="tight">
+                  <ul class="tight" style="list-style-type:disc;">
                     <li>
                       is_ok() -> bool
                     </li>
@@ -2462,7 +2890,11 @@ That's all Folks!
     loc.innerHTML = fn;
   </script>
   <script>
-    onLoadSplitter("fun");
+    onLoadSplitter("fun1");
+    onLoadSplitter("fun2");
+    onLoadSplitter("fun3");
+    onLoadSplitter("fun4");
+    onLoadSplitter("fun5");
   </script>
 </body>
 </html>

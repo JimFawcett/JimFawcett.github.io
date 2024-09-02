@@ -104,29 +104,6 @@
           </hgroup>
         </header>
 
-        <!--<toc-b id="toc">
-      <div style="display:flex; flex-direction:row">
-        <a href="Javascript:;" onclick="storyHlpMenu.help()" style="color:#fefefa;">Help</a>&nbsp;
-        <a href="Javascript:;" onclick="storyMenu.closeTOC()" style="color:#fefefa;">Close</a>&nbsp;
-        <a href="Javascript:;" onclick="storyMenu.sects()" style="color:#fefefa;">Sects</a>&nbsp;
-        <a href="Javascript:;" onclick="storyMenu.chaps()" style="color:#fefefa;">Chaps</a>&nbsp;
-      </div>
-      <up-b id="chaps" onmouseout="storyMenu.chaps()">
-        <a href="RustStory_Prologue.html">Prologue</a><br />
-        <a href="RustStory_Models.html">Models</a><br />
-        <a href="RustStory_Data.html">Data</a><br />
-        <a href="RustStory_Operations.html">Operations</a><br />
-        <a href="RustStory_Structures.html">Structs</a><br />
-        <a href="RustStory_Libraries.html">Libraries</a><br />
-        <a href="RustStory_CodeIndex.html">Code Index</a><br />
-        <a href="RustStory_References.html">References</a><br />
-      </up-b>
-      <rt-b id="sects">
-        <a href="#top">Top</a>, <a href="#prologue">Prologue</a>, <a href="#logger">Logger</a>,
-        <a href="#cmdlnproc">CmdLnProc</a>, <a href="#dirnav">DirNav</a>,
-        <a href="#epilogue">Epilogue</a>, <a href="#refs">References</a>
-      </rt-b>
-    </toc-b>-->
         <div id="hlp" style="display:none;">
         </div>
 
@@ -150,13 +127,13 @@
         <div style="width:calc(100vw - 9em);">
           <photosizer-block src="Pictures/RustLoggerOutput.JPG" width="300" class="photoSizerBlock right" style="margin-top:0;">
             <span style="
-        display: inline-block;
-        font-weight: bold;
-        font-family: 'Comic Sans MS, Tahoma';
-        background-color: #ddd;
-        width: 100%;
-        padding: 5px 0px;
-      ">
+              display: inline-block;
+              font-weight: bold;
+              font-family: 'Comic Sans MS, Tahoma';
+              background-color: #ddd;
+              width: 100%;
+              padding: 5px 0px;
+            ">
               Fig 1. Rust Logger Output
             </span>
           </photosizer-block>
@@ -192,10 +169,10 @@
                 Logger Struct
               </defn-head>
               <defn-code>
-                pub struct Logger {
-                fl:Option&lt;File&gt;,
-                console:bool,
-                }
+pub struct Logger {
+  fl:Option&lt;File&gt;,
+  console:bool,
+}
               </defn-code>
             </defn-block>
           </div>
@@ -231,136 +208,135 @@
                 <defn-block>
                   <defn-head>Logger Methods:</defn-head>
                   <defn-code>
-                    #[allow(dead_code)]
-                    impl Logger {
-                    /*-- create default logger --*/
-                    pub fn new() -&gt; Self {
-                    Self { fl:None, console:true, }
-                    }
-                    /*-- create initialized logger --*/
-                    pub fn init(f:File, con:bool) -&gt; Self {
-                    Self { fl:Some(f), console:con, }
-                    }
-                    /*-- enable | disable writing to console --*/
-                    pub fn console(&amp;mut self, con:bool) {
-                    self.console = con
-                    }
-                    /*-- attach file --*/
-                    pub fn file(&amp;mut self, f:File) {
-                    self.fl = Some(f);
-                    }
-                    /*-- attach Option&lt;File&gt; --*/
-                    pub fn opt(&amp;mut self, f:Option&lt;File&gt;) {
-                    self.fl = f;
-                    }
-                    /*-- attempt to open logger file --*/
-                    pub fn open(&amp;mut self, s:&amp;str) -&gt; bool {
-                    use std::fs::OpenOptions;
-                    self.fl = OpenOptions::new()
-                    .write(true)
-                    .create(true)
-                    .append(true)
-                    .open(s).ok();
-                    if self.fl.is_some() {
-                    return true;
-                    }
-                    false
-                    }
-                    /*-- write log entry with date-time stamp */
-                    /*-- can be chained                       */
-                    pub fn ts_write(&amp;mut self, s:&amp;str)
-                    -&gt; &amp;mut Self {
+#[allow(dead_code)]
+impl Logger {
+  /*-- create default logger --*/
+  pub fn new() -&gt; Self {
+    Self { fl:None, console:true, }
+  }
+  /*-- create initialized logger --*/
+  pub fn init(f:File, con:bool) -&gt; Self {
+    Self { fl:Some(f), console:con, }
+  }
+  /*-- enable | disable writing to console --*/
+  pub fn console(&amp;mut self, con:bool) {
+    self.console = con
+  }
+  /*-- attach file --*/
+  pub fn file(&amp;mut self, f:File) {
+    self.fl = Some(f);
+  }
+  /*-- attach Option&lt;File&gt; --*/
+  pub fn opt(&amp;mut self, f:Option&lt;File&gt;) {
+    self.fl = f;
+  }
+  /*-- attempt to open logger file --*/
+  pub fn open(&amp;mut self, s:&amp;str) -&gt; bool {
+    use std::fs::OpenOptions;
+    self.fl = OpenOptions::new()
+    .write(true)
+    .create(true)
+    .append(true)
+    .open(s).ok();
+    if self.fl.is_some() {
+      return true;
+    }
+    false
+  }
+  /*-- write log entry with date-time stamp */
+  /*-- can be chained                       */
+  pub fn ts_write(&amp;mut self, s:&amp;str)
+  -&gt; &amp;mut Self {
+    let now: DateTime&lt;Local&gt; = Local::now();
+    /* format DateTime string */
+    let mut now_str =
+      format!("\n  {}", now.to_rfc2822());
+    /* remove trailing -0400 */
+    now_str.truncate(now_str.len() - 6);
 
-                    let now: DateTime&lt;Local&gt; = Local::now();
-                    /* format DateTime string */
-                    let mut now_str =
-                    format!("\n  {}", now.to_rfc2822());
-                    /* remove trailing -0400 */
-                    now_str.truncate(now_str.len() - 6);
-
-                    let _ = Logger::write(self, &amp;now_str);
-                    let rslt = Logger::write(self, s);
-                    rslt
-                    }
-                    /*-- write log entry, can be chained --*/
-                    pub fn write(&amp;mut self, s:&amp;str)
-                    -&gt; &amp;mut Self {
-                    if self.console {
-                    print!("{}", s);
-                    }
-                    if let Some(ref mut f) = self.fl {
-                    let rslt = f.write(s.as_bytes());
-                    match rslt {
-                    Ok(_) =&gt; {},
-                    Err(_) =&gt;
-                    print!("\n  file write failed\n"),
-                    }
-                    }
-                    self
-                    }
-                    /*-- close log file */
-                    pub fn close(&amp;mut self) {
-                    self.fl = None;
-                    }
-                    }
-                    #[derive(PartialEq)]
-                    #[allow(dead_code)]
-                    pub enum OpenMode { Truncate, Append }
-                    #[allow(dead_code)]
-                    /*-----------------------------------------
-                    Helper functions
-                    */
-                    /*-- attempt to open file by name --*/
-                    pub fn open_file(s:&amp;str, mode:OpenMode)
-                    -&gt; Option&lt;File&gt; {
-                    let fl:Option&lt;File&gt;;
-                    use std::fs::OpenOptions;
-                    if mode == OpenMode::Truncate {
-                    fl = OpenOptions::new()
-                    .write(true)
-                    .truncate(true)
-                    .open(s).ok();
-                    }
-                    else {
-                    fl = OpenOptions::new()
-                    .write(true)
-                    .create(true)
-                    .append(true)
-                    .open(s).ok();
-                    }
-                    fl
-                    }
-                    /*-- attempt to remove file by name --*/
-                    pub fn remove_file(s:&amp;str) -&gt; bool {
-                    let rslt = std::fs::remove_file(s);
-                    rslt.is_ok()
-                    }
-                    /*-- does file contain a string? --*/
-                    pub fn file_contains(fl:&amp;str, ts:&amp;str)
-                    -&gt; bool {
-                    let contents = std::fs::read_to_string(fl);
-                    let mut s = "".to_string();
-                    if contents.is_ok() {
-                    s = contents.unwrap();
-                    }
-                    s.contains(ts)
-                    }
-                    /*-- display contents of named file --*/
-                    pub fn file_contents(fl:&amp;str) {
-                    let contents = std::fs::read_to_string(fl);
-                    if contents.is_ok() {
-                    let s = contents.unwrap();
-                    print!("{}", s);
-                    }
-                    else {
-                    print!("\n  no contents");
-                    }
-                    }
-                    /*-- does file exist? --*/
-                    pub fn file_exists(s:&amp;str) -&gt; bool {
-                    let path = Path::new(s);
-                    return path.exists();
-                    }
+    let _ = Logger::write(self, &amp;now_str);
+    let rslt = Logger::write(self, s);
+    rslt
+  }
+  /*-- write log entry, can be chained --*/
+  pub fn write(&amp;mut self, s:&amp;str)
+  -&gt; &amp;mut Self {
+    if self.console {
+      print!("{}", s);
+    }
+    if let Some(ref mut f) = self.fl {
+      let rslt = f.write(s.as_bytes());
+      match rslt {
+        Ok(_) =&gt; {},
+        Err(_) =&gt;
+        print!("\n  file write failed\n"),
+      }
+    }
+    self
+  }
+  /*-- close log file */
+  pub fn close(&amp;mut self) {
+    self.fl = None;
+  }
+}
+#[derive(PartialEq)]
+#[allow(dead_code)]
+pub enum OpenMode { Truncate, Append }
+#[allow(dead_code)]
+/*-----------------------------------------
+  Helper functions
+*/
+/*-- attempt to open file by name --*/
+pub fn open_file(s:&amp;str, mode:OpenMode)
+-&gt; Option&lt;File&gt; {
+  let fl:Option&lt;File&gt;;
+  use std::fs::OpenOptions;
+  if mode == OpenMode::Truncate {
+    fl = OpenOptions::new()
+    .write(true)
+    .truncate(true)
+    .open(s).ok();
+  }
+  else {
+    fl = OpenOptions::new()
+    .write(true)
+    .create(true)
+    .append(true)
+    .open(s).ok();
+  }
+  fl
+}
+/*-- attempt to remove file by name --*/
+pub fn remove_file(s:&amp;str) -&gt; bool {
+  let rslt = std::fs::remove_file(s);
+  rslt.is_ok()
+}
+/*-- does file contain a string? --*/
+pub fn file_contains(fl:&amp;str, ts:&amp;str)
+-&gt; bool {
+  let contents = std::fs::read_to_string(fl);
+  let mut s = "".to_string();
+  if contents.is_ok() {
+    s = contents.unwrap();
+  }
+  s.contains(ts)
+}
+/*-- display contents of named file --*/
+pub fn file_contents(fl:&amp;str) {
+  let contents = std::fs::read_to_string(fl);
+  if contents.is_ok() {
+    let s = contents.unwrap();
+    print!("{}", s);
+  }
+  else {
+    print!("\n  no contents");
+  }
+}
+/*-- does file exist? --*/
+pub fn file_exists(s:&amp;str) -&gt; bool {
+  let path = Path::new(s);
+  return path.exists();
+}
 
                   </defn-code>
                 </defn-block>
