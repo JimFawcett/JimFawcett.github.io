@@ -1,0 +1,2467 @@
+<!DOCTYPE html>
+<html>
+<!--
+  RustStory_Data.html
+-->
+<head>
+  <title>RustStory Data</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/x-icon" href="./images/favicon.ico" />
+  <link rel="stylesheet" href="css/StylesPhoto.css" />
+  <link rel="stylesheet" href="css/StylesSizerComp.css" />
+  <!-- PageFrame infrastructure -->
+  <link rel="stylesheet" href="css/StylesPageFrameDefaults.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameStructure.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameMenus.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameThemeRust.css" />
+  <link rel="stylesheet" href="css/StylesWebComponents.css" />
+  <script src="js/ScriptsWebComponents.js"></script>
+  <!--<script src="js/ScriptsPageFrameDefaults.js"></script>-->
+  <script src="js/ScriptsPageFrameRustStory.js"></script>
+  <script src="js/ScriptsPageFramePagesRustStory.js"></script>
+  <script src="js/ScriptsPageFrameKeyboard.js"></script>
+  <!-- No need for Pages script for pages with no next or prev pages -->
+  <!--<script src="js/ScriptsPageFramePages.js"></script>-->
+  <link rel="stylesheet" href="css/Styles_BitsContent.css" />
+  <script src="js/Scripts_BitsContent.js"></script>
+  <link rel="stylesheet" href="css/StylesSplitterBar.css" />
+  <script src="js/ScriptsSplitterBar.js"></script>
+  <link rel="stylesheet" href="css/prism.css" />
+  <script src="js/prism.js"></script>
+  <style>
+    #github .note {
+      border: 1px solid var(--dark);
+      padding: 0.75em 1.5em;
+      margin-top: 1.25em;
+      margin-bottom: 1.25em;
+      background-color: var(--light);
+      color: var(--dark);
+      max-width: 50em;
+    }
+
+    #github h2 {
+      margin-top: 0.75em;
+    }
+
+    #github ol.tight li {
+      line-height: 1.25em;
+      margin-top: 0.25em;
+      margin-bottom: 0.25em;
+      padding:0.0em;
+    }
+
+    #github ol > li > pre {
+      margin:0.5em 0.5em;
+    }
+    #github header h3 {
+      margin-top: 0em;
+      margin-left: 1em;
+    }
+  </style>
+  <script>
+    function loadifrust() {
+      var loc = window.location.href;
+      if (window.self === window.top) {
+        /*alert('top');*/
+        window.location.href = 'TOCRust.html?src=' + loc;
+      }
+      else {
+        /*alert('not top');*/
+        /*window.top.location.href = loc;*/
+        window.top.location.href = loc;
+      }
+    }
+  </script>
+  <!--   <script>
+      window.onmessage = function () {
+        // alert('msg received');
+        bottomMenu.sections();
+      }
+    </script>
+   -->
+</head>
+<body id="github" onload="initialize()">
+
+  <a id="Next" href="RustStory_Operations.html">Next</a>
+  <a id="Prev" href="RustStory_Models.html">Prev</a>
+
+  <page-frame>
+    <frame-header>
+      <nav id="navbar"></nav>
+    </frame-header>
+    <main>
+      <div id="about" onclick="this.style.display = 'none'">about</div>
+      <div id="page">RustStory Data</div>
+      <div id="modified">6/8/2022</div>
+      <div id="hlp"></div>
+      <a id="top"></a>
+      <content>
+        <header>
+          <!-- <a class="repoLink" style="margin-right:9em;" href="RustStoryRepo.html">Rust Story Repo</a> -->
+          <a target="_blank" class="repoLink" style="margin:2.0em 1.0em; font-size:0.9em;" href="https://github.com/JimFawcett/RustStory">Rust Story Code</a>
+          <hgroup id="pagetitle" onclick="loadifrust()" style="cursor:pointer;">
+            <h1 id="title">Chapter 2. - Rust Data</h1>
+            <h3 id="subtitle">Types, type deduction, ownership</h3>
+          </hgroup>
+        </header>
+        <div style="height:0em;"></div>
+        <a id="prologue"></a>
+        <h2>2.0&nbsp;&nbsp;Prologue</h2>
+        <t-b>
+          Compiler enforced memory safety is one of the primary features of Rust. That is implemented
+          with a strict ownership policy, ensuring that aliasing and mutation do not occur concurrently
+          for any instance of a Rust type.
+        </t-b>
+        <t-b>
+          <div>
+            <defn-outerBlock>
+              <defn-block>
+                <defn-head>Definition: Alias</defn-head>
+                <defn-body>
+                  Two or more identifiers are bound to part or all of the same memory location.<br />
+                  Example: <c-s>let mut iden1 = vec![1,2,3]; let iden2 = &iden1[1];</c-s>
+                </defn-body>
+              </defn-block>
+              <defn-block>
+                <defn-head>Definition: Mutation</defn-head>
+                <defn-body>
+                  Operations on an identifier change its bound value.<br />
+                  Example: <c-s>iden1.push(4);</c-s>
+                </defn-body>
+              </defn-block>
+            </defn-outerBlock>
+          </div>
+        </t-b>
+        <t-b>
+          By value, we mean the state of an identifier&apos;s bound instance.  The value of a String, for example,
+          is the collection of all its characters. The issue for memory safety is that changes to the String&apos;s
+          state may change its memory allocation if the original allocation did not have enough capacity for the
+          change.  Thus all aliases of the identifier responsible for the change will hold invalid references.
+        </t-b>
+        <t-b>
+          When new names bind to an existing value, the value will, for blittable types, be copied, and
+          will be moved for non-blittable types.  Note that a move is a tranfer of ownership, so the
+          original owner may no longer access that value.  References support borrowing, providing access to the
+          owning instance&apos;s value while suspending the owner&apos;s ability to mutate.  When borrowing
+          terminates, the owner&apos;s ability to mutate is restored.
+        </t-b>
+        <div class="blockSingle left" style="padding:0em; width:max-content; margin-top:0em;">
+          <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>References are borrows</strong></div>
+          <div style="padding:0.25em;">
+            <div class="codewrap clear" style="padding:0.25em; overflow-x:auto; width:max-content;">
+              <pre style="width:25em;"><code class="language-cpp">/* attempt to mutate after borrow */
+
+let mut s = String::from("s is owner");
+slog(&amp;s);
+
+{
+  let rs = &amp;s;  // borrow s
+  // statement below fails to compile
+  // owner can't mutate after borrow
+  // s += " with stuff";
+  slog(&amp;rs);
+}  // borrow ends here
+
+s += " with stuff";
+slog(&amp;s);
+</code></pre>
+            </div>
+          </div>
+        </div>
+        <t-b>
+          Each data may have any number of immutable references, often referred to as shared references.
+          However, only one mutable reference can be taken to data that has no other references. That&apos;s
+          referred to as a unique reference.
+        </t-b>
+        <t-b>
+          References are often referred to as borrows, as the reference borrows the ability to view or
+          mutate the referend.
+        </t-b>
+        <t-b>
+          When an immutable reference is taken on an instance of some type that instance
+          cannot be mutated until the borrow ends, as shown in the code block to the left.
+        </t-b>
+        <t-b>
+          When a mutable reference is taken, only that reference can mutate the instance until the borrow ends,
+          usually at the end of the scope in which the reference is defined.
+        </t-b>
+        <t-b>
+          All of these rules are enforced by the Rust compiler.  When a rule is violated, the compiler emits
+          a useful error message that helps a designer fix the violation.
+        </t-b>
+        <div style="height:1.5em; clear:both;"></div>
+        <a id="lifecycle"></a>
+        <h2>2.1&nbsp;&nbsp;Data and its Life Cycle</h2>
+        <t-b>
+          Rust data comes in two flavors (see <a href="https://cheats.rs/#basic-types">basic-types</a> for details):
+          <div class="pad5" style="margin-left:1em;">
+            <ol class="tight">
+              <li>
+                <strong>Blittable types:</strong>
+                <div class="pad5">
+                  Stored entirely in one contiguous block of stack memory.
+                  <indent-blocks>
+                    <ul class="tight" style="list-style-type: disc;">
+                      <li>
+                        Basic Types:
+                        <div>
+                          <c-s>
+                            u8, i8, u16, i16, u32, i32, u64, i64, usize, isize,
+                            f32, f64, bool, char, str
+                          </c-s>
+                        </div>
+                      </li>
+                      <li>
+                        Aggregate Types:
+                        <div>
+                          <c-s>
+                            array, tuple, struct
+                          </c-s> if all their items are blittable
+                        </div>
+                      </li>
+                      <li>
+                        User-Defined Types that have all blittable members and are marked Copy with #[derive(Copy)]
+                      </li>
+                    </ul>
+                  </indent-blocks>
+                </div>
+              </li>
+              <li>
+                <strong>Non-Blittable types:</strong>
+                <div class="pad5">
+                  Control block stored in one contiguous block of stack memory with references
+                  to data held in the heap.
+                  <indent-blocks>
+                    <ul class="tight" style="list-style-type: disc;">
+                      <li>
+                        Std Library Types:
+                        <div>
+                          <c-s>
+                            String, Box, Vec, VecDeque, LinkedList, HashMap, HashSet,
+                            BTreeMap, BTreeSet, BinaryHeap
+                          </c-s>
+                        </div>
+                      </li>
+                      <li>
+                        Aggregate Types:
+                        <div>
+                          <c-s>
+                            array, tuple, struct
+                          </c-s> if each has at least one non-blittable member
+                        </div>
+                      </li>
+                      <li>
+                        User-defined types that have at least one non-blittable member
+                      </li>
+                    </ul>
+                  </indent-blocks>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </t-b>
+        <div style="width:calc(100vw - 6rem);">
+          <photosizer-block src="Pictures/StringMove.jpg" width="500" class="photoSizerBlock right" style="margin-top:0;">
+            <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS', Tahoma;
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;
+        ">
+              Figure 1. String Move
+            </span>
+          </photosizer-block>
+        </div>
+        <t-b>
+          Blittable data values are copied:
+          <indent-block class="pad5">
+            <div>
+              <c-s>let x = 3.5;</c-s>
+              <t-b class="indent" style="font-size:0.95rem;">
+                Creates an <c-s>x:f64</c-s> on the stack initialized with the value <c-s>3.5</c-s>.
+              </t-b>
+            </div>
+          </indent-block>
+          <indent-block class="pad5">
+            <div>
+              <c-s>let y = x;</c-s>
+              <t-b class="indent" style="font-size:0.95rem;">
+                Creates an <c-s>y:f64</c-s> on the stack and copies <c-s>x</c-s>&apos;s value into y.
+                <c-s>x</c-s> is still valid.
+              </t-b>
+            </div>
+          </indent-block>
+        </t-b>
+        <t-b>
+          Non-Blittable data values are moved:
+          <indent-block class="pad5">
+            <div>
+              <c-s>let s = String::from("a string");</c-s>
+              <t-b class="indent" style="font-size:0.95rem;">
+                Creates an <c-s>s:String</c-s> control block on the stack pointing to continguous heap memory
+                containing the characters &quot;<c-s>a string</c-s>&quot;
+              </t-b>
+            </div>
+          </indent-block>
+          <indent-block class="pad5">
+            <div>
+              <c-s>let t = s;</c-s>
+              <t-b class="indent" style="font-size:0.95rem;">
+                Copies the <c-s>s:String</c-s> control block to <c-s>t</c-s> (still pointing to <c-s>s</c-s>&apos;s characters)
+                and marks <c-s>s</c-s> as moved.
+              </t-b>
+            </div>
+          </indent-block>
+        </t-b>
+        <t-b>
+          When <c-s>x</c-s> and <c-s>y</c-s> go out of scope, that is, the thread of execution leaves the scope
+          in which <c-s>x</c-s> and <c-s>y</c-s> are defined, nothing happens other than the stack frame is marked as
+          free and may be over-written at any time due to another stack allocation.
+        </t-b>
+        <t-b>
+          When <c-s>s</c-s> and <c-s>t</c-s> go out of scope, the string Drop trait method is called on
+          <c-s>t</c-s>, deallocating its character memory in the heap.
+          The Drop trait method is not called on <c-s>s</c-s> since it no longer owns anything on the heap.
+        </t-b>
+        <div style="width:calc(100vw - 6rem);">
+          <photosizer-block src="Pictures/StringClone.jpg" width="500" class="photoSizerBlock right" style="margin-top:0;">
+            <span style="
+          display: inline-block;
+          font-weight: bold;
+          font-family: 'Comic Sans MS', Tahoma;
+          background-color: #ddd;
+          width: 100%;
+          padding: 5px 0px;
+        ">
+              Figure 2. String Clone
+            </span>
+          </photosizer-block>
+        </div>
+        <t-b>
+          <t-b>
+            There is an alternative to that scenario. Many of the stdlibrary types, including <c-s>String</c-s>, implement
+            the Clone trait, giving them a clone method. So, a designer can replace a move that invalidates its
+            source with the construction of a clone, like this:
+          </t-b>
+          <indent-block class="pad5">
+            <div>
+              <c-s>let s = String::from("a string");</c-s>
+              <t-b class="indent" style="font-size:0.95rem;">
+                Creates an <c-s>s:String</c-s> control block on the stack pointing to continguous heap memory
+                containing the characters &quot;<c-s>a string</c-s>&quot;
+              </t-b>
+            </div>
+          </indent-block>
+          <indent-block class="pad5">
+            <div>
+              <c-s>let t = s.clone();</c-s>
+              <t-b class="indent" style="font-size:0.95rem;">
+                Creates a <c-s>t:String</c-s> control block on the stack pointing to continguous heap memory
+                containing a copy of the characters &quot;<c-s>a string</c-s>&quot;
+              </t-b>
+            </div>
+          </indent-block>
+        </t-b>
+        <t-b>
+          Now, both <c-s>s</c-s> and <c-s>t</c-s> are valid, each pointing to their own character allocations
+          on the heap, which, immediately following the clone operation, have the same characters.
+        </t-b>
+        <t-b>
+          When <c-s>s</c-s> and <c-s>t</c-s> go out of scope, the String Drop trait method drop() is called on
+          both <c-s>s</c-s> and <c-s>t</c-s> because they each own unique character array allocations.
+        </t-b>
+        <t-b>
+          User defined types can also implement the clone method by deriving the Clone trait, e.g., #[derive(Clone)]
+          just above the type definition.
+        </t-b>
+        <div class="clear"></div>
+        <div style="height:0.5em;"></div>
+        <a id="deduction"></a>
+        <h2>2.2&nbsp;&nbsp;Rust Types and Type Deduction</h2>
+        <t-b>
+          Rust has a strong type inference engine so you usually don&apos;t need to qualify newly
+          created instances with their types as long as they are initialized in the definition.
+        </t-b>
+        <t-b>
+          The Rust <c-s>let</c-s> declarator works much like the C++ <c-s>auto</c-s> declarator.
+          This is illustrated in the code example, below.
+        </t-b>
+        <t-b>
+          <div>
+            <details>
+              <summary class="labelStyle darkItem">Type Deduction</summary>
+              <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em);">
+                <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Fully qualified vs. deduced types</strong></div>
+                <div style="float:right; margin-right:0.75em; padding:0.25em 0em;"><strong>Output</strong></div>
+                <splitter-container id="container" class="clear">
+                  <first-item id="typeded-first" style="width:52%;">
+                    <div class="codewrap" onclick="cbubbleup('typeded-first')">
+                      <div style="display:flex; flex-direction:column;">
+                        <pre style="width:200em;"><code class="language-rust">use std::fmt::{Debug};
+
+#[allow(dead_code)]
+pub fn run () {
+
+  /*-- fully specified --*/
+  let i:i32 = 5;
+  let f:f64 = 3.4;
+  let a:[f32; 5] = [1.0, 1.5, 2.0, 1.5, 1.0];
+  let t:(i32, f64, String) = (1, 2.0, "three".to_string());
+  #[derive(Debug)]
+  struct S{i:i32, s:&amp;'static str, };
+  let s:S = S{i:15, s:"a literal string" };
+  #[derive(Debug)]
+  enum E {BS(String), MS(String), PhD(String),};
+  let e:E = E::MS("Computer Engineering".to_string());
+
+  print!("\n  -- fully specified types --\n");
+  print!("\n  i = {:?}", i);
+  print!("\n  f = {:?}", f);
+  print!("\n  a = {:?}", a);
+  print!("\n  t = {:?}", t);
+  print!("\n  s = {:?}", s);
+  print!("\n  e = {:?}", e);
+
+  /*-- using type deduction --*/
+  let i = 5;
+  let f = 3.4;
+  let a = [1.0, 1.5, 2.0, 1.5, 1.0];
+  let t = (1, 2.0, "three".to_string());
+  let s = S{i:15, s:"a literal string" };
+  let e = E::MS("Computer Engineering".to_string());
+
+  print!("\n\n  -- using type deduction --\n");
+  print!("\n  i = {:?}", i);
+  print!("\n  f = {:?}", f);
+  print!("\n  a = {:?}", a);
+  print!("\n  t = {:?}", t);
+  print!("\n  s = {:?}", s);
+  print!("\n  e = {:?}", e);
+}
+</code></pre>
+                      </div>
+                    </div>
+                  </first-item>
+                  <splitter-bar id="typeded-seperator"></splitter-bar>
+                  <second-item id="typeded-second" style="width:40em;">
+                    <div class="codewrap" onclick="obubbleup('typeded-first')">
+                      <div style="display:flex; flex-direction:column;">
+                        <pre style="width:200em;"><code class="language-term">C:\github\JimFawcett\RustBasicDemos\rust_probes>
+cargo -q run
+
+-- fully specified types --
+
+i = 5
+f = 3.4
+a = [1.0, 1.5, 2.0, 1.5, 1.0]
+t = (1, 2.0, "three")
+s = S { i: 15, s: "a literal string" }
+e = MS("Computer Engineering")
+
+-- using type deduction --
+
+i = 5
+f = 3.4
+a = [1.0, 1.5, 2.0, 1.5, 1.0]
+t = (1, 2.0, "three")
+s = S { i: 15, s: "a literal string" }
+e = MS("Computer Engineering")
+
+</code></pre>
+                      </div>
+                    </div>
+                  </second-item>
+                </splitter-container>
+              </div>
+              <div style="height:1em;"></div>
+            </details>
+          </div>
+        </t-b>
+        <div style="height:0.5em;"></div>
+        <a id="basictypes"></a>
+        <h3>2.2.1&nbsp;&nbsp;Basic Data Types</h3>
+        <t-b>
+          Rust basic types are:
+          <indent-block class="pad5">
+            <c-s>
+              i8, u8, i16, u16, i32, u32, i64, u64, i128, u128, isize, usize
+              f32, f64, char, bool, ()
+            </c-s>
+          </indent-block>
+        </t-b>
+        <t-b>
+          The last of these, &quot;<c-s>()</c-s>&quot; is the unit type. It represents the absence of a value.
+        </t-b>
+        <t-b>
+          Examples of all the basic types including code and output in 
+          <a target="_blank" href="https://github.com/JimFawcett/RustStory/tree/master/Chap_2_Data/data_types">Chap_2_Data/data_types</a> 
+          are shown in the details below.
+        </t-b>
+        <t-b>
+          <details>
+            <summary class="labelStyle darkItem">Basic Types</summary>
+            <t-b>
+              Rust compiler uses type inference, based on literal and previously identified type values in 
+              expressions to infer the type of a newly created variable.
+            </t-b>
+            <t-b>
+              Code authors can override that with explicit type declarations, either for clarity or to
+              establish a type that has a different size than the expected inferred type.
+            </t-b>
+            <t-b>
+              That is illustrated in the example, below.
+            </t-b>
+            <t-b>
+              Note that the basic types are blittable, and so implement the Copy trait.
+            </t-b>
+            <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em);">
+              <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Basic Types code from main</strong></div>
+              <div style="float:right; margin-right:0.75em; padding:0.25em 0em;"><strong>Output</strong></div>
+              <splitter-container id="container" class="clear">
+                <first-item id="typebasic-first" style="width:52%;">
+                  <div class="codewrap" onclick="cbubbleup('typebasic-first')">
+                    <div style="display:flex; flex-direction:column;">
+                      <pre style="width:200em;"><code class="language-rust">title("exploring basic types".to_string());
+/*
+  Rust basic types:
+  i8, u8, i16, u16, i32, u32, i64, u64, i128, u128, isize, usize
+  f32, f64, char, bool, ()
+*/
+let demo :i8 = 3;
+putln(&amp;"let demo :i8 = 3;");
+log(&amp;demo);
+
+separator();
+let demo = 5;
+putln(&amp;"let demo = 5;");
+log(&amp;demo);
+
+separator();
+let demo :usize = 7;
+putln(&amp;"let demo :usize = 7;");
+log(&amp;demo);
+
+/* Rust floats: f32, f64 */
+
+separator();
+let demo = 3.5;
+putln(&amp;"let demo = 3.5;");
+log(&amp;demo);
+
+separator();
+let demo :f32 = -3.5;
+putln(&amp;"let demo :f32 = -3.5;");
+log(&amp;demo);
+
+/* Rust chars: char */
+
+separator();
+let demo = 'a';
+putln(&amp;"let demo = 'a';");
+log(&amp;demo);
+
+separator();
+let demo :char = 'Z';
+putln(&amp;"let demo :char = 'Z';");
+log(&amp;demo);
+
+/* Rust boolean: bool */
+
+separator();
+let demo = true;
+putln(&amp;"let demo = true;");
+log(&amp;demo);
+
+separator();
+let demo :bool = false;
+putln(&amp;"let demo :bool = false");
+log(&amp;demo);
+
+/* Rust unit type: () */
+
+separator();
+let demo = ();
+putln(&amp;"let demo = ();");
+log(&amp;demo);
+
+separator();
+let demo :() = ();
+putln(&amp;"let demo :() = ();");
+log(&amp;demo);
+
+</code></pre>
+                    </div>
+                  </div>
+                </first-item>
+                <splitter-bar id="typebasic-seperator"></splitter-bar>
+                <second-item id="typebasic-second" style="width:40em;">
+                  <div class="codewrap" onclick="obubbleup('typebasic-first')">
+                    <div style="display:flex; flex-direction:column;">
+                      <pre style="width:200em;"><code class="language-term">C:\github\JimFawcett\RustBasicDemos\data_types>
+cargo -q run
+
+ exploring basic types
+-----------------------
+ let demo :i8 = 3;
+ TypeId: i8, size: 1
+ value:  3
+---------------------------------
+ let demo = 5;
+ TypeId: i32, size: 4
+ value:  5
+---------------------------------
+ let demo :usize = 7;
+ TypeId: usize, size: 4
+ value:  7
+---------------------------------
+ let demo = 3.5;
+ TypeId: f64, size: 8
+ value:  3.5
+---------------------------------
+ let demo :f32 = -3.5;
+ TypeId: f32, size: 4
+ value:  -3.5
+---------------------------------
+ let demo = 'a';
+ TypeId: char, size: 4
+ value:  'a'
+---------------------------------
+ let demo :char = 'Z';
+ TypeId: char, size: 4
+ value:  'Z'
+---------------------------------
+ let demo = true;
+ TypeId: bool, size: 1
+ value:  true
+---------------------------------
+ let demo :bool = false
+ TypeId: bool, size: 1
+ value:  false
+---------------------------------
+ let demo = ();
+ TypeId: (), size: 0
+ value:  ()
+---------------------------------
+ let demo :() = ();
+ TypeId: (), size: 0
+ value:  ()
+</code></pre>
+                    </div>
+                  </div>
+                </second-item>
+              </splitter-container>
+            </div>
+            <div style="height:1em;"></div>
+            <div class="blockSingle left" style="padding:0em; width:max-content;">
+              <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>main.rs</strong></div>
+              <div style="padding:0.25em;">
+                <div class="codewrap" style="padding:0.25em; overflow-x:auto; width:max-content;">
+                  <pre style="width:35em;"><code class="language-rust">#[allow(unused_imports)]
+use display::{ putline, title, show_type, log, putlinen };
+use std::fmt::{ Debug, Display };
+
+#[allow(dead_code)]
+fn put&lt;T: Display&gt;(value: &amp;T) {
+  print!("{}", value);
+}
+
+fn putln&lt;T: Display&gt;(value: &amp;T) {
+  let mut str_temp = String::new();
+  str_temp.push_str("\n  ");
+  str_temp.push_str(&amp;value.to_string());
+  print!("{}", str_temp);
+}
+
+fn separator() {
+  put(&amp;"\n ---------------------------------");
+}
+
+fn main() {
+  /* code elided - see panel above */
+}
+</code></pre>
+                </div>
+              </div>
+            </div>
+            <div style="height:3em;"></div>
+            <t-b>
+              The function <c-s>main()</c-s>, in the block to the left, contains all demonstration
+              code in the left block above.
+              <div style="height:0.75em;"></div>
+              Code above main consists of three functions that help format output into a relatively
+              readable form.
+            </t-b>
+            <div style="height:1em;"></div>
+
+          </details>
+        </t-b>
+        <div class="clear" style="height:0.5em;"></div>
+        <a id="aggregates"></a>
+        <h3>2.2.2&nbsp;&nbsp;Aggregate Data Types</h3>
+        <t-b>
+          Rust aggregate types are:
+          <indent-block class="pad5">
+            arrays, tuples, strings, references, structs, and enums
+          </indent-block>
+        </t-b>
+        <t-b>
+          Examples for all of the aggregate types, showing code and output from
+          <a target="_blank" href="https://github.com/JimFawcett/RustStory/tree/master/Chap_2_Data/aggr_probes">RustStory/Chap_2_Data/aggr_probes</a>:
+        </t-b>
+        <t-b>
+          <div>
+            <details>
+              <summary class="labelStyle darkItem">Aggregate Types</summary>
+              <t-b>
+        <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em);">
+          <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Aggregates Demonstration Code</strong></div>
+          <div style="float:right; margin-right:0.75em; padding:0.25em 0em;"><strong>Output</strong></div>
+          <splitter-container id="container" class="clear">
+            <first-item id="hello3-first" style="width:52%;">
+              <div class="codewrap" onclick="cbubbleup('hello3-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-rust">/*-- create and display basic aggregates -*/
+
+fn basic_aggr() {
+  show_title(&quot;Demonstrate Rust Aggregates&quot;);
+
+  /*-- array --*/
+  show_label(&quot;arrays&quot;);
+  show_op(&quot;let mut arr:[i32; 5] = [1, 2, 3, 4, 5]&quot;);
+  let mut arr: [i32; 5] = [1, 2, 3, 4, 5];
+  show_type(&arr);
+  show_value(&arr);
+  show_op(&quot;arr[1] = -2&quot;);
+  arr[1] = -2;
+  show_value(&arr);
+  println!();
+
+  /*-- slice --*/
+  show_label(&quot;slices&quot;);
+  show_op(&quot;let slc = &mut arr[1..4]&quot;);
+  let slc = &mut arr[1..4];
+  show_type(&slc);
+  show_value(&slc);
+  show_op(&quot;slc[0] = 0&quot;);
+  slc[0] = 0;
+  show_value(&slc);
+  show_op(&quot;value of array is now:&quot;);
+  show_value(&arr);
+  println!();
+
+  /*-- tuple --*/
+  show_label(&quot;tuples&quot;);
+  show_op(&quot;let tpl = (42, 'z', &#92;&quot;abc&#92;&quot;, 3.14159)&quot;);
+  #[allow(clippy::approx_constant)]
+  let tpl = (42, 'z', &quot;abc&quot;, 3.14159);
+  show_type(&tpl);
+  show_value(&tpl);
+  show_op(&quot;value of second element is:&quot;);
+  show_value(&tpl.1);
+  println!();
+
+  /*-- string --*/
+  show_label(&quot;strings&quot;);
+  show_op(&quot;let s = &#92;&quot;a string&#92;&quot;.to_string()&quot;);
+  let mut s = &quot;a string&quot;.to_string();
+  show_type(&s);
+  show_value(&s);
+  show_op(&quot;s.push_str(&#92;&quot; plus more&#92;&quot;)&quot;);
+  s.push_str(&quot; plus more&quot;);
+  show_value(&s);
+  println!();
+
+  /*-- reference --*/
+  show_label(&quot;references&quot;);
+  show_op(&quot;let r = &s&quot;);
+  let r = &s;
+  show_type(&r);
+  show_value(&r);
+  println!();
+
+  /*-- struct --*/
+  show_label(&quot;structures&quot;);
+  #[derive(Debug)]
+  struct DemStr { i:i32, c:char, d:f64, }
+  show_op(&quot;let st = DemStr { i:1, c:'a', d:0.333 }&quot;);
+  let st = DemStr { i:1, c:'a', d:0.333 };
+  show_type(&st);
+  show_value(&st);
+  let second = st.c;
+  show_op(&quot;let second = st.c&quot;);
+  show_value(&second);
+  println!();
+
+  /*-- enum --*/
+  show_label(&quot;enumerations&quot;);
+
+  #[derive(Debug)]
+  enum LangAge { Recent, Ancient }
+
+  #[derive(Debug)]
+  enum Langs {
+    Rust(LangAge), Fortran(LangAge)
+  }
+
+  let a_lang = Langs::Rust(LangAge::Recent);
+  show_type(&a_lang);
+  show_value(&a_lang);
+
+  let old_lang = Langs::Fortran(LangAge::Ancient);
+  show_type(&old_lang);
+  show_value(&old_lang);
+
+  /*-- matching requires handling all branches --*/
+  match a_lang {
+    Langs::Rust(LangAge::Recent) =&gt; { println!(&quot;  Rust is recent&quot;); }
+    Langs::Rust(LangAge::Ancient) =&gt; { println!(&quot;  Rust is ancient&quot;); }
+    Langs::Fortran(LangAge::Recent) =&gt; { println!(&quot;  Fortran is recent&quot;); }
+    Langs::Fortran(LangAge::Ancient) =&gt; { println!(&quot;  Fortran is ancient&quot;); }
+  }
+  /*-------------------------------------------------------
+    if let can examine one branch and provide
+    blanket handling for others
+  */
+  if let Langs::Rust(LangAge::Recent) = a_lang {
+    println!(&quot;  Rust was stablized in 2015&quot;)
+  } else {
+    println!(&quot;  this language isn't very interesting&quot;);
+  }
+}
+
+fn move_copy() {
+  show_title(&quot;Demonstrate Copy and Move&quot;);
+
+  show_label(&quot;copy array of integers&quot;);
+  show_op(&quot;let arri = [ 1, 2, 3, 2, 1]&quot;);
+  let arri = [ 1, 2, 3, 2, 1];
+  show_value(&arri);
+  show_op(&quot;let carri = arri&quot;);
+  let carri = arri;
+  show_value(&carri);
+  // the next statement succeeds because arri was copied
+  // println!(&quot;{arri:?}&quot;);
+  println!();
+
+  show_label(&quot;copy array of &strs&quot;);
+  show_op(&quot;let arri = [ &#92;&quot;1&#92;&quot;, &#92;&quot;2&#92;&quot;, &#92;&quot;3&#92;&quot;, &#92;&quot;2&#92;&quot;, &#92;&quot;1&#92;&quot;]&quot;);
+  let arri = [ &quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;2&quot;, &quot;1&quot;];
+  show_value(&arri);
+  show_op(&quot;let carri = arri&quot;);
+  let carri = arri;
+  show_value(&carri);
+  // the next statement succeeds because arri was copied
+  // println!(&quot;{arri:?}&quot;);
+  println!();
+
+  show_label(&quot;move array of Strings&quot;);
+  show_op(
+    &quot;let arri = [&#92;&quot;1&#92;&quot;.to_owned(), &#92;&quot;2&#92;&quot;.to_owned(),
+    &#92;&quot;3&#92;&quot;.to_owned(), &#92;&quot;2&#92;&quot;.to_owned(), &#92;&quot;1&#92;&quot;.to_owned()])&quot;
+  );
+  /*------------------------------------------------------
+    to_owned() converts copy type &str
+    to move type String
+  */
+  let arri = [
+    &quot;1&quot;.to_owned(), &quot;2&quot;.to_owned(), &quot;3&quot;.to_owned(),
+    &quot;2&quot;.to_owned(), &quot;1&quot;.to_owned()
+  ];
+  show_value(&arri);
+  show_op(&quot;let carri = arri&quot;);
+  let carri = arri;
+  show_value(&carri);
+  // the next statement fails because arri was moved
+  // println!(&quot;{arri:?}&quot;);
+  println!(&quot;  arri moved so no longer valid&#92;n&quot;);
+  println!(&quot;  an aggregate of all copy types is copy&quot;);
+  println!(&quot;  an aggregate with at least one move type element is move&quot;);
+}
+</code></pre>
+                </div>
+              </div>
+            </first-item>
+            <splitter-bar id="hello3-seperator"></splitter-bar>
+            <second-item id="hello3-second" style="width:40em;">
+              <div class="codewrap" onclick="obubbleup('hello3-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-cpp">
+
+-----------------------------
+ Demonstrate Rust Aggregates
+-----------------------------
+
+ arrays
+--------
+--- let mut arr:[i32; 5] = [1, 2, 3, 4, 5] ---
+  TypeId: [i32; 5], size: 20
+  value: [1, 2, 3, 4, 5]
+--- arr[1] = -2 ---
+  value: [1, -2, 3, 4, 5]
+
+
+
+  
+ slices
+--------
+--- let slc = &mut arr[1..4] ---
+  TypeId: &mut [i32], size: 16
+  value: [-2, 3, 4]
+--- slc[0] = 0 ---
+  value: [0, 3, 4]
+--- value of array is now: ---
+  value: [1, 0, 3, 4, 5]
+
+
+
+
+ tuples
+--------
+--- let tpl = (42, 'z', "abc", 3.14159) ---
+  TypeId: (i32, char, &str, f64), size: 32
+  value: (42, 'z', "abc", 3.14159)
+--- value of second element is: ---
+  value: 'z'
+
+
+
+
+ strings
+---------
+--- let s = "a string".to_string() ---
+  TypeId: alloc::string::String, size: 24
+  value: "a string"
+--- s.push_str(" plus more") ---
+  value: "a string plus more"
+
+
+
+
+ references
+------------
+--- let r = &s ---
+  TypeId: &alloc::string::String, size: 8
+  value: "a string plus more"
+
+
+
+ structures
+------------
+--- let st = DemStr { i:1, c:'a', d:0.333 } ---
+  TypeId: aggr_probes::basic_aggr::DemStr, size: 16
+  value: DemStr { i: 1, c: 'a', d: 0.333 }
+--- let second = st.c ---
+  value: 'a'
+
+
+
+
+
+
+ enumerations
+--------------
+  TypeId: aggr_probes::basic_aggr::Langs, size: 2
+  value: Rust(Recent)
+  TypeId: aggr_probes::basic_aggr::Langs, size: 2
+  value: Fortran(Ancient)
+  Rust is recent
+  Rust was stablized in 2015
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+---------------------------
+ Demonstrate Copy and Move
+---------------------------
+
+ copy array of integers
+------------------------
+--- let arri = [ 1, 2, 3, 2, 1] ---
+  value: [1, 2, 3, 2, 1]
+--- let carri = arri ---
+  value: [1, 2, 3, 2, 1]
+
+
+
+ copy array of &strs
+---------------------
+--- let arri = [ "1", "2", "3", "2", "1"] ---
+  value: ["1", "2", "3", "2", "1"]
+--- let carri = arri ---
+  value: ["1", "2", "3", "2", "1"]
+
+
+
+
+
+
+ move array of Strings
+-----------------------
+--- let arri = ["1".to_owned(), "2".to_owned(),
+    "3".to_owned(), "2".to_owned(), "1".to_owned()]) ---
+  value: ["1", "2", "3", "2", "1"]
+--- let carri = arri ---
+  value: ["1", "2", "3", "2", "1"]
+  arri moved so no longer valid
+
+  an aggregate of all copy types is copy
+  an aggregate with at least one move type element is move
+
+</code></pre>
+                </div>
+              </div>
+            </second-item>
+          </splitter-container>
+        </div>
+        <div style="height:1em;"></div>
+
+              </t-b>
+            </details>
+          </div>
+        </t-b>
+        <t-b>
+          Aggregate types are blittable if and only if they have all blittable members, e.g.,
+          no Strings, Vecs, ...  In that case they can acquire the Copy trait, simply by
+          qualifying them as implementing derived Copy:
+          <indent-block class="pad5">
+            #[derive(Debug, Copy, Clone)]
+            struct my_struct { ... }
+          </indent-block>
+          For this declaration the compiler generates these traits.
+          <div>
+            <ul class="tight">
+              <li>
+                Debug allows you to use {:?} in a format which uses a standard formatting
+                process for each of the Rust types.
+              </li>
+              <li>
+                Copy causes the compiler to copy an instance&apos;s value by blitting (memcpy) to
+                the new location. The compiler will refuse to derive Copy if any member is non-blittable
+                or the type already implements the Drop trait.
+              </li>
+              <li>
+                Clone is not called implicitly, but a designer can write code that calls clone() and
+                then pays whatever performance penalty accrues for making the copy. If you implement Copy you
+                are also required to implement Clone.
+              </li>
+            </ul>
+          </div>
+        </t-b>
+        <t-b style="margin-bottom:0px;">
+          If an aggregate type is non-blittable, then attempting to derive the Copy trait is a compile error.
+          However, you can implement Clone using the clone method on any non-blittable member if the member
+          has the Clone trait.
+        </t-b>
+        <div style="height:0.5em;"></div>
+        <a id="slices"></a>
+        <h3>2.2.3&nbsp;&nbsp;Slices of Aggregate Types:</h3>
+        <t-b>
+          A slice is a non-owning view into an aggregate data structure that may or may not be
+          viewing the complete data structure.  Consider an array:
+          <indent-block class="pad5">
+            <c-s>let arr = [1, 2, 3, 4, 5, 6];</c-s>
+            <ul class="tights">
+              <li>
+                <c-s>let slc1 = &arr[..];    // view the entire array</c-s>
+              </li>
+              <li>
+                <c-s>let slc2 = &arr[0..6];  // same as slc1</c-s>
+              </li>
+              <li>
+                <c-s>let slc3 = &arr[..3];   // views elements [1, 2, 3]</c-s>
+              </li>
+              <li>
+                <c-s>let slc4 = &arr[1..];   // views elements [2, 3, 4, 5, 6]</c-s>
+              </li>
+              <li>
+                <c-s>let slc5 = &arr[1..4];  // views elements [2, 3, 4]</c-s>
+              </li>
+            </ul>
+          </indent-block>
+        </t-b>
+        <t-b>
+          It only makes sense to take slices of array-like things, e.g., arrays, vectors, and strings.
+          Also, string slices only make sense if all the string characters are ASCII.  We will discuss
+          this further in the next section.
+        </t-b>
+        <div style="height:0.5em;"></div>
+        <a id="strings"></a>
+        <h3>2.2.4&nbsp;&nbsp;String Types:</h3>
+        <t-b>
+          Rust provides two native string types: String and str, and two types intended for use with
+          C language bindings: OsString and CString.  We will focus here on String and str.
+        </t-b>
+        <t-b style="margin-bottom:0px;">
+          The str type is part of the core Rust language and String is provided in the std library.  Both
+          contain sequences of utf-8 characters.  The size of utf-8 characters ranges from 1 to 4 bytes.
+          But String is implemented using Vec&lt;u8&gt;, so indexing into the Vec only yields a byte which
+          will be a whole character if ASCII, but only part of a character otherwise.  That means that you
+          can&apos;t index Strings.
+        </t-b>
+        <div style="height:0.5em;"></div>
+        <a id="string"></a>
+        <h4>2.2.4.1&nbsp;&nbsp;String</h4>
+        <t-b>
+          You retrieve the ith utf-8 char from a String, s, using:
+          <indent-block class="pad5">
+            <c-s>s.chars().nth(i).unwrap()</c-s>.
+          </indent-block>
+          <c-s>chars()</c-s> is a String iterator that knows how to find utf-8 character boundaries.
+          <c-s>nth(i)</c-s> calls <c-s>next</c-s> on the iterator <c-s>i</c-s> times.  That returns
+          a <c-s>std::option</c-s> that contains either <c-s>Some(ch)</c-s> or <c-s>None</c-s>. If the
+          indexing succeeded that returns <c-s>Some(ch)</c-s> and we can use ch directly. Note that this
+          is an order N process because we walk down the string looking for character boundaries.
+        </t-b>
+        <t-b>
+          Using <c-s>unwrap()</c-s> attempts to use the character directly.  If indexing failed that would
+          result in a panic. In cases where a panic is not appropriate (flight navigation system for the
+          Boeing 797) we use matching to react to the option.  We will discuss option processing in the
+          next chapter, Operations.
+        </t-b>
+        <t-b>
+          The method described above works for all utf-8 character sets.  However, for languages that use
+          diacritics, the diacritics get encoded in a separate char even though a speaker of the language
+          would say that those are part of an adjacent character in that language (Hindi for example).
+          the chars() iterator is not smart enough to handle that situation.
+        </t-b>
+        <t-b>
+          Here&apos;s a reference:
+          <a href="https://doc.rust-lang.org/1.25.0/book/second-edition/ch08-02-strings.html">
+            ch08-02-strings in the Rust Book
+          </a>
+        </t-b>
+        <t-b style="margin-bottom:0px;">
+          Note that Strings are not blittable, so rebinding a string to a new name transfers ownership,
+          and taking a borrow reference suspends the owner&apos;s ability to mutate until the borrow ends.
+        </t-b>
+        <div style="height:0.5em"></div>
+        <a id="str"></a>
+        <h4>2.2.4.2&nbsp;&nbsp;str</h4>
+        <t-b>
+          The str type represents litteral strings like &quot;a literal string&quot;. These are implemented
+          with contiguous blocks of memory, often on the stack, and so are blittable.  You almost always
+          encounter literal strings as references, &s.
+        </t-b>
+        <t-b>
+          strs can be converted to String instances in several ways.  Here&apos;s two:
+          <indent-block class="pad5">
+            <ol class="tight">
+              <li>
+                <c-s>let s = String::from("a literal string");</c-s>
+              </li>
+              <li>
+                <c-s>let s = "a literal string".to_string();</c-s>
+              </li>
+            </ol>
+          </indent-block>
+          And we can create an str by taking a slice of a String or a literal string:
+          <indent-block class="pad5">
+            <ol class="tight">
+              <li>
+                <c-s>let s1 = "Hello world";  // slice of the whole literal</c-s>
+              </li>
+              <li>
+                <c-s>let s2 = &s[1..3];  // second through 4th bytes of s</c-s>
+              </li>
+            </ol>
+          </indent-block>
+          Both <c-s>s1</c-s> and <c-s>s2</c-s> have type <c-s>&str</c-s>, a reference to a literal string.
+        </t-b>
+        <t-b style="margin-bottom:0px;">
+          Taking a complete slice always works, but, since Rust chars are utf-8 with sizes that range from
+          1 byte (ASCII characters) to 4 bytes for math symbols and emojis, a partial slice like s2 may not
+          have a correct representation of the second through 4th characters of s.
+        </t-b>
+        <t-b style="margin-bottom:0px;">
+          An excellent discussion of utf-8 strings is provided by <a href="https://fasterthanli.me/blog/2020/working-with-strings-in-rust/">amos</a>.
+        </t-b>
+        <div style="height:0.5em;"></div>
+        <a id="str_exmpls"></a>
+        <h4>2.2.5&nbsp;&nbsp;String Examples:</h4>
+        <t-b>
+          The String type has methods:
+          <div class="pad5">
+            <ul class="tights">
+              <li>
+                <c-s>let s = String::new();</c-s><br />
+                Creates new empty String instance
+              </li>
+              <li>
+                <c-s>let s = String::from("a literal");</c-s><br />
+                Creates instance from literal
+              </li>
+              <li>
+                <c-s>let t = s.replace("abc","xyz");</c-s><br />
+                <c-s>t</c-s> is a copy of <c-s>s</c-s> with every instance of <c-s>"abc"</c-s>
+                replaced with <c-s>"xyz"</c-s>
+              </li>
+              <li>
+                <c-s>s.len();</c-s><br />
+                returns length of <c-s>s</c-s> in bytes, not chars
+              </li>
+              <li>
+                <c-s>let slice = s.as_str();</c-s><br />
+                returns slice of entire String <c-s>s</c-s> contents
+              </li>
+              <li>
+                <c-s>s.push('a');</c-s><br />
+                append char <c-s>'a'</c-s> to end of <c-s>s</c-s>.
+              </li>
+              <li>
+                <c-s>s.push_str("abc");</c-s><br />
+                appends <c-s>"abc"</c-s> to the end of <c-s>s</c-s>
+              </li>
+              <li>
+                <c-s>let st = s.trim();</c-s><br />
+                returns string with leading and trailing whitespace removed.
+              </li>
+              <li>
+                <c-s>let iter = s.split_whitespace();</c-s><br />
+                returns iterator over whitespace separated tokens
+              </li>
+              <li>
+                <c-s>let iter = s.split('\n');</c-s><br />
+                returns iterator over lines
+              </li>
+              <li>
+                <c-s>let iter = s.chars();</c-s><br />
+                returns an iterator over the utf-8 chars of <c-s>s</c-s>
+              </li>
+            </ul>
+          </div>
+        </t-b>
+        <t-b>
+          Here&apos;s an example,  
+          <a target="_blank" href="https://github.com/JimFawcett/RustStory/tree/master/Chap_2_Data/string_probes">Chap_2_Data/string_probes</a>
+          showing many of these methods in action:
+        </t-b>
+        <t-b>
+          <div>
+            <details>
+              <summary class="labelStyle darkItem">String Examples:</summary>
+
+        <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em);">
+          <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>String Demonstration Code</strong></div>
+          <div style="float:right; margin-right:0.75em; padding:0.25em 0em;"><strong>Output</strong></div>
+          <splitter-container id="container" class="clear">
+            <first-item id="strings-first" style="width:52%;">
+              <div class="codewrap" onclick="cbubbleup('strings-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-rust">fn main() {
+
+  main_title(&quot;string_probes&quot;);
+  putlinen(2);
+
+  /*-- char --*/
+
+  show_op(&quot;let v = vec!['R', 'u', 's', 't']&quot;);
+  let v:Vec&lt;char&gt; = vec!['R', 'u', 's', 't'];
+  log(&v);
+  log(&'R');
+  putlinen(2);
+
+  show_op(&quot;let ch = 'a' as u8&quot;);
+  let ch:u8 = 'a' as u8;
+  log(&ch);
+  show(&quot;char is &quot;, &(ch as char));
+  putlinen(2);
+
+  /*-- String --*/
+
+  show_op(&quot;let s = String::from(&#92;&quot;Rust&#92;&quot;)&quot;);
+  let s:String = String::from(&quot;Rust&quot;);
+  log(&s);
+  let i:usize = 2;
+  let ch = at(&s, i);
+  print!(&quot;&#92;n  in string &#92;&quot;{}&#92;&quot;, char at {} is {}&quot;, &s, i, ch);
+  show(&quot;length in bytes of s = {:?}&quot;, &s.len());
+  putlinen(2);
+
+  show_op(&quot;let v = Vec::from(s.clone())&quot;);
+  let s1 = s.clone();
+  let v:Vec&lt;u8&gt; = Vec::from(s1);
+  log(&v[0]);
+  show(&quot;vec from string&quot;,&v);
+  putlinen(2);
+
+  /*-----------------------------------------------------
+    Displaying emoji's to illustrate the potential
+    of using utf-8.
+  */
+  show_op(&quot;displaying emoji's&quot;);
+  let mut s2 = String::new();
+  s2.push_str(&quot;&#92;u{1F600}&quot;);
+  s2.push('&#92;u{1F601}');
+  s2.push('&#92;u{1F602}');
+  s2.push('&#92;u{1F609}');
+  print!(&quot;&#92;n  {}&quot;, s2);
+  print!(&quot;&#92;n  {}&quot;, '&#92;u{1F601}');
+  putlinen(2);
+
+  /*-- str --*/
+
+  show_op(&quot;let s_slice = &s[..]&quot;);
+  let s_slice = &s[..];   // slice containing all chars of s
+  log(&s_slice);
+  show(&quot;s_slice = &quot;, &s_slice);
+  putlinen(2);
+
+  show_op(&quot;let s_slice2 = s.as_str()&quot;);
+  let s_slice2 = s.as_str();
+  log(&s_slice2);
+  putlinen(2);
+
+  /*-- create string and mutate --*/
+
+  show_op(&quot;let mut s = string::new()&quot;);
+  let mut s = String::new();
+  s.push('a');
+  s.push(' ');
+  s.push_str(&quot;test string&quot;);
+  log(&s);
+  putlinen(2);
+
+  show_op(&quot;let t = s.replace(from: &#92;&quot;string&#92;&quot;, to: &#92;&quot;Rust String&#92;&quot;&quot;);
+  let t = s.replace(&quot;string&quot;,&quot;Rust String&quot;);
+  log(&t);
+  putlinen(2);
+
+  show_op(&quot;tok in s.split_whitespace()&quot;);
+  for tok in s.split_whitespace() {
+    print!(&quot;&#92;n  {}&quot;, tok);
+  }
+  putline();
+
+  /*-----------------------------------------------------
+     Another, order n, way to index string:
+    - chars returns iterator over utf8 chars in string slice
+    - nth(i) calls next on iterator until it gets to i
+    - nth(i) returns std::option::Option&lt;char&gt;:
+       - that contains Some(ch) or None if operation failed
+  */
+  show(&quot;&#92;n  s = &quot;, &s);
+  putline();
+  show_op(&quot;let result = s.chars().nth(0)&quot;);
+  putline();
+  let result = s.chars().nth(0);
+  match result {
+    Some(r) =&gt; show(&quot;  s.chars().nth(0) = &quot;, &r),
+    None =&gt; print!(&quot;&#92;n  couldn't extract char&quot;),
+  }
+  putline();
+  show_op(&quot;let result = s.chars().nth(2)&quot;);
+  putline();
+  let result = s.chars().nth(2);
+  match result {
+    Some(r) =&gt; show(&quot;  s.chars().nth(2) = &quot;, &r),
+    None =&gt; print!(&quot;&#92;n  couldn't extract char&quot;),
+  }
+  putlinen(2);
+
+  {
+    /*-------------------------------------------------
+       Caution here:
+       - slice is returning array of bytes, not utf8 chars
+       - this works only because we use all ASCII chars
+    */
+    /*-- slices are non-owning views and are borrows of s --*/
+    show_op(&quot;let slice_all = &s&quot;);
+    let slice_all = &s;
+    log(&slice_all);
+    show(&quot;slice_all = &quot;, &slice_all);
+    putlinen(2);
+
+    show_op(&quot;let third = &s[2..3]&quot;);
+    let third = &s[2..3];       // string slice with one char
+    log(&third);
+    show(&quot;&#92;n  third = &quot;,&third);
+    putlinen(2);
+
+    /*-- this works for utf-8 encoding --*/
+    show_op(&quot;let ch = third.chars().nth(0)&quot;);
+    let ch = third.chars().nth(0);  //
+    log(&ch);
+    match ch {
+      Some(x) =&gt; { log(&x); show(&quot;&#92;n  match ch = &quot;, &x); },
+      None =&gt; print!(&quot;&#92;n can't return ch&quot;),
+    }
+
+    ///////////////////////////////////////////////////
+    // compile fails
+    // - can't modify owner while borrows are active
+    //------------------------------------------------
+    // s.push('Z');
+    // log(&slice_all);
+
+  }   // elem borrow ends here
+
+  s.push('Z');  // ok, borrows no longer active
+  putlinen(2);
+
+  /* format_args! macro */
+
+  show_op(&quot;let s = std::fmt::format(format_args!(...))&quot;);
+  let s = std::fmt::format(format_args!(&quot;&#92;n  {}, {}, {}&quot;, 1, 2, 3.5));
+  put_str(&s);
+  put(&s);
+  putlinen(2);
+
+  show_op(&quot;struct S { x:i32, y:f64, s:String, }&quot;);
+  #[allow(dead_code)]
+  #[derive(Debug)]
+  struct S {x:i32, y:f64, s:String, }
+  let st:S = S { x:3, y:4.2, s:&quot;xyz&quot;.to_string() };
+  put(&quot;&#92;n  &quot;);
+  putdb(&st);
+  putline();
+
+  sub_title(&quot;That's all Folks!&quot;);
+  putlinen(2);
+}
+</code></pre>
+                </div>
+              </div>
+            </first-item>
+            <splitter-bar id="strings-seperator"></splitter-bar>
+            <second-item id="strings-second" style="width:40em;">
+              <div class="codewrap" onclick="obubbleup('strings-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-term">
+
+  string_probes
+ ===============
+
+
+
+--- let v = vec!['R', 'u', 's', 't'] ---
+  TypeId: alloc::vec::Vec<char>, size: 24
+  value:  ['R', 'u', 's', 't']
+  TypeId: char, size: 4
+  value:  'R'
+
+--- let ch = 'a' as u8 ---
+  TypeId: u8, size: 1
+  value:  97char is 'a'
+
+
+
+
+
+--- let s = String::from("Rust") ---
+  TypeId: alloc::string::String, size: 24
+  value:  "Rust"
+  in string "Rust", char at 2 is slength in bytes of s = {:?}4
+
+
+
+
+
+--- let v = Vec::from(s.clone()) ---
+  TypeId: u8, size: 1
+  value:  82vec from string[82, 117, 115, 116]
+
+
+
+
+
+
+
+
+--- displaying emoji's ---
+  😀😁😂😉
+  😁
+
+
+
+
+
+
+
+
+
+--- let s_slice = &s[..] ---
+  TypeId: &str, size: 16
+  value:  "Rust"s_slice = "Rust"
+
+
+--- let s_slice2 = s.as_str() ---
+  TypeId: &str, size: 16
+  value:  "Rust"
+
+
+
+
+
+--- let mut s = string::new() ---
+  TypeId: alloc::string::String, size: 24
+  value:  "a test string"
+
+
+
+
+
+--- let t = s.replace(from: "string", to: "Rust String" ---
+  TypeId: alloc::string::String, size: 24
+  value:  "a test Rust String"
+
+
+--- tok in s.split_whitespace() ---
+  a
+  test
+  string
+
+
+
+
+
+
+
+
+
+  s = "a test string"
+--- let result = s.chars().nth(0) ---
+  s.chars().nth(0) = 'a'
+--- let result = s.chars().nth(2) ---
+  s.chars().nth(2) = 't'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--- let slice_all = &s ---
+  TypeId: &alloc::string::String, size: 8
+  value:  "a test string"slice_all = "a test string"
+
+
+
+--- let third = &s[2..3] ---
+  TypeId: &str, size: 16
+  value:  "t"
+  third = "t"
+
+
+
+--- let ch = third.chars().nth(0) ---
+  TypeId: core::option::Option<char>, size: 4
+  value:  Some('t')
+  TypeId: char, size: 4
+  value:  't'
+  match ch = 't'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--- let s = std::fmt::format(format_args!(...)) ---
+  1, 2, 3.5
+  1, 2, 3.5
+
+
+
+--- struct S { x:i32, y:f64, s:String, } ---
+  S { x: 3, y: 4.2, s: "xyz" }
+
+
+  That's all Folks!
+ -------------------
+
+</code></pre>
+                </div>
+              </div>
+            </second-item>
+          </splitter-container>
+        </div>
+        <div style="height:1em;"></div>
+
+
+        <div class="blockSingle left" style="padding:0em; width:max-content;">
+          <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Functions defined above main()</strong></div>
+          <div style="padding:0.25em;">
+            <div class="codewrap clear" style="padding:0.25em; overflow-x:auto; width:max-content;">
+              <pre style="width:35em;"><code class="language-rust">/////////////////////////////////////////////////////////////
+// string_probes::main.rs - basic string operations        //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 25 Feb 2020  //
+/////////////////////////////////////////////////////////////
+
+#[allow(unused_imports)]
+use display::{
+  log, slog, show, show_type, show_value,
+  putline, putlinen, main_title, sub_title
+};
+#[allow(unused_imports)]
+use std::fmt::{ Debug, Display };
+
+fn show_op(s:&str) {
+  let strg = &quot;--- &quot;.to_owned() + s + &quot; ---&quot;;
+  print!(&quot;{}&quot;, strg);
+}
+
+fn put&lt;T&gt;(t:T) where T:Display {
+  print!(&quot;{}&quot;, t);
+}
+
+fn putdb&lt;T&gt;(t:T) where T:Debug {
+  print!(&quot;{:?}&quot;, t);
+}
+
+fn put_str(s:&String) {
+  print!(&quot;{}&quot;,s);
+}
+/*-----------------------------------------------------------
+   Note:
+   Strings hold utf8 characters, which vary in size, so you
+   you can't directly index String instances.
+*/
+#[allow(dead_code)]
+pub fn at(s:&String, i:usize) -&gt; char {
+  s.chars().nth(i).unwrap()
+}
+/*-----------------------------------------------------------
+   note:
+   - order n, as str chars are utf8, e.g., from 1 to 5 bytes
+   - this ugliness is one way to index
+   - see below for another, not much better way
+*/
+#[allow(dead_code)]
+pub fn vectorize(s: &str) -&gt; Vec&lt;char&gt; {
+  s.chars().collect::&lt;Vec&lt;char&gt;&gt;()
+}
+/*-- note: order n, from vectorize -- prefer at, above --*/
+#[allow(dead_code)]
+pub fn get_char(s:&str, i:usize) -&gt; char {
+    vectorize(s)[i]
+}
+/*-- stringize - order n --*/
+#[allow(dead_code)]
+pub fn stringize(v: &Vec&lt;char&gt;) -&gt; String {
+  return v.into_iter().collect()
+}
+</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:1em;"></div>
+        <t-b>
+          The functions shown in the block to the right appear above <c-s>main</c-s> in demo code.
+          They are used for display to help make program output readable.
+        </t-b>
+            </details>
+          </div>
+        </t-b>
+        <div class="clear" style="height:0.25em;"></div>
+        <t-b>
+          The fact that Rust Strings hold utf-8 characters is good news and bad news.  The good news is
+          they can represent virtually anything a console can emit, e.g., ASCII chars, math symbols,
+          arabic fonts, european diacritics, and emojis.
+        </t-b>
+        <t-b style="margin-bottom:0px;">
+          The bad news is that you can&apos;t index a Rust String in constant time; and converting to
+          other data structures can get messy.
+        </t-b>
+        <div style="height:0.5em;"></div>
+        <a id="structs"></a>
+        <h2>2.3&nbsp;&nbsp;Structs</h2>
+        <t-b>
+          In Rust, most structs are aggregates of one or more fields where the fields may be arbitray types,
+          named types, or unit type:
+          <indent-block class="pad5">
+            <ol class="tight">
+              <li>
+                <strong>StructExprStruct</strong>:
+                <pre>
+struct Person {
+  name:String, occupation:String, age:u32,
+}
+</pre>
+              </li>
+              <li>
+                <strong>StructExprTuple</strong>:
+                <pre>
+struct Person (
+  String, String, u32,
+)
+</pre>
+              </li>
+              <li>
+                <strong>StructExprUnit</strong>:
+                <pre>
+struct Person;
+                </pre>
+              </li>
+            </ol>
+          </indent-block>
+        </t-b>
+        <t-b>
+          Each of these struct types is declared and used in the left and right top panels. Output from running
+          the using code is shown in the bottom right panel.
+          <div class="pad5">
+
+        <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em);">
+          <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Define Structs</strong></div>
+          <div style="float:right; margin-right:0.75em; padding:0.25em 0em;"><strong>Use Structs</strong></div>
+          <splitter-container id="container" class="clear">
+            <first-item id="structs-first" style="width:52%;">
+              <div class="codewrap" onclick="cbubbleup('structs-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-rust">#[allow(unused_imports)]
+use display::{*};
+use std::fmt;
+
+/*-- ExprStruct struct --*/
+#[derive(Debug)]
+struct Person1 {
+  name:String, occup:String, id:u32,
+}
+#[allow(dead_code)]
+impl Person1 {
+  fn show(&self) {
+    print!("\n  Person1: {:?}", &self);
+  }
+}
+/*-- ExprTuple struct --*/
+#[derive(Debug)]
+struct Person2 (
+  String, String, u32
+);
+#[allow(dead_code)]
+impl Person2 {
+  fn show(&self) {
+    print!("\n  Person2: {:?}", &self);
+  }
+}
+/*-- ExprUnit struct --*/
+#[derive(Debug)]
+struct Person3;
+#[allow(dead_code)]
+impl Person3 {
+  fn show(&self) {
+    print!("\n  Person3");
+  }
+}
+</code></pre>
+                </div>
+              </div>
+            </first-item>
+            <splitter-bar id="structs-seperator"></splitter-bar>
+            <second-item id="structs-second" style="width:40em;">
+              <div class="codewrap" onclick="obubbleup('structs-first')">
+                <div style="display:flex; flex-direction:column;">
+                  <pre style="width:200em;"><code class="language-rust">sub_title("Demonstrating Basic Structs");
+let p1 = Person1 {
+  name:"Jim".to_string(),
+  occup:"dev".to_string(),
+  id:42
+};
+p1.show();
+let p2 = Person2 {
+  0:"Jim".to_string(),
+  1:"dev".to_string(),
+  2:42
+};
+p2.show();
+let p3 = Person3;
+p3.show();
+putline();
+</code></pre>
+                  <div class="split"><div class="right">Output</div></div>
+                  <pre style="width:200em;"><code class="language-term">Demonstrating Basic Structs
+-----------------------------
+Person1: Person1 { name: "Jim", occup: "dev", id: 42 }
+Person2: Person2("Jim", "dev", 42)
+Person3
+
+</code></pre>
+                </div>
+              </div>
+            </second-item>
+          </splitter-container>
+        </div>
+        <div style="height:1em;"></div>
+
+
+          </div>
+        </t-b>
+        <t-b>
+          You may be puzzled by the &quot;Impl&quot; method implementations. They add methods to a struct
+          that interact with the struct&apos;s fields. That creates a component type. When defining components
+          we usually make the struct public, its fields private, and at least some of its methods public.
+          We will discuss all this in the next two chapters.
+        </t-b>
+        <div style="height:0.5em;"></div>
+        <a id="enums"></a>
+        <h2>2.4&nbsp;&nbsp;Enumerations</h2>
+        <t-b class="mbz">
+          An enumeration is a type identifier with a set of enumeration item fields.  Fields may be:
+          <indent-block class="pad5">
+            <ul class="tights">
+              <li>
+                <n-s>ItemDiscriminant</n-s>: a named integral value
+                <indent-blocks>
+                  <defn-code style="font-size: 1em;">
+enum Names { John, Sally = 35, Roger };
+                  </defn-code>
+                </indent-blocks>
+              </li>
+              <li>
+                <n-s>ItemTuple</n-s>: a named tuple with items specified by type
+                <indent-blocks>
+                  <defn-code style="font-size:1em;">
+enum Names {
+  Alok(String, f64), Priya(String, f64), Ram(String, f64)
+};
+                  </defn-code>
+                </indent-blocks>
+              </li>
+              <li>
+                <n-s>ItemStruct</n-s>: a named struct with items specified by name and type
+                <indent-blocks>
+                  <defn-code style="font-size:1em;">
+enum Names {
+  Jun  { occupation: String, age: f64 },
+  Xing { occupation: String, age: f64 },
+  Shi  { occupation: String, age: f64 },
+}
+                  </defn-code>
+                </indent-blocks>
+              </li>
+            </ul>
+          </indent-block>
+        </t-b>
+        <t-b class="mtz">
+          Enumerations can be generic. A common example in Rust code is the Option:
+          <indent-block class="pad5" style="font-size:1.05em;">
+            <c-s>enum Option&lt;T&gt;{ Some(T), None }</c-s>
+          </indent-block>
+          which can be used as the return value of a function that may or may not generate a result.
+        </t-b>
+        <t-b>
+          Here are some examples:
+        </t-b>
+        <details>
+          <summary class="darkItem">Enumeration Examples</summary>
+          <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em);">
+            <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Enumeration Example Code</strong></div>
+            <div style="float:right; margin-right:0.75em; padding:0.25em 0em;"><strong>Output</strong></div>
+            <splitter-container id="container" class="clear">
+              <first-item id="enum-first" style="width:52%;">
+                <div class="codewrap" onclick="cbubbleup('enum-first')">
+                  <div style="display:flex; flex-direction:column;">
+                    <pre style="width:200em;"><code class="language-rust">// enum_probes::main.rs
+
+use display::{*};
+use std::fmt::{Debug};
+
+#[allow(dead_code)]
+#[derive(Debug)]
+enum Name { John, Jim=42, Jack }
+
+#[allow(dead_code)]
+#[derive(Debug)]
+enum NameTuple {
+    John(String, u32), Jim(String, u32), Jack(String, u32)
+}
+
+#[allow(dead_code)]
+#[derive(Debug)]
+enum NameStruct {
+    John { occup:String, id:u32 },
+    Jim  { occup:String, id:u32 },
+    Jack { occup:String, id:u32 }
+}
+fn main() {
+
+    main_title(&quot;Demonstrating enum_probes&quot;);
+    print!(&quot;&#92;n  - enumerations, match, if let&quot;);
+    putline();
+
+    /*-- enum discriminant --*/
+    sub_title(&quot;  -- enum discriminant --  &quot;);
+    let test = Name::Jim;
+    match test {
+        Name::John =&gt; {
+            let john_discriminant = Name::John as u32;
+            print!(
+            &quot;&#92;n  I am John. my discriminant is {:?}&quot;,
+            john_discriminant
+        )},
+        Name::Jim =&gt; {
+            let jim_discriminant = Name::Jim as u32;
+            print!(
+            &quot;&#92;n  I am Jim. my discriminant is {:?}&quot;,
+            jim_discriminant
+        )},
+        Name::Jack =&gt; {
+            let jack_discriminant = Name::Jack as u32;
+            print!(
+            &quot;&#92;n  I am Jack. my discriminant is {:?}&quot;,
+            jack_discriminant
+        )},
+    }
+    putline();
+
+    let test1 = Name::John;
+    let test2 = Name::Jim;
+    let test3 = Name::Jack;
+
+    if let Name::Jack = test1 {
+        print!(&quot;&#92;n  I am John&quot;);
+    }
+    else {
+        print!(&quot;&#92;n  I am not John&quot;);
+    }
+    if let Name::Jack = test2 {
+        print!(&quot;&#92;n  I am Jim&quot;);
+    }
+    else {
+        print!(&quot;&#92;n  I am not Jim&quot;);
+    }
+    if let Name::Jack = test3 {
+        print!(&quot;&#92;n  I am Jack&quot;);
+    }
+    else {
+        print!(&quot;&#92;n  I am not Jack&quot;);
+    }
+    putline();
+
+    /*-- enum tuple --*/
+    sub_title(&quot;  -- enum tuple --  &quot;);
+    let value = NameTuple::John(&quot;pilot&quot;.to_string(), 52);
+    if let NameTuple::John(occup, id) = value {
+        print!(
+            &quot;
+  my name is John
+  occupupation is {}
+  id is {}&quot;, occup, id
+        );
+    }
+    putline();
+
+    /*-- enum struct --*/
+    sub_title(&quot;  -- enum struct --  &quot;);
+    let value = NameStruct::Jack { occup:&quot;plumber&quot;.to_string(), id:32 };
+    match value {
+        NameStruct::Jack {occup, id} =&gt; print!(&quot;&#92;n Jack - occup: {}, id: {}&quot;, occup, id),
+        _ =&gt; print!(&quot;&#92;n  not Jack&quot;)
+    }
+    putline();
+
+    println!(&quot;&#92;n&#92;nThat's all Folks!&#92;n&quot;);
+}
+</code></pre>
+                  </div>
+                </div>
+              </first-item>
+              <splitter-bar id="enum-seperator"></splitter-bar>
+              <second-item id="enum-second" style="width:40em;">
+                <div class="codewrap" onclick="obubbleup('enum-first')">
+                  <div style="display:flex; flex-direction:column;">
+                    <pre style="width:200em;"><code class="language-term">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  Demonstrating enum_probes
+ ===========================
+  - enumerations, match, if let
+
+    -- enum discriminant --
+ -----------------------------
+  I am Jim. my discriminant is 42
+
+  I am not John
+  I am not Jim
+  I am Jack
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  -- enum tuple --
+ ----------------------
+  my name is John
+  occupupation is pilot
+  id is 52
+
+  
+  
+  
+  
+  
+  
+  
+  -- enum struct --
+ -----------------------
+ Jack - occup: plumber, id: 32
+
+
+That's all Folks!
+
+  </code></pre>
+                  </div>
+                </div>
+              </second-item>
+            </splitter-container>
+          </div>
+          <div style="height:1em;"></div>
+         </details>
+        <div style="height:0.5em;"></div>
+
+        <a id="aliases"></a>
+        <h2>2.5&nbsp;&nbsp;Type Aliases</h2>
+        <t-b>
+          Type aliases provide an alternate name for an existing type, but is in fact the same type.
+          You construct an alias like this:
+          <indent-block class="pad5">
+            <ul class="tights">
+              <li>
+                <c-s>type PointF = (f64, f64, f64);  // tuple of three doubles</c-s>
+              </li>
+              <li>
+                <c-s>type VecPoint = Vec&lt;PointF&gt;</c-s>
+              </li>
+            </ul>
+          </indent-block>
+          Aliases help us provide meaningful application domain names for standard types and shortcuts for
+          long type names. Note that the Rust naming convention uses snake_case for functions and CamelCase
+          for types.
+        </t-b>
+        <div style="height:0.5em;"></div>
+        <a id="libtypes"></a>
+        <h2>2.6&nbsp;&nbsp;Std Lib Data Types</h2>
+        <t-b>
+          The std collections types are:
+          <indent-block class="pad5">
+            Vec, VecDeque, LinkedList, HashMap, HashSet, BTreeMap, BTreeSet, BinaryHeap
+          </indent-block>
+        </t-b>
+        <t-b>
+          There are many other types defined in the stdlib for fs (FileSystem), io, net (TCP, UDP types),
+          process, thread, time, ... In this section we will only look briefly at Vec, VecDeque, and HashMap.
+        </t-b>
+        <t-b>
+          <div>
+            <details>
+              <summary class="labelStyle darkItem">StdLib Data Types</summary>
+              <div class="blockSingle" style="padding:0em; width:100%; width:calc(100vw - 9em);">
+                <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>stdlib Examples</strong></div>
+                <div style="float:right; margin-right:0.75em; padding:0.25em 0em;"><strong>Output</strong></div>
+                <splitter-container id="container" class="clear">
+                  <first-item id="stdlib-first" style="width:52%;">
+                    <div class="codewrap" onclick="cbubbleup('stdlib-first')">
+                      <div style="display:flex; flex-direction:column;">
+                        <pre style="width:200em;"><code class="language-rust">fn main() {
+
+  show_title(&quot;Demonstrate std Library Types&quot;);
+  use std::collections::{VecDeque, HashMap};
+
+  show_label(&quot;std::Vec&lt;T&gt;&quot;);
+
+  show_op(&quot;let mut vi = vec![1, 2, 3, 2, 1]&quot;);
+  let mut vi = vec![1, 2, 3, 2, 1];
+  show_type(&vi);
+  show_value(&vi);
+  show_op(&quot;vi[1] = -2&quot;);
+  vi[1] = -2;
+  show_value(&vi);
+  show_op(&quot;vi.push(0)&quot;);
+  vi.push(0);
+  show_value(&vi);
+  show_op(&quot;vi.insert(1, 42)&quot;);
+  vi.insert(1, 42);
+  show_value(&vi);
+  println!();
+
+  show_label(&quot;VecDeque&lt;T&gt;&quot;);
+  show_op(&quot;let mut vdeq = VecDeque::&lt;f64&gt;::new()&quot;);
+  let mut vdeq = VecDeque::&lt;f64&gt;::new();
+  show_type(&vdeq);
+  show_value(&vdeq);
+  show_op(&quot;vdeq.push_back(2.5)&quot;);
+  vdeq.push_back(2.5);
+  show_op(&quot;vdeq.push_front(1.0)&quot;);
+  vdeq.push_front(1.0);
+  show_value(&vdeq);
+  println!();
+
+  show_label(&quot;HashMap&lt;K, V&gt;&quot;);
+  show_op(&quot;let mut hm = HashMap::&lt;i32, &str&gt;::new()&quot;);
+  let mut hm = HashMap::&lt;i32, &str&gt;::new();
+  show_type(&hm);
+  show_value(&hm);
+  show_op(&quot;hm.insert(1,&#92;&quot;one&#92;&quot;)&quot;);
+  hm.insert(1,&quot;one&quot;);
+  show_value(&hm);
+  hm.insert(0,&quot;zero&quot;);
+  show_value(&hm);
+  hm.insert(2,&quot;two&quot;);
+  show_value(&hm);
+  hm.insert(-2,&quot;minus two&quot;);
+  show_value(&hm);
+  show_op(&quot;hm.remove(&0)&quot;);
+  hm.remove(&0);
+  show_value(&hm);
+  /*
+    using entry API for HashMap
+    - if the key exists then modify the value
+      with a closure
+  */
+  show_op(&quot;hm.entry(1).and_modify(|v| *v = &#92;&quot;the number 1&#92;&quot;)&quot;);
+  hm.entry(1).and_modify(|v| *v = &quot;the number 1&quot;);
+  show_value(&hm);
+
+  println!(&quot;&#92;n  That's all Folks!&quot;);
+}
+</code></pre>
+                      </div>
+                    </div>
+                  </first-item>
+                  <splitter-bar id="stdlib-seperator"></splitter-bar>
+                  <second-item id="stdlib-second" style="width:40em;">
+                    <div class="codewrap" onclick="obubbleup('stdlib-first')">
+                      <div style="display:flex; flex-direction:column;">
+                        <pre style="width:200em;"><code class="language-term">
+-------------------------------
+ Demonstrate std Library Types
+-------------------------------
+
+ std::Vec&lt;T&gt;
+-------------
+--- let mut vi = vec![1, 2, 3, 2, 1] ---
+  TypeId: alloc::vec::Vec<i32>, size: 24
+  value: [1, 2, 3, 2, 1]
+--- vi[1] = -2 ---
+  value: [1, -2, 3, 2, 1]
+--- vi.push(0) ---
+  value: [1, -2, 3, 2, 1, 0]
+--- vi.insert(1, 42) ---
+  value: [1, 42, -2, 3, 2, 1, 0]
+
+
+
+
+
+ VecDeque&lt;T&gt;
+-------------
+--- let mut vdeq = VecDeque::<f64>::new() ---
+  TypeId: alloc::collections::vec_deque::VecDeque<f64>, size: 32   
+  value: []
+--- vdeq.push_back(2.5) ---
+--- vdeq.push_front(1.0) ---
+  value: [1.0, 2.5]
+
+
+
+
+
+ HashMap<K, V>
+---------------
+--- let mut hm = HashMap::<i32, &str>::new() ---
+  TypeId: std::collections::hash::map::HashMap<i32, &str>, size: 48
+  value: {}
+--- hm.insert(1,"one") ---
+  value: {1: "one"}
+  value: {1: "one", 0: "zero"}
+  value: {1: "one", 2: "two", 0: "zero"}
+  value: {-2: "minus two", 1: "one", 2: "two", 0: "zero"}
+--- hm.remove(&0) ---
+  value: {-2: "minus two", 1: "one", 2: "two"}
+--- hm.entry(1).and_modify(|v| *v = "the number 1") ---
+  value: {-2: "minus two", 1: "the number 1", 2: "two"}
+
+  That's all Folks!
+</code></pre>
+                      </div>
+                    </div>
+                  </second-item>
+                </splitter-container>
+              </div>
+              <div style="height:1em;"></div>
+            </details>
+          </div>
+        </t-b>
+        <t-b>
+          The std collections types are all non-blittable and are moved not copied.  All implement the Clone trait.
+        </t-b>
+        <div style="height:0.5em;"></div>
+        <a id="epilogue"></a>
+        <h2>2.7&nbsp;&nbsp;Epilogue:</h2>
+        <t-b>
+          This chapter has been all about storing and presenting data in scalar, aggregate, and structured forms.
+          In the next chapter we will be looking at ways to operate on this data with functions, operators, and
+          lambdas.
+        </t-b>
+        <a id="exercises"></a>
+        <hr class="spread" />
+        <h3>2.7.1&nbsp;&nbsp;Exercises:</h3>
+        <indent-block class="pad5">
+          <ol class="tight">
+            <li>
+              Construct a vec of i32 elements, populate it with 5 arbitrary elements, then display the value
+              and address of each element. This
+              <a href="https://doc.rust-lang.org/1.30.0/book/2018-edition/ch19-01-unsafe-rust.html">reference</a>
+              may help. Note that you don&apos;t need an unsafe block for this exercise.
+            </li>
+            <li>
+              Create an instance of std::collections::HashMap.  Populate it with information about projects
+              on which you are working.  Use project name as the key, and provide a small collection of items about
+              the project, i.e., purpose, programming language, and status. Display the results on the console.
+            </li>
+            <li>
+              Create an array of Strings, populating with arbitrary values.  Convert the array to a Vec.
+            </li>
+            <li>
+              Construct a str instance and convert it to a String. Evaluate the address of the str, the String,
+              and the first element of the String. Now, convert the String back to another str. Display everything
+              you have built and evaluated.
+            </li>
+            <li>
+              Declare a struct that has fields to describe your current employment. Display that on the console.
+            </li>
+            <li>
+              Repeat the last exercise, but use a tuple.  Use type aliases to make the tuple understandable.
+            </li>
+          </ol>
+        </indent-block>
+        <hr class="spread" />
+        <a id="refs"></a>
+        <h3>2.7.2&nbsp;&nbsp;References:</h3>
+        <table style="width:calc(100vw - 12rem);">
+          <tr>
+            <th class="darkItem">Reference Link</th>
+            <th class="darkItem">Description</th>
+          </tr>
+          <tr>
+            <td class="lightItem">
+              <a href="https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/">
+                Character sets
+              </a>
+            </td>
+            <td class="lightItem">
+              The Absolute Minimum Every Software Developer Absolutely, Positively Must Know About Unicode and
+              Character Sets (No Escuses!) [author&apos;s title] - Joel Spolsky
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem"><a href="https://fasterthanli.me/blog/2020/working-with-strings-in-rust/">utf-8 Strings - amos</a></td>
+            <td class="lightItem">Illustrating how utf-8 strings work with C and with Rust code.</td>
+          </tr>
+          <tr>
+            <td class="lightItem"><a href="https://doc.rust-lang.org/1.25.0/book/second-edition/ch08-02-strings.html">Rust Strings</a></td>
+            <td class="lightItem">Rust Strings are implemented with Vec&lt;u8&gt; but interpreted as utf-8 chars</td>
+          </tr>
+          <tr>
+            <td class="lightItem"><a href="https://docs.rs/regex/1.3.4/regex/">regex Crate</a></td>
+            <td class="lightItem">
+              Rust regex crate provides facilities for parsing, compiling, and executing regular expressions.
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem">
+              <a href="https://docs.google.com/presentation/d/1ySMGJqK9yKtx5JX6n7w8j8srkgCC9YdCFKPXKLZ6Fy4/edit#slide=id.p">Rust Lifetimes</a>
+            </td>
+            <td class="lightItem">
+              Very clear presentation of borrow lifetimes.
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem">
+              <a href="https://doc.rust-lang.org/reference/expressions/struct-expr.html">Rust Reference: Structs</a>
+            </td>
+            <td class="lightItem">
+              Rust Reference is the official language definition - surprisingly readable.
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem"><a href="https://docs.google.com/presentation/d/1q-c7UAyrUlM-eZyTo1pd8SZ0qwA_wYxmPZVOQkoDmH4/edit#slide=id.p">Rust Containers</a></td>
+            <td class="lightItem">
+              Container diagrams
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem">
+              <a href="https://www.rust-lang.org/">rust-lang.org home page</a>
+            </td>
+            <td class="lightItem">
+              Links to download and documentation
+            </td>
+          </tr>
+          <tr>
+            <td class="lightItem">
+              <a href="https://www.tutorialspoint.com/rust/index.htm">Tutorial&nbsp;-&nbsp;tutorialspoint.com</a>
+            </td>
+            <td class="lightItem">
+              Tutorials for most of the Rust parts with code examples.
+            </td>
+          </tr>
+          <!--<tr>
+        <td class="lightItem">
+          <a href="https://www.javatpoint.com/rust-tutorial">Tutorial - javatpoint.com</a>
+        </td>
+        <td class="lightItem">
+          Quite extensive list of cheats and helpers.
+        </td>
+      </tr>-->
+        </table>
+      </content>
+      <a id="bottom"></a>
+      <page-TOC id="pages" style="display:none;">
+      </page-TOC>
+      <page-sections id="sections" style="display:none;">
+        <menu-elem style="width:0.0em">&nbsp;</menu-elem>
+        <menu-elem class="secElem"><a href="#bottom">bottom</a></menu-elem>
+        <menu-elem class="secElem"><a href="#refs">refs</a></menu-elem>
+        <menu-elem class="secElem"><a href="#exercises">exercises</a></menu-elem>
+        <menu-elem class="secElem"><a href="#epilogue">epilogue</a></menu-elem>
+        <menu-elem class="secElem"><a href="#libtypes">stdlib types</a></menu-elem>
+        <menu-elem class="secElem"><a href="#aliases">typealias</a></menu-elem>
+        <menu-elem class="secElem"><a href="#enums">enums</a></menu-elem>
+        <menu-elem class="secElem"><a href="#structs">structs</a></menu-elem>
+        <menu-elem class="secElem"><a href="#strings">stringtypes</a></menu-elem>
+        <menu-elem class="secElem"><a href="#slices">slices</a></menu-elem>
+        <menu-elem class="secElem"><a href="#aggregates">aggregates</a></menu-elem>
+        <menu-elem class="secElem"><a href="#deduction">types</a></menu-elem>
+        <menu-elem class="secElem"><a href="#lifecycle">lifecycle</a></menu-elem>
+        <menu-elem class="secElem"><a href="#prologue">prologue</a></menu-elem>
+        <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
+        <div class='darkItem popupHeader' style="padding:0.25em 2.0em;" onclick="this.parentElement.style.display='none'">Sections</div>
+      </page-sections>
+    </main>
+    <frame-footer>
+      <menu-item style="width:1.0em;">&nbsp;</menu-item>
+      <menu-elem id="nextLink2" onclick="bottomMenu.next()">Next</menu-elem>
+      <menu-elem id="prevLink2" onclick="bottomMenu.prev()">Prev</menu-elem>
+      <menu-elem id="pgbtn" onclick="bottomMenu.pages()">Pages</menu-elem>
+      <menu-elem onclick="bottomMenu.sections()">Sections</menu-elem>
+      <menu-elem onclick="bottomMenu.about()">About</menu-elem>
+      <menu-elem id="kysbtn" onclick="storyHlpMenu.keys()">Keys</menu-elem>
+      <menu-elem style="margin-right:5em">
+        <span id="loc" style="display:inline-block; font-weight:normal"></span>
+      </menu-elem>
+    </frame-footer>
+  </page-frame>
+  <script>
+    let loc = document.getElementById("loc");
+    let fn = window.location.href.split(/\/|\\/).pop();
+    loc.innerHTML = fn;
+  </script>
+  <script>
+    onLoadSplitter("typeded");
+    onLoadSplitter("typebasic");
+    onLoadSplitter("structs");
+    onLoadSplitter("enum");
+    onLoadSplitter("stdlib");
+  </script>
+</body>
+</html>
