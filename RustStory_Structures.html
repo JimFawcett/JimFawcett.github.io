@@ -970,7 +970,7 @@ use std::fs::*;
 /////////////////////////////////////////////////////////////
 // sample command line with options
 //-----------------------------------------------------------
-// /P "." /p "rs,txt" /s [true] /r "abc" /h [true] /H [true]
+// /P &quot;.&quot; /p &quot;rs,txt&quot; /s [true] /r &quot;abc&quot; /h [true] /H [true]
 //
 // P - path in either absolute or relative form
 // p - pattern, a file extension indicating file to process
@@ -983,37 +983,37 @@ use std::fs::*;
 //          have value, v
 // Note:
 // Any attribute that has no value on command line will
-// have value "true" in option map
+// have value &quot;true&quot; in option map
 /////////////////////////////////////////////////////////////
 // CmdLineParse methods
 //-----------------------------------------------------------
 // new() -&gt; CmdLineParse
-// parse(&amp;self)
-// contains_option(&amp;self, opt: char) -&gt; bool
-// value(&amp;self, char opt) -&gt; &amp;str
-// options(&amp;self) -&gt; &amp;HashMap&lt;char, String&gt;
+// parse(&self)
+// contains_option(&self, opt: char) -&gt; bool
+// value(&self, char opt) -&gt; &str
+// options(&self) -&gt; &HashMap&lt;char, String&gt;
 // - defaults are created with default_options():
-//   - /P "."    - root search path is current directory
-//   - /s "true" - recurse
-//   - /r "."    - match all text
-//   - /H "true" - hide unused directories
+//   - /P &quot;.&quot;    - root search path is current directory
+//   - /s &quot;true&quot; - recurse
+//   - /r &quot;.&quot;    - match all text
+//   - /H &quot;true&quot; - hide unused directories
 //   - no patterns are equivalent to all files
-// path(&amp;self) -&gt; String
-// abs_path(&amp;self) -&gt; String
-// set_path(&amp;self, p:&amp;str)
-// patterns(&amp;self) -&gt; &amp;Vec&lt;String&gt;
-// add_pattern(&amp;mut self, p:&amp;str) -&gt; &amp;mut self
-// set_regex(&amp;mut self, re:&amp;str)
-// get_regex(&amp;self) -&gt; &amp;str
-// help(&amp;self) -&gt; String
-// replace_help(&amp;mut self, &amp;str) -&gt; String
+// path(&self) -&gt; String
+// abs_path(&self) -&gt; String
+// set_path(&self, p:&str)
+// patterns(&self) -&gt; &Vec&lt;String&gt;
+// add_pattern(&mut self, p:&str) -&gt; &mut self
+// set_regex(&mut self, re:&str)
+// get_regex(&self) -&gt; &str
+// help(&self) -&gt; String
+// replace_help(&mut self, &str) -&gt; String
 
 /// display command line arguments
 pub fn show_cmd_line() {
-  print!("\n  {:?}\n  ", args().next());
-  for arg in args().skip(1) {
-  print!("{:?} ", arg)
-  }
+    print!(&quot;&#92;n  {:?}&#92;n  &quot;, args().next());
+    for arg in args().skip(1) {
+        print!(&quot;{:?} &quot;, arg)
+    }
 }
 
 pub type Options = HashMap&lt;char, String&gt;;
@@ -1025,185 +1025,174 @@ pub struct CmdLineParse {
     opt_map : Options,
     patterns : CmdLinePatterns,
     help_str : String,
-  }
-  impl CmdLineParse {
+}
+impl CmdLineParse {
     /// create new instance of parser
     pub fn new() -&gt; Self {
-      let help = CmdLineParse::help_txt();
-      Self {
-        opt_map: Options::default(),
-        patterns: CmdLinePatterns::new(),
-        help_str: help,
-      }
+        let help = CmdLineParse::help_txt();
+        Self {
+            opt_map: Options::default(),
+            patterns: CmdLinePatterns::new(),
+            help_str: help,
+        }
     }
     /// returns string with command line arguments example
     fn help_txt() -&gt; String {
-      let mut str =
-        "\n  Help:\n  Options: /P . /p \"rs,txt\"".to_string();
-      str.push_str(" /s /r \"abc\" /H /h");
-      str
+        let mut str =
+        &quot;&#92;n  Help:&#92;n  Options: /P . /p &#92;&quot;rs,txt&#92;&quot;&quot;.to_string();
+        str.push_str(&quot; /s /r &#92;&quot;abc&#92;&quot; /H /h&quot;);
+        str
     }
     /// does the command line argument start with '/'
-    fn is_opt(&amp;self, s:&amp;str) -&gt; bool {
-      let bytes = s.as_bytes();
-      bytes[0] as char == '/'
+    fn is_opt(&self, s:&str) -&gt; bool {
+        let bytes = s.as_bytes();
+        bytes[0] as char == '/'
     }
-    /// returns path string with default value "."
-    pub fn path(&amp;self) -&gt; String {
-      if self.contains_option('P') {
-      self.opt_map[&amp;'P'].clone()
-    }
-    else {
-      ".".to_string()
-    }
-  }
-
-  /// replace Win path separator "\\" with Linux "/"
-  /// - use only with absolute paths for Windows
-  fn replace_sep(path: &amp;str) -&gt; String {
-    let mut rtn = path.to_string();
-    if rtn.contains("\\") {
-      rtn = rtn.replace("\\", "/");
-      rtn = rtn.chars().skip(4).collect();
-    }
-    rtn
-  }
-  /// convert relative to absolute path
-  pub fn abs_path(&amp;self) -&gt; String {
-    let abs = std::path::PathBuf::from(self.path());
-    let rslt = canonicalize(&amp;abs);
-    match rslt {
-      Ok(path_buf) =&gt; {
-        // print!("\n--path_buf = {:?}",path_buf);
-        let ap = path_buf.to_string_lossy().to_string();
-        let ap = CmdLineParse::replace_sep(&amp;ap);
-        // print!("\n--abs_path = {:?}",ap);
-        ap
-      }
-      Err(error) =&gt; error.to_string()
-    }
-  }
-  /// set new root path
-  pub fn set_path(&amp;mut self, p:&amp;str) {
-    self.opt_map.insert('P', p.to_string());
-  }
-  /// set new regex string for matching
-  pub fn set_regex(&amp;mut self, re:&amp;str) {
-    self.opt_map.insert('r', re.to_string());
-  }
-  /// return current regex string
-  pub fn get_regex(&amp;self) -&gt; &amp;str {
-    let re_opt = self.opt_map.get(&amp;'r');
-    match re_opt {
-      Some(value) =&gt; value,
-      None =&gt; ".",
-    }
-  }
-  /// commonly used default options
-  pub fn default_options(&amp;mut self) {
-    self.opt_map.insert('P', ".".to_string());
-    self.opt_map.insert('s', "true".to_string());
-    self.opt_map.insert('r', ".".to_string());
-    self.opt_map.insert('H', "true".to_string());
-  }
-  /// does options contain opt char?
-  pub fn contains_option(&amp;self, opt:char) -&gt; bool {
-    }  self.opt_map.contains_key(&amp;opt)
-  }
-  /// insert {o,v} if o key doesn't exist, else overwrite v
-  pub fn add_option(&amp;mut self, o:char, v:&amp;str) {
-    self.opt_map.insert(o, v.to_string());
-  }
-  /// return option value
-  pub fn value(&amp;self, opt:char) -&gt; &amp;str {
-    &amp;self.opt_map[&amp;opt]
-  }
-  /// add file ext (with no "*.")
-  pub fn add_pattern(&amp;mut self, p:&amp;str)
-  -&gt; &amp;mut Self {
-    let s = String::from(p);
-    if !self.patterns.contains(&amp;s) {
-      self.patterns.push(s);
-    }
-    self
-  }
-  /// returns non-mutable reference to patterns
-  pub fn patterns(&amp;self) -&gt; &amp;CmdLinePatterns {
-    &amp;self.patterns
-  }
-  /// returns non-mutable reference to options
-  pub fn options(&amp; self) -&gt; &amp;Options {
-    &amp;self.opt_map
-  }
-  /// return help string
-  pub fn help(&amp;self) -&gt; &amp;str {
-    &amp;self.help_str
-  }
-  /// replace help string
-  pub fn replace_help(&amp;mut self, s:&amp;str) {
-    self.help_str = s.to_string();
-  }
-  /// parse command line arguments, provided by env()
-  pub fn parse(&amp;mut self) {
-
-    let cl_args:Vec&lt;String&gt; = args().collect();
-    let end = cl_args.len();
-    for i in 1..end {
-      if self.is_opt(&amp;cl_args[i]) {
-        let bytes = cl_args[i].as_bytes();
-        let key = bytes[1] as char;
-        if i &lt; end - 1 {
-          if !self.is_opt(&amp;cl_args[i+1]) {
-          self.opt_map.insert(
-          key,cl_args[i+1].to_string()
-          );
+    /// returns path string with default value &quot;.&quot;
+    pub fn path(&self) -&gt; String {
+        if self.contains_option('P') {
+            self.opt_map[&'P'].clone()
         }
         else {
-          self.opt_map.insert(
-            key, "true".to_string()
-          );
+            &quot;.&quot;.to_string()
         }
-      }
-      else {
-        self.opt_map.insert(
-        key, "true".to_string()
-        );
-      }
     }
-  }
-  /*-- build patterns --*/
-  if self.contains_option('p') {
-    let pat_str = self.value('p').to_string();
-    let split_iter = pat_str.split(',');
-    for patt in split_iter {
-      self.add_pattern(patt);
+
+    /// replace Win path separator &quot;&#92;&#92;&quot; with Linux &quot;/&quot;
+    /// - use only with absolute paths for Windows
+    fn replace_sep(path: &str) -&gt; String {
+        let mut rtn = path.to_string();
+        if rtn.contains(&quot;&#92;&#92;&quot;) {
+            rtn = rtn.replace(&quot;&#92;&#92;&quot;, &quot;/&quot;);
+            rtn = rtn.chars().skip(4).collect();
+        }
+        rtn
     }
+    /// convert relative to absolute path
+    pub fn abs_path(&self) -&gt; String {
+        let abs = std::path::PathBuf::from(self.path());
+        let rslt = canonicalize(&abs);
+        match rslt {
+            Ok(path_buf) =&gt; {
+                // print!(&quot;&#92;n--path_buf = {:?}&quot;,path_buf);
+                let ap = path_buf.to_string_lossy().to_string();
+                let ap = CmdLineParse::replace_sep(&ap);
+                // print!(&quot;&#92;n--abs_path = {:?}&quot;,ap);
+                ap
+            }
+            Err(error) =&gt; error.to_string()
+        }
     }
-  }
-  }
-  #[cfg(test)]
-  mod tests {
-  use super::*;
-  #[test]
-  fn cl_args() {
-  let _mock_args = vec!["/P", ".", "/p", "rs,txt", "/s"];
-  print!("\n  cl args: ");
-  for arg in args() {
-  print!("{:?} ", arg);
-  }
-  let mut parser = CmdLineParse::new();
-  parser.parse();
-  for arg in args() {
-  let bytes = arg.as_bytes();
-  if '/' == (bytes[0] as char) {
-  assert!(
-  parser.opt_map.contains_key(
-  &amp;(bytes[1] as char)
-  )
-  );
-  }
-  }
-  }
+    /// set new root path
+    pub fn set_path(&mut self, p:&str) {
+        self.opt_map.insert('P', p.to_string());
+    }
+    /// set new regex string for matching
+    pub fn set_regex(&mut self, re:&str) {
+        self.opt_map.insert('r', re.to_string());
+    }
+    /// return current regex string
+    pub fn get_regex(&self) -&gt; &str {
+        let re_opt = self.opt_map.get(&'r');
+        match re_opt {
+            Some(value) =&gt; value,
+            None =&gt; &quot;.&quot;,
+        }
+    }
+    /// commonly used default options
+    pub fn default_options(&mut self) {
+        self.opt_map.insert('P', &quot;.&quot;.to_string());     // root is curr dir
+        self.opt_map.insert('s', &quot;true&quot;.to_string());  // recurse
+        self.opt_map.insert('r', &quot;.&quot;.to_string());     // regex always matches
+        self.opt_map.insert('H', &quot;true&quot;.to_string());  // hide unused dirs
+    }
+    /// does options contain opt char?
+    pub fn contains_option(&self, opt:char) -&gt; bool {
+        self.opt_map.contains_key(&opt)
+    }
+    /// insert {o,v} if o key doesn't exist, else overwrite v
+    pub fn add_option(&mut self, o:char, v:&str) {
+        self.opt_map.insert(o, v.to_string());
+    }
+    /// return option value
+    pub fn value(&self, opt:char) -&gt; &str {
+        &self.opt_map[&opt]
+    }
+    /// add file ext (with no &quot;*.&quot;)
+    pub fn add_pattern(&mut self, p:&str) -&gt; &mut Self {
+        let s = String::from(p);
+        if !self.patterns.contains(&s) {
+            self.patterns.push(s);
+        }
+        self
+    }
+    /// returns non-mutable reference to patterns
+    pub fn patterns(&self) -&gt; &CmdLinePatterns {
+        &self.patterns
+    }
+    /// returns non-mutable reference to options
+    pub fn options(& self) -&gt; &Options {
+        &self.opt_map
+    }
+    /// return help string
+    pub fn help(&self) -&gt; &str {
+        &self.help_str
+    }
+    /// replace help string
+    pub fn replace_help(&mut self, s:&str) {
+        self.help_str = s.to_string();
+    }
+    /// parse command line arguments, provided by env()
+    pub fn parse(&mut self) {
+
+        let cl_args:Vec&lt;String&gt; = args().collect();
+        let end = cl_args.len();
+        for i in 1..end {
+            if self.is_opt(&cl_args[i]) {
+                let bytes = cl_args[i].as_bytes();
+                let key = bytes[1] as char;
+                if i &lt; end - 1 {
+                    if !self.is_opt(&cl_args[i+1]) {
+                        self.opt_map.insert(key,cl_args[i+1].to_string());
+                    }
+                    else {
+                        self.opt_map.insert(key, &quot;true&quot;.to_string());
+                    }
+                }
+                else {
+                    self.opt_map.insert(key, &quot;true&quot;.to_string());
+                }
+            }
+        }
+        /*-- build patterns --*/
+        if self.contains_option('p') {
+            let pat_str = self.value('p').to_string();
+            let split_iter = pat_str.split(',');
+            for patt in split_iter {
+                self.add_pattern(patt);
+            }
+        }
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn cl_args() {
+        let _mock_args = vec![&quot;/P&quot;, &quot;.&quot;, &quot;/p&quot;, &quot;rs,txt&quot;, &quot;/s&quot;];
+        print!(&quot;&#92;n  cl args: &quot;);
+        for arg in args() {
+            print!(&quot;{:?} &quot;, arg);
+        }
+        let mut parser = CmdLineParse::new();
+        parser.parse();
+        for arg in args() {
+            let bytes = arg.as_bytes();
+            if '/' == (bytes[0] as char) {
+                assert!(parser.opt_map.contains_key(&(bytes[1] as char)));
+            }
+        }
+    }
 }
                     </defn-code>
                   </defn-block>
@@ -1324,7 +1313,7 @@ That's all Folks!
             <span style="
           display: inline-block;
           font-weight: bold;
-          font-family: 'Comic Sans MS, Tahoma';
+          font-family: 'Comic Sans MS', Tahoma;
           background-color: #ddd;
           width: 100%;
           padding: 5px 0px;
@@ -1433,400 +1422,363 @@ pub trait DirEvent {
                 <defn-block>
                   <defn-head>lib.rs</defn-head>
                   <defn-code>
-                    /////////////////////////////////////////////////////////////
-                    // rust_dir_nav::lib1.rs                                   //
-                    //                                                         //
-                    // Jim Fawcett, https://JimFawcett.github.io, 12 Apr 2020  //
-                    /////////////////////////////////////////////////////////////
-                    /*
-                    DirNav&lt;App&gt; is a directory navigator that  uses generic
-                    parameter App to define how files and directories are
-                    handled.
-                    - displays only paths that have file targets by default
-                    - hide(false) will show all directories traversed
-                    - recurses directory tree at specified root by default
-                    - recurse(false) examines only specified path.
-                    */
-                    use std::fs::{self, DirEntry};
-                    use std::io;
-                    use std::io::{Error, ErrorKind};
-                    #[allow(unused_imports)]
-                    use std::path::{Path, PathBuf};
+/////////////////////////////////////////////////////////////
+// rust_dir_nav::lib1.rs                                   //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 12 Apr 2020  //
+/////////////////////////////////////////////////////////////
+/*
+   DirNav&lt;App&gt; is a directory navigator that  uses the generic
+   parameter App to define how files and directories are
+   handled.
+   - displays only paths that have file targets by default
+   - hide(false) will show all directories traversed
+   - recurses directory tree at specified root by default
+   - recurse(false) examines only specified path.
+*/
+use std::fs::{self, DirEntry};
+use std::io;
+use std::io::{Error, ErrorKind};
+#[allow(unused_imports)]
+use std::path::{Path, PathBuf};
 
-                    /// trait required of the App generic parameter type
-                    pub trait DirEvent {
-                    fn do_dir(&amp;mut self, d: &amp;str);
-                    fn do_file(&amp;mut self, f: &amp;str);
-                    }
-                    //---------------------------------------
-                    // Sample implementation of DirNav param
-                    // --------------------------------------
-                    // #[derive(Debug, Default)]
-                    // pub struct Appl;
-                    // impl DirEvent for Appl {
-                    //     fn do_dir(&amp;mut self, d:&amp;str) {
-                    //         print!("\n  {:?}", d);
-                    //     }
-                    //     fn do_file(&amp;mut self, f:&amp;str) {
-                    //         print!("\n    {:?}", f);
-                    //     }
-                    // }
+/// trait required of the App generic parameter type
+pub trait DirEvent {
+    fn do_dir(&mut self, d: &str);
+    fn do_file(&mut self, f: &str);
+}
+//---------------------------------------
+// Sample implementation of DirNav param
+// --------------------------------------
+// #[derive(Debug, Default)]
+// pub struct Appl;
+// impl DirEvent for Appl {
+//     fn do_dir(&mut self, d:&str) {
+//         print!(&quot;&#92;n  {:?}&quot;, d);
+//     }
+//     fn do_file(&mut self, f:&str) {
+//         print!(&quot;&#92;n    {:?}&quot;, f);
+//     }
+// }
 
-                    /////////////////////////////////////////////////
-                    // Patterns are a collection of extension strings
-                    // used to identify files as search targets
+/////////////////////////////////////////////////
+// Patterns are a collection of extension strings
+// used to identify files as search targets
 
-                    type SearchPatterns = Vec&lt;std::ffi::OsString&gt;;
+type SearchPatterns = Vec&lt;std::ffi::OsString&gt;;
 
-                    /// Directory Navigator Structure
-                    #[allow(dead_code)]
-                    #[derive(Debug, Default)]
-                    pub struct DirNav&lt;App: DirEvent&gt; {
-                    /// file extensions to look for
-                    pats: SearchPatterns,
-                    /// instance of App : DirEvent, requires do_file
-                    /// and do_dir methods
-                    app: App,
-                    /// number of files processed
-                    num_file: usize,
-                    /// number of dirs processed
-                    num_dir: usize,
-                    /// recurse ?
-                    recurse : bool,
-                    /// hide dirs with no targets ?
-                    hide: bool,
-                    }
-                    impl&lt;App: DirEvent + Default&gt; DirNav&lt;App&gt; {
-                    pub fn new() -&gt; Self
-                    where
-                    App: DirEvent + Default,
-                    {
-                    Self {
-                    pats: SearchPatterns::new(),
-                    app: App::default(),
-                    num_file: 0,
-                    num_dir: 0,
-                    recurse: true,
-                    hide: true,
-                    }
-                    }
-                    /// do recursive visit?
-                    pub fn recurse(&amp;mut self, p:bool) {
-                    self.recurse = p;
-                    }
-                    /// hide dirs with no targets?
-                    pub fn hide(&amp;mut self, p:bool) {
-                    self.hide = p;
-                    }
-                    /// return reference to App to get results, if any
-                    pub fn get_app(&amp;mut self) -&gt; &amp;mut App {
-                    &amp;mut self.app
-                    }
-                    /// return number of dirs processed
-                    pub fn get_dirs(&amp;self) -&gt; usize {
-                    self.num_dir
-                    }
-                    /// return number of files processed
-                    pub fn get_files(&amp;self) -&gt; usize {
-                    self.num_file
-                    }
-                    /// return patterns, e.g., file extensions to look for
-                    pub fn get_patts(&amp;self) -&gt; &amp;SearchPatterns {
-                    &amp;self.pats
-                    }
+/// Directory Navigator Structure
+#[allow(dead_code)]
+#[derive(Debug, Default)]
+pub struct DirNav&lt;App: DirEvent&gt; {
+    /// file extensions to look for
+    pats: SearchPatterns,
+    /// instance of App : DirEvent, 
+    ///   requires do_file and do_dir methods
+    app: App,
+    /// number of files processed
+    num_file: usize,
+    /// number of dirs processed
+    num_dir: usize,
+    /// recurse ?
+    recurse : bool,
+    /// hide dirs with no targets ?
+    hide: bool,
+}
+impl&lt;App: DirEvent + Default&gt; DirNav&lt;App&gt; {
+    pub fn new() -&gt; Self
+    where
+        App: DirEvent + Default,
+    {
+        Self {
+            pats: SearchPatterns::new(),
+            app: App::default(),
+            num_file: 0,
+            num_dir: 0,
+            recurse: true,
+            hide: true,
+        }
+    }
+    /// do recursive visit?
+    pub fn recurse(&mut self, p:bool) {
+        self.recurse = p;
+    }
+    /// hide dirs with no targets?
+    pub fn hide(&mut self, p:bool) {
+        self.hide = p;
+    }
+    /// return reference to App to get results, if any
+    pub fn get_app(&mut self) -&gt; &mut App {
+        &mut self.app
+    }
+    /// return number of dirs processed
+    pub fn get_dirs(&self) -&gt; usize {
+        self.num_dir
+    }
+    /// return number of files processed
+    pub fn get_files(&self) -&gt; usize {
+        self.num_file
+    }
+    /// return patterns, e.g., file extensions to look for
+    pub fn get_patts(&self) -&gt; &SearchPatterns {
+        &self.pats
+    }
 
-                    /// add ext to search for - takes either String or &amp;str
-                    pub fn add_pat&lt;S: Into&lt;String&gt;&gt;(
-                    &amp;mut self, p: S
-                    ) -&gt; &amp;mut DirNav&lt;App&gt; {
-                    let mut t = std::ffi::OsString::new();
-                    t.push(p.into());
-                    self.pats.push(t);
-                    self
-                    }
-                    /// reset to default state
-                    pub fn clear(&amp;mut self) {
-                    self.pats.clear();
-                    self.num_dir = 0;
-                    self.num_file = 0;
-                    self.app = App::default();
-                    }
-                    /// Depth First Search for file exts starting at path dir&lt;br /&gt;
-                    /// Displays only directories with files matching pattern
-                    pub fn visit(&amp;mut self, dir: &amp;Path)
-                    -&gt; io::Result&lt;()&gt; where App: DirEvent
-                    {
-                    self.num_dir += 1;
-                    let dir_name: String =
-                    self.replace_sep(dir).to_string_lossy().to_string();
-                    let mut files = Vec::&lt;std::ffi::OsString&gt;::new();
-                    let mut sub_dirs =
-                    Vec::&lt;std::ffi::OsString&gt;::new();
-                    if dir.is_dir() {
-                    /* search local directory */
-                    for entry in fs::read_dir(dir)? {
-                    let entry = entry?;
-                    let path = entry.path();
-                    if path.is_dir() {
-                    let cd = self.replace_sep(&amp;path);
+    /// add extention to search for 
+    ///   - takes either String or &str
+    pub fn add_pat&lt;S: Into&lt;String&gt;&gt;(&mut self, p: S) 
+          -&gt; &mut DirNav&lt;App&gt; {
+        let mut t = std::ffi::OsString::new();
+        t.push(p.into());
+        self.pats.push(t);
+        self
+    }
+    /// reset to default state
+    pub fn clear(&mut self) {
+        self.pats.clear();
+        self.num_dir = 0;
+        self.num_file = 0;
+        self.app = App::default();
+    }
+    /// Depth First Search for file extentions starting at 
+    ///   path dir&lt;br /&gt;
+    /// Displays only directories with files matching pattern
+    pub fn visit(&mut self, dir: &Path) -&gt; io::Result&lt;()&gt;
+    where App: DirEvent
+    {
+        self.num_dir += 1;
+        let dir_name: String =
+          self.replace_sep(dir).to_string_lossy().to_string();
+        let mut files = Vec::&lt;std::ffi::OsString&gt;::new();
+        let mut sub_dirs = Vec::&lt;std::ffi::OsString&gt;::new();
+        if dir.is_dir() {
+            /* search local directory */
+            for entry in fs::read_dir(dir)? {
+                let entry = entry?;
+                let path = entry.path();
+                if path.is_dir() {
+                    let cd = self.replace_sep(&path);
                     sub_dirs.push(cd);
-                    } else {
+                } else {
                     self.num_file += 1;
-                    if self.in_patterns(&amp;entry)
-                    | self.pats.is_empty() {
-                    files.push(entry.file_name());
+                    if self.in_patterns(&entry) | 
+                       self.pats.is_empty() {
+                        files.push(entry.file_name());
                     }
-                    }
-                    }
-                    /*-- display only dirs with found files --*/
-                    if !files.is_empty() || !self.hide {
-                    self.app.do_dir(&amp;dir_name);
-                    }
-                    for fl in files {
-                    let flnm = fl.to_string_lossy().to_string();
-                    self.app.do_file(&amp;flnm);
-                    }
-                    /*-- recurse into subdirectories --*/
-                    for sub in sub_dirs {
-                    let mut pb = std::path::PathBuf::new();
-                    pb.push(sub);
-                    if self.recurse {
-                    self.visit(&amp;pb)?;
-                    }
-                    }
-                    return Ok(());  // normal return
-                    }
-                    Err(Error::new(ErrorKind::Other, "not a directory"))
-                    }
-                    /// replace Windows directory separator with Linux separator
-                    pub fn replace_sep(
-                    &amp;self, path: &amp;Path
-                    ) -&gt; std::ffi::OsString {
-                    let rtn = path.to_string_lossy();
-                    let mod_path = rtn.replace("\\", "/");
-                    let mut os_str: std::ffi::OsString =
-                    std::ffi::OsString::new();
-                    os_str.push(mod_path);
-                    os_str
-                    }
-                    /// does store contain d.path().extension() ?
-                    pub fn in_patterns(&amp;self, d: &amp;DirEntry) -&gt; bool {
-                    let p = d.path();
-                    let ext = p.extension();
-                    match ext {
-                    Some(extn) =&gt; self.pats.contains(
-                    &amp;(extn.to_os_string())
-                    ),
-                    None =&gt; false,
-                    }
-                    }
-                    }
+                }
+            }
+            /*-- display only dirs with found files --*/
+            if !files.is_empty() || !self.hide {
+                self.app.do_dir(&dir_name);
+            }
+            for fl in files {
+                let flnm = fl.to_string_lossy().to_string();
+                self.app.do_file(&flnm);
+            }
+            /*-- recurse into subdirectories --*/
+            for sub in sub_dirs {
+                let mut pb = std::path::PathBuf::new();
+                pb.push(sub);
+                if self.recurse {
+                    self.visit(&pb)?;
+                }
+            }
+            return Ok(());  // normal return
+        }
+        Err(Error::new(ErrorKind::Other, &quot;not a directory&quot;))
+    }
+    /// replace Win directory separator with Linux separator
+    pub fn replace_sep(&self, path: &Path) 
+          -&gt; std::ffi::OsString {
+        let rtn = path.to_string_lossy();
+        let mod_path = rtn.replace(&quot;&#92;&#92;&quot;, &quot;/&quot;);
+        let mut os_str: std::ffi::OsString = 
+          std::ffi::OsString::new();
+        os_str.push(mod_path);
+        os_str
+    }
+    /// does store contain d.path().extension() ?
+    pub fn in_patterns(&self, d: &DirEntry) -&gt; bool {
+        let p = d.path();
+        let ext = p.extension();
+        match ext {
+            Some(extn) =&gt; self.pats.contains(
+              &(extn.to_os_string())
+            ),
+            None =&gt; false,
+        }
+    }
+}
 
-                    #[cfg(test)]
-                    mod tests {
-                    // test_setup() should run first. To ensure that:
-                    //   use cargo -- --test-threads=1
-                    // to see console output:
-                    //   use cargo test -- --show-output --test-threads=1
-                    use super::*;
-                    #[derive(Debug)]
-                    struct ApplTest {
-                    rslt_store: Vec&lt;String&gt;,
-                    }
-                    impl DirEvent for ApplTest {
-                    fn do_dir(&amp;mut self, _d: &amp;str) {
-                    //print!("\n  {:?}", d);
-                    }
-                    fn do_file(&amp;mut self, f: &amp;str) {
-                    //print!("\n    {:?}", f);
-                    self.rslt_store.push((*f).to_string());
-                    }
-                    }
-                    impl Default for ApplTest {
-                    fn default() -&gt; Self {
-                    ApplTest {
-                    rslt_store: Vec::&lt;String&gt;::new(),
-                    }
-                    }
-                    }
-                    #[test]
-                    fn test_setup() {
-                    let _ = std::fs::create_dir("./test_dir");
-                    let _ = std::fs::create_dir("./test_dir/test_sub1_dir");
-                    let _ = std::fs::create_dir("./test_dir/test_sub2_dir");
-                    let _ = std::fs::File::create("./test_dir/test_file.rs");
-                    let _ = std::fs::File::create(
-                    "./test_dir/test_sub1_dir/test_file1.rs"
-                    );
-                    let _ = std::fs::File::create(
-                    "./test_dir/test_sub1_dir/test_file2.exe"
-                    );
-                    let _ = std::fs::File::create(
-                    "./test_dir/test_sub2_dir/test_file3.txt"
-                    );
-                    }
-                    #[test]
-                    fn test_walk() {
-                    let mut dn = DirNav::&lt;ApplTest&gt;::new();
-                    dn.add_pat("rs").add_pat("exe").add_pat("txt");
-                    let mut pb = PathBuf::new();
-                    pb.push("./test_dir".to_string());
-                    let _ = dn.visit(&amp;pb);
-                    let rl = &amp;dn.get_app().rslt_store;
-                    /*
-                    run exe in target/debug with --nocapture option
-                    to see output of print statement below.
-                    */
-                    print!("\n  {:?}", rl);
+#[cfg(test)]
+mod tests {
+    // test_setup() should run first. To ensure that:
+    //   use cargo -- --test-threads=1
+    // to see console output:
+    //   use cargo test -- --show-output --test-threads=1
+    use super::*;
+    #[derive(Debug)]
+    struct ApplTest {
+        rslt_store: Vec&lt;String&gt;,
+    }
+    impl DirEvent for ApplTest {
+        fn do_dir(&mut self, _d: &str) {
+            //print!(&quot;&#92;n  {:?}&quot;, d);
+        }
+        fn do_file(&mut self, f: &str) {
+            //print!(&quot;&#92;n    {:?}&quot;, f);
+            self.rslt_store.push((*f).to_string());
+        }
+    }
+    impl Default for ApplTest {
+        fn default() -&gt; Self {
+            ApplTest {
+                rslt_store: Vec::&lt;String&gt;::new(),
+            }
+        }
+    }
+    #[test]
+    fn test_setup() {
+        let _ = std::fs::create_dir(&quot;./test_dir&quot;);
+        let _ = std::fs::create_dir(&quot;./test_dir/test_sub1_dir&quot;);
+        let _ = std::fs::create_dir(&quot;./test_dir/test_sub2_dir&quot;);
+        let _ = std::fs::File::create(&quot;./test_dir/test_file.rs&quot;);
+        let _ = std::fs::File::create(
+                  &quot;./test_dir/test_sub1_dir/test_file1.rs&quot;
+                );
+        let _ = std::fs::File::create(
+                  &quot;./test_dir/test_sub1_dir/test_file2.exe&quot;
+                );
+        let _ = std::fs::File::create(
+                  &quot;./test_dir/test_sub2_dir/test_file3.txt&quot;
+                );
+    }
+    #[test]
+    fn test_walk() {
+        let mut dn = DirNav::&lt;ApplTest&gt;::new();
+        dn.add_pat(&quot;rs&quot;).add_pat(&quot;exe&quot;)
+          .add_pat(&quot;txt&quot;);
+        let mut pb = PathBuf::new();
+        pb.push(&quot;./test_dir&quot;.to_string());
+        let _ = dn.visit(&pb);
+        let rl = &dn.get_app().rslt_store;
+        /*
+          run exe in target/debug with --nocapture option
+          to see output of print statement below.
+        */
+        print!(&quot;&#92;n  {:?}&quot;, rl);
 
-                    // test for found files
-                    let l = |s: &amp;str| -&gt; String { s.to_string() };
+        // test for found files
+        let l = |s: &str| -&gt; String { s.to_string() };
 
-                    assert!(rl.contains(&amp;l("test_file.rs")));
-                    assert!(rl.contains(&amp;l("test_file1.rs")));
-                    assert!(rl.contains(&amp;l("test_file2.exe")));
-                    assert!(rl.contains(&amp;l("test_file3.txt")));
-                    /*
-                    uncomment line below to make test fail
-                    */
-                    //assert!(rl.contains(&amp;l("foobar")));
-                    }
-                    #[test]
-                    fn test_patts() {
-                    let mut dn = DirNav::&lt;ApplTest&gt;::new();
-                    dn.add_pat("foo").add_pat("bar");
-                    assert_eq!(dn.get_patts().len(), 2);
-                    let pats = dn.get_patts();
-                    let mut foo_str = std::ffi::OsString::new();
-                    foo_str.push("foo");
-                    assert!(pats.contains(&amp;foo_str));
-                    let mut bar_str = std::ffi::OsString::new();
-                    bar_str.push("bar");
-                    assert!(pats.contains(&amp;bar_str));
-                    dn.clear();
-                    assert_eq!(dn.get_patts().len(), 0);
-                    }
-                    }
+        assert!(rl.contains(&l(&quot;test_file.rs&quot;)));
+        assert!(rl.contains(&l(&quot;test_file1.rs&quot;)));
+        assert!(rl.contains(&l(&quot;test_file2.exe&quot;)));
+        assert!(rl.contains(&l(&quot;test_file3.txt&quot;)));
+        /*
+          uncomment line below to make test fail
+        */
+        //assert!(rl.contains(&l(&quot;foobar&quot;)));
+    }
+    #[test]
+    fn test_patts() {
+        let mut dn = DirNav::&lt;ApplTest&gt;::new();
+        dn.add_pat(&quot;foo&quot;).add_pat(&quot;bar&quot;);
+        assert_eq!(dn.get_patts().len(), 2);
+        let pats = dn.get_patts();
+        let mut foo_str = std::ffi::OsString::new();
+        foo_str.push(&quot;foo&quot;);
+        assert!(pats.contains(&foo_str));
+        let mut bar_str = std::ffi::OsString::new();
+        bar_str.push(&quot;bar&quot;);
+        assert!(pats.contains(&bar_str));
+        dn.clear();
+        assert_eq!(dn.get_patts().len(), 0);
+    }
+}
                   </defn-code>
                 </defn-block>
                 <defn-block>
                   <defn-head>test1.rs</defn-head>
                   <defn-code>
-                    /////////////////////////////////////////////////////////////
-                    // rust_dir_nav::test1.rs                                  //
-                    //                                                         //
-                    // Jim Fawcett, https://JimFawcett.github.io, 12 Apr 2020  //
-                    /////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+// rust_dir_nav::test1.rs                                  //
+//                                                         //
+// Jim Fawcett, https://JimFawcett.github.io, 12 Apr 2020  //
+/////////////////////////////////////////////////////////////
 
-                    use rust_dir_nav::*;
-                    #[allow(unused_imports)]
-                    use std::env::current_dir;
-                    use std::io;
+use rust_dir_nav::*;
+#[allow(unused_imports)]
+use std::env::current_dir;
+use std::io;
 
-                    struct Appl;
-                    impl DirEvent for Appl {
-                    fn do_dir(&amp;mut self, d: &amp;str) {
-                    print!("\n  {}", d);
-                    }
-                    fn do_file(&amp;mut self, f: &amp;str) {
-                    print!("\n      {}", f);
-                    }
-                    }
-                    impl Default for Appl {
-                    fn default() -&gt; Self {
-                    Appl
-                    }
-                    }
+struct Appl;
+impl DirEvent for Appl {
+    fn do_dir(&mut self, d: &str) {
+        print!(&quot;&#92;n  {}&quot;, d);
+    }
+    fn do_file(&mut self, f: &str) {
+        print!(&quot;&#92;n      {}&quot;, f);
+    }
+}
+impl Default for Appl {
+    fn default() -&gt; Self {
+        Appl
+    }
+}
 
-                    fn main() -&gt; io::Result&lt;()&gt; {
+fn main() -&gt; io::Result&lt;()&gt; {
 
-                    let mut dn = DirNav::&lt;Appl&gt;::new();
+    let mut dn = DirNav::&lt;Appl&gt;::new();
 
-                    /*-- takes a variety of formats --*/
+    /*-- takes a variety of formats --*/
 
-                    let _pat1: String = "rs".to_string();
-                    let _pat4: String = "rlib".to_string();
+    let _pat1: String = &quot;rs&quot;.to_string();
+    let _pat4: String = &quot;rlib&quot;.to_string();
 
-                    dn.add_pat(&amp;_pat1);
-                    dn.add_pat("toml".to_string());
-                    dn.add_pat("txt");
-                    dn.add_pat(_pat4);
-                    dn.add_pat(&amp;"exe".to_string());
+    dn.add_pat(&_pat1);
+    dn.add_pat(&quot;toml&quot;.to_string());
+    dn.add_pat(&quot;txt&quot;);
+    dn.add_pat(_pat4);
+    dn.add_pat(&&quot;exe&quot;.to_string());
 
-                    //dn.hide(false);
+    //dn.hide(false);
 
-                    let path = current_dir()?;
-                    print!("\n  Searching path {:?}\n", &amp;path);
+    let path = current_dir()?;
+    print!(&quot;&#92;n  Searching path {:?}&#92;n&quot;, &path);
 
-                    let _rslt = dn.visit(&amp;path)?;
+    let _rslt = dn.visit(&path)?;
 
-                    print!(
-                    "\n\n  processed {} files and {} dirs",
-                    dn.get_files(),
-                    dn.get_dirs()
-                    );
-                    print!("\n");
+    print!(
+        &quot;&#92;n&#92;n  processed {} files and {} dirs&quot;,
+        dn.get_files(),
+        dn.get_dirs()
+    );
+    print!(&quot;&#92;n&quot;);
 
-                    dn.clear();
-                    dn.add_pat("rs").add_pat("toml").add_pat("exe").add_pat("txt");
-                    let mut path = std::path::PathBuf::new();
-                    path.push("./test_dir");
-                    print!("\n  Searching path {:?}\n", &amp;path);
-                    let _rslt = dn.visit(&amp;path)?;
-                    print!(
-                    "\n\n  processed {} files in {} dirs",
-                    dn.get_files(),
-                    dn.get_dirs()
-                    );
-                    ///////////////////////////////////////////////
-                    // uncomment lines below to see error return
-                    //---------------------------------------------
-                    // print!("\n");
-                    // path.pop();
-                    // path.push("foobar");
-                    // dn.visit(&amp;path)?;
+    dn.clear();
+    dn.add_pat(&quot;rs&quot;).add_pat(&quot;toml&quot;)
+      .add_pat(&quot;exe&quot;).add_pat(&quot;txt&quot;);
+    let mut path = std::path::PathBuf::new();
+    path.push(&quot;./test_dir&quot;);
+    print!(&quot;&#92;n  Searching path {:?}&#92;n&quot;, &path);
+    let _rslt = dn.visit(&path)?;
+    print!(
+        &quot;&#92;n&#92;n  processed {} files in {} dirs&quot;,
+        dn.get_files(),
+        dn.get_dirs()
+    );
+    ///////////////////////////////////////////////
+    // uncomment lines below to see error return
+    //---------------------------------------------
+    // print!(&quot;&#92;n&quot;);
+    // path.pop();
+    // path.push(&quot;foobar&quot;);
+    // dn.visit(&path)?;
 
-                    print!("\n\n");
-                    Ok(())
-                    }
-                  </defn-code>
-                  <defn-head class="defnBorderTop">Output:</defn-head>
-                  <defn-code>
-                    Searching path "C:\\github\\JimFawcett\\RustDirNav"
-
-                    C:/github/JimFawcett/RustDirNav
-                    Cargo.toml
-                    Output.txt
-                    C:/github/JimFawcett/RustDirNav/examples
-                    test1.rs
-                    C:/github/JimFawcett/RustDirNav/src
-                    lib.rs
-                    C:/github/JimFawcett/RustDirNav/target/debug/deps
-                    librust_dir_nav-dd84fa97b7e9c811.rlib
-                    C:/github/JimFawcett/RustDirNav/target/debug/examples
-                    test1.exe
-                    C:/github/JimFawcett/RustDirNav/test_dir
-                    test_file.rs
-                    C:/github/JimFawcett/RustDirNav/test_dir/test_sub1_dir
-                    test_file1.rs
-                    test_file2.exe
-                    C:/github/JimFawcett/RustDirNav/test_dir/test_sub2_dir
-                    test_file3.txt
-
-                    processed 582 files and 256 dirs
-
-                    Searching path "./test_dir"
-
-                    ./test_dir
-                    test_file.rs
-                    ./test_dir/test_sub1_dir
-                    test_file1.rs
-                    test_file2.exe
-                    ./test_dir/test_sub2_dir
-                    test_file3.txt
-
-                    processed 4 files in 3 dirs
-
+    print!(&quot;&#92;n&#92;n&quot;);
+    Ok(())
+}
                   </defn-code>
                 </defn-block>
               </defn-outerBlock>
