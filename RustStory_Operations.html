@@ -132,6 +132,8 @@
           and enumeration matching,
           that support an expressive design language for building fast and robust software.
         </t-b>
+        <details>
+          <summary class="darkItem">Operations Syntax</summary>
         <div>
           <table id="synsum" style="position:relative; width:50em;">
             <tr>
@@ -205,11 +207,12 @@
   */             
 };
 
+
 </code></pre>
               </td>
               <td>
                 <t-b>
-                  Closures are anonymous functions that are built within some local context, e.g.,
+                  Closures are anonymous structs that create invokable objects and are built within some local context, e.g.,
                   a function body. They may use values or make references to variables
                   in that context.
                 </t-b>
@@ -327,23 +330,173 @@ impl Counter {
               <th colspan="2">Function Object Syntax</th>
             </tr>
             <tr>
+              <td>
+                <pre style="width:max-content;"><code class="language-rust">pub struct FO {
+  name: String
+}
+impl FO {
+  pub fn get_function_object(&self) -&gt; impl Fn()
+  {
+    let rname = &self.name;
+    move || {
+      /* do something with rname */
+    }
+  }
+}
+
+</code></pre>
+              </td>
+              <td>
+                Function objects are closures that capture data from an associated object. 
+                <div style="height:0.75em";></div>
+                The FO method <c-s>get_function_object(&self)</c-s> returns a closure that implements the 
+                <c-s>Fn</c-s> trait so it can be invoked.
+                <div style="height:0.75em";></div>
+                A closure is an anonymous struct that is invokeable and can capture data from the local scope.
+                <div style="height:0.75em";></div>
+                The move keyword ensures that the capture moves rname into the closure, so it can be safely passed 
+                to other functions
+                as long as its lifetime is no greater than that of FO.
+                <div style="height:0.75em";></div>
+                Since <c-s>rname</c-s> is a reference to <c-s>self.name</c-s> it does not consume <c-s>self.name</c-s>.
+              </td>
+            </tr>
+            <tr>
               <th colspan="2">Function Object Example</th>
+            </tr>
+            <tr>
+              <td>
+                <pre style="width:max-content;"><code class="language-rust">pub struct DemoFO {
+  name : String,
+}
+impl DemoFO {
+  pub fn new() -> Self {
+    Self {
+      name:"no_name".to_string(),
+    }
+  }
+  pub fn change_name(&mut self, s:&str) {
+    self.name = s.to_string();
+  }
+  pub fn get_function_object<'a>(&'a self)      
+    -> impl Fn() + 'a
+  {
+    let name = &self.name;
+    move || { 
+      println!("{:?}", name) 
+    }
+  }
+}
+
+</code>
+                </pre>
+              </td>
+              <td>
+<pre style="width:max-content"><code class="language-rust">pub fn demo_function_object() {
+  println!();
+  show_label("demo function objects");
+  let mut demo = DemoFO::new();
+
+  /* immutable borrow of DemoFO here */   
+  let fo = demo.get_function_object();
+  fo();
+  drop(fo);
+  /* 
+    mutable borrow of DemoFO below,
+    O.K. because fo dropped
+  */
+  demo.change_name("Arnold");
+  let fo = demo.get_function_object();
+  fo();
+}
+  
+</code></pre>
+<div style="height:0.0em;"></div>
+<pre style="width:max-content;"><code class="language-rust"> demo function objects
+-----------------------                   
+"no_name"
+"Arnold"  
+</code></pre>
+              </td>
             </tr>
             <tr>
               <th colspan="2">Function Pointer Syntax</th>
             </tr>
             <tr>
+              <td>
+<pre style="width:max-content"><code class="language-rust">/* demonstration function */
+fn this_function_has_a_very_long_name() {
+  println!("action of function with long name");
+}
+
+pub fn demo_function_pointer() {
+  println!();
+  show_label("demo function pointer");
+  let tfh = this_function_has_a_very_long_name;
+  tfh();
+}
+</code></pre>
+              </td>
+              <td>
+<pre style="width:max-content;"><code class="language-rust"> demo function pointer
+------------------------
+action of function with long name         
+
+
+
+
+
+
+
+  </code></pre>
+              </td>
+            </tr>
+            <tr>
               <th colspan="2">Function Pointer Example</th>
             </tr>
             <tr>
+              <td>
+              <pre style="width:max-content;"><code class="language-rust">/* demonstration function */
+pub fn u(s:&str) {
+  println!("{:?}", s);
+}
+/* function accepts function pointer */         
+pub fn v(fp:impl Fn(&str) -> ()) {
+  fp("using function pointer");
+}
+pub fn demo_function_pointer() {
+  println!();
+  show_label("demo function pointer");
+  v(u);
+}
+</code></pre>
+              </td>
+              <td>
+<pre style="width:max-content;"><code class="language-rust"> demo function pointer
+------------------------                  
+"using function pointer"
+  
+
+
+
+
+
+
+
+
+                  </code></pre>
+              </td>
+            </tr>
+            <!-- <tr>
               <th colspan="2">Delegate Syntax</th>
             </tr>
             <tr>
               <th colspan="2">Delegate Example</th>
-            </tr>
+            </tr> -->
           </table>
         </div>
-        <t-b>
+      </details>
+      <t-b>
           In this chapter we discuss all of these and explore their consequences with example code.
         </t-b>
         <a id="functions"></a>
@@ -351,7 +504,7 @@ impl Counter {
         <t-b>
           The syntax for Rust functions looks like this:
           <div class="inset">
-            <c-s>fn somefunction(ArgType1 t1, ArgType2 t2, ...) -> ReturnType { ... }</c-s>
+            <c-s>fn f(a1:A1, a2:A2, ...) -> R { ... }</c-s>
           </div>
           Often the return type is omitted when the compiler can infer the type by the return expression.  Statements are units of
           execution and end with a &quot;semicolon&quot;.  Expressions compile to some value and do not have a terminating semicolon.
@@ -391,19 +544,24 @@ fn pass_by_value_str(s:String) {  // move
   /* use s */
 }
 
-/* s now invalid - attempt to use is compile error */
+/* 
+  s now invalid - 
+  statements using s will fail to compile 
+*/
               </defn-code>
             </defn-block>
             <defn-block>
               <defn-head class="defnBorderTop">Pass by Reference</defn-head>
               <defn-code>
-/*-----------------------------------------------
-  Pass by ref borrows the argument. Borrow
-  created in the function's stack frame.
-  Borrow ends at end of function call, so
-  param rs is valid after call
+/*-------------------------------------
+  Pass by ref borrows the argument. 
+  Borrow reference created in the 
+  function's stack frame.
+  
+  Borrow ends at end of function call,
+  so param rs is valid after call
 */
-fn pass_by_ref_str(rs:&String) {  // borrow
+fn pass_by_ref_str(rs:&String) { // borrow
   /* use rs */
 }
 
@@ -424,48 +582,48 @@ fn pass_by_ref_str(rs:&String) {  // borrow
             </tr>
             <tr>
               <td style="width:20em;">
-                &nbsp;<strong>1. Pass copy type arg by value</strong>
+                &nbsp;<strong>1. Pass copy type by value</strong>
                 <hr style="margin:0.25em 0em;" />
                 &nbsp;Example: e(d:f64)
               </td>
               <td>
-                &nbsp;No side effects:<br />&nbsp;argument remains valid after call
+                &nbsp;No side effects, argument remains&nbsp;valid after call
                 <hr style="margin:0.25em 0em;" />
                 &nbsp;Example: let d = 3.1415927; e(d);
               </td>
             </tr>
             <tr>
               <td>
-                &nbsp;<strong>2. Pass copy type arg by ref</strong>
+                &nbsp;<strong>2. Pass copy type by ref</strong>
                 <hr style="margin:0.25em 0em;" />
                 &nbsp;Example: f(rd:&f64);
               </td>
               <td>
-                &nbsp;Side effects:<br />&nbsp;user sees change of value, argument remains valid
+                &nbsp;Side effects: user sees change of value, argument remains valid
                 <hr style="margin:0.25em 0em;" />
                 &nbsp;Example: let d = 3.1415927; f(&d);
               </td>
             </tr>
             <tr>
               <td>
-                &nbsp;<strong>3. Pass move type arg by value</strong>
+                &nbsp;<strong>3. Pass move type by value</strong>
                 <hr style="margin:0.25em 0em;" />
                 &nbsp;Example: g(v:Vec&lt;i32&gt;);
               </td>
               <td>
-                &nbsp;Side effects:<br />&nbsp;argument becomes invalid after call
+                &nbsp;Side effects: argument becomes invalid after call
                 <hr style="margin:0.25em 0em;" />
                 &nbsp;Example: let v = vec![1, 2, 3]; g(v):
               </td>
             </tr>
             <tr>
               <td>
-                &nbsp;<strong>4. Pass move type arg by ref</strong>
+                &nbsp;<strong>4. Pass move type by ref</strong>
                 <hr style="margin:0.25em 0em;" />
                 &nbsp;Example: h(rv:&Vec&lt;i32&gt;)
               </td>
               <td>
-                &nbsp;Side effects:<br />&nbsp;caller sees both change in value and change in instance<sup>1</sup>.
+                &nbsp;Side effects: caller sees both change in value and change in instance<sup>1</sup>.
                 
                 <hr style="margin:0.25em 0em;" />
                 &nbsp;Example: let v = vec![2, 1, 0]; h(rv:&Vec);
@@ -484,11 +642,11 @@ fn pass_by_ref_str(rs:&String) {  // borrow
           </table>
         </t-b>
         <div style="height: 0.5em;"></div>
-        <details>
+        <details open>
           <summary class="darkItem">Argument Passing Examples:&nbsp;</summary>
         <h3>Pass Copy Type argument by Value</h3>
         <div style="float:left; padding-right:0.5em;">
-          <div class="blockSingle" style="padding:0em; width:max-content; margin-top:0em;">
+          <div class="blockSingle" style="padding:0em; width:27em; margin-top:0em;">
             <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Pass by Value, Caller sees no Change</strong></div>
             <div style="padding:0.25em;">
               <div class="codewrap clear" style="padding:0.25em; overflow-x:auto; width:max-content;">
@@ -806,14 +964,14 @@ side-effects, passing copy type by ref
           </splitter-container>
         </div>
         <div style="height:1em;"></div>
+
         <h3>Pass Move Type by Reference</h3>
-        <div style=" width:calc(100vw - 25em);">
-        <div style="float:left; padding-right:0.5em;">
+        <div style="float:left; padding-right:0.5em; border:2px solid red; width:90%;">
           <div class="blockSingle" style="padding:0em; width:max-content; margin-top:0em;">
-            <div style="float:left;  margin-left:0.75em; padding:0.25em 0em;"><strong>Pass by Reference, Caller sees change of Instance</strong></div>
+            <div style="float:left; margin-left:0.75em; padding:0.25em 0em;"><strong>Pass by Reference, Caller sees change of Instance</strong></div>
             <div style="padding:0.25em;">
-              <div class="codewrap clear" style="padding:0.25em; overflow-x:auto; width:max-content;">
-                <pre style="width:35em;"><code class="language-rust">pub fn pass_move_by_ref_heap_instance&lt;T&gt;(rh:&mut Box&lt;T&gt;)
+              <div class="codewrap" style="padding:0.25em; overflow-x:auto; width:max-content;">
+                <pre style="width:35em;"><code class="language-rust">>pub fn pass_move_by_ref_heap_instance&lt;T&gt;(rh:&mut Box&lt;T&gt;)
   where T: From&lt;String&gt; + Default + Debug
 {
   show_op(&quot;in pass_move_by_ref_heap_instance&lt;T&gt;&quot;);
@@ -834,13 +992,16 @@ side-effects, passing copy type by ref
               </div>
             </div>
           </div>
+          commentary
         </div>
-        <div style="height:1em;"></div>
-        <p>
+        <div style="height:2em;"></div>
+        <t-b>
           Pass_move_by_ref_heap_instance&lt;T&gt;
           mutably borrows argument.
           Borrow ends at end of function call, so
           rh is valid after call.
+        </t-b>
+        <t-b>
           <ul style="position:relative; left:1.5em;">
             <li>
               This function displays type and value of its argument.
@@ -872,7 +1033,78 @@ side-effects, passing copy type by ref
               was changed.
             </li>
           </ul>        
-        </p>
+        </t-b>
+
+
+        <h3>Pass Move Type by Reference</h3>
+        <!-- <div style=" width:calc(100vw - 25em);"> -->
+        <div style="float:left; padding-right:0.5em; border:2px solid green;">
+          <div class="blockSingle" style="padding:0em; width:max-content; margin-top:0em;">
+            <div style="float:left;  margin-left:0.75em; padding:0.25em 0em; border:2px solid red;"><strong>Pass by Reference, Caller sees change of Instance</strong></div>
+            <div style="padding:0.25em;">
+              <div class="codewrap" style="padding:0.25em; overflow-x:auto; width:max-content;">
+                <pre style="width:35em;"><code class="language-rust">pub fn pass_move_by_ref_heap_instance&lt;T&gt;(rh:&mut Box&lt;T&gt;)
+  where T: From&lt;String&gt; + Default + Debug
+{
+  show_op(&quot;in pass_move_by_ref_heap_instance&lt;T&gt;&quot;);
+  show_type(&rh);
+  show_value(&rh);
+  print!(&quot;  address of rh is: {:p}&#92;n&quot;, *rh);
+  /*---------------------------------------
+    demonstrate side effects by changing
+    referenced object
+  */
+  show_op(&quot;*rh = Box::new(t)&quot;);
+  let t:T = &quot;a new string&quot;.to_string().into();
+  *rh = Box::new(t);  // change of instance
+  print!(&quot;  address of rh is: {:p}&#92;n&quot;, *rh);
+  show_value(&rh);
+  show_op(&quot;leaving function&quot;);
+}</code></pre>
+              </div>
+            </div>
+            </div>
+            <t-b>
+              Pass_move_by_ref_heap_instance&lt;T&gt;
+              mutably borrows argument.
+              Borrow ends at end of function call, so
+              rh is valid after call.
+            </t-b>
+            <t-b>
+              <ul style="position:relative; left:1.5em;">
+                <li>
+                  This function displays type and value of its argument.
+                </li>
+                <li>
+                  It then changes value to a T coerced from a
+                  String to illustrate when side effects occur.
+                </li>
+                <li>
+                  That is always possible for a type that implements
+                  Trait From&lt;String&gt; as compiler generates 
+                  Into&lt;String&gt; from From&lt;String&gt;, e.g.,
+                  it converts a String into a T type. 
+                </li>
+                <li>
+                  The function then sets the contents of rh to
+                  a Box&lt;T&gt;
+                </li>
+                <li>
+                  That has reset the reference to a new heap
+                  instance. That works only because Box is a 
+                  smart pointer, something more than just a 
+                  reference.
+                </li>
+                <li>
+                  The change of instance is sandwiched between two 
+                  displays of the address associated with the 
+                  argument, just to show that the instance really 
+                  was changed.
+                </li>
+              </ul>        
+            </t-b>
+          </div>
+        <div style="height:1em;"></div>
       </div>
         <div style="height:0em;"></div>
         <t-b>
