@@ -186,16 +186,16 @@
             <defn-block>
               <defn-head>Box - smart pointer to allocation on heap</defn-head>
               <defn-code style="font-size:0.9em;">
-                let sp = Box::new(T::new());
-                /*--------------------------------------------*/
-                Box automatically derefernces to a T
-                so you can call T methods on sp
-                /*--------------------------------------------*/
-                let vl = sp.getter();    // T method
-                sp.setter(vl);           // T method
-                let spc = sp.clone();    // Box method
-                let t = *sp;  // move heap value to stack
-                Box deallocates heap memory in its drop method
+  let sp = Box::new(T::new());
+  /*--------------------------------------------*/
+    Box automatically derefernces to a T
+    so you can call T methods on sp
+  /*--------------------------------------------*/
+  let vl = sp.getter();    // T method
+  sp.setter(vl);           // T method
+  let spc = sp.clone();    // Box method
+  let t = *sp;  // move heap value to stack, drops Box
+  // Box deallocates heap memory in its drop method
               </defn-code>
             </defn-block>
           </div>
@@ -211,100 +211,102 @@
                 <defn-block>
                   <defn-head>show_box::main.rs</defn-head>
                   <defn-code>
-                    /////////////////////////////////////////////////////////////
-                    // show_box::main.rs - demo Box&lt;T&gt; pointer to heap         //
-                    //                                                         //
-                    // Jim Fawcett, https://JimFawcett.github.io, 06 Jun 2020  //
-                    /////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////
+  // show_box::main.rs - demo Box&lt;T&gt; pointer to heap         //
+  //                                                         //
+  // Jim Fawcett, https://JimFawcett.github.io, 06 Jun 2020  //
+  /////////////////////////////////////////////////////////////
 
-                    #![allow(clippy::print_literal)]
+  #![allow(clippy::print_literal)]
 
-                    use core::fmt::{ Debug };
+  use core::fmt::{ Debug };
 
-                    /*-- same as print!("\n  sp = {:?}", sp) --*/
-                    fn show&lt;T:Debug&gt;(name:&amp;str, t:&amp;T) {
-                    print!("\n  {} = {:?}", name, t);
-                    }
+  /*-- same as print!("\n  sp = {:?}", sp) --*/
+  fn show&lt;T:Debug&gt;(name:&amp;str, t:&amp;T) {
+    print!("\n  {} = {:?}", name, t);
+  }
 
-                    fn main() {
+  fn main() {
 
-                    let putline = || print!("\n");
+    let putline = || print!("\n");
 
-                    type TLC = test_type::TestLifeCycle;
+    type TLC = test_type::TestLifeCycle;
 
-                    print!("\n  -- create Box pointer to TLC on heap --");
-                    let sp = Box::new(TLC::new());
-                    show("sp", &amp;sp);
-                    putline();
+    print!("\n  -- create Box pointer to TLC on heap --");
+    let sp = Box::new(TLC::new());
+    show("sp", &amp;sp);
+    putline();
 
-                    print!("\n  -- access member of TLC using Box --");
-                    let v = sp.get_value();
-                    show("v ", &amp;v);
-                    putline();
+    print!("\n  -- access member of TLC using Box --");
+    let v = sp.get_value();
+    show("v ", &amp;v);
+    putline();
 
-                    print!("\n  -- clone Box pointer to TLC on heap --");
-                    let mut spc = sp.clone();
-                    show("spc", &amp;spc);
-                    putline();
+    print!("\n  -- clone Box pointer to TLC on heap --");
+    let mut spc = sp.clone();
+    show("spc", &amp;spc);
+    putline();
 
-                    print!("\n  -- mutate TLC through Box --");
-                    spc.set_value(42);
-                    show("spc", &amp;spc);
-                    show("v ", &amp;spc.get_value());
-                    show("sp", &amp;sp);
-                    putline();
+    print!("\n  -- mutate TLC through Box --");
+    spc.set_value(42);
+    show("spc", &amp;spc);
+    show("v ", &amp;spc.get_value());
+    show("sp", &amp;sp);
+    putline();
 
-                    print!("\n  -- create reference to Box pointer --");
-                    let rspc = &amp;mut spc;
-                    rspc.set_value(21);
-                    show("rspc", &amp;rspc);    // holds new value
-                    show("spc", &amp;spc);      // holds new value too
-                    putline();
+    print!("\n  -- create reference to Box pointer --");
+    let rspc = &amp;mut spc;
+    rspc.set_value(21);
+    show("rspc", &amp;rspc);    // holds new value
+    show("spc", &amp;spc);      // holds new value too
+    putline();
 
-                    print!("\n  -- move contents of Box back to stack with deref --");
-                    let tlc = *sp;  // move
-                    show("tlc", &amp;tlc);
+    print!(
+      "\n  -- move contents of Box to stack with deref --"
+    );
+    let tlc = *sp;  // move
+    show("tlc", &amp;tlc);
 
-                    // statement below won't compile since sp has been moved
-                    // show("sp", &amp;sp);
+    // statement below won't compile since sp has been moved
+    // show("sp", &amp;sp);
 
-                    println!("\n\n  That's all Folks!");
+    println!("\n\n  That's all Folks!");
 
-                    }  /*-- drop Boxed item --*/
+  }  /*-- drop Boxed item --*/
                   </defn-code>
                 </defn-block>
                 <defn-block>
                   <defn-head>Output:</defn-head>
                   <defn-code>
-                    cargo run -q
+  cargo run -q
 
-                    -- create Box pointer to TLC on heap --
-                    creating instance 0 of TestLifeCycle
-                    sp = TestLifeCycle { count: 0 }
+  -- create Box pointer to TLC on heap --
+  creating instance 0 of TestLifeCycle
+  sp = TestLifeCycle { count: 0 }
 
-                    -- access member of TLC using Box --
-                    v  = 0
+  -- access member of TLC using Box --
+  v  = 0
 
-                    -- clone Box pointer to TLC on heap --
-                    TestLifeCycle instance 0 cloned
-                    spc = TestLifeCycle { count: 0 }
+  -- clone Box pointer to TLC on heap --
+  TestLifeCycle instance 0 cloned
+  spc = TestLifeCycle { count: 0 }
 
-                    -- mutate TLC through Box --
-                    spc = TestLifeCycle { count: 42 }
-                    v  = 42
-                    sp = TestLifeCycle { count: 0 }
+  -- mutate TLC through Box --
+  spc = TestLifeCycle { count: 42 }
+  v  = 42
+  sp = TestLifeCycle { count: 0 }
 
-                    -- create reference to Box pointer --
-                    rspc = TestLifeCycle { count: 21 }
-                    spc = TestLifeCycle { count: 21 }
+  -- create reference to Box pointer --
+  rspc = TestLifeCycle { count: 21 }
+  spc = TestLifeCycle { count: 21 }
 
-                    -- move contents of Box back to stack with deref --
-                    tlc = TestLifeCycle { count: 0 }
+  -- move contents of Box to stack with deref --
+  tlc = TestLifeCycle { count: 0 }
 
-                    That's all Folks!
+  That's all Folks!
 
-                    TestLifeCycle instance 0 dropped
-                    TestLifeCycle instance 21 dropped
+  TestLifeCycle instance 0 dropped
+  TestLifeCycle instance 21 dropped
                   </defn-code>
                 </defn-block>
               </defn-outerBlock>
@@ -327,32 +329,32 @@
             <defn-block>
               <defn-head>Rc - reference counted pointer</defn-head>
               <defn-code style="font-size:0.9em;">
-                let tlc = test_type::TestLifeCycle;
-                let mut rc1 = Rc::new(tlc)
-                /*------------------------------------------------*/
-                std::rc::Rc is a reference counted pointer.
-                - Rc::new(value) creates a pointer to value.
-                - Rc::clone creates a new pointer to the same
-                source inner value, adding 1 to ref count.
-                - Rc automatically dereferences to a T, so you
-                can call T methods on an Rc&lt;T&gt;.
-                - Rc::drop decrements the ref count, dropping
-                the inner value on zero.
-                - Note, it does no harm to drop a stack value
-                as long as there is no attempt to use after.
-                /*------------------------------------------------*/
-                let rc2 = rc1.clone();
-                let rc3 = Rc::clone(&rc2);
-                let opt = Rc::get_mut(&rc1);
-                // where opt: Option&lt;Some(&mut tlc)&gt;
-                /*------------------------------------------------*/
-                get_mut returns an Option because the Rust
-                ownership rules allow only one active mutable
-                reference.
-                If there is already an active mutable reference
-                the option contains the enumeration value None.
-                Otherwise it contains Some(&mut inner_value).
-                /*------------------------------------------------*/
+  let tlc = test_type::TestLifeCycle;
+  let mut rc1 = Rc::new(tlc)
+  /*--------------------------------------------------
+    std::rc::Rc is a reference counted pointer.
+    - Rc::new(value) creates a pointer to value.
+    - Rc::clone creates a new pointer to the same
+    source inner value, adding 1 to ref count.
+    - Rc automatically dereferences to a T, so you
+    can call T methods on an Rc&lt;T&gt;.
+    - Rc::drop decrements the ref count, dropping
+    the inner value on zero.
+    - Note, it does no harm to drop a stack value
+    as long as there is no attempt to use after.
+  --------------------------------------------------*/
+  let rc2 = rc1.clone();
+  let rc3 = Rc::clone(&rc2);
+  let opt = Rc::get_mut(&rc1);
+  // where opt: Option&lt;Some(&mut tlc)&gt;
+  /*--------------------------------------------------
+    get_mut returns an Option because the Rust
+    ownership rules allow only one active mutable
+    reference.
+    If there is already an active mutable reference
+    the option contains the enumeration value None.
+    Otherwise it contains Some(&mut inner_value).
+  --------------------------------------------------*/
               </defn-code>
             </defn-block>
           </div>
@@ -371,139 +373,139 @@
                 <defn-block>
                   <defn-head>show_rc::main.rs</defn-head>
                   <defn-code>
-                    /////////////////////////////////////////////////////////////
-                    // show_rc::main.rs - demo Rc&lt;T&gt; ref counted ptr           //
-                    //                                                         //
-                    // Jim Fawcett, https://JimFawcett.github.io, 06 Jun 2020  //
-                    /////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////
+  // show_rc::main.rs - demo Rc&lt;T&gt; ref counted ptr           //
+  //                                                         //
+  // Jim Fawcett, https://JimFawcett.github.io, 06 Jun 2020  //
+  /////////////////////////////////////////////////////////////
 
-                    use core::fmt::{ Debug };
-                    use std::rc::Rc;
+  use core::fmt::{ Debug };
+  use std::rc::Rc;
 
-                    /*-- same as print!("\n  sp = {:?}", sp) --*/
-                    #[allow(clippy::print_literal)]
-                    fn show&lt;T:Debug&gt;(name:&amp;str, t:&amp;T) {
-                    print!("\n  {} = {:?}", name, t);
-                    }
+  /*-- same as print!("\n  sp = {:?}", sp) --*/
+  #[allow(clippy::print_literal)]
+  fn show&lt;T:Debug&gt;(name:&amp;str, t:&amp;T) {
+    print!("\n  {} = {:?}", name, t);
+  }
 
-                    struct SpaceAtEnd;
-                    impl Drop for SpaceAtEnd {
-                    fn drop(&amp;mut self) {
-                    print!("\n\n");
-                    }
-                    }
+  struct SpaceAtEnd;
+  impl Drop for SpaceAtEnd {
+    fn drop(&amp;mut self) {
+      print!("\n\n");
+    }
+  }
 
-                    fn main() {
+  fn main() {
 
-                    let putline = || print!("\n");
-                    let _cosmetic = SpaceAtEnd;
+    let putline = || print!("\n");
+    let _cosmetic = SpaceAtEnd;
 
-                    print!("\n  -- create instance of TestLifeCycle in stack --");
-                    let tlc = test_type::TestLifeCycle::new();
-                    putline();
+    print!("\n  -- create instance of TestLifeCycle in stack --");
+    let tlc = test_type::TestLifeCycle::new();
+    putline();
 
-                    print!("\n  -- create Rc ptr to value in stack --");
-                    let mut rc1 = Rc::new(tlc);
-                    show("rc1", &amp;rc1);
-                    show("Rc strong count", &amp;Rc::strong_count(&amp;rc1));
-                    show("rc1 inner value", &rc1.get_value());
-                    putline();
+    print!("\n  -- create Rc ptr to value in stack --");
+    let mut rc1 = Rc::new(tlc);
+    show("rc1", &amp;rc1);
+    show("Rc strong count", &amp;Rc::strong_count(&amp;rc1));
+    show("rc1 inner value", &rc1.get_value());
+    putline();
 
-                    print!("\n  -- attempt to mutate inst through Rc ptr --");
-                    let opt_mut_rc1 = Rc::get_mut(&amp;mut rc1);
-                    match opt_mut_rc1 {
-                    Some(val) =&gt; {
-                    /*-- make mutable reference --*/
-                    let mut_rc1 = &amp;mut *val;
-                    mut_rc1.set_value(42);
-                    show("rc1", &amp;rc1);
-                    },
-                    None =&gt; {
-                    print!(
-                    "\n  can't have multiple mutable references"
-                    );
-                    }
-                    }
-                    putline();
+    print!("\n  -- attempt to mutate inst through Rc ptr --");
+    let opt_mut_rc1 = Rc::get_mut(&amp;mut rc1);
+    match opt_mut_rc1 {
+      Some(val) =&gt; {
+        /*-- make mutable reference --*/
+        let mut_rc1 = &amp;mut *val;
+        mut_rc1.set_value(42);
+        show("rc1", &amp;rc1);
+      },
+      None =&gt; {
+        print!(
+          "\n  can't have multiple mutable references"
+        );
+      }
+    }
+    putline();
 
-                    print!("\n  -- create new Rc ptr to inst in stack --");
-                    let mut rc2 = rc1.clone();
-                    show("rc2", &amp;rc2);
-                    show("Rc strong count", &amp;Rc::strong_count(&amp;rc2));
-                    putline();
+    print!("\n  -- create new Rc ptr to inst in stack --");
+    let mut rc2 = rc1.clone();
+    show("rc2", &amp;rc2);
+    show("Rc strong count", &amp;Rc::strong_count(&amp;rc2));
+    putline();
 
-                    print!("\n  -- attempt to mutate inst through Rc ptr --");
-                    let opt_mut_rc2 = Rc::get_mut(&amp;mut rc2);
-                    match opt_mut_rc2 {
-                    Some(val) =&gt; {
-                    /*-- make mutable reference --*/
-                    let mut_rc2 = &amp;mut *val;
-                    mut_rc2.set_value(21);
-                    show("rc2", &amp;rc2);
-                    },
-                    None =&gt; {
-                    print!(
-                    "\n  can't have multiple mutable references"
-                    );
-                    }
-                    }
-                    putline();
+    print!("\n  -- attempt to mutate inst through Rc ptr --");
+    let opt_mut_rc2 = Rc::get_mut(&amp;mut rc2);
+    match opt_mut_rc2 {
+      Some(val) =&gt; {
+        /*-- make mutable reference --*/
+        let mut_rc2 = &amp;mut *val;
+        mut_rc2.set_value(21);
+        show("rc2", &amp;rc2);
+      },
+      None =&gt; {
+        print!(
+          "\n  can't have multiple mutable references"
+        );
+      }
+    }
+    putline();
 
-                    /*-- alternate clone syntax --*/
-                    print!("\n  -- create another new Rc ptr to inst in stack --");
-                    let mut rc3 = Rc::clone(&amp;rc1);
-                    show("rc3", &amp;rc3);
-                    show("Rc strong count", &amp;Rc::strong_count(&amp;rc1));
-                    putline();
+    /*-- alternate clone syntax --*/
+    print!("\n  -- create another new Rc ptr to inst in stack --");
+    let mut rc3 = Rc::clone(&amp;rc1);
+    show("rc3", &amp;rc3);
+    show("Rc strong count", &amp;Rc::strong_count(&amp;rc1));
+    putline();
 
-                    /*-- alternate matching syntax --*/
-                    print!("\n  -- attempt to mutate inst through Rc ptr --");
-                    let opt_mut_rc3 = Rc::get_mut(&amp;mut rc3);
-                    if let Some(val) = opt_mut_rc3 {
-                    /*-- make mutable reference --*/
-                    let mut_rc3 = &amp;mut *val;
-                    mut_rc3.set_value(21);
-                    show("rc3", &amp;rc2);
-                    }
-                    else {
-                    print!(
-                    "\n  can't have multiple mutable references"
-                    );
-                    }
-                    putline();
+    /*-- alternate matching syntax --*/
+    print!("\n  -- attempt to mutate inst through Rc ptr --");
+    let opt_mut_rc3 = Rc::get_mut(&amp;mut rc3);
+    if let Some(val) = opt_mut_rc3 {
+    /*-- make mutable reference --*/
+    let mut_rc3 = &amp;mut *val;
+    mut_rc3.set_value(21);
+    show("rc3", &amp;rc2);
+    }
+    else {
+    print!(
+    "\n  can't have multiple mutable references"
+    );
+    }
+    putline();
 
-                    // print!("\n  dropping rc1");
-                    // drop(rc1);
-                    // print!("\n  dropping rc2");
-                    // drop(rc2);
-                    // print!("\n  dropping rc3");
-                    // drop(rc3);
-                    // putline();
+    // print!("\n  dropping rc1");
+    // drop(rc1);
+    // print!("\n  dropping rc2");
+    // drop(rc2);
+    // print!("\n  dropping rc3");
+    // drop(rc3);
+    // putline();
 
-                    /*-------------------------------------------------------
-                    Help with Option processing, used above:
-                    -----------------------------------------------------
-                    The code below illustrates destructuring an option
-                    with both if let and match constructs.
-                    These will be discussed again in the Error Handling
-                    Bite.
-                    */
-                    let maybe_cake = Some("this code is a piece of cake! :-)");
-                    let not_cake = std::option::Option::&lt;&amp;str&gt;::None;
-                    if let Some(cake) = maybe_cake {    // cake is a defined identifier
-                    print!("\n  {}", cake);         // due to if let destructuring
-                    }
+    /*-------------------------------------------------------
+    Help with Option processing, used above:
+    -----------------------------------------------------
+    The code below illustrates destructuring an option
+    with both if let and match constructs.
+    These will be discussed again in the Error Handling
+    Bite.
+    */
+    let maybe_cake = Some("this code is a piece of cake! :-)");
+    let not_cake = std::option::Option::&lt;&amp;str&gt;::None;
+    if let Some(cake) = maybe_cake {    // cake is a defined identifier
+    print!("\n  {}", cake);         // due to if let destructuring
+    }
 
-                    let maybe_cake: Option&lt;&amp;str&gt; = not_cake;
-                    match maybe_cake {
-                    Some(cake) =&gt; print!("\n  {}", cake),
-                    // now, cake is defined by
-                    // match destructuring
-                    None =&gt; print!("\n  this code is not a piece of cake!! :-(")
-                    }
+    let maybe_cake: Option&lt;&amp;str&gt; = not_cake;
+    match maybe_cake {
+    Some(cake) =&gt; print!("\n  {}", cake),
+    // now, cake is defined by
+    // match destructuring
+    None =&gt; print!("\n  this code is not a piece of cake!! :-(")
+    }
 
-                    println!("\n\n  That's all Folks!");
-                    }
+    println!("\n\n  That's all Folks!");
+  }
                   </defn-code>
                 </defn-block>
                 <defn-block>
