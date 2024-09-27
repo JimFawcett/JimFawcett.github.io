@@ -294,84 +294,84 @@ ib
               <defn-block>
                 <defn-head>No Interior Mutability</defn-head>
                 <defn-code>
-                  /*-----------------------------------------------------
-                  Illustrates that perfectly safe code can fail to
-                  compile.  The safety invariant is very strong.
-                  -----------------------------------------------------*/
-                  fn may_fail_to_build() {
-                  print!("\n  -- no interior mutability --");
-                  let mut x = 42i32;
-                  print!("\n    x = {}", x);
-                  print!("\n    - immutable reference -");
-                  let rx = &x;
-                  print!("\n    *rx = {}", rx);
-                  print!("\n    - mutable reference -");
-                  let mrx = &mut x;
-                  *mrx += 1;
-                  // drop(mrx); won't save compilation - not used by borrow chkr
-                  print!("\n    *mrx = {}", mrx);
-                  // error: attempt to use immutable ref with mutable ref in scope
-                  //        causes compile failure
-                  // print!("\n    *rx = {}", rx);
-                  println!();
-                  // final observation: error is not due to declaration
-                  // it's due to use.
-                  }
+/*-----------------------------------------------------
+  Illustrates that perfectly safe code can fail to
+  compile.  The safety invariant is very strong.
+-----------------------------------------------------*/
+fn may_fail_to_build() {
+  print!("\n  -- no interior mutability --");
+  let mut x = 42i32;
+  print!("\n    x = {}", x);
+  print!("\n    - immutable reference -");
+  let rx = &amp;x;
+  print!("\n    *rx = {}", rx);
+  print!("\n    - mutable reference -");
+  let mrx = &mut x;
+  *mrx += 1;
+  // drop(mrx); won't save compilation - not used by borrow chkr
+  print!("\n    *mrx = {}", mrx);
+  // error: attempt to use immutable ref with mutable ref in scope
+  //        causes compile failure
+  // print!("\n    *rx = {}", rx);
+  println!();
+  // final observation: error is not due to declaration
+  // it's due to use.
+}
 
-                  fn main() {
-                  may_fail_to_build();
-                  }
+fn main() {
+  may_fail_to_build();
+}
                 </defn-code>
                 <defn-head class="defnBorderTop">Output</defn-head>
                 <defn-code>
-                  -- no interior mutability --
-                  x = 42
-                  - immutable reference -
-                  *rx = 42
-                  - mutable reference -
-                  *mrx = 43
+-- no interior mutability --
+x = 42
+- immutable reference -
+*rx = 42
+- mutable reference -
+*mrx = 43
 
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Interior Mutability</defn-head>
                 <defn-code>
-                  /*-----------------------------------------------------
-                  Illustrates that code violating safety invariant
-                  can compile with the help of interior mutability.
-                  - you still can't break the iinvariant rule due to
-                  run-time checks.  However, using locks avoids
-                  run-time failure (not illustrated here, but later).
-                  -----------------------------------------------------*/
-                  fn may_fail_at_runtime() {
-                  print!("\n  -- interior mutability --");
-                  let x = RefCell::new(42i32);
-                  print!("\n    x = {}", x.into_inner());
-                  // RefCell is not copy so now invalid
-                  print!("\n    - immutable reference -");
-                  let x = RefCell::new(42i32);
-                  let rx = x.borrow();
-                  print!("\n    *rx = {}", rx);
-                  // commenting out drop causes run-time panic
-                  drop(rx);
-                  print!("\n    - mutable reference -");
-                  *x.borrow_mut() += 1;  // mutable ref ends here
-                  print!("\n    *mrx = {}", x.borrow());
+/*-----------------------------------------------------
+  Illustrates that code violating safety invariant
+  can compile with the help of interior mutability.
+  - you still can't break the iinvariant rule due to
+    run-time checks.  However, using locks avoids
+    run-time failure (not illustrated here, but later).
+-----------------------------------------------------*/
+fn may_fail_at_runtime() {
+  print!("\n  -- interior mutability --");
+  let x = RefCell::new(42i32);
+  print!("\n    x = {}", x.into_inner());
+  // RefCell is not copy so now invalid
+  print!("\n    - immutable reference -");
+  let x = RefCell::new(42i32);
+  let rx = x.borrow();
+  print!("\n    *rx = {}", rx);
+  // commenting out drop causes run-time panic
+  drop(rx);
+  print!("\n    - mutable reference -");
+  *x.borrow_mut() += 1;  // mutable ref ends here
+  print!("\n    *mrx = {}", x.borrow());
+}
 
-                  }
-                  fn main() {
-                  may_fail_at_runtime();
-                  }
+fn main() {
+  may_fail_at_runtime();
+}
 
                 </defn-code>
                 <defn-head class="defnBorderTop">Output</defn-head>
                 <defn-code>
-                  -- interior mutability --
-                  x = 42
-                  - immutable reference -
-                  *rx = 42
-                  - mutable reference -
-                  *mrx = 43
+-- interior mutability --
+x = 42
+- immutable reference -
+*rx = 42
+- mutable reference -
+*mrx = 43
 
                 </defn-code>
               </defn-block>
@@ -407,69 +407,69 @@ ib
             <defn-block>
               <defn-head><c-s>RefCell&lt;T&gt;</c-s> - Excerpts from std::cell code</defn-head>
               <defn-code>
-                pub struct RefCell&lt;T: ?Sized&gt; {
-                borrow: Cell&lt;BorrowFlag&gt;,
-                value: UnsafeCell&lt;T&gt;,
-                }
-                type BorrowFlag = isize;
-                const UNUSED: BorrowFlag = 0;
+pub struct RefCell&lt;T: ?Sized&gt; {
+  borrow: Cell&lt;BorrowFlag&gt;,
+  value: UnsafeCell&lt;T&gt;,
+}
+type BorrowFlag = isize;
+const UNUSED: BorrowFlag = 0;
 
-                impl&lt;T&gt; RefCell&lt;T&gt; {
+impl&lt;T&gt; RefCell&lt;T&gt; {
 
-                // elided code
+  // elided code
 
-                /// Mutably borrows the wrapped value.
-                ///
-                /// Borrow lasts until returned `RefMut` or all `RefMut`s
-                /// derived from it exit scope. Value cannot be borrowed
-                /// while this borrow is active.
-                ///
-                /// # Panics
-                ///
-                /// Panics if value is currently borrowed. For non-panicking
-                /// variant, use [`try_borrow_mut`](#method.try_borrow_mut).
-                ///
-                /*--------------------------------------------------------
-                Here is the core of interior mutability - Part 1
-                --------------------------------------------------------*/
-                pub fn borrow_mut(&self) -&gt; RefMut&lt;'_, T&gt; {
-                self.try_borrow_mut().expect("already borrowed")
-                }
+  /// Mutably borrows the wrapped value.
+  ///
+  /// Borrow lasts until returned `RefMut` or all `RefMut`s
+  /// derived from it exit scope. Value cannot be borrowed
+  /// while this borrow is active.
+  ///
+  /// # Panics
+  ///
+  /// Panics if value is currently borrowed. For non-panicking
+  /// variant, use [`try_borrow_mut`](#method.try_borrow_mut).
+  ///
+  /*--------------------------------------------------------
+    Here is the core of interior mutability - Part 1
+  --------------------------------------------------------*/
+  pub fn borrow_mut(&self) -&gt; RefMut&lt;'_, T&gt; {
+    self.try_borrow_mut().expect("already borrowed")
+  }
 
-                /// Mutably borrows wrapped value, returning error if value
-                /// is currently borrowed.
-                ///
-                /// Borrow lasts until returned `RefMut` or all `RefMut`s
-                /// derived from it exit scope. Value cannot be borrowed
-                /// while this borrow is active.
-                ///
-                pub fn try_borrow_mut(&self)
-                -&gt; Result&lt;RefMut&lt;'_, T&gt;, BorrowMutError&gt; {
-                match BorrowRefMut::new(&self.borrow) {
-                // SAFETY: `BorrowRef` guarantees unique access.
-                Some(b) =&gt; Ok(
-                RefMut {
-                value: unsafe {
-                &mut *self.value.get() },
-                borrow: b
-                }
-                ),
-                None =&gt; Err(BorrowMutError { _private: () }),
-                }
-                }
+  /// Mutably borrows wrapped value, returning error if value
+  /// is currently borrowed.
+  ///
+  /// Borrow lasts until returned `RefMut` or all `RefMut`s
+  /// derived from it exit scope. Value cannot be borrowed
+  /// while this borrow is active.
+  ///
+  pub fn try_borrow_mut(&self)
+    -&gt; Result&lt;RefMut&lt;'_, T&gt;, BorrowMutError&gt; {
+    match BorrowRefMut::new(&self.borrow) {
+      // SAFETY: `BorrowRef` guarantees unique access.
+      Some(b) =&gt; Ok(
+        RefMut {
+          value: unsafe {
+            &mut *self.value.get() },
+            borrow: b
+        }
+      ),
+      None =&gt; Err(BorrowMutError { _private: () }),
+    }
+  }
 
-                // elided code
+  // elided code
 
-                }
+}
 
-                /*--------------------------------------------------------
-                Here is the core of interior mutability - Part 2
-                --------------------------------------------------------*/
-                impl&lt;T: ?Sized&gt; DerefMut for RefMut&lt;'_, T&gt; {
-                fn deref_mut(&mut self) -&gt; &mut T {
-                self.value
-                }
-                }
+/*--------------------------------------------------------
+Here is the core of interior mutability - Part 2
+--------------------------------------------------------*/
+impl&lt;T: ?Sized&gt; DerefMut for RefMut&lt;'_, T&gt; {
+  fn deref_mut(&mut self) -&gt; &mut T {
+    self.value
+  }
+}
 
               </defn-code>
             </defn-block>
@@ -495,165 +495,165 @@ ib
                       <a href="https://doc.rust-lang.org/stable/std/cell/struct.UnsafeCell.html">UnsafeCell&lt;T&gt;</a> - partial definition
                     </defn-head>
                     <defn-code>
-                      pub struct UnsafeCell&lt;T: ?Sized&gt; {
-                      value: T,
-                      }
+pub struct UnsafeCell&lt;T: ?Sized&gt; {
+  value: T,
+}
 
-                      impl&lt;T: ?Sized&gt; !Sync for UnsafeCell&lt;T&gt; {}
+impl&lt;T: ?Sized&gt; !Sync for UnsafeCell&lt;T&gt; {}
 
-                      impl&lt;T&gt; UnsafeCell&lt;T&gt; {
-                      pub const fn new(value: T) -&gt; UnsafeCell&lt;T&gt; {
-                      UnsafeCell { value }
-                      }
+impl&lt;T&gt; UnsafeCell&lt;T&gt; {
+  pub const fn new(value: T) -&gt; UnsafeCell&lt;T&gt; {
+    UnsafeCell { value }
+  }
 
-                      pub const fn into_inner(self) -&gt; T {
-                      self.value
-                      }
-                      }
+  pub const fn into_inner(self) -&gt; T {
+  self.value
+  }
+}
 
-                      impl&lt;T: ?Sized&gt; UnsafeCell&lt;T&gt; {
-                      /// immutable interface yields mutable pointer !!
-                      pub const fn get(&self) -&gt; *mut T {
-                      // We can just cast pointer from `UnsafeCell&lt;T&gt;` to `T`
-                      self as *const UnsafeCell&lt;T&gt; as *const T as *mut T
-                      }
+impl&lt;T: ?Sized&gt; UnsafeCell&lt;T&gt; {
+  /// immutable interface yields mutable pointer !!
+  pub const fn get(&self) -&gt; *mut T {
+    // We can just cast pointer from `UnsafeCell&lt;T&gt;` to `T`
+    self as *const UnsafeCell&lt;T&gt; as *const T as *mut T
+  }
 
-                      /// This call borrows the `UnsafeCell` mutably
-                      /// (at compile-time) which guarantees that we
-                      /// possess the only reference.
-                      pub fn get_mut(&mut self) -&gt; &mut T {
-                      &mut self.value
-                      }
+  /// This call borrows the `UnsafeCell` mutably
+  /// (at compile-time) which guarantees that we
+  /// possess the only reference.
+  pub fn get_mut(&mut self) -&gt; &mut T {
+    &mut self.value
+  }
 
-                      pub const fn raw_get(this: *const Self) -&gt; *mut T {
-                      // We can just cast pointer from `UnsafeCell&lt;T&gt;` to `T`
-                      this as *const T as *mut T
-                      }
-                      }
+  pub const fn raw_get(this: *const Self) -&gt; *mut T {
+    // We can just cast pointer from `UnsafeCell&lt;T&gt;` to `T`
+    this as *const T as *mut T
+  }
+}
                     </defn-code>
                     <defn-head class="defnBorderTop">
                       <a href="https://doc.rust-lang.org/stable/std/cell/struct.Cell.html">Cell&lt;T&gt;</a> - Partial Definition
                     </defn-head>
                     <defn-code>
-                      pub struct Cell&lt;T: ?Sized&gt; {
-                      value: UnsafeCell&lt;T&gt;,
-                      }
+pub struct Cell&lt;T: ?Sized&gt; {
+  value: UnsafeCell&lt;T&gt;,
+}
 
-                      unsafe impl&lt;T: ?Sized&gt; Send for Cell&lt;T&gt; where T: Send {}
-                      impl&lt;T: ?Sized&gt; !Sync for Cell&lt;T&gt; {}
+unsafe impl&lt;T: ?Sized&gt; Send for Cell&lt;T&gt; where T: Send {}
+impl&lt;T: ?Sized&gt; !Sync for Cell&lt;T&gt; {}
 
-                      impl&lt;T: Copy&gt; Clone for Cell&lt;T&gt; {
-                      fn clone(&self) -&gt; Cell&lt;T&gt; {
-                      Cell::new(self.get())
-                      }
-                      }
+impl&lt;T: Copy&gt; Clone for Cell&lt;T&gt; {
+  fn clone(&self) -&gt; Cell&lt;T&gt; {
+    Cell::new(self.get())
+  }
+}
 
-                      impl&lt;T: Default&gt; Default for Cell&lt;T&gt; {
-                      /// Creates a `Cell&lt;T&gt;`, with the `Default` value for T.
-                      fn default() -&gt; Cell&lt;T&gt; {
-                      Cell::new(Default::default())
-                      }
-                      }
+impl&lt;T: Default&gt; Default for Cell&lt;T&gt; {
+  /// Creates a `Cell&lt;T&gt;`, with the `Default` value for T.
+  fn default() -&gt; Cell&lt;T&gt; {
+    Cell::new(Default::default())
+  }
+}
 
-                      impl&lt;T&gt; From&lt;T&gt; for Cell&lt;T&gt; {
-                      fn from(t: T) -&gt; Cell&lt;T&gt; {
-                      Cell::new(t)
-                      }
-                      }
+impl&lt;T&gt; From&lt;T&gt; for Cell&lt;T&gt; {
+  fn from(t: T) -&gt; Cell&lt;T&gt; {
+    Cell::new(t)
+  }
+}
 
-                      impl&lt;T&gt; Cell&lt;T&gt; {
-                      /// Creates a new `Cell` containing the given value.
-                      pub const fn new(value: T) -&gt; Cell&lt;T&gt; {
-                      Cell { value: UnsafeCell::new(value) }
-                      }
+impl&lt;T&gt; Cell&lt;T&gt; {
+  /// Creates a new `Cell` containing the given value.
+  pub const fn new(value: T) -&gt; Cell&lt;T&gt; {
+    Cell { value: UnsafeCell::new(value) }
+  }
 
-                      /// Sets the contained value.
-                      pub fn set(&self, val: T) {
-                      let old = self.replace(val);
-                      drop(old);
-                      }
+  /// Sets the contained value.
+  pub fn set(&self, val: T) {
+    let old = self.replace(val);
+    drop(old);
+  }
 
-                      /// Swaps the values of two Cells.
-                      /// Difference with `std::mem::swap` is that this
-                      /// function doesn't require `&mut` reference.
-                      pub fn swap(&self, other: &Self) {
-                      if ptr::eq(self, other) {
-                      return;
-                      }
-                      // SAFETY: This can be risky if called from
-                      // separate threads, but `Cell` is `!Sync`
-                      // so this won't happen. This also won't
-                      // invalidate any pointers since `Cell` makes
-                      // sure nothing else will be pointing into
-                      // either of these `Cell`s.
-                      unsafe {
-                      ptr::swap(self.value.get(), other.value.get());
-                      }
-                      }
+  /// Swaps the values of two Cells.
+  /// Difference with `std::mem::swap` is that this
+  /// function doesn't require `&mut` reference.
+  pub fn swap(&self, other: &Self) {
+    if ptr::eq(self, other) {
+      return;
+    }
+    // SAFETY: This can be risky if called from
+    // separate threads, but `Cell` is `!Sync`
+    // so this won't happen. This also won't
+    // invalidate any pointers since `Cell` makes
+    // sure nothing else will be pointing into
+    // either of these `Cell`s.
+    unsafe {
+      ptr::swap(self.value.get(), other.value.get());
+    }
+  }
 
-                      /// Replaces the contained value, and returns it.
-                      pub fn replace(&self, val: T) -&gt; T {
-                      // SAFETY: This can cause data races if called
-                      // from a separate thread,
-                      // but `Cell` is `!Sync` so this won't happen.
-                      mem::replace(unsafe { &mut *self.value.get() }, val)
-                      }
+  /// Replaces the contained value, and returns it.
+  pub fn replace(&self, val: T) -&gt; T {
+    // SAFETY: This can cause data races if called
+    // from a separate thread,
+    // but `Cell` is `!Sync` so this won't happen.
+    mem::replace(unsafe { &mut *self.value.get() }, val)
+  }
 
-                      /// Unwraps the value.
-                      pub const fn into_inner(self) -&gt; T {
-                      self.value.into_inner()
-                      }
-                      }
+  /// Unwraps the value.
+  pub const fn into_inner(self) -&gt; T {
+    self.value.into_inner()
+  }
+}
 
-                      impl&lt;T: Copy&gt; Cell&lt;T&gt; {
-                      /// Returns a copy of the contained value.
-                      pub fn get(&self) -&gt; T {
-                      // SAFETY: This can cause data races if called
-                      // from a separate thread,
-                      // but `Cell` is `!Sync` so this won't happen.
-                      unsafe { *self.value.get() }
-                      }
-                      }
+impl&lt;T: Copy&gt; Cell&lt;T&gt; {
+  /// Returns a copy of the contained value.
+  pub fn get(&self) -&gt; T {
+    // SAFETY: This can cause data races if called
+    // from a separate thread,
+    // but `Cell` is `!Sync` so this won't happen.
+    unsafe { *self.value.get() }
+  }
+}
 
-                      impl&lt;T: ?Sized&gt; Cell&lt;T&gt; {
-                      /// Returns raw pointer to underlying data in cell.
-                      pub const fn as_ptr(&self) -&gt; *mut T {
-                      self.value.get()
-                      }
+impl&lt;T: ?Sized&gt; Cell&lt;T&gt; {
+/// Returns raw pointer to underlying data in cell.
+pub const fn as_ptr(&self) -&gt; *mut T {
+self.value.get()
+}
 
-                      /// Returns mutable reference to underlying data.
-                      ///
-                      /// Call borrows `Cell` mutably (at compile-time)
-                      /// which guarantees that we possess the only
-                      /// reference.
-                      pub fn get_mut(&mut self) -&gt; &mut T {
-                      self.value.get_mut()
-                      }
+/// Returns mutable reference to underlying data.
+///
+/// Call borrows `Cell` mutably (at compile-time)
+/// which guarantees that we possess the only
+/// reference.
+pub fn get_mut(&mut self) -&gt; &mut T {
+self.value.get_mut()
+}
 
-                      /// Returns a `&Cell&lt;T&gt;` from a `&mut T`
-                      pub fn from_mut(t: &mut T) -&gt; &Cell&lt;T&gt; {
-                      // SAFETY: `&mut` ensures unique access.
-                      unsafe { &*(t as *mut T as *const Cell&lt;T&gt;) }
-                      }
-                      }
+/// Returns a `&Cell&lt;T&gt;` from a `&mut T`
+pub fn from_mut(t: &mut T) -&gt; &Cell&lt;T&gt; {
+// SAFETY: `&mut` ensures unique access.
+unsafe { &*(t as *mut T as *const Cell&lt;T&gt;) }
+}
+}
 
-                      impl&lt;T: Default&gt; Cell&lt;T&gt; {
-                      /// Takes value of cell, leaving `Default::default()`
-                      /// in its place.
-                      pub fn take(&self) -&gt; T {
-                      self.replace(Default::default())
-                      }
-                      }
+impl&lt;T: Default&gt; Cell&lt;T&gt; {
+/// Takes value of cell, leaving `Default::default()`
+/// in its place.
+pub fn take(&self) -&gt; T {
+self.replace(Default::default())
+}
+}
 
-                      impl&lt;T&gt; Cell&lt;[T]&gt; {
-                      /// Returns a `&[Cell&lt;T&gt;]` from a `&Cell&lt;[T]&gt;`
-                      pub fn as_slice_of_cells(&self) -&gt; &[Cell&lt;T&gt;] {
-                      // SAFETY: `Cell&lt;T&gt;` has same memory layout as `T`.
-                      unsafe {
-                      &*(self as *const Cell&lt;[T]&gt; as *const [Cell&lt;T&gt;])
-                      }
-                      }
-                      }
+impl&lt;T&gt; Cell&lt;[T]&gt; {
+/// Returns a `&[Cell&lt;T&gt;]` from a `&Cell&lt;[T]&gt;`
+pub fn as_slice_of_cells(&self) -&gt; &[Cell&lt;T&gt;] {
+// SAFETY: `Cell&lt;T&gt;` has same memory layout as `T`.
+unsafe {
+&*(self as *const Cell&lt;[T]&gt; as *const [Cell&lt;T&gt;])
+}
+}
+}
                     </defn-code>
                   </defn-block>
                   <defn-block>
