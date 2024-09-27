@@ -616,43 +616,43 @@ impl&lt;T: Copy&gt; Cell&lt;T&gt; {
 }
 
 impl&lt;T: ?Sized&gt; Cell&lt;T&gt; {
-/// Returns raw pointer to underlying data in cell.
-pub const fn as_ptr(&self) -&gt; *mut T {
-self.value.get()
-}
+  /// Returns raw pointer to underlying data in cell.
+  pub const fn as_ptr(&self) -&gt; *mut T {
+    self.value.get()
+  }
 
-/// Returns mutable reference to underlying data.
-///
-/// Call borrows `Cell` mutably (at compile-time)
-/// which guarantees that we possess the only
-/// reference.
-pub fn get_mut(&mut self) -&gt; &mut T {
-self.value.get_mut()
-}
+  /// Returns mutable reference to underlying data.
+  ///
+  /// Call borrows `Cell` mutably (at compile-time)
+  /// which guarantees that we possess the only
+  /// reference.
+  pub fn get_mut(&mut self) -&gt; &mut T {
+    self.value.get_mut()
+  }
 
-/// Returns a `&Cell&lt;T&gt;` from a `&mut T`
-pub fn from_mut(t: &mut T) -&gt; &Cell&lt;T&gt; {
-// SAFETY: `&mut` ensures unique access.
-unsafe { &*(t as *mut T as *const Cell&lt;T&gt;) }
-}
+  /// Returns a `&Cell&lt;T&gt;` from a `&mut T`
+  pub fn from_mut(t: &mut T) -&gt; &Cell&lt;T&gt; {
+    // SAFETY: `&mut` ensures unique access.
+    unsafe { &*(t as *mut T as *const Cell&lt;T&gt;) }
+  }
 }
 
 impl&lt;T: Default&gt; Cell&lt;T&gt; {
-/// Takes value of cell, leaving `Default::default()`
-/// in its place.
-pub fn take(&self) -&gt; T {
-self.replace(Default::default())
-}
+  /// Takes value of cell, leaving `Default::default()`
+  /// in its place.
+  pub fn take(&self) -&gt; T {
+    self.replace(Default::default())
+  }
 }
 
 impl&lt;T&gt; Cell&lt;[T]&gt; {
-/// Returns a `&[Cell&lt;T&gt;]` from a `&Cell&lt;[T]&gt;`
-pub fn as_slice_of_cells(&self) -&gt; &[Cell&lt;T&gt;] {
-// SAFETY: `Cell&lt;T&gt;` has same memory layout as `T`.
-unsafe {
-&*(self as *const Cell&lt;[T]&gt; as *const [Cell&lt;T&gt;])
-}
-}
+  /// Returns a `&[Cell&lt;T&gt;]` from a `&Cell&lt;[T]&gt;`
+  pub fn as_slice_of_cells(&self) -&gt; &[Cell&lt;T&gt;] {
+    // SAFETY: `Cell&lt;T&gt;` has same memory layout as `T`.
+    unsafe {
+      &*(self as *const Cell&lt;[T]&gt; as *const [Cell&lt;T&gt;])
+    }
+  }
 }
                     </defn-code>
                   </defn-block>
@@ -661,252 +661,251 @@ unsafe {
                       <a href="https://doc.rust-lang.org/stable/std/cell/struct.RefCell.html">RefCell&lt;T&gt;</a> - partial definition
                     </defn-head>
                     <defn-code>
-                      pub struct RefCell&lt;T: ?Sized&gt; {
-                      borrow: Cell&lt;BorrowFlag&gt;,
-                      value: UnsafeCell&lt;T&gt;,
-                      }
+pub struct RefCell&lt;T: ?Sized&gt; {
+  borrow: Cell&lt;BorrowFlag&gt;,
+  value: UnsafeCell&lt;T&gt;,
+}
 
-                      /// An error returned by [`RefCell::try_borrow`].
-                      pub struct BorrowError {
-                      _private: (),
-                      }
+/// An error returned by [`RefCell::try_borrow`].
+pub struct BorrowError {
+  _private: (),
+}
 
-                      /// An error returned by [`RefCell::try_borrow_mut`].
-                      pub struct BorrowMutError {
-                      _private: (),
-                      }
+/// An error returned by [`RefCell::try_borrow_mut`].
+pub struct BorrowMutError {
+  _private: (),
+}
 
-                      type BorrowFlag = isize;
-                      const UNUSED: BorrowFlag = 0;
+type BorrowFlag = isize;
+const UNUSED: BorrowFlag = 0;
 
-                      impl&lt;T&gt; RefCell&lt;T&gt; {
-                      pub const fn new(value: T) -&gt; RefCell&lt;T&gt; {
-                      RefCell {
-                      value: UnsafeCell::new(value),
-                      borrow: Cell::new(UNUSED)
-                      }
-                      }
+impl&lt;T&gt; RefCell&lt;T&gt; {
+  pub const fn new(value: T) -&gt; RefCell&lt;T&gt; {
+    RefCell {
+      value: UnsafeCell::new(value),
+      borrow: Cell::new(UNUSED)
+    }
+  }
 
-                      pub const fn into_inner(self) -&gt; T {
-                      // Since function takes `self` (the `RefCell`) by value,
-                      // compiler statically verifies that it is not currently
-                      // borrowed.
-                      self.value.into_inner()
-                      }
+  pub const fn into_inner(self) -&gt; T {
+    // Since function takes `self` (the `RefCell`) by value,
+    // compiler statically verifies that it is not currently
+    // borrowed.
+    self.value.into_inner()
+  }
 
-                      pub fn replace(&self, t: T) -&gt; T {
-                      mem::replace(&mut *self.borrow_mut(), t)
-                      }
+  pub fn replace(&self, t: T) -&gt; T {
+    mem::replace(&mut *self.borrow_mut(), t)
+  }
 
-                      pub fn swap(&self, other: &Self) {
-                      mem::swap(
-                      &mut *self.borrow_mut(),
-                      &mut *other.borrow_mut()
-                      )
-                      }
-                      }
+  pub fn swap(&self, other: &Self) {
+    mem::swap(
+      &mut *self.borrow_mut(),
+      &mut *other.borrow_mut()
+    )
+  }
+}
 
-                      impl&lt;T: ?Sized&gt; RefCell&lt;T&gt; {
-                      /// Immutably borrows the wrapped value.
-                      ///
-                      /// Borrow lasts until returned `Ref` exits scope.
-                      /// Multiple immutable borrows can be taken out at
-                      /// the same time.
-                      ///
-                      /// # Panics
-                      ///
-                      /// Panics if value is currently mutably borrowed.
-                      /// For a non-panicking variant, use
-                      /// [`try_borrow`](#method.try_borrow).
-                      ///
-                      pub fn borrow(&self) -&gt; Ref&lt;'_, T&gt; {
-                      self.try_borrow()
-                      .expect("already mutably borrowed")
-                      }
+impl&lt;T: ?Sized&gt; RefCell&lt;T&gt; {
+  /// Immutably borrows the wrapped value.
+  ///
+  /// Borrow lasts until returned `Ref` exits scope.
+  /// Multiple immutable borrows can be taken out at
+  /// the same time.
+  ///
+  /// # Panics
+  ///
+  /// Panics if value is currently mutably borrowed.
+  /// For a non-panicking variant, use
+  /// [`try_borrow`](#method.try_borrow).
+  ///
+  pub fn borrow(&self) -&gt; Ref&lt;'_, T&gt; {
+    self.try_borrow()
+    .expect("already mutably borrowed")
+  }
 
-                      /// Immutably borrows wrapped value, returning error
-                      /// if value is currently mutably borrowed.
-                      ///
-                      /// Borrow lasts until returned `Ref` exits scope.
-                      /// Multiple immutable borrows can be taken out at
-                      /// the same time.
-                      ///
-                      pub fn try_borrow(&self)
-                      -&gt; Result&lt;Ref&lt;'_, T&gt;, BorrowError&gt; {
-                      match BorrowRef::new(&self.borrow) {
-                      // SAFETY:
-                      //   `BorrowRef` ensures there is only immutable
-                      //   access to value while borrowed.
-                      Some(b) =&gt; Ok(
-                      Ref {
-                      value: unsafe { &*self.value.get() },
-                      borrow: b
-                      }
-                      ),
-                      None =&gt; Err(BorrowError { _private: () }),
-                      }
-                      }
+  /// Immutably borrows wrapped value, returning error
+  /// if value is currently mutably borrowed.
+  ///
+  /// Borrow lasts until returned `Ref` exits scope.
+  /// Multiple immutable borrows can be taken out at
+  /// the same time.
+  ///
+  pub fn try_borrow(&self)
+    -&gt; Result&lt;Ref&lt;'_, T&gt;, BorrowError&gt; {
+    match BorrowRef::new(&self.borrow) {
+      // SAFETY:
+      //   `BorrowRef` ensures there is only immutable
+      //   access to value while borrowed.
+      Some(b) =&gt; Ok(
+        Ref {
+          value: unsafe { &*self.value.get() },
+          borrow: b
+        }
+      ),
+      None =&gt; Err(BorrowError { _private: () }),
+    }
+  }
 
-                      /// Mutably borrows the wrapped value.
-                      ///
-                      /// Borrow lasts until returned `RefMut` or all `RefMut`s
-                      /// derived from it exit scope. Value cannot be borrowed
-                      /// while this borrow is active.
-                      ///
-                      /// # Panics
-                      ///
-                      /// Panics if value is currently borrowed. For non-panicking
-                      /// variant, use [`try_borrow_mut`](#method.try_borrow_mut).
-                      ///
-                      /*--------------------------------------------------------
-                      Here is the core of interior mutability - Part 1
-                      --------------------------------------------------------*/
-                      pub fn borrow_mut(&self) -&gt; RefMut&lt;'_, T&gt; {
-                      self.try_borrow_mut().expect("already borrowed")
-                      }
+  /// Mutably borrows the wrapped value.
+  ///
+  /// Borrow lasts until returned `RefMut` or all `RefMut`s
+  /// derived from it exit scope. Value cannot be borrowed
+  /// while this borrow is active.
+  ///
+  /// # Panics
+  ///
+  /// Panics if value is currently borrowed. For non-panicking
+  /// variant, use [`try_borrow_mut`](#method.try_borrow_mut).
+  ///
+  /*--------------------------------------------------------
+  Here is the core of interior mutability - Part 1
+  --------------------------------------------------------*/
+  pub fn borrow_mut(&self) -&gt; RefMut&lt;'_, T&gt; {
+    self.try_borrow_mut().expect("already borrowed")
+  }
 
-                      /// Mutably borrows wrapped value, returning error if value
-                      /// is currently borrowed.
-                      ///
-                      /// Borrow lasts until returned `RefMut` or all `RefMut`s
-                      /// derived from it exit scope. Value cannot be borrowed
-                      /// while this borrow is active.
-                      ///
-                      pub fn try_borrow_mut(&self)
-                      -&gt; Result&lt;RefMut&lt;'_, T&gt;, BorrowMutError&gt; {
-                      match BorrowRefMut::new(&self.borrow) {
-                      // SAFETY: `BorrowRef` guarantees unique access.
-                      Some(b) =&gt; Ok(
-                      RefMut {
-                      value: unsafe {
-                      &mut *self.value.get() },
-                      borrow: b
-                      }
-                      ),
-                      None =&gt; Err(BorrowMutError { _private: () }),
-                      }
-                      }
+  /// Mutably borrows wrapped value, returning error if value
+  /// is currently borrowed.
+  ///
+  /// Borrow lasts until returned `RefMut` or all `RefMut`s
+  /// derived from it exit scope. Value cannot be borrowed
+  /// while this borrow is active.
+  ///
+  pub fn try_borrow_mut(&self)
+    -&gt; Result&lt;RefMut&lt;'_, T&gt;, BorrowMutError&gt; {
+    match BorrowRefMut::new(&self.borrow) {
+      // SAFETY: `BorrowRef` guarantees unique access.
+      Some(b) =&gt; Ok(
+        RefMut {
+          value: unsafe {
+          &mut *self.value.get() },
+          borrow: b
+        }
+      ),
+      None =&gt; Err(BorrowMutError { _private: () }),
+    }
+  }
 
-                      /// Returns a raw pointer to the underlying data in this cell.
-                      pub fn as_ptr(&self) -&gt; *mut T {
-                      self.value.get()
-                      }
+  /// Returns a raw pointer to the underlying data in this cell.
+  pub fn as_ptr(&self) -&gt; *mut T {
+    self.value.get()
+  }
 
-                      /// Returns a mutable reference to the underlying data.
-                      ///
-                      /// Call borrows `RefCell` mutably (at compile-time) so no
-                      /// need for dynamic checks.
-                      ///
-                      pub fn get_mut(&mut self) -&gt; &mut T {
-                      self.value.get_mut()
-                      }
+  /// Returns a mutable reference to the underlying data.
+  ///
+  /// Call borrows `RefCell` mutably (at compile-time) so no
+  /// need for dynamic checks.
+  ///
+  pub fn get_mut(&mut self) -&gt; &mut T {
+    self.value.get_mut()
+  }
+}
 
-                      }
+impl&lt;T: Default&gt; RefCell&lt;T&gt; {
+  /// Takes wrapped value, leaving `Default::default()`
+  /// in its place.
+  pub fn take(&self) -&gt; T {
+    self.replace(Default::default())
+  }
+}
 
-                      impl&lt;T: Default&gt; RefCell&lt;T&gt; {
-                      /// Takes wrapped value, leaving `Default::default()`
-                      /// in its place.
-                      pub fn take(&self) -&gt; T {
-                      self.replace(Default::default())
-                      }
-                      }
+unsafe impl&lt;T: ?Sized&gt; Send for RefCell&lt;T&gt; where T: Send {}
+impl&lt;T: ?Sized&gt; !Sync for RefCell&lt;T&gt; {}
 
-                      unsafe impl&lt;T: ?Sized&gt; Send for RefCell&lt;T&gt; where T: Send {}
-                      impl&lt;T: ?Sized&gt; !Sync for RefCell&lt;T&gt; {}
+impl&lt;T: Clone&gt; Clone for RefCell&lt;T&gt; {
+  /// Panics if the value is currently mutably borrowed.
+  fn clone(&self) -&gt; RefCell&lt;T&gt; {
+    RefCell::new(self.borrow().clone())
+  }
+}
 
-                      impl&lt;T: Clone&gt; Clone for RefCell&lt;T&gt; {
-                      /// Panics if the value is currently mutably borrowed.
-                      fn clone(&self) -&gt; RefCell&lt;T&gt; {
-                      RefCell::new(self.borrow().clone())
-                      }
-                      }
+impl&lt;T: Default&gt; Default for RefCell&lt;T&gt; {
+  /// Creates `RefCell&lt;T&gt;`, with `Default` value for T.
+  fn default() -&gt; RefCell&lt;T&gt; {
+    RefCell::new(Default::default())
+  }
+}
 
-                      impl&lt;T: Default&gt; Default for RefCell&lt;T&gt; {
-                      /// Creates `RefCell&lt;T&gt;`, with `Default` value for T.
-                      fn default() -&gt; RefCell&lt;T&gt; {
-                      RefCell::new(Default::default())
-                      }
-                      }
+impl&lt;T&gt; From&lt;T&gt; for RefCell&lt;T&gt; {
+  fn from(t: T) -&gt; RefCell&lt;T&gt; {
+    RefCell::new(t)
+  }
+}
 
-                      impl&lt;T&gt; From&lt;T&gt; for RefCell&lt;T&gt; {
-                      fn from(t: T) -&gt; RefCell&lt;T&gt; {
-                      RefCell::new(t)
-                      }
-                      }
+struct BorrowRef&lt;'b&gt; {
+  borrow: &'b Cell&lt;BorrowFlag&gt;,
+}
 
-                      struct BorrowRef&lt;'b&gt; {
-                      borrow: &'b Cell&lt;BorrowFlag&gt;,
-                      }
+/// Wraps borrowed reference to value in a `RefCell` box.
+/// Wrapper type for immutably borrowed value from
+/// `RefCell&lt;T&gt;`.
+pub struct Ref&lt;'b, T: ?Sized + 'b&gt; {
+  value: &'b T,
+  borrow: BorrowRef&lt;'b&gt;,
+}
 
-                      /// Wraps borrowed reference to value in a `RefCell` box.
-                      /// Wrapper type for immutably borrowed value from
-                      /// `RefCell&lt;T&gt;`.
-                      pub struct Ref&lt;'b, T: ?Sized + 'b&gt; {
-                      value: &'b T,
-                      borrow: BorrowRef&lt;'b&gt;,
-                      }
+impl&lt;T: ?Sized&gt; Deref for Ref&lt;'_, T&gt; {
+  type Target = T;
 
-                      impl&lt;T: ?Sized&gt; Deref for Ref&lt;'_, T&gt; {
-                      type Target = T;
+  fn deref(&self) -&gt; &T {
+    self.value
+  }
+}
 
-                      fn deref(&self) -&gt; &T {
-                      self.value
-                      }
-                      }
+struct BorrowRefMut&lt;'b&gt; {
+  borrow: &'b Cell&lt;BorrowFlag&gt;,
+}
 
-                      struct BorrowRefMut&lt;'b&gt; {
-                      borrow: &'b Cell&lt;BorrowFlag&gt;,
-                      }
+impl Drop for BorrowRefMut&lt;'_&gt; {
+  fn drop(&mut self) {
+    let borrow = self.borrow.get();
+    debug_assert!(is_writing(borrow));
+    self.borrow.set(borrow + 1);
+  }
+}
 
-                      impl Drop for BorrowRefMut&lt;'_&gt; {
-                      fn drop(&mut self) {
-                      let borrow = self.borrow.get();
-                      debug_assert!(is_writing(borrow));
-                      self.borrow.set(borrow + 1);
-                      }
-                      }
+impl&lt;'b&gt; BorrowRefMut&lt;'b&gt; {
+  fn new(borrow: &'b Cell&lt;BorrowFlag&gt;)
+    -&gt; Option&lt;BorrowRefMut&lt;'b&gt;&gt; {
+    // NOTE:
+    // Unlike BorrowRefMut::clone, new is called to
+    // create initial mutable reference, and so there
+    // must currently be no existing references. Thus,
+    // while clone increments mutable refcount,
+    // we only allow going from UNUSED to UNUSED - 1.
+    match borrow.get() {
+      UNUSED =&gt; {
+        borrow.set(UNUSED - 1);
+        Some(BorrowRefMut { borrow })
+      }
+      _ =&gt; None,
+    }
+  }
+}
 
-                      impl&lt;'b&gt; BorrowRefMut&lt;'b&gt; {
-                      fn new(borrow: &'b Cell&lt;BorrowFlag&gt;)
-                      -&gt; Option&lt;BorrowRefMut&lt;'b&gt;&gt; {
-                      // NOTE:
-                      // Unlike BorrowRefMut::clone, new is called to
-                      // create initial mutable reference, and so there
-                      // must currently be no existing references. Thus,
-                      // while clone increments mutable refcount,
-                      // we only allow going from UNUSED to UNUSED - 1.
-                      match borrow.get() {
-                      UNUSED =&gt; {
-                      borrow.set(UNUSED - 1);
-                      Some(BorrowRefMut { borrow })
-                      }
-                      _ =&gt; None,
-                      }
-                      }
-                      }
+/// Wrapper type for mutably borrowed value from `RefCell&lt;T&gt;`.
+pub struct RefMut&lt;'b, T: ?Sized + 'b&gt; {
+  value: &'b mut T,
+  borrow: BorrowRefMut&lt;'b&gt;,
+}
 
-                      /// Wrapper type for mutably borrowed value from `RefCell&lt;T&gt;`.
-                      pub struct RefMut&lt;'b, T: ?Sized + 'b&gt; {
-                      value: &'b mut T,
-                      borrow: BorrowRefMut&lt;'b&gt;,
-                      }
+impl&lt;T: ?Sized&gt; Deref for RefMut&lt;'_, T&gt; {
+  type Target = T;
 
-                      impl&lt;T: ?Sized&gt; Deref for RefMut&lt;'_, T&gt; {
-                      type Target = T;
+  fn deref(&self) -&gt; &T {
+    self.value
+  }
+}
 
-                      fn deref(&self) -&gt; &T {
-                      self.value
-                      }
-                      }
-
-                      /*--------------------------------------------------------
-                      Here is the core of interior mutability - Part 2
-                      --------------------------------------------------------*/
-                      impl&lt;T: ?Sized&gt; DerefMut for RefMut&lt;'_, T&gt; {
-                      fn deref_mut(&mut self) -&gt; &mut T {
-                      self.value
-                      }
-                      }
+/*--------------------------------------------------------
+Here is the core of interior mutability - Part 2
+--------------------------------------------------------*/
+impl&lt;T: ?Sized&gt; DerefMut for RefMut&lt;'_, T&gt; {
+  fn deref_mut(&mut self) -&gt; &mut T {
+    self.value
+  }
+}
 
                     </defn-code>
                   </defn-block>
@@ -967,75 +966,75 @@ unsafe {
             <defn-block>
               <defn-head>Basic Thread Demo</defn-head>
               <defn-code>
-                // Basic Threads
-                // sharing std::output and AtomicUsize - both thread safe
+// Basic Threads
+// sharing std::output and AtomicUsize - both thread safe
 
-                use std::thread;
-                use std::time::Duration;
-                use std::sync::atomic::{AtomicUsize, Ordering};
+use std::thread;
+use std::time::Duration;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
-                static COUNT: AtomicUsize = AtomicUsize::new(0usize);
+static COUNT: AtomicUsize = AtomicUsize::new(0usize);
 
-                fn test() {
-                // child thread processing
-                let dur = Duration::from_millis(2);
-                let handle = thread::spawn(
-                move || {
-                for _i in 0..10 {
-                print!("\n  child thread printing");
-                let _ = COUNT.fetch_add(1, Ordering::SeqCst);
-                thread::sleep(dur);
-                }
-                }
-                );
-                // main thread processing
-                let dur = Duration::from_millis(3);
-                for _i in 0..10 {
-                print!("\n   main thread printing");
-                let _ = COUNT.fetch_add(1, Ordering::SeqCst);
-                thread::sleep(dur);
-                }
-                // wait for thread to complete
-                let _ = handle.join();
-                print!("\n\n  number of prints = {:?}", COUNT);
-                }
+fn test() {
+  // child thread processing
+  let dur = Duration::from_millis(2);
+  let handle = thread::spawn(
+    move || {
+      for _i in 0..10 {
+        print!("\n  child thread printing");
+        let _ = COUNT.fetch_add(1, Ordering::SeqCst);
+        thread::sleep(dur);
+      }
+    }
+  );
+  // main thread processing
+  let dur = Duration::from_millis(3);
+  for _i in 0..10 {
+    print!("\n   main thread printing");
+    let _ = COUNT.fetch_add(1, Ordering::SeqCst);
+    thread::sleep(dur);
+  }
+  // wait for thread to complete
+  let _ = handle.join();
+  print!("\n\n  number of prints = {:?}", COUNT);
+}
 
-                fn main() {
-                print!("\n  -- Basic Threads --\n");
-                test();
-                print!("\n\n  That's all Folks!\n\n");
-                }
+fn main() {
+  print!("\n  -- Basic Threads --\n");
+  test();
+  print!("\n\n  That's all Folks!\n\n");
+}
               </defn-code>
             </defn-block>
             <defn-block>
               <defn-head>Output</defn-head>
               <defn-code>
-                -- Basic Threads --
+-- Basic Threads --
 
-                main thread printing
-                child thread printing
-                child thread printing
-                child thread printing
-                main thread printing
-                child thread printing
-                main thread printing
-                child thread printing
-                main thread printing
-                child thread printing
-                child thread printing
-                main thread printing
-                child thread printing
-                main thread printing
-                child thread printing
-                child thread printing
-                main thread printing
-                main thread printing
-                main thread printing
-                main thread printing
+main thread printing
+child thread printing
+child thread printing
+child thread printing
+main thread printing
+child thread printing
+main thread printing
+child thread printing
+main thread printing
+child thread printing
+child thread printing
+main thread printing
+child thread printing
+main thread printing
+child thread printing
+child thread printing
+main thread printing
+main thread printing
+main thread printing
+main thread printing
 
-                number of prints = 20
+number of prints = 20
 
-                That's all Folks!
+That's all Folks!
               </defn-code>
             </defn-block>
           </defn-OuterBlock>
@@ -1092,84 +1091,84 @@ unsafe {
             <defn-block>
               <defn-head>Thread Sharing</defn-head>
               <defn-code>
-                // threads sharing string
+// threads sharing string
 
-                use std::thread;
-                use std::sync::{Arc, Mutex};
-                use std::time::Duration;
+use std::thread;
+use std::sync::{Arc, Mutex};
+use std::time::Duration;
 
-                fn test() {
-                let a = "        main thread pushes \'0\'";
-                let b = " first child thread pushes \'1\'";
-                let c = "second child thread pushes \'2\'";
-                print!("\n  {}", a);
-                print!("\n  {}", b);
-                print!("\n  {}\n", c);
+fn test() {
+  let a = "        main thread pushes \'0\'";
+  let b = " first child thread pushes \'1\'";
+  let c = "second child thread pushes \'2\'";
+  print!("\n  {}", a);
+  print!("\n  {}", b);
+  print!("\n  {}\n", c);
 
-                let s = String::new();
-                let shared = Arc::new(Mutex::new(s));
-                // main thread gets first edit
-                let shared0 = Arc::clone(&shared);
-                if let Ok(mut temp) = shared0.lock() {
-                temp.push('0');
-                }
-                // create child threads
-                let shared1 = Arc::clone(&shared);
-                let dur = Duration::from_millis(2);  // faster
-                let handle1 = thread::spawn(
-                move || {
-                for _i in 0..15 {
-                // child edits shared string
-                if let Ok(mut temp) = shared1.lock() {
-                temp.push('1');
-                }
-                thread::sleep(dur);
-                }
-                }
-                );
-                // create second child thread
-                let shared2 = Arc::clone(&shared);
-                let dur = Duration::from_millis(3);  // slower
-                let handle2 = thread::spawn(
-                move || {
-                for _i in 0..15 {
-                // child edits string
-                if let Ok(mut temp) = shared2.lock() {
-                temp.push('2');
-                }
-                thread::sleep(dur);
-                }
-                }
-                );
-                let _ = handle1.join();
-                let _ = handle2.join();
-                let mut s = String::new();
-                if let Ok(mut temp) = shared0.lock() {
-                temp.push('0');
-                s = temp.to_string();
-                }
-                print!("\n  {}", s);
-                }
+  let s = String::new();
+  let shared = Arc::new(Mutex::new(s));
+  // main thread gets first edit
+  let shared0 = Arc::clone(&shared);
+  if let Ok(mut temp) = shared0.lock() {
+    temp.push('0');
+  }
+  // create child threads
+  let shared1 = Arc::clone(&shared);
+  let dur = Duration::from_millis(2);  // faster
+  let handle1 = thread::spawn(
+    move || {
+      for _i in 0..15 {
+        // child edits shared string
+        if let Ok(mut temp) = shared1.lock() {
+          temp.push('1');
+        }
+        thread::sleep(dur);
+      }
+    }
+  );
+  // create second child thread
+  let shared2 = Arc::clone(&shared);
+  let dur = Duration::from_millis(3);  // slower
+  let handle2 = thread::spawn(
+    move || {
+      for _i in 0..15 {
+        // child edits string
+        if let Ok(mut temp) = shared2.lock() {
+          temp.push('2');
+        }
+        thread::sleep(dur);
+      }
+    }
+  );
+  let _ = handle1.join();
+  let _ = handle2.join();
+  let mut s = String::new();
+  if let Ok(mut temp) = shared0.lock() {
+    temp.push('0');
+    s = temp.to_string();
+  }
+  print!("\n  {}", s);
+}
 
-                fn main() {
-                print!("\n  -- Threads sharing String --\n");
-                test();
-                print!("\n\n  That's all Folks!\n\n");
-                }
+fn main() {
+  print!("\n  -- Threads sharing String --\n");
+  test();
+  print!("\n\n  That's all Folks!\n\n");
+}
               </defn-code>
             </defn-block>
             <defn-block>
               <defn-head>Output</defn-head>
               <defn-code>
-                -- Threads sharing String --
+-- Threads sharing String --
 
-                main thread pushes '0'
-                first child thread pushes '1'
-                second child thread pushes '2'
+main thread pushes '0'
+first child thread pushes '1'
+second child thread pushes '2'
 
-                01121121211212112112121212222220
+01121121211212112112121212222220
 
-                That's all Folks!
+That's all Folks!
               </defn-code>
             </defn-block>
           </defn-OuterBlock>
@@ -1206,155 +1205,156 @@ unsafe {
               <defn-block>
                 <defn-head>ThreadResult&lt;T&gt;</defn-head>
                 <defn-code>
-                  ////////////////////////////////////////////////
-                  // thread_result::lib.rs                      //
-                  //     - Wait for thread to complete          //
-                  //                                            //
-                  // Jim Fawcett, https://JimFawcett.github.io  //
-                  ////////////////////////////////////////////////
+////////////////////////////////////////////////
+// thread_result::lib.rs                      //
+//     - Wait for thread to complete          //
+//                                            //
+// Jim Fawcett, https://JimFawcett.github.io  //
+////////////////////////////////////////////////
 
-                  #![allow(clippy::mutex_atomic)]
-                  #![allow(dead_code)]
-                  use std::sync::*;
-                  use std::fmt::Debug;
+#![allow(clippy::mutex_atomic)]
+#![allow(dead_code)]
+use std::sync::*;
+use std::fmt::Debug;
 
-                  #[derive(Debug, Default)]
-                  pub struct ThreadResult&lt;T&gt; {
-                  pub result: Mutex&lt;T&gt;,
-                  cv: Condvar,
-                  ready: Mutex&lt;bool&gt;
-                  }
+#[derive(Debug, Default)]
+pub struct ThreadResult&lt;T&gt; {
+  pub result: Mutex&lt;T&gt;,
+  cv: Condvar,
+  ready: Mutex&lt;bool&gt;
+}
 
-                  impl&lt;T: Debug + Default + Clone&gt; ThreadResult&lt;T&gt; {
-                  pub fn new() -&gt; Self {
-                  Self {
-                  result: Mutex::new(T::default()),
-                  cv: Condvar::new(),
-                  ready: Mutex::new(false),
-                  }
-                  }
-                  /*--------------------------------------------
-                  Unwrapping is appropriate here.  The
-                  operation fails if the Mutex becomes
-                  poisoned, due to panic on a thread
-                  holding the lock.  But then you can't
-                  do much except quit, which the unwrap
-                  does for you.
-                  --------------------------------------------*/
-                  pub fn set(&self, t:T) {
-                  let mut lr = self.ready.lock().unwrap();
-                  *lr = true;
-                  let mut lrslt = self.result.lock().unwrap();
-                  *lrslt = t;
-                  self.cv.notify_all();
-                  }
-                  pub fn get(&self) -&gt; T {
-                  let mut rdy = self.ready.lock().unwrap();
-                  while !*rdy {
-                  rdy = self.cv.wait(rdy).unwrap();
-                  }
-                  let rslt = self.result.lock().unwrap();
-                  rslt.clone()
-                  }
-                  pub fn ready(&self) -&gt; bool {
-                  *self.ready.lock().unwrap()
-                  }
-                  }
+impl&lt;T: Debug + Default + Clone&gt; ThreadResult&lt;T&gt; {
+  pub fn new() -&gt; Self {
+    Self {
+      result: Mutex::new(T::default()),
+      cv: Condvar::new(),
+      ready: Mutex::new(false),
+    }
+  }
+  /*--------------------------------------------
+    Unwrapping is appropriate here.  The
+    operation fails if the Mutex becomes
+    poisoned, due to panic on a thread
+    holding the lock.  But then you can't
+    do much except quit, which the unwrap
+    does for you.
+  --------------------------------------------*/
+  pub fn set(&self, t:T) {
+    let mut lr = self.ready.lock().unwrap();
+    *lr = true;
+    let mut lrslt = self.result.lock().unwrap();
+    *lrslt = t;
+    self.cv.notify_all();
+  }
+  pub fn get(&self) -&gt; T {
+    let mut rdy = self.ready.lock().unwrap();
+    while !*rdy {
+      rdy = self.cv.wait(rdy).unwrap();
+    }
+    let rslt = self.result.lock().unwrap();
+    rslt.clone()
+  }
+  pub fn ready(&self) -&gt; bool {
+    *self.ready.lock().unwrap()
+  }
+}
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Using Code</defn-head>
                 <defn-code>
-                  ////////////////////////////////////////////////
-                  // thread_result::test1.rs                    //
-                  //     - basic ThreadResult test              //
-                  //                                            //
-                  // Jim Fawcett, https://JimFawcett.github.io  //
-                  ////////////////////////////////////////////////
+////////////////////////////////////////////////
+// thread_result::test1.rs                    //
+//     - basic ThreadResult test              //
+//                                            //
+// Jim Fawcett, https://JimFawcett.github.io  //
+////////////////////////////////////////////////
 
-                  use std::sync::Arc;
-                  use std::thread;
-                  use std::time::{Duration, Instant};
+use std::sync::Arc;
+use std::thread;
+use std::time::{Duration, Instant};
 
-                  fn test() {
-                  let thrd_rslt
-                  = Arc::new(ThreadResult::&lt;i32&gt;::new());
-                  let thrd_rslt1 = Arc::clone(&thrd_rslt);
-                  let thrd_rslt2 = Arc::clone(&thrd_rslt);
+fn test() {
+  let thrd_rslt
+    = Arc::new(ThreadResult::&lt;i32&gt;::new());
+  let thrd_rslt1 = Arc::clone(&thrd_rslt);
+  let thrd_rslt2 = Arc::clone(&thrd_rslt);
 
-                  let cls = |share:Arc&lt;ThreadResult&lt;i32&gt;&gt;| {
-                  print!("\n  starting thread");
-                  let dur = Duration::from_millis(100u64);
-                  thread::sleep(dur);
-                  share.set(42);
-                  };
-                  let handle1 = thread::spawn(
-                  move || {cls(thrd_rslt1).clone()}
-                  );
+  let cls = |share:Arc&lt;ThreadResult&lt;i32&gt;&gt;| {
+    print!("\n  starting thread");
+    let dur = Duration::from_millis(100u64);
+    thread::sleep(dur);
+    share.set(42);
+  };
+  let handle1 = thread::spawn(
+    move || {cls(thrd_rslt1).clone()}
+  );
 
-                  print!("\n  -- poll for result --");
-                  let dur = Duration::from_millis(20);
-                  loop {
-                  print!("\n  main polling");
-                  if !thrd_rslt2.ready() {
-                  thread::sleep(dur);
-                  }
-                  else {
-                  print!(
-                  "\n  thread result is {}\n",
-                  thrd_rslt2.get()
-                  );
-                  break;
-                  }
-                  }
-                  print!("\n  -- wait for result --");
-                  let thrd_rslt
-                  = Arc::new(ThreadResult::&lt;i32&gt;::new());
-                  let thrd_rslt1 = Arc::clone(&thrd_rslt);
-                  let thrd_rslt2 = Arc::clone(&thrd_rslt);
+  print!("\n  -- poll for result --");
+  let dur = Duration::from_millis(20);
+  loop {
+    print!("\n  main polling");
+    if !thrd_rslt2.ready() {
+      thread::sleep(dur);
+    }
+    else {
+      print!(
+        "\n  thread result is {}\n",
+        thrd_rslt2.get()
+      );
+      break;
+    }
+  }
+  print!("\n  -- wait for result --");
+  let thrd_rslt
+    = Arc::new(ThreadResult::&lt;i32&gt;::new());
+  let thrd_rslt1 = Arc::clone(&thrd_rslt);
+  let thrd_rslt2 = Arc::clone(&thrd_rslt);
 
-                  let dur = Duration::from_millis(50);
-                  let now = Instant::now();
-                  let handle2 = thread::spawn(
-                  move || {cls(thrd_rslt1).clone()}
-                  );
-                  thread::sleep(dur);
-                  let elapsed = now.elapsed().as_millis();
-                  print!(
-                  "\n  after {:?} millis calling get()",
-                  elapsed
-                  );
-                  let rslt = thrd_rslt2.get();
-                  let elapsed = now.elapsed().as_millis();
-                  print!(
-                  "\n  at {:?} millis, thread result is {}",
-                  elapsed, rslt
-                  );
+  let dur = Duration::from_millis(50);
+  let now = Instant::now();
+  let handle2 = thread::spawn(
+    move || {cls(thrd_rslt1).clone()}
+  );
+  thread::sleep(dur);
+  let elapsed = now.elapsed().as_millis();
+  print!(
+    "\n  after {:?} millis calling get()",
+    elapsed
+  );
+  let rslt = thrd_rslt2.get();
+  let elapsed = now.elapsed().as_millis();
+  print!(
+    "\n  at {:?} millis, thread result is {}",
+    elapsed, rslt
+  );
 
-                  let _ = handle1.join();
-                  let _ = handle2.join();
-                  println!();
-                  }
-                  fn main() {
-                  test();
-                  }
+  let _ = handle1.join();
+  let _ = handle2.join();
+  println!();
+}
+
+fn main() {
+  test();
+}
                 </defn-code>
                 <defn-head class="defnBorderTop">Output</defn-head>
                 <defn-code>
-                  -- poll for result --
-                  main polling
-                  starting thread
-                  main polling
-                  main polling
-                  main polling
-                  main polling
-                  main polling
-                  thread result is 42
+-- poll for result --
+main polling
+starting thread
+main polling
+main polling
+main polling
+main polling
+main polling
+thread result is 42
 
-                  -- wait for result --
-                  starting thread
-                  after 50 millis calling get()
-                  at 100 millis, thread result is 42
+-- wait for result --
+starting thread
+after 50 millis calling get()
+at 100 millis, thread result is 42
                 </defn-code>
               </defn-block>
             </defn-OuterBlock>
@@ -1391,191 +1391,191 @@ unsafe {
               <defn-block>
                 <defn-head>BlockingQueue&lt;T&gt; library</defn-head>
                 <defn-code>
-                  /////////////////////////////////////////////////
-                  // rust_blocking_queue::lib.rs - BlockingQueue //
-                  //                                             //
-                  // Jim Fawcett, https://JimFawcett.github.io   //
-                  /////////////////////////////////////////////////
-                  /*
-                  This is a BlockingQueue abstraction.  To be shared
-                  between threads, without using unsafe code, any
-                  abstraction must be composed only of Mutexes and
-                  Condvars or struct or tuple with only those members.
+/////////////////////////////////////////////////
+// rust_blocking_queue::lib.rs - BlockingQueue //
+//                                             //
+// Jim Fawcett, https://JimFawcett.github.io   //
+/////////////////////////////////////////////////
+/*
+  This is a BlockingQueue abstraction.  To be shared
+  between threads, without using unsafe code, any
+  abstraction must be composed only of Mutexes and
+  Condvars or struct or tuple with only those members.
 
-                  That means that the blocking queue must hold its
-                  native queue in a Mutex, as shown below.
+  That means that the blocking queue must hold its
+  native queue in a Mutex, as shown below.
 
-                  There is another alternative, based on Rust
-                  channels, which are essentially blocking queues.
-                  */
-                  #![allow(dead_code)]
-                  use std::sync::*;
-                  use std::collections::*;
+  There is another alternative, based on Rust
+  channels, which are essentially blocking queues.
+*/
+#![allow(dead_code)]
+use std::sync::*;
+use std::collections::*;
 
-                  #[derive(Debug)]
-                  /// Thread-safe queue that blocks de_q on empty
-                  pub struct BlockingQueue&lt;T&gt; {
-                  q: Mutex&lt;VecDeque&lt;T&gt;&gt;,
-                  cv: Condvar,
-                  }
-                  impl&lt;T&gt; BlockingQueue&lt;T&gt; {
-                  /// Create empty blocking queue
-                  pub fn new() -&gt; Self {
-                  Self {
-                  q: Mutex::new(VecDeque::new()),
-                  cv: Condvar::new(),
-                  }
-                  }
-                  /// push input on back of queue
-                  /// - unrecoverable if lock fails so just unwrap
-                  pub fn en_q(&self, t:T) {
-                  let mut lq = self.q.lock().unwrap();
-                  lq.push_back(t);
-                  self.cv.notify_one();
-                  }
-                  /// pop element from front of queue
-                  /// - unrecoverable if lock fails so just unwrap
-                  /// - same for condition variable
-                  pub fn de_q(&self) -&gt; T {
-                  let mut lq = self.q.lock().unwrap();
-                  while lq.len() == 0 {
-                  lq = self.cv.wait(lq).unwrap();
-                  }
-                  lq.pop_front().unwrap()
-                  }
-                  /// return number of elements in queue
-                  pub fn len(&self) -&gt; usize {
-                  self.q.lock().unwrap().len()
-                  }
-                  }
+#[derive(Debug)]
+/// Thread-safe queue that blocks de_q on empty
+pub struct BlockingQueue&lt;T&gt; {
+  q: Mutex&lt;VecDeque&lt;T&gt;&gt;,
+  cv: Condvar,
+}
+impl&lt;T&gt; BlockingQueue&lt;T&gt; {
+  /// Create empty blocking queue
+  pub fn new() -&gt; Self {
+    Self {
+      q: Mutex::new(VecDeque::new()),
+      cv: Condvar::new(),
+    }
+  }
+  /// push input on back of queue
+  /// - unrecoverable if lock fails so just unwrap
+  pub fn en_q(&self, t:T) {
+    let mut lq = self.q.lock().unwrap();
+    lq.push_back(t);
+    self.cv.notify_one();
+  }
+  /// pop element from front of queue
+  /// - unrecoverable if lock fails so just unwrap
+  /// - same for condition variable
+  pub fn de_q(&self) -&gt; T {
+      let mut lq = self.q.lock().unwrap();
+      while lq.len() == 0 {
+      lq = self.cv.wait(lq).unwrap();
+    }
+    lq.pop_front().unwrap()
+  }
+  /// return number of elements in queue
+  pub fn len(&self) -&gt; usize {
+    self.q.lock().unwrap().len()
+  }
+}
 
-                  #[cfg(test)]
-                  mod tests {
-                  use super::*;
-                  #[test]
-                  fn bq_len() {
-                  let bq = BlockingQueue::&lt;f64&gt;::new();
-                  assert_eq!(bq.len(), 0);
-                  }
-                  #[test]
-                  fn bq_en_queue() {
-                  let bq = BlockingQueue::&lt;f64&gt;::new();
-                  bq.en_q(3.5);
-                  assert_eq!(bq.len(), 1);
-                  }
-                  #[test]
-                  fn bq_de_queue() {
-                  let bq = BlockingQueue::&lt;f64&gt;::new();
-                  bq.en_q(3.5);
-                  assert_eq!(bq.de_q(), 3.5);
-                  assert_eq!(bq.len(), 0);
-                  }
-                  }
+#[cfg(test)]
+mod tests {
+  use super::*;
+  #[test]
+  fn bq_len() {
+    let bq = BlockingQueue::&lt;f64&gt;::new();
+    assert_eq!(bq.len(), 0);
+  }
+  #[test]
+  fn bq_en_queue() {
+    let bq = BlockingQueue::&lt;f64&gt;::new();
+    bq.en_q(3.5);
+    assert_eq!(bq.len(), 1);
+  }
+  #[test]
+  fn bq_de_queue() {
+    let bq = BlockingQueue::&lt;f64&gt;::new();
+    bq.en_q(3.5);
+    assert_eq!(bq.de_q(), 3.5);
+    assert_eq!(bq.len(), 0);
+  }
+}
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Using Code</defn-head>
                 <defn-code>
-                  ////////////////////////////////////////////////
-                  // rust_blocking_queue::test1.rs              //
-                  //     - demo blocking queue                  //
-                  //                                            //
-                  // Jim Fawcett, https://JimFawcett.github.io  //
-                  ////////////////////////////////////////////////
-                  /*
-                  This is a good demonstration of the way
-                  BlockingQueue will be used in applications.
-                  */
-                  use std::io::*;
-                  use std::sync::*;
-                  use std::thread;
-                  use rust_blocking_queue::{BlockingQueue};
-                  use std::time::Duration;
+////////////////////////////////////////////////
+// rust_blocking_queue::test1.rs              //
+//     - demo blocking queue                  //
+//                                            //
+// Jim Fawcett, https://JimFawcett.github.io  //
+////////////////////////////////////////////////
+/*
+  This is a good demonstration of the way
+  BlockingQueue will be used in applications.
+*/
+use std::io::*;
+use std::sync::*;
+use std::thread;
+use rust_blocking_queue::{BlockingQueue};
+use std::time::Duration;
 
-                  fn main() {
+fn main() {
 
-                  print!(
-                  "\n  Demonstrate queue shared between threads"
-                  );
-                  print!(
-                  "\n =========================================="
-                  );
+  print!(
+    "\n  Demonstrate queue shared between threads"
+  );
+  print!(
+    "\n =========================================="
+  );
 
-                  test();
-                  print!("\n\n  That's all Folks!\n");
-                  }
+  test();
+  print!("\n\n  That's all Folks!\n");
+}
 
-                  /*-- simple test of BlockingQueue --*/
-                  fn test() {
+/*-- simple test of BlockingQueue --*/
+fn test() {
 
-                  let share = Arc::new(BlockingQueue::&lt;String&gt;::new());
-                  let share1 = Arc::clone(&share);
-                  let share2 = Arc::clone(&share);
+  let share = Arc::new(BlockingQueue::&lt;String&gt;::new());
+  let share1 = Arc::clone(&share);
+  let share2 = Arc::clone(&share);
 
-                  let flush = || { let _ = std::io::stdout().flush(); };
+  let flush = || { let _ = std::io::stdout().flush(); };
 
-                  /*-- child thread dequeues messages --*/
-                  let handle = thread::spawn(move || {
-                  print!("\n  child thread started");
-                  flush();
-                  let dur = Duration::from_millis(50);
-                  loop {
-                  let t = share1.de_q();
-                  print!("\n  dequeued {} on child thread", t);
-                  flush();
-                  if &t == "quit" {
-                  break;
-                  }
-                  thread::sleep(dur);
-                  }
-                  print!("\n  thread shutting down");
-                  flush();
-                  });
+  /*-- child thread dequeues messages --*/
+  let handle = thread::spawn(move || {
+    print!("\n  child thread started");
+    flush();
+    let dur = Duration::from_millis(50);
+    loop {
+      let t = share1.de_q();
+      print!("\n  dequeued {} on child thread", t);
+      flush();
+      if &t == "quit" {
+        break;
+      }
+      thread::sleep(dur);
+    }
+    print!("\n  thread shutting down");
+    flush();
+  });
 
-                  /*-- main thread enqueues messages --*/
-                  let dur = Duration::from_millis(20);
-                  for i in 0..5 {
-                  let msg = format!("msg #{}", i.to_string());
-                  print!("\n  enqueued {:?} on main thread", msg);
-                  flush();
-                  share2.en_q(msg);
-                  thread::sleep(dur);
-                  }
-                  /*-- shut down child thread --*/
-                  print!("\n  enqueued {:?} on main thread", "quit");
-                  flush();
-                  share2.en_q("quit".to_string());
+  /*-- main thread enqueues messages --*/
+  let dur = Duration::from_millis(20);
+  for i in 0..5 {
+    let msg = format!("msg #{}", i.to_string());
+    print!("\n  enqueued {:?} on main thread", msg);
+    flush();
+    share2.en_q(msg);
+    thread::sleep(dur);
+  }
+  /*-- shut down child thread --*/
+  print!("\n  enqueued {:?} on main thread", "quit");
+  flush();
+  share2.en_q("quit".to_string());
 
-                  /*-- child thread must complete before exiting --*/
-                  print!("\n  waiting for child thread to stop");
-                  flush();
-                  let _ = handle.join();
+  /*-- child thread must complete before exiting --*/
+  print!("\n  waiting for child thread to stop");
+  flush();
+  let _ = handle.join();
 
-                  print!("\n  queue length = {}", share2.len());
-                  }
+  print!("\n  queue length = {}", share2.len());
+}
                 </defn-code>
                 <defn-head class="defnBorderTop">Output</defn-head>
                 <defn-code>
-                  Demonstrate queue shared between threads
-                  ==========================================
-                  enqueued "msg #0" on main thread
-                  child thread started
-                  dequeued msg #0 on child thread
-                  enqueued "msg #1" on main thread
-                  dequeued msg #1 on child thread
-                  enqueued "msg #2" on main thread
-                  enqueued "msg #3" on main thread
-                  dequeued msg #2 on child thread
-                  enqueued "msg #4" on main thread
-                  enqueued "quit" on main thread
-                  waiting for child thread to stop
-                  dequeued msg #3 on child thread
-                  dequeued msg #4 on child thread
-                  dequeued quit on child thread
-                  thread shutting down
-                  queue length = 0
+Demonstrate queue shared between threads
+==========================================
+enqueued "msg #0" on main thread
+child thread started
+dequeued msg #0 on child thread
+enqueued "msg #1" on main thread
+dequeued msg #1 on child thread
+enqueued "msg #2" on main thread
+enqueued "msg #3" on main thread
+dequeued msg #2 on child thread
+enqueued "msg #4" on main thread
+enqueued "quit" on main thread
+waiting for child thread to stop
+dequeued msg #3 on child thread
+dequeued msg #4 on child thread
+dequeued quit on child thread
+thread shutting down
+queue length = 0
 
-                  That's all Folks!
+That's all Folks!
 
                 </defn-code>
               </defn-block>
