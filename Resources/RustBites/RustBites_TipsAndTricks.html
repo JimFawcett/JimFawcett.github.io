@@ -274,64 +274,64 @@ ib
             <defn-block>
               <defn-head>Test1 - User-defined type with thread start()</defn-head>
               <defn-code>
-                use std::thread::{JoinHandle};
-                use std::sync::{Arc, Mutex};
+use std::thread::{JoinHandle};
+use std::sync::{Arc, Mutex};
 
-                struct Test1 {
-                count: Arc&lt;Mutex&lt;i32&gt;&gt;,
-                }
-                impl Test1 {
-                fn new() -&gt; Test1 {
-                Test1 {
-                count: Arc::new(Mutex::new(0)),
-                }
-                }
-                fn start(&amp;mut self) -&gt; JoinHandle&lt;()&gt; {
-                /* get a shared pointer */
-                let local_count = self.count.clone();
-                std::thread::spawn(move || {
-                for i in 0..5 {
-                let mut data = local_count.lock().unwrap();
-                *data += i;
-                print!("\n  {:?}", data);
-                }
-                })
-                }
-                fn show_count(&amp;self) {
-                print!(
-                "\n\n  t1 result = {:?}",
-                self.count.lock().unwrap()
-                );
-                }
-                }
+struct Test1 {
+  count: Arc&lt;Mutex&lt;i32&gt;&gt;,
+}
+impl Test1 {
+  fn new() -&gt; Test1 {
+    Test1 {
+      count: Arc::new(Mutex::new(0)),
+    }
+  }
+  fn start(&amp;mut self) -&gt; JoinHandle&lt;()&gt; {
+    /* get a shared pointer */
+    let local_count = self.count.clone();
+    std::thread::spawn(move || {
+      for i in 0..5 {
+        let mut data = local_count.lock().unwrap();
+        *data += i;
+        print!("\n  {:?}", data);
+      }
+    })
+  }
+  fn show_count(&amp;self) {
+    print!(
+      "\n\n  t1 result = {:?}",
+      self.count.lock().unwrap()
+    );
+  }
+}
               </defn-code>
             </defn-block>
             <defn-block>
               <defn-head>Using Code:</defn-head>
               <defn-code>
-                fn main() {
+fn main() {
 
-                print!("\n  -- demo Test1 --");
-                let mut t1 = Test1::new();
-                let handle = t1.start();
+  print!("\n  -- demo Test1 --");
+  let mut t1 = Test1::new();
+  let handle = t1.start();
 
-                /* do some useful work here */
+  /* do some useful work here */
 
-                let _ = handle.join();
-                t1.show_count();
-                println!();
-                }
+  let _ = handle.join();
+  t1.show_count();
+  println!();
+}
               </defn-code>
               <defn-head class="defnBorderTop">Output:</defn-head>
               <defn-code>
-                -- demo Test1 --
-                0
-                1
-                3
-                6
-                10
+-- demo Test1 --
+0
+1
+3
+6
+10
 
-                t1 result = 10
+t1 result = 10
               </defn-code>
             </defn-block>
           </defn-outerBlock>
@@ -352,76 +352,76 @@ ib
             <defn-block>
               <defn-head>Test3 - thread starting in new()</defn-head>
               <defn-code>
-                struct Test3 {
-                counter: Arc&lt;Mutex&lt;i32&gt;&gt;,
-                }
-                impl Test3 {
-                /*-----------------------------------------------------
-                This example uses the same technique as Test1, but
-                moves the thread into new(), the Test3 constructor.
-                That would be a good idea for any type whose instances
-                need the running thread to operate as expected.
+struct Test3 {
+  counter: Arc&lt;Mutex&lt;i32&gt;&gt;,
+}
+impl Test3 {
+  /*-----------------------------------------------------
+    This example uses the same technique as Test1, but
+    moves the thread into new(), the Test3 constructor.
+    That would be a good idea for any type whose instances
+    need the running thread to operate as expected.
 
-                Note that new() now returns a tuple with the newly
-                constructed Test2 instance and the thread handle.
-                Look at main to see how that is used.
-                */
-                fn new() -&gt; (Test3, JoinHandle&lt;()&gt;) {
+    Note that new() now returns a tuple with the newly
+    constructed Test2 instance and the thread handle.
+    Look at main to see how that is used.
+  */
+  fn new() -&gt; (Test3, JoinHandle&lt;()&gt;) {
 
-                /* create mutex guarded i32 in heap memory */
-                let scount = Arc::new(Mutex::new(0));
+    /* create mutex guarded i32 in heap memory */
+    let scount = Arc::new(Mutex::new(0));
 
-                /* create shared reference to that value */
-                let share = Arc::clone(&amp;scount);
+    /* create shared reference to that value */
+    let share = Arc::clone(&amp;scount);
 
-                /* scount is moved into thread&apos;s closure */
+    /* scount is moved into thread&apos;s closure */
 
-                let handle = std::thread::spawn(move || {
-                for i in 0..5 {
-                let mut data = scount.lock().unwrap();
-                *data += i;
-                print!("\n  {:?}", data);
-                }
-                });
-                /* share holds a valid ref to guarded i32 in heap */
-                (
-                Test3 { counter: share, },
-                handle
-                )
-                }
-                fn show_count(&amp;self) {
-                print!(
-                "\n\n  t3 result = {:?}",
-                self.counter.lock().unwrap()
-                );
-                }
-                }
+    let handle = std::thread::spawn(move || {
+      for i in 0..5 {
+        let mut data = scount.lock().unwrap();
+        *data += i;
+        print!("\n  {:?}", data);
+      }
+    });
+    /* share holds a valid ref to guarded i32 in heap */
+    (
+      Test3 { counter: share, },
+      handle
+    )
+  }
+  fn show_count(&amp;self) {
+    print!(
+      "\n\n  t3 result = {:?}",
+      self.counter.lock().unwrap()
+    );
+  }
+}
               </defn-code>
             </defn-block>
             <defn-block>
               <defn-head>Using Code:</defn-head>
               <defn-code>
-                fn main() {
+fn main() {
 
-                print!("\n  -- demo Test3 --");
-                let (t3, handle) = Test3::new();
+  print!("\n  -- demo Test3 --");
+  let (t3, handle) = Test3::new();
 
-                /* do some useful work here */
+  /* do some useful work here */
 
-                let _ = handle.join();
-                t3.show_count();
-                }
+  let _ = handle.join();
+  t3.show_count();
+}
               </defn-code>
               <defn-head class="defnBorderTop">Output:</defn-head>
               <defn-code>
-                -- demo Test3 --
-                0
-                1
-                3
-                6
-                10
+-- demo Test3 --
+0
+1
+3
+6
+10
 
-                t3 result = 10
+t3 result = 10
               </defn-code>
             </defn-block>
           </defn-outerBlock>
@@ -445,84 +445,84 @@ ib
             <defn-block>
               <defn-head>Test4 - graceful thread stop</defn-head>
               <defn-code>
-                struct Test4 {
-                counter: Arc&lt;Mutex&lt;i32&gt;&gt;,
-                do_run : Arc&lt;AtomicBool&gt;,
-                }
-                impl Test4 {
-                /*-----------------------------------------------------
-                This example demonstrates graceful thread shutdown
-                using an AtomicBool, set by the user and tested in
-                the thread loop.
-                */
-                fn new() -&gt; (Test4, JoinHandle&lt;()&gt;) {
-                let scount = Arc::new(Mutex::new(0));
-                let share = Arc::clone(&amp;scount);
-                let run = Arc::new(AtomicBool::new(true));
-                let run_clone = Arc::clone(&amp;run);
-                let handle = std::thread::spawn(move || {
-                for i in 0..5000 {
-                if !run.load(Ordering::Relaxed) {
-                break;
-                }
-                /* slow down loop for display */
-                std::thread::sleep(
-                Duration::from_micros(200)
-                );
-                let mut data = scount.lock().unwrap();
-                *data = i;
-                print!("\n  {:?}", data);
-                }
-                });
-                (
-                Test4 {
-                counter: share, do_run: run_clone
-                },
-                handle
-                )
-                }
-                fn stop(&amp;self) {
-                self.do_run.store(false, Ordering::Relaxed);
-                }
-                fn show_count(&amp;self) {
-                print!(
-                "\n\n  t4 result = {:?}",
-                self.counter.lock().unwrap()
-                );
-                }
-                }
+struct Test4 {
+  counter: Arc&lt;Mutex&lt;i32&gt;&gt;,
+  do_run : Arc&lt;AtomicBool&gt;,
+}
+impl Test4 {
+  /*-----------------------------------------------------
+    This example demonstrates graceful thread shutdown
+    using an AtomicBool, set by the user and tested in
+    the thread loop.
+  */
+  fn new() -&gt; (Test4, JoinHandle&lt;()&gt;) {
+    let scount = Arc::new(Mutex::new(0));
+    let share = Arc::clone(&amp;scount);
+    let run = Arc::new(AtomicBool::new(true));
+    let run_clone = Arc::clone(&amp;run);
+    let handle = std::thread::spawn(move || {
+      for i in 0..5000 {
+        if !run.load(Ordering::Relaxed) {
+          break;
+        }
+        /* slow down loop for display */
+        std::thread::sleep(
+          Duration::from_micros(200)
+        );
+        let mut data = scount.lock().unwrap();
+        *data = i;
+        print!("\n  {:?}", data);
+      }
+    });
+    (
+      Test4 {
+        counter: share, do_run: run_clone
+      },
+      handle
+    )
+  }
+  fn stop(&amp;self) {
+    self.do_run.store(false, Ordering::Relaxed);
+  }
+  fn show_count(&amp;self) {
+    print!(
+      "\n\n  t4 result = {:?}",
+      self.counter.lock().unwrap()
+    );
+  }
+}
               </defn-code>
             </defn-block>
             <defn-block>
               <defn-head>Using Code:</defn-head>
               <defn-code>
-                fn main() {
+fn main() {
 
-                print!(
-                "\n  -- demo Test4 - graceful stop --"
-                );
-                let (t4, handle) = Test4::new();
-                std::thread::sleep(
-                Duration::from_millis(100)
-                );
-                t4.stop();
-                let _ = handle.join();
-                t4.show_count();
-                }
+  print!(
+    "\n  -- demo Test4 - graceful stop --"
+  );
+  let (t4, handle) = Test4::new();
+  std::thread::sleep(
+    Duration::from_millis(100)
+  );
+  t4.stop();
+  let _ = handle.join();
+  t4.show_count();
+}
               </defn-code>
               <defn-head class="defnBorderTop">Output:</defn-head>
               <defn-code>
-                -- demo Test4 - graceful stop --
-                0
-                1
-                2
-                3
-                4
-                5
-                6
-                7
+-- demo Test4 - graceful stop --
+0
+1
+2
+3
+4
+5
+6
+7
 
-                t4 result = 7
+t4 result = 7
               </defn-code>
             </defn-block>
           </defn-outerBlock>
@@ -550,76 +550,77 @@ ib
             <defn-block>
               <defn-head>StopWatch</defn-head>
               <defn-code>
-                extern crate chrono;
+extern crate chrono;
 
-                /*-----------------------------------------------
-                StopWatch type measures elapsed times
-                */
-                use std::time::*;
-                use std::{thread};
-                use std::thread::{JoinHandle};
-                use std::fmt::*;
+/*-----------------------------------------------
+  StopWatch type measures elapsed times
+*/
+use std::time::*;
+use std::{thread};
+use std::thread::{JoinHandle};
+use std::fmt::*;
 
-                #[derive(Debug, Clone, Copy)]
-                pub struct StopWatch {
-                start: Instant,
-                elapsed: Duration,
-                }
-                impl StopWatch {
-                pub fn new() -&gt; StopWatch {
-                StopWatch {
-                start: Instant::now(),
-                elapsed: Duration::new(0,0),
-                }
-                }
-                pub fn start(&amp;mut self) {
-                self.start = Instant::now();
-                }
-                pub fn stop(&amp;mut self) -&gt; Duration {
-                self.elapsed = self.start.elapsed();
-                self.elapsed
-                }
-                pub fn elapsed_micros(&amp;self) -&gt; u128  {
-                self.elapsed.as_micros()
-                }
-                pub fn elapsed_millis(&amp;self) -&gt; u128 {
-                self.elapsed.as_millis()
-                }
-                pub fn elapsed_secs(&amp;self) -&gt; u64 {
-                self.elapsed.as_secs()
-                }
-                }
+#[derive(Debug, Clone, Copy)]
+pub struct StopWatch {
+  start: Instant,
+  elapsed: Duration,
+}
+impl StopWatch {
+  pub fn new() -&gt; StopWatch {
+    StopWatch {
+      start: Instant::now(),
+      elapsed: Duration::new(0,0),
+    }
+  }
+  pub fn start(&amp;mut self) {
+    self.start = Instant::now();
+  }
+  pub fn stop(&amp;mut self) -&gt; Duration {
+    self.elapsed = self.start.elapsed();
+    self.elapsed
+  }
+  pub fn elapsed_micros(&amp;self) -&gt; u128  {
+    self.elapsed.as_micros()
+  }
+  pub fn elapsed_millis(&amp;self) -&gt; u128 {
+    self.elapsed.as_millis()
+  }
+  pub fn elapsed_secs(&amp;self) -&gt; u64 {
+    self.elapsed.as_secs()
+  }
+}
 
-                fn sleep(millisec:u64) {
-                let secs = Duration::from_millis(millisec);
-                thread::sleep(secs);
-                }
+fn sleep(millisec:u64) {
+  let secs = Duration::from_millis(millisec);
+  thread::sleep(secs);
+}
               </defn-code>
             </defn-block>
             <defn-block>
               <defn-head>Using Code:</defn-head>
               <defn-code>
-                /*-----------------------------------------------
-                stop_watch displays thread sleep time
-                - expect small variations from run to run
-                due to uncertainty in sleep interval
-                */
-                fn stop_watch(millisec: u64) {
-                let mut sw = StopWatch::new();
-                sleep(millisec);
-                let time = sw.stop().as_millis();
-                print!("\n  elapsed time = {:?}",time);
-                }
-                fn main() {
-                print!("\n  -- demo StopWatch --");
-                stop_watch(25);
-                println!();
-                }
+/*-----------------------------------------------
+  stop_watch displays thread sleep time
+  - expect small variations from run to run
+    due to uncertainty in sleep interval
+*/
+fn stop_watch(millisec: u64) {
+  let mut sw = StopWatch::new();
+  sleep(millisec);
+  let time = sw.stop().as_millis();
+  print!("\n  elapsed time = {:?}",time);
+}
+
+fn main() {
+  print!("\n  -- demo StopWatch --");
+  stop_watch(25);
+  println!();
+}
               </defn-code>
               <defn-head class="defnBorderTop">Output:</defn-head>
               <defn-code>
-                -- demo StopWatch --
-                elapsed time = 26
+-- demo StopWatch --
+elapsed time = 26
               </defn-code>
             </defn-block>
           </defn-outerBlock>
