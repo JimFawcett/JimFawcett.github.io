@@ -179,101 +179,99 @@
                 <defn-block>
                   <defn-head>Code: Relatively Simple Logger</defn-head>
                   <defn-code>
-                    class Logger {
-                    public:
-                    Logger() : pStream_(nullptr) {}
-                    Logger(std::ostream* pStr)
-                    : pStream_(pStr) {}
-                    Logger(const Logger& logger) = delete;
-                    ~Logger() {
-                    std::ofstream* pFStrm =
-                    dynamic_cast<std::ofstream*>
-                      (pStream_);
-                      if (pFStrm != nullptr)
-                      pFStrm->close();
-                      }
-                      Logger& operator=(const Logger& logger)
-                      = delete;
-                      void open(const std::string& fileName) {
-                      std::ofstream* pFStrm =
-                      dynamic_cast<std::ofstream*>
-                        (pStream_);
-                        if (pFStrm != nullptr)
-                        pFStrm->open(fileName);
-                        }
-                        void write(const std::string& msg) {
-                        (*pStream_) << prefix_ << msg;
-                        }
-                        private:
-                        std::string prefix_ = "\n  ";
-                        std::ostream* pStream_;
-                        };
+class Logger {
+  public:
+  Logger() : pStream_(nullptr) {}
+  Logger(std::ostream* pStr)
+    : pStream_(pStr) {}
+  Logger(const Logger& logger) = delete;
+  ~Logger() {
+    std::ofstream* pFStrm =
+      dynamic_cast&lt;std::ofstream*&gt;(pStream_);
+    if (pFStrm != nullptr)
+      pFStrm->close();
+  }
+  Logger& operator=(const Logger& logger)
+    = delete;
+  void open(const std::string& fileName) {
+    std::ofstream* pFStrm =
+      dynamic_cast&lt;std::ofstream*&gt;(pStream_);
+    if (pFStrm != nullptr)
+      pFStrm->open(fileName);
+  }
+  void write(const std::string& msg) {
+    (*pStream_) &lt;&lt; prefix_ &lt;&lt; msg;
+  }
+  private:
+  std::string prefix_ = "\n  ";
+  std::ostream* pStream_;
+};
 
-                        std::unique_ptr<std::ofstream>
-                          makeOutFileStream(
-                          const std::string& fileName
-                          ) {
-                          std::unique_ptr<std::ofstream>
-                            pStrm(new std::ofstream(fileName));
-                            return pStrm;
-                            }
+std::unique_ptr&lt;std::ofstream&gt;
+makeOutFileStream(
+  const std::string& fileName
+) {
+  std::unique_ptr<std::ofstream>
+  pStrm(new std::ofstream(fileName));
+  return pStrm;
+}
 
-                            std::unique_ptr<std::ifstream>
-                              makeInFileStream(
-                              const std::string& fileName
-                              ) {
-                              std::unique_ptr<std::ifstream>
-                                pStrm(new std::ifstream(fileName));
-                                return pStrm;
-                                }
+std::unique_ptr&lt;std::ifstream&gt;
+makeInFileStream(
+  const std::string& fileName
+) {
+  std::unique_ptr&lt;std::ifstream&gt;
+  pStrm(new std::ifstream(fileName));
+  return pStrm;
+}
                   </defn-code>
                 </defn-block>
                 <defn-block>
                   <defn-head>Using Code</defn-head>
                   <defn-code>
-                    int main() {
+int main() {
 
-                    displayDemo("-- simple logger --");
+  displayDemo("-- simple logger --");
 
-                    std::string fileName = "log.txt";
-                    /*-----------------------------------------
-                    Create anonymous scope for logging so
-                    logger destructor will be called before
-                    trying to open log file.
-                    */
-                    {
-                    auto pOStrm = makeOutFileStream(fileName);
-                    if (!pOStrm->good()) {
-                    std::cout << "\n  couldn't open \""
-                    << fileName
-                    << " for writing\n\n";
-                    return 1;
-                    }
-                    Logger logger(pOStrm.get());
-                    logger.write("first log item");
-                    logger.write("second log item");
-                    logger.write("last log item");
-                    }
-                    auto pIStrm = makeInFileStream(fileName);
-                    if (!pIStrm->good())
-                    {
-                    std::cout << "\n  couldn't open \""
-                    << fileName
-                    << " for reading\n\n";
-                    return 1;
-                    }
+  std::string fileName = "log.txt";
+  /*-----------------------------------------
+    Create anonymous scope for logging so
+    logger destructor will be called before
+    trying to open log file.
+  */
+  {
+    auto pOStrm = makeOutFileStream(fileName);
+    if (!pOStrm->good()) {
+      std::cout &lt;&lt; "\n  couldn't open \""
+      &lt;&lt; fileName
+      &lt;&lt; " for writing\n\n";
+      return 1;
+    }
+    Logger logger(pOStrm.get());
+    logger.write("first log item");
+    logger.write("second log item");
+    logger.write("last log item");
+  }
+  auto pIStrm = makeInFileStream(fileName);
+  if (!pIStrm->good())
+  {
+    std::cout &lt;&lt; "\n  couldn't open \""
+    &lt;&lt; fileName
+    &lt;&lt; " for reading\n\n";
+    return 1;
+  }
 
-                    std::cout << "\n  " << pIStrm->rdbuf();
-                    putline(2);
-                    }
+  std::cout &lt;&lt; "\n  " &lt;&lt; pIStrm->rdbuf();
+  putline(2);
+}
                   </defn-code>
                   <defn-head class="defnBorderTop">Output</defn-head>
                   <defn-code>
-                    -- simple logger --
+-- simple logger --
 
-                    first log item
-                    second log item
-                    last log item
+first log item
+second log item
+last log item
                   </defn-code>
                 </defn-block>
               </defn-outerBlock>
@@ -453,37 +451,36 @@
                 First Class Example - Point:
               </defn-head>
               <defn-code>
-                namespace Example1 {
+namespace Example1 {
 
-                class Point {
-                public:
-                Point(const std::string& name = "none")
-                : name_(name), coordinates_{ 0.0, 0.0, 0.0 } {
-                }
-                std::string& name() {
-                return name_;
-                }
-                double& operator[](size_t i) {
-                if (i &lt; 0 || 3 &lt;= i)
-                throw std::exception("invalid index");
-                return coordinates_[i];
-                }
-                size_t size() const {
-                return 3;
-                }
-                private:
-                std::string name_;
-                double coordinates_[3];
-                };
+  class Point {
+    public:
+    Point(const std::string& name = "none")
+    : name_(name), coordinates_{ 0.0, 0.0, 0.0 } {}
+    std::string& name() {
+      return name_;
+    }
+    double& operator[](size_t i) {
+      if (i &lt; 0 || 3 &lt;= i)
+        throw std::exception("invalid index");
+      return coordinates_[i];
+    }
+    size_t size() const {
+      return 3;
+    }
+    private:
+    std::string name_;
+    double coordinates_[3];
+  };
 
-                void show(Point p) {
-                std::cout &lt;&lt; "\n  " &lt;&lt; p.name() &lt;&lt; "\n  ";
-                for (size_t i = 0; i &lt; p.size(); ++i) {
-                std::cout &lt;&lt; p[i] &lt;&lt; " ";
-                }
-                std::cout &lt;&lt; std::endl;
-                }
-                }
+  void show(Point p) {
+    std::cout &lt;&lt; "\n  " &lt;&lt; p.name() &lt;&lt; "\n  ";
+    for (size_t i = 0; i &lt; p.size(); ++i) {
+      std::cout &lt;&lt; p[i] &lt;&lt; " ";
+    }
+    std::cout &lt;&lt; std::endl;
+  }
+}
               </defn-code>
             </defn-block>
             <defn-block>
@@ -491,35 +488,35 @@
                 Using code:
               </defn-head>
               <defn-code>
-                displayDemo("--- Example1::Point ---");
-                Example1::Point p1("p1");
-                p1[0] = 1.0;
-                p1[1] = 2.0;
-                p1[2] = 3.0;
-                show(p1);
-                displayDemo("--- copy constr of p2 using src p1 ---");
-                Example1::Point p2{ p1 };
-                p2.name() = "p2";
-                show(p2);
-                displayDemo("--- copy assignment of p3 from src p2");
-                Example1::Point p3("p3");
-                p3 = p2;
-                p3.name() = "p3";
-                show(p3);
+displayDemo("--- Example1::Point ---");
+Example1::Point p1("p1");
+p1[0] = 1.0;
+p1[1] = 2.0;
+p1[2] = 3.0;
+show(p1);
+displayDemo("--- copy constr of p2 using src p1 ---");
+Example1::Point p2{ p1 };
+p2.name() = "p2";
+show(p2);
+displayDemo("--- copy assignment of p3 from src p2");
+Example1::Point p3("p3");
+p3 = p2;
+p3.name() = "p3";
+show(p3);
               </defn-code>
               <defn-head class="defnBorderTop">
                 Output:
               </defn-head>
               <defn-code>
-                --- Example1::Point ---
-                p1
-                1 2 3
-                --- copy construction of p2 using src p1 ---
-                p2
-                1 2 3
-                --- copy assignment of p3 from src p2
-                p3
-                1 2 3
+--- Example1::Point ---
+p1
+1 2 3
+--- copy construction of p2 using src p1 ---
+p2
+1 2 3
+--- copy assignment of p3 from src p2
+p3
+1 2 3
               </defn-code>
             </defn-block>
           </defn-outerBlock>
@@ -573,54 +570,54 @@
                 Revised Class Example - Point:
               </defn-head>
               <defn-code>
-                namespace Example2 {
+namespace Example2 {
 
-                class Point {
-                public:
-                Point(const std::string& name = "none", size_t N = 3);
-                std::string& name();
-                double& operator[](size_t i);
-                double operator[](size_t i) const;
-                size_t size() const;
-                private:
-                std::string name_;
-                std::vector&lt;double&gt; coordinates_;
-                };
-                /*--- constructor ---*/
-                Point::Point(const std::string& name, size_t N)
-                : name_(name), coordinates_(N) {
-                }
-                /*--- name accessor ---*/
-                std::string& Point::name() {
-                return name_;
-                }
-                /*--- indexer for non-const instances ---*/
-                double& Point::operator[](size_t i) {
-                if (i &lt; 0 || coordinates_.size() &lt;= i)
-                throw std::exception("index out of range");
-                return coordinates_[i];
-                }
-                /*--- indexer for const instances ---*/
-                double Point::operator[](size_t i) const {
-                if (i &lt; 0 || coordinates_.size() &lt;= i)
-                throw std::exception("index out of range");
-                return coordinates_[i];
-                }
-                /*--- buffer size accessor ---*/
-                size_t Point::size() const {
-                return coordinates_.size();
-                }
-                }
+  class Point {
+    public:
+    Point(const std::string& name = "none", size_t N = 3);
+    std::string& name();
+    double& operator[](size_t i);
+    double operator[](size_t i) const;
+    size_t size() const;
+    private:
+    std::string name_;
+    std::vector&lt;double&gt; coordinates_;
+  };
+  /*--- constructor ---*/
+  Point::Point(const std::string& name, size_t N)
+    : name_(name), coordinates_(N) {
+  }
+  /*--- name accessor ---*/
+  std::string& Point::name() {
+    return name_;
+  }
+  /*--- indexer for non-const instances ---*/
+  double& Point::operator[](size_t i) {
+    if (i &lt; 0 || coordinates_.size() &lt;= i)
+      throw std::exception("index out of range");
+    return coordinates_[i];
+  }
+  /*--- indexer for const instances ---*/
+  double Point::operator[](size_t i) const {
+    if (i &lt; 0 || coordinates_.size() &lt;= i)
+      throw std::exception("index out of range");
+    return coordinates_[i];
+  }
+  /*--- buffer size accessor ---*/
+  size_t Point::size() const {
+    return coordinates_.size();
+  }
+}
 
-                /*--- generic display function ---*/
-                template&lt;typename T&gt;
-                void show(T t) {
-                std::cout &lt;&lt; "\n  " &lt;&lt; t.name() &lt;&lt; "\n  ";
-                for (size_t i = 0; i &lt; t.size(); ++i) {
-                std::cout &lt;&lt; t[i] &lt;&lt; " ";
-                }
-                std::cout &lt;&lt; std::endl;
-                }
+/*--- generic display function ---*/
+template&lt;typename T&gt;
+void show(T t) {
+  std::cout &lt;&lt; "\n  " &lt;&lt; t.name() &lt;&lt; "\n  ";
+  for (size_t i = 0; i &lt; t.size(); ++i) {
+    std::cout &lt;&lt; t[i] &lt;&lt; " ";
+  }
+  std::cout &lt;&lt; std::endl;
+}
               </defn-code>
             </defn-block>
             <defn-block>
@@ -628,37 +625,37 @@
                 Using code:
               </defn-head>
               <defn-code>
-                displayDemo("--- Example2::Point ---");
-                Example2::Point p4("p4", 3);
-                p4[0] = -1.0;
-                p4[1] = 0.0;
-                p4[2] = 1.0;
-                show(p4);
-                displayDemo("--- copy constr of p5 using src p4 ---");
-                Example2::Point p5{ p4 };
-                p5.name() = "p5";
-                show(p5);
-                displayDemo("--- copy assignment of p6 from src p5");
-                Example2::Point p6("p6");
-                p6 = p5;
-                p6.name() = "p6";
-                show(p6);
+displayDemo("--- Example2::Point ---");
+Example2::Point p4("p4", 3);
+p4[0] = -1.0;
+p4[1] = 0.0;
+p4[2] = 1.0;
+show(p4);
+displayDemo("--- copy constr of p5 using src p4 ---");
+Example2::Point p5{ p4 };
+p5.name() = "p5";
+show(p5);
+displayDemo("--- copy assignment of p6 from src p5");
+Example2::Point p6("p6");
+p6 = p5;
+p6.name() = "p6";
+show(p6);
               </defn-code>
               <defn-head class="defnBorderTop">
                 Output:
               </defn-head>
               <defn-code>
-                --- Example2::Point ---
-                p4
-                -1 0 1
+--- Example2::Point ---
+p4
+-1 0 1
 
-                --- copy construction of p5 using src p4 ---
-                p5
-                -1 0 1
+--- copy construction of p5 using src p4 ---
+p5
+-1 0 1
 
-                --- copy assignment of p6 from src p5
-                p6
-                -1 0 1
+--- copy assignment of p6 from src p5
+p6
+-1 0 1
               </defn-code>
             </defn-block>
           </defn-outerBlock>
@@ -709,71 +706,70 @@
                 Revised again Example:
               </defn-head>
               <defn-code>
-                namespace Example3 {
+namespace Example3 {
 
-                class Point {
-                public:
-                Point(const std::string& name = "none", size_t N = 3);
-                Point(const Point& x);
-                ~Point();
-                Point& operator=(const Point& x);
-                std::string& name();
-                double& operator[](size_t i);
-                double operator[](size_t i) const;
-                size_t size() const;
-                private:
-                std::string name_;
-                double* pBuffer_ = nullptr;
-                size_t bufSize_ = 0;
-                };
-                /*--- constructor ---*/
-                Point::Point(const std::string& name, size_t N)
-                : name_(name),
-                bufSize_(N), pBuffer_(new double[N]) {
-                }
-                /*--- copy constructor ---*/
-                Point::Point(const Point& x)
-                : bufSize_(x.bufSize_),
-                pBuffer_(new double[x.bufSize_]) {
-                name_ = x.name_;
-                memcpy(pBuffer_, x.pBuffer_, bufSize_ * sizeof(double));
-                }
-                /*--- destructor ---*/
-                Point::~Point() {
-                delete[] pBuffer_;
-                }
-                /*--- copy assignment operator ---*/
-                Point& Point::operator=(const Point& x) {
-                if (this != &x) {
-                /* won't assign name */
-                bufSize_ = x.bufSize_;
-                delete pBuffer_;
-                pBuffer_ = new double[bufSize_];
-                memcpy(pBuffer_, x.pBuffer_, bufSize_ * sizeof(double));
-                }
-                return *this;
-                }
-                /*--- name accessor ---*/
-                std::string& Point::name() {
-                return name_;
-                }
-                /*--- indexer for non-const instances ---*/
-                double& Point::operator[](size_t i) {
-                if (i &lt; 0 || bufSize_ &lt;= i)
-                throw std::exception("index out of range");
-                return *(pBuffer_ + i);
-                }
-                /*--- indexer for const instances ---*/
-                double Point::operator[](size_t i) const {
-                if (i &lt; 0 || bufSize_ &lt;= i)
-                throw std::exception("index out of range");
-                return *(pBuffer_ + i);
-                }
-                /*--- buffer size accessor ---*/
-                size_t Point::size() const {
-                return bufSize_;
-                }
-                }
+  class Point {
+    public:
+    Point(const std::string& name = "none", size_t N = 3);
+    Point(const Point& x);
+    ~Point();
+    Point& operator=(const Point& x);
+    std::string& name();
+    double& operator[](size_t i);
+    double operator[](size_t i) const;
+    size_t size() const;
+    private:
+    std::string name_;
+    double* pBuffer_ = nullptr;
+    size_t bufSize_ = 0;
+  };
+  /*--- constructor ---*/
+  Point::Point(const std::string& name, size_t N)
+    : name_(name), 
+      bufSize_(N), pBuffer_(new double[N]) {}
+  /*--- copy constructor ---*/
+  Point::Point(const Point& x)
+    : bufSize_(x.bufSize_),
+      pBuffer_(new double[x.bufSize_]) {
+    name_ = x.name_;
+    memcpy(pBuffer_, x.pBuffer_, bufSize_ * sizeof(double));
+  }
+  /*--- destructor ---*/
+  Point::~Point() {
+    delete[] pBuffer_;
+  }
+  /*--- copy assignment operator ---*/
+  Point& Point::operator=(const Point& x) {
+    if (this != &x) {
+      /* won't assign name */
+      bufSize_ = x.bufSize_;
+      delete pBuffer_;
+      pBuffer_ = new double[bufSize_];
+      memcpy(pBuffer_, x.pBuffer_, bufSize_ * sizeof(double));
+    }
+    return *this;
+  }
+  /*--- name accessor ---*/
+  std::string& Point::name() {
+    return name_;
+  }
+  /*--- indexer for non-const instances ---*/
+  double& Point::operator[](size_t i) {
+    if (i &lt; 0 || bufSize_ &lt;= i)
+      throw std::exception("index out of range");
+    return *(pBuffer_ + i);
+  }
+  /*--- indexer for const instances ---*/
+  double Point::operator[](size_t i) const {
+    if (i &lt; 0 || bufSize_ &lt;= i)
+      throw std::exception("index out of range");
+    return *(pBuffer_ + i);
+  }
+  /*--- buffer size accessor ---*/
+  size_t Point::size() const {
+    return bufSize_;
+  }
+}
               </defn-code>
             </defn-block>
             <defn-block>
@@ -781,36 +777,36 @@
                 Using code:
               </defn-head>
               <defn-code>
-                displayDemo("--- Example3::Point ---");
-                Example3::Point p7("p7", 3);
-                p7[0] = -0.5;
-                p7[1] = 0.0;
-                p7[2] = 0.5;
-                show(p7);
-                displayDemo("--- copy constr p8 using src p7 ---");
-                Example3::Point p8{ p7 };
-                p8.name() = "p8";
-                show(p8);
-                displayDemo("--- copy assign p9 from src p8 ---");
-                Example3::Point p9("p9");
-                p9 = p8;
-                show(p8);
+displayDemo("--- Example3::Point ---");
+Example3::Point p7("p7", 3);
+p7[0] = -0.5;
+p7[1] = 0.0;
+p7[2] = 0.5;
+show(p7);
+displayDemo("--- copy constr p8 using src p7 ---");
+Example3::Point p8{ p7 };
+p8.name() = "p8";
+show(p8);
+displayDemo("--- copy assign p9 from src p8 ---");
+Example3::Point p9("p9");
+p9 = p8;
+show(p8);
               </defn-code>
               <defn-head class="defnBorderTop">
                 Output:
               </defn-head>
               <defn-code>
-                --- Example3::Point ---
-                p7
-                -0.5 0 0.5
+--- Example3::Point ---
+p7
+-0.5 0 0.5
 
-                --- copy construction of p8 using src p7 ---
-                p8
-                -0.5 0 0.5
+--- copy construction of p8 using src p7 ---
+p8
+-0.5 0 0.5
 
-                --- copy assignment of p9 from src p8
-                p8
-                -0.5 0 0.5
+--- copy assignment of p9 from src p8
+p8
+-0.5 0 0.5
               </defn-code>
             </defn-block>
           </defn-outerBlock>
@@ -998,149 +994,148 @@
             <defn-block>
               <defn-head>Anatomy Class</defn-head>
               <defn-code>
-                class Anatomy {
-                public:
-                Anatomy();                                 // default
-                Anatomy(const std::string& nameStr);       // promo
-                Anatomy(const Anatomy& a);                 // copy
-                Anatomy(Anatomy&& a) noexcept;             // move
-                Anatomy& operator=(const Anatomy& a);      // copy
-                Anatomy& operator=(Anatomy&& a) noexcept;  // move
-                ~Anatomy();                                // dtor
-                void name(const std::string& nameStr);
-                std::string name() const;
-                size_t objNumber() const;
-                template&lt;typename T&gt;
-                void setValue(const T& t);
-                template&lt;typename T&gt;
-                T getValue() const;
-                void showMsg(
-                size_t n, const std::string& msg
-                );
-                private:
-                std::string name_;
-                static size_t count;
-                size_t myCount = 0;
-                std::any value;
-                constexpr static size_t MaxMsg = 6;
-                std::string invMsg[MaxMsg]{
-                "default ctor invoked",
-                "copy ctor invoked",
-                "move ctor invoked",
-                "copy assignment invoked",
-                "move assignment invoked",
-                "dtor invoked"
-                };
-                };
+class Anatomy {
+  public:
+  Anatomy();                                 // default
+  Anatomy(const std::string& nameStr);       // promo
+  Anatomy(const Anatomy& a);                 // copy
+  Anatomy(Anatomy&& a) noexcept;             // move
+  Anatomy& operator=(const Anatomy& a);      // copy
+  Anatomy& operator=(Anatomy&& a) noexcept;  // move
+  ~Anatomy();                                // dtor
+  void name(const std::string& nameStr);
+  std::string name() const;
+  size_t objNumber() const;
+  template&lt;typename T&gt;
+  void setValue(const T& t);
+  template&lt;typename T&gt;
+  T getValue() const;
+  void showMsg(
+    size_t n, const std::string& msg
+  );
+  private:
+  std::string name_;
+  static size_t count;
+  size_t myCount = 0;
+  std::any value;
+  constexpr static size_t MaxMsg = 6;
+  std::string invMsg[MaxMsg]{
+  "default ctor invoked",
+  "copy ctor invoked",
+  "move ctor invoked",
+  "copy assignment invoked",
+  "move assignment invoked",
+  "dtor invoked"
+};
 
-                size_t Anatomy::count = 0;
+size_t Anatomy::count = 0;
 
-                void Anatomy::showMsg(
-                size_t n, const std::string& msg
-                ) {
-                if (Assert(0 &lt;= n && n &lt; MaxMsg))
-                return;
-                std::string localMsg = invMsg[n];
-                std::cout &lt;&lt; "\n  " &lt;&lt; localMsg;
-                if (msg.size() &gt; 0)
-                std::cout &lt;&lt; ", " &lt;&lt; msg;
-                }
-                /*--- default constructor ---*/
-                Anatomy::Anatomy()
-                : value(std::any()), name_("unknown") {
-                myCount = ++count;
-                showMsg(0, "obj #" + std::to_string(myCount));
-                }
-                /*--- promotion constructor ---*/
-                Anatomy::Anatomy(const std::string& nameStr)
-                : value(std::any()), name_(nameStr) {
-                myCount = ++count;
-                showMsg(0, "obj #" + std::to_string(myCount));
-                }
-                /*--- copy constructor ---*/
-                Anatomy::Anatomy(const Anatomy& a)
-                : value(a.value), name_(a.name_) {
-                myCount = ++count;
-                showMsg(1, "obj #" + std::to_string(myCount));
-                }
-                /*--- move constructor ---*/
-                Anatomy::Anatomy(Anatomy&& a) noexcept
-                : value(std::move(a.value)),
-                name_(std::move(a.name_)) {
-                myCount = ++count;
-                showMsg(2, "obj #" + std::to_string(myCount));
-                }
-                /*--- copy assignment operator ---*/
-                Anatomy& Anatomy::operator=(const Anatomy& a) {
-                if (this != &a) {
-                // don't want to rename, so no copy
-                value = a.value;
-                }
-                showMsg(3, "obj #" + std::to_string(myCount));
-                return *this;
-                }
-                /*--- move assignment operator ---*/
-                Anatomy& Anatomy::operator=(Anatomy&& a) noexcept {
-                if (this != &a) {
-                // don't want to rename, so no copy
-                value = std::move(a.value);
-                }
-                showMsg(4, "obj #" + std::to_string(myCount));
-                return *this;
-                }
-                /*--- destructor ---*/
-                Anatomy::~Anatomy() {
-                showMsg(5, "obj #" + std::to_string(myCount));
-                // name_ & value are composed, so their dtors
-                // are called here
-                }
-                /*--- name setter ----*/
-                void Anatomy::name(const std::string& nameStr) {
-                name_ = nameStr;
-                }
-                /*--- name getter ---*/
-                std::string Anatomy::name() const {
-                return name_;
-                }
-                /*--- objNumber getter ---*/
-                size_t Anatomy::objNumber() const {
-                return myCount;
-                }
-                /*--- value setter ---*/
-                template&lt;typename T&gt;
-                void Anatomy::setValue(const T& t) {
-                value = t;
-                }
-                /*--- value getter ---*/
-                template&lt;typename T&gt;
-                T Anatomy::getValue() const {
-                try {
-                return std::any_cast&lt;T&gt;(value);
-                }
-                catch (...) {
-                std::cout &lt;&lt; " --- can't retrieve value for "
-                &lt;&lt; name_ &lt;&lt; " ---";
-                return T();
-                }
-                }
-                /*--- Anatomy object factory ---*/
-                template&lt;typename T&gt;
-                Anatomy makeAnatomy(const T& t = T()) {
-                Anatomy temp("created");
-                temp.setValue(t);
-                return temp;
-                }
-                /*--- show Anatomy state ---*/
-                template&lt;typename T&gt;
-                void showAnatomy(const Anatomy& a, size_t line = 0) {
-                if (line &gt; 0)
-                std::cout &lt;&lt; "\n  at line #" &lt;&lt; line;
-                std::cout &lt;&lt; "\n  " &lt;&lt; a.name()
-                &lt;&lt; ", obj#" &lt;&lt; a.objNumber()
-                &lt;&lt; ", has value "
-                &lt;&lt; a.getValue&lt;T&gt;()
-                &lt;&lt; std::endl;
-                }
+void Anatomy::showMsg(
+  size_t n, const std::string& msg
+) {
+  if (Assert(0 &lt;= n && n &lt; MaxMsg))
+    return;
+  std::string localMsg = invMsg[n];
+  std::cout &lt;&lt; "\n  " &lt;&lt; localMsg;
+  if (msg.size() &gt; 0)
+    std::cout &lt;&lt; ", " &lt;&lt; msg;
+}
+/*--- default constructor ---*/
+Anatomy::Anatomy()
+  : value(std::any()), name_("unknown") {
+  myCount = ++count;
+  showMsg(0, "obj #" + std::to_string(myCount));
+}
+/*--- promotion constructor ---*/
+Anatomy::Anatomy(const std::string& nameStr)
+  : value(std::any()), name_(nameStr) {
+  myCount = ++count;
+  showMsg(0, "obj #" + std::to_string(myCount));
+}
+/*--- copy constructor ---*/
+Anatomy::Anatomy(const Anatomy& a)
+  : value(a.value), name_(a.name_) {
+  myCount = ++count;
+  showMsg(1, "obj #" + std::to_string(myCount));
+}
+/*--- move constructor ---*/
+Anatomy::Anatomy(Anatomy&& a) noexcept
+  : value(std::move(a.value)),
+    name_(std::move(a.name_)) {
+  myCount = ++count;
+  showMsg(2, "obj #" + std::to_string(myCount));
+}
+/*--- copy assignment operator ---*/
+Anatomy& Anatomy::operator=(const Anatomy& a) {
+  if (this != &a) {
+    // don't want to rename, so no copy
+    value = a.value;
+}
+showMsg(3, "obj #" + std::to_string(myCount));
+  return *this;
+}
+/*--- move assignment operator ---*/
+Anatomy& Anatomy::operator=(Anatomy&& a) noexcept {
+  if (this != &a) {
+    // don't want to rename, so no copy
+    value = std::move(a.value);
+}
+showMsg(4, "obj #" + std::to_string(myCount));
+  return *this;
+}
+/*--- destructor ---*/
+Anatomy::~Anatomy() {
+  showMsg(5, "obj #" + std::to_string(myCount));
+  // name_ & value are composed, so their dtors
+  // are implicitly called here
+}
+/*--- name setter ----*/
+void Anatomy::name(const std::string& nameStr) {
+  name_ = nameStr;
+}
+/*--- name getter ---*/
+std::string Anatomy::name() const {
+  return name_;
+}
+/*--- objNumber getter ---*/
+size_t Anatomy::objNumber() const {
+  return myCount;
+}
+/*--- value setter ---*/
+template&lt;typename T&gt;
+void Anatomy::setValue(const T& t) {
+  value = t;
+}
+/*--- value getter ---*/
+template&lt;typename T&gt;
+T Anatomy::getValue() const {
+  try {
+    return std::any_cast&lt;T&gt;(value);
+  }
+  catch (...) {
+    std::cout &lt;&lt; " --- can't retrieve value for "
+    &lt;&lt; name_ &lt;&lt; " ---";
+    return T();
+  }
+}
+/*--- Anatomy object factory ---*/
+template&lt;typename T&gt;
+Anatomy makeAnatomy(const T& t = T()) {
+  Anatomy temp("created");
+  temp.setValue(t);
+  return temp;
+}
+/*--- show Anatomy state ---*/
+template&lt;typename T&gt;
+void showAnatomy(const Anatomy& a, size_t line = 0) {
+  if (line &gt; 0)
+    std::cout &lt;&lt; "\n  at line #" &lt;&lt; line;
+  std::cout &lt;&lt; "\n  " &lt;&lt; a.name()
+  &lt;&lt; ", obj#" &lt;&lt; a.objNumber()
+  &lt;&lt; ", has value "
+  &lt;&lt; a.getValue&lt;T&gt;()
+  &lt;&lt; std::endl;
+}
               </defn-code>
             </defn-block>
             <defn-block>
@@ -1148,71 +1143,68 @@
                 Using Code:
               </defn-head>
               <defn-code>
-                362  std::cout &lt;&lt;
-                "\n  Demonstrate Class Anatomy";
-                363  std::cout &lt;&lt;
-                "\n ===========================\n";
-                364
-                365  Anatomy a1;
-                366  a1.setValue(1.5);
-                367  showAnatomy&lt;double>(a1, __LINE__ - 2);
-                368
-                369  Anatomy a2{ a1 };
-                370  a2.name("a2");
-                371  showAnatomy&lt;double>(a2, __LINE__ - 2);
-                372
-                373  a1 = a2;
-                374  showAnatomy&lt;double>(a1, __LINE__ - 1);
-                375
-                376  Anatomy a3 = makeAnatomy(
-                std::string("some string")
-                );
-                377  showAnatomy&lt;std::string>(
-                a3, __LINE__ - 1
-                );
-                378
-                379  Anatomy a4;
-                380  a4 = makeAnatomy(5);
-                381  showAnatomy&lt;int>(a4, __LINE__ - 1);
+std::cout &lt;&lt; "\n  Demonstrate Class Anatomy";
+std::cout &lt;&lt;
+  "\n ===========================\n";
+
+Anatomy a1;
+a1.setValue(1.5);
+showAnatomy&lt;double>(a1, __LINE__ - 2);
+
+Anatomy a2{ a1 };
+a2.name("a2");
+showAnatomy&lt;double>(a2, __LINE__ - 2);
+
+a1 = a2;
+showAnatomy&lt;double>(a1, __LINE__ - 1);
+
+Anatomy a3 = makeAnatomy(
+  std::string("some string")
+);
+showAnatomy&lt;std::string>(a3, __LINE__ - 1);
+
+Anatomy a4;
+a4 = makeAnatomy(5);
+showAnatomy&lt;int>(a4, __LINE__ - 1);
               </defn-code>
               <defn-head class="defnBorderTop">
                 Output:
               </defn-head>
               <defn-code>
-                Demonstrate Class Anatomy
-                ===========================
+Demonstrate Class Anatomy
+===========================
 
-                default ctor invoked, obj #1
-                at line #365
-                unknown, obj#1, has value 1.5
+default ctor invoked, obj #1
+at line #365
+unknown, obj#1, has value 1.5
 
-                copy ctor invoked, obj #2
-                at line #369
-                a2, obj#2, has value 1.5
+copy ctor invoked, obj #2
+at line #369
+a2, obj#2, has value 1.5
 
-                copy assignment invoked, obj #1
-                at line #373
-                unknown, obj#1, has value 1.5
+copy assignment invoked, obj #1
+at line #373
+unknown, obj#1, has value 1.5
 
-                default ctor invoked, obj #3
-                move ctor invoked, obj #4
-                dtor invoked, obj #3
-                at line #376
-                created, obj#4, has value some string
+default ctor invoked, obj #3
+move ctor invoked, obj #4
+dtor invoked, obj #3
+at line #376
+created, obj#4, has value some string
 
-                default ctor invoked, obj #5
-                default ctor invoked, obj #6
-                move ctor invoked, obj #7
-                dtor invoked, obj #6
-                move assignment invoked, obj #5
-                dtor invoked, obj #7
-                at line #380
-                unknown, obj#5, has value 5
+default ctor invoked, obj #5
+default ctor invoked, obj #6
+move ctor invoked, obj #7
+dtor invoked, obj #6
+move assignment invoked, obj #5
+dtor invoked, obj #7
+at line #380
+unknown, obj#5, has value 5
 
-                dtor invoked, obj #5
-                dtor invoked, obj #4
-                dtor invoked, obj #2
-                dtor invoked, obj #1
+dtor invoked, obj #5
+dtor invoked, obj #4
+dtor invoked, obj #2
+dtor invoked, obj #1
               </defn-code>
             </defn-block>
           </defn-outerBlock>
