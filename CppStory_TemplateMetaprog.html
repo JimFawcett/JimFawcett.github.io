@@ -187,47 +187,47 @@
               <defn-block>
                 <defn-head>TMP Code: display items in a std::tuple</defn-head>
                 <defn-code>
-                  #include &lt;iostream&gt;
-                  #include &lt;typeinfo&gt;
-                  #include &lt;tuple&gt;
-                  #include "../Display/Display.h"
+#include &lt;iostream&gt;
+#include &lt;typeinfo&gt;
+#include &lt;tuple&gt;
+#include "../Display/Display.h"
 
-                  namespace Chap7 {
+namespace Chap7 {
 
-                  // recursive showTuple definition
-                  template&lt;size_t I = 0, typename... Tp&gt;
-                  void showTuple(std::tuple&lt;Tp...&gt;&amp; t) {
-                  std::cout &lt;&lt; std::get&lt;I&gt;(t) &lt;&lt; " ";    // get Ith item
-                  if constexpr (I + 1 != sizeof...(Tp))  // I = I + 1
-                  showTuple&lt;I + 1&gt;(t);
-                  }
-                  }
+  // recursive showTuple definition
+  template&lt;size_t I = 0, typename... Tp&gt;
+  void showTuple(std::tuple&lt;Tp...&gt;&amp; t) {
+    std::cout &lt;&lt; std::get&lt;I&gt;(t) &lt;&lt; " ";    // get Ith item
+    if constexpr (I + 1 != sizeof...(Tp))  // I = I + 1
+      showTuple&lt;I + 1&gt;(t);
+  }
+}
 
-                  // if constexpr (pred) { /* code to conditionally compile */ }
-                  // - pred == true  => block is compiled so recurse
-                  // - pred == false => block is not compiled, stops recursion
+// if constexpr (pred) { /* code to conditionally compile */ }
+// - pred == true  => block is compiled so recurse
+// - pred == false => block is not compiled, stops recursion
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Using code:</defn-head>
                 <defn-code>
-                  int main() {
+int main() {
 
-                  displayTitle("Demonstrate TMP");
+  displayTitle("Demonstrate TMP");
 
-                  std::tuple t{ 1, 2.5, 'a', "a string" };
-                  std::cout &lt;&lt; "\n  ";
-                  Chap7::showTuple(t);
+  std::tuple t{ 1, 2.5, 'a', "a string" };
+  std::cout &lt;&lt; "\n  ";
+  Chap7::showTuple(t);
 
-                  std::cout &lt;&lt; "\n\n";
-                  }
+  std::cout &lt;&lt; "\n\n";
+}
                 </defn-code>
                 <defn-head class="defnBorderTop">Output:</defn-head>
                 <defn-code>
-                  Demonstrate TMP
-                  =================
+ Demonstrate TMP
+=================
 
-                  1 2.5 a a string
+1 2.5 a a string
                 </defn-code>
               </defn-block>
             </defn-outerblock>
@@ -263,94 +263,94 @@
               <defn-block>
                 <defn-head>Code: Variadic Function</defn-head>
                 <defn-code>
-                  #include &lt;iostream&gt;
-                  #include &lt;string&gt;
-                  #include "../Display/Display.h"
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include "../Display/Display.h"
 
-                  /*-- Helper function --*/
+/*-- Helper function --*/
 
-                  std::string strTrunc(
-                  const std::string&amp; src, size_t Max = 50
-                  ) {
-                  if (src.size() &gt; Max) {
-                  return src.substr(0, Max - 4) + " ...";
-                  }
-                  else {
-                  return src;
-                  }
-                  }
+std::string strTrunc(
+  const std::string&amp; src, size_t Max = 50
+) {
+  if (src.size() &gt; Max) {
+    return src.substr(0, Max - 4) + " ...";
+  }
+  else {
+    return src;
+  }
+}
 
-                  /*-- Templ specializ'n stops recursive eval --*/
+/*-- Templ specializ'n stops recursive eval --*/
 
-                  template&lt;typename T&gt;
-                  void f(T t)
-                  {
-                  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
-                  &lt;&lt; strTrunc(typeid(t).name(), 40)
-                  &lt;&lt; std::endl;
-                  }
+template&lt;typename T&gt;
+void f(T t)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
+            &lt;&lt; strTrunc(typeid(t).name(), 40)
+            &lt;&lt; std::endl;
+}
 
-                  /*-- Recursive definition of template function --
-                  Args is a "parameter pack
-                  https://en.cppreference.com
-                  */
-                  template&lt;typename T, typename... Args&gt;
-                  void f(T t, Args... args)
-                  {
-                  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
-                  &lt;&lt; typeid(t).name() &lt;&lt; std::endl;
-                  f(args...);
-                  }
+/*-- Recursive definition of template function --
+  Args is a "parameter pack
+  https://en.cppreference.com
+*/
+template&lt;typename T, typename... Args&gt;
+void f(T t, Args... args)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
+            &lt;&lt; typeid(t).name() &lt;&lt; std::endl;
+  f(args...);
+}
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Using Code</defn-head>
                 <defn-code>
-                  int main()
-                  {
-                  std::cout &lt;&lt;
-                  "\n  Demonstrate Variatic Functions";
-                  std::cout &lt;&lt;
-                  "\n ================================\n";
+int main()
+{
+  std::cout &lt;&lt;
+    "\n  Demonstrate Variatic Functions";
+  std::cout &lt;&lt;
+    "\n ================================\n";
 
-                  displayDemo("-- function with 5 args --\n");
-                  f(
-                  1, 3.5, 'z',
-                  "a literal string",
-                  std::string("a std::string")
-                  );
-                  putline();
-                  displayDemo("-- function with 2 args --\n");
-                  f('q', "only two args");
+  displayDemo("-- function with 5 args --\n");
+  f(
+    1, 3.5, 'z',
+    "a literal string",
+    std::string("a std::string")
+  );
+  putline();
+  displayDemo("-- function with 2 args --\n");
+  f('q', "only two args");
 
-                  std::cout &lt;&lt; "\n\n";
-                  return 0;
-                  }
+  std::cout &lt;&lt; "\n\n";
+  return 0;
+}
                 </defn-code>
                 <defn-head class="defnBorderTop">Output</defn-head>
                 <defn-code>
-                  Demonstrate Variatic Functions
-                  ================================
+ Demonstrate Variatic Functions
+================================
 
-                  -- function with 5 args --
+-- function with 5 args --
 
-                  1 : int
+1 : int
 
-                  3.5 : double
+3.5 : double
 
-                  z : char
+z : char
 
-                  a literal string : char const *
+a literal string : char const *
 
-                  a std::string :
-                  class std::basic_string&lt;char,struct  ...
+a std::string :
+class std::basic_string&lt;char,struct  ...
 
 
-                  -- function with 2 args --
+-- function with 2 args --
 
-                  q : char
+q : char
 
-                  only two args : char const *
+only two args : char const *
                 </defn-code>
               </defn-block>
             </defn-outerBlock>
@@ -377,74 +377,72 @@
               <defn-block>
                 <defn-head>Code: display function</defn-head>
                 <defn-code>
-                  #include &lt;iostream&gt;
+#include &lt;iostream&gt;
 
-                  template &lt;
-                  template &lt; typename, typename... &gt; class ContainerType,
-                  typename ValueType, typename... Args
-                  &gt;
-                  void print_container(
-                  const ContainerType&lt; ValueType, Args... &gt;&amp; c
-                  )
-                  {
-                  for (const auto&amp; v : c) {
-                  std::cout &lt;&lt; v &lt;&lt; ' ';
-                  }
-                  std::cout &lt;&lt; '\n';
-                  }
+template &lt;
+  template &lt; typename, typename... &gt; class ContainerType,
+  typename ValueType, typename... Args
+&gt;
+void print_container(
+  const ContainerType&lt; ValueType, Args... &gt;&amp; c
+)
+{
+  for (const auto&amp; v : c) {
+    std::cout &lt;&lt; v &lt;&lt; ' ';
+  }
+  std::cout &lt;&lt; '\n';
+}
 
-                  // Implement &lt;&lt; for pairs: this is needed
-                  // to print out mappings where range
-                  // iteration goes over (key, value) pairs.
+// Implement &lt;&lt; for pairs: this is needed
+// to print out mappings where range
+// iteration goes over (key, value) pairs.
 
-                  template &lt;typename T, typename U&gt;
-                  std::ostream&amp; operator&lt;&lt;(
-                  std::ostream&amp; out,
-                  const std::pair&lt;T, U&gt;&amp; p
-                  )
-                  {
-                  out &lt;&lt; "{" &lt;&lt; p.first &lt;&lt; ", "
-                  &lt;&lt; p.second &lt;&lt; "}";
-                  return out;
-                  }
+template &lt;typename T, typename U&gt;
+std::ostream&amp; operator&lt;&lt;(
+  std::ostream&amp; out,
+  const std::pair&lt;T, U&gt;&amp; p
+)
+{
+  out &lt;&lt; "{" &lt;&lt; p.first &lt;&lt; ", "
+      &lt;&lt; p.second &lt;&lt; "}";
+  return out;
+}
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Using Code</defn-head>
                 <defn-code>
-                  #include "Chap7Vdisplay.h"
-                  #include "../Display/Display.h"
-                  #include <vector>
-                    #include <unordered_map>
-                      #include <string>
+#include "Chap7Vdisplay.h"
+#include "../Display/Display.h"
+#include &lt;vector&gt;
+#include &lt;unordered_map&gt;
+#include &lt;string&gt;
 
-                        int main() {
+int main() {
 
-                        displayTitle("Demo Variadic Display Function");
+  displayTitle("Demo Variadic Display Function");
 
-                        std::vector<int>
-                          vInt{ 1,2,3,4 };
-                          std::cout << "\n  ";
-                          print_container(vInt);
+  std::vector&lt;int&gt;vInt{ 1,2,3,4 };
+  std::cout &lt;&lt; "\n  ";
+  print_container(vInt);
 
-                          std::unordered_map<int, std::string>
-                            mIntStr {
-                            {1, "one"}, { 2,"two" }, { 3, "three" }
-                            };
-                            std::cout << "\n  ";
-                            print_container(mIntStr);
+  std::unordered_map&lt;int, std::string&gt;mIntStr {
+    {1, "one"}, { 2,"two" }, { 3, "three" }
+  };
+  std::cout &lt;&lt; "\n  ";
+  print_container(mIntStr);
 
-                            putline(2);
-                            }
+  putline(2);
+}
                 </defn-code>
                 <defn-head class="defnBorderTop">Output</defn-head>
                 <defn-code>
-                  Demo Variadic Display Function
-                  ================================
+ Demo Variadic Display Function
+================================
 
-                  1 2 3 4
+1 2 3 4
 
-                  {1, one} {2, two} {3, three}
+{1, one} {2, two} {3, three}
 
                 </defn-code>
               </defn-block>
@@ -474,27 +472,27 @@
           <defn-block>
             <defn-head>Fragment from 1st Example:</defn-head>
             <defn-code>
-              /*-- Templ specializ'n stops recursive eval --*/
+/*-- Templ specializ'n stops recursive eval --*/
 
-              template&lt;typename T&gt;
-              void f(T t)
-              {
-              std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
-              &lt;&lt; strTrunc(typeid(t).name(), 40)
-              &lt;&lt; std::endl;
-              }
+template&lt;typename T&gt;
+void f(T t)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
+            &lt;&lt; strTrunc(typeid(t).name(), 40)
+            &lt;&lt; std::endl;
+}
 
-              /*-- Recursive definition of template function --
-              Args is a "parameter pack
-              https://en.cppreference.com
-              */
-              template&lt;typename T, typename... Args&gt;
-              void f(T t, Args... args)
-              {
-              std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
-              &lt;&lt; typeid(t).name() &lt;&lt; std::endl;
-              f(args...);
-              }
+/*-- Recursive definition of template function --
+  Args is a "parameter pack
+  https://en.cppreference.com
+*/
+template&lt;typename T, typename... Args&gt;
+void f(T t, Args... args)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; t &lt;&lt; " : "
+            &lt;&lt; typeid(t).name() &lt;&lt; std::endl;
+  f(args...);
+}
             </defn-code>
           </defn-block>
           <defn-block>
@@ -546,48 +544,48 @@
               <defn-block>
                 <defn-head>Code: folds over binary operator</defn-head>
                 <defn-code>
-                  template&lt;typename ...Args&gt;
-                  auto accumulateOrs(Args... args) {
-                  return ((args) || ...);
-                  }
+template&lt;typename ...Args&gt;
+auto accumulateOrs(Args... args) {
+  return ((args) || ...);
+}
 
-                  template&lt;typename ...Args&gt;
-                  auto accumulateAnds(Args... args) {
-                  return ((args) &amp;&amp; ...);
-                  }
+template&lt;typename ...Args&gt;
+auto accumulateAnds(Args... args) {
+  return ((args) &amp;&amp; ...);
+}
 
-                  template&lt;typename T, typename ...Args&gt;
-                  auto sum(T t, Args... args) {
-                  return (t + ... + args);
-                  }
+template&lt;typename T, typename ...Args&gt;
+auto sum(T t, Args... args) {
+  return (t + ... + args);
+}
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Using code:</defn-head>
                 <defn-code>
-                  displayDemo("\n  -- fold on logical operator --");
-                  std::cout &lt;&lt; std::boolalpha;
-                  std::cout &lt;&lt; "\n  " &lt;&lt; accumulateOrs(0, 0, 0);
-                  std::cout &lt;&lt; "\n  " &lt;&lt; accumulateOrs(false, true, false);
-                  std::cout &lt;&lt; "\n  " &lt;&lt; accumulateAnds(false, true, false);
+displayDemo("\n  -- fold on logical operator --");
+std::cout &lt;&lt; std::boolalpha;
+std::cout &lt;&lt; "\n  " &lt;&lt; accumulateOrs(0, 0, 0);
+std::cout &lt;&lt; "\n  " &lt;&lt; accumulateOrs(false, true, false);
+std::cout &lt;&lt; "\n  " &lt;&lt; accumulateAnds(false, true, false);
 
-                  displayDemo("\n  -- fold on addition operator --");
-                  std::cout &lt;&lt; "\n  " &lt;&lt; sum(1, 2.5, -2);
-                  std::string s1 = "first";
-                  std::string s2 = " and ";
-                  std::string s3 = "second";
-                  std::cout &lt;&lt; "\n  " &lt;&lt; sum(s1, s2, s3);
+displayDemo("\n  -- fold on addition operator --");
+std::cout &lt;&lt; "\n  " &lt;&lt; sum(1, 2.5, -2);
+std::string s1 = "first";
+std::string s2 = " and ";
+std::string s3 = "second";
+std::cout &lt;&lt; "\n  " &lt;&lt; sum(s1, s2, s3);
                 </defn-code>
                 <defn-head class="defnBorderTop">Output:</defn-head>
                 <defn-code>
-                  -- fold on logical operator --
-                  false
-                  true
-                  false
+-- fold on logical operator --
+false
+true
+false
 
-                  -- fold on addition operator --
-                  1.5
-                  first and second
+-- fold on addition operator --
+1.5
+first and second
                 </defn-code>
               </defn-block>
             </defn-outerBlock>
@@ -599,15 +597,15 @@
             <defn-block>
               <defn-head>Code fragment from previous example:</defn-head>
               <defn-code>
-                template&lt;typename ...Args&gt;
-                auto accumulateOrs(Args... args) {
-                return ((args) || ...);
-                }
+template&lt;typename ...Args&gt;
+auto accumulateOrs(Args... args) {
+  return ((args) || ...);
+}
 
-                template&lt;typename T, typename ...Args&gt;
-                auto sum(T t, Args... args) {
-                return (t + ... + args);
-                }
+template&lt;typename T, typename ...Args&gt;
+auto sum(T t, Args... args) {
+  return (t + ... + args);
+}
               </defn-code>
             </defn-block>
             <defn-block style="max-width:25rem;">
@@ -656,26 +654,26 @@
               <defn-block>
                 <defn-head>Code: push to std::cout</defn-head>
                 <defn-code>
-                  template&lt;typename ...Args&gt;
-                  void pushToCout1(Args&amp;&amp;... args) {
-                  (std::cout &lt;&lt; ... &lt;&lt; std::forward&lt;Args&gt;(args));
-                  }
+template&lt;typename ...Args&gt;
+void pushToCout1(Args&amp;&amp;... args) {
+  (std::cout &lt;&lt; ... &lt;&lt; std::forward&lt;Args&gt;(args));
+}
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Using code:</defn-head>
                 <defn-code>
-                  displayDemo("-- pushToCout1 -- fold on operator<< --");
-                  std::cout << "\n  ";
-                  pushToCout1("argggghhh!", 1, 2.5, 'z');
-                  std::cout << "\n  ";
-                  pushToCout1('z', 2.5, 1, "argggghhh!");
+displayDemo("-- pushToCout1 -- fold on operator&lt;&lt; --");
+std::cout &lt;&lt; "\n  ";
+pushToCout1("argggghhh!", 1, 2.5, 'z');
+std::cout &lt;&lt; "\n  ";
+pushToCout1('z', 2.5, 1, "argggghhh!");
                 </defn-code>
                 <defn-head class="defnBorderTop">Output:</defn-head>
                 <defn-code>
-                  -- pushToCout1 -- fold on operator<< --
-                  argggghhh!12.5z
-                  z2.51argggghhh!
+-- pushToCout1 -- fold on operator<< --
+argggghhh!12.5z
+z2.51argggghhh!
                 </defn-code>
               </defn-block>
             </defn-outerBlock>
@@ -702,47 +700,47 @@
               <defn-block>
                 <defn-head>Code: push to std::cout ver2</defn-head>
                 <defn-code>
-                  auto makeHelper(
-                  std::string prefix = ", ",
-                  std::string firstPrefix = ""
-                  )
-                  {
-                  int debug = 0;
-                  auto f = [prefix, firstPrefix](auto a) mutable {
-                  static std::ostringstream out2;
-                  out2 &lt;&lt; a;
-                  std::string temp = firstPrefix + out2.str();
-                  out2.str("");
-                  firstPrefix = prefix;
-                  return temp;
-                  };
-                  debug++;
-                  return f;
-                  }
+auto makeHelper(
+  std::string prefix = ", ",
+  std::string firstPrefix = ""
+)
+{
+  int debug = 0;
+  auto f = [prefix, firstPrefix](auto a) mutable {
+    static std::ostringstream out2;
+    out2 &lt;&lt; a;
+    std::string temp = firstPrefix + out2.str();
+    out2.str("");
+    firstPrefix = prefix;
+    return temp;
+  };
+  debug++;
+  return f;
+}
 
-                  template&lt;typename ...Args&gt;
-                  void pushToCout2(const Args&amp;... args) {
-                  static auto f = makeHelper(", ");
-                  (std::cout &lt;&lt; ... &lt;&lt; (f(args)));
-                  }
+template&lt;typename ...Args&gt;
+void pushToCout2(const Args&amp;... args) {
+  static auto f = makeHelper(", ");
+  (std::cout &lt;&lt; ... &lt;&lt; (f(args)));
+}
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Using code:</defn-head>
                 <defn-code>
-                  displayDemo(
-                  "\n  -- pushToCout2 -- fold on operator&lt;&lt; --"
-                  );
-                  std::cout &lt;&lt; "\n  ";
-                  pushToCout2("aaaahhhhh!", 1, 2.5, 'z');
-                  std::cout &lt;&lt; "\n  ";
-                  pushToCout2('z', 2.5, 1, "aaaahhhhh!");
+displayDemo(
+  "\n  -- pushToCout2 -- fold on operator&lt;&lt; --"
+);
+std::cout &lt;&lt; "\n  ";
+pushToCout2("aaaahhhhh!", 1, 2.5, 'z');
+std::cout &lt;&lt; "\n  ";
+pushToCout2('z', 2.5, 1, "aaaahhhhh!");
                 </defn-code>
                 <defn-head class="defnBorderTop">Output:</defn-head>
                 <defn-code>
-                  -- pushToCout2 -- fold on operator<< --
-                  aaaahhhhh!, 1, 2.5, z
-                  z, 2.5, 1, aaaahhhhh!
+-- pushToCout2 -- fold on operato&lt;&lt; --
+aaaahhhhh!, 1, 2.5, z
+z, 2.5, 1, aaaahhhhh!
                 </defn-code>
               </defn-block>
             </defn-outerBlock>
@@ -760,45 +758,46 @@
               <defn-block>
                 <defn-head>Code: push to std::cout ver3</defn-head>
                 <defn-code>
-                  auto makeHelper(
-                  std::string prefix = ", ",
-                  std::string firstPrefix = ""
-                  )
-                  {
-                  int debug = 0;
-                  auto f = [prefix, firstPrefix](auto a) mutable {
-                  static std::ostringstream out2;
-                  out2 &lt;&lt; a;
-                  std::string temp = firstPrefix + out2.str();
-                  out2.str("");
-                  firstPrefix = prefix;
-                  return temp;
-                  };
-                  debug++;
-                  return f;
+auto makeHelper(
+  std::string prefix = ", ",
+  std::string firstPrefix = ""
+)
+{
+  int debug = 0;
+  auto f = [prefix, firstPrefix](auto a) mutable {
+    static std::ostringstream out2;
+    out2 &lt;&lt; a;
+    std::string temp = firstPrefix + out2.str();
+    out2.str("");
+    firstPrefix = prefix;
+    return temp;
+  };
+  debug++;
+  return f;
 
-                  template&lt;typename F, typename ...Args&gt;
-                  void pushToCout3(F f, const Args&amp;... args) {
-                  (std::cout &lt;&lt; ... &lt;&lt; (f(args)));
-                  }
+  template&lt;typename F, typename ...Args&gt;
+  void pushToCout3(F f, const Args&amp;... args) {
+    (std::cout &lt;&lt; ... &lt;&lt; (f(args)));
+  }
+}
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Using code:</defn-head>
                 <defn-code>
-                  displayDemo(
-                  "\n  -- pushToCout3 -- fold on operator&lt;&lt; --"
-                  );
-                  std::cout &lt;&lt; "\n  ";
-                  pushToCout3(makeHelper(), "aaaahhhhh!", 1, 2.5, 'z');
-                  std::cout &lt;&lt; "\n  ";
-                  pushToCout3(makeHelper(), 'z', 2.5, 1, "aaaahhhhh!");
+displayDemo(
+  "\n  -- pushToCout3 -- fold on operator&lt;&lt; --"
+);
+std::cout &lt;&lt; "\n  ";
+pushToCout3(makeHelper(), "aaaahhhhh!", 1, 2.5, 'z');
+std::cout &lt;&lt; "\n  ";
+pushToCout3(makeHelper(), 'z', 2.5, 1, "aaaahhhhh!");
                 </defn-code>
                 <defn-head class="defnBorderTop">Output:</defn-head>
                 <defn-code>
-                  -- pushToCout3 -- fold on operator<< --
-                  aaaahhhhh!, 1, 2.5, z
-                  z, 2.5, 1, aaaahhhhh!
+-- pushToCout3 -- fold on operator<< --
+aaaahhhhh!, 1, 2.5, z
+z, 2.5, 1, aaaahhhhh!
                 </defn-code>
               </defn-block>
             </defn-outerBlock>
@@ -849,151 +848,151 @@
               <defn-block>
                 <defn-head>Code: Template Mixins</defn-head>
                 <defn-code>
-                  #include &lt;iostream&gt;
+#include &lt;iostream&gt;
 
-                  namespace Chap7 {
+namespace Chap7 {
 
-                  class A {
-                  public:
-                  A() {
-                  std::cout &lt;&lt; "\n  an A here";
-                  }
-                  A(const A&amp; a) {
-                  std::cout &lt;&lt; "\n  copy A here";
-                  }
-                  virtual ~A() {}
-                  };
+  class A {
+    public:
+    A() {
+      std::cout &lt;&lt; "\n  an A here";
+    }
+    A(const A&amp; a) {
+      std::cout &lt;&lt; "\n  copy A here";
+    }
+    virtual ~A() {}
+  };
 
-                  class B {
-                  public:
-                  B() {
-                  std::cout &lt;&lt; "\n  a B here";
-                  }
-                  B(const B&amp; b) {
-                  std::cout &lt;&lt; "\n  copy B here";
-                  }
-                  virtual ~B() {}
-                  };
+  class B {
+    public:
+    B() {
+      std::cout &lt;&lt; "\n  a B here";
+    }
+    B(const B&amp; b) {
+      std::cout &lt;&lt; "\n  copy B here";
+    }
+    virtual ~B() {}
+  };
 
-                  class C {
-                  public:
-                  C() {
-                  std::cout &lt;&lt; "\n  a C here";
-                  }
-                  C(const C&amp; c) {
-                  std::cout &lt;&lt; "\n  copy C here";
-                  }
-                  virtual ~C() {}
-                  void do_C_op() {
-                  std::cout &lt;&lt;
-                  "\n  doing C's operation";
-                  }
-                  };
+  class C {
+    public:
+    C() {
+      std::cout &lt;&lt; "\n  a C here";
+    }
+    C(const C&amp; c) {
+      std::cout &lt;&lt; "\n  copy C here";
+    }
+    virtual ~C() {}
+    void do_C_op() {
+      std::cout &lt;&lt;
+      "\n  doing C's operation";
+    }
+  };
 
-                  <span class=notice>
-                    template&lt;typename... Mixins&gt;
-                    class D : public Mixins...
-                  </span>
-                  {
-                  private:
-                  bool hasMixins = false;
-                  public:
-                  // D() fails to compile because same as
-                  // D(const Mixins&amp; ... mixins)
-                  // when there are no mixins
-                  // D() {
-                  //   std::cout &lt;&lt; "\n  a D here";
-                  // }
+  <span class=notice>
+    template&lt;typename... Mixins&gt;
+    class D : public Mixins...
+  </span>
+  {
+    private:
+    bool hasMixins = false;
+    public:
+    // D() fails to compile because same as
+    // D(const Mixins&amp; ... mixins)
+    // when there are no mixins
+    // D() {
+    //   std::cout &lt;&lt; "\n  a D here";
+    // }
 
-                  <span class="notice">
-                    D(const Mixins&amp; ... mixins)
-                    : Mixins(mixins)... {
-                    if (sizeof...(mixins) == 0)
-                  </span>
-                  std::cout &lt;&lt; "\n  a D here";
-                  else
-                  {
-                  hasMixins = true;
-                  std::cout &lt;&lt; "\n  copy D here";
-                  }
-                  }
-                  virtual ~D() {}
-                  void say()
-                  {
-                  if (!hasMixins)
-                  std::cout &lt;&lt;
-                  "\n  class D with no mixins here";
-                  else {
-                  std::cout &lt;&lt; "\n  "
-                  &lt;&lt; typeid(this).name();
-                  //std::cout &lt;&lt; "\n  "
-                  //  &lt;&lt; typeid(this).raw_name();
-                  }
-                  C* pC = dynamic_cast&lt;C*&gt;(this);
-                  if (pC)
-                  pC-&gt;do_C_op();
-                  std::cout &lt;&lt; "\n";
-                  }
-                  };
-                  }
+    <span class="notice">
+      D(const Mixins&amp; ... mixins)
+      : Mixins(mixins)... {
+        if (sizeof...(mixins) == 0)
+      </span>
+        std::cout &lt;&lt; "\n  a D here";
+      else
+      {
+        hasMixins = true;
+        std::cout &lt;&lt; "\n  copy D here";
+      }
+    }
+    virtual ~D() {}
+    void say()
+    {
+      if (!hasMixins)
+        std::cout &lt;&lt;
+          "\n  class D with no mixins here";
+      else {
+        std::cout &lt;&lt; "\n  "
+          &lt;&lt; typeid(this).name();
+        //std::cout &lt;&lt; "\n  "
+        //  &lt;&lt; typeid(this).raw_name();
+      }
+      C* pC = dynamic_cast&lt;C*&gt;(this);
+      if (pC)
+        pC-&gt;do_C_op();
+      std::cout &lt;&lt; "\n";
+    }
+  };
+}
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Using Code:</defn-head>
                 <defn-code>
-                  #include "Chap7VariadicClassMixins.h"
+#include "Chap7VariadicClassMixins.h"
 
-                  using namespace Chap7;
+using namespace Chap7;
 
-                  int main()
-                  {
-                  std::cout &lt;&lt;
-                  "\n  Variadic mixin template classes";
-                  std::cout &lt;&lt;
-                  "\n =================================\n";
+int main()
+{
+  std::cout &lt;&lt;
+    "\n  Variadic mixin template classes";
+  std::cout &lt;&lt;
+    "\n =================================\n";
 
-                  A a;
-                  B b;
-                  C c;
-                  D&lt;&gt; d;
-                  d.say();
+  A a;
+  B b;
+  C c;
+  D&lt;&gt; d;
+  d.say();
 
-                  D&lt;A&gt; dA(a);
-                  dA.say();
+  D&lt;A&gt; dA(a);
+  dA.say();
 
-                  D&lt;B, C&gt; dBC(b, c);
-                  dBC.say();
+  D&lt;B, C&gt; dBC(b, c);
+  dBC.say();
 
-                  // Will fail to compile
-                  // - incomplete argument list
-                  // D&lt;B, C&gt; dBC(b);
+  // Will fail to compile
+  // - incomplete argument list
+  // D&lt;B, C&gt; dBC(b);
 
-                  std::cout &lt;&lt; "\n\n";
-                  return 0;
-                  }
+  std::cout &lt;&lt; "\n\n";
+  return 0;
+}
                 </defn-code>
                 <defn-head class="defnBorderTop">Output:</defn-head>
                 <defn-code>
-                  Variadic mixin template classes
-                  =================================
+Variadic mixin template classes
+=================================
 
-                  an A here
-                  a B here
-                  a C here
-                  a D here
-                  class D with no mixins here
+an A here
+a B here
+a C here
+a D here
+class D with no mixins here
 
-                  copy A here
-                  copy D here
-                  class Chap7::D&lt;class Chap7::A&gt; * __ptr64
+copy A here
+copy D here
+class Chap7::D&lt;class Chap7::A&gt; * __ptr64
 
-                  copy B here
-                  copy C here
-                  copy D here
-                  class Chap7::D&lt;
-                  class Chap7::B,class Chap7::C
-                  &gt; * __ptr64
-                  doing C's operation
+copy B here
+copy C here
+copy D here
+class Chap7::D&lt;
+class Chap7::B,class Chap7::C
+&gt; * __ptr64
+doing C's operation
                 </defn-code>
               </defn-block>
             </defn-outerBlock>
@@ -1050,129 +1049,126 @@
               <defn-block>
                 <defn-head>Code: Variadic Class Composition</defn-head>
                 <defn-code>
-                  template&lt;typename ... T&gt;
-                  struct DataStructure {};
+template&lt;typename ... T&gt;
+struct DataStructure {};
 
-                  template&lt;size_t id, typename T&gt;
-                  struct GetHelper;
+template&lt;size_t id, typename T&gt;
+struct GetHelper;
 
-                  template&lt;typename T, typename ... Rest&gt;
-                  struct DataStructure&lt;T, Rest ...&gt;
-                  {
-                  DataStructure(
-                  const T&amp; first, const Rest&amp; ... rest
-                  )
-                  : first(first), rest(rest...)
-                  {}
+template&lt;typename T, typename ... Rest&gt;
+struct DataStructure&lt;T, Rest ...&gt;
+{
+  DataStructure(
+    const T&amp; first, const Rest&amp; ... rest
+  )
+  : first(first), rest(rest...) {}
 
-                  T first;
-                  DataStructure&lt;Rest ... &gt; rest;
+  T first;
+  DataStructure&lt;Rest ... &gt; rest;
 
-                  template&lt;size_t id&gt;
-                  auto get()
-                  {
-                  return GetHelper&lt;
-                  id, DataStructure&lt;T, Rest...&gt;
-                  &gt;::get(*this);
-                  }
-                  };
+  template&lt;size_t id&gt;
+  auto get()
+  {
+    return GetHelper&lt;
+      id, DataStructure&lt;T, Rest...&gt;
+    &gt;::get(*this);
+  }
+};
 
-                  template&lt;typename T, typename ... Rest&gt;
-                  struct GetHelper&lt;
-                  0, DataStructure&lt;T, Rest ... &gt;
-                  &gt;
-                  {
-                  static T get(
-                  DataStructure&lt;T, Rest...&gt;&amp; data
-                  )
-                  {
-                  return data.first;
-                  }
-                  };
+template&lt;typename T, typename ... Rest&gt;
+  struct GetHelper&lt;0, DataStructure&lt;T, Rest ... &gt;
+&gt;
+{
+  static T get(
+    DataStructure&lt;T, Rest...&gt;&amp; data
+  )
+  {
+    return data.first;
+  }
+};
 
-                  template&lt;
-                  size_t id, typename T, typename ... Rest
-                  &gt;
-                  struct GetHelper&lt;
-                  id, DataStructure&lt;T, Rest ... &gt;
-                  &gt;
-                  {
-                  static auto get(
-                  DataStructure&lt;T, Rest...&gt;&amp; data
-                  )
-                  {
-                  return GetHelper&lt;
-                  id - 1,
-                  DataStructure&lt;Rest ...&gt;
-                  &gt;::get(data.rest);
-                  }
-                  };
+template&lt;
+  size_t id, typename T, typename ... Rest
+&gt;
+struct GetHelper&lt;
+  id, DataStructure&lt;T, Rest ... &gt;
+&gt;
+{
+  static auto get(
+    DataStructure&lt;T, Rest...&gt;&amp; data
+  )
+  {
+    return GetHelper&lt;
+      id - 1,
+      DataStructure&lt;Rest ...&gt;
+    &gt;::get(data.rest);
+  }
+};
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Using Code:</defn-head>
                 <defn-code>
-                  #include "Chap7VariadicClassComp.h"
-                  #include "../Display/Display.h"
-                  #include &lt;iostream&gt;
-                  #include &lt;vector&gt;
+#include "Chap7VariadicClassComp.h"
+#include "../Display/Display.h"
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
 
-                  int main()
-                  {
-                  displayTitle(
-                  "Variadic Class Data by Composition"
-                  );
+int main()
+{
+  displayTitle(
+    "Variadic Class Data by Composition"
+  );
 
-                  DataStructure&lt;
-                  int, float, std::string
-                  &gt; data1(1, 2.1, "Hello");
+  DataStructure&lt;
+    int, float, std::string
+  &gt; data1(1, 2.1, "Hello");
 
-                  std::cout &lt;&lt;
-                  "\n  " &lt;&lt; data1.get&lt;0&gt;();
-                  std::cout &lt;&lt;
-                  "\n  " &lt;&lt; data1.get&lt;1&gt;();
-                  std::cout &lt;&lt;
-                  "\n  " &lt;&lt; data1.get&lt;2&gt;();
-                  putline();
+  std::cout &lt;&lt; "\n  " 
+            &lt;&lt; data1.get&lt;0&gt;();
+  std::cout &lt;&lt; "\n  "
+            &lt;&lt; data1.get&lt;1&gt;();
+  std::cout &lt;&lt; "\n  "
+            &lt;&lt; data1.get&lt;2&gt;();
+  putline();
 
-                  DataStructure&lt;
-                  int, float, std::string
-                  &gt; data2{ 2, 3.1, "Hello again" };
-                  std::cout &lt;&lt; "\n  "
-                  &lt;&lt; data2.get&lt;0&gt;();
-                  std::cout &lt;&lt; "\n  "
-                  &lt;&lt; data2.get&lt;1&gt;();
-                  std::cout &lt;&lt; "\n  "
-                  &lt;&lt; data2.get&lt;2&gt;();
-                  putline();
+  DataStructure&lt;
+    int, float, std::string
+  &gt; data2{ 2, 3.1, "Hello again" };
+  std::cout &lt;&lt; "\n  "
+            &lt;&lt; data2.get&lt;0&gt;();
+  std::cout &lt;&lt; "\n  "
+            &lt;&lt; data2.get&lt;1&gt;();
+  std::cout &lt;&lt; "\n  "
+            &lt;&lt; data2.get&lt;2&gt;();
+  putline();
 
-                  DataStructure&lt;std::vector&lt;int&gt;&gt;
-                  data3(std::vector&lt;int&gt;{1, 2, 3, 4, 5});
-                  std::vector&lt;int&gt; out
-                  = data3.get&lt;0&gt;();
-                  std::cout &lt;&lt; "\n  ";
-                  for (auto item : out) {
-                  std::cout &lt;&lt; item &lt;&lt; " ";
-                  }
-                  putline(2);
-                  return 0;
-                  }
+  DataStructure&lt;std::vector&lt;int&gt;&gt;
+  data3(std::vector&lt;int&gt;{1, 2, 3, 4, 5});
+  std::vector&lt;int&gt; out = data3.get&lt;0&gt;();
+  std::cout &lt;&lt; "\n  ";
+  for (auto item : out) {
+    std::cout &lt;&lt; item &lt;&lt; " ";
+  }
+  putline(2);
+  return 0;
+}
                 </defn-code>
                 <defn-head class="defnBorderTop">Output:</defn-head>
                 <defn-code>
 
-                  Variadic Class Data by Composition
-                  ====================================
+ Variadic Class Data by Composition
+====================================
 
-                  1
-                  2.1
-                  Hello
+1
+2.1
+Hello
 
-                  2
-                  3.1
-                  Hello again
+2
+3.1
+Hello again
 
-                  1 2 3 4 5
+1 2 3 4 5
                 </defn-code>
               </defn-block>
             </defn-outerblock>
@@ -1189,42 +1185,36 @@
             <defn-block>
               <defn-head>Code fragment from 1st example:</defn-head>
               <defn-code>
-                <span class=notice>
-                  template&lt;typename... Mixins&gt;
-                  class D : public Mixins...
-                </span>
-                {
-                private:
-                bool hasMixins = false;
-                public:
-                <span class="notice">
-                  D(const Mixins&amp; ... mixins)
-                  : Mixins(mixins)... {
-                  if (sizeof...(mixins) == 0)
-                </span>
-                std::cout &lt;&lt; "\n  a D here";
-                else
-                {
-                hasMixins = true;
-                std::cout &lt;&lt; "\n  copy D here";
-                }
-                }
-                virtual ~D() {}
-                void say()
-                {
-                if (!hasMixins)
-                std::cout &lt;&lt;
-                "\n  class D with no mixins here";
-                else {
-                std::cout &lt;&lt; "\n  "
-                &lt;&lt; typeid(this).name();
-                }
-                C* pC = dynamic_cast&lt;C*&gt;(this);
-                if (pC)
-                pC-&gt;do_C_op();
-                std::cout &lt;&lt; "\n";
-                }
-                };
+template&lt;typename... Mixins&gt;
+class D : public Mixins...
+{
+  private:
+  bool hasMixins = false;
+  public:
+  D(const Mixins&amp; ... mixins)
+    : Mixins(mixins)... {
+    if (sizeof...(mixins) == 0)
+      std::cout &lt;&lt; "\n  a D here";
+    else
+    {
+      hasMixins = true;
+      std::cout &lt;&lt; "\n  copy D here";
+    }
+  }
+  virtual ~D() {}
+  void say()
+  {
+    if (!hasMixins)
+      std::cout &lt;&lt; "\n  class D with no mixins here";
+    else {
+      std::cout &lt;&lt; "\n  " &lt;&lt; typeid(this).name();
+    }
+    C* pC = dynamic_cast&lt;C*&gt;(this);
+    if (pC)
+      pC-&gt;do_C_op();
+    std::cout &lt;&lt; "\n";
+  }
+};
               </defn-code>
             </defn-block>
             <defn-block>
@@ -1277,21 +1267,21 @@
               Type Representation:
             </defn-head>
             <defn-code>
-              template&lt;typename T&gt;
-              struct TypeRep {
-              using type = T;
-              };
+template&lt;typename T&gt;
+struct TypeRep {
+  using type = T;
+};
             </defn-code>
           </defn-block>
           <defn-block>
             <defn-head>Using Code:</defn-head>
             <defn-code>
-              std::cout &lt;&lt; "\n  "
-              &lt;&lt; typeid(TypeRep&lt;double&gt;::type).name();
+std::cout &lt;&lt; "\n  "
+          &lt;&lt; typeid(TypeRep&lt;double&gt;::type).name();
             </defn-code>
             <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
-              double
+double
             </defn-code>
           </defn-block>
         </defn-outerBlock>
@@ -1309,21 +1299,21 @@
               Value Representation:
             </defn-head>
             <defn-code>
-              template&lt;typename T, T v&gt;
-              struct ValueRep {
-              static constexpr T value = v;
-              };
+template&lt;typename T, T v&gt;
+struct ValueRep {
+  static constexpr T value = v;
+};
             </defn-code>
           </defn-block>
           <defn-block>
             <defn-head>Using Code:</defn-head>
             <defn-code>
-              std::cout &lt;&lt; "\n  "
-              &lt;&lt; ValueRep&lt;int, 3&gt;::value;
+std::cout &lt;&lt; "\n  "
+&lt;&lt; ValueRep&lt;int, 3&gt;::value;
             </defn-code>
             <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
-              3
+3
             </defn-code>
           </defn-block>
         </defn-outerBlock>
@@ -1338,24 +1328,24 @@
               Expression Representation:
             </defn-head>
             <defn-code>
-              template&lt;typename T, T v&gt;
-              struct ExpressionRep {
-              using type = T;
-              static constexpr T value = v;
-              constexpr operator T() { return v; }
-              };
+template&lt;typename T, T v&gt;
+struct ExpressionRep {
+  using type = T;
+  static constexpr T value = v;
+  constexpr operator T() { return v; }
+};
             </defn-code>
           </defn-block>
           <defn-block>
             <defn-head>Using Code:</defn-head>
             <defn-code>
-              std::cout &lt;&lt; "\n  "
-              &lt;&lt; typeid(ExpressionRep&lt;int, 3&gt;::type).name()
-              &lt;&lt; ", " &lt;&lt; ExpressionRep&lt;int, 3&gt;::value;
+std::cout &lt;&lt; "\n  "
+          &lt;&lt; typeid(ExpressionRep&lt;int, 3&gt;::type).name()
+          &lt;&lt; ", " &lt;&lt; ExpressionRep&lt;int, 3&gt;::value;
             </defn-code>
             <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
-              int, 3
+int, 3
             </defn-code>
           </defn-block>
         </defn-outerBlock>
@@ -1380,39 +1370,39 @@
               Another Expression Representation:
             </defn-head>
             <defn-code>
-              template&lt;typename T, T v&gt;
-              struct ExpRep2 {
-              using type = T;
-              static constexpr T value = v;
-              constexpr operator T() { return v; }
-              static constexpr T get() { return v; }
-              static constexpr T addOne() { return (v + 1); }
-              static constexpr T subOne() { return (v - 1); }
-              };
+template&lt;typename T, T v&gt;
+struct ExpRep2 {
+  using type = T;
+  static constexpr T value = v;
+  constexpr operator T() { return v; }
+  static constexpr T get() { return v; }
+  static constexpr T addOne() { return (v + 1); }
+  static constexpr T subOne() { return (v - 1); }
+};
             </defn-code>
           </defn-block>
           <defn-block>
             <defn-head>Using Code:</defn-head>
             <defn-code>
-              constexpr int v = 0;
-              std::cout &lt;&lt; "\n  "
-              &lt;&lt; typeid(ExpRep2&lt;size_t, v&gt;).name()
-              &lt;&lt; ", "
-              &lt;&lt; ExpRep2&lt;size_t, v&gt;::get();
-              std::cout &lt;&lt; "\n  "
-              &lt;&lt; ExpRep2&lt;int, v&gt;::addOne();
-              std::cout &lt;&lt; "\n  "
-              &lt;&lt; ExpRep2&lt;int, v&gt;();
-              std::cout &lt;&lt; "\n  "
-              &lt;&lt; ExpRep2&lt;int, v&gt;::subOne();
+constexpr int v = 0;
+std::cout &lt;&lt; "\n  "
+          &lt;&lt; typeid(ExpRep2&lt;size_t, v&gt;).name()
+          &lt;&lt; ", "
+          &lt;&lt; ExpRep2&lt;size_t, v&gt;::get();
+std::cout &lt;&lt; "\n  "
+          &lt;&lt; ExpRep2&lt;int, v&gt;::addOne();
+std::cout &lt;&lt; "\n  "
+          &lt;&lt; ExpRep2&lt;int, v&gt;();
+std::cout &lt;&lt; "\n  "
+          &lt;&lt; ExpRep2&lt;int, v&gt;::subOne();
             </defn-code>
             <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
-              struct ExpRep2<unsigned __int64,0>
-                , 0
-                1
-                0
-                -1
+struct ExpRep2<unsigned __int64,0>
+  , 0
+  1
+  0
+  -1
             </defn-code>
           </defn-block>
         </defn-outerBlock>
@@ -1439,14 +1429,14 @@
               <a href="http://www.cplusplus.com/reference/type_traits/integral_constant/">cplusplus.com</a>
             </defn-head>
             <defn-code>
-              template &lt;class T, T v&gt;
-              struct integral_constant {
-              static constexpr T value = v;
-              typedef T value_type;
-              typedef integral_constant&lt;T,v&gt; type;
-              constexpr operator T() const noexcept { return v; }
-              constexpr T operator()() const noexcept { return v; }
-              };
+template &lt;class T, T v&gt;
+struct integral_constant {
+  static constexpr T value = v;
+  typedef T value_type;
+  typedef integral_constant&lt;T,v&gt; type;
+  constexpr operator T() const noexcept { return v; }
+  constexpr T operator()() const noexcept { return v; }
+};
             </defn-code>
           </defn-block>
         </defn-outerBlock>
@@ -1472,28 +1462,28 @@
           <defn-block>
             <defn-head>Defining a type trait:</defn-head>
             <defn-code>
-              typedef integral_const&lt;bool, false&gt; false_type;
-              typedef integral_const&lt;bool, true&gt; true_type;
+typedef integral_const&lt;bool, false&gt; false_type;
+typedef integral_const&lt;bool, true&gt; true_type;
 
-              /* generic type is false */
-              template&lt;typename T&gt;
-              struct is_void : std::false_type {};
+/* generic type is false */
+template&lt;typename T&gt;
+struct is_void : std::false_type {};
 
-              /* specialization for void is true */
-              template&lt;&gt;
-              struct is_void&lt;void&gt; : std::true_type {};
+/* specialization for void is true */
+template&lt;&gt;
+struct is_void&lt;void&gt; : std::true_type {};
             </defn-code>
           </defn-block>
           <defn-block>
             <defn-head>Using Code:</defn-head>
             <defn-code>
-              std::cout << "\n  " << is_void&lt;void&gt;::value;
-              std::cout << "\n  " << is_void&lt;int&gt;::value;
+std::cout << "\n  " << is_void&lt;void&gt;::value;
+std::cout << "\n  " << is_void&lt;int&gt;::value;
             </defn-code>
             <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
-              true
-              false
+true
+false
             </defn-code>
           </defn-block>
         </defn-outerBlock>
@@ -1524,52 +1514,51 @@
           <defn-block>
             <defn-head>Custom type_trait is_vector</defn-head>
             <defn-code>
-              namespace impl {
-              template&lt;typename T&gt; struct
-              is_vector : std::false_type {};
-              template &lt;typename... Args&gt; struct
-              is_vector&lt;
-              std::vector&lt;Args...&gt;
-              &gt;:std::true_type {};
-              }
-              template&lt;typename T&gt; struct is_vector {
-              static constexpr bool const value =
-              impl::is_vector&lt;std::decay_t&lt;T &gt;&gt;::value;
-              };
+namespace impl {
+  template&lt;typename T&gt; struct
+  is_vector : std::false_type {};
+  template &lt;typename... Args&gt; struct
+  is_vector&lt;
+  std::vector&lt;Args...&gt;
+  &gt;:std::true_type {};
+}
+template&lt;typename T&gt; struct is_vector {
+  static constexpr bool const value =
+    impl::is_vector&lt;std::decay_t&lt;T &gt;&gt;::value;
+};
 
-              /*-----------------------------------------------------
-              The core part of the definition is in impl namespace.
-              That is then used in the final definition, stripping
-              cvr qualifiers from T with std::decay_t&lt;T&gt;.
+/*-----------------------------------------------------
+  The core part of the definition is in impl namespace.
+  That is then used in the final definition, stripping
+  cvr qualifiers from T with std::decay_t&lt;T&gt;.
 
-              Namespace impl is needed to avoid an infinite recurse
-              in that final definition fix-up.
-              -----------------------------------------------------*/
+  Namespace impl is needed to avoid an infinite recurse
+  in that final definition fix-up.
+-----------------------------------------------------*/
             </defn-code>
           </defn-block>
           <defn-block>
             <defn-head>Using Code:</defn-head>
             <defn-code>
-              displayDemo("--- is_vector ---");
-              std::cout &lt;&lt; "\n  "
-              &lt;&lt; is_vector&lt;
-              std::vector&lt;int&gt;
-              &gt;::value;
-              std::cout &lt;&lt; "\n  "
-              &lt;&lt; is_vector&lt;
-              std::vector&lt;double&gt;
-              &gt;::value;
-              std::cout &lt;&lt; "\n  "
-              &lt;&lt; is_vector&lt;
-              std::unordered_map&lt;int, std::string&gt;
-              &gt;::value;
+displayDemo("--- is_vector ---");
+std::cout &lt;&lt; "\n  "
+          &lt;&lt; is_vector&lt;std::vector&lt;int&gt;
+&gt;::value;
+std::cout &lt;&lt; "\n  "
+          &lt;&lt; is_vector&lt;
+std::vector&lt;double&gt;
+&gt;::value;
+std::cout &lt;&lt; "\n  "
+          &lt;&lt; is_vector&lt;
+std::unordered_map&lt;int, std::string&gt;
+&gt;::value;
             </defn-code>
             <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
-              --- is_vector ---
-              true
-              true
-              false
+--- is_vector ---
+true
+true
+false
             </defn-code>
           </defn-block>
         </defn-outerBlock>
@@ -1604,30 +1593,30 @@
           <defn-block>
             <defn-head>constexpr if</defn-head>
             <defn-code>
-              if constexpr(pred) {
-              /* compiled only if code for pred == true */
-              }
-              else {
-              /* compiled only if code for pred == false */
-              }
+if constexpr(pred) {
+  /* compiled only if code for pred == true */
+}
+else {
+  /* compiled only if code for pred == false */
+}
             </defn-code>
           </defn-block>
           <defn-block>
             <defn-head>Example:</defn-head>
             <defn-code>
-              /*---------------------------------
-              suppose function has to deal
-              with vectors and stacks
-              */
+/*---------------------------------
+  suppose function has to deal
+  with vectors and stacks
+*/
 
-              /* assumes v is know in code body */
+/* assumes v is know in code body */
 
-              if constexpr(is_vector&lt;T&gt;) {
-              T.push_back(v);
-              }
-              else {
-              T.push(v);
-              }
+if constexpr(is_vector&lt;T&gt;) {
+  T.push_back(v);
+}
+else {
+  T.push(v);
+}
           </defn-block>
         </defn-outerBlock>
         <t-b>
@@ -1646,51 +1635,51 @@
           <defn-block>
             <defn-head>std::enable_if</defn-head>
             <defn-code>
-              template &lt;
-              class T,
-              class std::enable_if&lt;
-              std::is_integral&lt;T&gt;::value, T
-              &gt;::type * = nullptr
-              &gt;
-              void do_stuff(T&amp; t) {
-              std::cout &lt;&lt;
-              "\n  doing integral stuff with type "
-              &lt;&lt; typeid(t).name();
-              }
+template &lt;
+  class T,
+  class std::enable_if&lt;
+    std::is_integral&lt;T&gt;::value, T
+  &gt;::type * = nullptr
+&gt;
+void do_stuff(T&amp; t) {
+  std::cout &lt;&lt;
+    "\n  doing integral stuff with type "
+    &lt;&lt; typeid(t).name();
+}
 
-              template &lt;
-              class T,
-              class std::enable_if&lt;
-              std::is_class&lt;T&gt;::value, T
-              &gt;::type * = nullptr
-              &gt;
-              void do_stuff(T&amp; t) {
-              std::cout &lt;&lt;
-              "\n  doing class stuff with type "
-              &lt;&lt; typeid(t).name();
-              }
+template &lt;
+  class T,
+  class std::enable_if&lt;
+    std::is_class&lt;T&gt;::value, T
+  &gt;::type * = nullptr
+&gt;
+void do_stuff(T&amp; t) {
+  std::cout &lt;&lt;
+    "\n  doing class stuff with type "
+    &lt;&lt; typeid(t).name();
+}
             </defn-code>
           </defn-block>
           <defn-block>
             <defn-head>Using Code:</defn-head>
             <defn-code>
-              displayDemo("--- enable_if ---");
-              class X {};
-              X x;
-              int i = 42;
-              do_stuff(i);
-              do_stuff(x);
-              std::string s("a string");
-              do_stuff(s);
+displayDemo("--- enable_if ---");
+class X {};
+X x;
+int i = 42;
+do_stuff(i);
+do_stuff(x);
+std::string s("a string");
+do_stuff(s);
             </defn-code>
             <defn-head class="defnBorderTop">Output:</defn-head>
             <defn-code>
-              --- enable_if ---
-              doing integral stuff with type int
-              doing class stuff with type
-              class `int __cdecl main(void)'::`2'::X
-              doing class stuff with type
-              class std::basic_string&lt;char,struct ...
+--- enable_if ---
+doing integral stuff with type int
+doing class stuff with type
+  class `int __cdecl main(void)'::`2'::X
+doing class stuff with type
+  class std::basic_string&lt;char,struct ...
             </defn-code>
           </defn-block>
         </defn-outerBlock>
@@ -1714,243 +1703,242 @@
               <defn-block>
                 <defn-head>Code Fragment: Chap7TypeTraits.h</defn-head>
                 <defn-code>
-                  /* ----------------------------------------------
-                  define type traits not supplied by
-                  the standard type_traits library
-                  */
+/* ----------------------------------------------
+  define type traits not supplied by
+  the standard type_traits library
+*/
 
-                  namespace impl {
+namespace impl {
 
-                  template&lt;typename T&gt;
-                  struct is_pair :std::false_type {};
-                  template &lt;typename... Args&gt;
-                  struct is_pair &lt; std::pair&lt;Args...&gt;&gt;
-                  :std::true_type {};
+  template&lt;typename T&gt;
+  struct is_pair :std::false_type {};
+  template &lt;typename... Args&gt;
+  struct is_pair &lt; std::pair&lt;Args...&gt;&gt;
+  :std::true_type {};
 
-                  template&lt;typename T&gt;
-                  struct is_tuple :std::false_type {};
-                  template &lt;typename... Args&gt; struct is_tuple &lt;
-                  std::tuple&lt;Args...&gt;
-                  &gt; :std::true_type {};
+  template&lt;typename T&gt;
+  struct is_tuple :std::false_type {};
+  template &lt;typename... Args&gt; struct is_tuple &lt;
+  std::tuple&lt;Args...&gt;
+  &gt; :std::true_type {};
 
-                  template&lt;typename T&gt;
-                  struct is_array :std::false_type {};
-                  template &lt;typename T, size_t N&gt;
-                  struct is_array &lt; std::array&lt;T, N&gt;&gt;
-                  :std::true_type {};
+  template&lt;typename T&gt;
+  struct is_array :std::false_type {};
+  template &lt;typename T, size_t N&gt;
+  struct is_array &lt; std::array&lt;T, N&gt;&gt;
+  :std::true_type {};
 
-                  template&lt;typename T&gt;
-                  struct is_basic_string :std::false_type {};
-                  template &lt;typename... Args&gt;
-                  struct is_basic_string &lt;
-                  std::basic_string&lt;Args...&gt;
-                  &gt; :std::true_type {};
+  template&lt;typename T&gt;
+  struct is_basic_string :std::false_type {};
+  template &lt;typename... Args&gt;
+  struct is_basic_string &lt;
+  std::basic_string&lt;Args...&gt;
+  &gt; :std::true_type {};
 
-                  template&lt;typename T&gt;
-                  struct is_vector :std::false_type {};
-                  template &lt;typename... Args&gt;
-                  struct is_vector &lt; std::vector&lt;Args...&gt;&gt;
-                  :std::true_type {};
+  template&lt;typename T&gt;
+  struct is_vector :std::false_type {};
+  template &lt;typename... Args&gt;
+  struct is_vector &lt; std::vector&lt;Args...&gt;&gt;
+  :std::true_type {};
 
-                  template&lt;typename T&gt;
-                  struct is_deque :std::false_type {};
-                  template &lt;typename... Args&gt;
-                  struct is_deque &lt; std::deque&lt;Args...&gt;&gt;
-                  :std::true_type {};
+  template&lt;typename T&gt;
+  struct is_deque :std::false_type {};
+  template &lt;typename... Args&gt;
+  struct is_deque &lt; std::deque&lt;Args...&gt;&gt;
+  :std::true_type {};
 
-                  /* code elided */
+  /* code elided */
 
-                  template&lt;typename T&gt;
-                  struct is_priority_queue :std::false_type {};
-                  template &lt;typename... Args&gt;
-                  struct is_priority_queue &lt;
-                  std::priority_queue&lt;Args...&gt;
-                  &gt; :std::true_type {};
-                  }
+  template&lt;typename T&gt;
+  struct is_priority_queue :std::false_type {};
+  template &lt;typename... Args&gt;
+  struct is_priority_queue &lt;
+  std::priority_queue&lt;Args...&gt;
+  &gt; :std::true_type {};
+}
 
-                  template&lt;typename T&gt; struct is_pair {
-                  static constexpr bool const value =
-                  impl::is_pair&lt;std::decay_t&lt;T &gt;&gt; ::value;
-                  };
+template&lt;typename T&gt; struct is_pair {
+  static constexpr bool const value =
+  impl::is_pair&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
 
-                  template&lt;typename T&gt; struct is_tuple {
-                  static constexpr bool const value =
-                  impl::is_tuple&lt;std::decay_t&lt;T &gt;&gt; ::value;
-                  };
+template&lt;typename T&gt; struct is_tuple {
+  static constexpr bool const value =
+  impl::is_tuple&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
 
-                  template&lt;typename T&gt;
-                  struct is_string :std::false_type {};
-                  template&lt;&gt; struct is_string&lt;std::string&gt;
-                  : std::true_type {};
+template&lt;typename T&gt;
+struct is_string :std::false_type {};
+template&lt;&gt; struct is_string&lt;std::string&gt;
+: std::true_type {};
 
-                  template&lt;typename T&gt; struct is_array {
-                  static constexpr bool const value =
-                  impl::is_array&lt;std::decay_t&lt;T &gt;&gt; ::value;
-                  };
+template&lt;typename T&gt; struct is_array {
+  static constexpr bool const value =
+  impl::is_array&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
 
-                  template&lt;typename T&gt; struct is_basic_string {
-                  static constexpr bool const value =
-                  impl::is_basic_string&lt;
-                  std::decay_t&lt;T &gt;
-                  &gt; ::value;
-                  };
+template&lt;typename T&gt; struct is_basic_string {
+  static constexpr bool const value =
+    impl::is_basic_string&lt;
+  std::decay_t&lt;T &gt;&gt; ::value;
+};
 
-                  template&lt;typename T&gt; struct is_vector {
-                  static constexpr bool const value =
-                  impl::is_vector&lt;std::decay_t&lt;T &gt;&gt; ::value;
-                  };
+template&lt;typename T&gt; struct is_vector {
+  static constexpr bool const value =
+  impl::is_vector&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
 
-                  template&lt;typename T&gt; struct is_deque {
-                  static constexpr bool const value =
-                  impl::is_deque&lt;std::decay_t&lt;T &gt;&gt; ::value;
-                  };
+template&lt;typename T&gt; struct is_deque {
+  static constexpr bool const value =
+  impl::is_deque&lt;std::decay_t&lt;T &gt;&gt; ::value;
+};
 
-                  /* code elided */
+/* code elided */
 
-                  template&lt;typename T&gt; struct is_priority_queue {
-                  static constexpr bool const value =
-                  impl::is_priority_queue&lt;
-                  std::decay_t&lt;T &gt;
-                  &gt; ::value;
-                  };
+template&lt;typename T&gt; struct is_priority_queue {
+  static constexpr bool const value =
+  impl::is_priority_queue&lt;
+  std::decay_t&lt;T &gt;
+  &gt; ::value;
+};
 
-                  template&lt;typename T&gt;
-                  using is_seqcont = std::integral_constant&lt;
-                  bool,
-                  is_array&lt;T&gt;::value ||
-                  is_string&lt;T&gt;::value ||
-                  is_basic_string&lt;T&gt;::value ||
-                  is_vector&lt;T&gt;::value ||
-                  is_deque&lt;T&gt;::value ||
-                  is_forward_list&lt;T&gt;::value ||
-                  is_list&lt;T&gt;::value
-                  &gt;;
+template&lt;typename T&gt;
+  using is_seqcont = std::integral_constant&lt;
+  bool,
+  is_array&lt;T&gt;::value ||
+  is_string&lt;T&gt;::value ||
+  is_basic_string&lt;T&gt;::value ||
+  is_vector&lt;T&gt;::value ||
+  is_deque&lt;T&gt;::value ||
+  is_forward_list&lt;T&gt;::value ||
+  is_list&lt;T&gt;::value
+&gt;;
 
-                  template&lt;typename T&gt;
-                  using is_assoccont = std::integral_constant&lt;
-                  bool,
-                  is_set&lt;T&gt;::value ||
-                  is_multiset&lt;T&gt;::value ||
-                  is_map&lt;T&gt;::value ||
-                  is_multimap&lt;T&gt;::value ||
-                  is_unordered_set&lt;T&gt;::value ||
-                  is_unordered_multiset&lt;T&gt;::value ||
-                  is_unordered_map&lt;T&gt;::value ||
-                  is_unordered_multimap&lt;T&gt;::value
-                  &gt;;
+template&lt;typename T&gt;
+  using is_assoccont = std::integral_constant&lt;
+  bool,
+  is_set&lt;T&gt;::value ||
+  is_multiset&lt;T&gt;::value ||
+  is_map&lt;T&gt;::value ||
+  is_multimap&lt;T&gt;::value ||
+  is_unordered_set&lt;T&gt;::value ||
+  is_unordered_multiset&lt;T&gt;::value ||
+  is_unordered_map&lt;T&gt;::value ||
+  is_unordered_multimap&lt;T&gt;::value
+&gt;;
 
-                  template&lt;typename T&gt;
-                  using is_adaptercont = std::integral_constant&lt;
-                  bool,
-                  is_stack&lt;T&gt;::value ||
-                  is_queue&lt;T&gt;::value ||
-                  is_priority_queue&lt;T&gt;::value
-                  &gt;;
+template&lt;typename T&gt;
+  using is_adaptercont = std::integral_constant&lt;
+  bool,
+  is_stack&lt;T&gt;::value ||
+  is_queue&lt;T&gt;::value ||
+  is_priority_queue&lt;T&gt;::value
+&gt;;
+
                 </defn-code>
               </defn-block>
               <defn-block>
                 <defn-head>Using Code: Chap7TypeTraits.cpp</defn-head>
                 <defn-code>
-                  #include "Chap7TypeTraits.h"
-                  #include "../Chapter7-Display/Chap7Display.h"
+#include "Chap7TypeTraits.h"
+#include "../Chapter7-Display/Chap7Display.h"
 
-                  /* code elided */
+/* code elided */
 
-                  int main() {
+int main() {
 
-                  /* code elided */
+  /* code elided */
 
-                  displayDemo("--- is_vector ---");
-                  std::cout &lt;&lt; "\n  "
-                  &lt;&lt; is_vector&lt;std::vector&lt;int&gt;&gt;::value;
-                  std::cout &lt;&lt; "\n  "
-                  &lt;&lt; is_vector&lt;std::vector&lt;double&gt;&gt;::value;
-                  std::cout &lt;&lt; "\n  "
-                  &lt;&lt; is_vector&lt;
-                  std::unordered_map&lt;int, std::string&gt;
-                  &gt;::value;
+  displayDemo("--- is_vector ---");
+  std::cout &lt;&lt; "\n  "
+            &lt;&lt; is_vector&lt;std::vector&lt;int&gt;&gt;::value;
+  std::cout &lt;&lt; "\n  "
+            &lt;&lt; is_vector&lt;std::vector&lt;double&gt;&gt;::value;
+  std::cout &lt;&lt; "\n  "
+            &lt;&lt; is_vector&lt;
+  std::unordered_map&lt;int, std::string&gt;&gt;::value;
 
-                  displayDemo("--- enable_if ---");
-                  class X {};
-                  X x;
-                  int i = 42;
-                  do_stuff(i);
-                  do_stuff(x);
-                  std::string s("a string");
-                  do_stuff(s);
-                  std::cout &lt;&lt; "\n\n";
+  displayDemo("--- enable_if ---");
+  class X {};
+  X x;
+  int i = 42;
+  do_stuff(i);
+  do_stuff(x);
+  std::string s("a string");
+  do_stuff(s);
+  std::cout &lt;&lt; "\n\n";
 
-                  displayDemo("--- std containers ---");
-                  testSTL_Traits(std::array&lt;int, 1&gt;{1});
-                  testSTL_Traits(std::string{});
-                  testSTL_Traits(std::basic_string&lt;char&gt;{""});
-                  testSTL_Traits(std::vector&lt;int&gt;{});
-                  testSTL_Traits(std::deque&lt;int&gt;{});
-                  testSTL_Traits(std::forward_list&lt;int&gt;{});
-                  testSTL_Traits(std::list&lt;int&gt;{});
-                  testSTL_Traits(std::set&lt;int&gt;{});
-                  testSTL_Traits(std::multiset&lt;int&gt;{});
-                  testSTL_Traits(std::map&lt;int,int&gt;{});
-                  testSTL_Traits(std::multimap&lt;int,int&gt;{});
-                  testSTL_Traits(std::unordered_set&lt;int&gt;{});
-                  testSTL_Traits(std::unordered_multiset&lt;int&gt;{});
-                  testSTL_Traits(std::unordered_map&lt;int, int&gt;{});
-                  testSTL_Traits(std::unordered_multimap&lt;int, int&gt;{});
-                  testSTL_Traits(std::stack&lt;int&gt;{});
-                  testSTL_Traits(std::queue&lt;int&gt;{});
-                  testSTL_Traits(std::priority_queue&lt;int&gt;{});
-                  putline(2);
-                  }
+  displayDemo("--- std containers ---");
+  testSTL_Traits(std::array&lt;int, 1&gt;{1});
+  testSTL_Traits(std::string{});
+  testSTL_Traits(std::basic_string&lt;char&gt;{""});
+  testSTL_Traits(std::vector&lt;int&gt;{});
+  testSTL_Traits(std::deque&lt;int&gt;{});
+  testSTL_Traits(std::forward_list&lt;int&gt;{});
+  testSTL_Traits(std::list&lt;int&gt;{});
+  testSTL_Traits(std::set&lt;int&gt;{});
+  testSTL_Traits(std::multiset&lt;int&gt;{});
+  testSTL_Traits(std::map&lt;int,int&gt;{});
+  testSTL_Traits(std::multimap&lt;int,int&gt;{});
+  testSTL_Traits(std::unordered_set&lt;int&gt;{});
+  testSTL_Traits(std::unordered_multiset&lt;int&gt;{});
+  testSTL_Traits(std::unordered_map&lt;int, int&gt;{});
+  testSTL_Traits(std::unordered_multimap&lt;int, int&gt;{});
+  testSTL_Traits(std::stack&lt;int&gt;{});
+  testSTL_Traits(std::queue&lt;int&gt;{});
+  testSTL_Traits(std::priority_queue&lt;int&gt;{});
+  putline(2);
+}
                 </defn-code>
                 <defn-head class="defnBorderTop">Output:</defn-head>
                 <defn-code>
-                  /* output elided */
+/* output elided */
 
-                  --- std containers ---
-                  is sequential container
-                  is array: class std::array&lt;int,1&gt;
-                  is sequential container
-                  is std::string:
-                  class std::basic_string&lt;char,struct std::char ...
-                  is std::basic_string:
-                  class std::basic_string&lt;char,struct std::char ...
-                  is sequential container
-                  is std::string:
-                  class std::basic_string&lt;char,struct std::char_ ...
-                  is std::basic_string:
-                  class std::basic_string&lt;char,struct std::char_ ...
-                  is sequential container
-                  is std::vector:
-                  class std::vector&lt;int,class std::allocator&lt; ...
-                  is sequential container
-                  is std::deque:
-                  class std::deque&lt;int,class std::allocator&lt;i ...
-                  is sequential container
-                  is std::forward_list: class std::forward_list&lt;in ...
-                  is sequential container
-                  is std::list: class std::list&lt;int,class std::all ...
-                  is associative container
-                  is std::set: class std::set&lt;int,struct std::less ...
-                  is associative container
-                  is std::multiset: class std::multiset&lt;int,struct ...
-                  is associative container
-                  is std::map: class std::map&lt;int,int,struct std:: ...
-                  is associative container
-                  is std::multimap: class std::multimap&lt;int,int,st ...
-                  is associative container
-                  is std::unordered_set: class std::unordered_set&lt; ...
-                  is associative container
-                  is std::unordered_multiset: class std::unordered_mu ...
-                  is associative container
-                  is std::unordered_map: class std::unordered_map&lt; ...
-                  is associative container
-                  is std::unordered_multimap: class std::unordered_mu ...
-                  is adapter container
-                  is std::stack: class std::stack&lt;int,class std::d ...
-                  is adapter container
-                  is std::queue: class std::queue&lt;int,class std::d ...
-                  is adapter container
-                  is std::priority_queue: class std::priority_queue&l ...
+--- std containers ---
+is sequential container
+is array: class std::array&lt;int,1&gt;
+is sequential container
+is std::string:
+class std::basic_string&lt;char,struct std::char ...
+is std::basic_string:
+class std::basic_string&lt;char,struct std::char ...
+is sequential container
+is std::string:
+class std::basic_string&lt;char,struct std::char_ ...
+is std::basic_string:
+class std::basic_string&lt;char,struct std::char_ ...
+is sequential container
+is std::vector:
+class std::vector&lt;int,class std::allocator&lt; ...
+is sequential container
+is std::deque:
+class std::deque&lt;int,class std::allocator&lt;i ...
+is sequential container
+is std::forward_list: class std::forward_list&lt;in ...
+is sequential container
+is std::list: class std::list&lt;int,class std::all ...
+is associative container
+is std::set: class std::set&lt;int,struct std::less ...
+is associative container
+is std::multiset: class std::multiset&lt;int,struct ...
+is associative container
+is std::map: class std::map&lt;int,int,struct std:: ...
+is associative container
+is std::multimap: class std::multimap&lt;int,int,st ...
+is associative container
+is std::unordered_set: class std::unordered_set&lt; ...
+is associative container
+is std::unordered_multiset: class std::unordered_mu ...
+is associative container
+is std::unordered_map: class std::unordered_map&lt; ...
+is associative container
+is std::unordered_multimap: class std::unordered_mu ...
+is adapter container
+is std::stack: class std::stack&lt;int,class std::d ...
+is adapter container
+is std::queue: class std::queue&lt;int,class std::d ...
+is adapter container
+is std::priority_queue: class std::priority_queue&l ...
                 </defn-code>
               </defn-block>
             </defn-outerBlock>
@@ -1971,298 +1959,298 @@
             <defn-block>
               <defn-head>Code Fragment: Chap7Display.h</defn-head>
               <defn-code>
-                #include "../Chapter7-TypeTraits/Chap7TypeTraits.h"
-                //#include "../CustomTraits/CustomTraits.h"
-                #include &lt;iostream&gt;
-                #include &lt;typeinfo&gt;
+#include "../Chapter7-TypeTraits/Chap7TypeTraits.h"
+//#include "../CustomTraits/CustomTraits.h"
+#include &lt;iostream&gt;
+#include &lt;typeinfo&gt;
 
-                inline auto putline = [](
-                size_t n = 1, const std::string&amp; msg = ""
-                ) {
-                for (size_t i = 0; i &lt; n; ++i) {
-                std::cout &lt;&lt; "\n";
-                }
-                if (msg.size() &gt; 0)
-                std::cout &lt;&lt; msg;
-                };
+inline auto putline = [](
+  size_t n = 1, const std::string&amp; msg = ""
+) {
+  for (size_t i = 0; i &lt; n; ++i) {
+    std::cout &lt;&lt; "\n";
+  }
+  if (msg.size() &gt; 0)
+    std::cout &lt;&lt; msg;
+};
 
-                inline void displayTitle(const std::string&amp; title)
-                {
-                std::cout &lt;&lt; "\n  " &lt;&lt; title;
-                std::cout &lt;&lt; "\n "
-                &lt;&lt; std::string(title.size() + 2, '=')
-                &lt;&lt; std::endl;
-                }
-                inline void displaySubtitle(const std::string&amp; title)
-                {
-                std::cout &lt;&lt; "\n  " &lt;&lt; title;
-                std::cout &lt;&lt; "\n "
-                &lt;&lt; std::string(title.size() + 2, '-');
-                }
-                inline void displayDemo(const std::string&amp; msg)
-                {
-                std::cout &lt;&lt; "\n  " &lt;&lt; msg;
-                }
+inline void displayTitle(const std::string&amp; title)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; title;
+  std::cout &lt;&lt; "\n "
+            &lt;&lt; std::string(title.size() + 2, '=')
+            &lt;&lt; std::endl;
+}
+inline void displaySubtitle(const std::string&amp; title)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; title;
+  std::cout &lt;&lt; "\n "
+            &lt;&lt; std::string(title.size() + 2, '-');
+}
+inline void displayDemo(const std::string&amp; msg)
+{
+  std::cout &lt;&lt; "\n  " &lt;&lt; msg;
+}
 
-                /*---- display selected type values ----*/
+/*---- display selected type values ----*/
 
-                // https://stackoverflow.com/questions/1198260/
-                // how-can-you-iterate-over-the-elements-of-an-stdtuple
+// https://stackoverflow.com/questions/1198260/
+// how-can-you-iterate-over-the-elements-of-an-stdtuple
 
-                template&lt;std::size_t I = 0, typename... Tp&gt;
-                inline typename std::enable_if&lt;
-                I == sizeof...(Tp), void
-                &gt;::type
-                displayTuple(const std::tuple&lt;Tp...&gt;&amp; t) { }
+template&lt;std::size_t I = 0, typename... Tp&gt;
+inline typename std::enable_if&lt;
+  I == sizeof...(Tp), void
+&gt;::type
+displayTuple(const std::tuple&lt;Tp...&gt;&amp; t) { }
 
-                template&lt;std::size_t I = 0, typename... Tp&gt;
-                inline typename std::enable_if &lt;
-                I &lt; sizeof...(Tp), void
-                &gt;::type
-                displayTuple(const std::tuple&lt;Tp...&gt; &amp; t)
-                {
-                std::cout &lt;&lt; std::get&lt;I&gt;(t) &lt;&lt; " ";
-                displayTuple&lt;I + 1, Tp...&gt;(t);
-                }
+template&lt;std::size_t I = 0, typename... Tp&gt;
+inline typename std::enable_if &lt;
+  I &lt; sizeof...(Tp), void
+&gt;::type
+displayTuple(const std::tuple&lt;Tp...&gt; &amp; t)
+{
+  std::cout &lt;&lt; std::get&lt;I&gt;(t) &lt;&lt; " ";
+  displayTuple&lt;I + 1, Tp...&gt;(t);
+}
 
 
-                template &lt;typename T&gt;
-                void displayValues(
-                const std::initializer_list&lt;T&gt;&amp; lst,
-                const std::string&amp; msg = "",
-                std::string prefix = "\n  "
-                )
-                {
-                for (auto item : lst)
-                {
-                try {
-                if constexpr (
-                std::is_scalar&lt;T&gt;::value ||
-                is_string&lt;T&gt;::value
-                )
-                {
-                std::cout &lt;&lt; prefix &lt;&lt; item;
-                }
-                else if constexpr (is_pair&lt;T&gt;::value)
-                {
-                std::cout &lt;&lt; prefix
-                &lt;&lt; "{ "
-                &lt;&lt; item.first
-                &lt;&lt; ", "
-                &lt;&lt; item.second
-                &lt;&lt; " }";
-                }
-                else if constexpr (is_tuple&lt;T&gt;::value)
-                {
-                std::cout &lt;&lt; prefix;
-                displayTuple(item);
-                }
-                else if constexpr (is_vector&lt;T&gt;::value)
-                {
-                for (auto elem : item)
-                {
-                displayValues({ elem }, "", prefix);
-                prefix = ", ";
-                }
-                }
-                else if constexpr (
-                is_unordered_map&lt;T&gt;::value
-                )
-                {
-                for (auto elem : item)
-                {
-                std::cout &lt;&lt; prefix
-                &lt;&lt; "{ "
-                &lt;&lt; elem.first
-                &lt;&lt; ", "
-                &lt;&lt; elem.second
-                &lt;&lt; " }";
-                }
-                }
-                prefix = ", ";
-                if (msg.size() &gt; 0)
-                std::cout &lt;&lt; msg;
-                }
-                catch (std::exception &amp; ex)
-                {
-                std::cout &lt;&lt; "\n  "
+template &lt;typename T&gt;
+void displayValues(
+  const std::initializer_list&lt;T&gt;&amp; lst,
+  const std::string&amp; msg = "",
+  std::string prefix = "\n  "
+)
+{
+  for (auto item : lst)
+  {
+    try {
+      if constexpr (
+        std::is_scalar&lt;T&gt;::value ||
+        is_string&lt;T&gt;::value
+      )
+      {
+        std::cout &lt;&lt; prefix &lt;&lt; item;
+      }
+      else if constexpr (is_pair&lt;T&gt;::value)
+      {
+        std::cout &lt;&lt; prefix
+        &lt;&lt; "{ "
+        &lt;&lt; item.first
+        &lt;&lt; ", "
+        &lt;&lt; item.second
+        &lt;&lt; " }";
+      }
+      else if constexpr (is_tuple&lt;T&gt;::value)
+      {
+        std::cout &lt;&lt; prefix;
+        displayTuple(item);
+      }
+      else if constexpr (is_vector&lt;T&gt;::value)
+      {
+        for (auto elem : item)
+        {
+          displayValues({ elem }, "", prefix);
+          prefix = ", ";
+        }
+      }
+      else if constexpr (
+        is_unordered_map&lt;T&gt;::value
+      )
+      {
+        for (auto elem : item)
+        {
+          std::cout &lt;&lt; prefix
+          &lt;&lt; "{ "
+          &lt;&lt; elem.first
+          &lt;&lt; ", "
+          &lt;&lt; elem.second
+          &lt;&lt; " }";
+        }
+      }
+      prefix = ", ";
+      if (msg.size() &gt; 0)
+        std::cout &lt;&lt; msg;
+    }
+    catch (std::exception &amp; ex)
+    {
+      std::cout &lt;&lt; "\n  "
                 &lt;&lt; ex.what();
-                }
-                }
-                }
+    }
+  }
+}
 
-                /*---- display type sizes ----*/
+/*---- display type sizes ----*/
 
-                template&lt;typename T&gt;
-                void displayType(
-                T&amp;&amp; t,
-                const std::string&amp;
-                msg = "", bool showSize = true
-                )
-                {
-                std::cout &lt;&lt; "\n  ";
-                if (showSize)
-                std::cout &lt;&lt; sizeof(t)
-                &lt;&lt; " = size of ";
-                std::string typeName = typeid(t).name();
-                if (typeName.size() &gt; 75)
-                typeName = typeName.substr(0, 75) + "...";
-                std::cout &lt;&lt; typeName;
-                if (msg.size() &gt; 0)
-                std::cout &lt;&lt; msg;
-                }
+template&lt;typename T&gt;
+void displayType(
+  T&amp;&amp; t,
+  const std::string&amp;
+  msg = "", bool showSize = true
+)
+{
+  std::cout &lt;&lt; "\n  ";
+  if (showSize)
+    std::cout &lt;&lt; sizeof(t)
+              &lt;&lt; " = size of ";
+  std::string typeName = typeid(t).name();
+  if (typeName.size() &gt; 75)
+    typeName = typeName.substr(0, 75) + "...";
+  std::cout &lt;&lt; typeName;
+  if (msg.size() &gt; 0)
+    std::cout &lt;&lt; msg;
+}
 
-                template&lt;typename T&gt;
-                void displayOnlyType(
-                const T&amp; t,
-                const std::string&amp; msg = ""
-                )
-                {
-                std::cout &lt;&lt; "\n  ";
-                std::string typeName = typeid(t).name();
-                if (typeName.size() &gt; 75)
-                typeName = typeName.substr(0, 75) + "...";
-                std::cout &lt;&lt; typeName;
-                if (msg.size() &gt; 0)
-                std::cout &lt;&lt; msg;
-                }
+template&lt;typename T&gt;
+void displayOnlyType(
+  const T&amp; t,
+  const std::string&amp; msg = ""
+)
+{
+  std::cout &lt;&lt; "\n  ";
+  std::string typeName = typeid(t).name();
+  if (typeName.size() &gt; 75)
+    typeName = typeName.substr(0, 75) + "...";
+  std::cout &lt;&lt; typeName;
+  if (msg.size() &gt; 0)
+    std::cout &lt;&lt; msg;
+}
 
-                template&lt;typename T&gt;
-                void displayTypeArgument(
-                const std::string&amp; msg = "",
-                bool showSize = true
-                )
-                {
-                std::cout &lt;&lt; "\n  ";
-                if (showSize)
-                std::cout &lt;&lt; sizeof(T)
-                &lt;&lt; " = size of ";
-                std::string typeName = typeid(T).name();
-                if (typeName.size() &gt; 50)
-                typeName = typeName.substr(0, 46) + " ...";
-                std::cout &lt;&lt; typeName;
-                if (msg.size() &gt; 0)
-                std::cout &lt;&lt; msg;
-                }
+template&lt;typename T&gt;
+void displayTypeArgument(
+  const std::string&amp; msg = "",
+  bool showSize = true
+)
+{
+  std::cout &lt;&lt; "\n  ";
+  if (showSize)
+    std::cout &lt;&lt; sizeof(T)
+              &lt;&lt; " = size of ";
+  std::string typeName = typeid(T).name();
+  if (typeName.size() &gt; 50)
+    typeName = typeName.substr(0, 46) + " ...";
+  std::cout &lt;&lt; typeName;
+  if (msg.size() &gt; 0)
+    std::cout &lt;&lt; msg;
+}
 
-                /*--- variadic display function ---*/
+/*--- variadic display function ---*/
 
-                // Template specialization that stops
-                // recursive evaluation
+// Template specialization that stops
+// recursive evaluation
 
-                template&lt;typename T&gt;
-                void displayValues(T t)
-                {
-                displayValues({ t });
-                std::cout &lt;&lt; "\n";
-                }
+template&lt;typename T&gt;
+void displayValues(T t)
+{
+  displayValues({ t });
+  std::cout &lt;&lt; "\n";
+}
 
-                // Recursive definition of template function
-                // Args is a "parameter pack
-                // https://en.cppreference.com/w/cpp
-                // /language/parameter_pack
+// Recursive definition of template function
+// Args is a "parameter pack
+// https://en.cppreference.com/w/cpp
+// /language/parameter_pack
 
-                template&lt;typename T, typename... Args&gt;
-                void displayValues(T t, Args... args)
-                {
-                displayValues({ t });
-                displayValues(args...);
-                }
+template&lt;typename T, typename... Args&gt;
+void displayValues(T t, Args... args)
+{
+  displayValues({ t });
+  displayValues(args...);
+}
               </defn-code>
             </defn-block>
             <defn-block>
               <defn-head>Using Code: Chap7Display.cpp</defn-head>
               <defn-code>
-                #include &lt;tuple&gt;
-                #include "Chap7Display.h"
+#include &lt;tuple&gt;
+#include "Chap7Display.h"
 
-                int main() {
+int main() {
 
-                displayTitle("Testing Chap7Display");
+  displayTitle("Testing Chap7Display");
 
-                displayDemo("--- displayTuple ---\n  ");
+  displayDemo("--- displayTuple ---\n  ");
 
-                std::tuple tp{ 1, 2.5 , 'a', "a string" };
-                displayTuple(tp);
-                putline(1, "  ");
-                displayTuple(std::tuple{ 1, 2.5 , 'a', "a string" });
+  std::tuple tp{ 1, 2.5 , 'a', "a string" };
+  displayTuple(tp);
+  putline(1, "  ");
+  displayTuple(std::tuple{ 1, 2.5 , 'a', "a string" });
 
-                displayDemo("\n  --- displayValues ---\n  ");
-                displayValues(
-                1, 3, 4.5, "a string", std::pair{ 1, "one" }
-                );
-                displayValues(
-                std::vector&lt;int&gt;{-1, 0, 1},
-                std::unordered_map&lt;int, std::string&gt;{
-                {1, "one"}, { 2, "two" }
-                }
-                );
-                displayValues({ 1.0, 1.5, 2.0, 2.5 });
+  displayDemo("\n  --- displayValues ---\n  ");
+  displayValues(
+    1, 3, 4.5, "a string", std::pair{ 1, "one" }
+  );
+  displayValues(
+    std::vector&lt;int&gt;{-1, 0, 1},
+    std::unordered_map&lt;int, std::string&gt;{
+      {1, "one"}, { 2, "two" }
+    }
+  );
+  displayValues({ 1.0, 1.5, 2.0, 2.5 });
 
-                displayDemo("\n  --- displayType ---\n  ");
-                displayType(1);
-                displayType(2.5);
-                displayType('z');
-                displayType("another string");
+  displayDemo("\n  --- displayType ---\n  ");
+  displayType(1);
+  displayType(2.5);
+  displayType('z');
+  displayType("another string");
 
-                displayDemo("\n  --- displayOnlyType ---\n  ");
-                displayOnlyType(1);
-                displayOnlyType(2.5);
-                displayOnlyType('z');
-                displayOnlyType("another string");
+  displayDemo("\n  --- displayOnlyType ---\n  ");
+  displayOnlyType(1);
+  displayOnlyType(2.5);
+  displayOnlyType('z');
+  displayOnlyType("another string");
 
-                displayDemo("\n  --- displayTypeArgument ---\n  ");
-                displayTypeArgument&lt;int&gt;();
-                displayTypeArgument&lt;double&gt;();
-                displayTypeArgument&lt;char&gt;();
-                displayTypeArgument&lt;std::string&gt;();
+  displayDemo("\n  --- displayTypeArgument ---\n  ");
+  displayTypeArgument&lt;int&gt;();
+  displayTypeArgument&lt;double&gt;();
+  displayTypeArgument&lt;char&gt;();
+  displayTypeArgument&lt;std::string&gt;();
 
-                putline(2);
-                }
+  putline(2);
+}
               </defn-code>
               <defn-head class="defnBorderTop"></defn-head>
               <defn-code>
-                Testing Chap7Display
-                ======================
+Testing Chap7Display
+======================
 
-                --- displayTuple ---
-                1 2.5 a a string
-                1 2.5 a a string
+--- displayTuple ---
+1 2.5 a a string
+1 2.5 a a string
 
-                --- displayValues ---
+--- displayValues ---
 
-                1
-                3
-                4.5
-                a string
-                { 1, one }
+1
+3
+4.5
+a string
+{ 1, one }
 
-                -1, 0, 1
-                { 1, one }
-                { 2, two }
+-1, 0, 1
+{ 1, one }
+{ 2, two }
 
-                1, 1.5, 2, 2.5
+1, 1.5, 2, 2.5
 
-                --- displayType ---
+--- displayType ---
 
-                4 = size of int
-                8 = size of double
-                1 = size of char
-                15 = size of char const [15]
+4 = size of int
+8 = size of double
+1 = size of char
+15 = size of char const [15]
 
-                --- displayOnlyType ---
+--- displayOnlyType ---
 
-                int
-                double
-                char
-                char const [15]
+int
+double
+char
+char const [15]
 
-                --- displayTypeArgument ---
+--- displayTypeArgument ---
 
-                4 = size of int
-                8 = size of double
-                1 = size of char
-                40 = size of class std::basic_string&lt;char...
+4 = size of int
+8 = size of double
+1 = size of char
+40 = size of class std::basic_string&lt;char...
               </defn-code>
             </defn-block>
           </defn-outerBlock>
@@ -2299,19 +2287,19 @@
                 What makes this a TMP question is that you need to overload on several types, e.g.,
                 double, int[5], ... For example:
                 <defn-code>
-                  int iarr[]{ 1, 3, 4 };
-                  format(iarr) --> "[ 1, 3, 4 ]"
+int iarr[]{ 1, 3, 4 };
+format(iarr) --> "[ 1, 3, 4 ]"
                 </defn-code>
               </li>
               <li>
                 Write a set of template function overloads:
                 <code-span style="display:block; font-size:large;">
 <pre>
-  template &lt;typename T&gt;
-  void WhoAmI(const T&amp; t)
-  {
-    ...
-  }
+template &lt;typename T&gt;
+void WhoAmI(const T&amp; t)
+{
+  ...
+}
 </pre>
                 </code-span>
                 that write a message to the console stating that t is one of:
