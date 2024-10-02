@@ -459,143 +459,142 @@
                 <defn-block>
                   <defn-head>Definitions: Op, show, and Vec, Lst, iterator</defn-head>
                   <defn-code>
-                    #include &lt;string&gt;
-                    #include &lt;vector&gt;
-                    #include &lt;list&gt;
-                    #include &lt;set&gt;
-                    #include &lt;unordered_map&gt;
-                    #include &lt;iostream&gt;
-                    #include &lt;functional&gt;
-                    #include &lt;algorithm&gt;
-                    #include "../Chapter7-Display/Chap7Display.h"
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;list&gt;
+#include &lt;set&gt;
+#include &lt;unordered_map&gt;
+#include &lt;iostream&gt;
+#include &lt;functional&gt;
+#include &lt;algorithm&gt;
+#include "../Chapter7-Display/Chap7Display.h"
 
-                    template&lt;typename V&gt;
-                    class Op {
-                    public:
-                    void operator()(V v) {
-                    if (first) {
-                    std::cout &lt;&lt; "\n  " &lt;&lt; v;
-                    first = false;
-                    }
-                    else {
-                    std::cout &lt;&lt; ", " &lt;&lt; v;
-                    }
-                    }
-                    private:
-                    bool first = true;
-                    };
+template&lt;typename V&gt;
+class Op {
+  public:
+  void operator()(V v) {
+    if (first) {
+      std::cout &lt;&lt; "\n  " &lt;&lt; v;
+      first = false;
+    }
+    else {
+      std::cout &lt;&lt; ", " &lt;&lt; v;
+    }
+  }
+  private:
+  bool first = true;
+};
 
-                    template&lt;typename C&gt;
-                    bool contains(C c, typename C::value_type v) {
-                    typename C::iterator iter =
-                    std::find(c.begin(), c.end(), v);
-                    return iter != c.end();
-                    }
+template&lt;typename C&gt;
+bool contains(C c, typename C::value_type v) {
+  typename C::iterator iter =
+  std::find(c.begin(), c.end(), v);
+  return iter != c.end();
+}
 
-                    template&lt;typename C&gt;
-                    void show(C&amp; c) {
-                    std::cout &lt;&lt; "  ";
-                    for_each(
-                    c.begin(), c.end(),
-                    Op&lt;typename C::value_type&gt;()
-                    );
-                    }
+template&lt;typename C&gt;
+void show(C&amp; c) {
+  std::cout &lt;&lt; "  ";
+  for_each(
+    c.begin(), c.end(),
+    Op&lt;typename C::value_type&gt;()
+  );
+}
 
-                    template&lt;typename T&gt;
-                    using Vec = std::vector&lt;T&gt;;
+template&lt;typename T&gt;
+using Vec = std::vector&lt;T&gt;;
 
-                    template&lt;typename T&gt;
-                    using Lst = std::list&lt;T&gt;;
+template&lt;typename T&gt;
+using Lst = std::list&lt;T&gt;;
 
-                    template&lt;typename T&gt;
-                    using iterator =
-                    typename std::vector&lt;T&gt;::iterator;
+template&lt;typename T&gt;
+using iterator =
+  typename std::vector&lt;T&gt;::iterator;
                   </defn-code>
                 </defn-block>
                 <defn-block>
                   <defn-head>Using Code:</defn-head>
                   <defn-code>
-                    int main() {
+int main() {
 
-                    displayDemo("-- traditional algo use --");
-                    Vec&lt;int&gt; vecInt{ 1, 2, 3, 4, 5 };
-                    std::for_each(
-                    vecInt.begin(), vecInt.end(),
-                    Op&lt;int&gt;()
-                    );
+  displayDemo("-- traditional algo use --");
+  Vec&lt;int&gt; vecInt{ 1, 2, 3, 4, 5 };
+  std::for_each(
+    vecInt.begin(), vecInt.end(),
+    Op&lt;int&gt;()
+  );
 
-                    int val = 3;
-                    std::cout &lt;&lt; std::boolalpha;
-                    std::cout &lt;&lt; "\n  vecInt contains "
-                    &lt;&lt; val &lt;&lt; ": "
-                    &lt;&lt; contains(vecInt, val);
+  int val = 3;
+  std::cout &lt;&lt; std::boolalpha;
+  std::cout &lt;&lt; "\n  vecInt contains "
+            &lt;&lt; val &lt;&lt; ": "
+            &lt;&lt; contains(vecInt, val);
 
-                    iterator&lt;int&gt; iter =
-                    std::find(
-                    vecInt.begin(), vecInt.end(), val
-                    );
-                    std::cout &lt;&lt; "\n  found " &lt;&lt; val
-                    &lt;&lt; " at location "
-                    &lt;&lt; iter - vecInt.begin();
-                    val = 0;
-                    std::cout &lt;&lt; "\n  vecInt contains "
-                    &lt;&lt; val &lt;&lt; ": "
-                    &lt;&lt; contains(vecInt, val);
+  iterator&lt;int&gt; iter =
+    std::find(
+      vecInt.begin(), vecInt.end(), val
+    );
+  std::cout &lt;&lt; "\n  found " &lt;&lt; val
+            &lt;&lt; " at location "
+            &lt;&lt; iter - vecInt.begin();
+  val = 0;
+  std::cout &lt;&lt; "\n  vecInt contains "
+            &lt;&lt; val &lt;&lt; ": "
+            &lt;&lt; contains(vecInt, val);
 
-                    displayDemo(
-                    "\n  -- copy with ostream_inserter --"
-                    );
-                    auto outIter =
-                    std::ostream_iterator&lt;int&gt;(
-                    std::cout, " "
-                    );
-                    putline(1, "  ");
-                    std::copy(
-                    vecInt.begin(), vecInt.end(), outIter
-                    );
+  displayDemo(
+    "\n  -- copy with ostream_inserter --"
+  );
+  auto outIter =
+    std::ostream_iterator&lt;int&gt;(
+      std::cout, " "
+    );
+  putline(1, "  ");
+  std::copy(
+    vecInt.begin(), vecInt.end(), outIter
+  );
 
-                    displayDemo(
-                    "\n  -- copy with back_inserter --"
-                    );
-                    Vec&lt;int&gt; dstVec;
-                    auto binserter = std::back_inserter(dstVec);
-                    auto begin = [&amp;vecInt]() {
-                    return vecInt.begin();
-                    };
-                    auto end = [&amp;vecInt]() {
-                    return vecInt.end();
-                    };
+  displayDemo(
+    "\n  -- copy with back_inserter --"
+  );
+  Vec&lt;int&gt; dstVec;
+  auto binserter = std::back_inserter(dstVec);
+  auto begin = [&amp;vecInt]() {
+    return vecInt.begin();
+  };
+  auto end = [&amp;vecInt]() {
+    return vecInt.end();
+  };
 
-                    std::copy(begin(), --end(), binserter);
-                    show(dstVec);
+  std::copy(begin(), --end(), binserter);
+  show(dstVec);
 
-                    displayDemo("\n  -- copy with inserter --");
-                    auto inserter =
+  displayDemo("\n  -- copy with inserter --");
+  auto inserter =
+    std::inserter(dstVec, ++++dstVec.begin());
+  std::copy(begin(), end(), inserter);
+  show(dstVec);
 
-                    std::inserter(dstVec, ++++dstVec.begin());
-                    std::copy(begin(), end(), inserter);
-                    show(dstVec);
-
-                    putline(2);
-                    }
+  putline(2);
+}
                   </defn-code>
                   <defn-head class="defnBorderTop">Output</defn-head>
                   <defn-code>
-                    -- traditional algo use --
-                    1, 2, 3, 4, 5
+-- traditional algo use --
+1, 2, 3, 4, 5
 
-                    vecInt contains 3: true
-                    found 3 at location 2
-                    vecInt contains 0: false
+vecInt contains 3: true
+found 3 at location 2
+vecInt contains 0: false
 
-                    -- copy with ostream_inserter --
-                    1 2 3 4 5
+-- copy with ostream_inserter --
+1 2 3 4 5
 
-                    -- copy with back_inserter --
-                    1, 2, 3, 4
+-- copy with back_inserter --
+1, 2, 3, 4
 
-                    -- copy with inserter --
-                    1, 2, 1, 2, 3, 4, 5, 3, 4
+-- copy with inserter --
+1, 2, 1, 2, 3, 4, 5, 3, 4
                   </defn-code>
                 </defn-block>
               </defn-outerBlock>
@@ -643,249 +642,249 @@
                 <defn-block>
                   <defn-head>Chap8ModifiedDemos.cpp</defn-head>
                   <defn-code>
-                    #include &lt;string&gt;
-                    #include &lt;vector&gt;
-                    #include &lt;list&gt;
-                    #include &lt;iostream&gt;
-                    #include &lt;algorithm&gt;
-                    #include &lt;type_traits&gt;
-                    #include "../Chapter7-Display/Chap7Display.h"
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;list&gt;
+#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;type_traits&gt;
+#include "../Chapter7-Display/Chap7Display.h"
 
-                    template&lt;typename V&gt;
-                    class ShowOp {
-                    public:
-                    ShowOp(const std::string&amp; prefix = ", ")
-                    : prefix_(prefix) {}
-                    void operator()(V v) {
-                    if (first) {
-                    std::cout &lt;&lt; "\n  " &lt;&lt; v;
-                    first = false;
-                    }
-                    else {
-                    std::cout &lt;&lt; prefix_ &lt;&lt; v;
-                    }
-                    }
-                    private:
-                    bool first = true;
-                    std::string prefix_ = ", ";
-                    };
+template&lt;typename V&gt;
+class ShowOp {
+  public:
+  ShowOp(const std::string&amp; prefix = ", ")
+    : prefix_(prefix) {}
+  void operator()(V v) {
+    if (first) {
+      std::cout &lt;&lt; "\n  " &lt;&lt; v;
+      first = false;
+    }
+    else {
+      std::cout &lt;&lt; prefix_ &lt;&lt; v;
+    }
+  }
+  private:
+  bool first = true;
+  std::string prefix_ = ", ";
+};
 
-                    template&lt;typename V&gt;
-                    class SumOp {
-                    public:
-                    void operator()(V v) {
-                    sum_ += v;
-                    }
-                    V sum() { return sum_; }
-                    private:
-                    V sum_;
-                    };
+template&lt;typename V&gt;
+class SumOp {
+  public:
+  void operator()(V v) {
+    sum_ += v;
+  }
+  V sum() { return sum_; }
+  private:
+  V sum_;
+};
 
-                    template&lt;typename C&gt;
-                    bool contains(C c, typename C::value_type v) {
-                    typename C::iterator iter =
-                    std::find(c.begin(), c.end(), v);
-                    return iter != c.end();
-                    }
+template&lt;typename C&gt;
+bool contains(C c, typename C::value_type v) {
+  typename C::iterator iter =
+    std::find(c.begin(), c.end(), v);
+  return iter != c.end();
+}
 
-                    template&lt;typename C&gt;
-                    void show(C&amp; c) {
-                    std::cout &lt;&lt; "  ";
-                    for_each(
-                    c.begin(), c.end(),
-                    ShowOp&lt;typename C::value_type&gt;()
-                    );
-                    }
+template&lt;typename C&gt;
+void show(C&amp; c) {
+  std::cout &lt;&lt; "  ";
+  for_each(
+    c.begin(), c.end(),
+    ShowOp&lt;typename C::value_type&gt;()
+  );
+}
 
-                    template&lt;typename T&gt;
-                    using Vec = std::vector&lt;T&gt;;
+template&lt;typename T&gt;
+using Vec = std::vector&lt;T&gt;;
 
-                    template&lt;typename T&gt;
-                    using Lst = std::list&lt;T&gt;;
+template&lt;typename T&gt;
+using Lst = std::list&lt;T&gt;;
 
-                    template&lt;typename T&gt;
-                    using vecIterator =
-                    typename std::vector&lt;T&gt;::iterator;
+template&lt;typename T&gt;
+using vecIterator =
+  typename std::vector&lt;T&gt;::iterator;
 
-                    template&lt;typename O&gt;
-                    struct Null {};
-                    <span class="notice">
-                      /*-----------------------------------------
-                      This is an important part
-                      - defines Range-like construct
-                      -----------------------------------------*/
-                    </span>
-                    template&lt;
-                    typename C,
-                    template&lt;typename&gt; class Op = Null
-                    &gt;
-                    struct Collection {
-                    Collection(
-                    C&amp; c,
-                    Op&lt;typename C::value_type&gt; op_ =
-                    Null&lt;
-                    typename C::value_type&gt;()
-                    ) : op(op_)
-                    {
-                    first = c.begin();
-                    last = c.end();
-                    }
-                    typename C::iterator first;
-                    typename C::iterator last;
-                    Op&lt;typename C::value_type&gt; op;
-                    };
-                    <span class="notice">
-                      /*-----------------------------------------
-                      This is another important part
-                      - defines foreach taking a Collection
-                      -----------------------------------------*/
-                    </span>
-                    template&lt;
-                    typename C,
-                    template&lt;typename&gt; class Op
-                    &gt;
-                    typename Op&lt;typename C::value_type&gt;
-                    foreach(
-                    Collection&lt;C, Op&gt; rng,
-                    Op&lt;typename C::value_type&gt; op
-                    )
-                    {
-                    return std::for_each(rng.first, rng.last, op);
-                    }
+template&lt;typename O&gt;
+struct Null {};
 
-                    template&lt;
-                    typename C,
-                    template&lt;typename&gt; class Op
-                    &gt;
-                    typename Op&lt;typename C::value_type&gt;
-                    foreach(
-                    Collection&lt;C&gt; rng,
-                    Op&lt;typename C::value_type&gt; op
-                    )
-                    {
-                    return std::for_each(rng.first, rng.last, op);
-                    }
+/*-----------------------------------------
+  This is an important part
+  - defines Range-like construct
+-----------------------------------------*/
 
-                    template&lt;
-                    typename C,
-                    template&lt;typename&gt; class Op
-                    &gt;
-                    typename Op&lt;typename C::value_type&gt;
-                    foreach(Collection&lt;C, Op&gt; rng) {
-                    return std::for_each(
-                    rng.first, rng.last, rng.op
-                    );
-                    }
+template&lt;
+  typename C,
+  template&lt;typename&gt; class Op = Null
+&gt;
+struct Collection {
+  Collection(
+    C&amp; c,
+    Op&lt;typename C::value_type&gt; op_ =
+    Null&lt;
+    typename C::value_type&gt;()
+  ) : op(op_)
+  {
+    first = c.begin();
+    last = c.end();
+  }
+  typename C::iterator first;
+  typename C::iterator last;
+  Op&lt;typename C::value_type&gt; op;
+};
+
+/*-----------------------------------------
+  This is another important part
+  - defines foreach taking a Collection
+-----------------------------------------*/
+
+template&lt;
+  typename C,
+  template&lt;typename&gt; class Op
+&gt;
+typename Op&lt;typename C::value_type&gt;
+foreach(
+  Collection&lt;C, Op&gt; rng,
+  Op&lt;typename C::value_type&gt; op
+)
+{
+  return std::for_each(rng.first, rng.last, op);
+}
+
+template&lt;
+  typename C,
+  template&lt;typename&gt; class Op
+&gt;
+typename Op&lt;typename C::value_type&gt;
+foreach(
+  Collection&lt;C&gt; rng,
+  Op&lt;typename C::value_type&gt; op
+)
+{
+  return std::for_each(rng.first, rng.last, op);
+}
+
+template&lt;
+  typename C,
+  template&lt;typename&gt; class Op
+&gt;
+typename Op&lt;typename C::value_type&gt;
+foreach(Collection&lt;C, Op&gt; rng) {
+  return std::for_each(
+    rng.first, rng.last, rng.op
+  );
+}
                   </defn-code>
                 </defn-block>
                 <defn-block>
                   <defn-head>Using Code:</defn-head>
                   <defn-code>
-                    int main() {
+int main() {
 
-                    displayDemo("-- traditional algo use --");
-                    Vec&lt;int&gt; vecInt{ 1, 2, 3, 4, 5 };
-                    std::for_each(
-                    vecInt.begin(), vecInt.end(),
-                    ShowOp&lt;int&gt;()
-                    );
+  displayDemo("-- traditional algo use --");
+  Vec&lt;int&gt; vecInt{ 1, 2, 3, 4, 5 };
+  std::for_each(
+    vecInt.begin(), vecInt.end(),
+    ShowOp&lt;int&gt;()
+  );
 
-                    displayDemo("\n  -- using generic synonyms --");
+  displayDemo("\n  -- using generic synonyms --");
 
-                    Vec&lt;std::string&gt; vecStr{
-                    "Joe", "Sally", "Ashok", "Ming", "Hasim"
-                    };
+  Vec&lt;std::string&gt; vecStr{
+    "Joe", "Sally", "Ashok", "Ming", "Hasim"
+  };
 
-                    Collection&lt;Vec&lt;std::string&gt;, ShowOp&gt;
-                    rFriends(vecStr, ShowOp&lt;std::string&gt;());
+  Collection&lt;Vec&lt;std::string&gt;, ShowOp&gt;
+  rFriends(vecStr, ShowOp&lt;std::string&gt;());
 
-                    /*-- std algorithm with synonym arguments*/
+  /*-- std algorithm with synonym arguments*/
 
-                    std::for_each(
-                    rFriends.first, rFriends.last, rFriends.op
-                    );
+  std::for_each(
+    rFriends.first, rFriends.last, rFriends.op
+  );
 
-                    /*-------------------------------------------
-                    prettified using Collection with
-                    embedded operation
-                    -------------------------------------------*/
+  /*-------------------------------------------
+    prettified using Collection with
+    embedded operation
+  -------------------------------------------*/
 
-                    foreach(rFriends);
+  foreach(rFriends);
 
-                    /*-------------------------------------------
-                    prettified using Collection and
-                    separate operation
-                    -------------------------------------------*/
+  /*-------------------------------------------
+    prettified using Collection and
+    separate operation
+  -------------------------------------------*/
 
-                    ShowOp&lt;std::string&gt; showCout;
-                    foreach(rFriends, showCout);
-                    putline();
+  ShowOp&lt;std::string&gt; showCout;
+  foreach(rFriends, showCout);
+  putline();
 
-                    Collection&lt;Vec&lt;int&gt;, SumOp&gt;
-                    vecIntColl(vecInt, SumOp&lt;int&gt;());
-                    SumOp&lt;int&gt; ret =
-                    foreach(vecIntColl, SumOp&lt;int&gt;());
-                    show(vecInt);
-                    std::cout &lt;&lt; "\n  sum = "
-                    &lt;&lt; ret.sum();
-                    <span class="notice">
-                      /*-------------------------------------------
-                      More tests
-                      -------------------------------------------*/
-                    </span>
-                    displayDemo("\n  -- more tests --");
-                    putline();
-                    Vec&lt;double&gt; vecDbl{ 1.0, -1.0, 0.5 };
-                    Collection&lt;
-                    Vec&lt;double&gt;, SumOp&gt;
-                    vecDblColl(vecDbl, SumOp&lt;double&gt;());
+  Collection&lt;Vec&lt;int&gt;, SumOp&gt;
+  vecIntColl(vecInt, SumOp&lt;int&gt;());
+  SumOp&lt;int&gt; ret =
+    foreach(vecIntColl, SumOp&lt;int&gt;());
+  show(vecInt);
+  std::cout &lt;&lt; "\n  sum = "
+    &lt;&lt; ret.sum();
 
-                    Collection&lt;Vec&lt;double&gt;&gt;
-                    vecDblColl2(vecDbl);
+  /*-------------------------------------------
+    More tests
+  -------------------------------------------*/
 
-                    SumOp&lt;double&gt; retd =
-                    foreach(vecDblColl2, SumOp&lt;double&gt;());
-                    double sumd =
-                    foreach(
-                    vecDblColl2, SumOp&lt;double&gt;()
-                    ).sum();
-                    show(vecDbl);
-                    std::cout &lt;&lt; "\n  sumd = "
-                    &lt;&lt; retd.sum();
+  displayDemo("\n  -- more tests --");
+  putline();
+  Vec&lt;double&gt; vecDbl{ 1.0, -1.0, 0.5 };
+  Collection&lt;
+  Vec&lt;double&gt;, SumOp&gt;
+  vecDblColl(vecDbl, SumOp&lt;double&gt;());
 
-                    std::list&lt;int&gt; listInt{ 1, 2, 3, 2, 1 };
-                    Collection&lt;Lst&lt;int&gt;&gt;
-                    listIntColl(listInt);
-                    foreach(listIntColl, ShowOp&lt;int&gt;());
-                    int sumi =
-                    foreach(
-                    listIntColl, SumOp&lt;int&gt;()
-                    ).sum();
-                    std::cout &lt;&lt; "\n  sum of list = "
-                    &lt;&lt; sumi;
+  Collection&lt;Vec&lt;double&gt;&gt;
+  vecDblColl2(vecDbl);
 
-                    putline(2);
-                    }
+  SumOp&lt;double&gt; retd =
+    foreach(vecDblColl2, SumOp&lt;double&gt;());
+  double sumd =
+    foreach(
+      vecDblColl2, SumOp&lt;double&gt;()
+    ).sum();
+  show(vecDbl);
+  std::cout &lt;&lt; "\n  sumd = "
+    &lt;&lt; retd.sum();
+
+  std::list&lt;int&gt; listInt{ 1, 2, 3, 2, 1 };
+  Collection&lt;Lst&lt;int&gt;&gt;
+  listIntColl(listInt);
+  foreach(listIntColl, ShowOp&lt;int&gt;());
+  int sumi =
+    foreach(
+      listIntColl, SumOp&lt;int&gt;()
+    ).sum();
+  std::cout &lt;&lt; "\n  sum of list = "
+    &lt;&lt; sumi;
+
+  putline(2);
+}
                   </defn-code>
                   <defn-head class="defnBorderTop">Output:</defn-head>
                   <defn-code>
-                    -- traditional algo use --
-                    1, 2, 3, 4, 5
+-- traditional algo use --
+1, 2, 3, 4, 5
 
-                    -- using generic synonyms --
-                    Joe, Sally, Ashok, Ming, Hasim
-                    Joe, Sally, Ashok, Ming, Hasim
-                    Joe, Sally, Ashok, Ming, Hasim
+-- using generic synonyms --
+Joe, Sally, Ashok, Ming, Hasim
+Joe, Sally, Ashok, Ming, Hasim
+Joe, Sally, Ashok, Ming, Hasim
 
-                    1, 2, 3, 4, 5
-                    sum = 15
+1, 2, 3, 4, 5
+sum = 15
 
-                    -- more tests --
+-- more tests --
 
-                    1, -1, 0.5
-                    sumd = 0.5
-                    1, 2, 3, 2, 1
-                    sum of list = 9
+1, -1, 0.5
+sumd = 0.5
+1, 2, 3, 2, 1
+sum of list = 9
                   </defn-code>
                 </defn-block>
               </defn-outerBlock>
