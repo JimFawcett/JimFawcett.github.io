@@ -417,7 +417,7 @@ function initializeMenu() {
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Site&nbsp;thread</div>\
+          <div class='ddLabel darkItem'>Posts&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
             <div class='ddItem'><a href='Post_DistinguishedRust.html'>DistinguishedRust</a></div>\
             <div class='ddItem undef'><a href='javascript:;'>Safety</a></div>\
