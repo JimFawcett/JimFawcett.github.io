@@ -419,11 +419,9 @@ function initializeMenu() {
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Site&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a href='index.html'>Home</a></div>\
-            <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
-            <div class='ddItem'><a href='SiteDemo.html'>SiteDemo</a></div>\
-            <div class='ddItem'><a href='SiteDesign.html'>SiteDesign</a></div>\
-          <div style='height:2em;'></div>\
+            <div class='ddItem'><a href='Post_DistinguishedRust.html'>DistinguishedRust</a></div>\
+            <div class='ddItem undef'><a href='javascript:;'>Safety</a></div>\
+          <div style='height:1em;'></div>\
         </div>\
     </div>\
     <div class='menuItem'><a id='prevLink' href='#'>Prev</a></div>\
