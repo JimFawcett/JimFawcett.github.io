@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html>
+<!--
+  BasicBites_Tooling.html
+-->
+<head>
+  <title>Safety</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/StylesPageFrameDefaults.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameStructure.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameMenus.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameThemeRust.css" />
+  <link rel="stylesheet" href="css/StylesWebComponents.css" />
+  <script src="js/ScriptsWebComponents.js"></script>
+  <script src="js/ScriptsPageFramePosts.js"></script>
+  <script src="js/ScriptsPageFramePagesPosts.js"></script>
+  <script src="js/ScriptsPageFrameKeyboard.js"></script>
+  <style>
+    #github table {
+      width: 90%;
+      border: 1px solid black;
+    }
+
+      #github table tr {
+        border: 1px solid var(--dark);
+      }
+
+        #github table tr th {
+          color: var(--dark);
+          background-color: var(--menu);
+        }
+
+        #github table tr td {
+          color: var(--dark);
+          background-color: var(--light);
+        }
+
+      #github table a:link {
+        color: var(--dark);
+        background-color: transparent;
+      }
+
+      #github table a:visited {
+        color: var(--dark);
+        background-color: transparent;
+      }
+
+      #github table a:hover {
+        color: var(--dark);
+        background-color: transparent;
+      }
+
+      #github table a:active {
+        color: var(--dark);
+        background-color: transparent;
+      }
+
+    #github hr.dotted {
+      border: none;
+      border-top: 2px dashed var(--dark);
+      color: var(--light);
+      background-color: var(--light);
+      height: 1px;
+      width: 55em;
+      margin-top: 0.5em;
+      margin-bottom: 1.5em;
+    }
+  </style>
+  <!--   <script>
+      window.onmessage = function () {
+        // alert('msg received');
+        bottomMenu.sections();
+      }
+    </script>
+   -->
+   <script>
+    function loadifrust() {
+      var loc = window.location.href;
+      if (window.self === window.top) {
+        window.location.href = 'TOCRust.html?src=' + loc;
+      }
+      else {
+        window.top.location.href = loc;
+      }
+    }
+  </script>
+</head>
+<body id="github" onload="initialize()">
+
+  <a id="Next" href="Post_CommCompare.html">Next</a>
+  <a id="Prev" href="Post_DistinguishedRust.html">Prev</a>
+
+  <page-frame>
+    <frame-header>
+      <nav id="navbar"></nav>
+    </frame-header>
+    <main>
+      <div id="about" onclick="this.style.display = 'none'">about</div>
+      <div id="modified">09/17/2022</div>
+      <div id="page">Post - Rust Safety</div>
+      <div id="hlp"></div>
+      <a id="top"></a>
+      <content>
+        <header>
+          <!-- <a target="_blank" class="repoLink" href="https://github.com/JimFawcett/Consuming_Rust_bite_by_byte" style="margin:2.8em 1.0em; font-size:0.9em;">
+            Rust Bites Code
+          </a> -->
+          <hgroup id="pagetitle" onclick="loadifrust()" style="cursor:pointer;">
+            <h1>Rust Safety</h1>
+            <h3 id="subtitle" class="indent">Rust is safe by construction via compiler enforcements</h3>
+          </hgroup>
+          <div class="darkItem" style="position:relative; padding:0.25em 0em 0.75em 0em; margin-top:-0.15em; border:2px solid var(--dark);">
+            <a class="repoLinks" target="_blank" href="https://github.com/JimFawcett" style="color:var(--light); margin-left:1.5em;">About</a>
+            <div style="font-size:0.9em; position:absolute; top:0.4em; right:2.5em;">click header to toggle Rust Explorer</div>
+          </div>
+        </header>
+        <hr class="spread" />
+        <a id="why"></a>
+        <h3>1.0 Why Rust?</h3>
+        <t-b>
+          Rust is an interesting language, combining memory safety of C# and Java with
+          performance of C++.  Unlike these languages, Rust also provides data race safety by construction.
+        </t-b>
+        <t-b>
+          Using modern idioms, one can build, with C++, memory safe programs without data
+          races.  But when building large systems, with many thousands of lines of code, it is
+          easy to forget, in a few of those lines, to use an idiom or
+          unintentionally share data between threads without proper locking.  C++ is memory and data race
+          safe by convention.
+        </t-b>
+        <t-b>
+          Rust, however,
+          ensures memory and data safety by construction.  Code with unsafe memory access and
+          data races will fail to compile.  It accomplishes that with an intersting ownership model.
+          We go over the details below, and explore code in several other Bites, e.g.,
+          <a target="_blank" href="Resources/RustBites/RustBites_UDB.html">Undefined Behavior</a> and
+          <a target="_blank" href="Resources/RustBites/RustBites_Ownrs.html">Ownership</a>.
+        </t-b>
+        <!--<div style="height:0.55em;">&nbsp;</div>-->
+        <hr class="spread" />
+        <a id="safety"></a>
+        <h3>2.0 Memory Safety</h3>
+        <t-b>
+          Memory Safety means that a program cannot read or write to memory it does not own, so memory safe code:
+          <ol class="tight smallspread">
+            <li>
+              Can not construct uninitialized references.
+            </li>
+            <li>
+              Can not allow references to become invalid due to a reallocation of memory by the referend.
+              <div class="largeindent smallspread smaller">
+                This could be caused by a vector, with a reference to its interior, reallocating to make
+                room for additional data.
+                <!--<div class="indent" style="padding-top:5px; padding-bottom:0px;">
+                  Note that vector indices, unlike references, are not invalidated, since an
+                  index is just an offset from the beginning of the vector, and remains valid over a reallocation.
+                </div>-->
+              </div>
+            </li>
+            <li>
+              References can not outlive instances they reference.
+            </li>
+            <li>
+              Can not read from, or write to, memory accessed by indexing beyond the size of any indexable
+              collection.
+              <!--<div class="indent" style="padding-top:5px; padding-bottom:0px;">
+                array, Vec, VecDeque, slice, or user-defined type that implements indexing.
+                For Rust that means a type implementing std::ops::Index or IndexMut.
+              </div>-->
+            </li>
+          </ol>
+        </t-b>
+        <t-b>
+          To see what could happen without these constraints, look at
+          <a target="_blank" href="Resources/RustBites/RustBites_UDB.html">Undefined Behavior with C++</a>. Modern C++ has facilities and idioms that
+          prevent undefined behavior by convention.  We will see that Rust does so by construction.
+        </t-b>
+        <t-b>
+          The purpose of Rust&apos;s safety mechanisms is to prevent unsound code by refusing
+          to build it.
+          <!--But exactly sorting all combinations of program constructs into sound or unsound categories
+            is an intractable problem.  Safety evaluation must be based on some hueristic that simplifies the
+            evaluation process and may therefore have either false positives or false negatives or both.
+          </t-b>
+          <t-b>-->
+          Rust chooses to to reject some safe programs in order to reject all unsafe programs, e.g., its hueristics
+          result in occasional false positives - claiming a sound program is unsound, but no false negatives.
+          We will have more to say about this in Section 7.
+        </t-b>
+        <t-b style="display:flex; flex-wrap:nowrap;">
+          <div style="float:left; padding: 1.0em 1.5em 1em 0em;">
+            <video width="300" controls poster="Resources/RustBites/videos/Safety.jpg" style="border: 2px solid var(--dark);">
+              <source src="Resources/RustBites/videos/RustShort_Safety.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <div>
+            <t-b>
+              This is a &quot;Rust Short&quot; - a brief video presenting a Rust Safety &quot;thought experiment&quot;.
+            </t-b>
+            <t-b>
+              <div style="border: 1px solid maroon; padding: 0.25em 1em; margin-top: -0.0em;">
+                You will probably want to view &quot;picture-in-picture&quot; or &quot;full-screen&quot;
+                so details are large enough to be seen easily.
+              </div>
+            </t-b>
+            <t-b>
+              Running as &quot;picture in picture&quot; allows you to move to other web pages while still
+              watching and listening to the video.
+            </t-b>
+          </div>
+        </t-b>
+        <!--<div style="height:0.55em;">&nbsp;</div>-->
+        <hr class="spread" />
+        <a id="invar"></a>
+        <h3>3.0 Rust Safety Invariants</h3>
+        <t-b>
+          Rust ensures memory safety, for all code outside <c-s>unsafe</c-s> blocks, by enforcing two invariants:
+          <ol class="tight smallspread">
+            <li>
+              Safe referencing - <strong>No shared mutabilty through references</strong>.
+            </li>
+            <li>
+              Safe indexing - All collections, including native arrays, are sized, and any attempt to index outside that sized
+              area results in a panic, e.g., an orderly shutdown of the current thread before any reads or writes
+              can complete.
+            </li>
+          </ol>
+        </t-b>
+        <t-b>
+          Using these two simple invariants as programming guides will make working with Rust easier. The first
+          invariant often causes problems for developers new to Rust when working with linked data structures.
+        </t-b>
+        <div style="padding-right:0.5rem;" class="left">
+          <photosizer-block src="Resources/RustBites/pictures/Graph1.jpg" width="200" class="photoSizerBlock">
+            <span style="font-family:'Comic Sans MS';">Fig 1. Directed Graph using references</span>
+          </photosizer-block>
+        </div>
+        <div style="padding-right:0.5rem;" class="left">
+          <photosizer-block src="Resources/RustBites/pictures/Graph2.jpg" width="200" class="photoSizerBlock">
+            <span style="font-family:'Comic Sans MS';">Fig 2. Directed Graph using vector indexes</span>
+          </photosizer-block>
+        </div>
+        <t-b>
+          Note that the first invariant is a <strong>very strong condition</strong>.  There are useful program constructs, like
+          directed graphs, that depend on shared mutability to function as expected.  A child graph node, like node 0 in Fig 1.,  may be
+          shared between several parents and without mutation of the node&apos;s value we could only build constant
+          graphs.
+        </t-b>
+        <t-b>
+          We can build non-constant directed graphs using Rust.  We
+          <a target="_blank" href="https://matklad.github.io/2022/11/18/if-a-tree-falls-in-a-forest-does-it-overflow-the-stack.html">cannot easily</a> construct graph edges
+          using references.
+          If we move all graph nodes into a vector, then each parent can refer to its children using vector
+          indices.  We will need to handle node deletions and reuse slots, but that is straight forward.
+        </t-b>
+        <t-b>
+          A program can safely share mutability through vector indices because indexes remain valid over
+          vector buffer reallocation when adding new nodes.  The first safety invariant applies to references,
+          but not to indexes.
+        </t-b>
+        <t-b>
+          Several years ago, before learning Rust, I built a <a target="_blank" href="CppGraph.html">C++ Directed Graph</a> class
+          using the strategy suggested above.  I found that was the easiest way to build a memory safe structure,
+          even though, unlike Rust, C++ would allow me to use pointers to establish parent-child relationships.
+        </t-b>
+        <t-b>
+          The message is that the safety mechanisms used by Rust may lead us to write some small part of our code using
+          different strategies than we would with C++ or other modern languages.  And that is eventually a good thing.
+        </t-b>
+        <!--<div style="height:0.55em;">&nbsp;</div>-->
+        <hr class="spread" />
+        <a id="ownership"></a>
+        <h3>4.0 Ownership<span class="normal"> - static analysis</span></h3>
+        <t-b>
+          Rust rejects unsafe programs at compile time with ownership rules derived from the &quot;no shared mutability
+          through references&quot; invariant.
+        </t-b>
+        <t-b>
+          <a target="_blank" href="Resources/RustBites/RustBites_Ownrs.html">Ownership Rules:</a>
+          <ol class="tight smallspread">
+            <li>
+              There is only one owner for every data item.  That owner is responsible for deallocating the data
+              when it goes out of scope.  It does that with a drop operation, very like a C++ destructor invocation.
+            </li>
+            <li>
+              Ownership can be transferred with <a target="_blank" href="Resources/RustBites/RustBites_Data.html#traits">move operations</a>.
+            </li>
+            <li>
+              Ownership can be borrowed by creating references.
+            </li>
+            <li>
+              Any number of readers (immutable references) may have access to a data value simultaneously.
+            </li>
+            <li>
+              Writers (mutable owner or mutable reference) get exclusive access to a value - no other readers or writers.
+            </li>
+          </ol>
+          Borrowing from an owner inhibits owner from mutating its data.  Mutably borrowing inhibits all other borrows.
+        </t-b>
+        <t-b>
+          It can be a bit complicated to evaluate these rules when you first start creating Rust code.  But you don&apos;t
+          have to.  The Rust compiler does a great job of reporting errors with just the right amount of detail, and often
+          provides a suggested solution.
+        </t-b>
+        <t-b>
+          Rust checks these rules with static analysis by a &quot;borrow-checker&quot;.  The checker is attempting to
+          determine if you violated the &quot;no shared mutability with references&quot; invariant.
+        </t-b>
+        <!--<div style="height:0.55em;">&nbsp;</div>-->
+        <hr class="spread" />
+        <a id="nlscope"></a>
+        <h3>5.0 Non-lexical Filters<span class="normal"> - refining static analysis</span></h3>
+        <t-b>
+          No build environment can accept and build every safe program and reject every unsafe program.  As a
+          consequence, Rust is conservative.  It chooses to reject some safe programs to insure that it rejects
+          all unsafe programs.
+        </t-b>
+        <t-b>
+          Rust reduces the number of false alarms generated by the Ownership Rules with a couple of additional filters.
+          <ol class="tight smallspread">
+            <li>
+              Calling a function with one or more immutable references following a mutable borrow will build successfully,
+              since no data in the function can be mutated while the function is being invoked.  The same is true
+              of other types of expressions that take immutable references.
+            </li>
+            <li>
+              Creating and using an immutable reference in the scope of a mutable reference will build if, and
+              only if, the mutable reference is not used after declaration of the immutable reference.
+            </li>
+          </ol>
+          The Rust community calls these non-lexical scope rules.
+        </t-b>
+        <!--<div style="height:0.55em;">&nbsp;</div>-->
+        <hr class="spread" />
+        <a id="intrmut"></a>
+        <h3>6.0 Interior Mutability<span class="normal"> - invariant analysis at run-time</span></h3>
+        <t-b>
+          There are blocks of code that do not violate the &quot;no shared mutability of references&quot; invariant
+          but fail static analysis, because they violate the Ownership rules, stated above, but never share mutability
+          because of the way they operate in time.  For example, you might wish to create a constant collection, but
+          can&apos;t initialize it until runtime, e.g., some values are not known at compile time.  So you want to
+          mutate it once, then provide immutable shared access.
+        </t-b>
+        <t-b>
+          Rust provides a construct called RefCell&lt;T&gt; that appears to the compiler to be immutable, but from
+          which code can extract both mutable and immutable references.  That doesn&apos;t allow you to violate
+          the invariant, because it checks at run-time each borrow, looking for shared mutability.  If your program
+          does have concurrent mutable and immutable borrows, using RefCell&lt;T&gt;, it will panic, terminating
+          the thread on which it runs.
+        </t-b>
+        <t-b>
+          In the initialization example, above, we can build the collection values with a single mutable reference
+          obtained from RefCell&lt;the_collection&gt;, but never use it again.  Your code can then take mulitple
+          immutable references, as needed, to view the collection.  This won&apos;t fail to build due to the non-lexical
+          scope filter, and will not fail at run-time since there is no concurrent mutation and aliasing.
+        </t-b>
+        <t-b>
+          Note that, for single threaded programs, we would only resort to run-time checking with RefCell&lt;T&gt;
+          when static analysis results in a false alarm, due to the (small additional) expense of run-time checking.
+        </t-b>
+        <t-b>
+          Rust uses this same run-time checking process for threads that need to share and mutate data by using
+          a Mutex&lt;T&gt; which is similar to a thread safe
+          version of RefCell&lt;T&gt;.  It holds both the protected data and a lock. A great benefit of Rust&apos;s
+          design is that Mutexes protect specific data, not critical sections of code, so there is no chance of
+          accidentally allowing two threads to use different locks to access the &quot;protected&quot; data,
+          e.g., they share the Mutex which wraps the data.  They don&apos;t share the data inside a protected
+          area.
+        </t-b>
+        <!--<div style="height:0.75rem;"></div>-->
+        <hr class="spread" />
+        <a id="eval"></a>
+        <h3>7.0 Evaluating Safety</h3>
+        <t-b>
+          In this final section we circle back to the question: in the presence of safety checking, &quot;is it
+          possible that Rust prevents us from building some safe program.&quot;  We look at that with a thought
+          experiment.
+        </t-b>
+        <div style="padding-right:0.5rem;" class="left">
+          <photosizer-block src="Resources/RustBites/pictures/soundness.jpg" width="500" class="photoSizerBlock">
+            <span style="font-family:'Comic Sans MS';">Figure 1. Soundness Metaphor</span>
+          </photosizer-block>
+        </div>
+        <div>
+          <t-b style="margin-top:0rem;">
+            Suppose that we could map program activities into the x-y plane, as shown in Figure 1. - don&apos;t
+            quibble, this is a metaphor.  Further, suppose that we can measure the effort required to separate
+            sound code from unsound code exactly, as shown by the soundness boundary.  As we approach the
+            boundary we have to spend more evaluation time, and be very clever, to determine if a program is sound.
+          </t-b>
+          <t-b>
+            Clearly, that is not feasible for a practical compiler, so instead, Rust chooses a simpler evaluation
+            strategy, as outlined in sections 2. and 3.  That simplified strategy creates a second boundary inside
+            the soundness region
+            which is relatively easy to evaluate, but will reject some sound programs.  Rust chooses to reject
+            some safe programs to insure that it rejects all unsafe programs.
+          </t-b>
+          <t-b>
+            So every program activity in area (1) is proveably sound and compiles; every activity in area (2)
+            is sound, but cannot be easily proven to be so, and does not compile.
+            This may worry you.  Suppose a program you are developing requires some program activities between
+            the two boundaries, e.g., sound, but not easily evaluated as sound.  Compilation will fail and the
+            compiler&apos;s error messages will tell you why it failed.
+          </t-b>
+          <t-b>
+            There are three things that you can do to resolve this issue:
+            <ol>
+              <li>
+                Much of the territory between the boundaries, i.e., region #2, is covered by Rust standard types,
+                which use unsafe
+                blocks that are very carefully vetted by the development team to be sound.  So your program
+                simply uses one or more of those types without directly using unsafe blocks.
+                <div style="height:0.75rem;"></div>
+                Consider the standard
+                library&apos;s vector.  Some of its operations clearly violate the scope-based rule about no shared
+                mutability.  It holds a reference to its internal memory, but will hand out a mutable reference to
+                your program.  That is safe because the vector (and compiler) conspire to manage change
+                on your behalf by refusing to mutate when there are outstanding references.  If you are curious
+                you can look at unsafe blocks in vector from its
+                <a target="_blank" href="https://doc.rust-lang.org/std/vec/struct.Vec.html#">source documentation</a>.
+                <div style="height:0.75rem;"></div>
+                We use the vector, the compiler doesn&apos;t complain because of vector&apos;s few small
+                well crafted unsafe
+                blocks, and we benefit from the library developer&apos;s expertise.
+                <div style="height:0.75rem;"></div>
+                Seldom do you know your program is walking in the valley of &quot;hard to evaluate region #2&quot;
+                You just use the standard library types and all is well.
+              </li>
+              <li>
+                In some of that territory, program operations don&apos;t violate the invariants, but that can&apos;t
+                be determined via static analysis, e.g., there is no simultaneous shared mutation using references
+                because of the way the program operates in time.  But that cannot be evaluated statically.  For
+                this case one may use &quot;interior mutability&quot;, discussed in section 6.
+              </li>
+              <li>
+                The design may be changed to avoid violating invariants, often by using indexing instead of
+                references, like the directed graph class we mentioned above.
+              </li>
+            </ol>
+          </t-b>
+          <t-b>
+            You don&apos;t need to think about all this when developing code.  The compiler will do the low-level
+            thinking for you.  It does help to understand why the language works the way it does and understand
+            why it works so well.
+            <a id="tips"></a>
+          </t-b>
+          <h4>Productivity Tips</h4>
+          <t-b>
+            Here are some tips that may make you more productive:
+            <ul class="tight" style="margin: 0.25rem 4.0rem 0.5rem 1.75rem;">
+              <li>
+                Use the
+                <a target="_blank" href="https://doc.rust-lang.org/std/collections/index.html#modules">
+                  Rust library linked types
+                </a>
+                (HashMap, linked_list, ...) instead of trying to craft
+                your own.
+              </li>
+              <li>
+                Find alternatives to custom linked data structures, as we did for the graph type
+                discussed above.  That will usually involve use of vectors.
+              </li>
+              <li>
+                Pass arguments to functions by reference.  If you pass by value the caller&apos;s
+                argument will be moved into the function and become permanently invalid in the
+                caller&apos;s scope.
+              </li>
+              <li>
+                In methods of a type you&apos;ve developed return a member value by reference.
+                Otherwise it would be moved to the caller and the member becomes invalid.
+                If returning by value is important for ergonomic reasons you can return a clone by value,
+                incurring the performance penalty of making a clone.
+              </li>
+              <li>
+                For all other functions, return a locally created object by value so the data is moved to the caller.
+                That&apos;s fast and the returned data continues to be valid.  In this case, Rust won&apos;t
+                let you return by reference, citing lifetime issues.
+              </li>
+            </ul>
+            You may encounter coding contexts where you would elect not to use one of these tips, but that will happen
+            infrequently.
+          </t-b>
+          <!--<t-b>
+            Here are some habits that make Rust code development easier:
+            <ul class="tight" style="margin-left:0.25rem; max-width:40rem;">
+              <li>
+                Implement requirements for shared mutation with indexing.
+              </li>
+              <li>
+                Isolate mutation through references by moving into functions.
+              </li>
+              <li>
+                Prefer pass by reference and return by value for functions unless there is some
+                compelling reason to do otherwise.
+                <div class="indent pad5">
+                  Passing an argument by value will move it into the function&apos;s scope for all non-primitive
+                  types, invalidating the caller&apos;s instance.
+                  Returning by reference will cause lifetime issues because the compiler needs to insure
+                  that references do not outlive their referends.
+                </div>
+              </li>
+              <li>
+                Occasionally compilation errors happen because you attempt to mutate an instance where
+                you should be mutating a copy.  In that case use cloning.
+              </li>
+            </ul>
+          </t-b>-->
+          <t-b>
+            After writing a lot of Rust code - more than 20 repositories - I never had to use unsafe blocks or
+            write contorted code to build projects.  And it was&apos;t that hard.  The compiler&apos;s error
+            messages are so good that it guides you to a sound implementation.
+          </t-b>
+        </div>
+        <div class="clear"></div>
+        <t-b>
+          <!--<div style="height:0.25em;">&nbsp;</div>-->
+          <hr class="spread" />
+          <a id="refs"></a>
+          <h3>7.0 References:</h3>
+          <div class="pad10 indents">
+            <table style="border-collapse: collapse; width:calc(100vw - 12rem);">
+              <tr>
+                <th class="darkItem">Reference</th>
+                <th class="darkItem">Description</th>
+              </tr>
+              <tr>
+                <td class="lightItem"><a target="_blank" href="https://www.youtube.com/watch?v=DnT-LUQgc7s">Jon Gjengset</a></td>
+                <td class="lightItem">Considering Rust - why should you explore Rust?</td>
+              </tr>
+              <tr>
+                <td class="lightItem"><a target="_blank" href="https://intorust.com">intorust.com</a></td>
+                <td class="lightItem">
+                  Excellent discussion of ownership and safety by an expert in five short videos.
+                </td>
+              </tr>
+              <tr>
+                <td class="lightItem">
+                  <a target="_blank" href="https://ryhl.io/blog/temporary-shared-mutation">
+                    Temporarily opt-in to shared mutation
+                  </a>
+                </td>
+                <td class="lightItem">
+                  Blog by Alice Ryhl, a primary maintainer of the Tokio crate.
+                </td>
+              </tr>
+              <tr>
+                <td class="lightItem">
+                  <a target="_blank" href="https://cs.stanford.edu/~aozdemir/blog/unsafe-rust-syntax/">
+                    Rust: Unsafe in Rust: Syntactic Patterns
+                  </a>
+                </td>
+                <td class="lightItem">
+                  Interesting analysis of unsafe in crates reported by Alex Ozdemir
+                </td>
+              </tr>
+              <tr>
+                <td class="lightItem">
+                  <a target="_blank" href="https://limpet.net/mbrubeck/2019/02/07/rust-a-unique-perspective.html">
+                    Rust: A unique perspective
+                  </a>
+                </td>
+                <td class="lightItem">
+                  Best description of Rust ownership and sharing that I&apos;ve found.  Check it out!
+                </td>
+              </tr>
+              <tr>
+                <td class="lightItem"><a target="_blank" href="../../Resources/RustTourAbbrev.pdf">RustTour.pdf</a></td>
+                <td class="lightItem">Quick tour of the Rust programming language emphasizing its unique attributes.</td>
+              </tr>
+              <tr>
+                <td class="lightItem">
+                  <a target="_blank" href="https://msrc-blog.microsoft.com/2019/07/22/why-rust-for-safe-systems-programming/">
+                    Why Rust for safe systems programming - Microsoft
+                  </a>
+                </td>
+                <td class="lightItem">Microsoft is exploring Rust for system programming.</td>
+              </tr>
+              <tr>
+                <td class="lightItem">
+                  <a target="_blank" href="https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html">
+                    The Rust Book - Ownership
+                  </a>
+                </td>
+                <td class="lightItem">Ownership rules with examples and discussion</td>
+              </tr>
+              <tr>
+                <td class="lightItem">
+                  <a target="_blank" href="https://doc.rust-lang.org/edition-guide/rust-2018/ownership-and-lifetimes/non-lexical-lifetimes.html">
+                    Rust edition-guide
+                  </a>
+                </td>
+                <td class="lightItem">Non-lexical lifetimes</td>
+              </tr>
+              <tr>
+                <td class="lightItem">
+                  <a target="_blank" href="https://doc.rust-lang.org/book/ch15-05-interior-mutability.html">
+                    Rust Book
+                  </a>
+                </td>
+                <td class="lightItem">RefCell&lt;T&gt; and the Interior Mutability Pattern</td>
+              </tr>
+            </table>
+          </div>
+        </t-b>
+        <s-5em></s-5em>
+        <a id="bottom"></a>
+        <a id="bottom"></a>
+      </content>
+      <a id="bottom"></a>
+      <page-TOC id="pages" style="display:none;">
+      </page-TOC>
+      <page-sections id="sections" style="display:none;">
+        <sec-elem style="width:0.0em">&nbsp;</sec-elem>
+        <menu-elem class="secElem"><a href="#bottom">bottom</a></menu-elem>
+        <menu-elem class="secElem"><a href="#refs">refs</a></menu-elem>
+        <menu-elem class="secElem"><a href="#eval">eval</a></menu-elem>
+        <menu-elem class="secElem"><a href="#intrmut">intrmut</a></menu-elem>
+        <menu-elem class="secElem"><a href="#nlscope">nls</a></menu-elem>
+        <menu-elem class="secElem"><a href="#ownership">ownership</a></menu-elem>
+        <menu-elem class="secElem"><a href="#invar">invar</a></menu-elem>
+        <menu-elem class="secElem"><a href="#safety">safety</a></menu-elem>
+        <menu-elem class="secElem"><a href="#why">why?</a></menu-elem>
+        <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
+        <div class='darkItem popupHeader' style="padding:0.25em 2.0em;" onclick="this.parentElement.style.display='none'">Sections</div>
+      </page-sections>
+    </main>
+    <frame-footer>
+      <menu-item style="width:1.0em;">&nbsp;</menu-item>
+      <menu-elem id="nextLink2" onclick="bottomMenu.next()">Next</menu-elem>
+      <menu-elem id="prevLink2" onclick="bottomMenu.prev()">Prev</menu-elem>
+      <menu-elem id="pgbtn" onclick="bottomMenu.pages()">Pages</menu-elem>
+      <menu-elem onclick="bottomMenu.sections()">Sections</menu-elem>
+      <menu-elem onclick="bottomMenu.about()">About</menu-elem>
+      <menu-elem id="kysbtn" onclick="storyHlpMenu.keys()">Keys</menu-elem>
+      <menu-elem style="margin-right:1em">
+        <span id="loc" style="display:inline-block; font-weight:normal"></span>
+      </menu-elem>
+    </frame-footer>
+  </page-frame>
+  <script>
+    let loc = document.getElementById("loc");
+    let fn = window.location.href.split(/\/|\\/).pop();
+    loc.innerHTML = fn + ": ";
+  </script>
+</body>
+</html>

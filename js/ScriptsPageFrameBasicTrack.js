@@ -357,6 +357,10 @@ function initializeMenu() {
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Design</summary>\
             <div style='margin-left:1.0em;'>\
+              <div class='ddItem'><a href='Post_DistinguishedRust.html'>Distinguished Rust</a></div>\
+              <div class='ddItem'><a href='Post_RustSafety.html'>Rust Safety</a></div>\
+              <div class='ddItem'><a href='Post_CommCompare.html'>Comm Compare</a></div>\
+              <div class='ddLabel'>--- SU Blogs ---</div>\
               <div class='ddItem ddDetails'><a href='BlogDesign.html'>SW&nbsp;Design</a></div>\
               <div class='ddItem ddDetails'><a href='BlogPrinciples.html'>Design&nbsp;Principles</a></div>\
               <div class='ddItem ddDetails'><a href='BlogOOD.html'>OO&nbsp;Design</a></div>\

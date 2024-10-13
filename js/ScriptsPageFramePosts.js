@@ -366,7 +366,9 @@ function initializeMenu() {
       Blogs&#9662\
       <div class='dropdown'>\
           <div class='ddLabel darkItem'>Opinions&nbsp;&amp;&nbsp;Ideas</div>\
-          <div class='ddItem'><a href='Post_DistinguishedRust.html'>Distinghuished&nbsp;Rust</a></div>\
+          <div class='ddItem'><a href='Post_DistinguishedRust.html'>Distinguished Rust</a></div>\
+          <div class='ddItem'><a href='Post_RustSafety.html'>Rust Safety</a></div>\
+          <div class='ddItem'><a href='Post_CommCompare.html'>Comm Compare</a></div>\
           <div class='ddLabel'>--- SU Blogs ---</div>\
           <div class='ddItem'><a href='Blog.html'>First&nbsp;Things</a></div>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
@@ -419,8 +421,9 @@ function initializeMenu() {
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Posts&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a href='Post_DistinguishedRust.html'>DistinguishedRust</a></div>\
-            <div class='ddItem undef'><a href='javascript:;'>Safety</a></div>\
+            <div class='ddItem'><a href='Post_DistinguishedRust.html'>Distinguished Rust</a></div>\
+            <div class='ddItem'><a href='Post_RustSafety.html'>Rust Safety</a></div>\
+            <div class='ddItem'><a href='Post_CommCompare.html'>Comm Compare</a></div>\
           <div style='height:1em;'></div>\
         </div>\
     </div>\

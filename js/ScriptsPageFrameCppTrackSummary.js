@@ -368,6 +368,10 @@ function initializeMenu() {
       Blogs&#9662\
       <div class='dropdown'>\
           <div class='ddLabel darkItem'>Opinions&nbsp;&amp;&nbsp;Ideas</div>\
+          <div class='ddItem'><a href='Post_DistinguishedRust.html'>Distinguished Rust</a></div>\
+          <div class='ddItem'><a href='Post_RustSafety.html'>Rust Safety</a></div>\
+          <div class='ddItem'><a href='Post_CommCompare.html'>Comm Compare</a></div>\
+          <div class='ddLabel'>--- SU Blogs ---</div>\
           <div class='ddItem'><a href='Blog.html'>First&nbsp;Things</a></div>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Design</summary>\
