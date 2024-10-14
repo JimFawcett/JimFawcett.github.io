@@ -189,7 +189,8 @@ function initializeMenu() {
             <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
             <div class='ddItem'><a href='SiteDemo.html'>SiteDemo</a></div>\
             <div class='ddItem'><a href='SiteDesign.html'>SiteDesign</a></div>\
-            <div class='ddItem'><a href='https://ecs.syr.edu/faculty/fawcett/handouts/webpages/fawcettHome.htm'>SU Site</a></div>\
+            <div class='ddItem'><a target='_blank' href='https://github.com/JimFawcett.html'>github repos</a></div>\
+            <div class='ddItem'><a target='_blank' href='https://ecs.syr.edu/faculty/fawcett/handouts/webpages/fawcettHome.htm'>SU Site</a></div>\
             <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
               <summary>About&nbsp;Site&nbsp;&nbsp;&nbsp;</summary>\
               <div style='margin-left:1.0em;'>\
