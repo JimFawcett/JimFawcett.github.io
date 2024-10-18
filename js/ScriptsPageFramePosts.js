@@ -177,7 +177,7 @@ function initializeMenu() {
     return;
   }
   topMenu.innerHTML = "<div style='position: relative; width:100%;' class='navbar'>\
-    <div class='menuItem'><a id='site' href='index.html'>Site</a></div>\
+    <div class='menuItem'><a id='site' target='_parent' href='index.html'>Site</a></div>\
     <div class='menuItem'>\
       Blogs&#9662\
       <div class='dropdown'>\
