@@ -350,51 +350,58 @@ function initializeMenu() {
           <div class='ddLabel darkItem'>Opinions&nbsp;&amp;&nbsp;Ideas</div>\
           <div class='ddItem'><a href='../../Post_DistinguishedRust.html'>Distinguished Rust</a></div>\
           <div class='ddItem'><a href='../../Post_RustSafety.html'>Rust Safety</a></div>\
+          <div class='ddItem'><a href='../../Post_RustTooling.html'>Rust Tooling</a></div>\
+          <div class='ddItem'><a href='../../Post_RustStrings.html'>Rust Strings</a></div>\
+          <div class='ddItem'><a href='../../Post_RustData.html'>Rust Data</a></div>\
+          <div class='ddItem'><a href='../../Post_RustOperations.html'>Rust Operations</a></div>\
           <div class='ddItem'><a href='../../Post_CommCompare.html'>Comm Compare</a></div>\
-          <div class='ddLabel'>--- SU Blogs ---</div>\
-          <div class='ddItem'><a target='_self' href='../../Blog.html'>First&nbsp;Things</a></div>\
+          <div style='height:0.25em;'></div>\
+          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+            <summary style='font-size:0.9em;'>SU Archive</summary>\
+            <div class='ddItem'><a href='../../Blog.html'>First&nbsp;Things</a></div>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Design</summary>\
             <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogDesign.html'>SW&nbsp;Design</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogPrinciples.html'>Design&nbsp;Principles</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogOOD.html'>OO&nbsp;Design</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogObjectModels.html'>Object&nbsp;Models</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogDesign.html'>SW&nbsp;Design</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogPrinciples.html'>Design&nbsp;Principles</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogOOD.html'>OO&nbsp;Design</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogObjectModels.html'>Object&nbsp;Models</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data</a></div>\
               <div style='height:0.5em;'></div>\
             </div>\
           </details>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Engineering SW</summary>\
             <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogOCD.html'>Concept&nbsp;Document</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogTesting.html'>SW&nbsp;Testing</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogOCD.html'>Concept&nbsp;Document</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogTesting.html'>SW&nbsp;Testing</a></div>\
               <div style='height:0.5em;'></div>\
             </div>\
           </details>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Software Systems&nbsp;&nbsp;</summary>\
             <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogStructure.html'>SW&nbsp;Structure</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogActiveObjects.html'>Active&nbsp;Objects</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogStructure.html'>SW&nbsp;Structure</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogActiveObjects.html'>Active&nbsp;Objects</a></div>\
               <div style='height:0.5em;'></div>\
             </div>\
           </details>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Reusable Pkgs</summary>\
             <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogNoSql.html'>noSQL&nbsp;Database</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogParser.html'>Parsing</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogMTree.html'>M-ary&nbsp;Trees</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogGraph.html'>Directed&nbsp;Graphs</a></div>\
-              <div class='ddItem ddDetails'><a target='_self' href='../../BlogFileSystem.html'>C++&nbsp;FileSystem</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogNoSql.html'>noSQL&nbsp;Database</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogParser.html'>Parsing</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogMTree.html'>M-ary&nbsp;Trees</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogGraph.html'>Directed&nbsp;Graphs</a></div>\
+              <div class='ddItem ddDetails'><a href='../../BlogFileSystem.html'>C++&nbsp;FileSystem</a></div>\
               <div style='height:0.5em;'></div>\
             </div>\
           </details>\
-          <div class='ddItem'><a target='_self' href='../../SummerReading.html'>Summer&nbsp;Reading</a></div>\
-          <div style='height:2em;'>&nbsp;</div>\
+          <div class='ddItem'><a href='../../SummerReading.html'>Summer&nbsp;Reading</a></div>\
+          </details>\
+          <div style='height:1em;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='menuItem'><a id='help' onclick='getHelp()'>Help</a></div>\

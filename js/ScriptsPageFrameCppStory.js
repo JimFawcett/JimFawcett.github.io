@@ -370,9 +370,15 @@ function initializeMenu() {
           <div class='ddLabel darkItem'>Opinions&nbsp;&amp;&nbsp;Ideas</div>\
           <div class='ddItem'><a href='Post_DistinguishedRust.html'>Distinguished Rust</a></div>\
           <div class='ddItem'><a href='Post_RustSafety.html'>Rust Safety</a></div>\
+          <div class='ddItem'><a href='Post_RustTooling.html'>Rust Tooling</a></div>\
+          <div class='ddItem'><a href='Post_RustStrings.html'>Rust Strings</a></div>\
+          <div class='ddItem'><a href='Post_RustData.html'>Rust Data</a></div>\
+          <div class='ddItem'><a href='Post_RustOperations.html'>Rust Operations</a></div>\
           <div class='ddItem'><a href='Post_CommCompare.html'>Comm Compare</a></div>\
-          <div class='ddLabel'>--- SU Blogs ---</div>\
-          <div class='ddItem'><a href='Blog.html'>First&nbsp;Things</a></div>\
+          <div style='height:0.25em;'></div>\
+          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+            <summary style='font-size:0.9em;'>SU Archive</summary>\
+            <div class='ddItem'><a href='Blog.html'>First&nbsp;Things</a></div>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Design</summary>\
             <div style='margin-left:1.0em;'>\
@@ -414,7 +420,8 @@ function initializeMenu() {
             </div>\
           </details>\
           <div class='ddItem'><a href='SummerReading.html'>Summer&nbsp;Reading</a></div>\
-          <div style='height:2em;'>&nbsp;</div>\
+          </details>\
+          <div style='height:1em;'>&nbsp;</div>\
       </div>\
     </div>\
     <div class='menuItem'><a id='help' onclick='getHelp()'>Help</a></div>\

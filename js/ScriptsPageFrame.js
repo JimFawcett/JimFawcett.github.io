@@ -369,10 +369,14 @@ function initializeMenu() {
           <div class='ddLabel darkItem'>Opinions&nbsp;&amp;&nbsp;Ideas</div>\
           <div class='ddItem'><a href='Post_DistinguishedRust.html'>Distinguished Rust</a></div>\
           <div class='ddItem'><a href='Post_RustSafety.html'>Rust Safety</a></div>\
+          <div class='ddItem'><a href='Post_RustTooling.html'>Rust Tooling</a></div>\
+          <div class='ddItem'><a href='Post_RustStrings.html'>Rust Strings</a></div>\
+          <div class='ddItem'><a href='Post_RustData.html'>Rust Data</a></div>\
+          <div class='ddItem'><a href='Post_RustOperations.html'>Rust Operations</a></div>\
           <div class='ddItem'><a href='Post_CommCompare.html'>Comm Compare</a></div>\
           <div style='height:0.25em;'></div>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-            <summary>Archive</summary>\
+            <summary style='font-size:0.9em;'>SU Archive</summary>\
             <div class='ddItem'><a href='Blog.html'>First&nbsp;Things</a></div>\
           <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Design</summary>\
