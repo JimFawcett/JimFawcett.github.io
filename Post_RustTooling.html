@@ -77,6 +77,29 @@
       }
     }
   </script>
+  <script>
+    function toggleShow(id, width) {
+      let showit = document.getElementById(id);
+      if (showit) {
+        if (showit.style.display === 'none') {
+          showit.style.display = 'block';
+          showit.firstElementChild.style.width = width + "px";
+        }
+        else {
+          let d3 = showit.style.width;
+          showit.firstElementChild.style.width = width + "px";
+          showit.style.display = 'None';
+          // location.reload();
+        }
+      }
+      else {
+        //alert('showit not defined');
+      }
+    }
+    function bigger(img) {
+      img.style.width = (img.clientWidth * 1.25) + "px";
+    }
+  </script>
 </head>
 <body id="github" onload="initialize()">
 
@@ -113,7 +136,7 @@
         </t-b> -->
         <a id="prologue"></a>
         <div style="height:0.005rem;"></div>
-        <h2>1. Prologue</h2>
+        <h3>1. Prologue</h3>
         <t-b>
           In this post we look at processes for building programs and software systems using Rust.
           The intent is to provide build processes for both Windows and Linux platforms.
@@ -320,8 +343,8 @@
         </t-b>
         <t-b>
           The <strong>Rust</strong> plugin provides intellisense and the ability to build and run the
-          resulting executable from the Run menu.  Usually I do all the building in the terminal window
-          and run from there as well.  I just use the VS Code run menu to start Rust debugging.
+          resulting executable from the Run menu.  Usually I do all building in the terminal window
+          and run from there as well, as shown in Figure 4.  I just use the VS Code run menu to start Rust debugging.
         </t-b>
         <strong>Debugging:</strong>
         <photosizer-block src="Resources/RustBites/pictures/VSCode_Debugging.jpg" width="600" class="photoSizerBlock right clear">
@@ -359,13 +382,181 @@
           and use virtually the same development processes on each.
         </t-b>
         <div style="height:1.25rem;"></div>
-
+        <a id="cargo"></a>
+        <h3>3.0 Cargo Package Manager</h3>
+        <t-b>
+          Visual Studio Code is an effective tool for adding files and editing code. Opening a terminal panel
+          in the editor supports command line builds, execution, formatting, and testing using the 
+          <strong>Cargo</strong> package manager.
+        </t-b>
+        <photosizer-block src="Pictures/VSCodeWithTerminal.png" width="600" class="photoSizerBlock right clear">
+          <span style="font-family:'Comic Sans MS';">Figure 4. VS Code with Terminal</span>
+        </photosizer-block>
+        <t-b>
+          Common cargo commands are: 
+          <ul>
+            <li>
+              cargo new mypkg<br />
+              Create directory with cargo.toml file and src directory
+            </li>
+            <li>
+              cargo run<br /> 
+              Build and execute binary created from src::main.rs
+            </li>
+            <li>
+              cargo test<br /> 
+              Run unit tests associated with src::lib.rs
+            </li>
+            <li>
+              cargo run --example test1<br /> 
+              Execute examples::test1.rs built with src::lib.rs 
+            </li>
+            <li>
+              cargo clippy<br />
+              Evaluate package&apos;s code style and complexity
+            </li>
+            <li>
+              cargo fmt<br /> 
+              Reformat local source code files according to Rust community accepted rules.
+            </li>
+          </ul>
+        </t-b>
+        <t-b>
+          Cargo is powerful but still quite easy to use, especially within a VS Code terminal panel, 
+          as shown in Figure 4. For the last two years I&apos;ve used VS Code and Cargo to build virtually
+          all of the code shown in my github repositories. That includes projects with multiple packages
+          and remote crates from crates.io. The Cargo.toml file provides a declarative interface to
+          define dependencies on muliple local libraries as well as remote crates.
+        </t-b>
+        <t-b>
+          You can view more details about cargo commands in the dropdown below.
+        </t-b>
+        <div class="clear" style="height:0.25em;"></div>
+        <details>
+          <summary class="darkItem">Cargo Commands&nbsp;</summary>
+          <table>
+            <tr>
+              <th class="darkItem" style="width:15%;">Cargo Command</th><th class="darkItem" style="width:85%;">Action</th>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <span style="margin-left:2em;">
+                  Selection of frequently used cargo commands and options. To see all: use cargo help
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>new</td>
+              <td>
+                Create a new package in a new folder. Folder contains cargo.toml file and src directory.
+                <hr />
+                syntax:&nbsp;&nbsp;cargo new name [options] [path]<br />
+                options: --bin, --lib, --name, (-v, --verbose), (-q, --quiet), (-h, --help)
+                <hr />
+                example: cargo new mypkg --bin<br />
+                Creates new package in subdirectory mypkg. src contains code for hello world executable.
+              </td>
+            </tr>
+            <tr>
+              <td>init</td>
+              <td>
+                Create a new package in an existing folder. Folder contains cargo.toml file and src directory.
+                <hr />
+                syntax:&nbsp;&nbsp;cargo init name [options] [path]<br />
+                options: --bin, --lib, --name, (-v, --verbose), (-q, --quiet), (-h, --help)
+                <hr />
+                example: cargo init mypkg --lib<br />
+                Creates new package in existing subdirectory mypkg. src contains code for library.
+              </td>
+            </tr>
+            <tr>
+              <td>build, b</td>
+              <td>
+                Compile local packages and all their dependencies that have changed since last build.
+                <hr />
+                syntax:&nbsp;&nbsp;cargo build [options]<br />
+                options: (-d, --debug), (-r, --release), --example name, (-v, --verbose), (-q, --quiet)
+                <hr />
+                example: cargo build --example test1<br />
+                Builds test1.rs in examples subdirectory (sibling of src)
+              </td>
+            </tr>
+            <tr>
+              <td>check, c</td>
+              <td>
+                Same as build but omits code generation.
+              </td>
+            </tr>
+            <tr>
+              <td>run, r</td>
+              <td>
+                Build local packages and their dependencies that have changed since last build and execute bin file.
+                <hr />
+                syntax:&nbsp;&nbsp;cargo run [options] [--args]<br />
+                options: (-d, --debug), (-r, --release), --example name, (-v, --verbose), (-q, --quiet)
+                <hr />
+                example: cargo run --example test1<br />
+                Builds test1.rs in examples subdirectory (sibling of src) and runs bin
+              </td>
+            </tr>
+            <tr>
+              <td>test, t</td>
+              <td>
+                Execute package unit, integration, and documentation tests.
+                <hr />
+                syntax:&nbsp;&nbsp;cargo test [testname] [--test-options]<br />
+                options: Use cargo help test
+                <hr />
+                example: cargo test
+              </td>
+            </tr>
+            <tr>
+              <td>clean</td>
+              <td>
+                Remove build products
+                <hr />
+                syntax: cargo clean [options]<br />
+                options: Use cargo help clean
+              </td>
+            </tr>
+            <tr>
+              <td>doc, d</td>
+              <td>
+                Build documentation for local package and all dependencies.
+                <hr />
+                syntax: cargo doc [options]<br />
+                options: Use cargo help doc
+              </td>
+            </tr>
+            <tr>
+              <td>clippy</td>
+              <td>
+                Style and complexity checker. Guidance to write idiomatic code.
+                <hr />
+                syntax: cargo clippy [options]<br />
+                options: Use cargo help clippy
+              </td>
+            </tr>
+            <tr>
+              <td>fmt</td>
+              <td>
+                Runs rustfmt on all bin and lib files in current package.
+                <hr />
+                syntax: cargo fmt<br />
+                common option: create rustfmt.toml file with tab_spaces = 2 to change indent width
+              </td>
+            </tr>
+          </table>
+          </details>
         <a id="dev"></a>
-        <h2>3. Rust Development Process:</h2>
+        <h3>4.0 Rust Development Process:</h3>
+        <t-b>
+          The table below captures a process for developing code using VS Code and Cargo.
+        </t-b>
         <table id="dev">
           <tr>
-            <th class="darkItem normal-font" style="width:15%">Topic</th>
-            <th class="darkItem normal-font" style="width:85%">Rust</th>
+            <th class="darkItem normal-font" style="width:20%">Topic</th>
+            <th class="darkItem normal-font" style="width:80%">Rust</th>
           </tr>
           <tr>
             <td class="topborder">
@@ -388,8 +579,14 @@
           <tr>
             <td class="topborder">
               Work Flow
+              <div onclick="toggleShow('pop1', 300)" style="cursor:pointer; white-space:nowrap; font-size:0.9em; margin-top:1em;">
+                [ show Example ].
+              </div>
+              <div id="pop1" style="display:None; cursor:pointer; padding:1.0em; position:absolute; z-index: 100;">
+                <img onclick="bigger(this)" src="Pictures/placeholder.png"/>
+              </div>
               <div style="height:0.75rem;"></div>
-              <a target="_blank" href="Resources/Build-On-2.pdf">BuildOn-2.pdf</a><br />page 6
+              <!-- <a target="_blank" href="Resources/Build-On-2.pdf">BuildOn-2.pdf</a><br />page 6 -->
             </td>
             <td class="topborder">
               <strong>Creating Projects:</strong>
@@ -494,7 +691,7 @@
                 </li>
                 <li>
                   One or more test and demonstration files, each with a main function, test1.rs, ...
-                  These files bind
+                  placed in an &quot;examples&quot; directory, a sibling of &quot;src&quot;. These files bind
                   to the library and provide visual evidence that library&apos;s operations are as
                   expected.  You run demonstration tests with the command:
                   <div class="indent pad5">
@@ -524,6 +721,64 @@
               The <a target="_blank" href="https://doc.rust-lang.org/cargo/">Cargo book</a> has examples of this with
               several additional options.
               <div style="height:1rem;"></div>
+            </td>
+          </tr>
+          <tr>
+            <td>Managing code with git</td>
+            <td>
+              git is a distributed version control system. It manages versions of code with one or more branches.
+              <div style="height:0.75em;"></div>
+              Typical commands are: 
+              <ul>
+                <li>
+                  git init
+                  <hr style="max-width:40em;" />
+                  create a git repository
+                </li>
+                <li>
+                  git status 
+                  <hr style="max-width:40em;" />
+                  list all files in a managed directory tree that have been changed since last git update
+                </li>
+                <li>
+                  git -A 
+                  <hr style="max-width:40em;" />
+                  add all changed files to staging area 
+                </li>
+                <li>
+                  git commit -m"&lt;message&gt;" 
+                  <hr style="max-width:40em;" />
+                  add staged files to git repository
+                </li>
+                <li>
+                  git push origin branch-name
+                  <hr style="max-width:40em;" />
+                  send updates to remote repository
+                </li>
+                <li>
+                  git pull origin branch-name
+                  <hr style="max-width:40em;" />
+                  pull updates from remote repository and save locally
+                </li>
+                <li>
+                  git checkout -b branch-name
+                  <hr style="max-width:40em;" />
+                  create new branch 
+                </li>
+                <li>
+                  git checkout branch-name
+                  <hr style="max-width:40em;" />
+                  switch to existing branch 
+                </li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Collaborate using github
+            </td>
+            <td>
+              Details coming soon ...
             </td>
           </tr>
           <!--<tr>
