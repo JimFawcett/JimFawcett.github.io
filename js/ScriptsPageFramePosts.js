@@ -247,7 +247,7 @@ function initializeMenu() {
           <div class='ddItem'><a href='Help_Git.html'>Git</a></div>\
           <div class='ddItem'><a href='Help_PowerShell.html'>PowerShell</a></div>\
           <div class='ddItem'><a href='Help_RegEx.html'>RegEx</a></div>\
-          <div class='ddItem'><a href='Help.html'>Site&nbsp;Navigation&nbsp;&nbsp;</a></div>\
+          <div class='ddItem undef'><a href='javascript:;'>Site&nbsp;Navigation&nbsp;&nbsp;</a></div>\
           <div style='height:1em;'>&nbsp;</div>\
       </div>\
     </div>\
