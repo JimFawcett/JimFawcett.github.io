@@ -251,12 +251,12 @@ function initializeMenu() {
       Resrcs&#9662\
       <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Resources</div>\
-          <div class='ddItem'><a href='../../Videos.html' class='menuItem'>Videos</a></div>\
           <div class='ddItem'><a href='../../Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a></div>\
           <div class='ddItem'><a href='../PublishingSourceCode.pdf'>Site&nbsp;Presentation</a></div>\
           <div class='ddItem'><a href='../../Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a></div>\
-           <div class='ddItem'><a href='../../ChatGPT.html'>ChatGPT</a></div>\
-         <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+          <div class='ddItem'><a href='../../ChatGPT.html'>ChatGPT</a></div>\
+          <div class='ddItem'><a href='../../Videos.html' class='menuItem'>Videos</a></div>\
+          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Design</summary>\
             <div style='margin-left:1.0em;'>\
                 <div class='ddItem ddDetails'><a href='../../Design.html'>Design Process</a></div>\
@@ -410,7 +410,23 @@ function initializeMenu() {
           <div style='height:1em;'>&nbsp;</div>\
       </div>\
     </div>\
-    <div class='menuItem'><a id='help' onclick='getHelp()'>Help</a></div>\
+    <div class='menuItem'>\
+      Help&#9662\
+      <div class='dropdown'>\
+          <div class='ddLabel darkItem'>Code&nbsp;Help&nbsp;</div>\
+          <div class='ddItem'><a target='_blank' href='../../Help_VSCode.html'>VS&nbsp;Code</a></div>\
+          <div class='ddItem'><a target='_blank' href='../../Help_Cargo.html'>Cargo</a></div>\
+          <div class='ddItem'><a target='_blank' href='../../Help_Cmake.html'>CMake&nbsp;&nbsp;</a></div>\
+          <div class='ddItem'><a target='_blank' href='../../Help_Dotnet.html'>dotnet&nbsp;&nbsp;</a></div>\
+          <div class='ddItem'><a target='_blank' href='../../Help_Git.html'>Git</a></div>\
+          <div class='ddItem'><a target='_blank' href='../../Help_Github.html'>Github</a></div>\
+          <div class='ddItem'><a target='_blank' href='../../Help_PowerShell.html'>PowerShell</a></div>\
+          <div class='ddItem'><a target='_blank' href='../../Help_RegEx.html'>RegEx</a></div>\
+          <div class='ddItem'><a target='_blank' href='../../Help_ChatGPT.html'>ChatGPT</a></div>\
+          <div class='ddItem'><a target='_blank' href='../../Help.html'>Site&nbsp;Navigation&nbsp;&nbsp;</a></div>\
+          <div style='height:1em;'>&nbsp;</div>\
+      </div>\
+    </div>\
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\

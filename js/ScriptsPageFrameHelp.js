@@ -1,5 +1,5 @@
 /*
- * ScriptsPageFrameCppTrackSummary.js
+ * ScriptsPageFrame.js
  * - Builds top menu so only one place to change for adding or removing link
  * - Builds bottom Pages menu since all pages in thread have same sibling pages
  * - Builds About popup, used by all pages
@@ -52,107 +52,124 @@ function closeQuickStatus() {
       let det = item.parentElement;
       det.removeAttribute('open');
     }
+    //let det = qstat[0].parentElement;
+    //det.removeAttribute('open');
+    let dummy = true;
   }
 }
+
 function loadif() {
   var loc = window.location.href;
   if (window.self === window.top) {
     window.location.href = 'TOC.html?src=' + loc;
   }
   else {
-    window.parent.location.href = 'TOC.html?src=' + loc;
-  }
-}
-function loadifbits() {
-  var loc = window.location.href;
-  if (window.self === window.top) {
-    window.location.href = 'TOCBits.html?src=' + loc;
-  }
-  else {
     window.top.location.href = loc;
+    /*window.top.location.href = 'TOC.html?src=index.html';*/
+    /*location.reload();*/
   }
 }
+
 function loadifcpp() {
   var loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCCpp.html?src=' + loc;
+    window.location.href = 'TOCCpp.html?src=indexCpp.html';
   }
   else {
-    window.top.location.href = loc;
+    window.top.location.href = 'TOCCpp.html';
   }
 }
+
 function loadifrust() {
-  var loc = window.location.href;
+  loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCRust.html?src=' + loc;
+    window.location.href = 'TOCRust.html?src=indexRust.html';
   }
   else {
-    window.top.location.href = loc;
+    window.top.location.href = 'TOCRust.html';
   }
 }
+
 function loadifcsharp() {
-  var loc = window.location.href;
+  loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCCSharp.html?src=' + loc;
+    window.location.href = 'TOCCSharp.html?src=indexCs.html';
   }
   else {
-    window.top.location.href = loc;
+    window.top.location.href = 'TOCCSharp.html';
   }
 }
+
 function loadifbasic() {
-  var loc = window.location.href;
+  loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCBasic.html?src=' + loc;
+    window.location.href = 'TOCBasic.html?src=indexBasic.html';
   }
   else {
-    window.top.location.href = loc;
+    window.top.location.href = 'TOCBasic.html';
   }
 }
+
+function loadifbits() {
+  loc = window.location.href;
+  if (window.self === window.top) {
+    window.location.href = 'TOCBits.html?src=indexBits.html';
+  }
+  else {
+    window.top.location.href = 'TOCBits.html';
+  }
+}
+
 function loadifwebdev() {
-  var loc = window.location.href;
+  loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCWebDev.html?src=' + loc;
+    window.location.href = 'TOCWebDev.html?src=indexWebDev.html';
   }
   else {
-    window.top.location.href = loc;
+    window.top.location.href = 'TOCWebDev.html';
   }
 }
+
 function loadifdesign() {
-  var loc = window.location.href;
+  loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCDesign.html?src=' + loc;
+    window.location.href = 'TOCDesign.html?src=indexDesign.html';
   }
   else {
-    window.top.location.href = loc;
+    window.top.location.href = 'TOCDesign.html';
   }
 }
+
 function loadifdeployment() {
-  var loc = window.location.href;
+  loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCDeployment.html?src=' + loc;
+    window.location.href = 'TOCDeployment.html?src=indexDeployment.html';
   }
   else {
-    window.top.location.href = loc;
+    window.top.location.href = 'TOCDeployment.html';
   }
 }
+
 function loadifprojects() {
-  var loc = window.location.href;
+  loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCProjects.html?src=' + loc;
+    window.location.href = 'TOCProjects.html?src=indexProjects.html';
   }
   else {
-    window.top.location.href = loc;
+    window.top.location.href = 'TOCProjects.html';
   }
 }
+
 function loadifprototypes() {
-  var loc = window.location.href;
+  loc = window.location.href;
   if (window.self === window.top) {
-    window.location.href = 'TOCPrototypes.html?src=' + loc;
+    window.location.href = 'TOCPrototypes.html?src=indexPrototypes.html';
   }
   else {
-    window.top.location.href = loc;
+    window.top.location.href = 'TOCPrototypes.html';
   }
 }
+
 
 function initializeMenu() {
   var topMenu = document.getElementById("navbar");
@@ -166,7 +183,7 @@ function initializeMenu() {
             <div class='darkItem' style='padding:0.25em 0.5em;'>Code Workshop</div>\
             <div class='ddItem'><a href='index.html'>Home</a></div>\
             <!--<div class='ddItem'><a target='_parent' href='TOC.html'>Site Explorer</a></div>-->\
-            <div class='ddItem'><a target='_parent' onclick='loadif()'>Site Explorer</a></div>\
+            <div class='ddItem'><a onclick='loadif()'>Site Explorer</a></div>\
             <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
             <div class='ddItem'><a href='SiteDemo.html'>SiteDemo</a></div>\
             <div class='ddItem'><a href='SiteDesign.html'>SiteDesign</a></div>\
@@ -179,7 +196,7 @@ function initializeMenu() {
               <div class='ddItem ddDetails'><a href='Interesting.html'>Interesting&nbsp;things&nbsp;&nbsp;</a></div>\
               <div class='ddItem ddDetails'><a href='Friends.html'>Friends&nbsp;&amp;&nbsp;Collaborators</a></div>\
               <div class='ddItem ddDetails'><a href='SitePlans.html'>Site Plans</a></div>\
-              <div class='ddItem ddDetails'><a href='https://github.com/JimFawcett'>Repositories&nbsp;code</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='https://github.com/JimFawcett'>Repositories&nbsp;code</a></div>\
               <div style='height:1em;'></div>\
             </div>\
           </details>\
@@ -242,67 +259,45 @@ function initializeMenu() {
       Resrcs&#9662\
       <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Resources</div>\
-          <div class='ddItem'><a href='Videos.html' class='menuItem'>Videos</a></div>\
-          <div class='ddItem'><a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a></div>\
-          <div class='ddItem'><a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a></div>\
-          <div class='ddItem'><a href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a></div>\
-          <div class='ddItem'><a href='ChatGPT.html'>ChatGPT</a></div>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-            <summary>Design</summary>\
-            <div style='margin-left:1.0em;'>\
-                <div class='ddItem ddDetails'><a href='Design.html'>Design Process</a></div>\
-                <div class='ddItem ddDetails'><a href='UML.html'>UML Diagrams</a></div>\
-                <div class='ddItem ddDetails'><a href='ProjectsList.html'>Project suggestions</a></div>\
-                <div style='height:0.25em;'></div>\
-            </div>\
-          </details>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+          <div class='ddItem'><a target='_blank' href='ChatGPT.html'>ChatGPT</a></div>\
+          <div class='ddItem'><a target='_blank' href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a></div>\
+          <div class='ddItem'><a target='_blank' href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a></div>\
+          <details style='margin:0.25em 0.5em; cursor:pointer;' class='ddItem'>\
             <summary>C++</summary>\
             <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a href='LangCpp.html'>C++&nbsp;Language&nbsp;Resources&nbsp;&nbsp;</a></div>\
-              <div class='ddItem ddDetails'><a href='https://en.cppreference.com/w/'>CppReference.com</a></div>\
-              <div class='ddItem ddDetails'><a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a></div>\
-              <div class='ddItem ddDetails'><a href='CppReferences.html'>C++ References</a></div>\
-              <div class='ddItem ddDetails'><a href='CppExamples.html'>C++ Example Code</a></div>\
-              <div class='ddItem ddDetails'><a href='CppSynopsis.html'>C++ Synopsis</a></div>\
-              <div class='ddItem ddDetails'><a href='DesignNote-Cpp11.html'>C++11 Survey</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='LangCpp.html'>C++&nbsp;Language&nbsp;Resources&nbsp;&nbsp;</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='https://en.cppreference.com/w/'>CppReference.com</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='CppReferences.html'>C++ References</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='CppExamples.html'>C++ Example Code</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='CppSynopsis.html'>C++ Synopsis</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='DesignNote-Cpp11.html'>C++11 Survey</a></div>\
               <div style='height:0.25em;'></div>\
             </div>\
           </details>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+          <details style='margin:0.25em 0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Rust</summary>\
             <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a href='Resources/RustBites/RustBites_CodeExamples.html'>RustBites Code Examples</a></div>\
-              <div class='ddItem ddDetails'><a href='https://github.com/JimFawcett/RustPlaygroundExamples'>RustPlaygroundExamples</a></div>\
-              <div class='ddItem ddDetails'><a href='IndexPage.html'>Rust Glossary</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='Resources/RustBites/RustBites_CodeExamples.html'>RustBites Code Examples</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='https://github.com/JimFawcett/RustPlaygroundExamples'>RustPlaygroundExamples</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='IndexPage.html'>Rust Glossary</a></div>\
               <div style='height:0.25em;'></div>\
             </div>\
           </details>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+          <details style='margin:0.25em 0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Regular Expressions</summary>\
             <div style='margin-left:1.0em;'>\
-                <div class='ddItem ddDetails'><a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a></div>\
-                <div class='ddItem ddDetails'><a href='https://dev.to/chrisachard/intro-to-regex-for-web-developers-2fj4'>RegExp&nbsp;for&nbsp;JavaScript</a></div>\
-                <div class='ddItem ddDetails'><a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a></div>\
+                <div class='ddItem ddDetails'><a target='_blank' href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a></div>\
+                <div class='ddItem ddDetails'><a target='_blank' href='https://dev.to/chrisachard/intro-to-regex-for-web-developers-2fj4'>RegExp&nbsp;for&nbsp;JavaScript</a></div>\
+                <div class='ddItem ddDetails'><a target='_blank' href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a></div>\
                 <div style='height:0.25em;'></div>\
             </div>\
           </details>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-            <summary>WebDev</summary>\
-            <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a href='WebNotes.html'>Web Notes</a></div>\
-              <div class='ddItem ddDetails'><a href='WebComponentTests.html'>UI Widget Tests</a></div>\
-              <div class='ddItem ddDetails'><a href='https://encycolorpedia.com/named'>Web Colors</a></div>\
-              <div class='ddItem ddDetails'><a href='TestGrid.html'>TestGrid - Sized</a></div>\
-              <div class='ddItem ddDetails'><a href='TestGrid2.html'>TestGrid - AbsPos</a></div>\
-              <div class='ddItem ddDetails'><a href='TestFlexMenu.html'>TestFlexMenu</a></div>\
-              <div class='ddItem ddDetails'><a href='../Test/FlexMenus/TestFlexMenu.html'>TestFlexMenu - Basic</a></div>\
-              <div style='height:0.25em;'></div>\
-            </div>\
-          </details>\
-          <div class='ddItem'><a href='CommCompare.html' class='menuItem'>CommCompare:&nbsp;Rust&nbsp;&amp;&nbsp;C++</a></div>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-            <summary>Tests</summary>\
+          <div class='ddItem'><a target='_blank' href='CommCompare.html' class='menuItem'>CommCompare:&nbsp;Rust&nbsp;&amp;&nbsp;C++</a></div>\
+          <div class='ddItem'><a target='_blank' href='Interesting.html'>Interesting</a></div>\
+          <div class='ddItem'><a target='_blank' href='personalComputerSecurity.html'>Personal&nbsp;Computer&nbsp;Security&nbsp;</a></div>\
+          <details style='margin:0.25em 0.5em; cursor:pointer;' class='ddItem'>\
+            <summary>Site Widget Tests</summary>\
             <div style='margin-left:1.0em;'>\
               <div class='ddItem ddDetails'><a href='Resources/Bits/Bits_DataTest.html'>New Test Bits UI</a></div>\
               <div class='ddItem ddDetails'><a href='Resources/Bits/Bits_Hello.html'>Test Bits UI</a></div>\
@@ -319,12 +314,7 @@ function initializeMenu() {
               <div style='height:0.25em;'></div>\
             </div>\
           </details>\
-          <div class='ddItem'><a href='personalComputerSecurity.html'>Personal&nbsp;Computer&nbsp;Security&nbsp;</a></div>\
-          <div class='ddItem'><a href='Interesting.html'>Interesting</a></div>\
-          <div class='ddItem'><a href='TechnicalLinks.html'>Technical Links</a></div>\
-          <div class='ddItem'><a href='https://github.com/joshnh/Git-Commands'>git commands</a></div>\
-          <div class='ddItem'><a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a></div>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+          <details style='margin:0.25em 0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Neighborhoods</summary>\
             <div style='margin-left:1.0em;'>\
               <div class='ddItem ddDetails'><a href='https://JimFawcett.github.io'>JimFawcett-github</a></div>\
@@ -341,8 +331,40 @@ function initializeMenu() {
               <div style='height:0.25em;'></div>\
             </div>\
           </details>\
-          <div class='ddItem'><a href='SummerReading.html'>Summer Reading</a></div>\
-          <div class='ddItem'><a href='Interviews.html'>Job Interviews</a></div>\
+          <details style='margin:0.25em 0.5em; cursor:pointer;' class='ddItem'>\
+            <summary>Archive</summary>\
+            <div style='margin-left:1.0em;'>\
+              <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+                <summary>Design</summary>\
+                <div style='margin-left:1.0em;'>\
+                    <div class='ddItem ddDetails'><a target='_blank' href='Design.html'>Design Process</a></div>\
+                    <div class='ddItem ddDetails'><a target='_blank' href='UML.html'>UML Diagrams</a></div>\
+                    <div class='ddItem ddDetails'><a target='_blank' href='ProjectsList.html'>Project suggestions</a></div>\
+                    <div style='height:0.25em;'></div>\
+                </div>\
+              </details>\
+              <details style='margin:0.25em 0.5em; cursor:pointer;' class='ddItem'>\
+                <summary>WebDev</summary>\
+                <div style='margin-left:1.0em;'>\
+                  <div class='ddItem ddDetails'><a target='_blank' href='WebNotes.html'>Web Notes</a></div>\
+                  <div class='ddItem ddDetails'><a target='_blank' href='WebComponentTests.html'>UI Widget Tests</a></div>\
+                  <div class='ddItem ddDetails'><a target='_blank' href='https://encycolorpedia.com/named'>Web Colors</a></div>\
+                  <div class='ddItem ddDetails'><a target='_blank' href='TestGrid.html'>TestGrid - Sized</a></div>\
+                  <div class='ddItem ddDetails'><a target='_blank' href='TestGrid2.html'>TestGrid - AbsPos</a></div>\
+                  <div class='ddItem ddDetails'><a target='_blank' href='TestFlexMenu.html'>TestFlexMenu</a></div>\
+                  <div class='ddItem ddDetails'><a target='_blank' href='../Test/FlexMenus/TestFlexMenu.html'>TestFlexMenu - Basic</a></div>\
+                  <div style='height:0.25em;'></div>\
+                </div>\
+              </details>\
+              <div class='ddItem'><a target='_blank' href='Videos.html' class='menuItem'>Videos</a></div>\
+              <div class='ddItem'><a target='_blank' href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a></div>\
+              <div class='ddItem'><a target='_blank' href='TechnicalLinks.html'>Technical Links</a></div>\
+              <div class='ddItem'><a target='_blank' href='https://github.com/joshnh/Git-Commands'>git commands</a></div>\
+              <div class='ddItem'><a target='_blank' href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a></div>\
+              <div class='ddItem'><a target='_blank' href='SummerReading.html'>Summer Reading</a></div>\
+              <div class='ddItem'><a target='_blank' href='Interviews.html'>Job Interviews</a></div>\
+            </div>\
+          </details>\
           <div style='height:2em;'></div>\
       </div>\
     </div>\
@@ -426,15 +448,19 @@ function initializeMenu() {
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Rust&nbsp;Track&nbsp</div>\
+          <div class='ddLabel darkItem'>Site&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a target='_parent' href='TOCWebDev.html?src=indexWebDev.html'>Track&nbsp;Summary&nbsp;</a></div>\
-            <div class='ddItem undef'><a target='_parent' href='javascript:;'>Track&nbsp;Repo</a></div>\
-            <div class='ddItem undef'><a target='_parent' href='javascript:;'>&nbsp;Glossary&nbsp;</a></div>\
-            <div class='ddItem undef'><a target='_parent' href='javascript:;'>&nbsp;References&nbsp;</a></div>\
-            <div class='ddItem undef'><a target='_parent' href='javascript:;'>&nbsp;Flash&nbsp;Cards</a></div>\
-            <div class='ddItem undef'><a target='_parent' href='javascript:;'>&nbsp;Additions&nbsp;</a></div>\
-          <div style='height:2em;'></div>\
+            <div class='ddItem'><a href='Help_VSCode.html'>VSCode</a></div>\
+            <div class='ddItem'><a href='Help_Cargo.html'>Cargo</a></div>\
+            <div class='ddItem'><a href='Help_CMake.html'>CMake/a></div>\
+            <div class='ddItem'><a href='Help_Dotnet.html'>dotnet</a></div>\
+            <div class='ddItem'><a href='Help_Git.html'>Git</a></div>\
+            <div class='ddItem'><a href='Help_Github.html'>Github</a></div>\
+            <div class='ddItem'><a href='Help_PowerShell.html'>PowerShell</a></div>\
+            <div class='ddItem'><a href='Help_RegEx.html'>RegEx</a></div>\
+            <div class='ddItem'><a href='Help_ChatGPT.html'>ChatGPT</a></div>\
+            <div class='ddItem'><a href='Help.html'>Site Navigation</a></div>\
+          <div style='height:1em;'></div>\
         </div>\
     </div>\
     <div class='menuItem'><a id='prevLink' href='#'>Prev</a></div>\

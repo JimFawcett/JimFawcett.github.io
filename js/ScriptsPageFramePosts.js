@@ -238,21 +238,6 @@ function initializeMenu() {
           <div style='height:1em;'>&nbsp;</div>\
       </div>\
     </div>\
-    <div class='menuItem'>\
-      Help&#9662\
-      <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Code&nbsp;Help&nbsp;</div>\
-          <div class='ddItem'><a href='Help_VSCode.html'>VS&nbsp;Code</a></div>\
-          <div class='ddItem'><a href='Help_Cargo.html'>Cargo</a></div>\
-          <div class='ddItem undef'><a href='javascript:;'>CMake&nbsp;&nbsp;</a></div>\
-          <div class='ddItem undef'><a href='javascript:;'>dotnet&nbsp;&nbsp;</a></div>\
-          <div class='ddItem'><a href='Help_Git.html'>Git</a></div>\
-          <div class='ddItem'><a href='Help_PowerShell.html'>PowerShell</a></div>\
-          <div class='ddItem'><a href='Help_RegEx.html'>RegEx</a></div>\
-          <div class='ddItem undef'><a href='javascript:;'>Site&nbsp;Navigation&nbsp;&nbsp;</a></div>\
-          <div style='height:1em;'>&nbsp;</div>\
-      </div>\
-    </div>\
     <div class='menuItem'><a id='prevLink' href='#'>Prev</a></div>\
     <div class='menuItem'><a id='nextLink' href='#'>Next</a></div>\
   </div>\
