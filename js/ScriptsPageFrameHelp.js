@@ -452,7 +452,7 @@ function initializeMenu() {
             <div style='height:0.0em;'></div>\
             <div class='ddItem'><a href='Help_VSCode.html'>VSCode</a></div>\
             <div class='ddItem'><a href='Help_Cargo.html'>Cargo</a></div>\
-            <div class='ddItem'><a href='Help_CMake.html'>CMake/a></div>\
+            <div class='ddItem'><a href='Help_CMake.html'>CMake</a></div>\
             <div class='ddItem'><a href='Help_Dotnet.html'>dotnet</a></div>\
             <div class='ddItem'><a href='Help_Git.html'>Git</a></div>\
             <div class='ddItem'><a href='Help_Github.html'>Github</a></div>\
