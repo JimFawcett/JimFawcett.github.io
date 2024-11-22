@@ -170,6 +170,26 @@ function loadifprototypes() {
   }
 }
 
+function toggleShow(id, width) {
+  let showit = document.getElementById(id);
+  if (showit) {
+    if (showit.style.display === 'none') {
+      showit.style.display = 'block';
+      showit.firstElementChild.style.width = width + "px";
+    }
+    else {
+      let d3 = showit.style.width;
+      showit.firstElementChild.style.width = width + "px";
+      showit.style.display = 'None';
+    }
+  }
+  else {
+    //alert('showit not defined');
+  }
+}
+function bigger(img) {
+  img.style.width = (img.clientWidth * 1.25) + "px";
+}
 
 function initializeMenu() {
   var topMenu = document.getElementById("navbar");
@@ -237,12 +257,12 @@ function initializeMenu() {
         <div class='dropdown'>\
             <div class='ddLabel darkItem'>Stories,&nbsp;Bites,&nbsp;&amp;&nbsp;Bits&nbsp;</div>\
             <div class='ddItem'><a href='Stories.html'>What is a Story?</a></div>\
-            <div class='ddItem'><a href='BasicBiteByByte.html'>Basics Bites</a></div>\
-            <div class='ddItem'><a href='DesignBites.html'>Design Bites</a></div>\
             <div class='ddItem'><a href='CppStoryRepo.html'>C++&nbsp;Story</a></div>\
             <div class='ddItem'><a href='CppBiteByByte.html'>C++&nbsp;Bites</a></div>\
             <div class='ddItem'><a href='RustStoryRepo.html'>Rust&nbsp;Story</a></div>\
             <div class='ddItem'><a href='RustBiteByByte.html'>Rust&nbsp;bites&nbsp;</a></div>\
+            <div class='ddItem'><a href='BasicBiteByByte.html'>Basics Bites</a></div>\
+            <div class='ddItem'><a href='DesignBites.html'>Design Bites</a></div>\
             <div class='ddItem'><a href='BitsRepo.html'>Bits&nbsp;-&nbsp;C++,Rust,C#,Python,JvScpt&nbsp;</a></div>\
             <div class='ddItem'><a href='BuildOn.html'>BuildOn:&nbsp;learn&nbsp;Rust&nbsp;&nbsp;</a></div>\
             <div class='ddItem'><a href='IdiomsAndPatterns.html'>Idioms&nbsp;&amp;&nbsp;Patterns:&nbsp;depricated</a></div>\
@@ -252,6 +272,7 @@ function initializeMenu() {
             <div class='ddItem'><a href='StoryTeller_LocalStorage.html'>StoryTeller:&nbsp;depricated</a></div>\
             <div class='ddItem'><a href='StoryTellerDesign.html'>StoryTeller Design</a></div>\
             <div class='ddItem'><a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a></div>\
+            <div class='ddItem'><a href='Story_Prototype.html'>Story&nbsp;Prototype</a></div>\
             <div style='height:2em;'></div>\
         </div>\
     </div>\
@@ -425,6 +446,7 @@ function initializeMenu() {
           </details>\
           <div class='ddItem'><a href='SummerReading.html'>Summer&nbsp;Reading</a></div>\
           </details>\
+          <div class='ddItem'><a href='Blog_Prototype.html'>Blog Prototype</a></div>\
           <div style='height:1em;'>&nbsp;</div>\
       </div>\
     </div>\

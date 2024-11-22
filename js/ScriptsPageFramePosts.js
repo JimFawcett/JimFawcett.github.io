@@ -170,6 +170,26 @@ function loadifprototypes() {
   }
 }
 
+function toggleShow(id, width) {
+  let showit = document.getElementById(id);
+  if (showit) {
+    if (showit.style.display === 'none') {
+      showit.style.display = 'block';
+      showit.firstElementChild.style.width = width + "px";
+    }
+    else {
+      let d3 = showit.style.width;
+      showit.firstElementChild.style.width = width + "px";
+      showit.style.display = 'None';
+    }
+  }
+  else {
+    //alert('showit not defined');
+  }
+}
+function bigger(img) {
+  img.style.width = (img.clientWidth * 1.25) + "px";
+}
 
 function initializeMenu() {
   var topMenu = document.getElementById("navbar");
@@ -235,6 +255,7 @@ function initializeMenu() {
           </details>\
           <div class='ddItem'><a href='SummerReading.html'>Summer&nbsp;Reading</a></div>\
           </details>\
+          <div class='ddItem'><a href='Blog_Prototype.html'>Blog Prototype</a></div>\
           <div style='height:1em;'>&nbsp;</div>\
       </div>\
     </div>\
