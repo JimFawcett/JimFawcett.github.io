@@ -1,300 +1,403 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
+<!--
+  BlogMessagePassingComm.html
+-->
 <head>
-  <!--
-   - BlogMessagePassingComm.htm
-   - ver 1.1 - 17 Aug 2011
-   - Jim Fawcett, Syracuse University
-  -->
-  <title>Msg Passing Comm</title>
-  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
-  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
-  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
-  <meta name="Author" content="Jim Fawcett" />
-  <meta name="Author" content="James Fawcett" />
-  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-  <script src="js/ScriptsUtilities.js"></script>
-  <script src="js/ScriptsTemplate.js"></script>
-  <script src="js/ScriptsKeyboard.js"></script>
-  <script src="js/ScriptsMenu.js"></script>
-  <script src="js/ScriptsSizerComp.js"></script>
+  <title>Blog Msg Passing Comm</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- <link rel="icon" type="image/x-icon" href="./images/favicon.ico" /> -->
+  <link rel="stylesheet" href="css/StylesPhoto.css" />
   <link rel="stylesheet" href="css/StylesSizerComp.css" />
-  <link rel="stylesheet" href="css/StylesTemplate.css" />
-  <link rel="stylesheet" href="css/StylesDefault.css" />
-  <link rel="stylesheet" href="css/StylesMenu.css" />
-  <link rel="stylesheet" href="css/StylesBrownTheme.css" />
+  <!-- PageFrame infrastructure -->
+  <link rel="stylesheet" href="css/StylesPageFrameDefaults.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameStructure.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameMenus.css" />
+  <link rel="stylesheet" href="css/StylesPageFrameThemePython.css" />
+  <link rel="stylesheet" href="css/StylesWebComponents.css" />
+  <script src="js/ScriptsWebComponents.js"></script>
+  <!--<script src="js/ScriptsPageFrameDefaults.js"></script>-->
+  <script src="js/ScriptsPageFramePosts.js"></script>
+  <script src="js/ScriptsPageFramePagesPosts.js"></script>
+  <script src="js/ScriptsPageFrameKeyboard.js"></script>
+  <script src="js/ScriptsSizerComp.js"></script>
+  <!-- No need for Pages script for pages with no next or prev pages -->
+  <!--<script src="js/ScriptsPageFramePages.js"></script>-->
+  <!-- <script src="js/ScriptsTemplate.js"></script>
+  <link rel="stylesheet" href="css/StylesTemplate.css" /> -->
   <style>
-    #github header {
-      margin-left: 0px;
-      margin-right: 0px;
+    h3 {
+      margin-top: 1.5em;
     }
 
-    #github #pagetitle {
-      background-color: #e3dac9;
-      color: #800020;
-      border: 1px solid maroon;
+    #subtitle {
+      margin-top: 0.4em;
+      margin-bottom: 0.3em;
     }
 
-    #github #title {
-      background-color: #e3dac9;
-      color: #3f000f;
+    #github header summary {
+      border: 1px solid var(--light);
+    }
+
+    #github summary {
+      padding-right: 2em;
+    }
+    /* #github .menuHead {
+          margin:0em -0.25em 0.0em -0.25em;
+          padding:0.25em 0.5em;
+        } */
+  </style>
+  <script>
+    function load() {
+      initialize();
+      //loadif();
+    }
+  </script>
+  <style>
+    #github note {
+      display: block;
+      width:max-content;
+      border:1px solid red;
+      padding:0.5em 1.0em;
+      margin:0.5em 0em;
+    }
+    #github .bargraph {
+      border: 1px solid var(--dark);
+      /* background-color: #bbb; */
+      padding: 0.1em 0.5em;
+      font-size:0.9em;
+    }
+    #github table {
+      border:2px solid var(--dark);
+    }
+    #github table td {
+      padding:0.25em 1.0em;
+      border:none;
+    }
+    body {
+      user-select:none;
     }
   </style>
-</head>
-<body id="github" onload="initializeMenu()">
-
-  <navKeys-Container>
-    <nav-Key id="sKey" onclick="toggleSwipeEvents()">S</nav-Key>
-    <nav-Key id="rKey" onclick="location.reload()">R</nav-Key>
-    <nav-Key id="tKey" onclick="scrollPageTop()">T</nav-Key>
-    <nav-Key id="bKey" onclick="scrollPageBottom()">B</nav-Key>
-    <nav-Key id="hKey" onclick="helpWin()">H</nav-Key>
-    <nav-Key id="pKey" onclick="loadPrev()">P</nav-Key>
-    <nav-Key id="nKey" onclick="loadNext()">N</nav-Key>
-  </navKeys-Container>
-
-  <nav>
-    <div id="navbar"></div>
-  </nav>
-  <a id="Next" href="BlogActiveObjects.html">N</a>
-  <a id="Prev" href="BlogStructure.html">P</a>
-
-  <header>
-    <hgroup id="pagetitle">
-      <h1 id="title">Code Artistry - Message-Passing Communication with Queues</h1>
-      <h3 id="subtitle"></h3>
-    </hgroup>
-  </header>
-
-  <h3>Introduction:</h3>
-  <t-b>
-    Message-Passing Communication (MPC) establishes a channel between processes to communciate by sending messages.  A well
-    known example is the communication between browsers and web servers sending request and reply messages using the
-    HTTP protocol.
-  </t-b>
-  <t-b>
-    The simplest of these MPC systems is the client server model where a client sends a request message to a specified
-    server, the server processes the message, and sends back an appropriate reply message.  This request / reply sequence
-    constitutes a talk protocol.  The client initiates all message exchanges and the server simply responds.  It has the
-    benefit of a very simple message exchange sequence, but has the liability that the client must wait for a response.
-  </t-b>
-
-  <h4>Channels:</h4>
-  <t-b>
-    Another style is based on one-way asynchronous message channels between a sender on one peer and a receiver on another, as shown
-    in the diagram below.  Each of these "peers" might be located on seperate machines or in seperate processes in the same
-    machine.
-  </t-b>
-  <div style="width:calc(100vw - 9rem);"><div id="fig1"></div></div>
-  <t-b>
-    Each peer contains a sender and receiver package.  The sender communicates with one receiver at a time.  The receivers
-    each handle concurrent senders by accepting messages in a receive queue.  Often those messages are processed sequentially
-    by a single thread.  This means that the receiver and consequential processing do not have to be thread safe, as long as
-    the receiving queue is thread-safe.
-  </t-b>
-
-  <h4>End Points:</h4>
-  <t-b>
-    Each receiver has a listener assigned to a specific port, and we describe the ip-address and port number as an endpoint
-    which we represent as an attribute pair ip : port.  The endpoint is an address for a particular service provided by a peer.
-    Note that the diagram emphasizes that the communication endpoints are identical, even though the processing that is provided
-    at a particular endpoint may be quite different from that at another endpoint.  The communication endpoints are peers, but
-    the machines are not.
-  </t-b>
-
-  <h4>Talk Protocol:</h4>
-  <t-b>
-    The resulting talk protocol is very simple because messages only flow one way in each channel.  A sender can send to an
-    endpoint at any time, and a receiver can handle enqueued messages at any time.  This makes a very flexible and fluid style
-    of communication.  The sender does not wait for a response.  After sending a message it may send messages to other peers
-    or do other processing.  Eventually the receiver of the message may elect to send back a reply message to the sender, but
-    is not required to do so.  The exchange is very like threads of email that we all use.
-  </t-b>
-  <h4>Messages:</h4>
-  <t-b>
-    Messages contain a destination address so that the sender can connect to that endpoint.  If the reciever will eventually
-    reply, then, since there will be multiple senders, the message needs a return address.  The message also needs to define
-    the requested operation and provide any parameters needed to carry out the requested action.
-  </t-b>
-  <div style="width:calc(100vw - 9rem);"><div id="fig2"></div></div>
-  <h4>WCF Communication:</h4>
-  <t-b>
-    If we use a communcation framework
-    like Windows Communication Foundation (WCF), then each message will consist of a Simple Object Access Protocol (SOAP) wrapper
-    around a serialized instance of a data class that defines the request, the to and from addresses, and any parameters needed to
-    execute the request.
-  </t-b>
-  <t-b>
-    The diagram at the right shows one possible design for peer-to-peer communication using WCF.  Each Receiver instantiates a
-    WCF service.  The service objects simply enqueue incoming messages, for processing by the dequeueing thread.  If a reply
-    is appropriate the message processor builds a reply message, using the incoming message return address and passes it to its
-    sender, usually with a PostMessage(msg) invocation.
-  </t-b>
-
-  <h4>Socket Communication:</h4>
-  <t-b>
-    If we craft our own communication infrastructure with sockets, we're likely to use HTTP style messages.
-    The HTTP protocol uses messages
-    that contain a header, consisting of text lines, where each line is an attribute pair.  The message header is terminated with
-    a blank line.  If the message contains a content-length:483 attribute, that implies that the header is followed with a body
-    containing 483 bytes of data, which need not be text.
-  </t-b>
-  <div style="width:calc(100vw - 9rem);"><div id="fig3"></div></div>
-  <t-b>
-    Receivers instantiate a socket listener, running on its own thread.  When a connection is established, the listener passes
-    a work-item to a thread pool thread that contains the connected socket and a reference to the blocking queue.  When a thread
-    pool thread is available, it begins framing messages by pulling bytes out of the socket, reading lines from the message header
-    and pulling out the message body.  It builds a message instance from the bytes it receives and enqueues for processing
-    by the Message Processing Thread.
-  </t-b>
-
-  <h4>Message Queues:</h4>
-  <t-b>
-    Each receiver has a thread-safe blocking queue that is shared by all senders to that endpoint.  If we are using WCF, we
-    make the queue a static member of the service class so that every service instance shares the same queue, e.g., each sender
-    to that endpoint gets a service instance and the service simply enqueues messages for the endpoint's processing thread to
-    dequeue and process.  This is the design we use for the last of the CSE681 - Software Modeling and Analysis projects.
-  </t-b>
-  <t-b>
-    If we are building a socket-based communication system, the listener socket, using threads from a threadpool, provides a
-    dedicated client handler thread with the connected socket and a reference to the shared blocking queue.  In CSE687 - Object Oriented Design,
-    we will use this design for some projects.
-  </t-b>
-
-  <h4>File Transfer:</h4>
-  <t-b>
-    For sending a file between endpoints we could send blocks of bytes from the file in a sequence of messages, but it would be
-    somewhat more efficient to send a beginning message that identifies the file name, length, and block size, and then a sequence of
-    blocks of bytes, perhaps followed by a terminating message. Note that, while performing a file transfer, the service objects
-    will simply write incoming blocks into a file, but not post them to the receive queue.  When transfer is complete it posts
-    a message to the queue so the message processor knows a file has arrived.
-  </t-b>
-  <div style="width:calc(100vw - 9rem);"><div id="fig4"></div></div>
-  <h4>Channel Structure</h4>
-  <t-b>
-    We show, in Figure 4., details of the channel processing.  Each peer has a Comm component that contains both a Sender
-    and a Receiver, so the Peers are depicted as mirror images in the diagram.
-  </t-b>
-  <t-b>
-    Socket Listeners are shown as boxes labeled SL.  Receiving sockets are shown as boxes labeled S, and Sending sockets are
-    shown as boxes labeled with SC.  These labels correspond to classes in the socket library, e.g., Socket, SocketListener,
-    and SocketConnector.
-  </t-b>
-  <t-b>
-    The gray clouds are ClientHandler instances connected to Peers not shown in the diagram.  The white clouds are
-    ClientHandler instances used for a two-way conversation between the Peers shown in the diagram.
-  </t-b>
-  <t-b>
-    Remember that a sender does not wait for a response.  It simply sends a message describing an activity to be conducted
-    by the receiver or information needed by the receiver, along with the destination address and its own return address for replies.
-    Should the recever need to reply, it simply sends a message to
-    the endpoint specified by the return address of the message it received.
-  </t-b>
-  <t-b>
-    This asynchronous message-passing communication is very fluid.  It establishes conversations, much like email exchanges,
-    with its peers.  Of course, this flexibility is bought at the expense of sockets and threads at each end, but is very
-    easy to set up and use.
-  </t-b>
-  <div style="width:calc(100vw - 9rem);"><div id="fig5"></div></div>
-  <div style="width:calc(100vw - 9rem);"><div id="fig6"></div></div>
-  <h4>Message Structure</h4>
-  <t-b>
-    Messages are similar to those used for HTTP communication.  We add &quot;to&quot; and &quot;from&quot; attributes
-    and frequenly use custome attributes to provide information needed by the receiver.  Our messages start with a
-    command line, but that is often different from the HTTP command lines holding GET, POST, PUT, DELETE, etc.
-  </t-b>
-  <t-b>
-    When sending binary data we usually use chunking.  That may entail sending one chunk each in a sequence of messages,
-    or could be one initiating message describing the length of the binary body, and then sending a sequence of binary blocks
-    until the specified content-length has been sent.  Any given application would use one or the other.
-  </t-b>
-  <t-b>
-    There is only one type of message, used in our channels, as this message type accomodates an open-ended
-    number of attributes, allowing us to send whatever information and commands are required by the other end.
-    What we have done is to push all of the application specific details out of the communication channel, and
-    into messsages that are composed by application senders and interpreted by application receivers.
-  </t-b>
-  <t-b>
-    This encourages a very flexible &quot;duck-typing&quot; style of design concentrated in message handling,
-    but keeping strict typing for all of the non-message communication parts.
-  </t-b>
-  <t-b>
-    Essentially, we get the best of
-    both worlds - very mutable message contents, supporting whatever the application needs, but strict control
-    of the channel typing which eliminates errors due to typing errors and failures to connect components
-    according to their interfaces.
-  </t-b>
-  <t-b>
-    When messages are received, they are dispatched to methods that are appropriate for handling that specific
-    message.  We provide each message with a key - the command (see Figure 5.) - that is used to lookup a functor
-    or lambda to handle processing of that messages.
-  </t-b>
-  <t-b>
-    When we want to add new functionality to a server, we just design a new message format and a lambda to handle
-    that message.  Nothing else changes, so we get virtually no breakage when responding to new requirements.
-  </t-b>
-
-  <h4>Message-Passing Comm Classes</h4>
-  <t-b>
-    Each Peer contains a Comm instance.  The Comm class composes a Sender and a Receiver instance, both of
-    which use a thread-safe blocking queue and a socket library with a base Socket class and derivedf
-    SocketListener and SocketConnecter classes.
-  </t-b>
-  <t-b>
-    Each Receiver contains an instance of SocketListener, running on its own thread.  When a connection is
-    made, the SocketListerner instance creates an instance of a ClientHandler thread, passing it a Socket
-    instance connected to the sender.  The ClientHandler is responsible for framing messages drawn from its
-    Socket instance and enqueuing them for server processing.
-  </t-b>
-  <t-b>
-    Each Sender instance has a send thread that inspects input messages to get the destination address,
-    and attempts to connect to that address, or uses an already open connection.  Send and ClientHandler
-    threads also collaborate to handle transmission of file chunks.
-    Each Peer contains a Comm instance.  The Comm class composes a Sender and a Receiver instance, both of
-    which use a thread-safe blocking queue and a socket library with a base Socket class and derivedf
-    SocketListener and SocketConnecter classes.
-  </t-b>
-  <h4>Server Threading</h4>
-  <t-b>
-    As shown in Figure 4., a server dequeues and processes messages with a single thread.  Multiple clients
-    are being served concurrently, as each ClientHandler thread is framing messages and/or receiving files,
-    for potentially multiple concurrent clients.  This style of processing is often referred to as a Single
-    Threaded Apartment (STA), a term that was coined to describe one type of Microsoft COM processing in COM
-    components.  Virtually all Graphical User Interfaces, Windows message handling, and JavaScript (and
-    node.js) execution use this form of processing.
-  </t-b>
-  <t-b>
-    The advantages are that there won't be any thread conflicts when servers access a data store or open files
-    because only one thread processes all messages.  Should we decide that, for performance reasons, we need
-    to use multi-threading for message processing, the server can always spawn new threads, and lock any
-    shared resources.
-  </t-b>
-  <h4>Code Resources</h4>
-  <t-b>
-    You will find all the C++ code for a demonstration of Asynchronous Message-Passing in
-    <a href="../Repository/Cpp/CppCommWithFileXfer">CppCommWithFileXfer</a>.  This was written using Visual Studio 2017
-    and its Visual C++ compiler and standard libraries.  The Socket Library is also included with that project.
-  </t-b>
-  <t-b>
-    You will also find C# code that implements an Asynchronous Message-Passing Communication channel in
-    <a href="../Repository/CSharp/CsMessagePassingComm">CsMessagePassingComm</a>.  That channel uses the .Net
-    Windows Communication Foundation (WCF) framework instead of directly handling sockets.  Note that you must run
-    Visual Studio in administrator mode for this project to run successfully.  That is a policy set by WCF.
-  </t-b>
-  <t-b>
-    Note that Figures 1., 3., 4. and 6. are specific to the C++ channel.  Figure 2. is specific to the C# WCF channel,
-    and Figure 5. applies to both.  The C# channel processing is similar to that shown in Figure 4., but some of the
-    details are different, e.g., we use WCF instead of sockets.
-  </t-b>
-  <img class="photo" src="Pictures/facultyCenterStrip.jpg" style="width:100%;" />
-  <info-bar></info-bar>
   <script>
-    createSizer("Pictures/AsyncMsgPassComm.jpg", "Fig 1. Peer-to-Peer Communication", 500, "fig1");
-    createSizer("Pictures/WCF-MsgPassing.PNG", "Fig 2. WCF Message-Passing Communication", 500, "fig2");
-    createSizer("Pictures/Socket-MsgPassing.PNG", "Fig 3. Socket Message-Passing Communication", 500, "fig3");
-    createSizer("Pictures/ChannelStructure.JPG", "Fig 4. Socket-based Channel Structure", 500, "fig4");
-    createSizer("Pictures/MessageStructure.jpg", "Fig 5. Message Structure", 500, "fig5");
-    createSizer("Pictures/CommClasses.png", "Fig 6. Message-passing Comm Class Diagram", 500, "fig6");
+    function clickstat() {
+      // prevent parent click event handling
+      event.stopImmediatePropagation();
+    }
+  </script>
+</head>
+<body id="github" onload="load()" style="position:relative;">
+
+  <a id="Next" href="BlogActiveObjects.html">Next</a>
+  <a id="Prev" href="BlogStructure.html">Prev</a>
+
+  <page-frame>
+    <frame-header>
+      <nav id="navbar"></nav>
+    </frame-header>
+    <main id="main">
+      <div id="about" onclick="this.style.display = 'none'">about</div>
+      <div id="page">Blog: Msg Passing Comm</div>
+      <div id="modified">11/27/2024</div>
+      <div id="hlp"></div>
+      <a id="top"></a>
+      <content style="height:100vh; position:relative;">
+        <header style="cursor:pointer;" onclick="loadif()">
+          <!-- <a target="_blank" class="repoLink" href="https://github.com/JimFawcett">github Repositories</a> -->
+          <hgroup id="pagetitle" style="border: 2px solid var(--dark);">
+            <h1 id="title">Blog: Message Passing Comm</h1>
+            <h3 class="indent" id="subtitle">
+              channels, endpoints, messages, queues
+            </h3>
+          </hgroup>
+          <!-- <img style="width:100%; margin:-0.1em 0em; border:2px solid var(--dark); padding:0.5em; background-color:var(--light);" src="Pictures/officestrip3a.svg" /> -->
+          <div class="darkItem" onclick="loadif()" style="cursor:pointer; position:relative; padding:0.0em 0em 0.25em 0em; margin-top:-0.50em; border:2px solid var(--dark);">
+            <a class="repoLinks" target="_blank" href="https://github.com/JimFawcett" style="color:var(--atten); margin-left:1.5em;">About</a>
+            <div style="font-size:0.9em; position:absolute; top:0.1em; right:1.5em;">click to toggle Site Explorer</div>
+            <div style="height:0.5em;"></div>
+          </div>
+        </header>
+
+        <h3>Introduction:</h3>
+        <t-b>
+          Message-Passing Communication (MPC) establishes a channel between processes to communciate by sending messages.  A well
+          known example is the communication between browsers and web servers sending request and reply messages using the
+          HTTP protocol.
+        </t-b>
+        <t-b>
+          The simplest of these MPC systems is the client server model where a client sends a request message to a specified
+          server, the server processes the message, and sends back an appropriate reply message.  This request / reply sequence
+          constitutes a talk protocol.  The client initiates all message exchanges and the server simply responds.  It has the
+          benefit of a very simple message exchange sequence, but has the liability that the client must wait for a response.
+        </t-b>
+      
+        <h4 id="channels">Channels:</h4>
+        <t-b>
+          Another style is based on one-way asynchronous message channels between a sender on one peer and a receiver on another, as shown
+          in the diagram below.  Each of these "peers" might be located on seperate machines or in seperate processes in the same
+          machine.
+        </t-b>
+        <div style="width:calc(100vw - 9rem);"><div id="fig1"></div></div>
+        <t-b>
+          Each peer contains a sender and receiver package.  The sender communicates with one receiver at a time.  The receivers
+          each handle concurrent senders by accepting messages in a receive queue.  Often those messages are processed sequentially
+          by a single thread.  This means that the receiver and consequential processing do not have to be thread safe, as long as
+          the receiving queue is thread-safe.
+        </t-b>
+      
+        <h4 id="endpoints">End Points:</h4>
+        <t-b>
+          Each receiver has a listener assigned to a specific port, and we describe the ip-address and port number as an endpoint
+          which we represent as an attribute pair ip : port.  The endpoint is an address for a particular service provided by a peer.
+          Note that the diagram emphasizes that the communication endpoints are identical, even though the processing that is provided
+          at a particular endpoint may be quite different from that at another endpoint.  The communication endpoints are peers, but
+          the machines are not.
+        </t-b>
+      
+        <h4>Talk Protocol:</h4>
+        <t-b>
+          The resulting talk protocol is very simple because messages only flow one way in each channel.  A sender can send to an
+          endpoint at any time, and a receiver can handle enqueued messages at any time.  This makes a very flexible and fluid style
+          of communication.  The sender does not wait for a response.  After sending a message it may send messages to other peers
+          or do other processing.  Eventually the receiver of the message may elect to send back a reply message to the sender, but
+          is not required to do so.  The exchange is very like threads of email that we all use.
+        </t-b>
+        <h4 id="messages">Messages:</h4>
+        <t-b>
+          Messages contain a destination address so that the sender can connect to that endpoint.  If the reciever will eventually
+          reply, then, since there will be multiple senders, the message needs a return address.  The message also needs to define
+          the requested operation and provide any parameters needed to carry out the requested action.
+        </t-b>
+        <div style="width:calc(100vw - 9rem);"><div id="fig2"></div></div>
+        <h4>WCF Communication:</h4>
+        <t-b>
+          If we use a communcation framework
+          like Windows Communication Foundation (WCF), then each message will consist of a Simple Object Access Protocol (SOAP) wrapper
+          around a serialized instance of a data class that defines the request, the to and from addresses, and any parameters needed to
+          execute the request.
+        </t-b>
+        <t-b>
+          The diagram at the right shows one possible design for peer-to-peer communication using WCF.  Each Receiver instantiates a
+          WCF service.  The service objects simply enqueue incoming messages, for processing by the dequeueing thread.  If a reply
+          is appropriate the message processor builds a reply message, using the incoming message return address and passes it to its
+          sender, usually with a PostMessage(msg) invocation.
+        </t-b>
+      
+        <h4>Socket Communication:</h4>
+        <t-b>
+          If we craft our own communication infrastructure with sockets, we're likely to use HTTP style messages.
+          The HTTP protocol uses messages
+          that contain a header, consisting of text lines, where each line is an attribute pair.  The message header is terminated with
+          a blank line.  If the message contains a content-length:483 attribute, that implies that the header is followed with a body
+          containing 483 bytes of data, which need not be text.
+        </t-b>
+        <div style="width:calc(100vw - 9rem);"><div id="fig3"></div></div>
+        <t-b>
+          Receivers instantiate a socket listener, running on its own thread.  When a connection is established, the listener passes
+          a work-item to a thread pool thread that contains the connected socket and a reference to the blocking queue.  When a thread
+          pool thread is available, it begins framing messages by pulling bytes out of the socket, reading lines from the message header
+          and pulling out the message body.  It builds a message instance from the bytes it receives and enqueues for processing
+          by the Message Processing Thread.
+        </t-b>
+      
+        <h4 id="queues">Message Queues:</h4>
+        <t-b>
+          Each receiver has a thread-safe blocking queue that is shared by all senders to that endpoint.  If we are using WCF, we
+          make the queue a static member of the service class so that every service instance shares the same queue, e.g., each sender
+          to that endpoint gets a service instance and the service simply enqueues messages for the endpoint's processing thread to
+          dequeue and process.  This is the design we use for the last of the CSE681 - Software Modeling and Analysis projects.
+        </t-b>
+        <t-b>
+          If we are building a socket-based communication system, the listener socket, using threads from a threadpool, provides a
+          dedicated client handler thread with the connected socket and a reference to the shared blocking queue.  In CSE687 - Object Oriented Design,
+          we will use this design for some projects.
+        </t-b>
+      
+        <h4 id="files">File Transfer:</h4>
+        <t-b>
+          For sending a file between endpoints we could send blocks of bytes from the file in a sequence of messages, but it would be
+          somewhat more efficient to send a beginning message that identifies the file name, length, and block size, and then a sequence of
+          blocks of bytes, perhaps followed by a terminating message. Note that, while performing a file transfer, the service objects
+          will simply write incoming blocks into a file, but not post them to the receive queue.  When transfer is complete it posts
+          a message to the queue so the message processor knows a file has arrived.
+        </t-b>
+        <div style="width:calc(100vw - 9rem);"><div id="fig4"></div></div>
+        <h4 id="channel_structure">Channel Structure</h4>
+        <t-b>
+          We show, in Figure 4., details of the channel processing.  Each peer has a Comm component that contains both a Sender
+          and a Receiver, so the Peers are depicted as mirror images in the diagram.
+        </t-b>
+        <t-b>
+          Socket Listeners are shown as boxes labeled SL.  Receiving sockets are shown as boxes labeled S, and Sending sockets are
+          shown as boxes labeled with SC.  These labels correspond to classes in the socket library, e.g., Socket, SocketListener,
+          and SocketConnector.
+        </t-b>
+        <t-b>
+          The gray clouds are ClientHandler instances connected to Peers not shown in the diagram.  The white clouds are
+          ClientHandler instances used for a two-way conversation between the Peers shown in the diagram.
+        </t-b>
+        <t-b>
+          Remember that a sender does not wait for a response.  It simply sends a message describing an activity to be conducted
+          by the receiver or information needed by the receiver, along with the destination address and its own return address for replies.
+          Should the recever need to reply, it simply sends a message to
+          the endpoint specified by the return address of the message it received.
+        </t-b>
+        <t-b>
+          This asynchronous message-passing communication is very fluid.  It establishes conversations, much like email exchanges,
+          with its peers.  Of course, this flexibility is bought at the expense of sockets and threads at each end, but is very
+          easy to set up and use.
+        </t-b>
+        <div style="width:calc(100vw - 9rem);"><div id="fig5"></div></div>
+        <div style="width:calc(100vw - 9rem);"><div id="fig6"></div></div>
+        <h4 id="message_structure">Message Structure</h4>
+        <t-b>
+          Messages are similar to those used for HTTP communication.  We add &quot;to&quot; and &quot;from&quot; attributes
+          and frequenly use custome attributes to provide information needed by the receiver.  Our messages start with a
+          command line, but that is often different from the HTTP command lines holding GET, POST, PUT, DELETE, etc.
+        </t-b>
+        <t-b>
+          When sending binary data we usually use chunking.  That may entail sending one chunk each in a sequence of messages,
+          or could be one initiating message describing the length of the binary body, and then sending a sequence of binary blocks
+          until the specified content-length has been sent.  Any given application would use one or the other.
+        </t-b>
+        <t-b>
+          There is only one type of message, used in our channels, as this message type accomodates an open-ended
+          number of attributes, allowing us to send whatever information and commands are required by the other end.
+          What we have done is to push all of the application specific details out of the communication channel, and
+          into messsages that are composed by application senders and interpreted by application receivers.
+        </t-b>
+        <t-b>
+          This encourages a very flexible &quot;duck-typing&quot; style of design concentrated in message handling,
+          but keeping strict typing for all of the non-message communication parts.
+        </t-b>
+        <t-b>
+          Essentially, we get the best of
+          both worlds - very mutable message contents, supporting whatever the application needs, but strict control
+          of the channel typing which eliminates errors due to typing errors and failures to connect components
+          according to their interfaces.
+        </t-b>
+        <t-b>
+          When messages are received, they are dispatched to methods that are appropriate for handling that specific
+          message.  We provide each message with a key - the command (see Figure 5.) - that is used to lookup a functor
+          or lambda to handle processing of that messages.
+        </t-b>
+        <t-b>
+          When we want to add new functionality to a server, we just design a new message format and a lambda to handle
+          that message.  Nothing else changes, so we get virtually no breakage when responding to new requirements.
+        </t-b>
+      
+        <h4 id="mpc_classes">Message-Passing Comm Classes</h4>
+        <t-b>
+          Each Peer contains a Comm instance.  The Comm class composes a Sender and a Receiver instance, both of
+          which use a thread-safe blocking queue and a socket library with a base Socket class and derivedf
+          SocketListener and SocketConnecter classes.
+        </t-b>
+        <t-b>
+          Each Receiver contains an instance of SocketListener, running on its own thread.  When a connection is
+          made, the SocketListerner instance creates an instance of a ClientHandler thread, passing it a Socket
+          instance connected to the sender.  The ClientHandler is responsible for framing messages drawn from its
+          Socket instance and enqueuing them for server processing.
+        </t-b>
+        <t-b>
+          Each Sender instance has a send thread that inspects input messages to get the destination address,
+          and attempts to connect to that address, or uses an already open connection.  Send and ClientHandler
+          threads also collaborate to handle transmission of file chunks.
+          Each Peer contains a Comm instance.  The Comm class composes a Sender and a Receiver instance, both of
+          which use a thread-safe blocking queue and a socket library with a base Socket class and derivedf
+          SocketListener and SocketConnecter classes.
+        </t-b>
+        <h4 id="server_threading">Server Threading</h4>
+        <t-b>
+          As shown in Figure 4., a server dequeues and processes messages with a single thread.  Multiple clients
+          are being served concurrently, as each ClientHandler thread is framing messages and/or receiving files,
+          for potentially multiple concurrent clients.  This style of processing is often referred to as a Single
+          Threaded Apartment (STA), a term that was coined to describe one type of Microsoft COM processing in COM
+          components.  Virtually all Graphical User Interfaces, Windows message handling, and JavaScript (and
+          node.js) execution use this form of processing.
+        </t-b>
+        <t-b>
+          The advantages are that there won't be any thread conflicts when servers access a data store or open files
+          because only one thread processes all messages.  Should we decide that, for performance reasons, we need
+          to use multi-threading for message processing, the server can always spawn new threads, and lock any
+          shared resources.
+        </t-b>
+        <h4 id="resources">Code Resources</h4>
+        <t-b>
+          You will find all the C++ code for a demonstration of Asynchronous Message-Passing in
+          <a href="../Repository/Cpp/CppCommWithFileXfer">CppCommWithFileXfer</a>.  This was written using Visual Studio 2017
+          and its Visual C++ compiler and standard libraries.  The Socket Library is also included with that project.
+        </t-b>
+        <t-b>
+          You will also find C# code that implements an Asynchronous Message-Passing Communication channel in
+          <a href="../Repository/CSharp/CsMessagePassingComm">CsMessagePassingComm</a>.  That channel uses the .Net
+          Windows Communication Foundation (WCF) framework instead of directly handling sockets.  Note that you must run
+          Visual Studio in administrator mode for this project to run successfully.  That is a policy set by WCF.
+        </t-b>
+        <t-b>
+          Note that Figures 1., 3., 4. and 6. are specific to the C++ channel.  Figure 2. is specific to the C# WCF channel,
+          and Figure 5. applies to both.  The C# channel processing is similar to that shown in Figure 4., but some of the
+          details are different, e.g., we use WCF instead of sockets.
+        </t-b>
+        <div style="height:1em;"></div>
+        <img class="photo" src="Pictures/facultyCenterStrip.jpg" style="width:100%;" />
+        <div style="height:1.0em;"></div>
+        <script>
+          createSizer("Pictures/AsyncMsgPassComm.jpg", "Fig 1. Peer-to-Peer Communication", 500, "fig1");
+          createSizer("Pictures/WCF-MsgPassing.PNG", "Fig 2. WCF Message-Passing Communication", 500, "fig2");
+          createSizer("Pictures/Socket-MsgPassing.PNG", "Fig 3. Socket Message-Passing Communication", 500, "fig3");
+          createSizer("Pictures/ChannelStructure.JPG", "Fig 4. Socket-based Channel Structure", 500, "fig4");
+          createSizer("Pictures/MessageStructure.jpg", "Fig 5. Message Structure", 500, "fig5");
+          createSizer("Pictures/CommClasses.png", "Fig 6. Message-passing Comm Class Diagram", 500, "fig6");
+        </script>
+          <a id="bottom"></a>
+      </content>
+      <page-TOC id="pages" style="display:none;">
+      </page-TOC>
+      <page-sections id="sections" style="display:none;">
+        <menu-elem style="width:0.0em">&nbsp;</menu-elem>
+        <menu-elem class="secElem"><a href="#bottom">bottom</a></menu-elem>
+        <menu-elem class="secElem"><a href="#resources">resources</a></menu-elem>
+        <menu-elem class="secElem"><a href="#server_threading">server threading</a></menu-elem>
+        <menu-elem class="secElem"><a href="#mpc_classes">mpc classes</a></menu-elem>
+        <menu-elem class="secElem"><a href="#message_structure">message structure</a></menu-elem>
+        <menu-elem class="secElem"><a href="#channel_structure">channel structure</a></menu-elem>
+        <menu-elem class="secElem"><a href="#files">files</a></menu-elem>
+        <menu-elem class="secElem"><a href="#queues">queues</a></menu-elem>
+        <menu-elem class="secElem"><a href="#messages">messages</a></menu-elem>
+        <menu-elem class="secElem"><a href="#endpoints">endpoints</a></menu-elem>
+        <menu-elem class="secElem"><a href="#channels">channels</a></menu-elem>
+        <menu-elem class="secElem"><a href="#top">top</a></menu-elem>
+        <div class='darkItem popupHeader' style="padding:0.25em 2.0em;" onclick="this.parentElement.style.display='none'">Sections</div>
+      </page-sections>
+    </main>
+    <frame-footer>
+      <menu-item style="width:2.0em;">&nbsp;</menu-item>
+      <menu-elem id="nextLink2" onclick="bottomMenu.next()">Next</menu-elem>
+      <menu-elem id="prevLink2" onclick="bottomMenu.prev()">Prev</menu-elem>
+      <menu-elem id="pgbtn" onclick="bottomMenu.pages()">Pages</menu-elem>
+      <menu-elem onclick="bottomMenu.sections()">Sections</menu-elem>
+      <menu-elem onclick="bottomMenu.about()">About</menu-elem>
+      <menu-elem id="kysbtn" onclick="storyHlpMenu.keys()">Keys</menu-elem>
+      <menu-elem style="margin-right:1em">
+        <span id="loc" style="display:inline-block; font-weight:normal"></span>
+      </menu-elem>
+    </frame-footer>
+  </page-frame>
+  <script>
+    createSizer("Pictures/SimpleProgram.JPG", "Fig 1. Simple Program Package Structure", 400, "fig1");
+    createSizer("Pictures/ClientServer.PNG", "Fig 2. Traditional Client/Server Model", 400, "fig2");
+    createSizer("Pictures/AspNetServer.JPG", "Fig 3. Browser Client / Asp.Net Server", 600, "fig3");
+    createSizer("Pictures/MVC.jpg", "Fig 4. Model-View-Controller Structure", 600, "fig4");
+    createSizer("Pictures/ParserStaticStructure.JPG", "Fig 5. Rule-Based Parser", 600, "fig5");
+    createSizer("Pictures/ParallelTypeAnal.JPG", "Fig 6. Parallel Pipelined Concurrency for Type Analysis", 600, "fig6");
+    createSizer("Pictures/WindowsEventProcessing.JPG", "Fig 7. Handling Events based on Windows Messages", 400, "fig7");
+    createSizer("Pictures/PeerToPeer.JPG", "Fig 8. Peer-To-Peer Communication", 400, "fig8");
+    createSizer("Pictures/webservices.jpg", "Fig 9. Service Architecture", 400, "fig9");
+    createSizer("Pictures/Federation-RTS.JPG", "Fig 10. SW Dev Federation", 600, "fig10");
+  </script>
+<script>
+    let loc = document.getElementById("loc");
+    let fn = window.location.href.split(/\/|\\/).pop();
+    loc.innerHTML = fn + ":";
   </script>
 </body>
 </html>

@@ -1,0 +1,297 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - BlogActiveObjs.htm - Code Artist Thoughts
+   - ver 1.2 - 15 August 2013
+   - Jim Fawcett, Syracuse University
+  -->
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <title>Blog.ActiveObjects</title>
+  <script src="js/ScriptsUtilities.js"></script>
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <script src="js/ScriptsSizerComp.js"></script>
+  <link rel="stylesheet" href="css/StylesSizerComp.css" />
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesDefault.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+  <link rel="stylesheet" href="css/StylesBrownTheme.css" />
+  <style>
+    #github header {
+      margin-left: 0px;
+      margin-right: 0px;
+    }
+
+    #github #pagetitle {
+      background-color: #e3dac9;
+      color: #800020;
+      border: 1px solid maroon;
+    }
+
+    #github #title {
+      background-color: #e3dac9;
+      color: #3f000f;
+    }
+  </style>
+</head>
+<body id="github" onload="initializeMenu()">
+
+  <navKeys-Container>
+    <nav-Key id="sKey" onclick="toggleSwipeEvents()">S</nav-Key>
+    <nav-Key id="rKey" onclick="location.reload()">R</nav-Key>
+    <nav-Key id="tKey" onclick="scrollPageTop()">T</nav-Key>
+    <nav-Key id="bKey" onclick="scrollPageBottom()">B</nav-Key>
+    <nav-Key id="hKey" onclick="helpWin()">H</nav-Key>
+    <nav-Key id="pKey" onclick="loadPrev()">P</nav-Key>
+    <nav-Key id="nKey" onclick="loadNext()">N</nav-Key>
+  </navKeys-Container>
+
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <a id="Next" href="BlogNoSql.html">N</a>
+  <a id="Prev" href="BlogMessagePassingComm.html">P</a>
+
+  <header>
+    <hgroup id="pagetitle">
+      <h1 id="title">Code Artistry - Active Objects</h1>
+    </hgroup>
+  </header>
+
+  <!-- page content -->
+  <h3>Initial Thoughts:</h3>
+  <t-b>
+    Active objects are instances of a type that accepts messages in an input queue, processes each message according to rules defined for its type,
+    and passes results, if any, to another active object.  Each active object derives from a base class that holds a thread-safe blocking queue,
+    and a thread that runs a virtual function for message processing.  Probably we would make the base abstract by making its message processing
+    function pure virtual.  Each derived class overrides the bases virtual function to define its activities. The Server Communication system
+    discussed below uses active objects to implement its operations.
+  </t-b>
+  <t-b>
+    Communication channels are one of the more challenging software constructs to build.  We need them to be flexible, reliable, and fast.
+    A lot of the technical community focuses on communication using a Remote Procedure Call (RPC) model.  I don't think that is always a good idea. RPC establishes
+    an interface for communication that provides functions to carry out the application's business.  But those functions will likely change with every
+    application; so we find ourselves constantly rebuilding these channels for new projects<sup>1</sup>.
+  </t-b>
+  <t-b>
+    What we need is an immutable interface that serves well for almost every application, and that's just what Message-Passing Communication (MPC) does.
+    Essentially we move the application specific communication details where it belongs - with the application.  The sending application decides how to
+    configure messages with commands, notifications, and data and the receivers decide how to interpret them.
+    The channel simply manages transmission of messages between endpoints with a single
+    call, PostMessage(msg).
+  </t-b>
+  <t-b>
+    That, of course, is not new - it's similar to what networks and the internet do, using HTTP over TCP/IP.  A lot of use has shown that to work well.
+    With MPC We can focus on building a reusable
+    channel that takes care of all the issues our particular business needs and we then use it, without change, in most of our projects.  We're going to propose
+    a specific architecture for that, based on HTTP like messaging and dispatching to registered communicators, as shown in the diagrams below.
+  </t-b>
+
+  <h3>Background:</h3>
+  <t-b>
+    What you see here was developed as a prototype to help students with a project for CSE681 - Software Modeling and Analysis called
+    "The Document Vault".  Students were implementing a client and Server system where the server acted as a vault to store documents
+    with associated XML metadata files.  The client and server conspire to allow users to navigate through document categories and files
+    in each category.  File upload and download are supported along with queries into the text and metadata.
+    We used Windows Communication Foundation (WPF) to communicate across a network, passing messages that specified source, destination,
+    and task to be executed.
+  </t-b>
+
+  <div style="width:calc(100vw - 9rem);"><div id="fig1"></div></div>
+  <!--<div class="right photo" style="margin: 10px; padding: 10px; margin-top: 20px;">
+    <img name="Comms" width="620" onmouseover="Comms.width='620'" onmouseout="Comms.width='620'" src="Pictures/Communicators.png" />
+    <div class="center">Figure 1 - MPC with Active Communicators Concept</div>
+  </div>-->
+
+  <h3>The Core Idea:</h3>
+  <t-b>
+    Messages are passed between active Communicators - a form of active object - as shown in Figure&nbsp;1.  Each Communicator has a blocking queue and child thread that processes messages from
+    its queue and posts messages to other Communicators.
+  </t-b>
+
+  <h4>Active Communicators and Dispatchers</h4>
+  <t-b>
+    An active communicator derives from an AbstractCommunicator class that holds a thread-safe blocking queue and an instance of a thread.
+    When messages arrive the child thread awakes and processes the incoming message.  Each concrete Communicator defines message processing
+    according to its mission.  It then may send back a reply or request additional processing by another Communicator.
+  </t-b>
+  <t-b>
+    Message routing is based on endpoint and Communicator name, as shown in Figure&nbsp;2.  It is the responsibility of a MessageDispatcher, derived from AbstractMessageDispatcher,
+    to route message according to the message's TargetUrl and TargetCommunicator name.  The dispatcher knows about local Communicators that have registered
+    their name and reference.  Unknow destinations go to the Sender Communicator.  Sender's look at the TargetUrl and connect when needed.
+  </t-b>
+  <t-b>
+    Each communicator registers with the dispatcher at startup.  All messages from the communication channel are posted by the Receiver to the
+    dispatcher for routing to their target destinations.  Senders and Receivers encapsulate channel processing so the Client and Server
+    developers don't have to deal with those details.
+  </t-b>
+
+  <div style="width:calc(100vw - 9rem);"><div id="fig2"></div></div>
+  <!--<div class="right clear photo" style="margin: 10px; padding: 10px;">
+    <img name="CommObjs" width="620" onmouseover="CommObjs.width='620'" onmouseout="CommObjs.width='620'" src="Pictures/CommObjs.png" />
+    <div class="center">Figure 2 - Document Vault Demo using Message Dispatching in the Server</div>
+  </div>-->
+
+  <h3>Design:</h3>
+  <t-b>
+    In this design each endpoint has both a sender and receiver that encapsulate the communication channel proxy and stub.
+    The sender is a communicator dedicated to sending messages over the
+    communication channel.  Receivers are thin wrappers around a concrete MessageDispatcher.  This structure allows users of the
+    channel to ignore all its internal details.  Clients and Servers simply post messages to senders and register communicators with
+    a receiver.
+  </t-b>
+  <t-b>
+    Communicators pass each other messages by posting to the target's message queue.  But this isn't done directly.
+    Instead, we use a dispatching mediator, as shown in Figure&nbsp;2.  This allows the server functionality to be extended by plugging in
+    a new communicator.  We simply create the code for a new communicator, register it with the VaultDispatcher, and clients can immediately
+    start to use the new capability.  It's a very flexible configuration that makes it easy to build client and server functionality incrementally and to
+    maintain the software after it's been deployed.
+  </t-b>
+  <t-b>
+    For this project we want the clients and server to each be able to send and receive messages.  Each client passes requests to the server and
+    the server will work off all requests pending from possibly multiple concurrent clients by dispatching them to the target communicator named in the
+    message.  That means that the server supports concurrent processing for its clients and will respond with results when ready.
+  </t-b>
+  <t-b>
+    When a communicator has completed its processing task it may swap source and destination markup in the message and post to the dispatcher's queue to
+    return to the appropriate endpoint.  Alternately it may name another server-side communicator for additional processing.
+    If the target specified in a message sent to the dispatcher is not registered with the dispatcher the dispatcher posts it to the sender
+    to go back to the appropriate client.  The sender inspects the message destination and connects to that endpoint for delivery.
+  </t-b>
+  <t-b>
+    If we configure our endpoints to have both sending and receiving capbility, then notification requires no additional infrastructure.  Notifications
+    are just another kind of message we send using the existing channel facilities.
+  </t-b>
+  <t-b>
+    While we have very little Client processing in this demo the Client's Receiver contains a MessageDispatcher so we can add additional
+    functionality to the client in increments without causing any breakage in the rest of its code; this due to the plug-in nature of the design.
+  </t-b>
+
+  <div style="width:calc(100vw - 9rem);"><div id="fig3"></div></div>
+  <!--<div class="right clear photo" style="margin:10px; padding: 10px;">
+    <img name="Activ" width="620" onmouseover="Activ.width='620'" onmouseout="Activ.width='620'" src="Pictures/CommunicatorActivities.png" />
+    <div class="center">Figure 3 - Client and Server Activities</div>
+  </div>-->
+
+  <h4>Client and Server Activities:</h4>
+  <t-b>
+    Figure&nbsp;3 illustrates the flow of activities during client to server transactions.  On startup the VaultClient sends a message to the DocumentVault
+    server requesting a list of its document categories, which the server interprets, processes, and returns a reply containing the category list.  The
+    Client interprets the reply and constructs a navigation view showing the document categories and waits for the user to click on a category to
+    get a list of its files.  This same flow results from each user action until the user shuts down the client.
+  </t-b>
+
+  <div style="width:calc(100vw - 9rem);"><div id="fig4"></div></div>
+  <!--<div class="right clear photo" style="margin:10px; padding: 10px;">
+    <img name="pkg" width="620" onmouseover="pkg.width='620'" onmouseout="pkg.width='620'" src="Pictures/CommunicatorPackages.png" />
+    <div class="center">Figure 4 - Client and Server Packages</div>
+  </div>-->
+
+  <h4>Client and Server Packages:</h4>
+  <t-b>
+    Figure&nbsp;4 presents the package structure of the Demo - actually, the Demo does not provide a GUI, but since this is probably the first
+    incremental improvement to make we show it in the diagram.  A finished system has essentially the same structure, only with additional Communicators
+    for additional system functionalities.  On the Client, for example, there is likely to be a communicator for each of several views for navigation,
+    query results, file handling, etc.
+  </t-b>
+  <t-b>Note that each of the Communicators is likely to have a few subservient packages, not shown, to help it carry out its assigned tasks.</t-b>
+
+  <div style="width:calc(100vw - 9rem);"><div id="fig5"></div></div>
+  <!--<div class="right clear photo">
+    <div align="right" style="margin-right:40px; margin-top:0px;">
+      Document Vault Structure&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <input type="button" value="+" onclick="incrementSize(5);" />&nbsp;
+      <input type="button" value="-" onclick="decrementSize(5);" />
+    </div>
+    <img id="5" src="Pictures/MsgPassFramework.png" width="625" />
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;Figure 5. - Document Vault Demo Logical Structure</div>
+  </div>-->
+
+  <h4>Message Handling Infrastructure:</h4>
+  <t-b>
+    Figure&nbsp;5 shows the logical design used by the demo to support communication and dispatching.  The core part is the AbstractCommunictor class
+    that holds a thread-safe blocking queue and thread as non-static members.  So each derived Communicator inherits its own instance of those parts.
+    The AbstractMessageDispatcher derives from AbstractCommunicator and holds a Dictionary with Name strings as keys and values of references to
+    Communicators. The dictionary sees these values as implementers of the IComm interface with the single method void PostMessage(Message msg).
+  </t-b>
+  <t-b>
+    This is all the machinery needed to route messages to any local Communicator by name.  Any message with name the Dispatcher doesn't recognize gets
+    sent back to its originator, using the Sender Communicator.  Note that you have to be careful that messages with names that aren't recognized on either
+    end don't circulate continuously between endpoints.
+  </t-b>
+
+  <div style="width:calc(100vw - 9rem);"><div id="fig6"></div></div>
+  <!--<div class="right clear photo">
+    <div align="right" style="margin-right:40px; margin-top:0px;">
+      Demo Output&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <input type="button" value="+" onclick="incrementSize(6);" />&nbsp;
+      <input type="button" value="-" onclick="decrementSize(6);" />
+    </div>
+    <img id="6" src="Pictures/CommunicatorOutput.png" width="625" />
+    <div>&nbsp;&nbsp;&nbsp;&nbsp;Figure 6. - Document Vault Demo Output</div>
+  </div>-->
+
+  <h3>Typical Output:</h3>
+  <t-b>
+    Demo output is presented in Figure&nbsp;6, which shows message flow from the client to server and replies coming back.  If you look closely at the output
+    you will see the message structure used by the demo.  Note that it is easy to change the message content structure without breaking any of the message
+    handling.  All you have to do is preserve the source and destination information you see in the message content display.
+  </t-b>
+  <h3>Source Code:</h3>
+  <t-b>
+    This Message-Passing Demo is written in C# using Visual Studio 2012 and compiles and runs using Visual Studio 2013 as well.
+    The CSE687 - Object Oriented Design class, Spring 2014, will implement something like this in C++ to do experiments with server performance.
+  </t-b>
+
+  <t-b>
+    <div class="indent" style="margin:10px;"><a href="../CoreTechnologies/CSharp/Code/MessagePassingDemo">Message-Passing Demo Code</a></div>
+    This code bears a copyright &copy; that grants all rights to users except the right to publish and requires retention of the copyright notice.
+  </t-b>
+  <h3>Conclusions:</h3>
+  <t-b>
+    The Message-Passing Demo was used in Fall 2013 by many of the 117 students in CSE681 - Software Modeling and Analysis as the basis for their Project #4 - Document Vault
+    implementation.  The demo was quite straight forward to implement using an existing blocking queue and the .Net Thread class.  That took one day to rough in
+    and another couple of days to polish before posting for the class to use.
+  </t-b>
+  <div style="height:20px; clear:both"></div>
+  <div class="footnote">
+    <hr />
+    <ol>
+      <li>
+        The reusability argument for message-passing systems is not as strong as it might appear here.  RPC systems can be designed to be relatively easy to
+        reuse.
+        <p />
+        Microsoft's Windows Communication Foundation (WCF) provides great configurability of transport mechanisms and remote object activation.  A company
+        can decide on the transport and endpoint model it wants to support for its products with an XML configuration file.  Then each new project defines the
+        communication service with an annotated ServiceContract and DataContracts, implemented with ordinary C# classes, usually in a very small amount of code.
+        <p />
+        Another example is the Adaptive Communication Environment (<a href="http://www.cs.wustl.edu/~schmidt/ACE.html">ACE</a>), developed by Douglas Schmidt and his students. i've only perused the ace documentation,
+        so i can't speak authoritatively about ace, but note that it is a widely used framework for building communication middleware.
+        <p />
+        The primary reason for using something like the mediated Active Communiators, discussed above, is that, unlike WCF - a Windows only technology,
+        it is easily made cross platform by writing in C++ or Java.  ACE, on the otherhand, is cross platform, but requires a substantial investment in learning,
+        acquiring, setting up, and maintaining the communication infrastructure.  Active Communicators are simple, implemented in a small set of packages.
+      </li>
+    </ol>
+  </div>
+  <p>
+    <img class="photo" src="Pictures/quad2Strip.jpg" alt="Newhouse" style="width:100%;" />
+  </p>
+  <info-bar></info-bar>
+  <script>
+    createSizer("Pictures/Communicators.png", "Fig 1. MPC with Active Communicators", 400, "fig1");
+    createSizer("Pictures/CommObjs.png", "Fig 2. Document Vault using Message Dispatching in Server", 500, "fig2");
+    createSizer("Pictures/CommunicatorActivities.png", "Fig 3. Client and Server Activities", 400, "fig3");
+    createSizer("Pictures/CommunicatorPackages.png", "Fig 4. Client and Server Packages", 400, "fig4");
+    createSizer("Pictures/MsgPassFramework.png", "Fig 5. Document Vault Demo Logical Structure", 400, "fig5");
+    createSizer("Pictures/CommunicatorOutput.png", "Fig 6. Document Vault Demo Output", 400, "fig6");
+  </script>
+</body>
+</html>

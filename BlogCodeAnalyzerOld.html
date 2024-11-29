@@ -1,0 +1,442 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <!--
+   - BlogCodeAnalyzer.htm - Code Artist Thoughts
+   - ver 1.0 - 02 September 2016
+   - Jim Fawcett, Syracuse University
+  -->
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta name="description" content="Software Engineering course notes. Code Samples. Software Links" />
+  <meta name="keywords" content="Lecture, Notes, Code, Syracuse,University" />
+  <meta name="Author" content="Jim Fawcett" />
+  <meta name="Author" content="James Fawcett" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <title>Blog.CodeAnalyzer</title>
+  <script src="js/ScriptsUtilities.js"></script>
+  <script src="js/ScriptsTemplate.js"></script>
+  <script src="js/ScriptsKeyboard.js"></script>
+  <script src="js/ScriptsMenu.js"></script>
+  <script src="js/ScriptsSizerComp.js"></script>
+  <link rel="stylesheet" href="css/StylesSizerComp.css" />
+  <link rel="stylesheet" href="css/StylesTemplate.css" />
+  <link rel="stylesheet" href="css/StylesDefault.css" />
+  <link rel="stylesheet" href="css/StylesMenu.css" />
+  <link rel="stylesheet" href="css/StylesBrownTheme.css" />
+  <style>
+    .itemHeading {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      font-size: 1.1em;
+      font-weight: 500;
+    }
+  </style>
+  <style>
+    #github header {
+      margin-left: 0px;
+      margin-right: 0px;
+    }
+
+    #github #pagetitle {
+      background-color: #e3dac9;
+      color: #800020;
+      border: 1px solid maroon;
+    }
+
+    #github #title {
+      background-color: #e3dac9;
+      color: #3f000f;
+    }
+  </style>
+</head>
+<body id="github" onload="initializeMenu()">
+
+  <navKeys-Container>
+    <nav-Key id="sKey" onclick="toggleSwipeEvents()">S</nav-Key>
+    <nav-Key id="rKey" onclick="location.reload()">R</nav-Key>
+    <nav-Key id="tKey" onclick="scrollPageTop()">T</nav-Key>
+    <nav-Key id="bKey" onclick="scrollPageBottom()">B</nav-Key>
+    <nav-Key id="hKey" onclick="helpWin()">H</nav-Key>
+    <nav-Key id="pKey" onclick="loadPrev()">P</nav-Key>
+    <nav-Key id="nKey" onclick="loadNext()">N</nav-Key>
+  </navKeys-Container>
+
+  <nav>
+    <div id="navbar"></div>
+  </nav>
+  <a id="Next" href="BlogMTree.html">N</a>
+  <a id="Prev" href="BlogParser.html">P</a>
+
+  <header>
+    <hgroup id="pagetitle">
+      <h1 id="title">Code Artistry - Code Analyzer</h1>
+    </hgroup>
+  </header>
+
+  <!-- page content -->
+  <h3>Initial Thoughts:</h3>
+  <t-b>
+    Code analysis is an interesting topic that takes us into many of the areas covered by our course sequence, especially
+    <a href="CSE681.htm">CSE681 - Software Modeling and Analysis</a>, <a href="CSE687.htm">CSE687 - Object Oriented Design</a>
+    and <a href="CSE776.htm">CSE776 - Design Patterns</a>.  Before reading this blog you may wish to review the
+    <a href="BlogParser.htm">Code Parsing Blog</a>, as parsing is the most important and complex activity for the Analyzer.
+    I'll assume that you are familiar with that material and not repeat those discussions here.
+  </t-b>
+  <t-b>
+    The <strong>Mission</strong> of the analyzer is to compute size and complexity metrics for all the source code files
+    residing in the directory tree rooted at a specified path.  It can also show you the Abstract Syntax Tree (AST) it built
+    to hold the analysis results, and show the files analyzed with their line counts.  Another goal of this design is
+    to provide a structure that can easily be extended to other kinds of analysis, e.g., finding dependencies between all files
+    in the working set, or identifying some of the flaws in a design.
+  </t-b>
+  <t-b>
+    The design and implementation come in two parts.  The first part is a console application written in C++, using some
+    of the features of the latest C++11 standard.  It takes all of its inputs from its command line and writes its output
+    to the console and also, if that option is chosen, to a log file deposited at the root of the analysis path.  This
+    first part implements the entire analysis functionality of the Analyzer.
+  </t-b>
+  <t-b>
+    The second part is a Graphical User Interface, written in the managed .Net language C++/CLI, and uses the
+    Windows Presentation Foundation (WPF) framework<sup>1</sup>.  The purpose of the GUI is to support easily browsing to the
+    root directory for analysis and to collect user settings.  The path and settings it builds into a command line and then
+    starts the Analyzer console application process with that.
+  </t-b>
+  <t-b>
+    The implementation was divided into these two parts because browsing for a starting path is much easier with a GUI using
+    an OpenFileDialog<sup>2</sup> than from the command line with a lot of CDing to navigate.  However, a console is a better place to
+    send a lot of information which needs space and flexibility to convey a lot of resulting information.
+  </t-b>
+  <t-b>
+    In this discussion we look at the package structure of the analyzer, its activities, and the output it generates.  At the
+    end we will draw some conclusions about what makes this design interesting and areas for improvement.
+  </t-b>
+  <ol>
+    <li>
+      <h3 style="margin-top:15px;">Packages:</h3>
+      <div style="width:calc(100vw - 9rem)"><div id="fig1"></div></div>
+
+      The Code Analyzer package structure is shown in the figure at the right.  The packages focus on three areas:
+      <ul>
+        <li>
+          <div class="itemHeading">Building a List of Source Code Files:</div>
+          <div class="itemContent">
+            The Window package is used to identify the root directory for the analysis and to pick file patterns for the language
+            we want to analyze, e.g., *.h, *.cpp, or *.cs.
+            <br /><br />
+            FileMgr package constructs a list of fully qualified file names that match specifications provided by the window
+            package.  It uses FileSystem package to query the file system to find child directories and files<sup>3</sup>
+            using operating system APIs (we have implementations for both Windows and Linux).  It does its work by
+            recursively calling its search function with the root and then discovered child directories.
+          </div>
+        </li>
+        <li>
+          <div class="itemHeading">Parsing each Source Code File:</div>
+          <div class="itemContent">
+            The Parser package is responsible for analyzing a source file based on rules defined in the ActionsAndRules package.
+            Parser collects its input from the scanner packages Tokenizer and SemiExp.  That results in a list of tokens that has
+            just enough information to make a decision about grammatical constructs without having to save left over information for the
+            next round.  What that last sentence means is that the token sequence has just enough tokens to search for matches in the rule
+            collection.
+            <br /><br />
+            When a rule matches it invokes its actions.  It is the actions that build the Abstract Syntax Tree (AST), using help from the
+            Scope Stack.  That process continues until all of the files have been analyzed.
+            <br /><br />
+            The AbstrSynTree and ScopeStack packages provide all the mechanics for building the AST.  The AST serves as a container for all
+            information that results from parsing all the selected files.
+          </div>
+        </li>
+        <li>
+          <div class="itemHeading">Displaying Results:</div>
+          <div class="itemContent">
+            Each of the displays is build by the Display package from information contained in the AST.  This package provides functionality
+            to build:
+            <ul>
+              <li>
+                Metrics Display which shows, for each function, size in line count and complexity as measured by the number of descendent scopes
+                in the function.
+              </li>
+              <li>Abstract Syntax Tree visualization, an indented list of all the nodes in the AST.</li>
+              <li>SLOC list, showing each file and its source line count.</li>
+            </ul>
+
+            The logger package is used by display to write to the console and to a log file.  It has three different kinds of output,
+            using three different specialized loggers:
+            <ul>
+              <li>Results mode - used to show normal output</li>
+              <li>
+                Demonstration mode - used to help users understand how the program works, mostly by looking at rule firings and
+                the resulting actions
+              </li>
+              <li>
+                Debug mode - used to look at parsing details to help make the parsing detections and actions correct.
+              </li>
+            </ul>
+            Analyzser code has statements for each of these three specialized loggers.  The user just turns them on and off to
+            see the various types of output.  That is done with checkboxes in the GUI Display Mode tab.
+          </div>
+        </li>
+      </ul>
+      <!--<div style="clear:both"></div>-->
+    </li>
+    <li>
+      <h3 style="margin-top:0px;">Activities:</h3>
+      <div style="width:calc(100vw - 9rem)"><div id="fig2"></div></div>
+
+      Activities are separated, in the activities diagram at the right, into two rows.  The top row shows GUI activities and the bottom
+      shows the Analyzer activities.
+      <ul>
+        <li>
+          <div class="itemHeading">GUI Window Activities:</div>
+          Start sequentially, but may enter a loop where the user makes settings, runs the anlyzer and looks at the
+          analysis output.  Then the user may select new settings, a new path for example, and runs the analyzer again.
+          <ul>
+            <li>
+              <div class="itemHeading">Create Views:</div>
+              <div class="itemContent">
+                This first activity builds the views programmatically<sup>4</sup>.  There are three: Execution, Setup, and Display Mode views.
+                Each view provides the contents for one of the GUI window tabs.
+              </div>
+            </li>
+            <li>
+              <div class="itemHeading">Retrieve User Settings:</div>
+              <div class="itemContent">
+                This activity reads a text file with the last set of user settings and populates controls on the window accordingly,
+                e.g., checking checkboxes and writing paths into textboxes.
+              </div>
+            </li>
+            <li>
+              <div class="itemHeading">Respond to User Actions:</div>
+              <div class="itemContent">
+                Here, the GUI responds, via its event handler functions, to button clicks and changes in checkboxes and text in textboxes.
+                For example, clicking on checkboxes or changing text in a textbox changes the member data of the Window class.
+              </div>
+            </li>
+            <li>
+              <div class="itemHeading">Create CodeAnalyzer Command Line:</div>
+              <div class="itemContent">
+                A string that represents the console application's command line is built using Window member data that was
+                determined by extracting information from check boxes and textboxes in the previous activity.
+              </div>
+            </li>
+            <li>
+              <div class="itemHeading">Start CodeAnalyzer Process:</div>
+              <div class="itemContent">
+                In response to a &quot;Start Analysis&quot; button click the button's event handler prepares information to start the
+                console application analyzer, passing it the command line prepared by the previous activity.
+              </div>
+            </li>
+            <li>
+              <div class="itemHeading">Save User Settings:</div>
+              <div class="itemContent">
+                At the end of an analysis the user settings are saved to a text file located in the same directory as the GUI and Analyzer
+                execution images.  At this point the GUI is idle until the user either clicks the kill button to terminate or makes
+                changes to the settings to run another analysis.
+              </div>
+            </li>
+          </ul>
+          <br />
+        </li>
+        <li>
+          <strong>Code Analyzer activities</strong> are all sequential in the large, although there are many internal loops, not shown here,
+          that run during file analysis and parsing.
+          <ul>
+            <li>
+              <div class="itemHeading">Process Command Line:</div>
+              <div class="itemContent">
+                The CodeAnalyzer starts by processing its command line.  That may result in immediate termination if needed settings
+                have been omitted.  That won't happen when using the GUI, but might when users run the CodeAnalyzer from a command line.
+                That hasn't been shown in the diagram because we show the GUI driven activities.
+                If the command line has all the needed information, processing moves to the next activity.
+              </div>
+            </li>
+            <li>
+              <div class="itemHeading">Find Source Code Files:</div>
+              <div class="itemContent">
+                The CodeAnalyzer executive passes the path and file patterns to the FileMgr package for this activity.  That results
+                in a recursive descent through the directory tree rooted at the specfied path, looking for all the files that match
+                the given patterns.  That information flows into the next activity.
+              </div>
+            </li>
+            <li>
+              <div class="itemHeading">Parse Source Code:</div>
+              <div class="itemContent">
+                For each file in the file list the parser collects SemiExps and passes them to each of its rules until a match
+                occurs.  The match results in calls into the AbstrSynTree package to add another node to the AST or add information
+                to an existing node on the top of the Scope Stack.
+              </div>
+            </li>
+            <li>
+              <div class="itemHeading">Build AST &amp; Record Lines:</div>
+              <div class="itemContent">
+                The loop between &quot;Parse Source Code&quot; and &quot;Build AST &amp; Record Lines&quot; is traversed for each
+                rule detection.  This looping continues from the start of the first file analysis to the end of the last.
+                If the rule is for the beginning of a scope, a new node is pushed onto the Scope Stack.  If the rule matches
+                an end of scope event then the node is popped off the stack.  For all other rules information in the node at the
+                top of the stack is modified.
+              </div>
+            </li>
+            <li>
+              <div class="itemHeading">Complexity Analysis:</div>
+              <div class="itemContent">
+                When we get to this activity all the AST nodes have been added to the tree.  Complexity Analysis just walks the AST and for each
+                namespace, class, struct, or function node, records the number of descendent scope nodes.  That, of course,
+                has to happen just before we pop back to a parent node during the tree walk, at which time we record the
+                complexity information in the current node. When we leave this activity all of the analysis information has been
+                stored in the tree.
+              </div>
+            </li>
+            <li>
+              <div class="itemHeading">Display Metrics:</div>
+              <div class="itemContent">
+                The Display package gathers Metric information by walking the AST, collecting node name, type, starting line, line count, and complexity.
+                That is then formatted into a table and written out using the logger.
+                <br /><br />
+                Actions store data declarations encountered in some scope in the AST node for that scope.  They keep track of whether the data
+                has public, protected, or private access specified.  That information is stored along with the data declaration in the AST node
+                for that scope.  This information is shown in the metrics display and also used in the last activity of the CodeAnalyzer
+                before termination.
+              </div>
+            </li>
+            <li>
+              <div class="itemHeading">Display SLOCs:</div>
+              <div class="itemContent">
+                While building the AST actions store size information in a table with filename keys.  That is enumerated by the Display package
+                to provide this display.
+              </div>
+            </li>
+            <li>
+              <div class="itemHeading">Display AST:</div>
+              <div class="itemContent">
+                This display is generated by the Display package by walking the AST tree, extracting information, and displaying with
+                an indentation that is proportional to the depth of the current node in the tree.
+              </div>
+            </li>
+            <li>
+              <div class="itemHeading">Display Metrics Summary:</div>
+              <div class="itemContent">
+                This activity is very similar to the Metrics display processing except that the only information displayed is that which
+                exceeds limits for function size and complexity.  Also shown are all of the public data defined anywhere in the AST.
+              </div>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <!--<div style="clear:both"></div>-->
+    </li>
+    <li>
+      <h3 style="margin-top:0px;">Output:</h3>
+      <div style="width:calc(100vw - 9rem)"><div id="fig3"></div></div>
+
+      You see, in the figure at the right, a typical output for VisualCodeAnalyzer execution.  The user has selected both C++ and C# file analysis,
+      browsed to the root folder of the CodeAnalyser Solution, selected metric display, and started the CodeAnalyzer.  The command line paramters
+      for the console application are shown at the top of the display, along with the date and time of execution.
+      <br /><br />
+      It is convenient to have the controls and output in separate windows.  We can look at the console output, decide to change some execution
+      parameters, do that in the GUI window while still observing the output, and run again.  One other point - one way communication from the GUI
+      application to the console is a lot eaiser to set up and manage than two way communcation between the executing code and GUI displays.
+      <br /><br />
+      Notice that public data is shown in the console window just below the class or struct that owns that data, and the display also localizes
+      it to a particular package.  In this application the public data are members of a couple of structs that are strictly private
+      to the implementation.  They are never returned from functions that another code author might have to deal with.  I treat public data
+      from classes, and any construct that other code has to use, as an error of design. I do not do that for data held in private structs.
+      <div style="clear:both"></div>
+    </li>
+  </ol>
+  <p></p>
+  <h3>Summary - The Good, The Bad, and the Ugly<sup>5</sup>:</h3>
+  <div class="indent">
+    <h4>Here are things I like about this design:</h4>
+    <ol>
+      <li>
+        <strong>The combination of GUI and Console Application</strong>.  GUI for browsing and setting parameters combined with a
+        console analysis application for execution of the analysis is simple, works well, and is very usable.
+      </li>
+      <li>
+        <strong>The structure is fairly simple</strong> for processing as complex as code analysis.  We've built something close to a compiler front end.
+        It is of course simpler, because we need to recognize only a small part of the C++ and C# languages.  It's also surprising how
+        much code is common for the analysis of both C++ and C# code.
+      </li>
+      <li>
+        <strong>The individual parts are all recognizable by name</strong> and function and they <strongs>distribute the program's complexity</strongs>
+        fairly uniformily among themselves.
+      </li>
+      <li>
+        <strong>Not much Need to Change:</strong><br />
+        The structure is such that other applications like dependency analysis will keep almost all the packages intact, only modifying
+        a few, like Window, ActionsAndRules, and Display, and those modifications will be small.  Almost all the other of the fifteen
+        packages will not need to change.
+      </li>
+    </ol>
+
+    <h4>Here are things I don't like about the design:</h4>
+    <ol>
+      <li>
+        <strong>Processing is not concurrent.</strong><br />
+        Analysis of each file is independent of that for every other file.  The only thing that is shared is use of the Astract Syntax tree
+        and scope stack.
+        <ul>
+          <li>
+            That means that we could make the expensive parsing part concurrent, provided that we let each analyzer thread have its own Abstract
+            Syntax Tree and Scope Stack.  We just run each file's analysis on a thread pool thread.
+          </li>
+          <li>
+            That means that we have to build mechanics to merge the ASTs for each file, but that is close to trivial to accomplish.
+          </li>
+          <li>
+            We would also have to construct a parser for each file because the parser is welded to its scanner data source and that
+            could work only on a single file at a time.  It turns out that is also easy to do.  In fact some of my parser demos do just that.
+          </li>
+        </ul>
+        So making this application concurrent should be relatively easy to do.  I just haven't done that yet.
+      </li>
+      <li>
+        <strong>It's incomplete.</strong><br />
+        I haven't gotten around to trying on Java code.  I expect that since it works on C# it's very likely to need next to no changes
+        for Java.
+      </li>
+    </ol>
+
+    <h4>Here are the ugly parts:</h4>
+    <ol>
+      <li>
+        Well, I really can't think of anything I think is ugly about this design!
+      </li>
+    </ol>
+  </div>
+  <div style="height:30px;"></div>
+  <hr />
+  <ol>
+    <li>
+      The C++/CLI compiler tool chain does not have a Xaml processor so all of the WPF functionality needs to be implemented
+      with code - no declarative implementation.
+    </li>
+    <li>
+      You might thing we would use a FolderBrowserDialog for selecting directories.  I did not for two reasons.
+      The first is that the FolderBrowserDialog control doesn't work very well.  It does not scroll down to the
+      selected path when you open it.  You have to manually scroll and that gets to be a pain.
+      The second reason is that sometimes we want to select specific files to process, not all those matching a
+      pattern.  For that you need the OpenFileDialog.
+    </li>
+    <li>
+      C++ surprisingly does not have a directory manipulation library, so I wrote one a couple of years ago
+      and use that here.
+    </li>
+    <li>
+      We build views programmatically because we can't do that declaratively with C++/CLI.  See footnote 1.
+    </li>
+    <li>
+      Thanks Clint!  Great movie.
+    </li>
+  </ol>
+
+  <p>
+    <img class="photo" src="Pictures/campusStrip.jpg" alt="Newhouse" style="width:100%;" />
+  </p>
+  <info-bar></info-bar>
+  <script>
+    createSizer("Pictures/CodeAnalyzerPackages.JPG", "Fig 1. Code Analyzer Packages", 400, "fig1");
+    createSizer("Pictures/CodeAnalyzerActivities.JPG", "Fig 2. Code Analyzer Activities", 400, "fig2");
+    createSizer("Pictures/CodeAnalyzerOutput.JPG", "Fig 3. Code Analyzer Output", 600, "fig3");
+  </script>
+</body>
+</html>
