@@ -197,6 +197,7 @@ function initializeMenu() {
     return;
   }
   topMenu.innerHTML = "<div style='position: relative; width:100%;' class='navbar'>\
+    <div class='menuItem' style='width:2em;'></div>\
     <div class='menuItem'><a id='site' target='_parent' href='index.html'>Site</a></div>\
     <div class='menuItem'>\
       Blogs&#9662\
@@ -231,6 +232,23 @@ function initializeMenu() {
           <div class='ddItem'><a href='BlogGraph.html'>Directed&nbsp;Graphs</a></div>\
           <div class='ddItem'><a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a></div>\
           <div class='ddItem'><a href='Blog_Prototype.html'>Blog Prototype</a></div>\
+          <div style='height:1em;'>&nbsp;</div>\
+      </div>\
+    </div>\
+    <div class='menuItem'>\
+      Help&#9662\
+      <div class='dropdown'>\
+          <div class='ddLabel darkItem'>Code&nbsp;Help&nbsp;</div>\
+          <div class='ddItem'><a target='_blank' href='Help_VSCode.html'>VS&nbsp;Code</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_Cargo.html'>Cargo</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_Cmake.html'>CMake&nbsp;&nbsp;</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_Dotnet.html'>dotnet&nbsp;&nbsp;</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_Git.html'>Git</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_Github.html'>Github</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_PowerShell.html'>PowerShell</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_RegEx.html'>RegEx</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_ChatGPT.html'>ChatGPT</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help.html'>Site&nbsp;Navigation&nbsp;&nbsp;</a></div>\
           <div style='height:1em;'>&nbsp;</div>\
       </div>\
     </div>\
