@@ -424,7 +424,7 @@ function initializeMenu() {
     <div class='menuItem'>\
         Pages&#9662\
         <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Site&nbsp;thread</div>\
+          <div class='ddLabel darkItem'>Help&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
             <div class='ddItem'><a href='Help_VSCode.html'>VSCode</a></div>\
             <div class='ddItem'><a href='Help_Cargo.html'>Cargo</a></div>\
