@@ -395,16 +395,16 @@ function initializeMenu() {
       Help&#9662\
       <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code&nbsp;Help&nbsp;</div>\
-          <div class='ddItem'><a target='_blank' href='../../Help_VSCode.html'>VS&nbsp;Code</a></div>\
-          <div class='ddItem'><a target='_blank' href='../../Help_Cargo.html'>Cargo</a></div>\
-          <div class='ddItem'><a target='_blank' href='../../Help_Cmake.html'>CMake&nbsp;&nbsp;</a></div>\
-          <div class='ddItem'><a target='_blank' href='../../Help_Dotnet.html'>dotnet&nbsp;&nbsp;</a></div>\
-          <div class='ddItem'><a target='_blank' href='../../Help_Git.html'>Git</a></div>\
-          <div class='ddItem'><a target='_blank' href='../../Help_Github.html'>Github</a></div>\
-          <div class='ddItem'><a target='_blank' href='../../Help_PowerShell.html'>PowerShell</a></div>\
-          <div class='ddItem'><a target='_blank' href='../../Help_RegEx.html'>RegEx</a></div>\
-          <div class='ddItem'><a target='_blank' href='../../Help_ChatGPT.html'>ChatGPT</a></div>\
-          <div class='ddItem'><a target='_blank' href='../../Help.html'>Site&nbsp;Navigation&nbsp;&nbsp;</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_VSCode.html'>VS&nbsp;Code</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_Cargo.html'>Cargo</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_Cmake.html'>CMake&nbsp;&nbsp;</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_Dotnet.html'>dotnet&nbsp;&nbsp;</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_Git.html'>Git</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_Github.html'>Github</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_PowerShell.html'>PowerShell</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_RegEx.html'>RegEx</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help_ChatGPT.html'>ChatGPT</a></div>\
+          <div class='ddItem'><a target='_blank' href='Help.html'>Site&nbsp;Navigation&nbsp;&nbsp;</a></div>\
           <div style='height:1em;'>&nbsp;</div>\
       </div>\
     </div>\
