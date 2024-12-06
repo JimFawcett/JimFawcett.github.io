@@ -427,7 +427,7 @@ function initializeMenu() {
             <div class='ddItem'><a target='_parent' href='TOCBits.html?src=BitsRepo.html'>Bits&nbsp;Repo</a></div>\
             <div class='ddItem'><a href='Resources/Bits/Bits_Intro.html'>Introduction</a></div>\
             <div class='ddItem'><a href='Resources/Bits/Bits_Tooling.html'>Tooling</a></div>\
-            <div class='ddItem'><a target='parent' href='Resources/Bits/Bits_HelloCpp.html'>Hello</a></div>\
+            <div class='ddItem'><a target='parent' href='Resources/Bits/Bits_HelloCpp.html'>Hello World</a></div>\
             <div class='ddItem'><a target='parent' href='Resources/Bits/Bits_DataCpp.html'>Data</a></div>\
             <div class='ddItem'><a target='parent' href='Resources/Bits/Bits_ObjectsCpp.html'>Objects</a></div>\
             <div class='ddItem'><a target='parent' href='Resources/Bits/Bits_GenericCpp.html'>Generics</a></div>\

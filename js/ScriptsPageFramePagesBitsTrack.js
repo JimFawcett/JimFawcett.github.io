@@ -8,7 +8,7 @@ function initializePages() {
   var pgbtn = document.getElementById("pgbtn");
   if (isDefined(pagesMenu)) {
     pgbtn.style.display = "flex";
-    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='bottomMenu.pages()'>Pages</div>\
+    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='bottomMenu.pages()'>C++ Thread</div>\
           <menu-elem class='ddItems pageElem undefined'><a href='CppBiteByByte.html'>Cpp&nbsp;Bites&nbsp;Repo&nbsp;</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='indexCpp.html'>Cpp&nbsp;Track&nbsp;Summary</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='Resources/CppBites/CppBites_Intro.html'>Intro</a></menu-elem>\

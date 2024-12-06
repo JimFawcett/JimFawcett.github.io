@@ -8,7 +8,7 @@ function initializePages() {
   var pgbtn = document.getElementById("pgbtn");
   if (isDefined(pagesMenu)) {
     pgbtn.style.display = "flex";
-    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='bottomMenu.pages()'>Pages</div>\
+    pagesMenu.innerHTML = "<div class='darkItem popupHeader' onclick='bottomMenu.pages()'>Bits Thread</div>\
           <menu-elem class='ddItems pageElem'><a target='_parent' href='../../TOCBits.html?src=indexBits.html'>Bits Track Summary</a>&nbsp;</menu-elem >\
           <menu-elem class='ddItems pageElem'><a target='_parent' href='../../TOCBits.html?src=BitsRepo.html'>BitsRepo</a>&nbsp;</menu-elem >\
           <menu-elem class='ddItems pageElem'><a target='_parent' href='../../TOCBits.html?src=Resources/Bits/Bits_Intro.html'>Introduction</a>&nbsp;</menu-elem >\
@@ -18,7 +18,7 @@ function initializePages() {
           <menu-elem class='ddItems pageElem'><a target='_parent' href='Bits_ObjectsCpp.html'>Objects</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a target='_parent' href='Bits_GenericCpp.html'>Generics</a>&nbsp;</menu-elem>\
           <menu-elem class='ddItems pageElem'><a target='_parent' href='Bits_IterCpp.html'>Iteration</a>&nbsp;</menu-elem>\
-          <menu-elem>&nbsp;</menu-elem>\
+          <menu-elem class='ddItems pageElem undef'><a target='_parent' hrefd='Bits_LibsCpp.html'>Libraries</a>&nbsp;</menu-elem>\
           <menu-elem>&nbsp;</menu-elem>";
   }
   else {

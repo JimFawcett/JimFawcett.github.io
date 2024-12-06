@@ -9,7 +9,7 @@ function initializePages() {
   if (isDefined(pagesMenu)) {
     /*pgbtn.style.display = "flex";*/
     pagesMenu.innerHTML = "<div class='ddLabel darkItem popupHeader' onclick='bottomMenu.pages()'>&nbsp;&nbsp;&nbsp;Basic Bites Thread&nbsp;&nbsp;&nbsp;</div>\
-          <menu-elem class='ddItems pageElem'><a href='../../indexBasic.html'>Basic Track</a></menu-elem>\
+          <menu-elem class='ddItems pageElem'><a href='../../indexBasic.html'>Basic Track Summary</a></menu-elem>\
           <menu-elem class='ddItems pageElem'><a href='BasicBites_Platform.html'>Platform</a></menu-elem>\
           <menu-elem class='ddItems pageElem'>&nbsp;&nbsp;<a href='BasicBites_PlatformMemory.html'>Memory</a></menu-elem>\
           <menu-elem class='ddItems pageElem'>&nbsp;&nbsp;<a href='BasicBites_PlatformSched.html'>Scheduling</a></menu-elem>\

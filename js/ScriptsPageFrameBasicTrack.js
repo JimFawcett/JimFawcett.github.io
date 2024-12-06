@@ -246,67 +246,45 @@ function initializeMenu() {
       Resrcs&#9662\
       <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Resources</div>\
-          <div class='ddItem'><a href='Videos.html' class='menuItem'>Videos</a></div>\
-          <div class='ddItem'><a href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a></div>\
-          <div class='ddItem'><a href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a></div>\
-          <div class='ddItem'><a href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a></div>\
-          <div class='ddItem'><a href='ChatGPT.html'>ChatGPT</a></div>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-            <summary>Design</summary>\
-            <div style='margin-left:1.0em;'>\
-                <div class='ddItem ddDetails'><a href='Design.html'>Design Process</a></div>\
-                <div class='ddItem ddDetails'><a href='UML.html'>UML Diagrams</a></div>\
-                <div class='ddItem ddDetails'><a href='ProjectsList.html'>Project suggestions</a></div>\
-                <div style='height:0.25em;'></div>\
-            </div>\
-          </details>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+          <div class='ddItem'><a target='_blank' href='ChatGPT.html'>ChatGPT</a></div>\
+          <div class='ddItem'><a target='_blank' href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a></div>\
+          <div class='ddItem'><a target='_blank' href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a></div>\
+          <details style='margin:0.25em 0.5em; cursor:pointer;' class='ddItem'>\
             <summary>C++</summary>\
             <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a href='LangCpp.html'>C++&nbsp;Language&nbsp;Resources&nbsp;&nbsp;</a></div>\
-              <div class='ddItem ddDetails'><a href='https://en.cppreference.com/w/'>CppReference.com</a></div>\
-              <div class='ddItem ddDetails'><a href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a></div>\
-              <div class='ddItem ddDetails'><a href='CppReferences.html'>C++ References</a></div>\
-              <div class='ddItem ddDetails'><a href='CppExamples.html'>C++ Example Code</a></div>\
-              <div class='ddItem ddDetails'><a href='CppSynopsis.html'>C++ Synopsis</a></div>\
-              <div class='ddItem ddDetails'><a href='DesignNote-Cpp11.html'>C++11 Survey</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='LangCpp.html'>C++&nbsp;Language&nbsp;Resources&nbsp;&nbsp;</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='https://en.cppreference.com/w/'>CppReference.com</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md'>C++ Core Guidelines</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='CppReferences.html'>C++ References</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='CppExamples.html'>C++ Example Code</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='CppSynopsis.html'>C++ Synopsis</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='DesignNote-Cpp11.html'>C++11 Survey</a></div>\
               <div style='height:0.25em;'></div>\
             </div>\
           </details>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+          <details style='margin:0.25em 0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Rust</summary>\
             <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a href='Resources/RustBites/RustBites_CodeExamples.html'>RustBites Code Examples</a></div>\
-              <div class='ddItem ddDetails'><a href='https://github.com/JimFawcett/RustPlaygroundExamples'>RustPlaygroundExamples</a></div>\
-              <div class='ddItem ddDetails'><a href='IndexPage.html'>Rust Glossary</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='Resources/RustBites/RustBites_CodeExamples.html'>RustBites Code Examples</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='https://github.com/JimFawcett/RustPlaygroundExamples'>RustPlaygroundExamples</a></div>\
+              <div class='ddItem ddDetails'><a target='_blank' href='IndexPage.html'>Rust Glossary</a></div>\
               <div style='height:0.25em;'></div>\
             </div>\
           </details>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+          <details style='margin:0.25em 0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Regular Expressions</summary>\
             <div style='margin-left:1.0em;'>\
-                <div class='ddItem ddDetails'><a href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a></div>\
-                <div class='ddItem ddDetails'><a href='https://dev.to/chrisachard/intro-to-regex-for-web-developers-2fj4'>RegExp&nbsp;for&nbsp;JavaScript</a></div>\
-                <div class='ddItem ddDetails'><a href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a></div>\
+                <div class='ddItem ddDetails'><a target='_blank' href='https://cs.lmu.edu/~ray/notes/regex/'>Regular Expressions</a></div>\
+                <div class='ddItem ddDetails'><a target='_blank' href='https://dev.to/chrisachard/intro-to-regex-for-web-developers-2fj4'>RegExp&nbsp;for&nbsp;JavaScript</a></div>\
+                <div class='ddItem ddDetails'><a target='_blank' href='http://cpprocks.com/files/c++11-regex-cheatsheet.pdf'>C++11 regex</a></div>\
                 <div style='height:0.25em;'></div>\
             </div>\
           </details>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-            <summary>WebDev</summary>\
-            <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a href='WebNotes.html'>Web Notes</a></div>\
-              <div class='ddItem ddDetails'><a href='WebComponentTests.html'>UI Widget Tests</a></div>\
-              <div class='ddItem ddDetails'><a href='https://encycolorpedia.com/named'>Web Colors</a></div>\
-              <div class='ddItem ddDetails'><a href='TestGrid.html'>TestGrid - Sized</a></div>\
-              <div class='ddItem ddDetails'><a href='TestGrid2.html'>TestGrid - AbsPos</a></div>\
-              <div class='ddItem ddDetails'><a href='TestFlexMenu.html'>TestFlexMenu</a></div>\
-              <div class='ddItem ddDetails'><a href='../Test/FlexMenus/TestFlexMenu.html'>TestFlexMenu - Basic</a></div>\
-              <div style='height:0.25em;'></div>\
-            </div>\
-          </details>\
-          <div class='ddItem'><a href='CommCompare.html' class='menuItem'>CommCompare:&nbsp;Rust&nbsp;&amp;&nbsp;C++</a></div>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-            <summary>Tests</summary>\
+          <div class='ddItem'><a target='_blank' href='CommCompare.html' class='menuItem'>CommCompare:&nbsp;Rust&nbsp;&amp;&nbsp;C++</a></div>\
+          <div class='ddItem'><a target='_blank' href='Interesting.html'>Interesting</a></div>\
+          <div class='ddItem'><a target='_blank' href='personalComputerSecurity.html'>Personal&nbsp;Computer&nbsp;Security&nbsp;</a></div>\
+          <details style='margin:0.25em 0.5em; cursor:pointer;' class='ddItem'>\
+            <summary>Site Widget Tests</summary>\
             <div style='margin-left:1.0em;'>\
               <div class='ddItem ddDetails'><a href='Resources/Bits/Bits_DataTest.html'>New Test Bits UI</a></div>\
               <div class='ddItem ddDetails'><a href='Resources/Bits/Bits_Hello.html'>Test Bits UI</a></div>\
@@ -323,12 +301,7 @@ function initializeMenu() {
               <div style='height:0.25em;'></div>\
             </div>\
           </details>\
-          <div class='ddItem'><a href='personalComputerSecurity.html'>Personal&nbsp;Computer&nbsp;Security&nbsp;</a></div>\
-          <div class='ddItem'><a href='Interesting.html'>Interesting</a></div>\
-          <div class='ddItem'><a href='TechnicalLinks.html'>Technical Links</a></div>\
-          <div class='ddItem'><a href='https://github.com/joshnh/Git-Commands'>git commands</a></div>\
-          <div class='ddItem'><a href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a></div>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+          <details style='margin:0.25em 0.5em; cursor:pointer;' class='ddItem'>\
             <summary>Neighborhoods</summary>\
             <div style='margin-left:1.0em;'>\
               <div class='ddItem ddDetails'><a href='https://JimFawcett.github.io'>JimFawcett-github</a></div>\
@@ -345,15 +318,47 @@ function initializeMenu() {
               <div style='height:0.25em;'></div>\
             </div>\
           </details>\
-          <div class='ddItem'><a href='SummerReading.html'>Summer Reading</a></div>\
-          <div class='ddItem'><a href='Interviews.html'>Job Interviews</a></div>\
+          <details style='margin:0.25em 0.5em; cursor:pointer;' class='ddItem'>\
+            <summary>Archive</summary>\
+            <div style='margin-left:1.0em;'>\
+              <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
+                <summary>Design</summary>\
+                <div style='margin-left:1.0em;'>\
+                    <div class='ddItem ddDetails'><a target='_blank' href='Design.html'>Design Process</a></div>\
+                    <div class='ddItem ddDetails'><a target='_blank' href='UML.html'>UML Diagrams</a></div>\
+                    <div class='ddItem ddDetails'><a target='_blank' href='ProjectsList.html'>Project suggestions</a></div>\
+                    <div style='height:0.25em;'></div>\
+                </div>\
+              </details>\
+              <details style='margin:0.25em 0.5em; cursor:pointer;' class='ddItem'>\
+                <summary>WebDev</summary>\
+                <div style='margin-left:1.0em;'>\
+                  <div class='ddItem ddDetails'><a target='_blank' href='WebNotes.html'>Web Notes</a></div>\
+                  <div class='ddItem ddDetails'><a target='_blank' href='WebComponentTests.html'>UI Widget Tests</a></div>\
+                  <div class='ddItem ddDetails'><a target='_blank' href='https://encycolorpedia.com/named'>Web Colors</a></div>\
+                  <div class='ddItem ddDetails'><a target='_blank' href='TestGrid.html'>TestGrid - Sized</a></div>\
+                  <div class='ddItem ddDetails'><a target='_blank' href='TestGrid2.html'>TestGrid - AbsPos</a></div>\
+                  <div class='ddItem ddDetails'><a target='_blank' href='TestFlexMenu.html'>TestFlexMenu</a></div>\
+                  <div class='ddItem ddDetails'><a target='_blank' href='../Test/FlexMenus/TestFlexMenu.html'>TestFlexMenu - Basic</a></div>\
+                  <div style='height:0.25em;'></div>\
+                </div>\
+              </details>\
+              <div class='ddItem'><a target='_blank' href='Videos.html' class='menuItem'>Videos</a></div>\
+              <div class='ddItem'><a target='_blank' href='Resources/PublishingSourceCode.pdf'>Site&nbsp;Presentation</a></div>\
+              <div class='ddItem'><a target='_blank' href='TechnicalLinks.html'>Technical Links</a></div>\
+              <div class='ddItem'><a target='_blank' href='https://github.com/joshnh/Git-Commands'>git commands</a></div>\
+              <div class='ddItem'><a target='_blank' href='Resources/VisualStudioHelpSlides.pdf'>Visual Studio Help Slides</a></div>\
+              <div class='ddItem'><a target='_blank' href='SummerReading.html'>Summer Reading</a></div>\
+              <div class='ddItem'><a target='_blank' href='Interviews.html'>Job Interviews</a></div>\
+            </div>\
+          </details>\
           <div style='height:2em;'></div>\
       </div>\
     </div>\
     <div class='menuItem'>\
       Blogs&#9662\
       <div class='dropdown'>\
-          <div class='ddLabel darkItem'>Opinions&nbsp;&amp;&nbsp;Ideas</div>\
+          <div class='ddLabel darkItem'>Posts:&nbsp;Opinions&nbsp;&amp;&nbsp;Ideas</div>\
           <div class='ddItem'><a href='Post_DistinguishedRust.html'>Distinguished Rust</a></div>\
           <div class='ddItem'><a href='Post_RustSafety.html'>Rust Safety</a></div>\
           <div class='ddItem'><a href='Post_RustTooling.html'>Rust Tooling</a></div>\
@@ -362,51 +367,27 @@ function initializeMenu() {
           <div class='ddItem'><a href='Post_RustOperations.html'>Rust Operations</a></div>\
           <div class='ddItem'><a href='Post_CommCompare.html'>Comm Compare</a></div>\
           <div style='height:0.25em;'></div>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-            <summary style='font-size:0.9em;'>SU Archive</summary>\
-            <div class='ddItem'><a href='Blog.html'>First&nbsp;Things</a></div>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-            <summary>Design</summary>\
-            <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a href='BlogDesign.html'>SW&nbsp;Design</a></div>\
-              <div class='ddItem ddDetails'><a href='BlogPrinciples.html'>Design&nbsp;Principles</a></div>\
-              <div class='ddItem ddDetails'><a href='BlogOOD.html'>OO&nbsp;Design</a></div>\
-              <div class='ddItem ddDetails'><a href='BlogObjectModels.html'>Object&nbsp;Models</a></div>\
-              <div class='ddItem ddDetails'><a href='BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data</a></div>\
-              <div style='height:0.5em;'></div>\
-            </div>\
-          </details>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-            <summary>Engineering SW</summary>\
-            <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a href='BlogOCD.html'>Concept&nbsp;Document</a></div>\
-              <div class='ddItem ddDetails'><a href='BlogTesting.html'>SW&nbsp;Testing</a></div>\
-              <div style='height:0.5em;'></div>\
-            </div>\
-          </details>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-            <summary>Software Systems&nbsp;&nbsp;</summary>\
-            <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a href='BlogStructure.html'>SW&nbsp;Structure</a></div>\
-              <div class='ddItem ddDetails'><a href='BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a></div>\
-              <div class='ddItem ddDetails'><a href='BlogActiveObjects.html'>Active&nbsp;Objects</a></div>\
-              <div style='height:0.5em;'></div>\
-            </div>\
-          </details>\
-          <details style='margin-left:0.5em; cursor:pointer;' class='ddItem'>\
-            <summary>Reusable Pkgs</summary>\
-            <div style='margin-left:1.0em;'>\
-              <div class='ddItem ddDetails'><a href='BlogNoSql.html'>noSQL&nbsp;Database</a></div>\
-              <div class='ddItem ddDetails'><a href='BlogParser.html'>Parsing</a></div>\
-              <div class='ddItem ddDetails'><a href='BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a></div>\
-              <div class='ddItem ddDetails'><a href='BlogMTree.html'>M-ary&nbsp;Trees</a></div>\
-              <div class='ddItem ddDetails'><a href='BlogGraph.html'>Directed&nbsp;Graphs</a></div>\
-              <div class='ddItem ddDetails'><a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a></div>\
-              <div style='height:0.5em;'></div>\
-            </div>\
-          </details>\
-          <div class='ddItem'><a href='SummerReading.html'>Summer&nbsp;Reading</a></div>\
-          </details>\
+          <div class='ddLabel darkItem'>Syracuse Univ Blogs</div>\
+          <div class='ddItem'><a href='Blog.html'>First&nbsp;Things</a></div>\
+          <div class='ddItem'><a href='BlogDesign.html'>SW&nbsp;Design</a></div>\
+          <div class='ddItem'><a href='BlogPrinciples.html'>Design&nbsp;Principles</a></div>\
+          <div class='ddItem'><a href='BlogOOD.html'>OO&nbsp;Design</a></div>\
+          <div class='ddItem'><a href='BlogObjectModels.html'>Object&nbsp;Models</a></div>\
+          <div class='ddItem'><a href='BlogGlobals.html'>Scopes&nbsp;&amp;&nbsp;Global&nbsp;Data</a></div>\
+          <div style='height:0.5em;'></div>\
+          <div class='ddItem'><a href='BlogOCD.html'>Concept&nbsp;Document</a></div>\
+          <div class='ddItem'><a href='BlogTesting.html'>SW&nbsp;Testing</a></div>\
+          <div class='ddItem'><a href='BlogStructure.html'>SW&nbsp;Structure</a></div>\
+          <div class='ddItem'><a href='BlogMessagePassingComm.html'>Msg-Passing&nbsp;Comm</a></div>\
+          <div class='ddItem'><a href='BlogActiveObjects.html'>Active&nbsp;Objects</a></div>\
+          <div style='height:0.5em;'></div>\
+          <div class='ddItem'><a href='BlogNoSql.html'>noSQL&nbsp;Database</a></div>\
+          <div class='ddItem'><a href='BlogParser.html'>Parsing</a></div>\
+          <div class='ddItem'><a href='BlogCodeAnalyzer.html'>Code&nbsp;Analyzer</a></div>\
+          <div class='ddItem'><a href='BlogMTree.html'>M-ary&nbsp;Trees</a></div>\
+          <div class='ddItem'><a href='BlogGraph.html'>Directed&nbsp;Graphs</a></div>\
+          <div class='ddItem'><a href='BlogFileSystem.html'>C++&nbsp;FileSystem</a></div>\
+          <div class='ddItem'><a href='Blog_Prototype.html'>Blog Prototype</a></div>\
           <div style='height:1em;'>&nbsp;</div>\
       </div>\
     </div>\
@@ -432,7 +413,6 @@ function initializeMenu() {
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Basic&nbsp;Track&nbsp;thread</div>\
             <div style='height:0.0em;'></div>\
-            <div class='ddItem'><a href='BasicBiteByByte.html'>Basic Track Repo</a></div>\
             <div class='ddItem'><a href='indexBasic.html'>Basic Track Summary</a></div>\
             <div class='ddItem'><a href='Resources/BasicBites/BasicBites_Platform.html'>Platform</a></div>\
             <div class='ddItem'><a href='Resources/BasicBites/BasicBites_PlatformMemory.html'>&nbsp;&nbsp;Memory</a></div>\
