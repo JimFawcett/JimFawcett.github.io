@@ -193,7 +193,7 @@ function initializeMenu() {
     <div class='menuItem'>\
         Tracks&#9662\
         <div class='dropdown'>\
-           <div class='ddLabel darkItem'>Code Tracks</div>\
+          <div class='ddLabel darkItem'>Code Tracks</div>\
           <div class='ddItem'><a target='_parent' href='../../TOCBits.html'>&nbsp;Bits</a></div>\
           <div class='ddItem'><a target='_parent' href='../../TOCCpp.html'>&nbsp;C++</a></div>\
           <div class='ddItem'><a target='_parent' href='../../TOCRust.html'>&nbsp;Rust</a></div>\
@@ -203,7 +203,7 @@ function initializeMenu() {
           <div class='ddItem'><a target='_parent' href='../../TOCDesign.html'>&nbsp;Design</a></div>\
           <div class='ddItem'><a target='_parent' href='../../TOCDeployment.html'>&nbsp;Deployment</a></div>\
           <div class='ddItem'><a target='_parent' href='../../TOCProjects.html'>&nbsp;Projects</a></div>\
-          <div class='ddItem'><a target='_parent' href='../../TOCPrototypes.html'>&nbsp;Prototypes</a></div>\
+          <div class='ddItem'><a target='_parent' href=.../../TOCPrototypes.html'>&nbsp;Prototypes</a></div>\
           <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
