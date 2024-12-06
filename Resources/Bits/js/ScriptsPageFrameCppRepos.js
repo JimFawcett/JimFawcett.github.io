@@ -65,13 +65,16 @@ function initializeMenu() {
         Tracks&#9662\
         <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Tracks</div>\
-          <div class='ddItem'><a href='indexBasic.html'>&nbsp;Basics</a>&nbsp;</div>\
-          <div class='ddItem'><a href='indexCpp.html'>&nbsp;C++</a>&nbsp;</div>\
-          <div class='ddItem'><a href='indexRust.html'>&nbsp;Rust</a>&nbsp;</div>\
-          <div class='ddItem'><a href='indexCs.html'>&nbsp;C#</a>&nbsp;</div>\
-          <div class='ddItem'><a href='indexWebDev.html'>&nbsp;WebDev</a>&nbsp;</div>\
-          <div class='ddItem'><a href='indexDesign.html'>&nbsp;Design</a>&nbsp;</div>\
-          <div class='ddItem'><a href='indexDeployment.html'>&nbsp;Deployment</a>&nbsp;</div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCBits.html'>&nbsp;Bits</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCCpp.html'>&nbsp;C++</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCRust.html'>&nbsp;Rust</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCCSharp.html'>&nbsp;C#</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCBasic.html'>&nbsp;Basics</a>&nbsp;</div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCWebDev.html'>&nbsp;WebDev</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCDesign.html'>&nbsp;Design</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCDeployment.html'>&nbsp;Deployment</a></div>\
+          <div class='ddItem'><a target='_parent' href='../../TOCProjects.html'>&nbsp;Projects</a></div>\
+          <div class='ddItem'><a target='_parent' href=.../../TOCPrototypes.html'>&nbsp;Prototypes</a></div>\
           <div style='height:2em;'>&nbsp;</div>\
         </div>\
     </div>\
