@@ -281,6 +281,7 @@ function initializeMenu() {
       <div class='dropdown'>\
           <div class='ddLabel darkItem'>Code Resources</div>\
           <div class='ddItem'><a target='_blank' href='ChatGPT.html'>ChatGPT</a></div>\
+          <div class='ddItem'><a target='_blank' href='../NewSite/Explore.html'>Test Site</a></div>\
           <div class='ddItem'><a target='_blank' href='Resources.html'>Presentations&nbsp;&amp;&nbsp;Diagrams&nbsp;&nbsp;</a></div>\
           <div class='ddItem'><a target='_blank' href='Conferences.html'>Conferences:&nbsp;videos&nbsp;&amp;&nbsp;slides&nbsp;&nbsp;</a></div>\
           <details style='margin:0.25em 0.5em; cursor:pointer;' class='ddItem'>\
