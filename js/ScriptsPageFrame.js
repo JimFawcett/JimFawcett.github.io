@@ -202,7 +202,7 @@ function initializeMenu() {
         <div class='dropdown'>\
             <div class='darkItem' style='padding:0.25em 0.5em;'>Code Workshop</div>\
             <div class='ddItem'><a href='index.html'>Home</a></div>\
-            <div class='ddItem'><a target='_parent' href='../NewSite/Explore.html'>New Site</a></div>\
+            <div class='ddItem'><a target='_parent' href='../NewSite/Site/Explore.html'>New Site</a></div>\
             <!--<div class='ddItem'><a target='_parent' href='TOC.html'>Site Explorer</a></div>-->\
             <div class='ddItem'><a onclick='loadif()'>Site Explorer</a></div>\
             <div class='ddItem'><a href='SiteMap.html'>SiteMap</a></div>\
